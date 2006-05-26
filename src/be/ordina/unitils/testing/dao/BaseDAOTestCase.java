@@ -43,12 +43,13 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
     /* Name of the properties file */
     private static final String PROPERTIES_FILE_NAME = "daotest.properties";
 
-    /* Property keys in the property file daotest.properties */
+    /* Property keys indicating if the database schema should be updated before performing the tests */
     private static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
     private static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "disableConstraints.enabled";
 
+    /* Property keys of the datasource factory classname */
     private static final String PROPKEY_DATASOURCEFACTORY_CLASSNAME = "dataSourceFactory.className";
 
     /* Property key of the implementation class of {@link ConstraintsDisabler} */
@@ -151,7 +152,7 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
     protected IDataSet getExpectedDataSet() throws Exception {
         String dataSetFileName = getExpectedDataSetFileName();
         IDataSet dataSet = loadDataSet(dataSetFileName);
-        if (dataSet != null) {
+        if (dataSet == null) {
             throw new FileNotFoundException("Unable to find test dataset with file name: " + dataSetFileName);
         }
         return dataSet;
