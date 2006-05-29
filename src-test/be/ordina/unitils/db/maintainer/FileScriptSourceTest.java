@@ -21,15 +21,21 @@ import java.util.Properties;
  */
 public class FileScriptSourceTest extends TestCase {
 
-    private static final String DBCHANGE_FILE_CLASSPATH = "be/ordina/unitils/db/maintainer/script1.sql";
+    private static final String DBCHANGE_FILE_CLASSPATH = "be/ordina/unitils/db/maintainer/001_script.sql";
 
-    private static final String DBCHANGE_FILE_FILESYSTEM = System.getProperty("java.io.tmpdir") + "script1.sql";
+    private static final String DBCHANGE_FILE_FILESYSTEM = System.getProperty("java.io.tmpdir") + "001_script.sql";
+
+    private static final String[][] scriptSourceProperties = {
+            {"dbMaintainer.fileScriptSource.dir", System.getProperty("java.io.tmpdir")},
+            {"dbMaintainer.fileScriptSource.versionNrLength", "3"},
+            {"dbMaintainer.fileScriptSource.fileExtension", "sql"}
+    };
 
     private FileScriptSource fileDBChangeSource;
 
     protected void setUp() throws Exception {
         super.setUp();
-        Properties testProperties = PropertiesUtils.loadClassProperties(this.getClass());
+        Properties testProperties = PropertiesUtils.asProperties(scriptSourceProperties);
         fileDBChangeSource = new FileScriptSource();
         fileDBChangeSource.init(testProperties);
         copyFile();
@@ -45,9 +51,8 @@ public class FileScriptSourceTest extends TestCase {
     }
 
     public void testGetNextDbChange() {
-        //todo implement test
-//        String script1contents = fileDBChangeSource.getScript(1L); // Should load script1.sql
-//        assertEquals("Contents of script 1", script1contents);
+        String script1contents = fileDBChangeSource.getScript(1L); // Should load script1.sql
+        assertEquals("Contents of script 1", script1contents);
     }
 
     public void testGetNextDbChange_noMoreChanges() {

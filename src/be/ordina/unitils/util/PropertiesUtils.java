@@ -16,17 +16,6 @@ import java.util.Properties;
 public class PropertiesUtils {
 
     /**
-     * Loads the .properties file that is located in the same directory as the given class into a <code>Properties
-     * </code> object.
-     *
-     * @param clazz
-     * @return A <code>Properties</code> object.
-     */
-    public static Properties loadClassProperties(Class clazz) {
-        return loadPropertiesFromClasspath(clazz.getName().replaceAll("\\.", "/") + ".properties");
-    }
-
-    /**
      * Loads the properties file with the given name from the classpath
      *
      * @param propertiesFileName
@@ -44,6 +33,20 @@ public class PropertiesUtils {
             throw new RuntimeException("Error while loading properties " + propertiesFileName, e);
         }
         return prop;
+    }
+
+    /**
+     * Creates a new <code>Properties</code> object, created from the given array of key-value pairs.
+     * @param keyValuePairs Array consisting of a number of arrays with each time 2 elements, the first being the key,
+     *                          the second being the value of a property
+     * @return a <code>Properties</code> object, containing the given key-value pairs as properties.
+     */
+    public static Properties asProperties(String[][] keyValuePairs) {
+        Properties result = new Properties();
+        for (String[] keyValuePair : keyValuePairs) {
+            result.put(keyValuePair[0], keyValuePair[1]);
+        }
+        return result;
     }
 
     /**

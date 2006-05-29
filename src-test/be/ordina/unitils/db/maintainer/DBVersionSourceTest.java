@@ -21,6 +21,11 @@ import java.util.Properties;
  */
 public class DBVersionSourceTest extends BaseDAOTestCase {
 
+    private static final String[][] dbVersionSourceProperties = {
+            {"dbMaintainer.dbVersionSource.tableName", "db_version"},
+            {"dbMaintainer.dbVersionSource.columnName", "version"}
+    };
+
     /**
      * The tested instance
      */
@@ -33,7 +38,7 @@ public class DBVersionSourceTest extends BaseDAOTestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        Properties properties = PropertiesUtils.loadClassProperties(this.getClass());
+        Properties properties = PropertiesUtils.asProperties(dbVersionSourceProperties);
         dbVersionSource = new DBVersionSource();
         dbVersionSource.init(properties, getDataSource());
     }
