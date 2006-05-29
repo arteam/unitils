@@ -8,10 +8,13 @@ package be.ordina.unitils.db.maintainer.script;
 
 import be.ordina.unitils.util.PropertiesUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FilenameFilter;
 import java.util.Properties;
+import java.util.List;
 
 /**
  * Implementation of <code>ScriptSource</code> that reads script files from the filesystem. The directory, the
@@ -25,14 +28,14 @@ public class FileScriptSource implements ScriptSource {
     private static final String PROPKEY_SCRIPTFILES_DIR = "dbMaintainer.fileScriptSource.dir";
 
     /**
-     * Property key for the start of the filenames that contain the scripts
-     */
-    private static final String PROPKEY_SCRIPTFILES_FILENAMESTART = "dbMaintainer.fileScriptSource.fileNameStart";
-
-    /**
      * Property key for the extension of the script files
      */
     private static final String PROPKEY_SCRIPTFILES_FILEEXTENSION = "dbMaintainer.fileScriptSource.fileExtension";
+
+    /**
+     * Property key for the length of the version nr
+     */
+    private static final String PROPKEY_SCRIPTFILES_VERSIONNRLENGTH = "dbMaintainer.fileScriptSource.versionNrLength";
 
     /**
      * The directory in which the script files are located
@@ -40,9 +43,9 @@ public class FileScriptSource implements ScriptSource {
     private String updateFilesDir;
 
     /**
-     * The start of the filenames that contain the scripts
+     * The length of the version nr in the filenames of the scripts
      */
-    private String fileNameStart;
+    private int versionNrLength;
 
     /**
      * The extension of the script files
@@ -57,10 +60,14 @@ public class FileScriptSource implements ScriptSource {
         if (!new File(updateFilesDir).exists()) {
             throw new IllegalArgumentException("Script files directory '" + updateFilesDir + "' does not exist");
         }
-        fileNameStart = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCRIPTFILES_FILENAMESTART);
         fileExtension = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCRIPTFILES_FILEEXTENSION);
         if (fileExtension.startsWith(".")) {
             throw new IllegalArgumentException("Extension should not start with a '.'");
+        }
+        try {
+            versionNrLength = Integer.parseInt(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCRIPTFILES_VERSIONNRLENGTH));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Property " + PROPKEY_SCRIPTFILES_VERSIONNRLENGTH + " does not contain valid number", e);
         }
     }
 
@@ -68,10 +75,19 @@ public class FileScriptSource implements ScriptSource {
      * @see ScriptSource#getScript(long)
      */
     public String getScript(long version) {
-        File changeFile = new File(updateFilesDir + '/' + fileNameStart + version + "." + fileExtension);
-        if (!changeFile.exists()) {
+        final String fileNameStart = StringUtils.leftPad("" + version, versionNrLength, '0') + '_';
+        File[] filesHavingVersion = new File(updateFilesDir).listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith(fileNameStart) && name.endsWith(fileExtension);
+            }
+        });
+        if (filesHavingVersion.length == 0) {
             return null;
         }
+        if (filesHavingVersion.length > 1) {
+            throw new RuntimeException("Multiple files found starting with " + fileNameStart);
+        }
+        File changeFile = filesHavingVersion[0];
         try {
             return FileUtils.readFileToString(changeFile, System.getProperty("file.encoding"));
         } catch (IOException e) {
