@@ -6,6 +6,27 @@
  */
 package be.ordina.unitils.testing.dao;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.dbutils.DbUtils;
+import org.dbunit.Assertion;
+import org.dbunit.DatabaseTestCase;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.ITableIterator;
+import org.dbunit.dataset.ITableMetaData;
+import org.dbunit.dataset.ReplacementDataSet;
+import org.dbunit.dataset.SortedTable;
+import org.dbunit.dataset.filter.DefaultColumnFilter;
+import org.dbunit.operation.DatabaseOperation;
+
 import be.ordina.unitils.db.config.DataSourceFactory;
 import be.ordina.unitils.db.constraints.ConstraintsDisabler;
 import be.ordina.unitils.db.handler.StatementHandler;
@@ -13,19 +34,6 @@ import be.ordina.unitils.db.handler.StatementHandlerException;
 import be.ordina.unitils.db.maintainer.DBMaintainer;
 import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
-import org.dbunit.Assertion;
-import org.dbunit.DatabaseTestCase;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.*;
-import org.dbunit.dataset.filter.DefaultColumnFilter;
-import org.dbunit.operation.DatabaseOperation;
-
-import javax.sql.DataSource;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.Properties;
 
 /**
  * Base class for DAO tests.
@@ -279,19 +287,29 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
      * the expected DataSet are compared with the database content.
      */
     protected void assertExpectedDataset() throws Exception {
-        IDataSet expectedDataSet = getExpectedDataSet();
-        IDataSet actualDataSet = getConnection().createDataSet(expectedDataSet.getTableNames());
-        ITableIterator tables = expectedDataSet.iterator();
-
-        while (tables.next()) {
-            ITable expectedTable = tables.getTable();
-            ITableMetaData metaData = expectedTable.getTableMetaData();
-            ITable actualTable = actualDataSet.getTable(expectedTable.getTableMetaData().getTableName());
-            ITable filteredActualTable = DefaultColumnFilter.includedColumnsTable(actualTable, metaData.getColumns());
-
-            Assertion.assertEquals(new SortedTable(expectedTable), new SortedTable(filteredActualTable,
-                    expectedTable.getTableMetaData()));
-        }
+    	IDatabaseConnection databaseConnection = null;
+    	try {
+    		databaseConnection = getConnection();
+    		
+	        IDataSet expectedDataSet = getExpectedDataSet();
+	        IDataSet actualDataSet = databaseConnection.createDataSet(expectedDataSet.getTableNames());
+	        ITableIterator tables = expectedDataSet.iterator();
+	
+	        while (tables.next()) {
+	            ITable expectedTable = tables.getTable();
+	            ITableMetaData metaData = expectedTable.getTableMetaData();
+	            ITable actualTable = actualDataSet.getTable(expectedTable.getTableMetaData().getTableName());
+	            ITable filteredActualTable = DefaultColumnFilter.includedColumnsTable(actualTable, metaData.getColumns());
+	
+	            Assertion.assertEquals(new SortedTable(expectedTable), new SortedTable(filteredActualTable,
+	                    expectedTable.getTableMetaData()));
+	        }
+	        
+    	} finally {
+    		if (databaseConnection != null){
+    			DbUtils.closeQuietly(databaseConnection.getConnection());
+    		}
+    	}
     }
 
 }
