@@ -22,7 +22,7 @@ public class OracleConstraintsDisabler implements ConstraintsDisabler {
      * SQL statement to select the database constraints
      */
     private static final String DISABLE_CONSTRAINTS_SQL = "select table_name, constraint_name "
-        + " from user_constraints ";    
+        + " from user_constraints where constraint_type <> 'P'";    
 
     /**
      * The DataSource
@@ -82,8 +82,7 @@ public class OracleConstraintsDisabler implements ConstraintsDisabler {
             buf.append(" ");
             buf.append(enableDisable);
             buf.append(" constraint ");
-            buf.append(resultSet.getString("constraint_name"));
-            buf.append(";\n");
+            buf.append(resultSet.getString("constraint_name"));            
             statementHandler.handle(buf.toString());
         }
     }
