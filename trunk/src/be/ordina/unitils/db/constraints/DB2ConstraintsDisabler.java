@@ -24,8 +24,7 @@ public class DB2ConstraintsDisabler implements ConstraintsDisabler {
       * C --> check constraint (NOT_NULL)
       * V --> view constraint (???)
       */
-    private static final String DISABLE_CONSTRAINTS_SQL = "select table_name, constraint_name "
-            + " from user_constraints ";
+    private static final String DISABLE_CONSTRAINTS_SQL = "select TABNAME, CONSTNAME from SYSCAT.TABCONST";
 
     /**
      * The DataSource

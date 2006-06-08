@@ -21,7 +21,8 @@ public class OracleConstraintsDisabler implements ConstraintsDisabler {
     /**
      * SQL statement to select the database constraints
      */
-    private static final String DISABLE_CONSTRAINTS_SQL = "select TABNAME, CONSTNAME from SYSCAT.TABCONST";
+    private static final String DISABLE_CONSTRAINTS_SQL = "select table_name, constraint_name "
+        + " from user_constraints ";    
 
     /**
      * The DataSource
