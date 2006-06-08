@@ -237,7 +237,9 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
             ConstraintsDisabler constraintsDisabler = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_CONSTRAINTSDISABLER_START + "." + PropertiesUtils.getPropertyRejectNull(properties,
                     PROPKEY_DATABASE_DIALECT)));
             StatementHandler statementHandler = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, "constraintsDisabler.statementHandler.className"));
+            statementHandler.init(properties, dataSource);
             constraintsDisabler.init(dataSource, statementHandler);
+            constraintsDisabler.disableConstraints();
         }
     }
 
