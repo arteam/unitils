@@ -67,7 +67,7 @@ public class SQLScriptRunner implements ScriptRunner {
             List<String> statements = new ArrayList<String>();
             br = new BufferedReader(new InputStreamReader(in));
             String line;
-            boolean comment = false;
+            boolean inBlockComment = false;
             StringBuffer statement = new StringBuffer();
             while ((line = br.readLine()) != null) {
                 line = StringUtils.trimToNull(line);
@@ -78,16 +78,21 @@ public class SQLScriptRunner implements ScriptRunner {
                     continue;
                 }
 
-                if (line.startsWith("/*")) {
-                    comment = true;
+                if (line.endsWith("*/")) {
+                    inBlockComment = false;
                     continue;
                 }
-                if (comment) {
-                    if (line.endsWith("*/")) {
-                        comment = false;
-                    }
+                
+                if (inBlockComment) {                    
                     continue;
                 }
+                
+                if (line.startsWith("/*")) {                	
+                    inBlockComment = true;
+                    continue;
+                }
+                
+                //TODO WATCH out FIX so that ; can exist within comment '' 
                 int pos = line.indexOf(";");
                 if (pos > 0) {
                     statement.append(line.substring(0, pos));
