@@ -17,11 +17,11 @@
     <target name="compile" description="Compile classes">
         <mkdir dir="${classes.dir}"/>
 
-        <javac srcdir="${sources.dir}" destdir="${classes.dir}" fork="true" classpathref="classpath"/>
+        <javac srcdir="${sources.dir}" destdir="${classes.dir}" fork="true" classpathref="classpath" debug="true" />
 
-        <copy todir="${classes.dir}">
+        <!--copy todir="${classes.dir}">
             <fileset dir="${sources.dir}" excludes="**/*.class"/>
-        </copy>
+        </copy-->
     </target>
 
     <target name="jar">
