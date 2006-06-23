@@ -36,6 +36,16 @@ public class DBVersionSource implements VersionSource {
     private static final String PROPKEY_VERSION_COLUMN_NAME = "dbMaintainer.dbVersionSource.columnName";
 
     /**
+     * The key of the property that specifies the schema name of the database
+     */
+    private static final String PROPKEY_DATABASE_USERNAME = "dataSource.userName";
+
+    /**
+     * The name of the database schema
+     */
+    private String schemaName;
+
+    /**
      * The name of the datase table in which the  DB version is stored
      */
     private String tableName;
@@ -54,8 +64,9 @@ public class DBVersionSource implements VersionSource {
      * @param dataSource
      */
     public void init(Properties properties, DataSource dataSource) {
-        this.tableName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSION_TABLE_NAME);
-        this.columnName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSION_COLUMN_NAME);
+        this.schemaName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DATABASE_USERNAME).toUpperCase();
+        this.tableName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSION_TABLE_NAME).toUpperCase();
+        this.columnName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSION_COLUMN_NAME).toUpperCase();
         this.dataSource = dataSource;
     }
 
@@ -81,7 +92,8 @@ public class DBVersionSource implements VersionSource {
     }
 
     /**
-     * Checks if the version table is empty. If so, a new record is inserted
+     * Checks if the version table a column are available and if a record exists with the version number. If
+     * not, create the table, column and/or record.
      *
      * @param conn
      */
@@ -90,9 +102,24 @@ public class DBVersionSource implements VersionSource {
         ResultSet rs = null;
         try {
             st = conn.createStatement();
+            // Check if the version table exists
+            DatabaseMetaData metadata = conn.getMetaData();
+            rs = metadata.getTables(null, schemaName, tableName, null);
+            if (!rs.next()) {
+                // The version table does not exist. Create it
+                 st.execute("create table " + tableName + " ( " + columnName + " number(10) )");
+            } else {
+                // Check if the version table has the expected column
+                rs = metadata.getColumns(null, schemaName, tableName, columnName);
+                if (!rs.next()) {
+                    // The version table exists but the column does not. Create it
+                    st.execute("alter table " + tableName + " add " + columnName + " number(10)");
+                }
+            }
+            // The version table and column exist. Check if a record with the version is available
             rs = st.executeQuery("select " + columnName + " from " + tableName);
             if (!rs.next()) {
-                // The version table is empty, so this is the first time it is accessed. Set the version number to 1.
+                // The version table is empty. Insert a record with version number 0.
                 st.execute("insert into " + tableName + " (" + columnName + ") values (0)");
             }
         } catch (SQLException e) {
