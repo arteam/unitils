@@ -67,11 +67,11 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
 
 
     /**
-     * Test with right object containing only java defaults.
+     * Test with left object containing only java defaults.
      */
     public void testCheckEquals_equalsIgnoreDefaults() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsA, elementAllDefaults, true, false);
+        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementAllDefaults, elementNoDefaultsA, true, false);
 
         assertTrue(reflectionEquals.isEquals());
         assertNull(reflectionEquals.getDifferenceFieldStack());
@@ -109,30 +109,30 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
 
 
     /**
-     * Test with right object containing only java defaults but no ignore defaults.
+     * Test with left object containing only java defaults but no ignore defaults.
      */
     public void testCheckEquals_notEqualsNoIgnoreDefaults() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsB, elementAllDefaults, false, false);
-
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("booleanValue", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals(Boolean.TRUE, reflectionEquals.getDifferenceLeftValue());
-        assertEquals(Boolean.FALSE, reflectionEquals.getDifferenceRightValue());
-    }
-
-
-    /**
-     * Test with left instead of right object containing only java defaults.
-     */
-    public void testCheckEquals_notEqualsIgnoreDefaultsButDefaultsLeft() {
-
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementAllDefaults, elementNoDefaultsB, true, true);
+        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementAllDefaults, elementNoDefaultsB, false, false);
 
         assertFalse(reflectionEquals.isEquals());
         assertEquals("booleanValue", reflectionEquals.getDifferenceFieldStack().get(0));
         assertEquals(Boolean.FALSE, reflectionEquals.getDifferenceLeftValue());
         assertEquals(Boolean.TRUE, reflectionEquals.getDifferenceRightValue());
+    }
+
+
+    /**
+     * Test with right instead of left object containing only java defaults.
+     */
+    public void testCheckEquals_notEqualsIgnoreDefaultsButDefaultsLeft() {
+
+        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsB, elementAllDefaults, true, true);
+
+        assertFalse(reflectionEquals.isEquals());
+        assertEquals("booleanValue", reflectionEquals.getDifferenceFieldStack().get(0));
+        assertEquals(Boolean.TRUE, reflectionEquals.getDifferenceLeftValue());
+        assertEquals(Boolean.FALSE, reflectionEquals.getDifferenceRightValue());
     }
 
 
