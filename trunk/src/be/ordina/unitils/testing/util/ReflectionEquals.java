@@ -385,7 +385,7 @@ public class ReflectionEquals {
                 Object rightValue = f.get(right);
 
                 //ignore default values if needed
-                if (isIgnoredDefault(rightValue, fieldClazz)) {
+                if (isIgnoredDefault(leftValue, fieldClazz)) {
                     continue;
                 }
 

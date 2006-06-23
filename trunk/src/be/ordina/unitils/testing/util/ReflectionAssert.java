@@ -26,7 +26,7 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertEquals(Object expected, Object actual) throws AssertionFailedError {
-        assertEquals(null, actual, expected, false, false);
+        assertEquals(null, expected, actual, false, false);
     }
 
 
@@ -40,7 +40,7 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertEquals(Object expected, Object actual, boolean ignoreDefaults, boolean lenientDates) throws AssertionFailedError {
-        assertEquals(null, actual, expected, ignoreDefaults, lenientDates);
+        assertEquals(null, expected, actual, ignoreDefaults, lenientDates);
     }
 
 
@@ -55,7 +55,36 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertEquals(String message, Object expected, Object actual) throws AssertionFailedError {
-        assertEquals(message, actual, expected, false, false);
+        assertEquals(message, expected, actual, false, false);
+    }
+
+    /**
+     * Asserts that two objects are equal. If they are not
+     * an AssertionFailedError is thrown with the given message.
+     * Reflection is used to compare all fields of the given objects.
+     * Java default values (null for objects, 0 for numeric types) of the expected object are ignored.
+     *
+     * @param expected the expected object
+     * @param actual   the given object
+     * @throws AssertionFailedError when both objects are not equals
+     */
+    public static void assertEqualsIgnoreDefaults(Object expected, Object actual) throws AssertionFailedError {
+        assertEquals(null, expected, actual, true, false);
+    }
+
+    /**
+     * Asserts that two objects are equal. If they are not
+     * an AssertionFailedError is thrown with the given message.
+     * Reflection is used to compare all fields of the given objects.
+     * Java default values (null for objects, 0 for numeric types) of the expected object are ignored.
+     *
+     * @param message  the message for the AssertionFailedError when not equals
+     * @param expected the expected object
+     * @param actual   the given object
+     * @throws AssertionFailedError when both objects are not equals
+     */
+    public static void assertEqualsIgnoreDefaults(String message, Object expected, Object actual) throws AssertionFailedError {
+        assertEquals(message, expected, actual, true, false);
     }
 
     /**
