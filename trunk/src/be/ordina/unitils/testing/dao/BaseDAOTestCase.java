@@ -48,6 +48,9 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
     /* The pooled datasource instance */
     private static DataSource dataSource;
 
+    /* The cached DBUnit connection instance */
+    private static IDatabaseConnection connection;
+
     /* Name of the properties file */
     private static final String PROPERTIES_FILE_NAME = "daotest.properties";
 
@@ -99,6 +102,8 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
                     properties = PropertiesUtils.loadPropertiesFromClasspath(PROPERTIES_FILE_NAME);
                     //create the singleton datasource
                     dataSource = createDataSource();
+                    //create the connection instance
+                    connection = new DatabaseConnection(dataSource.getConnection());
                     //bring version test database schema up to date
                     updateDatabaseSchemaIfNeeded();
                     //disable database constraints
@@ -111,6 +116,19 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
     }
 
     /**
+     * Overrides DBUnits closeConnection method, so that the connection is not actually closed. This
+     * way, the same Connection instance can be reused thoughout the tests. This conforms to
+     * DBUnits spec's.
+     *
+     * @see org.dbunit.DatabaseTestCase#closeConnection(org.dbunit.database.IDatabaseConnection)
+     */
+    @Override
+    protected void closeConnection(IDatabaseConnection connection) throws Exception {
+        // Connection should not be closed between tests
+    }
+
+
+    /**
      * Implementation of {@link org.dbunit.DatabaseTestCase#getConnection()}.
      * This will use the datasource of {@link #getDataSource()} to get a connection.
      *
@@ -118,8 +136,7 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
      * @throws SQLException if the connection could not org created
      */
     protected IDatabaseConnection getConnection() throws SQLException {
-        DataSource dataSource = getDataSource();
-        return new DatabaseConnection(dataSource.getConnection());
+        return connection;
     }
 
 
