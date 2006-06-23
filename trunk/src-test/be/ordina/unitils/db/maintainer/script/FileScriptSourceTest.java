@@ -4,7 +4,7 @@
  * Distributable under LGPL license.
  * See terms of license at gnu.org.
  */
-package be.ordina.unitils.db.maintainer;
+package be.ordina.unitils.db.maintainer.script;
 
 import be.ordina.unitils.db.maintainer.script.FileScriptSource;
 import be.ordina.unitils.util.PropertiesUtils;
@@ -21,7 +21,7 @@ import java.util.Properties;
  */
 public class FileScriptSourceTest extends TestCase {
 
-    private static final String DBCHANGE_FILE_CLASSPATH = "be/ordina/unitils/db/maintainer/001_script.sql";
+    private static final String DBCHANGE_FILE_CLASSPATH = "be/ordina/unitils/db/maintainer/script/001_script.sql";
 
     private static final String DBCHANGE_FILE_FILESYSTEM = System.getProperty("java.io.tmpdir") + "001_script.sql";
 
