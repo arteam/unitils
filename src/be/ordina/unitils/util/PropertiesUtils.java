@@ -8,6 +8,8 @@ package be.ordina.unitils.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.File;
 import java.util.Properties;
 
 /**
@@ -29,6 +31,20 @@ public class PropertiesUtils {
         Properties prop = new Properties();
         try {
             prop.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException("Error while loading properties " + propertiesFileName, e);
+        }
+        return prop;
+    }
+
+    public static Properties loadPropertiesFromFile(String propertiesFileName) {
+        Properties prop = new Properties();
+        try {
+            File file = new File(propertiesFileName);
+            if (!file.exists()) {
+                throw new RuntimeException("Properties file " + propertiesFileName + " not found");
+            }
+            prop.load(new FileInputStream(file));
         } catch (IOException e) {
             throw new RuntimeException("Error while loading properties " + propertiesFileName, e);
         }
