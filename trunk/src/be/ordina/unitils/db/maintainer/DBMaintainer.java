@@ -134,7 +134,7 @@ public class DBMaintainer {
             try {
                 scriptRunner.execute(dbChange);
             } catch (StatementHandlerException e) {
-                logger.error("Error while executing script: " + dbChange + "\nDatabase version not incremented");
+                logger.error("Error while executing script: " + dbChange + "\nDatabase version not incremented", e);
                 logger.error("Current database version is " + versionSource.getDbVersion());
                 throw e;
             }
