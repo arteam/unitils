@@ -4,7 +4,7 @@
  * Distributable under LGPL license.
  * See terms of license at gnu.org.
  */
-package be.ordina.unitils.db.maintainer;
+package be.ordina.unitils.db.maintainer.version;
 
 import be.ordina.unitils.db.maintainer.version.DBVersionSource;
 import be.ordina.unitils.testing.dao.BaseDAOTestCase;
