@@ -8,6 +8,7 @@ package be.ordina.unitils.testing.dao;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -32,6 +33,7 @@ import be.ordina.unitils.db.constraints.ConstraintsDisabler;
 import be.ordina.unitils.db.handler.StatementHandler;
 import be.ordina.unitils.db.handler.StatementHandlerException;
 import be.ordina.unitils.db.maintainer.DBMaintainer;
+import be.ordina.unitils.db.sequences.SequenceUpdater;
 import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
 
@@ -60,11 +62,17 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
     /* Property key indicating if the database constraints should org disabled after updating the database */
     private static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "disableConstraints.enabled";
 
+/* Property key indicating if the database constraints should org disabled after updating the database */
+    private static final String PROPKEY_UPDATESEQUENCES_ENABLED = "updateSequences.enabled";
+
     /* Property keys of the datasource factory classname */
     private static final String PROPKEY_DATASOURCEFACTORY_CLASSNAME = "dataSourceFactory.className";
 
     /* Property key of the implementation class of {@link ConstraintsDisabler} */
     public static final String PROPKEY_CONSTRAINTSDISABLER_START = "constraintsDisabler.className";
+
+    /* Property key of the implementation class of {@link SequenceDisabler} */
+    public static final String PROPKEY_SEQUENCEUPDATER_START = "sequenceUpdater.className";
 
     /* Property key of the SQL dialect of the underlying DBMS implementation */
     private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
@@ -99,7 +107,7 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
         if (dataSource == null) {
             synchronized (BaseDAOTestCase.class) {
                 if (dataSource == null) {
-                    properties = PropertiesUtils.loadPropertiesFromClasspath(PROPERTIES_FILE_NAME);
+                    loadProperties();
                     //create the singleton datasource
                     dataSource = createDataSource();
                     //create the connection instance
@@ -108,11 +116,22 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
                     updateDatabaseSchemaIfNeeded();
                     //disable database constraints
                     disableConstraintsIfNeeded();
+                    //Update sequence values
+                    updateSequenceValuesIfNeeded();
                 }
             }
         }
         //setup database test
         super.setUp();
+    }
+
+    private void loadProperties() {
+        String userHomeFileName = System.getProperty("user.home") + '/' + PROPERTIES_FILE_NAME;
+        if (new File(userHomeFileName).exists()) {
+            properties = PropertiesUtils.loadPropertiesFromFile(userHomeFileName);
+        } else {
+            properties = PropertiesUtils.loadPropertiesFromClasspath(PROPERTIES_FILE_NAME);
+        }
     }
 
     /**
@@ -257,6 +276,18 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
             statementHandler.init(properties, dataSource);
             constraintsDisabler.init(dataSource, statementHandler);
             constraintsDisabler.disableConstraints();
+        }
+    }
+
+    /**
+     * Makes sure the sequence values are set to a sufficiently high value
+     */
+    private void updateSequenceValuesIfNeeded() {
+        if ("true".equalsIgnoreCase(properties.getProperty(PROPKEY_UPDATESEQUENCES_ENABLED))) {
+            SequenceUpdater sequenceUpdater = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SEQUENCEUPDATER_START + "." + PropertiesUtils.getPropertyRejectNull(properties,
+                    PROPKEY_DATABASE_DIALECT)));
+            sequenceUpdater.init(properties, dataSource);
+            sequenceUpdater.updateSequences();
         }
     }
 
