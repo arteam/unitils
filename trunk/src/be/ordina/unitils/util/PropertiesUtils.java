@@ -37,6 +37,12 @@ public class PropertiesUtils {
         return prop;
     }
 
+    /**
+     * Loads the properties file with the given name from the file system
+     *
+     * @param propertiesFileName
+     * @return A <code>Properties</code> object
+     */
     public static Properties loadPropertiesFromFile(String propertiesFileName) {
         Properties prop = new Properties();
         try {
@@ -80,6 +86,50 @@ public class PropertiesUtils {
             throw new IllegalArgumentException("Property not found " + key);
         }
         return value;
+    }
+
+    /**
+     * Returns the int property value with the given key from the given <code>Properties</code> object. If the <code>
+     * Properties</code> object doesn't contain the property, an <code>IllegalArgumentException</code> is thrown
+     *
+     * @param properties
+     * @param key
+     * @return The value associated with the given key
+     * @throws IllegalArgumentException If the <code>Properties</code> doesn't contain the property with the given key
+     */
+    public static int getIntPropertyRejectNull(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Property not found " + key);
+        }
+        try {
+            int intValue = Integer.parseInt(value);
+            return intValue;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Property " + key + " has value " + value + " which is not a correct integer", e);
+        }
+    }
+
+    /**
+     * Returns the int property value with the given key from the given <code>Properties</code> object. If the <code>
+     * Properties</code> object doesn't contain the property, an <code>IllegalArgumentException</code> is thrown
+     *
+     * @param properties
+     * @param key
+     * @return The value associated with the given key
+     * @throws IllegalArgumentException If the <code>Properties</code> doesn't contain the property with the given key
+     */
+    public static long getLongPropertyRejectNull(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Property not found " + key);
+        }
+        try {
+            long longValue = Long.parseLong(value);
+            return longValue;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Property " + key + " has value " + value + " which is not a correct integer", e);
+        }
     }
 
 }

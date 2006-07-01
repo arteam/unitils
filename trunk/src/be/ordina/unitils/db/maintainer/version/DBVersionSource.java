@@ -87,7 +87,7 @@ public class DBVersionSource implements VersionSource {
         } catch (SQLException e) {
             throw new RuntimeException("Error while retrieving database version", e);
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            DbUtils.closeQuietly(conn, st, rs);
         }
     }
 
