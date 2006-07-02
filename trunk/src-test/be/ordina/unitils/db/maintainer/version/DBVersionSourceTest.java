@@ -7,7 +7,7 @@
 package be.ordina.unitils.db.maintainer.version;
 
 import be.ordina.unitils.db.maintainer.version.DBVersionSource;
-import be.ordina.unitils.testing.dao.BaseDAOTestCase;
+import be.ordina.unitils.testing.dao.BaseDatabaseTestCase;
 import be.ordina.unitils.util.PropertiesUtils;
 import org.apache.commons.dbutils.DbUtils;
 
@@ -19,7 +19,7 @@ import java.util.Properties;
 /**
  * Test class for {@link DBVersionSource}
  */
-public class DBVersionSourceTest extends BaseDAOTestCase {
+public class DBVersionSourceTest extends BaseDatabaseTestCase {
 
     private static final String[][] dbVersionSourceProperties = {
             {"dbMaintainer.dbVersionSource.tableName", "db_version"},
