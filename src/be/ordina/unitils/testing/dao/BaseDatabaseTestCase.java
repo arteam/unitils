@@ -42,7 +42,7 @@ import be.ordina.unitils.util.ReflectionUtils;
  * Provides connection pooling, automatic schema updating and dataset loading.
  * todo
  */
-public abstract class BaseDAOTestCase extends DatabaseTestCase {
+public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
 
     /* The configuration (daotest.properties) */
     private static Properties properties;
@@ -80,7 +80,7 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
     /**
      * Creates a test instance with null as test name.
      */
-    protected BaseDAOTestCase() {
+    protected BaseDatabaseTestCase() {
         this(null);
     }
 
@@ -89,7 +89,7 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
      *
      * @param testName the name
      */
-    protected BaseDAOTestCase(String testName) {
+    protected BaseDatabaseTestCase(String testName) {
         super(testName);
     }
 
@@ -105,7 +105,7 @@ public abstract class BaseDAOTestCase extends DatabaseTestCase {
     protected void setUp() throws Exception {
         //initialize once for all tests
         if (dataSource == null) {
-            synchronized (BaseDAOTestCase.class) {
+            synchronized (BaseDatabaseTestCase.class) {
                 if (dataSource == null) {
                     loadProperties();
                     //create the singleton datasource
