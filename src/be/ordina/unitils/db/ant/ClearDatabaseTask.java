@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * Ant tasks that drops all database tables in the current database
  */
-public class CleanDatabaseTask extends BaseUnitilsTask {
+public class ClearDatabaseTask extends BaseUnitilsTask {
 
-    private static final Logger logger = Logger.getLogger(CleanDatabaseTask.class);
+    private static final Logger logger = Logger.getLogger(ClearDatabaseTask.class);
 
     public void doExecute() throws BuildException {
         Connection conn = null;
