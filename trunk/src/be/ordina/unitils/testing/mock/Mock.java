@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Filip Neven
+ * Annotation indicating that a mock object should be injected into the annotated field.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
