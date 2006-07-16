@@ -28,7 +28,8 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
             dropTables(conn, st);
             dropSequences(conn, st);
         } catch (Exception e) {
-            throw new BuildException("Error generating DTD file", e);
+            logger.error(e);
+            throw new BuildException("Error clearning database", e);
         } finally {
             DbUtils.closeQuietly(conn);
         }

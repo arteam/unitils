@@ -10,7 +10,11 @@ import be.ordina.unitils.db.handler.StatementHandlerException;
 import be.ordina.unitils.db.maintainer.script.ScriptSource;
 import be.ordina.unitils.db.maintainer.version.VersionSource;
 import be.ordina.unitils.db.script.SQLScriptRunner;
+import be.ordina.unitils.db.constraints.ConstraintsDisabler;
+import be.ordina.unitils.db.sequences.SequenceUpdater;
+import be.ordina.unitils.db.dtd.DtdGenerator;
 import be.ordina.unitils.testing.mock.EasyMockTestCase;
+import be.ordina.unitils.testing.mock.Mock;
 import static org.easymock.classextension.EasyMock.*;
 
 /**
@@ -18,12 +22,18 @@ import static org.easymock.classextension.EasyMock.*;
  */
 public class DBMaintainerTest extends EasyMockTestCase {
 
-    /**
-     * Mock objects
-     */
+    @Mock
     private VersionSource mockVersionSource;
+    @Mock
     private ScriptSource mockScriptSource;
+    @Mock
     private SQLScriptRunner mockScriptRunner;
+    @Mock
+    private ConstraintsDisabler mockConstraintsDisabler;
+    @Mock
+    private SequenceUpdater mockSequenceUpdater;
+    @Mock
+    private DtdGenerator mockDtdGenerator;
 
     /**
      * Tested object
@@ -38,10 +48,8 @@ public class DBMaintainerTest extends EasyMockTestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        mockVersionSource = getMock(VersionSource.class);
-        mockScriptSource = getMock(ScriptSource.class);
-        mockScriptRunner = getMock(SQLScriptRunner.class);
-        dbMaintainer = new DBMaintainer(mockVersionSource, mockScriptSource, mockScriptRunner);
+        dbMaintainer = new DBMaintainer(mockVersionSource, mockScriptSource, mockScriptRunner, mockConstraintsDisabler,
+                mockSequenceUpdater, mockDtdGenerator);
     }
 
     /**
@@ -55,6 +63,9 @@ public class DBMaintainerTest extends EasyMockTestCase {
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(3L);
         expect(mockScriptSource.getScript(4L)).andReturn(null);
+        mockConstraintsDisabler.disableConstraints();
+        mockSequenceUpdater.updateSequences();
+        mockDtdGenerator.generateDtd();
 
         replay();
 

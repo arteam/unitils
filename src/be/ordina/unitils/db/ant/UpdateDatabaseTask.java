@@ -25,7 +25,7 @@ public class UpdateDatabaseTask extends BaseUnitilsTask {
             dbMaintainer.updateDatabase();
         } catch (StatementHandlerException e) {
             logger.error(e);
-            throw new BuildException(e.getMessage());
+            throw new BuildException("Error updateing database", e);
         }
     }
 
