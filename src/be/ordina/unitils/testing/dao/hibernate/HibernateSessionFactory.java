@@ -6,6 +6,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.PropertyNotFoundException;
 import org.hibernate.cfg.Environment;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.apache.log4j.Logger;
 
 import javax.naming.InitialContext;
@@ -35,7 +36,7 @@ public class HibernateSessionFactory {
     /**
      * The single instance of hibernate configuration
      */
-    private static Configuration cfg = new Configuration();
+    private static Configuration cfg = new AnnotationConfiguration();
 
     /**
      * The single instance of hibernate SessionFactory
