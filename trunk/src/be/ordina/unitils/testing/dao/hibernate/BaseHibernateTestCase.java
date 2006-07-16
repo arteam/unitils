@@ -66,9 +66,7 @@ public abstract class BaseHibernateTestCase extends BaseDatabaseTestCase {
      * files using the <code>addClass</code> or <code>addFile</code> methods.
      * @param configuration
      */
-    protected void performExtraHibernateConfiguration(Configuration configuration) {
-        // Empty implementation
-    }
+    abstract protected void performExtraHibernateConfiguration(Configuration configuration);
 
     /**
      * This method should be overwritten if your regular code doesn't make use of Unitils
@@ -78,8 +76,7 @@ public abstract class BaseHibernateTestCase extends BaseDatabaseTestCase {
      * This method should make sure that your DAO classes make
      * use of the Hibernate session provided by the <code>UnitTestHibernateSessionManager</code>.
      */
-    protected void injectSessionManager(UnitTestHibernateSessionManager unitTestSessionManager) {
-    }
+    abstract protected void injectSessionManager(UnitTestHibernateSessionManager unitTestSessionManager);
 
     /**
      * Hibernate guarantees that within the context of a single HibernateSession,
