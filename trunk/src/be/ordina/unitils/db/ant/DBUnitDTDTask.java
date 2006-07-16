@@ -1,40 +1,26 @@
 package be.ordina.unitils.db.ant;
 
 import be.ordina.unitils.util.PropertiesUtils;
-import org.apache.commons.dbutils.DbUtils;
+import be.ordina.unitils.util.ReflectionUtils;
+import be.ordina.unitils.db.dtd.DtdGenerator;
 import org.apache.tools.ant.BuildException;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.xml.FlatDtdDataSet;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.sql.Connection;
+import org.apache.log4j.Logger;
 
 /**
  * Ant task that generates a DTD from the unit test database.
  */
 public class DBUnitDTDTask extends BaseUnitilsTask {
 
-    private static final String PROPKEY_DTD_NAME = "database.dbunit.dtd";
+    private static final Logger logger = Logger.getLogger(ClearDatabaseTask.class);
 
-    private String dtdFileName;
+    /* Property key of the impelementation class of {@link DtdGenerator} */
+    private static final String PROPKEY_DTDGENERATOR_CLASSNAME = "dbMaintainer.database.dtdGenerator.className";
 
     public void doExecute() throws BuildException {
-        dtdFileName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DTD_NAME);
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            IDatabaseConnection dbUnitConn = new DatabaseConnection(conn, schemaName.toUpperCase());
-            // write DTD file
-            File dtdFile = new File(dtdFileName);
-            dtdFile.getParentFile().mkdirs();
-            FlatDtdDataSet.write(dbUnitConn.createDataSet(), new FileOutputStream(dtdFile));
-        } catch (Exception e) {
-            throw new BuildException("Error generating DTD file", e);
-        } finally {
-            DbUtils.closeQuietly(conn);
-        }
+        DtdGenerator dtdGenerator = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
+                PROPKEY_DTDGENERATOR_CLASSNAME));
+        dtdGenerator.init(properties, dataSource);
+        dtdGenerator.generateDtd();
     }
 
 }

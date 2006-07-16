@@ -50,7 +50,7 @@ public class OracleSequenceUpdater implements SequenceUpdater {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            List<String> sequencesWithLowValue = getSequencesWithLowValue(st);
+            List<String> sequencesWithLowValue = getSequencesWithLowValue(conn, st);
             for (String sequenceWithLowValue : sequencesWithLowValue) {
                 incrementSequence(sequenceWithLowValue, st);
             }
@@ -67,17 +67,32 @@ public class OracleSequenceUpdater implements SequenceUpdater {
      * @return the names of all sequences that have a value lower than <code>lowestAcceptableSequenceValue</code>
      * @throws SQLException
      */
-    private List<String> getSequencesWithLowValue(Statement st) throws SQLException {
+    private List<String> getSequencesWithLowValue(Connection conn, Statement st) throws SQLException {
         ResultSet rs = null;
+        Statement st1 = null;
         try {
+            st1 = conn.createStatement();
             List<String> sequences = new ArrayList<String>();
-            rs = st.executeQuery("select SEQUENCE_NAME from USER_SEQUENCES where LAST_NUMBER < " + lowestAcceptableSequenceValue);
+            rs = st.executeQuery("select SEQUENCE_NAME, LAST_NUMBER, INCREMENT_BY from USER_SEQUENCES where LAST_NUMBER < "
+                    + lowestAcceptableSequenceValue);
             while (rs.next()) {
-                sequences.add(rs.getString("SEQUENCE_NAME"));
+                String sequenceName = rs.getString("SEQUENCE_NAME");
+                long lastNumber = rs.getLong("LAST_NUMBER");
+                long incrementBy = rs.getLong("INCREMENT_BY");
+                String sqlChangeIncrement = "alter sequence " + sequenceName + " increment by " +
+                        (lowestAcceptableSequenceValue - lastNumber);
+                logger.info(sqlChangeIncrement);
+                st1.execute(sqlChangeIncrement);
+                String sqlNextSequenceValue = "select " + sequenceName + ".NEXTVAL from DUAL";
+                logger.info(sqlNextSequenceValue);
+                st1.execute(sqlNextSequenceValue);
+                String sqlResetIncrement = "alter sequence " + sequenceName + " increment by " + incrementBy;
+                logger.info(sqlResetIncrement);
+                st1.execute(sqlResetIncrement);
             }
             return sequences;
         } finally {
-            DbUtils.closeQuietly(rs);
+            DbUtils.closeQuietly(null, st1, rs);
         }
     }
 

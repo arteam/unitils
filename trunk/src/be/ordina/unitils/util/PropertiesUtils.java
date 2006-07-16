@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.File;
 import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Utility methods related to the class <code>java.lang.Properties</code>
@@ -98,10 +101,7 @@ public class PropertiesUtils {
      * @throws IllegalArgumentException If the <code>Properties</code> doesn't contain the property with the given key
      */
     public static int getIntPropertyRejectNull(Properties properties, String key) {
-        String value = properties.getProperty(key);
-        if (value == null) {
-            throw new IllegalArgumentException("Property not found " + key);
-        }
+        String value = getPropertyRejectNull(properties, key);
         try {
             int intValue = Integer.parseInt(value);
             return intValue;
@@ -111,7 +111,7 @@ public class PropertiesUtils {
     }
 
     /**
-     * Returns the int property value with the given key from the given <code>Properties</code> object. If the <code>
+     * Returns the long property value with the given key from the given <code>Properties</code> object. If the <code>
      * Properties</code> object doesn't contain the property, an <code>IllegalArgumentException</code> is thrown
      *
      * @param properties
@@ -120,10 +120,7 @@ public class PropertiesUtils {
      * @throws IllegalArgumentException If the <code>Properties</code> doesn't contain the property with the given key
      */
     public static long getLongPropertyRejectNull(Properties properties, String key) {
-        String value = properties.getProperty(key);
-        if (value == null) {
-            throw new IllegalArgumentException("Property not found " + key);
-        }
+        String value = getPropertyRejectNull(properties, key);
         try {
             long longValue = Long.parseLong(value);
             return longValue;
@@ -132,4 +129,34 @@ public class PropertiesUtils {
         }
     }
 
+    /**
+     * Returns the boolean property value with the given key from the given <code>Properties</code> object. If the <code>
+     * Properties</code> object doesn't contain the property, an <code>IllegalArgumentException</code> is thrown
+     *
+     * @param properties
+     * @param key
+     * @return The value associated with the given key
+     * @throws IllegalArgumentException If the <code>Properties</code> doesn't contain the property with the given key
+     */
+    public static boolean getBooleanPropertyRejectNull(Properties properties, String key) {
+        String value = getPropertyRejectNull(properties, key);
+        if ("true".equalsIgnoreCase(value) || "on".equalsIgnoreCase(value)) {
+            return true;
+        }
+        if ("false".equalsIgnoreCase(value) || "off".equalsIgnoreCase(value)) {
+            return false;
+        }
+        throw new IllegalArgumentException("Property " + key + " is a boolean value and should have one of the values"
+                + " [true, on, false, off]");
+    }
+
+    public static List<String> getCommaSeperatedStringsRejectNull(Properties properties, String key) {
+        List<String> result = new ArrayList<String>();
+        String value = getPropertyRejectNull(properties, key);
+        StringTokenizer st = new StringTokenizer(value, ",");
+        while (st.hasMoreTokens()) {
+            result.add(st.nextToken());
+        }
+        return result;
+    }
 }
