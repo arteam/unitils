@@ -16,6 +16,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * TODO test me
+ * TODO javadoc me
+ * @author BaVe
+ *
+ */
 public class DB2ConstraintsDisabler implements ConstraintsDisabler {
 
     /* CONSTRAINT_TYPE
