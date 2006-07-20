@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="trunk/src"/>
+	<classpathentry kind="src" path="trunk/src-test"/>
+	<classpathentry kind="lib" path="releases/unitils-0.5/unitils-0.5.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/asm.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/asm-attrs.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/commons-collections-3.1.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/commons-dbcp-1.2.1.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/commons-dbutils-1.0.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/commons-io-1.2.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/commons-lang-2.1.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/commons-pool-1.2.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/dbunit-2.1.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/easymock-2.0.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/easymockclassextension.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/junit.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/junit-4.0.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/junit-addons-1.4.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/mysql-connector-java-3.0.17-ga-bin.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="trunk/lib/ant-1.6.5.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/hibernate3.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/hibernate-annotations-3.2.jar"/>
+	<classpathentry kind="lib" path="trunk/lib/commons-beanutils-1.7.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
