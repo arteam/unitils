@@ -6,6 +6,10 @@
  */
 package be.ordina.unitils.db.maintainer.script;
 
+import be.ordina.unitils.db.maintainer.VersionScriptPair;
+
+import javax.sql.DataSource;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -21,13 +25,13 @@ public interface ScriptSource {
     void init(Properties properties);
 
     /**
-     * Returns a <code>String</code> that describes the database change, that will update the database from state
-     * version -1 to version, if the given version is supported, and null otherwise
+     * Returns a <code>List<VersionScriptPair></code> containing the statements that will update the database from the
+     * given currentVersion to the latest one.
      *
-     * @param version The version for which the change is requested
-     * @return A string describing the database change associated with the given version, or <code>null</code>
-     *         if none exists.
+     * @param currentVersion The current database version
+     * @return A List<VersionScriptPair> containing the scripts that need to be executed to update the database
+     * version to the latest state together with their version
      */
-    String getScript(long version);
+    List<VersionScriptPair> getScripts(Long currentVersion);
 
 }

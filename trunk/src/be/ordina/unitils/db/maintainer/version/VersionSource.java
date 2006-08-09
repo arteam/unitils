@@ -27,12 +27,12 @@ public interface VersionSource {
      *
      * @return The current version of the underlying database
      */
-    long getDbVersion();
+    Long getDbVersion();
 
     /**
      * Updates the version of the database to the given value
      *
      * @param version
      */
-    void setDbVersion(long version);
+    void setDbVersion(Long version);
 }

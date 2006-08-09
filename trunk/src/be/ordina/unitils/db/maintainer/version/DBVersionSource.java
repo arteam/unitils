@@ -46,14 +46,19 @@ public class DBVersionSource implements VersionSource {
     private String schemaName;
 
     /**
-     * The name of the datase table in which the  DB version is stored
+     * The name of the datase table in which the DB version is stored
      */
     private String tableName;
 
     /**
-     * The name of the datase column in which the  DB version is stored
+     * The name of the datase column in which the DB version is stored
      */
     private String columnName;
+
+    /**
+     * The type of the database column in which the DB vesion is stored
+     */
+    private String columnType;
 
     /**
      * Initializes with the given <code>Properties</code> and <code>DataSource</code>. The <code>Properties</code>
@@ -73,7 +78,7 @@ public class DBVersionSource implements VersionSource {
     /**
      * @see be.ordina.unitils.db.maintainer.version.DBVersionSource#getDbVersion()
      */
-    public long getDbVersion() {
+    public Long getDbVersion() {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -107,20 +112,20 @@ public class DBVersionSource implements VersionSource {
             rs = metadata.getTables(null, schemaName, tableName, null);
             if (!rs.next()) {
                 // The version table does not exist. Create it
-                 st.execute("create table " + tableName + " ( " + columnName + " number(10) )");
+                 st.execute("create table " + tableName + " ( " + columnName + " " + columnType + " )");
             } else {
                 // Check if the version table has the expected column
                 rs = metadata.getColumns(null, schemaName, tableName, columnName);
                 if (!rs.next()) {
                     // The version table exists but the column does not. Create it
-                    st.execute("alter table " + tableName + " add " + columnName + " number(10)");
+                    st.execute("alter table " + tableName + " add " + columnName + " varchar(10)");
                 }
             }
             // The version table and column exist. Check if a record with the version is available
             rs = st.executeQuery("select " + columnName + " from " + tableName);
             if (!rs.next()) {
                 // The version table is empty. Insert a record with version number 0.
-                st.execute("insert into " + tableName + " (" + columnName + ") values (0)");
+                st.execute("insert into " + tableName + " (" + columnName + ") values ('')");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error while checking version table", e);
@@ -130,16 +135,16 @@ public class DBVersionSource implements VersionSource {
     }
 
     /**
-     * @see VersionSource#setDbVersion(long)
+     * @see VersionSource#setDbVersion(Long)
      */
-    public void setDbVersion(long version) {
+    public void setDbVersion(Long version) {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
             conn = dataSource.getConnection();
             checkVersionTable(conn);
             ps = conn.prepareStatement("update " + tableName + " set " + columnName + " = ?");
-            ps.setLong(1, version);
+            ps.setObject(1, version);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error while incrementing database version", e);
