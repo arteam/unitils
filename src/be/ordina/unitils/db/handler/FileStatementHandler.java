@@ -44,7 +44,7 @@ public class FileStatementHandler implements StatementHandler {
     public void handle(String statement) throws StatementHandlerException {
         try {
             PrintWriter pw = new PrintWriter(new FileWriter(fileName, true));
-            pw.println(statement + "\n");
+            pw.println(statement + ";\n");
             pw.close();
         } catch (IOException e) {
             throw new StatementHandlerException("Error while trying to write to file " + fileName, e);

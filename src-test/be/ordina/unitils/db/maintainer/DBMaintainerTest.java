@@ -13,9 +13,13 @@ import be.ordina.unitils.db.script.SQLScriptRunner;
 import be.ordina.unitils.db.constraints.ConstraintsDisabler;
 import be.ordina.unitils.db.sequences.SequenceUpdater;
 import be.ordina.unitils.db.dtd.DtdGenerator;
+import be.ordina.unitils.db.clear.DBClearer;
 import be.ordina.unitils.testing.mock.EasyMockTestCase;
 import be.ordina.unitils.testing.mock.Mock;
 import static org.easymock.classextension.EasyMock.*;
+
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Filip Neven
@@ -29,6 +33,8 @@ public class DBMaintainerTest extends EasyMockTestCase {
     @Mock
     private SQLScriptRunner mockScriptRunner;
     @Mock
+    private DBClearer mockDbClearer;
+    @Mock
     private ConstraintsDisabler mockConstraintsDisabler;
     @Mock
     private SequenceUpdater mockSequenceUpdater;
@@ -41,6 +47,11 @@ public class DBMaintainerTest extends EasyMockTestCase {
     private DBMaintainer dbMaintainer;
 
     /**
+     * Test database update scripts
+     */
+    private List<VersionScriptPair> versionScriptPairs;
+
+    /**
      * Create an instance of DBMaintainer, linked with mock versions of VersionSource, ScriptSource and
      * SQLScriptRunner
      *
@@ -48,8 +59,12 @@ public class DBMaintainerTest extends EasyMockTestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        dbMaintainer = new DBMaintainer(mockVersionSource, mockScriptSource, mockScriptRunner, mockConstraintsDisabler,
-                mockSequenceUpdater, mockDtdGenerator);
+        dbMaintainer = new DBMaintainer(mockVersionSource, mockScriptSource, mockScriptRunner, mockDbClearer,
+                mockConstraintsDisabler, mockSequenceUpdater, mockDtdGenerator);
+
+        versionScriptPairs = new ArrayList<VersionScriptPair>();
+        versionScriptPairs.add(new VersionScriptPair(2L, "Script 2"));
+        versionScriptPairs.add(new VersionScriptPair(3L, "Script 3"));
     }
 
     /**
@@ -58,11 +73,13 @@ public class DBMaintainerTest extends EasyMockTestCase {
      */
     public void testDBMaintainer() throws Exception {
         // Record behavior
-        expect(mockVersionSource.getDbVersion()).andReturn(2L);
-        expect(mockScriptSource.getScript(3L)).andReturn("Script 1");
-        mockScriptRunner.execute("Script 1");
+        expect(mockVersionSource.getDbVersion()).andReturn(1L);
+        expect(mockScriptSource.getScripts(1L)).andReturn(versionScriptPairs);
+        mockDbClearer.clearDatabase();
+        mockScriptRunner.execute("Script 2");
+        mockVersionSource.setDbVersion(2L);
+        mockScriptRunner.execute("Script 3");
         mockVersionSource.setDbVersion(3L);
-        expect(mockScriptSource.getScript(4L)).andReturn(null);
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDtdGenerator.generateDtd();
@@ -81,9 +98,10 @@ public class DBMaintainerTest extends EasyMockTestCase {
      * database version must not org incremented and a StatementHandlerException must org thrown.
      */
     public void testDBMaintainer_errorInScript() throws Exception {
-        expect(mockVersionSource.getDbVersion()).andReturn(3L).anyTimes();
-        expect(mockScriptSource.getScript(4L)).andReturn("Erroneous script");
-        mockScriptRunner.execute("Erroneous script");
+        expect(mockVersionSource.getDbVersion()).andReturn(2L).anyTimes();
+        expect(mockScriptSource.getScripts(2L)).andReturn(versionScriptPairs);
+        mockDbClearer.clearDatabase();
+        mockScriptRunner.execute("Script 2");
         expectLastCall().andThrow(new StatementHandlerException("Test exception"));
 
         replay();
