@@ -1,11 +1,8 @@
 package be.ordina.unitils.testing.dao.hibernate;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.Session;
-import org.hibernate.dialect.Dialect;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 
@@ -46,6 +43,7 @@ public class UnitTestHibernateSessionManager extends HibernateSessionManager {
         currentSession.clear();
     }
 
+    @Override
     public Configuration doGetConfiguration() {
         return configuration;
     }
