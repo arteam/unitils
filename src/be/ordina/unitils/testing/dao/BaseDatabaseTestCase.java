@@ -317,7 +317,7 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
      * Compares the contents of the expected DataSet with the contents of the database. Only the tables that occur in
      * the expected DataSet are compared with the database content.
      */
-    protected void assertMatchesResultDataset() throws Exception {
+    protected void assertDBContentAsExpected() throws Exception {
     	IDatabaseConnection databaseConnection = null;
     	try {
     		databaseConnection = getConnection();

@@ -14,14 +14,30 @@ import java.sql.SQLException;
 import junit.framework.Assert;
 
 /**
- *
+ * Assert class that offers assert methods for testing things that are specific to Hibernate.
  */
 public class HibernateAssert {
 
+    /**
+     * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method assumes
+     * that the <code>HibernateSessionManager</code> is correctly configured. This is automatically the case when the
+     * <code>BaseHibernateTestCase</code> is used as test superclass.
+     */
     public static void assertMappingToDatabase() {
         Configuration configuration = HibernateSessionManager.getConfiguration();
         Session session = HibernateSessionManager.getSession();
 
+        assertMappingToDatabase(configuration, session);
+    }
+
+    /**
+     * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method does the
+     * same as <code>assertMappingToDatabase</code> without parameters, but can also be used if the
+     * <code>HibernateSessionManager</code> is not used for unit test session management.
+     * @param configuration
+     * @param session
+     */
+    public static void assertMappingToDatabase(Configuration configuration, Session session) {
         String[] script = generateScript(configuration, session);
 
         List<String> differences = new ArrayList<String>();
@@ -36,6 +52,12 @@ public class HibernateAssert {
                 formatMessage(differences), differences.isEmpty());
     }
 
+    /**
+     * Formats the given list of messages.
+     * @param messageParts
+     *          The different parts of the message
+     * @return A formatted message, containing the different message parts.
+     */
     private static String formatMessage(List<String> messageParts) {
         StringBuffer message = new StringBuffer();
         for (String messagePart : messageParts) {

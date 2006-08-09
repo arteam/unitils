@@ -3,7 +3,6 @@ package be.ordina.unitils.testing.dao.hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
 import org.hibernate.HibernateException;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 
 /**
@@ -18,7 +17,7 @@ public class DefaultHibernateSessionManager extends HibernateSessionManager {
     // private static final ThreadLocal<Session> threadSession = new ThreadLocal<Session>();
 
     public DefaultHibernateSessionManager() {
-        configuration = new AnnotationConfiguration();
+        configuration = new Configuration();
         sessionFactory = configuration.configure().buildSessionFactory();
     }
 
