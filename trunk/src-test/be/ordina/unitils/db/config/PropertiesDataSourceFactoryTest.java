@@ -27,7 +27,7 @@ public class PropertiesDataSourceFactoryTest extends TestCase {
                 return mockBasicDataSource;
             }
         };
-        propertiesFileDataSourceConfig.init(PropertiesUtils.loadPropertiesFromClasspath("be/ordina/unitils/db/config/testproperties.properties"));
+        propertiesFileDataSourceConfig.init(PropertiesUtils.loadPropertiesFromClasspath("/be/ordina/unitils/db/config/testproperties.properties"));
     }
 
     public void testCreateDataSource() {

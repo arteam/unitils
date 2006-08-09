@@ -27,7 +27,7 @@ public class PropertiesUtils {
      * @return A <code>Properties</code> object
      */
     public static Properties loadPropertiesFromClasspath(String propertiesFileName) {
-        InputStream is = ClassLoader.getSystemResourceAsStream(propertiesFileName);
+        InputStream is = PropertiesUtils.class.getResourceAsStream(propertiesFileName);
         if (is == null) {
             throw new RuntimeException("Properties file " + propertiesFileName + " not found");
         }
