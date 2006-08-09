@@ -85,7 +85,7 @@ public abstract class BaseHibernateTestCase extends BaseDatabaseTestCase {
      * Call this method in your tests if you want to test update behavior, after calling the method that performs
      * the update, to avoid getting the retrieved instance from the session cache (first-level).
      */
-    protected void clearSession() {
+    protected void flushAndClearSession() {
         // Flush all pending saves, updates and deletes to the database.
         unitTestHibernateSessionManager.flushSession();
         // Remove all objects from the Session cache
