@@ -7,6 +7,7 @@
 package be.ordina.unitils.testing.util;
 
 import junit.framework.TestCase;
+import junit.framework.AssertionFailedError;
 import junitx.framework.StringAssert;
 
 
@@ -55,7 +56,7 @@ public class ReflectionAssertTest extends TestCase {
         try {
             ReflectionAssert.assertEquals(objectsA, objectsDifferentValue);
 
-        } catch (AssertionError a) {
+        } catch (AssertionFailedError a) {
             message = a.getMessage();
         }
 
@@ -75,7 +76,7 @@ public class ReflectionAssertTest extends TestCase {
         try {
             ReflectionAssert.assertEquals(null, objectsA);
 
-        } catch (AssertionError a) {
+        } catch (AssertionFailedError a) {
             message = a.getMessage();
         }
 
@@ -95,7 +96,7 @@ public class ReflectionAssertTest extends TestCase {
         try {
             ReflectionAssert.assertEquals(objectsA, null);
 
-        } catch (AssertionError a) {
+        } catch (AssertionFailedError a) {
             message = a.getMessage();
         }
 
