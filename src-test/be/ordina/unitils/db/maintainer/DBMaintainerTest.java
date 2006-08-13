@@ -20,6 +20,8 @@ import static org.easymock.classextension.EasyMock.*;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Arrays;
 
 /**
  * @author Filip Neven
@@ -63,8 +65,8 @@ public class DBMaintainerTest extends EasyMockTestCase {
                 mockConstraintsDisabler, mockSequenceUpdater, mockDtdGenerator);
 
         versionScriptPairs = new ArrayList<VersionScriptPair>();
-        versionScriptPairs.add(new VersionScriptPair(2L, "Script 2"));
-        versionScriptPairs.add(new VersionScriptPair(3L, "Script 3"));
+        versionScriptPairs.add(new VersionScriptPair(1L, Arrays.asList("Script 1", "Script 2")));
+        versionScriptPairs.add(new VersionScriptPair(2L, Arrays.asList("Script 3")));
     }
 
     /**
@@ -73,13 +75,14 @@ public class DBMaintainerTest extends EasyMockTestCase {
      */
     public void testDBMaintainer() throws Exception {
         // Record behavior
-        expect(mockVersionSource.getDbVersion()).andReturn(1L);
-        expect(mockScriptSource.getScripts(1L)).andReturn(versionScriptPairs);
+        expect(mockVersionSource.getDbVersion()).andReturn(0L);
+        expect(mockScriptSource.getScripts(0L)).andReturn(versionScriptPairs);
         mockDbClearer.clearDatabase();
+        mockScriptRunner.execute("Script 1");
         mockScriptRunner.execute("Script 2");
-        mockVersionSource.setDbVersion(2L);
+        mockVersionSource.setDbVersion(1L);
         mockScriptRunner.execute("Script 3");
-        mockVersionSource.setDbVersion(3L);
+        mockVersionSource.setDbVersion(2L);
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDtdGenerator.generateDtd();
@@ -101,7 +104,7 @@ public class DBMaintainerTest extends EasyMockTestCase {
         expect(mockVersionSource.getDbVersion()).andReturn(2L).anyTimes();
         expect(mockScriptSource.getScripts(2L)).andReturn(versionScriptPairs);
         mockDbClearer.clearDatabase();
-        mockScriptRunner.execute("Script 2");
+        mockScriptRunner.execute("Script 1");
         expectLastCall().andThrow(new StatementHandlerException("Test exception"));
 
         replay();

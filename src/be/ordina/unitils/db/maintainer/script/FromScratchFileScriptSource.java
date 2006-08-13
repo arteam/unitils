@@ -11,7 +11,11 @@ import be.ordina.unitils.db.maintainer.VersionScriptPair;
 import java.util.Properties;
 import java.util.List;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  * Implementation of <code>ScriptSource</code> that reads script files from the filesystem, given a version in the
@@ -31,10 +35,23 @@ public class FromScratchFileScriptSource extends AbstractFileScriptSource {
         List<File> scriptFiles = getScriptFilesSorted();
         Long scriptsTimestamp = getHighestScriptTimestamp(scriptFiles);
         if (scriptsTimestamp > currentVersion) {
-            return getStatementsFromFiles(scriptFiles);
+            return Collections.singletonList(new VersionScriptPair(scriptsTimestamp, getScriptsFromFiles(scriptFiles)));
         } else {
             return Collections.EMPTY_LIST;
         }
+    }
+
+    private List<String> getScriptsFromFiles(List<File> scriptFiles) {
+        List<String> scripts = new ArrayList<String>();
+        for (File scriptFile : scriptFiles) {
+            try {
+                String script = FileUtils.readFileToString(scriptFile, System.getProperty("file.encoding"));
+                scripts.add(script);
+            } catch (IOException e) {
+                throw new RuntimeException("Error while trying to read file " + scriptFile);
+            }
+        }
+        return scripts;
     }
 
     private Long getHighestScriptTimestamp(List<File> scriptFiles) {

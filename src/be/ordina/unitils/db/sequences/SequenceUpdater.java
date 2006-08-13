@@ -1,5 +1,8 @@
 package be.ordina.unitils.db.sequences;
 
+import be.ordina.unitils.db.handler.StatementHandler;
+import be.ordina.unitils.db.handler.StatementHandlerException;
+
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -14,12 +17,13 @@ public interface SequenceUpdater {
      *
      * @param properties
      * @param dataSource
+     * @param statementHandler
      */
-    void init(Properties properties, DataSource dataSource);
+    void init(Properties properties, DataSource dataSource, StatementHandler statementHandler);
 
     /**
      * Updates the database sequences
      */
-    void updateSequences();
+    void updateSequences() throws StatementHandlerException;
 
 }

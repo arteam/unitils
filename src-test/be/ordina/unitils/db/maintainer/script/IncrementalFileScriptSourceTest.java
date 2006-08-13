@@ -1,24 +1,30 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package be.ordina.unitils.db.maintainer.script;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.util.Properties;
-import java.util.List;
-
-import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.db.maintainer.script.IncrementalFileScriptSource;
 import be.ordina.unitils.db.maintainer.VersionScriptPair;
+import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.testing.util.ReflectionAssert;
 import junit.framework.TestCase;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
+
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.File;
+import java.util.Properties;
+import java.util.List;
 
 /**
  * @author Filip Neven
  */
-public class FromScratchFileScriptSourceTest extends TestCase {
+public class IncrementalFileScriptSourceTest extends TestCase {
 
     private static final String DBCHANGE_FILE_DIRECTORY = System.getProperty("java.io.tmpdir") + "/FileScriptSourceTest";
 
@@ -35,9 +41,7 @@ public class FromScratchFileScriptSourceTest extends TestCase {
             {"dbMaintainer.fileScriptSource.fileExtension", "sql"}
     };
 
-    private ScriptSource fromScratchFileScriptSource;
-
-    private long fileVersion;
+    private ScriptSource incrementalFileScriptSource;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -49,34 +53,34 @@ public class FromScratchFileScriptSourceTest extends TestCase {
 
         // Copy test files
         copyFile(DBCHANGE_FILE1_CLASSPATH, DBCHANGE_FILE1_FILESYSTEM);
-        File f2 = copyFile(DBCHANGE_FILE2_CLASSPATH, DBCHANGE_FILE2_FILESYSTEM);
-        fileVersion = f2.lastModified();
+        copyFile(DBCHANGE_FILE2_CLASSPATH, DBCHANGE_FILE2_FILESYSTEM);
 
         // Initialize FileScriptSourceObject
         Properties testProperties = PropertiesUtils.asProperties(scriptSourceProperties);
-        fromScratchFileScriptSource = new FromScratchFileScriptSource();
-        fromScratchFileScriptSource.init(testProperties);
+        incrementalFileScriptSource = new IncrementalFileScriptSource();
+        incrementalFileScriptSource.init(testProperties);
     }
 
-    private File copyFile(String fileInClassPath, String systemPath) throws Exception {
+    private void copyFile(String fileInClassPath, String systemPath) throws Exception {
         //todo if file not found => NullPointer exception --> fix with proper checks
         InputStream is = getClass().getResourceAsStream(fileInClassPath);
         OutputStream os = new FileOutputStream(systemPath);
         IOUtils.copy(is, os);
         is.close();
         os.close();
-        return new File(systemPath);
     }
 
     public void testGetNextDbChange() {
-        List<VersionScriptPair> script = fromScratchFileScriptSource.getScripts(0L); // Should load script1.sql and script2.sql
-        assertEquals(new Long(fileVersion), script.get(0).getVersion());
+        List<VersionScriptPair> script = incrementalFileScriptSource.getScripts(0L); // Should load script1.sql
+        assertEquals(new Long(1L), script.get(0).getVersion());
         assertEquals("Contents of script 1", script.get(0).getScripts().get(0));
-        assertEquals("Contents of script 2", script.get(0).getScripts().get(1));
+        assertEquals(new Long(2L), script.get(1).getVersion());
+        assertEquals("Contents of script 2", script.get(1).getScripts().get(0));
     }
 
     public void testGetNextDbChange_noMoreChanges() {
-        List<VersionScriptPair> script = fromScratchFileScriptSource.getScripts(fileVersion); // There is no script2.sql, should return null
+        List<VersionScriptPair> script = incrementalFileScriptSource.getScripts(2L); // There is no script2.sql, should return null
         assertTrue(script.isEmpty());
     }
+
 }

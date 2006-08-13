@@ -25,11 +25,6 @@ import java.util.List;
 public class SQLScriptRunner implements ScriptRunner {
 
     /**
-     * Logger to which the statements which are executed are logged
-     */
-    private static final Logger logger = Logger.getLogger(SQLScriptRunner.class);
-
-    /**
      * StatementHandler to which the individual SQL statements in the script are passed
      */
     private StatementHandler statementHandler;
@@ -50,7 +45,6 @@ public class SQLScriptRunner implements ScriptRunner {
     public void execute(String script) throws StatementHandlerException {
         List<String> statements = loadStatements(IOUtils.toInputStream(script));
         for (String statement : statements) {
-            logger.info("Executing statement: " + statement);
             statementHandler.handle(statement);
         }
     }

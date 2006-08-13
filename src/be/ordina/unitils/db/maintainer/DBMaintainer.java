@@ -10,6 +10,7 @@ import be.ordina.unitils.db.constraints.ConstraintsDisabler;
 import be.ordina.unitils.db.dtd.DtdGenerator;
 import be.ordina.unitils.db.handler.StatementHandler;
 import be.ordina.unitils.db.handler.StatementHandlerException;
+import be.ordina.unitils.db.handler.LoggingStatementHandlerDecorator;
 import be.ordina.unitils.db.maintainer.script.ScriptSource;
 import be.ordina.unitils.db.maintainer.version.VersionSource;
 import be.ordina.unitils.db.script.SQLScriptRunner;
@@ -173,8 +174,7 @@ public class DBMaintainer {
      * @param dataSource
      */
     public DBMaintainer(Properties properties, DataSource dataSource) {
-        String configurationType = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
-                PROPKEY_CONFIGURATION_TYPE));
+        String configurationType = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_CONFIGURATION_TYPE);
         if (!PROPVALUE_CONFIGURATION_TYPE_INCREMENTAL.equals(configurationType)
                 && !PROPVALUE_CONFIGURATION_TYPE_FROMSCRATCH.equals(configurationType)) {
             throw new IllegalArgumentException("Property '" + PROPKEY_CONFIGURATION_TYPE + "' should have one of the values '" +
@@ -190,8 +190,9 @@ public class DBMaintainer {
                 '.' + configurationType));
         scriptSource.init(properties);
 
-        StatementHandler statementHandler = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
-                PROPKEY_STATEMENTHANDLER));
+        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler)
+                ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
+                PROPKEY_STATEMENTHANDLER)));
         statementHandler.init(properties, dataSource);
         scriptRunner = new SQLScriptRunner(statementHandler);
 
@@ -213,7 +214,7 @@ public class DBMaintainer {
         if (updateSequences) {
             sequenceUpdater = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
                     PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
-            sequenceUpdater.init(properties, dataSource);
+            sequenceUpdater.init(properties, dataSource, statementHandler);
         }
 
         generateDtd = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_GENERATEDTD_ENABLED);
@@ -240,7 +241,9 @@ public class DBMaintainer {
             }
             for (VersionScriptPair versionScriptPair : versionScriptPairs) {
                 try {
-                    scriptRunner.execute(versionScriptPair.getScript());
+                    for (String script : versionScriptPair.getScripts()) {
+                        scriptRunner.execute(script);
+                    }
                 } catch (StatementHandlerException e) {
                     logger.error("Error while executing scripts: " + versionScriptPair + "\nDatabase version not incremented", e);
                     logger.error("Current database version is " + versionSource.getDbVersion());

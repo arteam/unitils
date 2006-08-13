@@ -56,7 +56,7 @@ public abstract class AbstractFileScriptSource implements ScriptSource {
      */
     protected List<File> getScriptFilesSorted() {
         List<File> scriptFiles = getScriptFiles();
-        List<File> filesSorted = sortFilesByVersion(scriptFiles);
+        List<File> filesSorted = sortFilesByIndex(scriptFiles);
         return filesSorted;
     }
 
@@ -72,8 +72,8 @@ public abstract class AbstractFileScriptSource implements ScriptSource {
                 if (!StringUtils.contains(name, '_')) {
                     return false;
                 }
-                String versionNrStr = StringUtils.substringBefore(name, "_");
-                if (!StringUtils.isNumeric(versionNrStr)) {
+                String indexNrStr = StringUtils.substringBefore(name, "_");
+                if (!StringUtils.isNumeric(indexNrStr)) {
                     return false;
                 }
                 return true;
@@ -83,20 +83,20 @@ public abstract class AbstractFileScriptSource implements ScriptSource {
     }
 
     /**
-     * Sorts the given list of script files according to their version number
-     * @param filesHavingVersion
+     * Sorts the given list of script files according to their index number
+     * @param files
      * @return The sorted list of script files
      */
-    protected List<File> sortFilesByVersion(List<File> filesHavingVersion) {
-        Comparator<File> versionComparator = new Comparator<File>() {
+    protected List<File> sortFilesByIndex(List<File> files) {
+        Comparator<File> indexComparator = new Comparator<File>() {
             public int compare(File file1, File file2) {
-                Long file1VersionNr = getVersion(file1);
-                Long file2VersionNr = getVersion(file2);
-                return file1VersionNr.compareTo(file2VersionNr);
+                Long file1IndexNr = getIndex(file1);
+                Long file2IndexNr = getIndex(file2);
+                return file1IndexNr.compareTo(file2IndexNr);
             }
         };
-        Collections.sort(filesHavingVersion, versionComparator);
-        return filesHavingVersion;
+        Collections.sort(files, indexComparator);
+        return files;
     }
 
     /**
@@ -104,25 +104,8 @@ public abstract class AbstractFileScriptSource implements ScriptSource {
      * @param scriptFile The file containing a script
      * @return The version of the script file
      */
-    protected Long getVersion(File scriptFile) {
+    protected Long getIndex(File scriptFile) {
         return new Long(StringUtils.substringBefore(scriptFile.getName(), "_"));
     }
-
-    /**
-     * Returns the scripts from the given list of script files as a list of <code>VersionScriptPair</code> objects
-     * @param filesSorted The script files
-     * @return The scripts as a list of <code>VersionScriptPair</code> objects
-     */
-    protected List<VersionScriptPair> getStatementsFromFiles(List<File> filesSorted) {
-        List<VersionScriptPair> scripts = new ArrayList<VersionScriptPair>();
-        for (File file : filesSorted) {
-            try {
-                scripts.add(new VersionScriptPair(getVersion(file),
-                        FileUtils.readFileToString(file, System.getProperty("file.encoding"))));
-            } catch (IOException e) {
-                throw new RuntimeException("Error while trying to read file " + file);
-            }
-        }
-        return scripts;
-    }
+    
 }
