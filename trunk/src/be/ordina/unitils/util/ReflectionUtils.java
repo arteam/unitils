@@ -26,7 +26,7 @@ public class ReflectionUtils {
             Constructor constructor = clazz.getConstructor();
             return (T) constructor.newInstance();
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Class " + className + " identified not found");
+            throw new IllegalArgumentException("Class " + className + " not found");
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("Class " + className + " does not contain no-argument constructor");
         } catch (Exception e) {

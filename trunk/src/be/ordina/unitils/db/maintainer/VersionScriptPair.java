@@ -1,24 +1,32 @@
 package be.ordina.unitils.db.maintainer;
 
+import java.util.List;
+
 /**
- * Class representing an update script associated with a given version
+ * Class representing the database update scripts for updateing the database to a given version.
  */
 public class VersionScriptPair {
 
+    /**
+     * The version to which the database will be updated after all the scripts have been executed
+     */
     private Long version;
 
-    private String script;
+    /**
+     *  The list of DDL scripts that will bring the database into the version
+     */
+    private List<String> scripts;
 
-    public VersionScriptPair(Long version, String script) {
+    public VersionScriptPair(Long version, List<String> scripts) {
         this.version = version;
-        this.script = script;
+        this.scripts = scripts;
     }
 
     public Long getVersion() {
         return version;
     }
 
-    public String getScript() {
-        return script;
+    public List<String> getScripts() {
+        return scripts;
     }
 }

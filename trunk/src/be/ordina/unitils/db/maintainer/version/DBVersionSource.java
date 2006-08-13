@@ -56,11 +56,6 @@ public class DBVersionSource implements VersionSource {
     private String columnName;
 
     /**
-     * The type of the database column in which the DB vesion is stored
-     */
-    private String columnType;
-
-    /**
      * Initializes with the given <code>Properties</code> and <code>DataSource</code>. The <code>Properties</code>
      * object should at least contain the properties {@link PROPKEY_VERSION_TABLE_NAME} and
      * {@link PROPKEY_VERSION_COLUMN_NAME}
@@ -112,13 +107,13 @@ public class DBVersionSource implements VersionSource {
             rs = metadata.getTables(null, schemaName, tableName, null);
             if (!rs.next()) {
                 // The version table does not exist. Create it
-                 st.execute("create table " + tableName + " ( " + columnName + " " + columnType + " )");
+                 st.execute("create table " + tableName + " ( " + columnName + " number(20) )");
             } else {
                 // Check if the version table has the expected column
                 rs = metadata.getColumns(null, schemaName, tableName, columnName);
                 if (!rs.next()) {
                     // The version table exists but the column does not. Create it
-                    st.execute("alter table " + tableName + " add " + columnName + " varchar(10)");
+                    st.execute("alter table " + tableName + " add " + columnName + " number(20)");
                 }
             }
             // The version table and column exist. Check if a record with the version is available

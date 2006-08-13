@@ -62,8 +62,8 @@ public class OracleDBClearer implements DBClearer {
             conn = dataSource.getConnection();
             Statement st = conn.createStatement();
 
-            dropTables(conn, st);
-            dropSequences(conn, st);
+            dropTables(conn);
+            dropSequences(st);
         } catch (SQLException e) {
             throw new RuntimeException("Error while clearing database", e);
         } finally {
@@ -71,7 +71,7 @@ public class OracleDBClearer implements DBClearer {
         }
     }
 
-    private void dropTables(Connection conn, Statement st) throws SQLException, StatementHandlerException {
+    private void dropTables(Connection conn) throws SQLException, StatementHandlerException {
         ResultSet rset = null;
         try {
             DatabaseMetaData databaseMetadata = conn.getMetaData();
@@ -80,7 +80,6 @@ public class OracleDBClearer implements DBClearer {
                 String tableName = rset.getString("TABLE_NAME");
                 if (!tableName.equalsIgnoreCase(versionTableName)) {
                     String dropTableSQL = "drop table " + tableName + " cascade constraints";
-                    logger.info(dropTableSQL);
                     statementHandler.handle(dropTableSQL);
                 }
             }
@@ -89,7 +88,7 @@ public class OracleDBClearer implements DBClearer {
         }
     }
 
-    private void dropSequences(Connection conn, Statement st) throws SQLException, StatementHandlerException {
+    private void dropSequences(Statement st) throws SQLException, StatementHandlerException {
         ResultSet rset = null;
         try {
             rset = st.executeQuery("select SEQUENCE_NAME from USER_SEQUENCES");
@@ -98,7 +97,6 @@ public class OracleDBClearer implements DBClearer {
                 dropStatements.add("drop sequence " + rset.getString("SEQUENCE_NAME"));
             }
             for (String dropStatement : dropStatements) {
-                logger.info(dropStatement);
                 statementHandler.handle(dropStatement);
             }
         } finally {
