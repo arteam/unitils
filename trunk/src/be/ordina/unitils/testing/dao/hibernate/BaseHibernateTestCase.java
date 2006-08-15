@@ -92,4 +92,11 @@ public abstract class BaseHibernateTestCase extends BaseDatabaseTestCase {
         unitTestHibernateSessionManager.clearSession();
     }
 
+    @Override
+    protected void assertDBContentAsExpected() throws Exception {
+        // Flush all pending saves, updates and deletes to the database.
+        unitTestHibernateSessionManager.flushSession();
+        super.assertDBContentAsExpected();
+    }
+
 }
