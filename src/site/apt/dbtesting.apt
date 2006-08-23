@@ -1,0 +1,11 @@
+ -----
+ The Unitils website - Database testing
+ -----
+ -----
+
+Unit testing the database access layer
+
+ Unitils offers a complete and ready-to-start baseline to start with writing unit tests for classes that access a relational database.
+ Unitils makes use of {{{www.dbunit.org}DBUnit}} for management of test data. A DBMaintainer has been developed to automatically update
+ the state of the database.
+ 

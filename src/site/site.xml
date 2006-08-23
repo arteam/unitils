@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Unitils">
+  <bannerLeft>
+    <name>Unitils</name>
+    <!--<src>http://maven.apache.org/images/apache-maven-project.png</src>-->
+    <!--<href>http://maven.apache.org/</href>-->
+  </bannerLeft>
+  <!--<bannerRight>
+    <src>http://maven.apache.org/images/maven-small.gif</src>
+  </bannerRight>-->
+  <body>
+    <links>
+      <item name="SF.net project page" href="http://sourceforge.net/unitils" />
+      <item name="Ordina" href="http://www.ordina.be/"/>
+    </links>
+
+    <menu name="Unitils">
+      <item name="Summary" href="index.html"/>
+      <item name="News" href="news.html"/>
+      <item name="FAQ" href="faq.html"/>      
+    </menu>
+    <menu name="Documentation">
+      <item name="Assert utils" href="assertutils.html"/>
+      <item name="DAO unit testing" href="dbtesting.html"/>
+      <item name="Hibernate unit testing" href="hbntesting.html"/>
+      <item name="Mock objects" href="mocktesting.html"/>
+    </menu>
+  </body>
+</project>
