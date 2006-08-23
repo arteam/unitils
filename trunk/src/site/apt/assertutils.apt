@@ -1,0 +1,12 @@
+ -----
+ The Unitils website - assert utils
+ -----
+ -----
+
+Assert utils
+
+ Equals methods can contain business logic and should therefore not be used to test whether all inner values are equal. 
+ Instead of using the equals() method, you should compare each of the field values one by one. 
+ This can be done by accessing the field values through their getter methods (if the field has one) 
+ and then comparing the values directly. Doing this manually however would require lots of coding and is very error-prone. 
+ It’s better to do this automatically by using reflection. The <ReflectionAssert> class offers methods to do so.
