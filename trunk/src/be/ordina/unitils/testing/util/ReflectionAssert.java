@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
 
 
 /**
- * A class for asserting that 2 objects are equals by comparing all fields of the objects using reflection.
+ * A class for asserting that 2 objects are equal by comparing all fields of the objects using reflection.
  */
 public class ReflectionAssert {
 
