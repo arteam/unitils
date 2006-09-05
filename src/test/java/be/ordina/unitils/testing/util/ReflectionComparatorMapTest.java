@@ -6,6 +6,7 @@
  */
 package be.ordina.unitils.testing.util;
 
+import be.ordina.unitils.testing.util.ReflectionComparator.Difference;
 import junit.framework.TestCase;
 
 import java.util.HashMap;
@@ -14,10 +15,10 @@ import java.util.Map;
 
 
 /**
- * Test class for {@link ReflectionEquals}.
+ * Test class for {@link ReflectionComparator}.
  * Contains tests with map types.
  */
-public class ReflectionEqualsBuilderMapTest extends TestCase {
+public class ReflectionComparatorMapTest extends TestCase {
 
     /* Test map */
     private Map mapA;
@@ -40,6 +41,8 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
     /* Same as innerA and innerB but different string value for inner element 2 */
     private Map mapInnerDifferentValue;
 
+    /* Class under test */
+    private ReflectionComparator reflectionComparator;
 
     /**
      * Initializes the test fixture.
@@ -55,6 +58,8 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
         mapInnerA = createMap("key 2", null, mapA);
         mapInnerB = createMap("key 2", null, mapB);
         mapInnerDifferentValue = createMap("key 2", null, mapDifferentValue);
+
+        reflectionComparator = new ReflectionComparator();
     }
 
 
@@ -63,12 +68,9 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
      */
     public void testCheckEquals_equals() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(mapA, mapB);
+        Difference result = reflectionComparator.getDifference(mapA, mapB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -77,12 +79,9 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
      */
     public void testCheckEquals_equalsInner() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(mapInnerA, mapInnerB);
+        Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -91,12 +90,12 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
      */
     public void testCheckEquals_notEqualsDifferentValues() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(mapA, mapDifferentValue);
+        Difference result = reflectionComparator.getDifference(mapA, mapDifferentValue);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("key 2", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals("test 2", reflectionEquals.getDifferenceLeftValue());
-        assertEquals("XXXXXX", reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("key 2", result.getFieldStack().get(0));
+        assertEquals("test 2", result.getLeftValue());
+        assertEquals("XXXXXX", result.getRightValue());
     }
 
 
@@ -108,12 +107,12 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
         iterator.next();
         iterator.remove();
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(mapA, mapB);
+        Difference result = reflectionComparator.getDifference(mapA, mapB);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertTrue(reflectionEquals.getDifferenceFieldStack().isEmpty());
-        assertSame(mapA, reflectionEquals.getDifferenceLeftValue());
-        assertSame(mapB, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertSame(mapA, result.getLeftValue());
+        assertSame(mapB, result.getRightValue());
     }
 
 
@@ -122,13 +121,13 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
      */
     public void testCheckEquals_notEqualsInnerDifferentValues() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(mapInnerA, mapInnerDifferentValue);
+        Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerDifferentValue);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("key 2", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals("inner", reflectionEquals.getDifferenceFieldStack().get(1));
-        assertEquals("test 2", reflectionEquals.getDifferenceLeftValue());
-        assertEquals("XXXXXX", reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("key 2", result.getFieldStack().get(0));
+        assertEquals("inner", result.getFieldStack().get(1));
+        assertEquals("test 2", result.getLeftValue());
+        assertEquals("XXXXXX", result.getRightValue());
     }
 
 
@@ -137,12 +136,12 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
      */
     public void testCheckEquals_notEqualsDifferentKeys() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(mapA, mapDifferentKey);
+        Difference result = reflectionComparator.getDifference(mapA, mapDifferentKey);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("key 2", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertSame(mapA.get("key 2"), reflectionEquals.getDifferenceLeftValue());
-        assertEquals(null, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("key 2", result.getFieldStack().get(0));
+        assertSame(mapA.get("key 2"), result.getLeftValue());
+        assertEquals(null, result.getRightValue());
     }
 
 
@@ -154,12 +153,12 @@ public class ReflectionEqualsBuilderMapTest extends TestCase {
         iterator.next();
         iterator.remove();
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(mapInnerA, mapInnerB);
+        Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerB);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("key 2", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertSame(mapA, reflectionEquals.getDifferenceLeftValue());
-        assertSame(mapB, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("key 2", result.getFieldStack().get(0));
+        assertSame(mapA, result.getLeftValue());
+        assertSame(mapB, result.getRightValue());
     }
 
 

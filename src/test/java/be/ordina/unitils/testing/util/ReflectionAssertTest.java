@@ -6,8 +6,8 @@
  */
 package be.ordina.unitils.testing.util;
 
-import junit.framework.TestCase;
 import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 import junitx.framework.StringAssert;
 
 
@@ -25,6 +25,9 @@ public class ReflectionAssertTest extends TestCase {
     /* Same as A and B but different string value for stringValue2 */
     private Objects objectsDifferentValue;
 
+    /* Class under test */
+    private ReflectionAssert reflectionAssert;
+
 
     /**
      * Initializes the test fixture.
@@ -35,15 +38,18 @@ public class ReflectionAssertTest extends TestCase {
         objectsA = new Objects("test 1", "test 2");
         objectsB = new Objects("test 1", "test 2");
         objectsDifferentValue = new Objects("test 1", "XXXXXX");
+
+        reflectionAssert = new ReflectionAssert();
     }
 
+    //todo tests for lenient stuff
 
     /**
      * Test for two equal objects.
      */
     public void testAssertEquals_equals() {
 
-        ReflectionAssert.assertEquals(objectsA, objectsB);
+        reflectionAssert.assertEquals(objectsA, objectsB);
     }
 
 
@@ -54,7 +60,7 @@ public class ReflectionAssertTest extends TestCase {
 
         String message = null;
         try {
-            ReflectionAssert.assertEquals(objectsA, objectsDifferentValue);
+            reflectionAssert.assertEquals(objectsA, objectsDifferentValue);
 
         } catch (AssertionFailedError a) {
             message = a.getMessage();
@@ -74,7 +80,7 @@ public class ReflectionAssertTest extends TestCase {
 
         String message = null;
         try {
-            ReflectionAssert.assertEquals(null, objectsA);
+            reflectionAssert.assertEquals(null, objectsA);
 
         } catch (AssertionFailedError a) {
             message = a.getMessage();
@@ -94,7 +100,7 @@ public class ReflectionAssertTest extends TestCase {
 
         String message = null;
         try {
-            ReflectionAssert.assertEquals(objectsA, null);
+            reflectionAssert.assertEquals(objectsA, null);
 
         } catch (AssertionFailedError a) {
             message = a.getMessage();
@@ -112,7 +118,7 @@ public class ReflectionAssertTest extends TestCase {
      */
     public void testCheckEquals_null() {
 
-        ReflectionAssert.assertEquals(null, null);
+        reflectionAssert.assertEquals(null, null);
     }
 
 

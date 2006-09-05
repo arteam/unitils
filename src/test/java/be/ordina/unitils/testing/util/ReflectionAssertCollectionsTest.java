@@ -1,16 +1,18 @@
 package be.ordina.unitils.testing.util;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+
+import static be.ordina.unitils.testing.util.ReflectionComparatorModes.*;
 
 /**
- * @author Filip Neven
+ * todo javadoc
  */
-public class CollectionAssertTest extends TestCase {
+public class ReflectionAssertCollectionsTest extends TestCase {
 
     private List<String> list = Arrays.asList("el1", "el2");
 
@@ -32,17 +34,30 @@ public class CollectionAssertTest extends TestCase {
 
     private List<TestObject> differentListObjects = Arrays.asList(new TestObject("el2"), new TestObject("el3"));
 
+    /* Class under test */
+    private ReflectionAssert reflectionAssert;
+
+    /**
+     * Initializes the test fixture.
+     */
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        reflectionAssert = new ReflectionAssert();
+    }
+
+
     public void testAssertEquals_sameSequence() {
-        CollectionAssert.assertEquals(list, sameList);
+        reflectionAssert.assertEquals(list, sameList);
     }
 
     public void testAssertEquals_differentSequence() {
-        CollectionAssert.assertEquals(list, listDifferentSequence);
+        new ReflectionAssert(LENIENT_ORDER).assertEquals(list, listDifferentSequence);
     }
 
     public void testAssertEquals_differentListSameSize() {
         try {
-            CollectionAssert.assertEquals(list, differentListSameSize);
+            reflectionAssert.assertEquals(list, differentListSameSize);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -52,7 +67,7 @@ public class CollectionAssertTest extends TestCase {
 
     public void testAssertEquals_duplicateElement() {
         try {
-            CollectionAssert.assertEquals(list, listDuplicateElement);
+            reflectionAssert.assertEquals(list, listDuplicateElement);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -62,7 +77,7 @@ public class CollectionAssertTest extends TestCase {
 
     public void testAssertEquals_oneElementLess() {
         try {
-            CollectionAssert.assertEquals(list, listOneElementLess);
+            reflectionAssert.assertEquals(list, listOneElementLess);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -72,7 +87,7 @@ public class CollectionAssertTest extends TestCase {
 
     public void testAssertEquals_oneElementMore() {
         try {
-            CollectionAssert.assertEquals(list, listOneElementMore);
+            reflectionAssert.assertEquals(list, listOneElementMore);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -81,12 +96,12 @@ public class CollectionAssertTest extends TestCase {
     }
 
     public void testAssertEquals_strictSequence_sameSequence() {
-        CollectionAssert.assertEquals(list, sameList, true);
+        reflectionAssert.assertEquals(list, sameList);
     }
 
     public void testAssertEquals_strictSequence_differentSequence() {
         try {
-            CollectionAssert.assertEquals(list, listDifferentSequence, true);
+            reflectionAssert.assertEquals(list, listDifferentSequence);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -96,7 +111,7 @@ public class CollectionAssertTest extends TestCase {
 
     public void testAssertEquals_strictSequence_differentListSameSize() {
         try {
-            CollectionAssert.assertEquals(list, differentListSameSize);
+            reflectionAssert.assertEquals(list, differentListSameSize);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -106,7 +121,7 @@ public class CollectionAssertTest extends TestCase {
 
     public void testAssertEquals_strictSequence_duplicateElement() {
         try {
-            CollectionAssert.assertEquals(list, listDuplicateElement, true);
+            reflectionAssert.assertEquals(list, listDuplicateElement);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -116,7 +131,7 @@ public class CollectionAssertTest extends TestCase {
 
     public void testAssertEquals_strictSequence_oneElementLess() {
         try {
-            CollectionAssert.assertEquals(list, listOneElementLess, true);
+            reflectionAssert.assertEquals(list, listOneElementLess);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -126,7 +141,7 @@ public class CollectionAssertTest extends TestCase {
 
     public void testAssertEquals_strictSequence_oneElementMore() {
         try {
-            CollectionAssert.assertEquals(list, listOneElementMore, true);
+            reflectionAssert.assertEquals(list, listOneElementMore);
         } catch (AssertionFailedError e) {
             // Expected
             return;
@@ -134,17 +149,23 @@ public class CollectionAssertTest extends TestCase {
         Assert.fail("Expected AssertionFailedError");
     }
 
+
+
+
+
+    //todo other test class
+
     public void testAssertPropertyEquals_sameSequence() {
-        CollectionAssert.assertPropertyEquals(list, listObjects, "testProperty");
+        reflectionAssert.assertPropertyEquals("testProperty", list, listObjects);
     }
 
     public void testAssertPropertyEquals_differentSequence() {
-        CollectionAssert.assertPropertyEquals(list, listObjects, "testProperty");
+        reflectionAssert.assertPropertyEquals("testProperty", list, listObjects);
     }
 
     public void testAssertPropertyEquals_differentList() {
         try {
-            CollectionAssert.assertPropertyEquals(list, differentListObjects, "testProperty", true);
+            reflectionAssert.assertPropertyEquals("testProperty", list, differentListObjects);
         } catch (AssertionFailedError e) {
             // Excpected
             return;
@@ -153,12 +174,12 @@ public class CollectionAssertTest extends TestCase {
     }
 
     public void testAssertPropertyEquals_strictSequence_sameSequence() {
-        CollectionAssert.assertPropertyEquals(list, listObjects, "testProperty", true);
+        reflectionAssert.assertPropertyEquals("testProperty", list, listObjects);
     }
 
     public void testAssertPropertyEquals_strictSequence_differentSequence() {
         try {
-            CollectionAssert.assertPropertyEquals(list, listObjectsDifferentSequence, "testProperty", true);
+            reflectionAssert.assertPropertyEquals("testProperty", list, listObjectsDifferentSequence);
         } catch (AssertionFailedError e) {
             // Excpected
             return;
@@ -183,4 +204,5 @@ public class CollectionAssertTest extends TestCase {
         }
 
     }
+
 }

@@ -6,14 +6,15 @@
  */
 package be.ordina.unitils.testing.util;
 
+import be.ordina.unitils.testing.util.ReflectionComparator.Difference;
 import junit.framework.TestCase;
 
 
 /**
- * Test class for {@link ReflectionEquals}.
+ * Test class for {@link ReflectionComparator}.
  * Contains tests with primitive types.
  */
-public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
+public class ReflectionComparatorPrimitivesTest extends TestCase {
 
     /* Test object */
     private Primitives primitivesA;
@@ -36,6 +37,8 @@ public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
     /* Same as innerA and innerB but different int value for inner intValue2 */
     private Primitives primitivesInnerDifferentValue;
 
+    /* Class under test */
+    private ReflectionComparator reflectionComparator;
 
     /**
      * Initializes the test fixture.
@@ -51,6 +54,8 @@ public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
         primitivesInnerA = new Primitives(0, 0, primitivesA);
         primitivesInnerB = new Primitives(0, 0, primitivesB);
         primitivesInnerDifferentValue = new Primitives(0, 0, primitiveDifferentValue);
+
+        reflectionComparator = new ReflectionComparator();
     }
 
 
@@ -59,12 +64,9 @@ public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
      */
     public void testCheckEquals_equals() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(primitivesA, primitivesB);
+        Difference result = reflectionComparator.getDifference(primitivesA, primitivesB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -73,12 +75,9 @@ public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
      */
     public void testCheckEquals_equalsInner() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(primitivesInnerA, primitivesInnerB);
+        Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -87,12 +86,12 @@ public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
      */
     public void testCheckEquals_notEqualsDifferentValues() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(primitivesA, primitiveDifferentValue);
+        Difference result = reflectionComparator.getDifference(primitivesA, primitiveDifferentValue);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("intValue2", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals(new Integer(2), reflectionEquals.getDifferenceLeftValue());
-        assertEquals(new Integer(9999), reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("intValue2", result.getFieldStack().get(0));
+        assertEquals(new Integer(2), result.getLeftValue());
+        assertEquals(new Integer(9999), result.getRightValue());
     }
 
 
@@ -101,12 +100,12 @@ public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
      */
     public void testCheckEquals_notEqualsRight0() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(primitivesA, primitives0Value);
+        Difference result = reflectionComparator.getDifference(primitivesA, primitives0Value);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("intValue2", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals(new Integer(2), reflectionEquals.getDifferenceLeftValue());
-        assertEquals(new Integer(0), reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("intValue2", result.getFieldStack().get(0));
+        assertEquals(new Integer(2), result.getLeftValue());
+        assertEquals(new Integer(0), result.getRightValue());
     }
 
 
@@ -115,12 +114,12 @@ public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
      */
     public void testCheckEquals_notEqualsLeft0() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(primitives0Value, primitivesA);
+        Difference result = reflectionComparator.getDifference(primitives0Value, primitivesA);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("intValue2", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals(new Integer(0), reflectionEquals.getDifferenceLeftValue());
-        assertEquals(new Integer(2), reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("intValue2", result.getFieldStack().get(0));
+        assertEquals(new Integer(0), result.getLeftValue());
+        assertEquals(new Integer(2), result.getRightValue());
     }
 
 
@@ -129,13 +128,13 @@ public class ReflectionEqualsBuilderPrimitivesTest extends TestCase {
      */
     public void testCheckEquals_notEqualsInnerDifferentValues() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(primitivesInnerA, primitivesInnerDifferentValue);
+        Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerDifferentValue);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("inner", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals("intValue2", reflectionEquals.getDifferenceFieldStack().get(1));
-        assertEquals(new Integer(2), reflectionEquals.getDifferenceLeftValue());
-        assertEquals(new Integer(9999), reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("inner", result.getFieldStack().get(0));
+        assertEquals("intValue2", result.getFieldStack().get(1));
+        assertEquals(new Integer(2), result.getLeftValue());
+        assertEquals(new Integer(9999), result.getRightValue());
     }
 
 
