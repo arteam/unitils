@@ -6,18 +6,20 @@
  */
 package be.ordina.unitils.testing.util;
 
+import be.ordina.unitils.testing.util.ReflectionComparator.Difference;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 
 /**
- * Test class for {@link ReflectionEquals}.
+ * Test class for {@link ReflectionComparator}.
  * Contains tests with collection types.
  */
-public class ReflectionEqualsBuilderCollectionTest extends TestCase {
+public class ReflectionComparatorCollectionTest extends TestCase {
 
     /* Test collection */
     private Collection collectionA;
@@ -28,6 +30,9 @@ public class ReflectionEqualsBuilderCollectionTest extends TestCase {
     /* Same as A and B but different string value for element 2 */
     private Collection collectionDifferentValue;
 
+    /* Same as A but in a LinkedList instead of an ArrayList */
+    private Collection collectionDifferentType;
+
     /* Test collection with inner collection for element 2 */
     private Collection collectionInnerA;
 
@@ -37,6 +42,8 @@ public class ReflectionEqualsBuilderCollectionTest extends TestCase {
     /* Same as innerA and innerB but different string value for inner element 2 */
     private Collection collectionInnerDifferentValue;
 
+    /* Class under test */
+    private ReflectionComparator reflectionComparator;
 
     /**
      * Initializes the test fixture.
@@ -47,10 +54,13 @@ public class ReflectionEqualsBuilderCollectionTest extends TestCase {
         collectionA = createCollection("test 2", null);
         collectionB = createCollection("test 2", null);
         collectionDifferentValue = createCollection("XXXXXX", null);
+        collectionDifferentType = new LinkedList(collectionA);
 
         collectionInnerA = createCollection(null, collectionA);
         collectionInnerB = createCollection(null, collectionB);
         collectionInnerDifferentValue = createCollection(null, collectionDifferentValue);
+
+        reflectionComparator = new ReflectionComparator();
     }
 
 
@@ -59,26 +69,29 @@ public class ReflectionEqualsBuilderCollectionTest extends TestCase {
      */
     public void testCheckEquals_equals() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(collectionA, collectionB);
+        Difference result = reflectionComparator.getDifference(collectionA, collectionB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
+    /**
+     * Test for two equal collections that are of a different type.
+     */
+    public void testCheckEquals_equalsDifferentType() {
+
+        Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentType);
+
+        assertNull(result);
+    }
 
     /**
      * Test for two equal collections as an inner field of an object.
      */
     public void testCheckEquals_equalsInner() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(collectionInnerA, collectionInnerB);
+        Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -87,12 +100,12 @@ public class ReflectionEqualsBuilderCollectionTest extends TestCase {
      */
     public void testCheckEquals_notEqualsDifferentValues() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(collectionA, collectionDifferentValue);
+        Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentValue);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("1", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals("test 2", reflectionEquals.getDifferenceLeftValue());
-        assertEquals("XXXXXX", reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("1", result.getFieldStack().get(0));
+        assertEquals("test 2", result.getLeftValue());
+        assertEquals("XXXXXX", result.getRightValue());
     }
 
 
@@ -104,12 +117,12 @@ public class ReflectionEqualsBuilderCollectionTest extends TestCase {
         iterator.next();
         iterator.remove();
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(collectionA, collectionB);
+        Difference result = reflectionComparator.getDifference(collectionA, collectionB);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertTrue(reflectionEquals.getDifferenceFieldStack().isEmpty());
-        assertSame(collectionA, reflectionEquals.getDifferenceLeftValue());
-        assertSame(collectionB, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertSame(collectionA, result.getLeftValue());
+        assertSame(collectionB, result.getRightValue());
     }
 
 
@@ -118,13 +131,13 @@ public class ReflectionEqualsBuilderCollectionTest extends TestCase {
      */
     public void testCheckEquals_notEqualsInnerDifferentValues() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(collectionInnerA, collectionInnerDifferentValue);
+        Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerDifferentValue);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("1", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals("inner", reflectionEquals.getDifferenceFieldStack().get(1));
-        assertEquals("test 2", reflectionEquals.getDifferenceLeftValue());
-        assertEquals("XXXXXX", reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("1", result.getFieldStack().get(0));
+        assertEquals("inner", result.getFieldStack().get(1));
+        assertEquals("test 2", result.getLeftValue());
+        assertEquals("XXXXXX", result.getRightValue());
     }
 
 
@@ -136,12 +149,12 @@ public class ReflectionEqualsBuilderCollectionTest extends TestCase {
         iterator.next();
         iterator.remove();
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(collectionInnerA, collectionInnerB);
+        Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerB);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("1", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertSame(collectionA, reflectionEquals.getDifferenceLeftValue());
-        assertSame(collectionB, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("1", result.getFieldStack().get(0));
+        assertSame(collectionA, result.getLeftValue());
+        assertSame(collectionB, result.getRightValue());
     }
 
 

@@ -6,14 +6,15 @@
  */
 package be.ordina.unitils.testing.util;
 
+import be.ordina.unitils.testing.util.ReflectionComparator.Difference;
 import junit.framework.TestCase;
 
 
 /**
- * Test class for {@link ReflectionEquals}.
+ * Test class for {@link ReflectionComparator}.
  * Contains tests with primitive array types.
  */
-public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
+public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
 
     /* Test array */
     private int[] arrayA;
@@ -39,6 +40,8 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
     /* Same as innerA and innerB but no 3rd inner element */
     private Element arrayInnerDifferentSize;
 
+    /* Class under test */
+    private ReflectionComparator reflectionComparator;
 
     /**
      * Initializes the test fixture.
@@ -55,6 +58,8 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
         arrayInnerB = new Element(arrayB);
         arrayInnerDifferentValue = new Element(arrayDifferentValue);
         arrayInnerDifferentSize = new Element(arrayDifferentSize);
+
+        reflectionComparator = new ReflectionComparator();
     }
 
 
@@ -63,12 +68,9 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
      */
     public void testCheckEquals_equals() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(arrayA, arrayB);
+        Difference result = reflectionComparator.getDifference(arrayA, arrayB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -77,12 +79,9 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
      */
     public void testCheckEquals_equalsInner() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(arrayInnerA, arrayInnerB);
+        Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -91,12 +90,12 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
      */
     public void testCheckEquals_notEqualsDifferentValues() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(arrayA, arrayDifferentValue);
+        Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentValue);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertTrue(reflectionEquals.getDifferenceFieldStack().isEmpty());
-        assertSame(arrayA, reflectionEquals.getDifferenceLeftValue());
-        assertSame(arrayDifferentValue, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertSame(arrayA, result.getLeftValue());
+        assertSame(arrayDifferentValue, result.getRightValue());
     }
 
 
@@ -105,12 +104,12 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
      */
     public void testCheckEquals_notEqualsDifferentSize() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(arrayA, arrayDifferentSize);
+        Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentSize);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertTrue(reflectionEquals.getDifferenceFieldStack().isEmpty());
-        assertSame(arrayA, reflectionEquals.getDifferenceLeftValue());
-        assertSame(arrayDifferentSize, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertSame(arrayA, result.getLeftValue());
+        assertSame(arrayDifferentSize, result.getRightValue());
     }
 
 
@@ -119,12 +118,12 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
      */
     public void testCheckEquals_notEqualsInnerDifferentValues() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(arrayInnerA, arrayInnerDifferentValue);
+        Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentValue);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("inner", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertSame(arrayA, reflectionEquals.getDifferenceLeftValue());
-        assertSame(arrayDifferentValue, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("inner", result.getFieldStack().get(0));
+        assertSame(arrayA, result.getLeftValue());
+        assertSame(arrayDifferentValue, result.getRightValue());
     }
 
 
@@ -133,12 +132,12 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
      */
     public void testCheckEquals_notEqualsInnerDifferentSize() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(arrayInnerA, arrayInnerDifferentSize);
+        Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentSize);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("inner", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertSame(arrayA, reflectionEquals.getDifferenceLeftValue());
-        assertSame(arrayDifferentSize, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("inner", result.getFieldStack().get(0));
+        assertSame(arrayA, result.getLeftValue());
+        assertSame(arrayDifferentSize, result.getRightValue());
     }
 
 
@@ -177,5 +176,4 @@ public class ReflectionEqualsBuilderPrimitivesArrayTest extends TestCase {
             return false;
         }
     }
-
 }

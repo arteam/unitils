@@ -24,10 +24,14 @@
     <option name="COMPILE_IN_BACKGROUND" value="false" />
     <option name="AUTO_SHOW_ERRORS_IN_EDITOR" value="true" />
     <option name="CLOSE_MESSAGE_VIEW_IF_SUCCESS" value="true" />
-    <option name="COMPILE_DEPENDENT_FILES" value="false" />
   </component>
   <component name="Cvs2Configuration">
+    <option name="ON_FILE_ADDING" value="0" />
+    <option name="ON_FILE_REMOVING" value="0" />
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
+    <option name="SHOW_UPDATE_OPTIONS" value="true" />
+    <option name="SHOW_ADD_OPTIONS" value="true" />
+    <option name="SHOW_REMOVE_OPTIONS" value="true" />
     <option name="MERGING_MODE" value="0" />
     <option name="MERGE_WITH_BRANCH1_NAME" value="HEAD" />
     <option name="MERGE_WITH_BRANCH2_NAME" value="HEAD" />
@@ -36,8 +40,10 @@
     <option name="DEFAULT_TEXT_FILE_SUBSTITUTION" value="kv" />
     <option name="PROCESS_UNKNOWN_FILES" value="false" />
     <option name="PROCESS_DELETED_FILES" value="false" />
-    <option name="PROCESS_IGNORED_FILES" value="false" />
+    <option name="SHOW_EDIT_DIALOG" value="true" />
     <option name="RESERVED_EDIT" value="false" />
+    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <option name="SHOW_CHECKOUT_OPTIONS" value="true" />
     <option name="CHECKOUT_DATE_OR_REVISION_SETTINGS">
       <value>
         <option name="BRANCH" value="" />
@@ -63,45 +69,42 @@
       </value>
     </option>
     <option name="SHOW_OUTPUT" value="false" />
+    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
+    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
     <option name="ADD_WATCH_INDEX" value="0" />
     <option name="REMOVE_WATCH_INDEX" value="0" />
     <option name="UPDATE_KEYWORD_SUBSTITUTION" />
     <option name="MAKE_NEW_FILES_READONLY" value="false" />
     <option name="SHOW_CORRUPTED_PROJECT_FILES" value="0" />
     <option name="TAG_AFTER_FILE_COMMIT" value="false" />
-    <option name="OVERRIDE_EXISTING_TAG_FOR_FILE" value="true" />
     <option name="TAG_AFTER_FILE_COMMIT_NAME" value="" />
     <option name="TAG_AFTER_PROJECT_COMMIT" value="false" />
-    <option name="OVERRIDE_EXISTING_TAG_FOR_PROJECT" value="true" />
     <option name="TAG_AFTER_PROJECT_COMMIT_NAME" value="" />
-    <option name="CLEAN_COPY" value="false" />
+    <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
+    <option name="SHOW_CHECKIN_OPTIONS" value="true" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
+    <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_FILE_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
   </component>
   <component name="CvsTabbedWindow" />
   <component name="DaemonCodeAnalyzer">
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/src/be/ordina/unitils/db/maintainer/script/FromScratchFileScriptSource.java" line="34" class="be.ordina.unitils.db.maintainer.script.FromScratchFileScriptSource" package="be.ordina.unitils.db.maintainer.script">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </line_breakpoints>
-    <breakpoint_any>
-      <breakpoint>
+    <line_breakpoints />
+    <exception_breakpoints>
+      <breakpoint_any>
         <option name="NOTIFY_CAUGHT" value="true" />
         <option name="NOTIFY_UNCAUGHT" value="true" />
         <option name="ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND_VM" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
         <option name="COUNT_FILTER_ENABLED" value="false" />
@@ -109,12 +112,12 @@
         <option name="CONDITION_ENABLED" value="false" />
         <option name="CLASS_FILTERS_ENABLED" value="false" />
         <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </breakpoint_any>
-    <breakpoint_rules />
-    <ui_properties />
+        <option name="myCondition" value="" />
+        <option name="myLogMessage" value="" />
+      </breakpoint_any>
+    </exception_breakpoints>
+    <field_breakpoints />
+    <method_breakpoints />
   </component>
   <component name="ErrorTreeViewConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
@@ -133,113 +136,53 @@
     </favorites_list>
     <option name="myCurrentFavoritesList" value="Unitils" />
   </component>
-  <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="UnitilsProperties.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/UnitilsProperties.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="61" selection-start="192" selection-end="192" vertical-scroll-proportion="0.24844721">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EasyMockTestCase.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/EasyMockTestCase.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="4" selection-start="1388" selection-end="1388" vertical-scroll-proportion="0.4037267">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AutoInjector.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/AutoInjector.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="17" selection-start="119" selection-end="119" vertical-scroll-proportion="0.2173913">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AutoDetectAutoInjector.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/AutoDetectAutoInjector.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AutoInjectMocks.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/AutoInjectMocks.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="18" selection-start="315" selection-end="315" vertical-scroll-proportion="0.3726708">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ConstructorAutoInjector.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/ConstructorAutoInjector.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ByTypeAutoInjector.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/ByTypeAutoInjector.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ByNameAutoInjector.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/ByNameAutoInjector.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NoInjectionAutoInjector.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/NoInjectionAutoInjector.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="unittest.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/unittest.properties">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+  <component name="FileEditorManager" split-orientation="horizontal" split-proportion="0.5">
+    <first-group selected-file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertCollectionsTest.java">
+      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionAssert.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="103" column="37" selection-start="3762" selection-end="3762" vertical-scroll-proportion="1.026">
+            <folding>
+              <element signature="imports" expanded="true" />
+            </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertTest.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="84" column="18" selection-start="2083" selection-end="2083" vertical-scroll-proportion="0.45615762">
+            <folding>
+              <element signature="imports" expanded="true" />
+            </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorCollectionTest.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="83" column="0" selection-start="2451" selection-end="2451" vertical-scroll-proportion="0.34679803">
+            <folding>
+              <element signature="imports" expanded="true" />
+            </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertCollectionsTest.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="119" column="12" selection-start="3689" selection-end="3689" vertical-scroll-proportion="0.21674877">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionComparator.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="127" column="99" selection-start="5179" selection-end="5179" vertical-scroll-proportion="0.334">
+            <folding>
+              <element signature="imports" expanded="true" />
+            </folding>
+          </state>
+        </provider>
+      </entry>
+    </first-group>
+    <second-group />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -254,36 +197,16 @@
   <component name="InspectionManager">
     <option name="AUTOSCROLL_TO_SOURCE" value="false" />
     <option name="SPLITTER_PROPORTION" value="0.5" />
-    <option name="GROUP_BY_SEVERITY" value="false" />
-    <option name="ANALYZE_TEST_SOURCES" value="true" />
-    <option name="SCOPE_TYPE" value="1" />
     <profile name="Default" />
   </component>
-  <component name="J2EEProjectPane">
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.j2ee.module.view.nodes.J2EEProjectNodeDescriptor" />
-      </PATH_ELEMENT>
-    </PATH>
-    <setting name="SHOW_AS_DEPLOYMENT_VIEW" value="false" />
-  </component>
+  <component name="J2EEProjectPane" />
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" value="Unitils" />
     <option name="LAST_EDITED_TAB_NAME" value="Libraries (Classpath)" />
   </component>
   <component name="NamedScopeManager" />
   <component name="PackagesPane">
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
-      </PATH_ELEMENT>
-    </PATH>
+    <expanded_node url="" module="Unitils" type="module" />
   </component>
   <component name="PerforceChangeBrowserSettings">
     <option name="USE_USER_FILTER" value="true" />
@@ -326,362 +249,26 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectPane">
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db\maintainer" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db\maintainer" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db\maintainer\version" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db\maintainer" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db\maintainer\script" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src-test\be\ordina\unitils\db\config" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils\util" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils\testing" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils\testing" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils\testing\mock" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="Unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils\testing" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils\testing\mock" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\Projects\unitils\trunk\src\be\ordina\unitils\testing\mock\inject" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
+    <expanded_node url="file://$PROJECT_DIR$/src" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$" module="Unitils" type="directory" />
+    <expanded_node url="" module="Unitils" type="module" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/db/script" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/dao" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/db" module="Unitils" type="directory" />
   </component>
   <component name="ProjectReloadState">
     <option name="STATE" value="0" />
@@ -693,11 +280,9 @@
       <showModules />
       <showLibraryContents />
       <hideEmptyPackages />
-      <abbreviatePackageNames />
       <showStructure ProjectPane="false" />
-      <autoscrollToSource />
-      <autoscrollFromSource />
-      <sortByType />
+      <autoscrollToSource ProjectPane="true" />
+      <autoscrollFromSource ProjectPane="true" />
     </navigator>
   </component>
   <component name="PropertiesComponent">
@@ -738,14 +323,12 @@
   <component name="RestoreUpdateTree" />
   <component name="RunManager">
     <activeType name="JUnit" />
-    <tempConfiguration selected="true" default="false" name="CollectionAssertTest" type="JUnit" factoryName="JUnit">
+    <tempConfiguration selected="true" default="false" name="be.ordina.unitils.testing.util" type="JUnit" factoryName="JUnit">
       <module name="Unitils" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="be.ordina.unitils.testing.util" />
-      <option name="MAIN_CLASS_NAME" value="be.ordina.unitils.testing.util.CollectionAssertTest" />
+      <option name="MAIN_CLASS_NAME" />
       <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="TEST_OBJECT" value="package" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -765,22 +348,16 @@
       <option name="HEIGHT" value="300" />
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
     </configuration>
-    <configuration selected="false" default="true" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <module name="" />
+    <configuration selected="false" default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
     </configuration>
     <configuration selected="false" default="true" type="JUnit" factoryName="JUnit">
       <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" />
       <option name="MAIN_CLASS_NAME" />
       <option name="METHOD_NAME" />
@@ -793,44 +370,30 @@
         <value defaultName="wholeProject" />
       </option>
     </configuration>
-    <configuration selected="false" default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
+    <configuration selected="false" default="true" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <module name="" />
     </configuration>
     <configuration selected="true" default="false" name="DuplicateFileSearch" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="util.DuplicateFileSearch" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PROGRAM_PARAMETERS" value="C:\I386\xqt1 C:\I386\duplicates" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <module name="Unitils" />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-    </configuration>
-    <configuration selected="false" default="false" name="PropertiesDataSourceFactoryTest" type="JUnit" factoryName="JUnit">
-      <module name="Unitils" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="be.ordina.unitils.db.config" />
-      <option name="MAIN_CLASS_NAME" value="be.ordina.unitils.db.config.PropertiesDataSourceFactoryTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
     </configuration>
   </component>
-  <component name="SelectInManager" />
+  <component name="SelectInManager">
+    <target name="J2EE View" />
+    <target name="File Structure" />
+    <target name="Project" />
+    <target name="Packages" />
+    <target name="Commander" />
+  </component>
   <component name="StarteamConfiguration">
     <option name="SERVER" value="" />
     <option name="PORT" value="49201" />
@@ -839,12 +402,29 @@
     <option name="PROJECT" value="" />
     <option name="VIEW" value="" />
     <option name="ALTERNATIVE_WORKING_PATH" value="" />
+    <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
+    <option name="SHOW_CHECKIN_OPTIONS" value="true" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
+    <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_FILE_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
   </component>
   <component name="StructuralSearchPlugin" />
   <component name="StructureViewFactory">
+    <option name="SORT_MODE" value="0" />
+    <option name="GROUP_INHERITED" value="true" />
     <option name="AUTOSCROLL_MODE" value="true" />
+    <option name="SHOW_FIELDS" value="true" />
     <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
-    <option name="ACTIVE_ACTIONS" value="" />
+    <option name="GROUP_GETTERS_AND_SETTERS" value="true" />
+    <option name="SHOW_INHERITED" value="false" />
+    <option name="HIDE_NOT_PUBLIC" value="false" />
   </component>
   <component name="SvnChangesBrowserSettings">
     <option name="USE_AUTHOR_FIELD" value="true" />
@@ -861,42 +441,40 @@
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
       <are-packages-shown value="false" />
-      <are-modules-shown value="false" />
       <flatten-packages value="false" />
       <is-autoscroll-to-source value="true" />
     </todo-panel>
     <todo-panel id="all">
       <are-packages-shown value="true" />
-      <are-modules-shown value="false" />
-      <flatten-packages value="false" />
+      <flatten-packages value="true" />
       <is-autoscroll-to-source value="true" />
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1928" height="1174" extended-state="0" />
-    <editor active="true" />
+    <frame x="30" y="-4" width="1574" height="1208" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3298279" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.21002132" order="0" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.32695985" order="1" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.32962963" order="7" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="true" weight="0.32720104" order="0" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3271028" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.24967149" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.22466539" order="11" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.225" order="11" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.39961758" order="6" />
-      <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="9" />
-      <window_info id="Favorites" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="5" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.14392324" order="1" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.27246654" order="2" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.25361368" order="1" x="59" y="60" width="1515" height="1080" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.4861111" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
-      <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="4" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33652008" order="4" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.3361111" order="4" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="sliding" type="sliding" visible="false" weight="0.4" order="0" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="10" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="0" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="3" />
+      <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
+      <window_info id="Favorites" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="5" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="5" />
+      <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="4" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="10" />
     </layout>
   </component>
   <component name="VCS.FileViewConfiguration">
@@ -907,29 +485,10 @@
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
-    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
-    <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
-    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
-    <option name="OPTIMIZE_IMPORTS_BEFORE_FILE_COMMIT" value="false" />
-    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
-    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
-    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
-    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
-    <option name="ERROR_OCCURED" value="false" />
     <option name="ACTIVE_VCS_NAME" value="svn" />
-    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
-    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
-    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
-    <MESSAGE value="Make sure the Hibernate session is flushed when asserting DB contents through DBUnit" />
+    <option name="STATE" value="0" />
   </component>
   <component name="VssConfiguration">
-    <option name="CLIENT_PATH" value="" />
-    <option name="SRCSAFEINI_PATH" value="" />
-    <option name="USER_NAME" value="" />
-    <option name="PWD" value="" />
-    <option name="VSS_IS_INITIALIZED" value="true" />
     <CheckoutOptions>
       <option name="COMMENT" value="" />
       <option name="DO_NOT_GET_LATEST_VERSION" value="false" />
@@ -957,136 +516,155 @@
       <option name="MAKE_WRITABLE" value="false" />
       <option name="RECURSIVE" value="false" />
     </GetOptions>
+    <option name="CLIENT_PATH" value="" />
+    <option name="SRCSAFEINI_PATH" value="" />
+    <option name="USER_NAME" value="" />
+    <option name="PWD" value="" />
+    <option name="SHOW_CHECKOUT_OPTIONS" value="true" />
+    <option name="SHOW_ADD_OPTIONS" value="true" />
+    <option name="VSS_IS_INITIALIZED" value="true" />
+    <option name="SHOW_UNDOCHECKOUT_OPTIONS" value="true" />
+    <option name="SHOW_DIFF_OPTIONS" value="true" />
+    <option name="SHOW_GET_OPTIONS" value="true" />
+    <option name="REUSE_LAST_COMMENT" value="false" />
+    <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
+    <option name="SHOW_CHECKIN_OPTIONS" value="true" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
+    <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_FILE_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
     <option name="FILTER_TARGETS" value="false" />
-    <buildFile url="file://$PROJECT_DIR$/build.xml">
-      <antCommandLine value="" />
-      <runInBackground value="false" />
-      <targetFilters />
-      <treeView value="true" />
-      <verbose value="true" />
-      <viewClosedWhenNoErrors value="false" />
-    </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/util/PropertiesUtils.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorMapTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="67" selection-start="1193" selection-end="1193" vertical-scroll-proportion="0.6924101">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/dao/hibernate/UnitTestHibernateSessionManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="23" selection-start="1075" selection-end="1075" vertical-scroll-proportion="1.1185087">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/java/jdk1.5.0_05/src.zip!/java/lang/reflect/Field.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="144" column="18" selection-start="4983" selection-end="4983" vertical-scroll-proportion="0.44074568">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/dao/hibernate/BaseHibernateTestCase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="62" selection-start="340" selection-end="340" vertical-scroll-proportion="0.18641812">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/dao/BaseDatabaseTestCase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="97" column="30" selection-start="3509" selection-end="3509" vertical-scroll-proportion="0.25679347">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/unittest.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/NoInjectionAutoInjector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
+        <state line="20" column="13" selection-start="439" selection-end="439" vertical-scroll-proportion="0.25373134">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/ConstructorAutoInjector.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorPrimitivesArrayTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
+        <state line="16" column="13" selection-start="375" selection-end="375" vertical-scroll-proportion="0.18606965">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/ByTypeAutoInjector.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
+        <state line="15" column="13" selection-start="329" selection-end="329" vertical-scroll-proportion="0.16915423">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/ByNameAutoInjector.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorPrimitivesTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
+        <state line="16" column="13" selection-start="369" selection-end="369" vertical-scroll-proportion="0.18606965">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/AutoInjector.java">
+    <entry file="jar://$PROJECT_DIR$/lib/commons-beanutils-1.7.0.jar!/org/apache/commons/beanutils/BeanToPropertyValueTransformer.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="17" selection-start="119" selection-end="119" vertical-scroll-proportion="0.2173913">
+        <state line="13" column="11" selection-start="417" selection-end="417" vertical-scroll-proportion="0.18190661">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/inject/AutoDetectAutoInjector.java">
+    <entry file="jar://$PROJECT_DIR$/lib/commons-collections-3.1.jar!/org/apache/commons/collections/CollectionUtils.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.2795031">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/AutoInjectMocks.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="18" selection-start="315" selection-end="315" vertical-scroll-proportion="0.3726708">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/UnitilsProperties.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="61" selection-start="192" selection-end="192" vertical-scroll-proportion="0.24844721">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/be/ordina/unitils/testing/mock/EasyMockTestCase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="4" selection-start="1388" selection-end="1388" vertical-scroll-proportion="0.4037267">
+        <state line="58" column="29" selection-start="2643" selection-end="2643" vertical-scroll-proportion="0.88439304">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorLenientTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="73" selection-start="283" selection-end="356" vertical-scroll-proportion="0.1310212">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/junit-3.8.1.jar!/junit/framework/TestCase.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="0" selection-start="644" selection-end="644" vertical-scroll-proportion="0.53443116">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/util/TreeSet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="104" column="11" selection-start="4819" selection-end="4819" vertical-scroll-proportion="0.26782274">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/util/TreeMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1092" column="0" selection-start="41717" selection-end="41717" vertical-scroll-proportion="0.1618497">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionAssert.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="103" column="37" selection-start="3762" selection-end="3762" vertical-scroll-proportion="1.026">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="84" column="18" selection-start="2083" selection-end="2083" vertical-scroll-proportion="0.45615762">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorCollectionTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="83" column="0" selection-start="2451" selection-end="2451" vertical-scroll-proportion="0.34679803">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertCollectionsTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="119" column="12" selection-start="3689" selection-end="3689" vertical-scroll-proportion="0.21674877">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionComparator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="127" column="99" selection-start="5179" selection-end="5179" vertical-scroll-proportion="0.334">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

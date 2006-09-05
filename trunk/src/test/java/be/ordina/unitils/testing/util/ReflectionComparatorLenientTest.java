@@ -6,16 +6,19 @@
  */
 package be.ordina.unitils.testing.util;
 
+import be.ordina.unitils.testing.util.ReflectionComparator.Difference;
 import junit.framework.TestCase;
 
 import java.util.Date;
 
+import static be.ordina.unitils.testing.util.ReflectionComparatorModes.*;
+
 
 /**
- * Test class for {@link ReflectionEquals}.
+ * Test class for {@link ReflectionComparator}.
  * Contains tests for ignore defaults and lenient dates.
  */
-public class ReflectionEqualsBuilderLenientTest extends TestCase {
+public class ReflectionComparatorLenientTest extends TestCase {
 
     /* Test object with no java defaults */
     private Element elementNoDefaultsA;
@@ -35,6 +38,9 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
     /* Same as A but different date */
     private Element elementNoDefaultsDifferentDate;
 
+    /* Class under test */
+    private ReflectionComparator reflectionComparator;
+
 
     /**
      * Initializes the test fixture.
@@ -49,6 +55,8 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
         elementNoDefaultsNullDateB = new Element(true, 'c', (byte) 1, (short) 2, 3, 4l, 5.0f, 6.0, null, "object");
         elementNoDefaultsDifferentDate = new Element(true, 'c', (byte) 1, (short) 2, 3, 4l, 5.0f, 6.0, new Date(), "object");
         elementAllDefaults = new Element(false, (char) 0, (byte) 0, (short) 0, 0, 0l, 0.0f, 0.0, null, null);
+
+        reflectionComparator = new ReflectionComparator();
     }
 
 
@@ -57,12 +65,9 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_equals() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsA, elementNoDefaultsB, false, false);
+        Difference result = reflectionComparator.getDifference(elementNoDefaultsA, elementNoDefaultsB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -71,12 +76,9 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_equalsIgnoreDefaults() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementAllDefaults, elementNoDefaultsA, true, false);
+        Difference result = new ReflectionComparator(IGNORE_DEFAULTS).getDifference(elementAllDefaults, elementNoDefaultsA);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -85,12 +87,9 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_equalsLenientDatesBothNull() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsNullDateA, elementNoDefaultsNullDateB, false, true);
+        Difference result = new ReflectionComparator(LENIENT_DATES).getDifference(elementNoDefaultsNullDateA, elementNoDefaultsNullDateB);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -99,12 +98,9 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_equalsLenientDatesBothNotNull() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsA, elementNoDefaultsDifferentDate, false, true);
+        Difference result = new ReflectionComparator(LENIENT_DATES).getDifference(elementNoDefaultsA, elementNoDefaultsDifferentDate);
 
-        assertTrue(reflectionEquals.isEquals());
-        assertNull(reflectionEquals.getDifferenceFieldStack());
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNull(result);
     }
 
 
@@ -113,12 +109,12 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_notEqualsNoIgnoreDefaults() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementAllDefaults, elementNoDefaultsB, false, false);
+        Difference result = reflectionComparator.getDifference(elementAllDefaults, elementNoDefaultsB);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("booleanValue", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals(Boolean.FALSE, reflectionEquals.getDifferenceLeftValue());
-        assertEquals(Boolean.TRUE, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("booleanValue", result.getFieldStack().get(0));
+        assertEquals(Boolean.FALSE, result.getLeftValue());
+        assertEquals(Boolean.TRUE, result.getRightValue());
     }
 
 
@@ -127,12 +123,12 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_notEqualsIgnoreDefaultsButDefaultsLeft() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsB, elementAllDefaults, true, true);
+        Difference result = new ReflectionComparator(LENIENT_DATES, IGNORE_DEFAULTS).getDifference(elementNoDefaultsB, elementAllDefaults);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("booleanValue", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals(Boolean.TRUE, reflectionEquals.getDifferenceLeftValue());
-        assertEquals(Boolean.FALSE, reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("booleanValue", result.getFieldStack().get(0));
+        assertEquals(Boolean.TRUE, result.getLeftValue());
+        assertEquals(Boolean.FALSE, result.getRightValue());
     }
 
 
@@ -141,12 +137,12 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_notEqualsLenientDatesLeftDateNull() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsNullDateA, elementNoDefaultsDifferentDate, false, true);
+        Difference result = new ReflectionComparator(LENIENT_DATES).getDifference(elementNoDefaultsNullDateA, elementNoDefaultsDifferentDate);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("dateValue", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertNull(reflectionEquals.getDifferenceLeftValue());
-        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("dateValue", result.getFieldStack().get(0));
+        assertNull(result.getLeftValue());
+        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), result.getRightValue());
     }
 
 
@@ -155,12 +151,12 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_notEqualsLenientDatesRightDateNull() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsDifferentDate, elementNoDefaultsNullDateA, false, true);
+        Difference result = new ReflectionComparator(LENIENT_DATES).getDifference(elementNoDefaultsDifferentDate, elementNoDefaultsNullDateA);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("dateValue", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("dateValue", result.getFieldStack().get(0));
+        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), result.getLeftValue());
+        assertNull(result.getRightValue());
     }
 
 
@@ -169,12 +165,12 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
      */
     public void testCheckEquals_notEqualsLenientDatesAndIgnoreDefaultsWithRightDateNull() {
 
-        ReflectionEquals reflectionEquals = ReflectionEquals.checkEquals(elementNoDefaultsDifferentDate, elementNoDefaultsNullDateA, true, true);
+        Difference result = new ReflectionComparator(LENIENT_DATES, IGNORE_DEFAULTS).getDifference(elementNoDefaultsDifferentDate, elementNoDefaultsNullDateA);
 
-        assertFalse(reflectionEquals.isEquals());
-        assertEquals("dateValue", reflectionEquals.getDifferenceFieldStack().get(0));
-        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), reflectionEquals.getDifferenceLeftValue());
-        assertNull(reflectionEquals.getDifferenceRightValue());
+        assertNotNull(result);
+        assertEquals("dateValue", result.getFieldStack().get(0));
+        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), result.getLeftValue());
+        assertNull(result.getRightValue());
     }
 
 
@@ -339,6 +335,5 @@ public class ReflectionEqualsBuilderLenientTest extends TestCase {
             return false;
         }
     }
-
 
 }
