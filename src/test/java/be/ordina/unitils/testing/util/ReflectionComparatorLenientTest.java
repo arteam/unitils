@@ -83,6 +83,55 @@ public class ReflectionComparatorLenientTest extends TestCase {
 
 
     /**
+     * Test with ignore defaults and left object null.
+     */
+    public void testCheckEquals_equalsIgnoreDefaultsLeftNull() {
+
+        Difference result = new ReflectionComparator(IGNORE_DEFAULTS).getDifference(null, elementNoDefaultsA);
+
+        assertNull(result);
+    }
+
+
+    /**
+     * Test with ignore defaults and right object null
+     */
+    public void testCheckEquals_notEqualsIgnoreDefaultsRightNull() {
+
+        Difference result = new ReflectionComparator(IGNORE_DEFAULTS).getDifference(elementNoDefaultsA, null);
+
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertSame(elementNoDefaultsA, result.getLeftValue());
+        assertNull(result.getRightValue());
+    }
+
+
+    /**
+     * Test with ignore defaults and left value 0.
+     */
+    public void testCheckEquals_equalsIgnoreDefaultsLeft0() {
+
+        Difference result = new ReflectionComparator(IGNORE_DEFAULTS).getDifference(0, 999);
+
+        assertNull(result);
+    }
+
+    /**
+     * Test with ignore defaults and right value 0.
+     */
+    public void testCheckEquals_equalsIgnoreDefaultsRight0() {
+
+        Difference result = new ReflectionComparator(IGNORE_DEFAULTS).getDifference(999, 0);
+
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertEquals(999, result.getLeftValue());
+        assertEquals(0, result.getRightValue());
+    }
+
+
+    /**
      * Test for lenient dates with 2 null dates.
      */
     public void testCheckEquals_equalsLenientDatesBothNull() {
@@ -121,28 +170,14 @@ public class ReflectionComparatorLenientTest extends TestCase {
     /**
      * Test with right instead of left object containing only java defaults.
      */
-    public void testCheckEquals_notEqualsIgnoreDefaultsButDefaultsLeft() {
+    public void testCheckEquals_notEqualsIgnoreDefaultsButDefaultsRight() {
 
-        Difference result = new ReflectionComparator(LENIENT_DATES, IGNORE_DEFAULTS).getDifference(elementNoDefaultsB, elementAllDefaults);
+        Difference result = new ReflectionComparator(IGNORE_DEFAULTS).getDifference(elementNoDefaultsB, elementAllDefaults);
 
         assertNotNull(result);
         assertEquals("booleanValue", result.getFieldStack().get(0));
         assertEquals(Boolean.TRUE, result.getLeftValue());
         assertEquals(Boolean.FALSE, result.getRightValue());
-    }
-
-
-    /**
-     * Test for lenient dates but with only left date null.
-     */
-    public void testCheckEquals_notEqualsLenientDatesLeftDateNull() {
-
-        Difference result = new ReflectionComparator(LENIENT_DATES).getDifference(elementNoDefaultsNullDateA, elementNoDefaultsDifferentDate);
-
-        assertNotNull(result);
-        assertEquals("dateValue", result.getFieldStack().get(0));
-        assertNull(result.getLeftValue());
-        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), result.getRightValue());
     }
 
 
@@ -161,16 +196,30 @@ public class ReflectionComparatorLenientTest extends TestCase {
 
 
     /**
-     * Test for lenient dates while ignore defaults but with only right date null (= not treated as default).
+     * Test for lenient dates but with only left date null.
      */
-    public void testCheckEquals_notEqualsLenientDatesAndIgnoreDefaultsWithRightDateNull() {
+    public void testCheckEquals_notEqualsLenientDatesLeftDateNull() {
 
-        Difference result = new ReflectionComparator(LENIENT_DATES, IGNORE_DEFAULTS).getDifference(elementNoDefaultsDifferentDate, elementNoDefaultsNullDateA);
+        Difference result = new ReflectionComparator(LENIENT_DATES).getDifference(elementNoDefaultsNullDateA, elementNoDefaultsDifferentDate);
 
         assertNotNull(result);
         assertEquals("dateValue", result.getFieldStack().get(0));
-        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), result.getLeftValue());
-        assertNull(result.getRightValue());
+        assertNull(result.getLeftValue());
+        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), result.getRightValue());
+    }
+
+
+    /**
+     * Test for lenient dates while ignore defaults but with only left date null (= not treated as default).
+     */
+    public void testCheckEquals_notEqualsLenientDatesAndIgnoreDefaultsWithLeftDateNull() {
+
+        Difference result = new ReflectionComparator(LENIENT_DATES, IGNORE_DEFAULTS).getDifference(elementNoDefaultsNullDateA, elementNoDefaultsDifferentDate);
+
+        assertNotNull(result);
+        assertEquals("dateValue", result.getFieldStack().get(0));
+        assertNull(result.getLeftValue());
+        assertEquals(elementNoDefaultsDifferentDate.getDateValue(), result.getRightValue());
     }
 
 

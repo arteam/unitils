@@ -31,8 +31,8 @@ import java.util.*;
  * By default, a strict comparison is performed, but if needed, some leniency can be configured by use of the
  * ignoreDefaults and lenientDates attributes:
  * <ul>
- * <li>If ignoreDefaults is set, all fields that have a default java value for the right object will be ignored. Eg if
- * the right object contains an int field with value 0 it will not be compared to the value of the left object.</li>
+ * <li>If ignoreDefaults is set, all fields that have a default java value for the left object will be ignored. Eg if
+ * the left object contains an int field with value 0 it will not be compared to the value of the right object.</li>
  * <li>If lenientDates is set, the check will only see whether both objects contain a value or not, the value itself
  * is not compared. Eg. if the left object contained a date with value 1-1-2006 and the right object contained a date
  * with value 2-2-2006 they would still be considered equal.</li>
@@ -107,11 +107,17 @@ public class ReflectionComparator {
         }
 
         // check (lenient) dates
-        if (left instanceof Date) {
+        // lenient dates overrides ignore defaults
+        if ((left == null || left instanceof Date) && (right == null || right instanceof Date)) {
             return compareDates((Date) left, (Date) right, fieldStack);
         }
 
-        // check left or right is null, ignore defaults is handled by compareFields
+        // ignore default values if needed
+        if (isIgnoredDefault(left)) {
+            return null;
+        }
+
+        // check left or right is null
         if (left == null) {
             return new Difference("Left value null.", left, right, fieldStack);
         }
@@ -155,6 +161,9 @@ public class ReflectionComparator {
      */
     private Difference compareDates(Date left, Date right, Stack fieldStack) {
         if (!lenientDates) {
+            if (left == null) {
+                return null;
+            }
             boolean equal = equalsBuilder.append(left, right).isEquals();
             if (equal) {
                 return null;
@@ -360,14 +369,8 @@ public class ReflectionComparator {
                 continue;
             }
             try {
-                Class fieldClazz = f.getType();
                 Object leftValue = f.get(left);
                 Object rightValue = f.get(right);
-
-                // ignore default values if needed
-                if (isIgnoredDefault(leftValue, fieldClazz)) {
-                    continue;
-                }
 
                 // recursively check the value of the fields
                 Difference difference = getDifferenceImpl(leftValue, rightValue, fieldStack, traversedInstanceMap);
@@ -401,35 +404,29 @@ public class ReflectionComparator {
      * True will be returned when ignoreDefaults is true and the value is the java default value for the given type. <br>
      * Dates will be ignored if lenientDates is true.
      *
-     * @param rightValue the value to check
-     * @param clazz      the type of the value
+     * @param value the value to check
      * @return true if the value should be ignored
      */
-    private boolean isIgnoredDefault(Object rightValue, Class clazz) {
+    private boolean isIgnoredDefault(Object value) {
+
         if (!ignoreDefaults) {
             return false;
         }
 
-        //lenientDates overrides ignore defaults
-        if (lenientDates && clazz == Date.class) {
-            return false;
-        }
-
-        //object types
-        if (rightValue == null) {
+        // object types
+        if (value == null) {
             return true;
         }
 
-        //primitive types
-        if (clazz.isPrimitive() && (
-                (rightValue instanceof Boolean && !((Boolean) rightValue).booleanValue()) ||
-                (rightValue instanceof Character && ((Character) rightValue).charValue() == 0) ||
-                (rightValue instanceof Byte && ((Byte) rightValue).byteValue() == 0) ||
-                (rightValue instanceof Short && ((Short) rightValue).shortValue() == 0) ||
-                (rightValue instanceof Integer && ((Integer) rightValue).intValue() == 0) ||
-                (rightValue instanceof Long && ((Long) rightValue).longValue() == 0) ||
-                (rightValue instanceof Float && ((Float) rightValue).floatValue() == 0) ||
-                (rightValue instanceof Double && ((Double) rightValue).doubleValue() == 0))) {
+        // primitive types
+        if ((value instanceof Boolean && !((Boolean) value).booleanValue()) ||
+                (value instanceof Character && ((Character) value).charValue() == 0) ||
+                (value instanceof Byte && ((Byte) value).byteValue() == 0) ||
+                (value instanceof Short && ((Short) value).shortValue() == 0) ||
+                (value instanceof Integer && ((Integer) value).intValue() == 0) ||
+                (value instanceof Long && ((Long) value).longValue() == 0) ||
+                (value instanceof Float && ((Float) value).floatValue() == 0) ||
+                (value instanceof Double && ((Double) value).doubleValue() == 0)) {
             return true;
         }
 
@@ -437,6 +434,7 @@ public class ReflectionComparator {
     }
 
 
+    //todo javadoc
     public static class Difference {
 
         private String message;

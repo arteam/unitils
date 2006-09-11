@@ -137,47 +137,50 @@
     <option name="myCurrentFavoritesList" value="Unitils" />
   </component>
   <component name="FileEditorManager" split-orientation="horizontal" split-proportion="0.5">
-    <first-group selected-file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertCollectionsTest.java">
-      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionAssert.java" pinned="false">
+    <first-group selected-file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock/LenientMocksControl.java">
+      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock/LenientMocksControl.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="103" column="37" selection-start="3762" selection-end="3762" vertical-scroll-proportion="1.026">
+          <state line="21" column="106" selection-start="667" selection-end="667" vertical-scroll-proportion="0.34393063">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertTest.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock/ReflectionArgumentMatcher.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="84" column="18" selection-start="2083" selection-end="2083" vertical-scroll-proportion="0.45615762">
-            <folding>
-              <element signature="imports" expanded="true" />
-            </folding>
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorCollectionTest.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="83" column="0" selection-start="2451" selection-end="2451" vertical-scroll-proportion="0.34679803">
-            <folding>
-              <element signature="imports" expanded="true" />
-            </folding>
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertCollectionsTest.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="119" column="12" selection-start="3689" selection-end="3689" vertical-scroll-proportion="0.21674877">
+          <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
             <folding />
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionComparator.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorLenientTest.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="127" column="99" selection-start="5179" selection-end="5179" vertical-scroll-proportion="0.334">
+          <state line="114" column="0" selection-start="3484" selection-end="3484" vertical-scroll-proportion="0.12138728">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionAssert.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="88" column="6" selection-start="3061" selection-end="3061" vertical-scroll-proportion="0.03371869">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock/inject/AutoDetectAutoInjector.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="9" column="13" selection-start="175" selection-end="175" vertical-scroll-proportion="0.114643544">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock/AutoInjectMocks.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="12" column="18" selection-start="315" selection-end="315" vertical-scroll-proportion="0.14739884">
+            <folding />
           </state>
         </provider>
       </entry>
@@ -249,26 +252,30 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectPane">
-    <expanded_node url="file://$PROJECT_DIR$/src" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$" module="Unitils" type="directory" />
-    <expanded_node url="" module="Unitils" type="module" />
-    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/main/java" module="Unitils" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/db/script" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/mock/.svn" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util" module="Unitils" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/test" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/main" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/java" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be" module="Unitils" type="directory" />
+    <expanded_node url="" module="Unitils" type="module" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/db" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$" module="Unitils" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils" module="Unitils" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina" module="Unitils" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock/inject" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/mock" module="Unitils" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/test/java" module="Unitils" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock" module="Unitils" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/dao" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util" module="Unitils" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/db" module="Unitils" type="directory" />
   </component>
   <component name="ProjectReloadState">
     <option name="STATE" value="0" />
@@ -323,12 +330,12 @@
   <component name="RestoreUpdateTree" />
   <component name="RunManager">
     <activeType name="JUnit" />
-    <tempConfiguration selected="true" default="false" name="be.ordina.unitils.testing.util" type="JUnit" factoryName="JUnit">
+    <tempConfiguration selected="true" default="false" name="LenientMocksControlTest" type="JUnit" factoryName="JUnit">
       <module name="Unitils" />
-      <option name="PACKAGE_NAME" value="be.ordina.unitils.testing.util" />
-      <option name="MAIN_CLASS_NAME" />
+      <option name="PACKAGE_NAME" value="be.ordina.unitils.testing.mock" />
+      <option name="MAIN_CLASS_NAME" value="be.ordina.unitils.testing.mock.LenientMocksControlTest" />
       <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="package" />
+      <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -356,6 +363,13 @@
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
     </configuration>
+    <configuration selected="false" default="true" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <module name="" />
+    </configuration>
     <configuration selected="false" default="true" type="JUnit" factoryName="JUnit">
       <module name="" />
       <option name="PACKAGE_NAME" />
@@ -370,14 +384,7 @@
         <value defaultName="wholeProject" />
       </option>
     </configuration>
-    <configuration selected="false" default="true" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <module name="" />
-    </configuration>
-    <configuration selected="true" default="false" name="DuplicateFileSearch" type="Application" factoryName="Application">
+    <configuration selected="false" default="false" name="DuplicateFileSearch" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="util.DuplicateFileSearch" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PROGRAM_PARAMETERS" value="C:\I386\xqt1 C:\I386\duplicates" />
@@ -452,20 +459,20 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="30" y="-4" width="1574" height="1208" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.32962963" order="7" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="true" weight="0.32720104" order="0" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3271028" order="1" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.24967149" order="1" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.32720104" order="0" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32685184" order="1" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.24967149" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.225" order="11" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.39961758" order="6" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="9" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.25361368" order="1" x="59" y="60" width="1515" height="1080" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.4861111" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.5787037" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.3361111" order="4" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3361111" order="4" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="sliding" type="sliding" visible="false" weight="0.4" order="0" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.25" order="2" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="0" />
@@ -545,126 +552,114 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorMapTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="13" selection-start="439" selection-end="439" vertical-scroll-proportion="0.25373134">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorPrimitivesArrayTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="13" selection-start="375" selection-end="375" vertical-scroll-proportion="0.18606965">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="13" selection-start="329" selection-end="329" vertical-scroll-proportion="0.16915423">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorPrimitivesTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="13" selection-start="369" selection-end="369" vertical-scroll-proportion="0.18606965">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/commons-beanutils-1.7.0.jar!/org/apache/commons/beanutils/BeanToPropertyValueTransformer.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="11" selection-start="417" selection-end="417" vertical-scroll-proportion="0.18190661">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/commons-collections-3.1.jar!/org/apache/commons/collections/CollectionUtils.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="58" column="29" selection-start="2643" selection-end="2643" vertical-scroll-proportion="0.88439304">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorLenientTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="73" selection-start="283" selection-end="356" vertical-scroll-proportion="0.1310212">
+        <state line="114" column="0" selection-start="3484" selection-end="3484" vertical-scroll-proportion="0.12138728">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/junit-3.8.1.jar!/junit/framework/TestCase.class">
+    <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/internal/MockInvocationHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="0" selection-start="644" selection-end="644" vertical-scroll-proportion="0.53443116">
+        <state line="17" column="0" selection-start="437" selection-end="437" vertical-scroll-proportion="0.32519084">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/util/TreeSet.java">
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/reflect/InvocationHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="104" column="11" selection-start="4819" selection-end="4819" vertical-scroll-proportion="0.26782274">
+        <state line="39" column="18" selection-start="1399" selection-end="1399" vertical-scroll-proportion="0.10381679">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/util/TreeMap.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock/LenientMocksControl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1092" column="0" selection-start="41717" selection-end="41717" vertical-scroll-proportion="0.1618497">
+        <state line="21" column="106" selection-start="667" selection-end="667" vertical-scroll-proportion="0.34393063">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/reflect/Field.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="773" column="18" selection-start="32089" selection-end="32089" vertical-scroll-proportion="0.9044335">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Class.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2908" column="18" selection-start="116063" selection-end="116063" vertical-scroll-proportion="0.88439304">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Thread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1156" column="23" selection-start="45433" selection-end="45433" vertical-scroll-proportion="0.33497536">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Throwable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="507" column="33" selection-start="21094" selection-end="21094" vertical-scroll-proportion="0.33300492">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/io/PrintWriter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="13" selection-start="1221" selection-end="1221" vertical-scroll-proportion="0.33300492">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Object.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="48" selection-start="1185" selection-end="1185" vertical-scroll-proportion="0.33300492">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/internal/Invocation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="18" selection-start="358" selection-end="358" vertical-scroll-proportion="0.15073891">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/reflect/Method.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="150" column="39" selection-start="5582" selection-end="5601" vertical-scroll-proportion="0.15073891">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/mock/ReflectionArgumentMatcher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/mock/LenientMocksControlTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="71" column="0" selection-start="1954" selection-end="1954" vertical-scroll-proportion="0.63152707">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionAssert.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="103" column="37" selection-start="3762" selection-end="3762" vertical-scroll-proportion="1.026">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="18" selection-start="2083" selection-end="2083" vertical-scroll-proportion="0.45615762">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionComparatorCollectionTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="83" column="0" selection-start="2451" selection-end="2451" vertical-scroll-proportion="0.34679803">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/be/ordina/unitils/testing/util/ReflectionAssertCollectionsTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="119" column="12" selection-start="3689" selection-end="3689" vertical-scroll-proportion="0.21674877">
+        <state line="88" column="6" selection-start="3061" selection-end="3061" vertical-scroll-proportion="0.03371869">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/be/ordina/unitils/testing/util/ReflectionComparator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="127" column="99" selection-start="5179" selection-end="5179" vertical-scroll-proportion="0.334">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
