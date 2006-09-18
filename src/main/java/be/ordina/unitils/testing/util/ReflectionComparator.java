@@ -15,7 +15,7 @@ import java.util.*;
 
 
 /**
- * A class for testing equality of 2 objects by using reflection. <br>
+ * A class for testing equality of 2 objects using reflection. <br>
  * The {@link Object#equals} method is often used for business logic equality checking. The {@link Object#equals} method
  * can for example return true when the id fields of 2 instances have equal values, no matter what the values of the
  * other fields are. This class offers another way to check equality of objects.
@@ -28,24 +28,24 @@ import java.util.*;
  * java.lang.* type field values. Eg a field of type java.lang.Integer will be compared using its equals method. No
  * superclass comparison is done on java.lang.* type classes. Eg the java.lang.Ojbect class fields will not be compared.
  * <p/>
- * By default, a strict comparison is performed, but if needed, some leniency can be configured by use of the
- * ignoreDefaults and lenientDates attributes:
- * <ul>
- * <li>If ignoreDefaults is set, all fields that have a default java value for the left object will be ignored. Eg if
+ * By default, a strict comparison is performed, but if needed, some leniency can be configured by setting one or more
+ * comparator modes: <ul>
+ * <li>ignore defaults: all fields that have a default java value for the left object will be ignored. Eg if
  * the left object contains an int field with value 0 it will not be compared to the value of the right object.</li>
- * <li>If lenientDates is set, the check will only see whether both objects contain a value or not, the value itself
+ * <li>lenient dates: only check whether both Date objects contain a value or not, the value itself
  * is not compared. Eg. if the left object contained a date with value 1-1-2006 and the right object contained a date
  * with value 2-2-2006 they would still be considered equal.</li>
- * </ul><p/>
- * If the check indicates that both objects are not equal, the first (and only the first!) found difference can be
- * retrieved by the differenceFieldStack, differenceLeftValue and differenceRightValue properties.
- * <p/>
- * todo javadoc order
+ * <li>lenient order: only check whether both collections or arrays contain the same value, the actual order of the
+ * values is not compared. Eg. if the left object is int[]{ 1, 2} and the right value is int[]{2, 1} they would still
+ * be considered equal.</li>
+ * </ul>
+ * If the check indicates that both objects are not equal, the first (and only the first!) found difference is returned.
+ * The actual difference can then be retrieved by the fieldStack, leftValue and rightValue properties.
  */
 public class ReflectionComparator {
 
 
-    /* True if fields should not be compared if the right value is a java default (0, null)
+    /* True if fields should not be compared if the left value is a java default (0, null)
        LenientDates overrides ignoreDefaults for fields of type Date */
     private boolean ignoreDefaults = false;
 
@@ -53,28 +53,29 @@ public class ReflectionComparator {
        both null or both not null */
     private boolean lenientDates = false;
 
-    /* todo javadoc */
+    /* True if the order of arrays or collections should not be taken into account. Collections or arrays are
+       considered equal when they both contain the same elements. */
     private boolean lenientOrder = false;
 
     /* A utility instance used for non reflection comparing. */
     private EqualsBuilder equalsBuilder = new EqualsBuilder();
 
-
+    //todo javadoc
     public ReflectionComparator(ReflectionComparatorModes... modes) {
 
         if (modes == null) {
             return;
         }
 
-        for (int i = 0; i < modes.length; i++) {
+        for (ReflectionComparatorModes mode : modes) {
 
-            if (modes[i] == ReflectionComparatorModes.IGNORE_DEFAULTS) {
+            if (mode == ReflectionComparatorModes.IGNORE_DEFAULTS) {
                 ignoreDefaults = true;
 
-            } else if (modes[i] == ReflectionComparatorModes.LENIENT_DATES) {
+            } else if (mode == ReflectionComparatorModes.LENIENT_DATES) {
                 lenientDates = true;
 
-            } else if (modes[i] == ReflectionComparatorModes.LENIENT_ORDER) {
+            } else if (mode == ReflectionComparatorModes.LENIENT_ORDER) {
                 lenientOrder = true;
             }
         }
@@ -88,7 +89,7 @@ public class ReflectionComparator {
 
     //todo javadoc
     public Difference getDifference(Object left, Object right) {
-        return getDifferenceImpl(left, right, new Stack(), new HashMap());
+        return getDifferenceImpl(left, right, new Stack<Object>(), new HashMap<Object, Object>());
     }
 
 
@@ -99,7 +100,7 @@ public class ReflectionComparator {
      * @param right the right instance for the comparison
      *              todo Used for holding all traversed objects to avoid infinite loops with circular references
      */
-    private Difference getDifferenceImpl(Object left, Object right, Stack fieldStack, Map traversedInstanceMap) {
+    private Difference getDifferenceImpl(Object left, Object right, Stack<Object> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         // check same instances or both null
         if (left == right) {
@@ -133,12 +134,12 @@ public class ReflectionComparator {
 
         // check collections
         if (left instanceof Collection) {
-            return compareCollections((Collection) left, (Collection) right, fieldStack, traversedInstanceMap);
+            return compareCollections((Collection<Object>) left, (Collection<Object>) right, fieldStack, traversedInstanceMap);
         }
 
         // check maps
         if (left instanceof Map) {
-            return compareMaps((Map) left, (Map) right, fieldStack, traversedInstanceMap);
+            return compareMaps((Map<Object, Object>) left, (Map<Object, Object>) right, fieldStack, traversedInstanceMap);
         }
 
         // check primitive and object arrays
@@ -186,7 +187,7 @@ public class ReflectionComparator {
      * @param left  the left array for the comparison, not null
      * @param right the right array for the comparison, not null
      */
-    private Difference compareArrays(Object left, Object right, Class clazz, Stack fieldStack, Map traversedInstanceMap) {
+    private Difference compareArrays(Object left, Object right, Class clazz, Stack<Object> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         // check primitive array
         if (clazz.getComponentType().isPrimitive()) {
@@ -198,8 +199,8 @@ public class ReflectionComparator {
         }
 
         // check object array
-        List leftList = Arrays.asList((Object[]) left);
-        List rightList = Arrays.asList((Object[]) right);
+        List<Object> leftList = Arrays.asList((Object[]) left);
+        List<Object> rightList = Arrays.asList((Object[]) right);
         if (leftList.size() != rightList.size()) {
             return new Difference("Different array lengths. Left length: " + leftList.size() + ", right size: " + rightList.size(), left, right, fieldStack);
         }
@@ -212,7 +213,7 @@ public class ReflectionComparator {
      * @param left  the left collection for the comparison, not null
      * @param right the right collection for the comparison, not null
      */
-    private Difference compareCollections(Collection left, Collection right, Stack fieldStack, Map traversedInstanceMap) {
+    private Difference compareCollections(Collection<Object> left, Collection<Object> right, Stack<Object> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         if (left.size() != right.size()) {
             return new Difference("Different collection sizes.", left, right, fieldStack);
@@ -231,7 +232,7 @@ public class ReflectionComparator {
      * @param left  the left collection for the comparison, not null
      * @param right the right collection for the comparison, not null
      */
-    private Difference compareCollectionsStrictOrder(Collection left, Collection right, Stack fieldStack, Map traversedInstanceMap) {
+    private Difference compareCollectionsStrictOrder(Collection<Object> left, Collection<Object> right, Stack<Object> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         int i = 0;
         Iterator lhsIterator = left.iterator();
@@ -259,16 +260,14 @@ public class ReflectionComparator {
      * @param left  the left collection for the comparison, not null
      * @param right the right collection for the comparison, not null
      */
-    private Difference compareCollectionsLenientOrder(Collection left, Collection right, Stack fieldStack) {
+    private Difference compareCollectionsLenientOrder(Collection<Object> left, Collection<Object> right, Stack<Object> fieldStack) {
 
         // Create copy from which we can remove elements.
-        ArrayList rightCopy = new ArrayList(right);
+        ArrayList rightCopy = new ArrayList<Object>(right);
 
         int i = 0;
-        Iterator lhsIterator = left.iterator();
-        while (lhsIterator.hasNext()) {
+        for (Object lhsValue : left) {
             fieldStack.push("" + i++);
-            Object lhsValue = lhsIterator.next();
 
             boolean found = false;
             Iterator rhsIterator = rightCopy.iterator();
@@ -299,15 +298,13 @@ public class ReflectionComparator {
      * @param left  the left map for the comparison, not null
      * @param right the right map for the comparison, not null
      */
-    private Difference compareMaps(Map left, Map right, Stack fieldStack, Map traversedInstanceMap) {
+    private Difference compareMaps(Map<Object, Object> left, Map<Object, Object> right, Stack<Object> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         if (left.size() != right.size()) {
             return new Difference("Different map sizes.", left, right, fieldStack);
         }
 
-        Iterator lhsIterator = left.entrySet().iterator();
-        while (lhsIterator.hasNext()) {
-            Map.Entry lhsEntry = (Map.Entry) lhsIterator.next();
+        for (Map.Entry<Object, Object> lhsEntry : left.entrySet()) {
             Object lhsKey = lhsEntry.getKey();
 
             fieldStack.push("" + lhsKey);
@@ -324,13 +321,12 @@ public class ReflectionComparator {
 
 
     // todo javadoc
-    private Difference compareObjects(Object left, Object right, Class clazz, Stack fieldStack, Map traversedInstanceMap) {
+    private Difference compareObjects(Object left, Object right, Class clazz, Stack<Object> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         // check different class type
         if (!clazz.equals(right.getClass())) {
             return new Difference("Different class types. Left: " + clazz + ", right: " + right.getClass(), left, right, fieldStack);
         }
-
 
         // compare java.lang.* objects with equals()
         if (clazz.getName().startsWith("java.lang")) {
@@ -354,13 +350,12 @@ public class ReflectionComparator {
      * @param right the right object for the comparison, not null
      * @param clazz the type of both objects
      */
-    private Difference compareFields(Object left, Object right, Class clazz, Stack fieldStack, Map traversedInstanceMap) {
+    private Difference compareFields(Object left, Object right, Class clazz, Stack<Object> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
 
-        for (int i = 0; i < fields.length; i++) {
-            Field f = fields[i];
+        for (Field f : fields) {
             fieldStack.push(f.getName());
 
             // skip transient and static fields
@@ -419,18 +414,14 @@ public class ReflectionComparator {
         }
 
         // primitive types
-        if ((value instanceof Boolean && !((Boolean) value).booleanValue()) ||
-                (value instanceof Character && ((Character) value).charValue() == 0) ||
-                (value instanceof Byte && ((Byte) value).byteValue() == 0) ||
-                (value instanceof Short && ((Short) value).shortValue() == 0) ||
-                (value instanceof Integer && ((Integer) value).intValue() == 0) ||
-                (value instanceof Long && ((Long) value).longValue() == 0) ||
-                (value instanceof Float && ((Float) value).floatValue() == 0) ||
-                (value instanceof Double && ((Double) value).doubleValue() == 0)) {
-            return true;
-        }
-
-        return false;
+        return (value instanceof Boolean && !(Boolean) value) ||
+                (value instanceof Character && (Character) value == 0) ||
+                (value instanceof Byte && (Byte) value == 0) ||
+                (value instanceof Short && (Short) value == 0) ||
+                (value instanceof Integer && (Integer) value == 0) ||
+                (value instanceof Long && (Long) value == 0) ||
+                (value instanceof Float && (Float) value == 0) ||
+                (value instanceof Double && (Double) value == 0);
     }
 
 
@@ -449,6 +440,8 @@ public class ReflectionComparator {
         /* When isEquals is false, this will contain the right value of the field where the difference was found. */
         private Object rightValue;
 
+
+        //todo javadoc
         private Difference(String message, Object leftValue, Object rightValue, Stack fieldStack) {
             this.message = message;
             this.leftValue = leftValue;
@@ -457,11 +450,11 @@ public class ReflectionComparator {
         }
 
         /**
-         * When isEquals is false this return a string representation of the field stack.
+         * Gets a string representation of the field stack.
          * Eg primitiveFieldInB.fieldBinA.fieldA
-         * When isEquals is true, null will be returned.
+         * The top-level element is an empty string.
          *
-         * @return the field names as sting or null
+         * @return the field names as sting
          */
         public String getFieldStackAsString() {
             String result = "";
@@ -475,16 +468,23 @@ public class ReflectionComparator {
             return result;
         }
 
+
+        /**
+         * Gets the message indicating the kind of difference.
+         *
+         * @return the message
+         */
         public String getMessage() {
             return message;
         }
 
+
         /**
-         * When isEquals is false this will return the stack of the fieldnames where the difference was found.
+         * Gets the stack of the fieldnames where the difference was found.
          * The inner most field will be the top of the stack, eg "primitiveFieldInB", "fieldBinA", "fieldA".
-         * When isEquals is true, null will be returned.
+         * The top-level element has an empty stack.
          *
-         * @return the stack of field names or null
+         * @return the stack of field names, not null
          */
         public Stack getFieldStack() {
             return fieldStack;
@@ -492,10 +492,9 @@ public class ReflectionComparator {
 
 
         /**
-         * When isEquals is false this will contain the left value of the field where the difference was found.
-         * When isEquals is true, null will be returned.
+         * Gets the left value of the field where the difference was found.
          *
-         * @return the value or null
+         * @return the value
          */
         public Object getLeftValue() {
             return leftValue;
@@ -503,10 +502,9 @@ public class ReflectionComparator {
 
 
         /**
-         * When isEquals is false, this will contain the right value of the field where the difference was found.
-         * When isEquals is true, null will be returned.
+         * Gets the right value of the field where the difference was found.
          *
-         * @return the value or null
+         * @return the value
          */
         public Object getRightValue() {
             return rightValue;
