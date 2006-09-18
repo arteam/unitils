@@ -1,21 +1,22 @@
 package be.ordina.unitils.testing.mock;
 
-import junit.framework.AssertionFailedError;
+import static be.ordina.unitils.testing.util.ReflectionComparatorModes.IGNORE_DEFAULTS;
 import junit.framework.TestCase;
-import org.easymock.internal.MocksControl;
+import static org.easymock.classextension.EasyMock.*;
+import static org.easymock.internal.MocksControl.MockType.NICE;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.easymock.classextension.EasyMock.*;
-import static be.ordina.unitils.testing.util.ReflectionComparatorModes.*;
-
 /**
+ * A test for {@link LenientMocksControl}
+ * <p/>
  * todo javadoc
  */
 public class LenientMocksControlTest extends TestCase {
 
 
+    /* Class under test, with mock type NICE and ignore defaults */
     private LenientMocksControl lenientMocksControl;
 
     /**
@@ -24,11 +25,40 @@ public class LenientMocksControlTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        lenientMocksControl = new LenientMocksControl(MocksControl.MockType.NICE, IGNORE_DEFAULTS);
+        lenientMocksControl = new LenientMocksControl(NICE, IGNORE_DEFAULTS);
     }
 
     /**
      * Test for two equal objects without java defaults.
+     */
+    public void testCheckEquals_equals() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
+        expect(mock.someBehavior(true, 999, "Test", new ArrayList())).andReturn("Result");
+        replay(mock);
+
+        String result = mock.someBehavior(true, 999, "Test", new ArrayList());
+
+        assertEquals("Result", result);
+        verify(mock);
+    }
+
+    /**
+     * Test for two equal objects without java defaults.
+     */
+    public void testCheckEquals_equalsNoArguments() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
+        mock.someBehavior();
+        replay(mock);
+
+        mock.someBehavior();
+
+        verify(mock);
+    }
+
+    /**
+     * Test for two equal objects with all java defaults.
      */
     public void testCheckEquals_equalsIgnoreDefaults() {
 
@@ -46,23 +76,26 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for two equal objects without java defaults.
      */
-    public void testCheckEquals_equals() {
+    public void testCheckEquals_notEqualsNotCalled() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
-        expect(mock.someBehavior(true, 999, "Test", new ArrayList())).andReturn("Result");
+        expect(mock.someBehavior(true, 999, "XXXX", new ArrayList())).andReturn("Result");
         replay(mock);
 
-        String result = mock.someBehavior(true, 999, "Test", new ArrayList());
-
-        assertEquals("Result", result);
-        verify(mock);
+        try {
+            verify(mock);
+            fail();
+        } catch (AssertionError e) {
+            //expected
+            e.printStackTrace();
+        }
     }
 
 
     /**
      * Test for two equal objects without java defaults.
      */
-    public void testCheckEquals_notEquals() {
+    public void testCheckEquals_notEqualsDifferentArguments() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 999, "XXXX", new ArrayList())).andReturn("Result");
@@ -71,14 +104,18 @@ public class LenientMocksControlTest extends TestCase {
         try {
             mock.someBehavior(true, 999, "Test", new ArrayList());
             fail();
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             //expected
             e.printStackTrace();
         }
     }
 
 
+    //todo javadoc
     private static class MockedClass {
+
+        public void someBehavior() {
+        }
 
         public String someBehavior(boolean b, int i, Object object, List list) {
             return null;
