@@ -1,11 +1,9 @@
 package be.ordina.unitils.util;
 
-import be.ordina.unitils.testing.mock.inject.Inject;
-
-import java.lang.reflect.Field;
 import java.lang.annotation.Annotation;
-import java.util.List;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Filip Neven
@@ -14,6 +12,7 @@ public class AnnotationUtils {
 
     /**
      * Returns the given' class's declared fields that are marked with the given annotation
+     *
      * @param clazz
      * @param annotation
      * @return A List containing fields annotated with the given annotation
