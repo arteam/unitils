@@ -64,11 +64,9 @@ public class EasyMockTestCase extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         if (properties == null) {
-            properties = UnitilsProperties.loadProperties();
-            autoInjector = getAutoInjector(properties.getProperty(PROPKEY_AUTOINJECTION_DEAULTMODE));
+            properties = UnitilsProperties.loadProperties(UnitilsProperties.DEFAULT_PROPERTIES_FILE_NAME);
         }
         injectMocksIntoTest();
-        injectMocksIntoObjects();
     }
 
     /**
@@ -142,53 +140,4 @@ public class EasyMockTestCase extends TestCase {
         }
     }
 
-    /**
-     * Makes sure the mock objects annotated with {@link @Mock} are injected into the fields that are annotated either
-     * with {#link @AutoInjectMocks} or with {@link @InjectMock}
-     * <p>
-     * NOTE: This method is NOT automatically invoked! You should call this method yourself at the end of your setUp()
-     * method!
-     */
-    protected void injectMocksIntoObjects() throws IllegalAccessException {
-        Field[] fields = this.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getAnnotation(AutoInjectMocks.class) != null) {
-                field.setAccessible(true);
-                Object obj = field.get(this);
-                autoInjectMocks(obj);
-            }
-        }
-    }
-
-    /**
-     * Injects the mock objects into the object
-     * @param obj
-     */
-    private void autoInjectMocks(Object obj) {
-        autoInjector.autoInject(obj, mocks);
-    }
-
-    /**
-     * Creates and returns an <code>AutoInjector</code> of the given type.
-     * @param autoInjectionMode
-     * @return an <code>AutoInjector</code> of the given type.
-     */
-    private AutoInjector getAutoInjector(String autoInjectionMode) {
-        if (StringUtils.isEmpty(autoInjectionMode)) {
-            return new NoInjectionAutoInjector();
-        } else if (AUTOINJECTIONMODE_NOINJECTION.equals(autoInjectionMode)) {
-            return new NoInjectionAutoInjector();
-        } else if (AUTOINJECTIONMODE_BYNAME.equals(autoInjectionMode)) {
-            return new ByNameAutoInjector();
-        } else if (AUTOINJECTIONMODE_BYTYPE.equals(autoInjectionMode)) {
-            return new ByTypeAutoInjector();
-        } else if (AUTOINJECTIONMODE_CONSTRUCTOR.equals(autoInjectionMode)) {
-            return new ConstructorAutoInjector();
-        } else if (AUTOINJECTIONMODE_AUTODETECT.equals(autoInjectionMode)) {
-            return new AutoDetectAutoInjector();
-        }
-        throw new IllegalArgumentException("Unknown autoinjector type " + autoInjectionMode + ". Should be '" +
-            AUTOINJECTIONMODE_NOINJECTION + "', '" + AUTOINJECTIONMODE_BYNAME + "', '" + AUTOINJECTIONMODE_BYTYPE +
-            "', '" + AUTOINJECTIONMODE_CONSTRUCTOR + "' or '" + AUTOINJECTIONMODE_AUTODETECT + "'");
-    }
 }

@@ -7,6 +7,7 @@
 package be.ordina.unitils.util;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 
 /**
  * Utility methods that use reflection in some way.

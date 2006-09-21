@@ -14,6 +14,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Utility methods related to the class <code>java.lang.Properties</code>
@@ -27,7 +29,7 @@ public class PropertiesUtils {
      * @return A <code>Properties</code> object
      */
     public static Properties loadPropertiesFromClasspath(String propertiesFileName) {
-        InputStream is = PropertiesUtils.class.getResourceAsStream(propertiesFileName);
+        InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(propertiesFileName);
         if (is == null) {
             throw new RuntimeException("Properties file " + propertiesFileName + " not found");
         }
@@ -158,5 +160,17 @@ public class PropertiesUtils {
             result.add(st.nextToken());
         }
         return result;
+    }
+
+    public static Set<String> getPropertyKeysStartingWith(Properties unitilsProperties, String propkeyModuleStart) {
+        Set<String> propKeysStartingWith = new HashSet<String>();
+        Set keys = unitilsProperties.keySet();
+        for (Object key : keys) {
+            String propKey = (String) key;
+            if (propKey.startsWith(propkeyModuleStart)) {
+                propKeysStartingWith.add(propKey);
+            }
+        }
+        return propKeysStartingWith;
     }
 }

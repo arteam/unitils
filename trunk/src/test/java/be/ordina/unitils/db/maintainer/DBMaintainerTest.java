@@ -6,7 +6,6 @@
  */
 package be.ordina.unitils.db.maintainer;
 
-import be.ordina.unitils.BaseUnitilsEasyMockTestCase;
 import be.ordina.unitils.db.clear.DBClearer;
 import be.ordina.unitils.db.constraints.ConstraintsDisabler;
 import be.ordina.unitils.db.dtd.DtdGenerator;
@@ -16,10 +15,8 @@ import be.ordina.unitils.db.maintainer.version.Version;
 import be.ordina.unitils.db.maintainer.version.VersionSource;
 import be.ordina.unitils.db.script.SQLScriptRunner;
 import be.ordina.unitils.db.sequences.SequenceUpdater;
-import be.ordina.unitils.testing.mock.AutoInjectMocks;
 import be.ordina.unitils.testing.mock.Mock;
-import be.ordina.unitils.testing.mock.inject.InjectionType;
-import be.ordina.unitils.testing.mock.inject.PropertyAccessType;
+import be.ordina.unitils.testing.mock.EasyMockTestCase;
 import static org.easymock.classextension.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.expectLastCall;
 
@@ -29,7 +26,7 @@ import java.util.List;
 /**
  * @author Filip Neven
  */
-public class DBMaintainerTest extends BaseUnitilsEasyMockTestCase {
+public class DBMaintainerTest extends EasyMockTestCase {
 
     @Mock
     private VersionSource mockVersionSource = null;
@@ -72,8 +69,6 @@ public class DBMaintainerTest extends BaseUnitilsEasyMockTestCase {
         version2 = new Version(2L, 2L);
         versionScriptPairs.add(new VersionScriptPair(version1, "Script 1"));
         versionScriptPairs.add(new VersionScriptPair(version2, "Script 2"));
-
-        injectMocks();
     }
 
     /**
