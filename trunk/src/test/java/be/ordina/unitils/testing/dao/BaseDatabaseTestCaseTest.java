@@ -107,6 +107,10 @@ public class BaseDatabaseTestCaseTest extends TestCase {
             super("testName");
         }
 
+        protected String getPropertiesFileName() {
+            return null;
+        }
+
     }
 
 }

@@ -13,6 +13,7 @@ import be.ordina.unitils.db.handler.StatementHandlerException;
 import be.ordina.unitils.db.handler.LoggingStatementHandlerDecorator;
 import be.ordina.unitils.db.maintainer.script.ScriptSource;
 import be.ordina.unitils.db.maintainer.version.VersionSource;
+import be.ordina.unitils.db.maintainer.version.Version;
 import be.ordina.unitils.db.script.SQLScriptRunner;
 import be.ordina.unitils.db.script.ScriptRunner;
 import be.ordina.unitils.db.sequences.SequenceUpdater;
@@ -45,7 +46,7 @@ import java.util.List;
  * the database version from the updated database schema itself. Another implementation could e.g. retrieve the version
  * from a file.</li>
  * <li>dbMaintainer.scriptSource.className: Fully qualified name of the implementation of {@link ScriptSource} that is
- * used. The recommeded value is {@link be.ordina.unitils.db.maintainer.script.IncrementalFileScriptSource}, which will retrieve the
+ * used. The recommeded value is {@link be.ordina.unitils.db.maintainer.script.FileScriptSource}, which will retrieve the
  * scripts from the local file system. Another implementation could e.g. retrieve the scripts directly from the
  * Version Control System.</li>
  * <li>dbMaintainer.statementHandler.className: Fully qualified name of the implementation of {@link StatementHandler}
@@ -59,14 +60,8 @@ public class DBMaintainer {
     /* Logger */
     private static final Logger logger = Logger.getLogger(DBMaintainer.class);
 
-    /* Property key of the dbMaintainer configuration type */
-    private static final String PROPKEY_CONFIGURATION_TYPE = "dbMaintainer.configurationType";
-
-    /* Value 'incremental' for the configuration property */
-    private static final String PROPVALUE_CONFIGURATION_TYPE_INCREMENTAL = "incremental";
-
-    /* Value 'fromScratch' for the configuration property */
-    private static final String PROPVALUE_CONFIGURATION_TYPE_FROMSCRATCH = "fromScratch";
+    /* Property key indicating if updating the database from scratch is enabled */
+    private static final String PROPKEY_FROMSCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
 
     /* Property key of the implementation class of {@link VersionSource} */
     private static final String PROPKEY_VERSIONSOURCE = "dbMaintainer.versionSource.className";
@@ -124,45 +119,11 @@ public class DBMaintainer {
     private DtdGenerator dtdGenerator;
 
 
-    /* Indicates if the database constraints are to be disabled */
-    private boolean disableConstraints;
+    /* Indicates if updateing the database from scratch is enabled. If yes, the database is cleared before updateing
+      if an already executed script is modified */
+    private boolean fromScratchEnabled;
 
-    /* Indicates if the database sequences have to be updated */
-    private boolean updateSequences;
-
-    /* Indicates if a DTD is to be generated */
-    private boolean generateDtd;
-
-    /* Indicates if the database has to be cleared before updating */
-    private boolean clearDb;
-
-    /**
-     * Create a new instance of <code>DBMaintainer</code>, using the given instances of {@link VersionSource},
-     * {@link ScriptSource} and {@link SQLScriptRunner}.
-     *
-     * @param versionSource
-     * @param scriptSource
-     * @param scriptRunner
-     */
-    public DBMaintainer(VersionSource versionSource, ScriptSource scriptSource, SQLScriptRunner scriptRunner,
-                        DBClearer dbClearer, ConstraintsDisabler constraintsDisabler, SequenceUpdater sequenceUpdater,
-                        DtdGenerator dtdGenerator) {
-        this.versionSource = versionSource;
-        this.scriptSource = scriptSource;
-        this.scriptRunner = scriptRunner;
-
-        clearDb = (dbClearer != null);
-        this.dbClearer = dbClearer;
-
-        disableConstraints = (constraintsDisabler != null);
-        this.constraintsDisabler = constraintsDisabler;
-
-        updateSequences = (sequenceUpdater != null);
-        this.sequenceUpdater = sequenceUpdater;
-
-        generateDtd = (dtdGenerator != null);
-        this.dtdGenerator = dtdGenerator;
-    }
+    public DBMaintainer() {}
 
     /**
      * Create a new instance of <code>DBMaintainer</code>, The concrete implementations of {@link VersionSource},
@@ -174,20 +135,14 @@ public class DBMaintainer {
      * @param dataSource
      */
     public DBMaintainer(Properties properties, DataSource dataSource) {
-        String configurationType = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_CONFIGURATION_TYPE);
-        if (!PROPVALUE_CONFIGURATION_TYPE_INCREMENTAL.equals(configurationType)
-                && !PROPVALUE_CONFIGURATION_TYPE_FROMSCRATCH.equals(configurationType)) {
-            throw new IllegalArgumentException("Property '" + PROPKEY_CONFIGURATION_TYPE + "' should have one of the values '" +
-                PROPVALUE_CONFIGURATION_TYPE_FROMSCRATCH + "' or '" + PROPVALUE_CONFIGURATION_TYPE_INCREMENTAL + "'");
-        }
+
         String databaseDialect = PropertiesUtils.getPropertyRejectNull(properties,
                 PROPKEY_DATABASE_DIALECT);
 
         versionSource = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSIONSOURCE));
         versionSource.init(properties, dataSource);
 
-        scriptSource = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCRIPTSOURCE +
-                '.' + configurationType));
+        scriptSource = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCRIPTSOURCE));
         scriptSource.init(properties);
 
         StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler)
@@ -196,28 +151,28 @@ public class DBMaintainer {
         statementHandler.init(properties, dataSource);
         scriptRunner = new SQLScriptRunner(statementHandler);
 
-        clearDb = PROPVALUE_CONFIGURATION_TYPE_FROMSCRATCH.equals(configurationType);
-        if (clearDb) {
+        fromScratchEnabled = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_FROMSCRATCH_ENABLED);
+        if (fromScratchEnabled) {
             dbClearer = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DBCLEARER_START +
                     "." + databaseDialect));
             dbClearer.init(properties, dataSource, statementHandler);
         }
 
-        disableConstraints = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_DISABLECONSTRAINTS_ENABLED);
+        boolean disableConstraints = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_DISABLECONSTRAINTS_ENABLED);
         if (disableConstraints) {
             constraintsDisabler = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
                     PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect));
             constraintsDisabler.init(dataSource, statementHandler);
         }
 
-        updateSequences = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_UPDATESEQUENCES_ENABLED);
+        boolean updateSequences = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_UPDATESEQUENCES_ENABLED);
         if (updateSequences) {
             sequenceUpdater = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
                     PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
             sequenceUpdater.init(properties, dataSource, statementHandler);
         }
 
-        generateDtd = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_GENERATEDTD_ENABLED);
+        boolean generateDtd = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_GENERATEDTD_ENABLED);
         if (generateDtd) {
             dtdGenerator = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
                     PROPKEY_DTDGENERATOR_CLASSNAME));
@@ -233,34 +188,46 @@ public class DBMaintainer {
      * @throws StatementHandlerException If an error occurs with one of the scripts
      */
     public void updateDatabase() throws StatementHandlerException {
-        Long currentVersion = versionSource.getDbVersion();
+        Version currentVersion = versionSource.getDbVersion();
         List<VersionScriptPair> versionScriptPairs = scriptSource.getScripts(currentVersion);
         if (versionScriptPairs.size() > 0) {
-            if (clearDb) {
-                dbClearer.clearDatabase();
+            if (scriptSource.shouldRunFromScratch(currentVersion)) {
+                if (fromScratchEnabled) {
+                    dbClearer.clearDatabase();
+                } else {
+                    throw new RuntimeException("Existing database update script has been modified, but updateing " +
+                            "from scratch is not enabled");
+                }
             }
             for (VersionScriptPair versionScriptPair : versionScriptPairs) {
                 try {
-                    for (String script : versionScriptPair.getScripts()) {
-                        scriptRunner.execute(script);
-                    }
+                    scriptRunner.execute(versionScriptPair.getScript());
                 } catch (StatementHandlerException e) {
-                    logger.error("Error while executing scripts: " + versionScriptPair + "\nDatabase version not incremented", e);
+                    logger.error("Error while executing script: " + versionScriptPair + "\nDatabase version not incremented", e);
                     logger.error("Current database version is " + versionSource.getDbVersion());
                     throw e;
                 }
                 versionSource.setDbVersion(versionScriptPair.getVersion());
                 logger.info("Database version incremented to " + versionScriptPair.getVersion());
             }
-            if (disableConstraints) {
+            if (constraintsDisabler != null) {
                 constraintsDisabler.disableConstraints();
             }
-            if (updateSequences) {
+            if (sequenceUpdater != null) {
                 sequenceUpdater.updateSequences();
             }
-            if (generateDtd) {
+            if (dtdGenerator != null) {
                 dtdGenerator.generateDtd();
             }
         }
     }
+
+    /**
+     * Allows to set fromScratchEnabled property for unittesting purposes
+     * @param fromScratchEnabled
+     */
+    void setFromScratchEnabled(boolean fromScratchEnabled) {
+        this.fromScratchEnabled = fromScratchEnabled;
+    }
+
 }
