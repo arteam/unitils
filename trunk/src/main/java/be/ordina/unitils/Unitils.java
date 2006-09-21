@@ -3,7 +3,7 @@ package be.ordina.unitils;
 import be.ordina.unitils.module.UnitilsModule;
 import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
-import be.ordina.unitils.util.UnitilsProperties;
+import be.ordina.unitils.util.UnitilsConfiguration;
 
 import java.util.*;
 
@@ -24,7 +24,7 @@ public class Unitils {
 
     public void beforeSuite() throws Exception {
         // Loading module will be done the first time only
-        unitilsProperties = UnitilsProperties.loadProperties(UnitilsProperties.DEFAULT_PROPERTIES_FILE_NAME);
+        unitilsProperties = UnitilsConfiguration.loadProperties(UnitilsConfiguration.DEFAULT_PROPERTIES_FILE_NAME);
         loadModules(unitilsProperties);
         // For each module, invoke the init method
         for (UnitilsModule module : modules) {
