@@ -11,14 +11,15 @@ import java.util.Properties;
 public class UnitilsProperties {
 
     /* Name of the properties file */
-    private static final String PROPERTIES_FILE_NAME = "unittest.properties";
+    public static final String DEFAULT_PROPERTIES_FILE_NAME = "unitils.properties";
 
-    public static Properties loadProperties() {
-        String userHomeFileName = System.getProperty("user.home") + '/' + PROPERTIES_FILE_NAME;
+    public static Properties loadProperties(String propertiesFileName) {
+        String userHomeFileName = System.getProperty("user.home") + '/' + propertiesFileName;
         if (new File(userHomeFileName).exists()) {
             return PropertiesUtils.loadPropertiesFromFile(userHomeFileName);
         } else {
-            return PropertiesUtils.loadPropertiesFromClasspath(PROPERTIES_FILE_NAME);
+            return PropertiesUtils.loadPropertiesFromClasspath(propertiesFileName);
         }
     }
+
 }

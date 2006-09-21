@@ -6,14 +6,14 @@
  */
 package be.ordina.unitils.db.script;
 
-import be.ordina.unitils.BaseUnitilsEasyMockTestCase;
 import be.ordina.unitils.db.handler.StatementHandler;
+import be.ordina.unitils.testing.mock.EasyMockTestCase;
 import be.ordina.unitils.testing.mock.Mock;
 
 /**
  * @author Filip Neven
  */
-public class SQLScriptRunnerTest extends BaseUnitilsEasyMockTestCase {
+public class SQLScriptRunnerTest extends EasyMockTestCase {
 
     @Mock
     private StatementHandler mockStatementHandler = null;
