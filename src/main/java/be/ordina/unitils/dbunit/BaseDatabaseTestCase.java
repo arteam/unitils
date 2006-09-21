@@ -11,8 +11,9 @@ import be.ordina.unitils.dbmaintainer.handler.StatementHandlerException;
 import be.ordina.unitils.dbmaintainer.maintainer.DBMaintainer;
 import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
-import be.ordina.unitils.util.UnitilsProperties;
+import be.ordina.unitils.util.UnitilsConfiguration;
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.dbunit.Assertion;
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.DatabaseConfig;
@@ -90,7 +91,7 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
         if (dataSource == null) {
             synchronized (BaseDatabaseTestCase.class) {
                 if (properties == null) {
-                    properties = UnitilsProperties.loadProperties(getPropertiesFileName());
+                    properties = UnitilsConfiguration.loadProperties(getPropertiesFileName());
                     //create the singleton datasource
                     dataSource = createDataSource();
                     //create the connection instance

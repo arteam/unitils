@@ -13,7 +13,7 @@ import be.ordina.unitils.dbunit.annotation.DataSet;
 import be.ordina.unitils.dbunit.annotation.ExpectedDataSet;
 import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
-import be.ordina.unitils.util.UnitilsProperties;
+import be.ordina.unitils.util.UnitilsConfiguration;
 import org.apache.commons.dbutils.DbUtils;
 import org.dbunit.Assertion;
 import org.dbunit.database.DatabaseConfig;
@@ -71,7 +71,7 @@ public class DatabaseUnitils {
         this.testInstance = testInstance;
 
         //todo implement
-        properties = UnitilsProperties.loadProperties(UnitilsProperties.DEFAULT_PROPERTIES_FILE_NAME);
+        properties = UnitilsConfiguration.loadProperties(UnitilsConfiguration.DEFAULT_PROPERTIES_FILE_NAME);
 
         //create the singleton datasource
         dataSource = createDataSource(properties);
@@ -210,7 +210,7 @@ public class DatabaseUnitils {
     private String getExpectedDataSetFileName() {
         Method testMethod = getTestMethod(testInstance);
         if (testMethod != null) {
-            ExpectedDataSet expectedDataSet = testMethod.getAnnotation(ExpectedDataSet.class);
+            testMethod.getAnnotation(ExpectedDataSet.class);
             //todo implement
         }
 

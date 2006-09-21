@@ -7,7 +7,7 @@
 package be.ordina.unitils.easymock;
 
 import be.ordina.unitils.inject.AutoInjector;
-import be.ordina.unitils.util.UnitilsProperties;
+import be.ordina.unitils.util.UnitilsConfiguration;
 import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.createMock;
 import org.easymock.classextension.internal.ClassExtensionHelper;
@@ -57,7 +57,7 @@ public class EasyMockTestCase extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         if (properties == null) {
-            properties = UnitilsProperties.loadProperties(UnitilsProperties.DEFAULT_PROPERTIES_FILE_NAME);
+            properties = UnitilsConfiguration.loadProperties(UnitilsConfiguration.DEFAULT_PROPERTIES_FILE_NAME);
         }
         injectMocksIntoTest();
     }
