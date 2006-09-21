@@ -6,23 +6,20 @@
  */
 package be.ordina.unitils.db.script;
 
+import be.ordina.unitils.BaseUnitilsEasyMockTestCase;
 import be.ordina.unitils.db.handler.StatementHandler;
-import be.ordina.unitils.testing.mock.EasyMockTestCase;
+import be.ordina.unitils.testing.mock.Mock;
 
 /**
  * @author Filip Neven
  */
-public class SQLScriptRunnerTest extends EasyMockTestCase {
+public class SQLScriptRunnerTest extends BaseUnitilsEasyMockTestCase {
 
-    /**
-     * Tested instance
-     */
+    @Mock
+    private StatementHandler mockStatementHandler = null;
+
+    /* Tested instance  */
     private SQLScriptRunner sqlScriptRunner;
-
-    /**
-     * Mock statement handler, used for verification
-     */
-    private StatementHandler mockStatementHandler;
 
     /**
      * Normal script, containing 2 statements and a blank line
@@ -83,7 +80,7 @@ public class SQLScriptRunnerTest extends EasyMockTestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        mockStatementHandler = getMock(StatementHandler.class);
+
         sqlScriptRunner = new SQLScriptRunner(mockStatementHandler);
     }
 

@@ -96,7 +96,7 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
         if (dataSource == null) {
             synchronized (BaseDatabaseTestCase.class) {
                 if (properties == null) {
-                    properties = UnitilsProperties.loadProperties();
+                    properties = UnitilsProperties.loadProperties(getPropertiesFileName());
                     //create the singleton datasource
                     dataSource = createDataSource();
                     //create the connection instance
@@ -109,6 +109,15 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
         //setup database test
         super.setUp();
     }
+
+    /**
+     * Returns the name of the properties file containing all Unitils configuration options. Note: although it is possible
+     * to override this method in every test class, only in the first one the properties file will be loaded. It is advisory
+     * to override this method in a base TestCase class, which is used as superclass for all of your tests.
+     * <p>
+     * @return The name of the properties file containing all Unitils configuration options
+     */
+    protected abstract String getPropertiesFileName();
 
     private void createConnection() throws SQLException {
         connection = new DatabaseConnection(dataSource.getConnection(),
