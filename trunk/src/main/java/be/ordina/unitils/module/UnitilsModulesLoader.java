@@ -99,8 +99,12 @@ public class UnitilsModulesLoader {
                 String className = configuration.getString(PROPERTY_MODULE_PREFIX + moduleName + PROPERTY_MODULE_SUFFIX_CLASS_NAME);
 
                 // create module instance
-                UnitilsModule module = ReflectionUtils.getInstance(className);
-                modules.add(module);
+                Object module = ReflectionUtils.getInstance(className);
+                if (!(module instanceof UnitilsModule)) {
+
+                    throw new RuntimeException("Unable to load module. Module class is not of type UnitilsModule: " + className);
+                }
+                modules.add((UnitilsModule) module);
             }
         }
         return modules;
@@ -124,16 +128,19 @@ public class UnitilsModulesLoader {
         // Check for infinite loops
         if (traversedModuleNames.containsKey(moduleName)) {
 
-            throw new RuntimeException("Unable to load modules, circular dependency found for modules: " + traversedModuleNames.keySet());
+            throw new RuntimeException("Unable to load modules. Circular dependency found for modules: " + traversedModuleNames.keySet());
         }
         traversedModuleNames.put(moduleName, moduleName);
 
         int count = 1;
         String[] runAfters = allRunAfters.get(moduleName);
-        for (String currentModuleName : runAfters) {
+        if (runAfters != null) {
 
-            // recursively count all dependencies
-            count += countRunAfters(currentModuleName, allRunAfters, traversedModuleNames);
+            for (String currentModuleName : runAfters) {
+
+                // recursively count all dependencies
+                count += countRunAfters(currentModuleName, allRunAfters, traversedModuleNames);
+            }
         }
 
         traversedModuleNames.remove(moduleName);

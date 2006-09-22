@@ -29,13 +29,13 @@ public class ReflectionUtils {
             return (T) constructor.newInstance();
 
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Class " + className + " not found");
+            throw new IllegalArgumentException("Class " + className + " not found", e);
 
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException("Class " + className + " does not contain no-argument constructor");
+            throw new IllegalArgumentException("Class " + className + " does not contain no-argument constructor", e);
 
         } catch (Exception e) {
-            throw new RuntimeException("Error while trying to create object of class " + className);
+            throw new RuntimeException("Error while trying to create object of class " + className, e);
         }
     }
 }
