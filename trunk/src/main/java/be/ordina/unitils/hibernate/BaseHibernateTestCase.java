@@ -1,10 +1,8 @@
 package be.ordina.unitils.hibernate;
 
 import be.ordina.unitils.dbunit.BaseDatabaseTestCase;
-import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
 import org.hibernate.cfg.Configuration;
-
-import java.util.List;
 
 /**
  * Base class for DAO tests that use Hibernate.
@@ -34,10 +32,11 @@ public abstract class BaseHibernateTestCase extends BaseDatabaseTestCase {
     }
 
     private Configuration createHibernateConfiguration() {
-        String configurationClassName = PropertiesUtils.getPropertyRejectNull(properties,
-                PROPKEY_HIBERNATE_CONFIGURATION_CLASS);
-        List<String> configFiles = PropertiesUtils.getCommaSeperatedStringsRejectNull(properties,
-                PROPKEY_HIBERNATE_CONFIGFILES);
+
+        org.apache.commons.configuration.Configuration unitilsConfiguration = UnitilsConfiguration.getInstance();
+        String configurationClassName = unitilsConfiguration.getString(PROPKEY_HIBERNATE_CONFIGURATION_CLASS);
+
+        String[] configFiles = unitilsConfiguration.getStringArray(PROPKEY_HIBERNATE_CONFIGFILES);
         try {
             Configuration configuration = (Configuration) Class.forName(configurationClassName).newInstance();
             for (String configFile : configFiles) {

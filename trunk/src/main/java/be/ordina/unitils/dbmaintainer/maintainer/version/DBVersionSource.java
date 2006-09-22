@@ -6,12 +6,12 @@
  */
 package be.ordina.unitils.dbmaintainer.maintainer.version;
 
-import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.Properties;
 
 /**
  * Implementation of <code>VersionSource</code> that stores the version in the database
@@ -65,16 +65,18 @@ public class DBVersionSource implements VersionSource {
     private String versionTimestampColumnName;
 
     /**
+     * todo javadoc
      * Initializes with the given <code>Properties</code> and <code>DataSource</code>.
      *
-     * @param properties
      * @param dataSource
      */
-    public void init(Properties properties, DataSource dataSource) {
-        this.schemaName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DATABASE_USERNAME).toUpperCase();
-        this.tableName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSION_TABLE_NAME).toUpperCase();
-        this.versionIndexColumnName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();
-        this.versionTimestampColumnName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME).toUpperCase();
+    public void init(DataSource dataSource) {
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+        this.schemaName = configuration.getString(PROPKEY_DATABASE_USERNAME).toUpperCase();
+        this.tableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
+        this.versionIndexColumnName = configuration.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();
+        this.versionTimestampColumnName = configuration.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME).toUpperCase();
         this.dataSource = dataSource;
     }
 

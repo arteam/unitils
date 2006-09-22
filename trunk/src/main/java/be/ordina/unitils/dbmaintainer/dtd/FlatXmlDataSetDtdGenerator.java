@@ -1,6 +1,7 @@
 package be.ordina.unitils.dbmaintainer.dtd;
 
-import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -10,7 +11,6 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.Connection;
-import java.util.Properties;
 
 /**
  * @author Filip Neven
@@ -32,10 +32,12 @@ public class FlatXmlDataSetDtdGenerator implements DtdGenerator {
     /* The DTD file name */
     private String dtdFileName;
 
-    public void init(Properties properties, DataSource dataSource) {
+    public void init(DataSource dataSource) {
         this.dataSource = dataSource;
-        dtdFileName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DTD_FILENAME);
-        schemaName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCHEMA_NAME);
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+        dtdFileName = configuration.getString(PROPKEY_DTD_FILENAME);
+        schemaName = configuration.getString(PROPKEY_SCHEMA_NAME);
     }
 
     public void generateDtd() {

@@ -8,9 +8,10 @@ package be.ordina.unitils.dbmaintainer.maintainer.script;
 
 import be.ordina.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import be.ordina.unitils.dbmaintainer.maintainer.version.Version;
-import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -44,14 +45,16 @@ public class FileScriptSource implements ScriptSource {
     private String fileExtension;
 
     /**
-     * @see ScriptSource#init(java.util.Properties)
+     * @see ScriptSource#init()
      */
-    public void init(Properties properties) {
-        scriptFilesDir = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCRIPTFILES_DIR);
+    public void init() {
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+        scriptFilesDir = configuration.getString(PROPKEY_SCRIPTFILES_DIR);
         if (!new File(scriptFilesDir).exists()) {
             throw new IllegalArgumentException("Script files directory '" + scriptFilesDir + "' does not exist");
         }
-        fileExtension = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCRIPTFILES_FILEEXTENSION);
+        fileExtension = configuration.getString(PROPKEY_SCRIPTFILES_FILEEXTENSION);
         if (fileExtension.startsWith(".")) {
             throw new IllegalArgumentException("Extension should not start with a '.'");
         }

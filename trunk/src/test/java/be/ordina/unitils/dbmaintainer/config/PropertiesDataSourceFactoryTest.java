@@ -6,7 +6,6 @@
  */
 package be.ordina.unitils.dbmaintainer.config;
 
-import be.ordina.unitils.util.PropertiesUtils;
 import junit.framework.TestCase;
 import org.apache.commons.dbcp.BasicDataSource;
 import static org.easymock.classextension.EasyMock.*;
@@ -27,7 +26,7 @@ public class PropertiesDataSourceFactoryTest extends TestCase {
                 return mockBasicDataSource;
             }
         };
-        propertiesFileDataSourceConfig.init(PropertiesUtils.loadPropertiesFromClasspath("unitils-tests.properties"));
+        propertiesFileDataSourceConfig.init();
     }
 
     public void testCreateDataSource() {

@@ -9,11 +9,10 @@ package be.ordina.unitils.dbunit;
 import be.ordina.unitils.dbmaintainer.config.DataSourceFactory;
 import be.ordina.unitils.dbmaintainer.handler.StatementHandlerException;
 import be.ordina.unitils.dbmaintainer.maintainer.DBMaintainer;
-import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
 import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.configuration.ConfigurationConverter;
 import org.dbunit.Assertion;
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.DatabaseConfig;
@@ -30,7 +29,6 @@ import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Properties;
 
 /**
  * Base class for DAO tests.
@@ -39,8 +37,6 @@ import java.util.Properties;
  */
 public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
 
-    /* The configuration (unittest.properties) */
-    protected static Properties properties;
 
     /* The pooled datasource instance */
     private static DataSource dataSource;
@@ -90,8 +86,8 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
         //initialize once for all tests
         if (dataSource == null) {
             synchronized (BaseDatabaseTestCase.class) {
-                if (properties == null) {
-                    properties = UnitilsConfiguration.loadProperties(getPropertiesFileName());
+                if (dataSource == null) {
+
                     //create the singleton datasource
                     dataSource = createDataSource();
                     //create the connection instance
@@ -116,9 +112,11 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
     protected abstract String getPropertiesFileName();
 
     private void createConnection() throws SQLException {
-        connection = new DatabaseConnection(dataSource.getConnection(),
-                PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCHEMA_NAME).toUpperCase());
-        String databaseDialect = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DATABASE_DIALECT);
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+
+        connection = new DatabaseConnection(dataSource.getConnection(), configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase());
+        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         if ("oracle".equals(databaseDialect)) {
             DatabaseConfig config = connection.getConfig();
             config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new OracleDataTypeFactory());
@@ -203,14 +201,6 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
         return dataSet;
     }
 
-    /**
-     * Gets the singleton dao test properties.
-     *
-     * @return the properties
-     */
-    protected Properties getProperties() {
-        return properties;
-    }
 
     /**
      * Gets the singleton datasource.
@@ -260,8 +250,11 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
      * latest changes. See {@link DBMaintainer} for more information.
      */
     protected void updateDatabaseSchemaIfNeeded() throws StatementHandlerException {
-        if ("true".equalsIgnoreCase(properties.getProperty(PROPKEY_UPDATEDATABASESCHEMA_ENABLED))) {
-            DBMaintainer dbMaintainer = new DBMaintainer(properties, dataSource);
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+
+        if (configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED)) {
+            DBMaintainer dbMaintainer = new DBMaintainer(dataSource);
             dbMaintainer.updateDatabase();
         }
     }
@@ -302,8 +295,11 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
      * @throws Exception if the factory or the datasource could not org created
      */
     private DataSource createDataSource() throws Exception {
-        DataSourceFactory dataSourceFactory = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DATASOURCEFACTORY_CLASSNAME));
-        dataSourceFactory.init(properties);
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+
+        DataSourceFactory dataSourceFactory = ReflectionUtils.getInstance(configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME));
+        dataSourceFactory.init();
         return dataSourceFactory.createDataSource();
     }
 

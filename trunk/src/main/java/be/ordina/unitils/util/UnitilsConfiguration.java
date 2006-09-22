@@ -13,9 +13,6 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.util.Properties;
-
 /**
  * Utility for keeping all configuration settings of unitils.
  * <p/>
@@ -40,17 +37,6 @@ import java.util.Properties;
  */
 public class UnitilsConfiguration {
 
-    //TODO REMOVE properties
-
-    /* Name of the properties file */
-    public static Properties loadProperties(String propertiesFileName) {
-        String userHomeFileName = System.getProperty("user.home") + '/' + propertiesFileName;
-        if (new File(userHomeFileName).exists()) {
-            return PropertiesUtils.loadPropertiesFromFile(userHomeFileName);
-        } else {
-            return PropertiesUtils.loadPropertiesFromClasspath(propertiesFileName);
-        }
-    }
 
     /**
      * Name of the fixed configuration file that contains all defaults
@@ -75,6 +61,17 @@ public class UnitilsConfiguration {
     /* The configuration settings */
     private static Configuration configuration;
 
+
+    /**
+     * Todo remove use injection
+     * <p/>
+     * Sets the configuration singleton instance. Used for testing purposes.
+     *
+     * @param instance
+     */
+    public static synchronized void setInstance(Configuration instance) {
+        configuration = instance;
+    }
 
     /**
      * Gets the configuration settings.

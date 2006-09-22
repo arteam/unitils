@@ -38,6 +38,7 @@ public class Unitils {
 
         // For each module, invoke the init method
         for (UnitilsModule module : modules) {
+
             module.beforeAll();
         }
     }
@@ -53,7 +54,8 @@ public class Unitils {
         try {
             currentTestHolder.set(test);
             currentMethodNameHolder.set(methodName);
-// For each module, invoke the beforeTestMethod method
+
+            // For each module, invoke the beforeTestMethod method
             for (UnitilsModule module : modules) {
                 module.beforeTestMethod(test, methodName);
             }
@@ -63,6 +65,38 @@ public class Unitils {
             e.printStackTrace();
         }
     }
+
+
+    public void afterTestMethod(Object test, String methodName) {
+        try {
+            // For each module, invoke the afterTestMethod method
+            for (UnitilsModule module : modules) {
+                module.afterTestMethod(test, methodName);
+            }
+
+            currentTestHolder.set(null);
+            currentMethodNameHolder.set(null);
+
+        } catch (Exception e) {
+            //todo implement exception handling
+            e.printStackTrace();
+        }
+    }
+
+    public void afterTestClass(Object test) throws Exception {
+        for (UnitilsModule module : modules) {
+            module.afterTestClass(test);
+        }
+    }
+
+
+    public void afterAll() throws Exception {
+
+        for (UnitilsModule module : modules) {
+            module.afterAll();
+        }
+    }
+
 
     public static Object getCurrentTest() {
         return currentTestHolder.get();

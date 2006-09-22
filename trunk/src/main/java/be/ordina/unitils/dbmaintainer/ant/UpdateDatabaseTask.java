@@ -13,7 +13,7 @@ public class UpdateDatabaseTask extends BaseUnitilsTask {
     private static final Logger logger = Logger.getLogger(UpdateDatabaseTask.class);
 
     public void doExecute() throws BuildException {
-        DBMaintainer dbMaintainer = new DBMaintainer(properties, dataSource);
+        DBMaintainer dbMaintainer = new DBMaintainer(dataSource);
         try {
             dbMaintainer.updateDatabase();
         } catch (StatementHandlerException e) {

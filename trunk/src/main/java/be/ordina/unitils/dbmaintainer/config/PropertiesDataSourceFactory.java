@@ -6,11 +6,12 @@
  */
 package be.ordina.unitils.dbmaintainer.config;
 
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * {@link DataSourceFactory} that loads the necessary information from a properties file.
@@ -38,16 +39,19 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     private String password;
 
     /**
+     * todo javadoc
+     * <p/>
      * Initializes itself using the properties in the given <code>Properties</code> object.
      *
-     * @param properties The properties
      * @throws IllegalArgumentException When the given <code>Properties</code> misses one or more required properties.
      */
-    public void init(Properties properties) throws IllegalArgumentException {
-        driverClassName = properties.getProperty("dataSource.driverClassName");
-        databaseUrl = properties.getProperty("dataSource.url");
-        userName = properties.getProperty("dataSource.userName");
-        password = properties.getProperty("dataSource.password");
+    public void init() throws IllegalArgumentException {
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+        driverClassName = configuration.getString("dataSource.driverClassName");
+        databaseUrl = configuration.getString("dataSource.url");
+        userName = configuration.getString("dataSource.userName");
+        password = configuration.getString("dataSource.password");
 
         if (StringUtils.isEmpty(driverClassName)) {
             throw new IllegalArgumentException("Could not determine driver class name. Missing property dataSource.driverClassName");

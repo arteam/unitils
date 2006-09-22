@@ -62,7 +62,7 @@ public class FileScriptSourceTest extends TestCase {
         // Initialize FileScriptSourceObject
         Properties testProperties = PropertiesUtils.asProperties(scriptSourceProperties);
         fromScratchFileScriptSource = new FileScriptSource();
-        fromScratchFileScriptSource.init(testProperties);
+        //fromScratchFileScriptSource.init(testProperties); //todo implement
     }
 
     private File copyFile(String fileInClassPath, String systemPath) throws Exception {

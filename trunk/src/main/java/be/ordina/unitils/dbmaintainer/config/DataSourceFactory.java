@@ -7,20 +7,20 @@
 package be.ordina.unitils.dbmaintainer.config;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * Interface for different sorts of Factories of a DataSource.
+ * <p/>
+ * todo javadoc
  */
 public interface DataSourceFactory {
 
     /**
      * Initializes itself using the properties in the given <code>Properties</code> object.
      *
-     * @param properties The properties
      * @throws IllegalArgumentException When the given <code>Properties</code> misses one or more required properties.
      */
-    public void init(Properties properties);
+    public void init();
 
 
     /**

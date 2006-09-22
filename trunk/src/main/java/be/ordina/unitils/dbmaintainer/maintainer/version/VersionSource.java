@@ -7,7 +7,6 @@
 package be.ordina.unitils.dbmaintainer.maintainer.version;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * Interface that gives access to the version of a database, and a means to increment this version
@@ -17,10 +16,9 @@ public interface VersionSource {
     /**
      * Initializes the VersionSource
      *
-     * @param properties
      * @param dataSource
      */
-    void init(Properties properties, DataSource dataSource);
+    void init(DataSource dataSource);
 
     /**
      * Returns the current version of the underlying database

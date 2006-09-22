@@ -4,10 +4,9 @@ import be.ordina.unitils.dbmaintainer.config.DataSourceFactory;
 import be.ordina.unitils.dbmaintainer.handler.StatementHandlerException;
 import be.ordina.unitils.dbmaintainer.maintainer.DBMaintainer;
 import be.ordina.unitils.module.BaseUnitilsModule;
-import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
 import be.ordina.unitils.util.UnitilsConfiguration;
-import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.commons.configuration.Configuration;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -22,7 +21,6 @@ import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Properties;
 
 /**
  * @author Filip Neven
@@ -41,9 +39,6 @@ public class DatabaseTestModule extends BaseUnitilsModule {
     /* Property key of the name of the database schema */
     private static final String PROPKEY_SCHEMA_NAME = "dataSource.userName";
 
-    /* The configuration (unittest.properties) */
-    private Properties properties;
-
     /* The pooled datasource instance */
     private DataSource dataSource;
 
@@ -52,7 +47,6 @@ public class DatabaseTestModule extends BaseUnitilsModule {
     private static ThreadLocal<IDatabaseConnection> connectionHolder = new ThreadLocal<IDatabaseConnection>();
 
     public void beforeAll() {
-        properties = ConfigurationConverter.getProperties(UnitilsConfiguration.getInstance());
         firstTime = true;
     }
 
@@ -86,15 +80,19 @@ public class DatabaseTestModule extends BaseUnitilsModule {
      * @return the datasource
      */
     private DataSource createDataSource() {
-        DataSourceFactory dataSourceFactory = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DATASOURCEFACTORY_CLASSNAME));
-        dataSourceFactory.init(properties);
+        Configuration configuration = UnitilsConfiguration.getInstance();
+
+        DataSourceFactory dataSourceFactory = ReflectionUtils.getInstance(configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME));
+        dataSourceFactory.init();
         return dataSourceFactory.createDataSource();
     }
 
     private IDatabaseConnection createConnection() throws SQLException {
-        IDatabaseConnection connection = new DatabaseConnection(dataSource.getConnection(),
-                PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCHEMA_NAME).toUpperCase());
-        String databaseDialect = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DATABASE_DIALECT);
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+
+        IDatabaseConnection connection = new DatabaseConnection(dataSource.getConnection(), configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase());
+        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         if ("oracle".equals(databaseDialect)) {
             DatabaseConfig config = connection.getConfig();
             config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new OracleDataTypeFactory());
@@ -115,8 +113,10 @@ public class DatabaseTestModule extends BaseUnitilsModule {
      * latest changes. See {@link be.ordina.unitils.dbmaintainer.maintainer.DBMaintainer} for more information.
      */
     protected void updateDatabaseSchemaIfNeeded() throws StatementHandlerException {
-        if ("true".equalsIgnoreCase(properties.getProperty(PROPKEY_UPDATEDATABASESCHEMA_ENABLED))) {
-            DBMaintainer dbMaintainer = new DBMaintainer(properties, dataSource);
+        Configuration configuration = UnitilsConfiguration.getInstance();
+
+        if (configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED)) {
+            DBMaintainer dbMaintainer = new DBMaintainer(dataSource);
             dbMaintainer.updateDatabase();
         }
     }

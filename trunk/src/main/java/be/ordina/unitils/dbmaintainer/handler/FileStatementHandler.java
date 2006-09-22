@@ -6,13 +6,13 @@
  */
 package be.ordina.unitils.dbmaintainer.handler;
 
-import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.Configuration;
 
 import javax.sql.DataSource;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Properties;
 
 /**
  * Implementation of {@link StatementHandler} that writes each statement to a file. The fileName is specified
@@ -32,10 +32,12 @@ public class FileStatementHandler implements StatementHandler {
     private String fileName;
 
     /**
-     * @see StatementHandler#init(java.util.Properties, javax.sql.DataSource)
+     * @see StatementHandler#init(javax.sql.DataSource)
      */
-    public void init(Properties properties, DataSource dataSource) {
-        fileName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_FILENAME);
+    public void init(DataSource dataSource) {
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+        fileName = configuration.getString(PROPKEY_FILENAME);
     }
 
     /**

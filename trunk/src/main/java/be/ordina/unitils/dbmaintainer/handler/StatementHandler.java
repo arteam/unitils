@@ -7,7 +7,6 @@
 package be.ordina.unitils.dbmaintainer.handler;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * Interface for classes that handle SQL statements.
@@ -17,10 +16,9 @@ public interface StatementHandler {
     /**
      * Provides a <code>Properties</code> and a <code>DataSource</code> object for initialization
      *
-     * @param properties
      * @param dataSource
      */
-    void init(Properties properties, DataSource dataSource);
+    void init(DataSource dataSource);
 
     /**
      * Handles the given SQL statement
