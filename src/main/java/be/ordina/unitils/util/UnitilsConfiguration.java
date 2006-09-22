@@ -1,14 +1,20 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package be.ordina.unitils.util;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import java.util.Properties;
 import java.io.File;
+import java.util.Properties;
 
 /**
  * Utility for keeping all configuration settings of unitils.
@@ -45,7 +51,6 @@ public class UnitilsConfiguration {
             return PropertiesUtils.loadPropertiesFromClasspath(propertiesFileName);
         }
     }
-
 
     /**
      * Name of the fixed configuration file that contains all defaults
@@ -97,6 +102,8 @@ public class UnitilsConfiguration {
         Configuration localConfiguration = createLocalConfiguration(defaultConfiguration, customConfiguration);
 
         CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
+        compositeConfiguration.setThrowExceptionOnMissing(true);
+
         if (localConfiguration != null) {
             compositeConfiguration.addConfiguration(localConfiguration);
         }

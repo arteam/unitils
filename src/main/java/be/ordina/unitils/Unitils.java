@@ -1,74 +1,66 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package be.ordina.unitils;
 
 import be.ordina.unitils.module.UnitilsModule;
-import be.ordina.unitils.util.PropertiesUtils;
-import be.ordina.unitils.util.ReflectionUtils;
-import be.ordina.unitils.util.UnitilsConfiguration;
+import be.ordina.unitils.module.UnitilsModulesLoader;
+import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.List;
 
 /**
- * @author Filip Neven
+ * todo javadoc
  */
 public class Unitils {
 
+
+    /* The logger instance for this class */
+    private static final Logger logger = Logger.getLogger(Unitils.class);
+
+
     private static final String PROPKEY_MODULE_START = "module.";
 
-    private static Properties unitilsProperties;
 
-    List<UnitilsModule> modules;
+    private List<UnitilsModule> modules;
 
-    private static ThreadLocal currentTestHolder = new ThreadLocal();
+    private static ThreadLocal<Object> currentTestHolder = new ThreadLocal<Object>();
 
     private static ThreadLocal<String> currentMethodNameHolder = new ThreadLocal<String>();
 
-    public void beforeSuite() throws Exception {
+    public void beforeAll() throws Exception {
         // Loading module will be done the first time only
-        unitilsProperties = UnitilsConfiguration.loadProperties(UnitilsConfiguration.DEFAULT_PROPERTIES_FILE_NAME);
-        loadModules(unitilsProperties);
+        UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
+        modules = unitilsModulesLoader.loadModules();
+
         // For each module, invoke the init method
         for (UnitilsModule module : modules) {
-            module.beforeSuite(unitilsProperties);
+            module.beforeAll();
         }
     }
 
-    private void loadModules(Properties unitilsProperties) {
-        modules = new ArrayList<UnitilsModule>();
-        Set<String> modulePropKeys = PropertiesUtils.getPropertyKeysStartingWith(unitilsProperties, PROPKEY_MODULE_START);
-        for (String modulePropKey : modulePropKeys) {
-            String moduleClassName = PropertiesUtils.getPropertyRejectNull(unitilsProperties, modulePropKey);
-            UnitilsModule module = ReflectionUtils.getInstance(moduleClassName);
-            modules.add(module);
+
+    public void beforeTestClass(Object test) throws Exception {
+        for (UnitilsModule module : modules) {
+            module.beforeTestClass(test);
         }
-        Collections.sort(modules, new Comparator<UnitilsModule>() {
-            public int compare(UnitilsModule module1, UnitilsModule module2) {
-                if (dependentOn(module1, module2)) {
-                    return 1;
-                } else if (dependentOn(module2, module1)) {
-                    return -1;
-                } else {
-                    return 0;
-                }
+    }
+
+    public void beforeTestMethod(Object test, String methodName) {
+        try {
+            currentTestHolder.set(test);
+            currentMethodNameHolder.set(methodName);
+// For each module, invoke the beforeTestMethod method
+            for (UnitilsModule module : modules) {
+                module.beforeTestMethod(test, methodName);
             }
 
-            private boolean dependentOn(UnitilsModule module1, UnitilsModule module2) {
-                return Arrays.asList(module1.getModulesDependingOn()).contains(module2.getClass());
-            }
-        });
-    }
-
-    public void beforeClass(Object test) throws Exception {
-        for (UnitilsModule module : modules) {
-            module.beforeClass(test);
-        }
-    }
-
-    public void beforeMethod(Object test, String methodName) {
-        currentTestHolder.set(test);
-        currentMethodNameHolder.set(methodName);
-        // For each module, invoke the beforeTestMethod method
-        for (UnitilsModule module : modules) {
-            module.beforeTestMethod(test, methodName);
+        } catch (Exception e) {
+            //todo implement exception handling
+            e.printStackTrace();
         }
     }
 

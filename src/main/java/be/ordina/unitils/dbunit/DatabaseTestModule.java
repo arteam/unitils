@@ -3,9 +3,11 @@ package be.ordina.unitils.dbunit;
 import be.ordina.unitils.dbmaintainer.config.DataSourceFactory;
 import be.ordina.unitils.dbmaintainer.handler.StatementHandlerException;
 import be.ordina.unitils.dbmaintainer.maintainer.DBMaintainer;
-import be.ordina.unitils.module.UnitilsModule;
+import be.ordina.unitils.module.BaseUnitilsModule;
 import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -25,7 +27,7 @@ import java.util.Properties;
 /**
  * @author Filip Neven
  */
-public class DatabaseTestModule implements UnitilsModule {
+public class DatabaseTestModule extends BaseUnitilsModule {
 
     /* Property keys indicating if the database schema should be updated before performing the tests */
     private static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
@@ -49,12 +51,12 @@ public class DatabaseTestModule implements UnitilsModule {
 
     private static ThreadLocal<IDatabaseConnection> connectionHolder = new ThreadLocal<IDatabaseConnection>();
 
-    public void beforeSuite(Properties unitilsProperties) {
-        properties = unitilsProperties;
+    public void beforeAll() {
+        properties = ConfigurationConverter.getProperties(UnitilsConfiguration.getInstance());
         firstTime = true;
     }
 
-    public void beforeClass(Object test) throws Exception {
+    public void beforeTestClass(Object test) throws Exception {
         if (isDatabaseTest(test) && firstTime) {
             firstTime = false;
             //create the singleton datasource
