@@ -16,12 +16,12 @@ public class UnitilsTestNG implements IHookable {
     @BeforeSuite
     protected void unitilsBeforeSuite() throws Exception {
         unitils = new Unitils();
-        unitils.beforeSuite();
+        unitils.beforeAll();
     }
 
     @BeforeClass
     protected void unitilsBeforeClass() throws Exception {
-        unitils.beforeClass(this);
+        unitils.beforeTestClass(this);
     }
 
     /**
@@ -31,7 +31,8 @@ public class UnitilsTestNG implements IHookable {
      * @param testResult
      */
     public void run(IHookCallBack callBack, ITestResult testResult) {
-        unitils.beforeMethod(this, testResult.getName());
+
+        unitils.beforeTestMethod(this, testResult.getName());
         callBack.runTestMethod(testResult);
     }
 }

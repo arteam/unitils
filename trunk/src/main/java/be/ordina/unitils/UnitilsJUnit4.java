@@ -21,12 +21,12 @@ public class UnitilsJUnit4 {
         if (firstTime) {
             firstTime = false;
             unitils = new Unitils();
-            unitils.beforeSuite();
+            unitils.beforeAll();
         }
         if (isFirstMethodFromClass()) {
-            unitils.beforeClass(this);
+            unitils.beforeTestClass(this);
         }
-        unitils.beforeMethod(this, null);
+        unitils.beforeTestMethod(this, null);
     }
 
     private boolean isFirstMethodFromClass() {

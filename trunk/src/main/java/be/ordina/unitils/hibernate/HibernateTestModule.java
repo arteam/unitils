@@ -1,8 +1,10 @@
 package be.ordina.unitils.hibernate;
 
 import be.ordina.unitils.dbunit.DatabaseTestModule;
-import be.ordina.unitils.module.UnitilsModule;
+import be.ordina.unitils.module.BaseUnitilsModule;
 import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.hibernate.cfg.Configuration;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,7 +15,7 @@ import java.util.Properties;
 /**
  * @author Filip Neven
  */
-public class HibernateTestModule implements UnitilsModule {
+public class HibernateTestModule extends BaseUnitilsModule {
 
     private static final String PROPKEY_HIBERNATE_CONFIGFILES = "hibernatetestcase.hibernate.cfg.configfiles";
 
@@ -24,12 +26,14 @@ public class HibernateTestModule implements UnitilsModule {
 
     private static boolean firstTime;
 
-    public void beforeSuite(Properties unitilsProperties) throws Exception {
-        properties = unitilsProperties;
+    public void beforeAll() {
+        //Todo refactor
+        properties = ConfigurationConverter.getProperties(UnitilsConfiguration.getInstance());
+
         firstTime = true;
     }
 
-    public void beforeClass(Object test) throws Exception {
+    public void beforeTestClass(Object test) throws Exception {
         if (firstTime) {
             firstTime = false;
             Configuration configuration = createHibernateConfiguration(this);

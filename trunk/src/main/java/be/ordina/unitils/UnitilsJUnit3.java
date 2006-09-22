@@ -20,12 +20,12 @@ public class UnitilsJUnit3 extends TestCase {
         if (firstTime) {
             firstTime = false;
             unitils = new Unitils();
-            unitils.beforeSuite();
+            unitils.beforeAll();
         }
         if (isFirstMethodFromClass()) {
-            unitils.beforeClass(this);
+            unitils.beforeTestClass(this);
         }
-        unitils.beforeMethod(this, this.getName());
+        unitils.beforeTestMethod(this, this.getName());
     }
 
     private boolean isFirstMethodFromClass() {

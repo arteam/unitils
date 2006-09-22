@@ -1,18 +1,22 @@
 package be.ordina.unitils.module;
 
-import java.util.Properties;
-
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  */
 public interface UnitilsModule {
 
-    void beforeSuite(Properties unitilsProperties) throws Exception;
+    public void beforeAll() throws Exception;
 
-    void beforeClass(Object test) throws Exception;
+    public void beforeTestClass(Object test) throws Exception;
 
-    void beforeTestMethod(Object test, String methodName);
+    public void beforeTestMethod(Object test, String methodName) throws Exception;
 
-    Class[] getModulesDependingOn();
+    public void afterTestMethod(Object test, String methodName) throws Exception;
+
+    public void afterTestClass(Object test) throws Exception;
+
+    public void afterAll() throws Exception;
 
 }

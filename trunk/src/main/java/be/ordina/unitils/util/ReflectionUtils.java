@@ -7,7 +7,6 @@
 package be.ordina.unitils.util;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 
 /**
  * Utility methods that use reflection in some way.
@@ -23,13 +22,18 @@ public class ReflectionUtils {
      */
     public static <T> T getInstance(String className) {
         try {
-            Class clazz = Class.forName(className);
-            Constructor constructor = clazz.getConstructor();
+            Class<?> clazz = Class.forName(className);
+            Constructor<?> constructor = clazz.getConstructor();
+
+            //noinspection unchecked
             return (T) constructor.newInstance();
+
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Class " + className + " not found");
+
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("Class " + className + " does not contain no-argument constructor");
+
         } catch (Exception e) {
             throw new RuntimeException("Error while trying to create object of class " + className);
         }
