@@ -18,13 +18,13 @@ import be.ordina.unitils.dbmaintainer.maintainer.version.VersionSource;
 import be.ordina.unitils.dbmaintainer.script.SQLScriptRunner;
 import be.ordina.unitils.dbmaintainer.script.ScriptRunner;
 import be.ordina.unitils.dbmaintainer.sequences.SequenceUpdater;
-import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.ReflectionUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * A class for performing automatic maintenance of a database.<br>
@@ -132,52 +132,46 @@ public class DBMaintainer {
      * These objects are initialized too using their init method and the given <code>Properties</code> and
      * <code>DataSource</code> object.
      *
-     * @param properties
      * @param dataSource
      */
-    public DBMaintainer(Properties properties, DataSource dataSource) {
+    public DBMaintainer(DataSource dataSource) {
 
-        String databaseDialect = PropertiesUtils.getPropertyRejectNull(properties,
-                PROPKEY_DATABASE_DIALECT);
+        Configuration configuration = UnitilsConfiguration.getInstance();
 
-        versionSource = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSIONSOURCE));
-        versionSource.init(properties, dataSource);
+        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
 
-        scriptSource = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_SCRIPTSOURCE));
-        scriptSource.init(properties);
+        versionSource = ReflectionUtils.getInstance(configuration.getString(PROPKEY_VERSIONSOURCE));
+        versionSource.init(dataSource);
 
-        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler)
-                ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
-                        PROPKEY_STATEMENTHANDLER)));
-        statementHandler.init(properties, dataSource);
+        scriptSource = ReflectionUtils.getInstance(configuration.getString(PROPKEY_SCRIPTSOURCE));
+        scriptSource.init();
+
+        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler) ReflectionUtils.getInstance(configuration.getString(PROPKEY_STATEMENTHANDLER)));
+        statementHandler.init(dataSource);
         scriptRunner = new SQLScriptRunner(statementHandler);
 
-        fromScratchEnabled = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_FROMSCRATCH_ENABLED);
+        fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
         if (fromScratchEnabled) {
-            dbClearer = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DBCLEARER_START +
-                    "." + databaseDialect));
-            dbClearer.init(properties, dataSource, statementHandler);
+            dbClearer = ReflectionUtils.getInstance(configuration.getString(PROPKEY_DBCLEARER_START + "." + databaseDialect));
+            dbClearer.init(dataSource, statementHandler);
         }
 
-        boolean disableConstraints = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_DISABLECONSTRAINTS_ENABLED);
+        boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         if (disableConstraints) {
-            constraintsDisabler = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
-                    PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect));
+            constraintsDisabler = ReflectionUtils.getInstance(configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect));
             constraintsDisabler.init(dataSource, statementHandler);
         }
 
-        boolean updateSequences = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_UPDATESEQUENCES_ENABLED);
+        boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
         if (updateSequences) {
-            sequenceUpdater = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
-                    PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
-            sequenceUpdater.init(properties, dataSource, statementHandler);
+            sequenceUpdater = ReflectionUtils.getInstance(configuration.getString(PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
+            sequenceUpdater.init(dataSource, statementHandler);
         }
 
-        boolean generateDtd = PropertiesUtils.getBooleanPropertyRejectNull(properties, PROPKEY_GENERATEDTD_ENABLED);
+        boolean generateDtd = configuration.getBoolean(PROPKEY_GENERATEDTD_ENABLED);
         if (generateDtd) {
-            dtdGenerator = ReflectionUtils.getInstance(PropertiesUtils.getPropertyRejectNull(properties,
-                    PROPKEY_DTDGENERATOR_CLASSNAME));
-            dtdGenerator.init(properties, dataSource);
+            dtdGenerator = ReflectionUtils.getInstance(configuration.getString(PROPKEY_DTDGENERATOR_CLASSNAME));
+            dtdGenerator.init(dataSource);
         }
     }
 

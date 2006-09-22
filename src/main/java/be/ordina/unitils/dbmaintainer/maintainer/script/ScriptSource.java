@@ -10,7 +10,6 @@ import be.ordina.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import be.ordina.unitils.dbmaintainer.maintainer.version.Version;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Interface that gives access to a source that provides scripts for updating the database to a given state
@@ -19,10 +18,8 @@ public interface ScriptSource {
 
     /**
      * Initialize using the properties in the given <code>Properties</code> object
-     *
-     * @param properties
      */
-    void init(Properties properties);
+    void init();
 
     /**
      * This methods returns true if, given the current database version, the scripts should be run from scratch, or

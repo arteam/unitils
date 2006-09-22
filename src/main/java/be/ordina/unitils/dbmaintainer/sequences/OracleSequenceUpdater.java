@@ -2,7 +2,8 @@ package be.ordina.unitils.dbmaintainer.sequences;
 
 import be.ordina.unitils.dbmaintainer.handler.StatementHandler;
 import be.ordina.unitils.dbmaintainer.handler.StatementHandlerException;
-import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 
 import javax.sql.DataSource;
@@ -10,7 +11,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Properties;
 
 /**
  * @author Filip Neven
@@ -35,12 +35,14 @@ public class OracleSequenceUpdater implements SequenceUpdater {
     private long lowestAcceptableSequenceValue;
 
     /**
-     * @see SequenceUpdater#init(java.util.Properties,javax.sql.DataSource,be.ordina.unitils.dbmaintainer.handler.StatementHandler)
+     * @see SequenceUpdater#init(javax.sql.DataSource,be.ordina.unitils.dbmaintainer.handler.StatementHandler)
      */
-    public void init(Properties properties, DataSource dataSource, StatementHandler statementHandler) {
+    public void init(DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
-        lowestAcceptableSequenceValue = PropertiesUtils.getLongPropertyRejectNull(properties, PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE);
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+        lowestAcceptableSequenceValue = configuration.getLong(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE);
     }
 
     /**

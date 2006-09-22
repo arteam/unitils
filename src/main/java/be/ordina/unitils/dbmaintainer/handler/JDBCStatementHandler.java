@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Properties;
 
 /**
  * Implementation of {@link StatementHandler} that will execute the SQL statements on a database using JDBC.
@@ -25,10 +24,9 @@ public class JDBCStatementHandler implements StatementHandler {
     /**
      * Init of <code>DataSource</code> on which statements should org executed
      *
-     * @param properties
      * @param dataSource
      */
-    public void init(Properties properties, DataSource dataSource) {
+    public void init(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

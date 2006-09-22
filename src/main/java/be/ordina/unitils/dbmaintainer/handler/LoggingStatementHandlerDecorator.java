@@ -3,7 +3,6 @@ package be.ordina.unitils.dbmaintainer.handler;
 import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * @author Filip Neven
@@ -18,8 +17,8 @@ public class LoggingStatementHandlerDecorator implements StatementHandler {
         this.decoratedStatementHandler = decoratedStatementHandler;
     }
 
-    public void init(Properties properties, DataSource dataSource) {
-        decoratedStatementHandler.init(properties, dataSource);
+    public void init(DataSource dataSource) {
+        decoratedStatementHandler.init(dataSource);
     }
 
     public void handle(String statement) throws StatementHandlerException {

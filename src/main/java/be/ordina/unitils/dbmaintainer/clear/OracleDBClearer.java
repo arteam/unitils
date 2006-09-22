@@ -2,23 +2,19 @@ package be.ordina.unitils.dbmaintainer.clear;
 
 import be.ordina.unitils.dbmaintainer.handler.StatementHandler;
 import be.ordina.unitils.dbmaintainer.handler.StatementHandlerException;
-import be.ordina.unitils.util.PropertiesUtils;
+import be.ordina.unitils.util.UnitilsConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Filip Neven
  */
 public class OracleDBClearer implements DBClearer {
-
-    private static final Logger logger = Logger.getLogger(OracleDBClearer.class);
-
 
     /* Property keys of the database schema name */
     private static final String PROPKEY_DATABASE_USERNAME = "dataSource.userName";
@@ -45,11 +41,13 @@ public class OracleDBClearer implements DBClearer {
     /* The name of the version table */
     private String versionTableName;
 
-    public void init(Properties properties, DataSource dataSource, StatementHandler statementHandler) {
+    public void init(DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
-        schemaName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_DATABASE_USERNAME);
-        versionTableName = PropertiesUtils.getPropertyRejectNull(properties, PROPKEY_VERSION_TABLE_NAME);
+
+        Configuration configuration = UnitilsConfiguration.getInstance();
+        schemaName = configuration.getString(PROPKEY_DATABASE_USERNAME);
+        versionTableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME);
     }
 
     public void clearDatabase() throws StatementHandlerException {

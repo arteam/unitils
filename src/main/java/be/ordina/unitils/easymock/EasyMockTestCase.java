@@ -7,7 +7,6 @@
 package be.ordina.unitils.easymock;
 
 import be.ordina.unitils.inject.AutoInjector;
-import be.ordina.unitils.util.UnitilsConfiguration;
 import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.createMock;
 import org.easymock.classextension.internal.ClassExtensionHelper;
@@ -15,7 +14,6 @@ import org.easymock.classextension.internal.ClassExtensionHelper;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Base class for testing with mock objects using EasyMock.
@@ -35,9 +33,6 @@ public class EasyMockTestCase extends TestCase {
     /* Implementation of AutoInjector for automatically injecting mocks into objects */
     private static AutoInjector autoInjector;
 
-    /* The configuration (unittest.properties) */
-    protected static Properties properties;
-
     /* Property key for the default mode of auto injection that is used */
     private static final String PROPKEY_AUTOINJECTION_DEAULTMODE = "mocks.autoinjection.defaultMode";
 
@@ -56,9 +51,7 @@ public class EasyMockTestCase extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (properties == null) {
-            properties = UnitilsConfiguration.loadProperties(UnitilsConfiguration.DEFAULT_PROPERTIES_FILE_NAME);
-        }
+
         injectMocksIntoTest();
     }
 
