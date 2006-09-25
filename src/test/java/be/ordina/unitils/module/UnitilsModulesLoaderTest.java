@@ -78,6 +78,26 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
 
     /**
+     * Tests the loading with modules (a, b) and dependencies (a -> b, d) that are declared twice.
+     * The doubles should have been ignored
+     */
+    public void testLoadModules_notDoubles() {
+
+        configuration.setProperty(PROPERTY_MODULES, "a, b, c, d, a, b");
+        configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "b, b, d, b, d");
+
+        List<UnitilsModule> result = unitilsModulesLoader.loadModules();
+
+        assertNotNull(result);
+        assertEquals(4, result.size());
+        assertTrue(result.get(0) instanceof TestUnitilsModuleD);
+        assertTrue(result.get(1) instanceof TestUnitilsModuleB);
+        assertTrue(result.get(2) instanceof TestUnitilsModuleA);
+        assertTrue(result.get(3) instanceof TestUnitilsModuleC);
+    }
+
+
+    /**
      * Tests the loading with a totally empty configuration.
      */
     public void testLoadModules_emptyConfiguration() {

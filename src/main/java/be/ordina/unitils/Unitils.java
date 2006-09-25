@@ -8,7 +8,6 @@ package be.ordina.unitils;
 
 import be.ordina.unitils.module.UnitilsModule;
 import be.ordina.unitils.module.UnitilsModulesLoader;
-import org.apache.log4j.Logger;
 
 import java.util.List;
 
@@ -18,35 +17,39 @@ import java.util.List;
 public class Unitils {
 
 
-    /* The logger instance for this class */
-    private static final Logger logger = Logger.getLogger(Unitils.class);
-
-
-    private static final String PROPKEY_MODULE_START = "module.";
-
-
     private List<UnitilsModule> modules;
 
     private static ThreadLocal<Object> currentTestHolder = new ThreadLocal<Object>();
 
     private static ThreadLocal<String> currentMethodNameHolder = new ThreadLocal<String>();
 
-    public void beforeAll() throws Exception {
-        // Loading module will be done the first time only
-        UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
-        modules = unitilsModulesLoader.loadModules();
+    public void beforeAll() {
+        try {
+            // Loading module will be done the first time only
+            UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
+            modules = unitilsModulesLoader.loadModules();
 
-        // For each module, invoke the init method
-        for (UnitilsModule module : modules) {
+            // For each module, invoke the init method
+            for (UnitilsModule module : modules) {
 
-            module.beforeAll();
+                module.beforeAll();
+            }
+
+        } catch (Exception e) {
+            //todo implement
+            e.printStackTrace();
         }
     }
 
 
-    public void beforeTestClass(Object test) throws Exception {
-        for (UnitilsModule module : modules) {
-            module.beforeTestClass(test);
+    public void beforeTestClass(Object test) {
+        try {
+            for (UnitilsModule module : modules) {
+                module.beforeTestClass(test);
+            }
+        } catch (Exception e) {
+            //todo implement
+            e.printStackTrace();
         }
     }
 
@@ -83,17 +86,27 @@ public class Unitils {
         }
     }
 
-    public void afterTestClass(Object test) throws Exception {
-        for (UnitilsModule module : modules) {
-            module.afterTestClass(test);
+    public void afterTestClass(Object test) {
+        try {
+            for (UnitilsModule module : modules) {
+                module.afterTestClass(test);
+            }
+
+        } catch (Exception e) {
+            //todo implement
+            e.printStackTrace();
         }
     }
 
 
-    public void afterAll() throws Exception {
-
-        for (UnitilsModule module : modules) {
-            module.afterAll();
+    public void afterAll() {
+        try {
+            for (UnitilsModule module : modules) {
+                module.afterAll();
+            }
+        } catch (Exception e) {
+            //todo implement
+            e.printStackTrace();
         }
     }
 
