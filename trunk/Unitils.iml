@@ -8,6 +8,8 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/sample/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/sample/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -237,15 +239,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/junit-4.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/testng-5.1-jdk15.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -260,6 +253,17 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://D:/_apps/java/commons-configuration-1.2/commons-configuration-1.2-ide.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/junit-4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://D:/_apps/java/junit4.1/junit-4.1-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

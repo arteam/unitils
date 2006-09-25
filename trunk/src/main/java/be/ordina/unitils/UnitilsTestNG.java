@@ -1,27 +1,46 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package be.ordina.unitils;
 
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 
 /**
- * @author Filip Neven
+ * todo javadoc
  */
 public class UnitilsTestNG implements IHookable {
 
-    private Unitils unitils;
+    private static Unitils unitils;
 
     @BeforeSuite
-    protected void unitilsBeforeSuite() throws Exception {
+    protected void unitilsBeforeSuite() {
         unitils = new Unitils();
         unitils.beforeAll();
     }
 
+    @AfterSuite
+    protected void unitilsAfterSuite() {
+        unitils.afterAll();
+    }
+
+
     @BeforeClass
-    protected void unitilsBeforeClass() throws Exception {
+    protected void unitilsBeforeClass() {
         unitils.beforeTestClass(this);
+    }
+
+    @AfterClass
+    protected void unitilsAfterClass() {
+        unitils.afterTestClass(this);
     }
 
     /**
@@ -34,5 +53,6 @@ public class UnitilsTestNG implements IHookable {
 
         unitils.beforeTestMethod(this, testResult.getName());
         callBack.runTestMethod(testResult);
+        unitils.afterTestMethod(this, testResult.getName());
     }
 }

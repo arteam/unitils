@@ -17,16 +17,16 @@ import org.apache.log4j.Logger;
  * Utility for keeping all configuration settings of unitils.
  * <p/>
  * Unitils settings can be defined in 3 files:<ul>
- * <li><b>unitils-default.configuration</b> - a fixed file packaged in the unitils jar that contains all predefined defaults.
+ * <li><b>unitils-default.properties</b> - a fixed file packaged in the unitils jar that contains all predefined defaults.
  * This file should typically not be modified.</li>
- * <li><b>unitils.configuration</b> - a file somewhere in the classpath or user.home dir that contains all custom configuration
+ * <li><b>unitils.properties</b> - a file somewhere in the classpath or user.home dir that contains all custom configuration
  * settings. Settings in this file will override the unitil default settings. This is where you should put your project
  * specific configuration</li>
- * <li><b>unitils-local.propeties</b> - a file somewhere in the classpath or user.home that contains machine/user local
+ * <li><b>unitils-local.properties</b> - a file somewhere in the classpath or user.home that contains machine/user local
  * configuration. Eg the database schema specific to the local user could be defined here. Settings in this file
  * will override the unitil default and custom settings.</li>
  * </ul>
- * The name of the custom settings file (unitils.configuration) is defined by the {@link #PROPERTY_CUSTOM_CONFIGURATION}
+ * The name of the custom settings file (unitils.properties) is defined by the {@link #PROPERTY_CUSTOM_CONFIGURATION}
  * property in the default settings. The name of the local settings file (unitils-local.propeties) is defined
  * by the {@link #PROPERTY_LOCAL_CONFIGURATION} in the custom or default settings. If these configuration are set to
  * null or empty, the corresponding property file will not be loaded.
@@ -41,7 +41,7 @@ public class UnitilsConfiguration {
     /**
      * Name of the fixed configuration file that contains all defaults
      */
-    public static final String DEFAULT_PROPERTIES_FILE_NAME = "unitils-default.configuration";
+    public static final String DEFAULT_PROPERTIES_FILE_NAME = "unitils-default.properties";
 
     /**
      * Property in the defaults configuration file that contains the name of the custom configuration file

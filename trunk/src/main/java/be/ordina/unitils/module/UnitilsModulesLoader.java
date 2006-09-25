@@ -62,8 +62,8 @@ public class UnitilsModulesLoader {
 
         Configuration configuration = UnitilsConfiguration.getInstance();
 
-        // get all declared modules
-        String[] moduleNames = configuration.getStringArray(PROPERTY_MODULES);
+        // get all declared modules (filter doubles)
+        Set<String> moduleNames = new TreeSet<String>(Arrays.asList(configuration.getStringArray(PROPERTY_MODULES)));
 
         // get all module dependencies
         Map<String, String[]> runAfters = new HashMap<String, String[]>();
