@@ -17,12 +17,12 @@ import java.lang.reflect.Method;
 /**
  * todo javadoc
  */
-public class UnitilsTestClassRunner extends TestClassRunner {
+public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
 
     private static Unitils unitils;
 
 
-    public UnitilsTestClassRunner(Class<?> testClass) throws InitializationError {
+    public UnitilsJUnit4TestClassRunner(Class<?> testClass) throws InitializationError {
         super(testClass, new CustomTestClassMethodsRunner(testClass));
 
         if (unitils == null) {

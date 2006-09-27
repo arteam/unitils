@@ -6,6 +6,7 @@
  */
 package be.ordina.unitils.easymock;
 
+import be.ordina.unitils.easymock.annotation.Mock;
 import be.ordina.unitils.inject.AutoInjector;
 import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.createMock;
@@ -16,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * todo remove
+ * <p/>
  * Base class for testing with mock objects using EasyMock.
  * <p/>
  * Mock creation is simplified by automatically inserting EasyMock generated mocks for fields annotated with the

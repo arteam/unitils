@@ -1,6 +1,6 @@
 package be.ordina.unitils.dbunit;
 
-import be.ordina.unitils.Unitils;
+import be.ordina.unitils.module.TestContext;
 import org.apache.commons.dbutils.DbUtils;
 import org.dbunit.Assertion;
 import org.dbunit.database.IDatabaseConnection;
@@ -16,17 +16,19 @@ import java.io.InputStream;
 public class DatabaseAssert {
 
     public static void assertDBContentAsExpected() throws Exception {
-        String currentMethodName = Unitils.getCurrentMethodName();
+
+        String currentMethodName = TestContext.getTestMethodName();
         if (currentMethodName == null) {
             throw new RuntimeException("This method is not supported when using a test framework that doesn't " +
                     "support resolving the name of the current test, such as JUnit4 or TestNG, use the version of " +
                     "this method that takes the method name as parameter");
         }
-        assertDBContentAsExpected(Unitils.getCurrentTest(), currentMethodName);
+        assertDBContentAsExpected(TestContext.getTestObject(), currentMethodName);
     }
 
     public static void assertDBContentAsExpected(String testMethodName) throws Exception {
-        assertDBContentAsExpected(Unitils.getCurrentTest(), testMethodName);
+
+        assertDBContentAsExpected(TestContext.getTestMethodName(), testMethodName);
     }
 
     /**

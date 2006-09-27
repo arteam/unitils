@@ -10,6 +10,9 @@ import java.util.List;
  */
 public class AnnotationUtils {
 
+    //todo javadoc
+    public static final String DEFAULT_ENUM_VALUE_NAME = "DEFAULT";
+
     /**
      * Returns the given' class's declared fields that are marked with the given annotation
      *
@@ -26,5 +29,34 @@ public class AnnotationUtils {
             }
         }
         return annotatedFields;
+    }
+
+
+    // todo javadoc
+    @SuppressWarnings({"unchecked"})
+    public static <T extends Enum> T getValueReplaceDefault(T enumValue) {
+
+        if (DEFAULT_ENUM_VALUE_NAME.equalsIgnoreCase(enumValue.name())) {
+
+            return getDefaultValue((Class<T>) enumValue.getClass());
+        }
+        return enumValue;
+    }
+
+
+    // todo javadoc
+    private static <T extends Enum> T getDefaultValue(Class<T> enumClass) {
+
+        String enumClassName = enumClass.getName();
+        String defaultValueName = UnitilsConfiguration.getInstance().getString(enumClassName);
+
+        T[] enumValues = enumClass.getEnumConstants();
+        for (T enumValue : enumValues) {
+            if (defaultValueName.equals(enumValue.name())) {
+
+                return enumValue;
+            }
+        }
+        throw new RuntimeException("todo");
     }
 }

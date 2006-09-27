@@ -8,7 +8,7 @@ package be.ordina.unitils.dbmaintainer.script;
 
 import be.ordina.unitils.dbmaintainer.handler.StatementHandler;
 import be.ordina.unitils.easymock.EasyMockTestCase;
-import be.ordina.unitils.easymock.Mock;
+import be.ordina.unitils.easymock.annotation.Mock;
 
 /**
  * @author Filip Neven

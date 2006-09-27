@@ -3,7 +3,9 @@ package be.ordina.unitils.dbunit;
 import be.ordina.unitils.dbmaintainer.config.DataSourceFactory;
 import be.ordina.unitils.dbmaintainer.handler.StatementHandlerException;
 import be.ordina.unitils.dbmaintainer.maintainer.DBMaintainer;
-import be.ordina.unitils.module.BaseUnitilsModule;
+import be.ordina.unitils.module.TestContext;
+import be.ordina.unitils.module.TestListener;
+import be.ordina.unitils.module.UnitilsModule;
 import be.ordina.unitils.util.ReflectionUtils;
 import be.ordina.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -25,7 +27,7 @@ import java.sql.SQLException;
 /**
  * @author Filip Neven
  */
-public class DatabaseTestModule extends BaseUnitilsModule {
+public class DatabaseTestModule implements UnitilsModule {
 
     /* Property keys indicating if the database schema should be updated before performing the tests */
     private static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
@@ -50,29 +52,11 @@ public class DatabaseTestModule extends BaseUnitilsModule {
         firstTime = true;
     }
 
-    public void beforeTestClass(Object test) throws Exception {
-        if (isDatabaseTest(test) && firstTime) {
-            firstTime = false;
-            //create the singleton datasource
-            dataSource = createDataSource();
-            //create the connection instance
-            connectionHolder.set(createConnection());
-            //bring version test database schema up to date
-            updateDatabaseSchemaIfNeeded();
-        }
-    }
 
     private boolean isDatabaseTest(Object test) {
         return test.getClass().getAnnotation(DatabaseTest.class) != null;
     }
 
-    public void beforeTestMethod(Object test, String methodName) {
-        try {
-            DatabaseOperation.CLEAN_INSERT.execute(getConnection(), getDataSet(test, methodName));
-        } catch (Exception e) {
-            throw new RuntimeException("Error while trying to insert test data in database", e);
-        }
-    }
 
     /**
      * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
@@ -217,5 +201,45 @@ public class DatabaseTestModule extends BaseUnitilsModule {
 
     public Class[] getModulesDependingOn() {
         return new Class[]{};
+    }
+
+
+    public TestListener createTestListener() {
+        return new DatabaseTestListener();
+    }
+
+    //todo javadoc
+    // todo refactor
+    private class DatabaseTestListener extends TestListener {
+
+        public void beforeTestClass() {
+
+            try {
+                if (isDatabaseTest(TestContext.getTestObject()) && firstTime) {
+                    firstTime = false;
+                    //create the singleton datasource
+                    dataSource = createDataSource();
+                    //create the connection instance
+                    connectionHolder.set(createConnection());
+                    //bring version test database schema up to date
+                    updateDatabaseSchemaIfNeeded();
+                }
+            } catch (Exception e) {
+                //todo implement
+                throw new RuntimeException(e);
+            }
+        }
+
+
+        public void beforeTestMethod() {
+            try {
+
+                DatabaseOperation.CLEAN_INSERT.execute(getConnection(), getDataSet(TestContext.getTestObject(), TestContext.getTestMethodName()));
+
+            } catch (Exception e) {
+                throw new RuntimeException("Error while trying to insert test data in database", e);
+            }
+        }
+
     }
 }

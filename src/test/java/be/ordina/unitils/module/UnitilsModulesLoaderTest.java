@@ -168,38 +168,54 @@ public class UnitilsModulesLoaderTest extends TestCase {
     /**
      * A test unitils module type
      */
-    public static class TestUnitilsModuleA extends BaseUnitilsModule {
-        //empty
+    public static class TestUnitilsModuleA implements UnitilsModule {
+
+        public TestListener createTestListener() {
+            return null;
+        }
     }
 
     /**
      * A test unitils module type
      */
-    public static class TestUnitilsModuleB extends BaseUnitilsModule {
-        //empty
+    public static class TestUnitilsModuleB implements UnitilsModule {
+
+        public TestListener createTestListener() {
+            return null;
+        }
     }
 
     /**
      * A test unitils module type
      */
-    public static class TestUnitilsModuleC extends BaseUnitilsModule {
-        //empty
+    public static class TestUnitilsModuleC implements UnitilsModule {
+
+        public TestListener createTestListener() {
+            return null;
+        }
     }
 
     /**
      * A test unitils module type
      */
-    public static class TestUnitilsModuleD extends BaseUnitilsModule {
-        //empty
+    public static class TestUnitilsModuleD implements UnitilsModule {
+
+        public TestListener createTestListener() {
+            return null;
+        }
     }
 
 
     /**
      * A test unitils module type having a private constructor
      */
-    public static class TestUnitilsModulePrivate extends BaseUnitilsModule {
+    public static class TestUnitilsModulePrivate implements UnitilsModule {
 
         private TestUnitilsModulePrivate() {
+        }
+
+        public TestListener createTestListener() {
+            return null;
         }
     }
 }

@@ -11,7 +11,6 @@ import org.testng.annotations.*;
 
 public class SampleTest1 extends UnitilsTestNG {
 
-
     @BeforeClass
     public void beforeClass() {
         System.out.println("SampleTest1.beforeClass");
