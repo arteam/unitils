@@ -1,7 +1,9 @@
 package be.ordina.unitils.hibernate;
 
 import be.ordina.unitils.dbunit.DatabaseTestModule;
-import be.ordina.unitils.module.BaseUnitilsModule;
+import be.ordina.unitils.module.TestContext;
+import be.ordina.unitils.module.TestListener;
+import be.ordina.unitils.module.UnitilsModule;
 import be.ordina.unitils.util.PropertiesUtils;
 import be.ordina.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.ConfigurationConverter;
@@ -15,7 +17,7 @@ import java.util.Properties;
 /**
  * @author Filip Neven
  */
-public class HibernateTestModule extends BaseUnitilsModule {
+public class HibernateTestModule implements UnitilsModule {
 
     private static final String PROPKEY_HIBERNATE_CONFIGFILES = "hibernatetestcase.hibernate.cfg.configfiles";
 
@@ -26,22 +28,6 @@ public class HibernateTestModule extends BaseUnitilsModule {
 
     private static boolean firstTime;
 
-    public void beforeAll() {
-        //Todo refactor
-        properties = ConfigurationConverter.getProperties(UnitilsConfiguration.getInstance());
-
-        firstTime = true;
-    }
-
-    public void beforeTestClass(Object test) throws Exception {
-        if (firstTime) {
-            firstTime = false;
-            Configuration configuration = createHibernateConfiguration(this);
-            UnitTestHibernateSessionManager unitTestHibernateSessionManager = new UnitTestHibernateSessionManager(configuration);
-            HibernateSessionManager.injectInstance(unitTestHibernateSessionManager);
-            injectSessionManager(test, unitTestHibernateSessionManager);
-        }
-    }
 
     private void injectSessionManager(Object test, UnitTestHibernateSessionManager unitTestHibernateSessionManager) {
         Method[] methods = test.getClass().getMethods();
@@ -91,11 +77,41 @@ public class HibernateTestModule extends BaseUnitilsModule {
         }
     }
 
-    public void beforeTestMethod(Object test, String methodName) {
+    public void beforeTestMethod() {
         // Nothing to do in particular (datafile loading is performed by DatabaseTestModule)
     }
 
     public Class[] getModulesDependingOn() {
         return new Class[]{DatabaseTestModule.class};
+    }
+
+    public TestListener createTestListener() {
+        return new HibernateTestListener();
+    }
+
+
+    //Todo javadoc and extract behavior
+    private class HibernateTestListener extends TestListener {
+
+        public void beforeAll() {
+            //Todo refactor
+            properties = ConfigurationConverter.getProperties(UnitilsConfiguration.getInstance());
+
+            firstTime = true;
+        }
+
+        public void beforeTestClass() {
+            if (firstTime) {
+                firstTime = false;
+                Configuration configuration = createHibernateConfiguration(this);
+                UnitTestHibernateSessionManager unitTestHibernateSessionManager = new UnitTestHibernateSessionManager(configuration);
+                HibernateSessionManager.injectInstance(unitTestHibernateSessionManager);
+
+                //todo refactor
+                Object testObject = TestContext.getTestObject();
+                injectSessionManager(testObject, unitTestHibernateSessionManager);
+            }
+        }
+
     }
 }

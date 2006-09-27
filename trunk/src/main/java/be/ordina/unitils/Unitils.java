@@ -6,10 +6,14 @@
  */
 package be.ordina.unitils;
 
+import be.ordina.unitils.module.TestContext;
+import be.ordina.unitils.module.TestListener;
 import be.ordina.unitils.module.UnitilsModule;
 import be.ordina.unitils.module.UnitilsModulesLoader;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * todo javadoc
@@ -17,106 +21,101 @@ import java.util.List;
 public class Unitils {
 
 
+    //todo javadoc
     private List<UnitilsModule> modules;
 
-    private static ThreadLocal<Object> currentTestHolder = new ThreadLocal<Object>();
+    private Map<UnitilsModule, TestListener> testListeners;
 
-    private static ThreadLocal<String> currentMethodNameHolder = new ThreadLocal<String>();
 
     public void beforeAll() {
-        try {
-            // Loading module will be done the first time only
-            UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
-            modules = unitilsModulesLoader.loadModules();
 
-            // For each module, invoke the init method
-            for (UnitilsModule module : modules) {
+        // Loading module will be done the first time only
+        UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
+        modules = unitilsModulesLoader.loadModules();
+        testListeners = createTestListeners(modules);
 
-                module.beforeAll();
-            }
+        setTestContextValue(null, null, null);
 
-        } catch (Exception e) {
-            //todo implement
-            e.printStackTrace();
+        // For each module, invoke the beforeAll method
+        for (UnitilsModule module : modules) {
+            getTestListener(module).beforeAll();
         }
     }
 
 
     public void beforeTestClass(Object test) {
-        try {
-            for (UnitilsModule module : modules) {
-                module.beforeTestClass(test);
-            }
-        } catch (Exception e) {
-            //todo implement
-            e.printStackTrace();
+
+        setTestContextValue(test.getClass(), test, null);
+
+        for (UnitilsModule module : modules) {
+            getTestListener(module).beforeTestClass();
         }
     }
 
+
     public void beforeTestMethod(Object test, String methodName) {
-        try {
-            currentTestHolder.set(test);
-            currentMethodNameHolder.set(methodName);
 
-            // For each module, invoke the beforeTestMethod method
-            for (UnitilsModule module : modules) {
-                module.beforeTestMethod(test, methodName);
-            }
+        setTestContextValue(test.getClass(), test, methodName);
 
-        } catch (Exception e) {
-            //todo implement exception handling
-            e.printStackTrace();
+        // For each module, invoke the beforeTestMethod method
+        for (UnitilsModule module : modules) {
+            getTestListener(module).beforeTestMethod();
         }
     }
 
 
     public void afterTestMethod(Object test, String methodName) {
-        try {
-            // For each module, invoke the afterTestMethod method
-            for (UnitilsModule module : modules) {
-                module.afterTestMethod(test, methodName);
-            }
 
-            currentTestHolder.set(null);
-            currentMethodNameHolder.set(null);
+        setTestContextValue(test.getClass(), test, methodName);
 
-        } catch (Exception e) {
-            //todo implement exception handling
-            e.printStackTrace();
+        // For each module, invoke the afterTestMethod method
+        for (UnitilsModule module : modules) {
+            getTestListener(module).afterTestMethod();
         }
     }
 
     public void afterTestClass(Object test) {
-        try {
-            for (UnitilsModule module : modules) {
-                module.afterTestClass(test);
-            }
 
-        } catch (Exception e) {
-            //todo implement
-            e.printStackTrace();
+        setTestContextValue(test.getClass(), test, null);
+
+        for (UnitilsModule module : modules) {
+            getTestListener(module).afterTestClass();
         }
     }
 
 
     public void afterAll() {
-        try {
-            for (UnitilsModule module : modules) {
-                module.afterAll();
-            }
-        } catch (Exception e) {
-            //todo implement
-            e.printStackTrace();
+
+        setTestContextValue(null, null, null);
+
+        for (UnitilsModule module : modules) {
+            getTestListener(module).afterAll();
         }
     }
 
 
-    public static Object getCurrentTest() {
-        return currentTestHolder.get();
+    private TestListener getTestListener(UnitilsModule module) {
+
+        return testListeners.get(module);
     }
 
-    public static String getCurrentMethodName() {
-        return currentMethodNameHolder.get();
+
+    private Map<UnitilsModule, TestListener> createTestListeners(List<UnitilsModule> modules) {
+        Map<UnitilsModule, TestListener> result = new HashMap<UnitilsModule, TestListener>(modules.size());
+
+        for (UnitilsModule module : modules) {
+
+            result.put(module, module.createTestListener());
+        }
+        return result;
+    }
+
+
+    private void setTestContextValue(Class testClass, Object testObject, String testMethodName) {
+
+        TestContext.setTestClass(testClass);
+        TestContext.setTestObject(testObject);
+        TestContext.setTestMethodName(testMethodName);
     }
 
 }

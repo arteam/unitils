@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 /**
  * todo javadoc
  */
-@RunWith(UnitilsTestClassRunner.class)
+@RunWith(UnitilsJUnit4TestClassRunner.class)
 public class UnitilsJUnit4 {
 
 

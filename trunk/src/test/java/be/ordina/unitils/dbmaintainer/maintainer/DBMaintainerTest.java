@@ -16,7 +16,7 @@ import be.ordina.unitils.dbmaintainer.maintainer.version.VersionSource;
 import be.ordina.unitils.dbmaintainer.script.SQLScriptRunner;
 import be.ordina.unitils.dbmaintainer.sequences.SequenceUpdater;
 import be.ordina.unitils.easymock.EasyMockTestCase;
-import be.ordina.unitils.easymock.Mock;
+import be.ordina.unitils.easymock.annotation.Mock;
 import static org.easymock.classextension.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.expectLastCall;
 
