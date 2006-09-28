@@ -1,4 +1,4 @@
-package be.ordina.unitils.sample.junit4;
+package org.unitils.sample.junit4;
 
 import org.unitils.UnitilsJUnit4;
 import junit.framework.JUnit4TestAdapter;

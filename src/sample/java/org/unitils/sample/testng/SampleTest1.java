@@ -4,7 +4,7 @@
  * Distributable under LGPL license.
  * See terms of license at gnu.org.
  */
-package be.ordina.unitils.sample.testng;
+package org.unitils.sample.testng;
 
 import org.unitils.UnitilsTestNG;
 import org.testng.annotations.*;
