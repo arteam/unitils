@@ -2,6 +2,7 @@ package org.unitils.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class AnnotationUtils {
 
     /**
      * Returns the values of all the given objects' fields that are annotated with the given annotation
+     *
      * @param object
      * @param annotation
      * @return the values of all the given objects' fields that are annotated with the given annotation
@@ -49,6 +51,25 @@ public class AnnotationUtils {
             }
         }
         return fieldValues;
+    }
+
+    /**
+     * Returns the given class's declared methods that are marked with the given annotation
+     *
+     * @param clazz
+     * @param annotation
+     * @return A List containing methods annotated with the given annotation
+     */
+    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation) {
+
+        List<Method> annotatedMethods = new ArrayList<Method>();
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.getAnnotation(annotation) != null) {
+                annotatedMethods.add(method);
+            }
+        }
+        return annotatedMethods;
     }
 
 

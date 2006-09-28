@@ -1,4 +1,4 @@
-package org.unitils.module;
+package org.unitils.core;
 
 /**
  * todo javadoc

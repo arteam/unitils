@@ -1,34 +1,30 @@
 package org.unitils.inject;
 
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Collections;
-
-import ognl.Ognl;
-import ognl.OgnlException;
 import ognl.DefaultMemberAccess;
+import ognl.Ognl;
 import ognl.OgnlContext;
+import ognl.OgnlException;
 import org.apache.commons.lang.StringUtils;
-import org.unitils.inject.annotation.Inject;
-import org.unitils.inject.annotation.InjectStatic;
-import org.unitils.inject.annotation.AutoInject;
-import org.unitils.inject.annotation.AutoInjectStatic;
-import org.unitils.inject.annotation.TestedObject;
-import org.unitils.module.UnitilsModule;
-import org.unitils.module.TestListener;
-import org.unitils.module.TestContext;
+import org.unitils.core.TestContext;
+import org.unitils.core.TestListener;
+import org.unitils.core.UnitilsModule;
+import org.unitils.inject.annotation.*;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
-import org.unitils.util.UnitilsConfiguration;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  */
 public class InjectModule implements UnitilsModule {
 
-    private static final String PROPKEY_PROPERTYACCESSTYPE_DEFAULT = "inject.propertyaccesstype.default";
 
     public TestListener createTestListener() {
         return new InjectTestListener();

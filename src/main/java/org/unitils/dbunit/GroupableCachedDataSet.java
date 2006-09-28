@@ -24,7 +24,7 @@ public class GroupableCachedDataSet extends AbstractDataSet implements IDataSetC
     private DefaultTable _activeTable;
 
     /**
-     * Default constructor.
+     * DEFAULT constructor.
      */
     public GroupableCachedDataSet() {
     }

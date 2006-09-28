@@ -1,10 +1,10 @@
-package org.unitils.module;
+package org.unitils.core;
 
-import static org.unitils.module.UnitilsModulesLoader.*;
-import org.unitils.util.UnitilsConfiguration;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import static org.unitils.core.UnitilsModulesLoader.*;
+import org.unitils.util.UnitilsConfiguration;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
     /* Class under test */
     private UnitilsModulesLoader unitilsModulesLoader;
 
-    /* The unitils configuration settings that control the module loading */
+    /* The unitils configuration settings that control the core loading */
     private Configuration configuration;
 
 
@@ -60,8 +60,8 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
 
     /**
-     * Tests the loading with 1 module name left out: c.
-     * The c module should not have been loaded.
+     * Tests the loading with 1 core name left out: c.
+     * The c core should not have been loaded.
      */
     public void testLoadModules_notActive() {
 
@@ -74,6 +74,23 @@ public class UnitilsModulesLoaderTest extends TestCase {
         assertTrue(result.get(0) instanceof TestUnitilsModuleD);
         assertTrue(result.get(1) instanceof TestUnitilsModuleB);
         assertTrue(result.get(2) instanceof TestUnitilsModuleA);
+    }
+
+    /**
+     * Tests the loading with core d disabled.
+     * The core should have been ignored
+     */
+    public void testLoadModules_notEnabled() {
+
+        configuration.setProperty(PROPERTY_MODULE_PREFIX + "d" + PROPERTY_MODULE_SUFFIX_ENABLED, "false");
+
+        List<UnitilsModule> result = unitilsModulesLoader.loadModules();
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertTrue(result.get(0) instanceof TestUnitilsModuleB);
+        assertTrue(result.get(1) instanceof TestUnitilsModuleA);
+        assertTrue(result.get(2) instanceof TestUnitilsModuleC);
     }
 
 
@@ -112,7 +129,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
 
     /**
-     * Tests the loading of a module that is configured with a class name for a class that is not a UnitilsModule.
+     * Tests the loading of a core that is configured with a class name for a class that is not a UnitilsModule.
      * A runtime exception should have been thrown.
      */
     public void testLoadModules_wrongClassName() {
@@ -148,7 +165,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
 
     /**
-     * Tests the loading of a module that is configured with a class name for a class that has a private constructor.
+     * Tests the loading of a core that is configured with a class name for a class that has a private constructor.
      * A runtime exception should have been thrown.
      */
     public void testLoadModules_privateConstructor() {
@@ -166,7 +183,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
 
     /**
-     * A test unitils module type
+     * A test unitils core type
      */
     public static class TestUnitilsModuleA implements UnitilsModule {
 
@@ -176,7 +193,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
     }
 
     /**
-     * A test unitils module type
+     * A test unitils core type
      */
     public static class TestUnitilsModuleB implements UnitilsModule {
 
@@ -186,7 +203,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
     }
 
     /**
-     * A test unitils module type
+     * A test unitils core type
      */
     public static class TestUnitilsModuleC implements UnitilsModule {
 
@@ -196,7 +213,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
     }
 
     /**
-     * A test unitils module type
+     * A test unitils core type
      */
     public static class TestUnitilsModuleD implements UnitilsModule {
 
@@ -207,7 +224,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
 
     /**
-     * A test unitils module type having a private constructor
+     * A test unitils core type having a private constructor
      */
     public static class TestUnitilsModulePrivate implements UnitilsModule {
 

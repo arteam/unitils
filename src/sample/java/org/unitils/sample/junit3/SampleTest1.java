@@ -6,10 +6,11 @@
  */
 package org.unitils.sample.junit3;
 
-import org.unitils.easymock.annotation.Mock;
+import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.easymock.EasyMockModule;
-import static org.easymock.EasyMock.expect;
+import org.unitils.easymock.annotation.AfterCreateMock;
+import org.unitils.easymock.annotation.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.List;
 public class SampleTest1 extends UnitilsJUnit3 {
 
 
-    @Mock (order = Mock.Order.Default)
-    private MockedClass mock;
+    @Mock(order = Mock.Order.NONE)
+    private MockedClass mock = null;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -31,13 +32,15 @@ public class SampleTest1 extends UnitilsJUnit3 {
 
     public void test1() throws IllegalAccessException {
 
+        System.out.println("SampleTest1.test1");
+
         expect(mock.someBehavior(false, 0, null, null)).andReturn("Result");
-        EasyMockModule.replay();
+        EasyMockModule.replayAll();
 
         String result = mock.someBehavior(true, 999, "Test", new ArrayList());
 
         assertEquals("Result", result);
-        EasyMockModule.verify();
+        EasyMockModule.verifyAll();
     }
 
 
@@ -48,6 +51,12 @@ public class SampleTest1 extends UnitilsJUnit3 {
 
     public void test3() {
         System.out.println("SampleTest1.test3");
+    }
+
+
+    @AfterCreateMock
+    public void afterCreateMocks(Object mock, String name, Class type) {
+        System.out.println("SampleTest1.afterCreateMocks mock: " + mock + ", name: " + name + ", type: " + type);
     }
 
 

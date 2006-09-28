@@ -8,7 +8,7 @@ package org.unitils;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-import org.unitils.Unitils;
+import org.unitils.core.Unitils;
 
 /**
  * javadoc

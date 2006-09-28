@@ -42,7 +42,7 @@ public class HibernateSessionFactory {
     private static org.hibernate.SessionFactory sessionFactory;
 
     /**
-     * Default constructor.
+     * DEFAULT constructor.
      */
     private HibernateSessionFactory() {
     }
