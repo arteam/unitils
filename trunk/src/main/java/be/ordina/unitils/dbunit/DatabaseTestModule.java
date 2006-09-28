@@ -66,7 +66,7 @@ public class DatabaseTestModule implements UnitilsModule {
     private DataSource createDataSource() {
         Configuration configuration = UnitilsConfiguration.getInstance();
 
-        DataSourceFactory dataSourceFactory = ReflectionUtils.getInstance(configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME));
+        DataSourceFactory dataSourceFactory = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME));
         dataSourceFactory.init();
         return dataSourceFactory.createDataSource();
     }

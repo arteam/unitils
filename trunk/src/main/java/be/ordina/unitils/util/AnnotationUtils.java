@@ -14,7 +14,7 @@ public class AnnotationUtils {
     public static final String DEFAULT_ENUM_VALUE_NAME = "DEFAULT";
 
     /**
-     * Returns the given' class's declared fields that are marked with the given annotation
+     * Returns the given class's declared fields that are marked with the given annotation
      *
      * @param clazz
      * @param annotation
@@ -29,6 +29,26 @@ public class AnnotationUtils {
             }
         }
         return annotatedFields;
+    }
+
+    /**
+     * Returns the values of all the given objects' fields that are annotated with the given annotation
+     * @param object
+     * @param annotation
+     * @return the values of all the given objects' fields that are annotated with the given annotation
+     */
+    public static <T extends Annotation> List getFieldValuesAnnotatedWith(Object object, Class<T> annotation) {
+        List fieldValues = new ArrayList();
+        List<Field> annotatedFields = getFieldsAnnotatedWith(object.getClass(), annotation);
+        for (Field annotatedField : annotatedFields) {
+            try {
+                annotatedField.setAccessible(true);
+                fieldValues.add(annotatedField.get(object));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Error while accessing field", e);
+            }
+        }
+        return fieldValues;
     }
 
 

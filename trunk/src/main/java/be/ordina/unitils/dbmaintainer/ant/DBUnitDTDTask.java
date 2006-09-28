@@ -17,7 +17,7 @@ public class DBUnitDTDTask extends BaseUnitilsTask {
     public void doExecute() throws BuildException {
 
         Configuration configuration = UnitilsConfiguration.getInstance();
-        DtdGenerator dtdGenerator = ReflectionUtils.getInstance(configuration.getString(PROPKEY_DTDGENERATOR_CLASSNAME));
+        DtdGenerator dtdGenerator = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DTDGENERATOR_CLASSNAME));
         dtdGenerator.init(dataSource);
         dtdGenerator.generateDtd();
     }
