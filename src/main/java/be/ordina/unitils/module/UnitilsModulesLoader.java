@@ -99,7 +99,7 @@ public class UnitilsModulesLoader {
                 String className = configuration.getString(PROPERTY_MODULE_PREFIX + moduleName + PROPERTY_MODULE_SUFFIX_CLASS_NAME);
 
                 // create module instance
-                Object module = ReflectionUtils.getInstance(className);
+                Object module = ReflectionUtils.createInstanceOfType(className);
                 if (!(module instanceof UnitilsModule)) {
 
                     throw new RuntimeException("Unable to load module. Module class is not of type UnitilsModule: " + className);

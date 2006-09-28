@@ -140,37 +140,37 @@ public class DBMaintainer {
 
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
 
-        versionSource = ReflectionUtils.getInstance(configuration.getString(PROPKEY_VERSIONSOURCE));
+        versionSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_VERSIONSOURCE));
         versionSource.init(dataSource);
 
-        scriptSource = ReflectionUtils.getInstance(configuration.getString(PROPKEY_SCRIPTSOURCE));
+        scriptSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_SCRIPTSOURCE));
         scriptSource.init();
 
-        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler) ReflectionUtils.getInstance(configuration.getString(PROPKEY_STATEMENTHANDLER)));
+        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler) ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_STATEMENTHANDLER)));
         statementHandler.init(dataSource);
         scriptRunner = new SQLScriptRunner(statementHandler);
 
         fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
         if (fromScratchEnabled) {
-            dbClearer = ReflectionUtils.getInstance(configuration.getString(PROPKEY_DBCLEARER_START + "." + databaseDialect));
+            dbClearer = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DBCLEARER_START + "." + databaseDialect));
             dbClearer.init(dataSource, statementHandler);
         }
 
         boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         if (disableConstraints) {
-            constraintsDisabler = ReflectionUtils.getInstance(configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect));
+            constraintsDisabler = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect));
             constraintsDisabler.init(dataSource, statementHandler);
         }
 
         boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
         if (updateSequences) {
-            sequenceUpdater = ReflectionUtils.getInstance(configuration.getString(PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
+            sequenceUpdater = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
             sequenceUpdater.init(dataSource, statementHandler);
         }
 
         boolean generateDtd = configuration.getBoolean(PROPKEY_GENERATEDTD_ENABLED);
         if (generateDtd) {
-            dtdGenerator = ReflectionUtils.getInstance(configuration.getString(PROPKEY_DTDGENERATOR_CLASSNAME));
+            dtdGenerator = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DTDGENERATOR_CLASSNAME));
             dtdGenerator.init(dataSource);
         }
     }
