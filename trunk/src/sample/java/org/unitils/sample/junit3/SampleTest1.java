@@ -4,7 +4,7 @@
  * Distributable under LGPL license.
  * See terms of license at gnu.org.
  */
-package be.ordina.unitils.sample.junit3;
+package org.unitils.sample.junit3;
 
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.UnitilsJUnit3;

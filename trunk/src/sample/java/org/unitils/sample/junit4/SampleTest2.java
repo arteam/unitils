@@ -1,17 +1,14 @@
-/*
- * Copyright (C) 2006, Ordina
- *
- * Distributable under LGPL license.
- * See terms of license at gnu.org.
- */
-package be.ordina.unitils.sample.testng;
+package org.unitils.sample.junit4;
 
-import org.unitils.UnitilsTestNG;
-import org.testng.annotations.*;
+import org.unitils.UnitilsJUnit4;
+import junit.framework.JUnit4TestAdapter;
+import org.junit.*;
 
+public class SampleTest2 extends UnitilsJUnit4 {
 
-public class SampleTest2 extends UnitilsTestNG {
-
+    public static junit.framework.Test suite() {
+        return new JUnit4TestAdapter(org.unitils.sample.junit3.SampleTest2.class);
+    }
 
     @BeforeClass
     public static void beforeClass() {
@@ -24,12 +21,12 @@ public class SampleTest2 extends UnitilsTestNG {
         System.out.println("SampleTest2.afterClass");
     }
 
-    @BeforeTest
+    @Before
     public void before() {
         System.out.println("SampleTest2.before");
     }
 
-    @AfterTest
+    @After
     public void after() {
         System.out.println("SampleTest2.after");
     }
@@ -46,3 +43,4 @@ public class SampleTest2 extends UnitilsTestNG {
     }
 
 }
+

@@ -1,4 +1,4 @@
-package be.ordina.unitils.sample.junit3;
+package org.unitils.sample.junit3;
 
 import org.unitils.UnitilsJUnit3;
 
