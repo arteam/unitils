@@ -6,10 +6,9 @@
  */
 package be.ordina.unitils.sample.junit3;
 
-import be.ordina.unitils.easymock.annotation.Mock;
-import be.ordina.unitils.UnitilsJUnit3;
-import be.ordina.unitils.easymock.EasyMockModule;
-import be.ordina.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.annotation.Mock;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.easymock.EasyMockModule;
 import static org.easymock.EasyMock.expect;
 
 import java.util.ArrayList;

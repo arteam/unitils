@@ -1,6 +1,6 @@
 package be.ordina.unitils.sample.junit4;
 
-import be.ordina.unitils.UnitilsJUnit4;
+import org.unitils.UnitilsJUnit4;
 import junit.framework.JUnit4TestAdapter;
 import org.junit.*;
 
