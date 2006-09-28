@@ -1,6 +1,6 @@
 package be.ordina.unitils.sample.junit3;
 
-import be.ordina.unitils.UnitilsJUnit3;
+import org.unitils.UnitilsJUnit3;
 
 public class SampleTest2 extends UnitilsJUnit3 {
 

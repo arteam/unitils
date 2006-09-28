@@ -6,7 +6,7 @@
  */
 package be.ordina.unitils.sample.testng;
 
-import be.ordina.unitils.UnitilsTestNG;
+import org.unitils.UnitilsTestNG;
 import org.testng.annotations.*;
 
 
