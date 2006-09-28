@@ -1,4 +1,6 @@
-package be.ordina.unitils.inject;
+package be.ordina.unitils.inject.annotation;
+
+import be.ordina.unitils.inject.PropertyAccessType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
