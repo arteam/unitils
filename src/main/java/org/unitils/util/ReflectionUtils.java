@@ -6,6 +6,8 @@
  */
 package org.unitils.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -78,32 +80,15 @@ public class ReflectionUtils {
     }
 
     /**
-     * Returns the value of the field with the given name in the given object
-     * @param object
-     * @param fieldName
-     * @return
-     * @throws NoSuchFieldException
-     */
-    public static Object getFieldValueWithName(Object object, String fieldName) throws NoSuchFieldException {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Error while accessing field " + fieldName, e);
-        }
-    }
-
-    /**
      * Invokes the given method with the given parameters on the given target object
      * @param target
      * @param method
      * @param params
      */
-    public static void invokeMethod(Object target, Method method, Object... params) {
+    public static Object invokeMethod(Object target, Method method, Object... params) {
         try {
             method.setAccessible(true);
-            method.invoke(target, params);
+            return method.invoke(target, params);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Error while invoking method " + method, e);
         } catch (InvocationTargetException e) {
@@ -143,7 +128,7 @@ public class ReflectionUtils {
         }
         return null;
     }
-    
+
     public static Method getSetterOfType(Class clazz, Class type, boolean isStatic) {
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method method : declaredMethods) {
@@ -187,5 +172,68 @@ public class ReflectionUtils {
             }
         }
        return false;
+    }
+
+    /**
+     * From the given class, returns the setter for the property with the given name and type. If isStatic == true,
+     * a static setter is searched. If no such setter exists in the given class, null is returned
+     * @param propertyName
+     * @param type
+     * @param isStatic
+     * @return The setter method that matches the given parameters
+     */
+    public static Method getSetter(String propertyName, Class clazz, Class type, boolean isStatic) {
+        String setterName = "set" + StringUtils.capitalize(propertyName);
+        Method[] declaredMethods = clazz.getDeclaredMethods();
+        for (Method method : declaredMethods) {
+            if (isSetter(method) && setterName.equals(method.getName()) && method.getParameterTypes()[0].isAssignableFrom(type)
+                    && isStatic == Modifier.isStatic(method.getModifiers())) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * From the given class, returns the getter for the given propertyname. If isStatic == true, the getter must be
+     * static
+     * @param propertyName
+     * @param clazz
+     * @param isStatic
+     * @return The getter method that matches the given parameters, or null if no such method exists
+     */
+    public static Method getGetter(String propertyName, Class clazz, boolean isStatic) {
+        String getterName = "get" + StringUtils.capitalize(propertyName);
+        try {
+            Method getter = clazz.getDeclaredMethod(getterName);
+            if (isStatic == Modifier.isStatic(getter.getModifiers())) {
+                return getter;
+            } else {
+                return null;
+            }
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    /**
+     * From the given class, returns the field with the given name. isStatic indicates if it should be a static
+     * field or not.
+     * @param fieldName
+     * @param clazz
+     * @param isStatic
+     * @return The field that matches the given parameters, or null if no such field exists
+     */
+    public static Field getFieldWithName(String fieldName, Class clazz, boolean isStatic) {
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
+            if (Modifier.isStatic(field.getModifiers()) == isStatic) {
+                return field;
+            } else {
+                return null;
+            }
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
     }
 }

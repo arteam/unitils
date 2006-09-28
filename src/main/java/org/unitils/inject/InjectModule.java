@@ -1,16 +1,5 @@
 package org.unitils.inject;
 
-import org.unitils.module.TestContext;
-import org.unitils.module.TestListener;
-import org.unitils.module.UnitilsModule;
-import org.unitils.util.AnnotationUtils;
-import org.unitils.util.ReflectionUtils;
-import org.unitils.util.UnitilsConfiguration;
-import org.unitils.inject.annotation.Inject;
-import org.unitils.inject.annotation.TestedObject;
-import org.unitils.inject.annotation.AutoInject;
-import org.unitils.inject.annotation.InjectStatic;
-import org.unitils.inject.annotation.AutoInjectStatic;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -22,6 +11,17 @@ import ognl.OgnlException;
 import ognl.DefaultMemberAccess;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
+import org.unitils.inject.annotation.Inject;
+import org.unitils.inject.annotation.InjectStatic;
+import org.unitils.inject.annotation.AutoInject;
+import org.unitils.inject.annotation.AutoInjectStatic;
+import org.unitils.inject.annotation.TestedObject;
+import org.unitils.module.UnitilsModule;
+import org.unitils.module.TestListener;
+import org.unitils.module.TestContext;
+import org.unitils.util.AnnotationUtils;
+import org.unitils.util.ReflectionUtils;
+import org.unitils.util.UnitilsConfiguration;
 
 /**
  * @author Filip Neven
@@ -39,7 +39,7 @@ public class InjectModule implements UnitilsModule {
             injectObjects(TestContext.getTestObject());
         }
     }
-    
+
     void injectObjects(Object test) {
         inject(test);
         autoInject(test);
@@ -86,7 +86,7 @@ public class InjectModule implements UnitilsModule {
         }
         try {
             for (Object target : targets) {
-                setValue(property, target, objectToInject);
+                setValueUsingOgnl(property, target, objectToInject);
             }
         } catch (OgnlException e) {
             throw new RuntimeException("Property could not be parsed", e);
@@ -99,8 +99,9 @@ public class InjectModule implements UnitilsModule {
         Class objectToInjectType = fieldToInject.getType();
         String targetName = autoInjectAnnotation.target();
         List targets = getTargets(targetName, test);
+        AutoInject.PropertyAccessType propertyAccessType = AnnotationUtils.getValueReplaceDefault(autoInjectAnnotation.propertyAccessType());
         for (Object target : targets) {
-            if (autoInjectAnnotation.propertyAccessType() == AutoInject.PropertyAccessType.FIELD) {
+            if (propertyAccessType == AutoInject.PropertyAccessType.FIELD) {
                 Field fieldToInjectTo = ReflectionUtils.getFieldOfType(target.getClass(), objectToInjectType, false);
                 if (fieldToInjectTo == null) {
                     // If one field exist that has a type which is more specific than all other fields of the given type,
@@ -158,11 +159,37 @@ public class InjectModule implements UnitilsModule {
         if (StringUtils.isEmpty(property)) {
             throw new IllegalArgumentException("Property cannot be empty");
         }
-        setValueStatic(property, targetClass, objectToInject);
+        String staticProperty = StringUtils.substringBefore(property, ".");
+        if (property.equals(staticProperty)) {
+            setValueStatic(staticProperty, targetClass, objectToInject);
+        } else {
+            Object objectToInjectInto = getValueStatic(staticProperty, targetClass);
+            String remainingPropertyPart = StringUtils.substringAfter(property, ".");
+            try {
+                setValueUsingOgnl(remainingPropertyPart, objectToInjectInto, objectToInject);
+            } catch (OgnlException e) {
+                throw new RuntimeException("Property named " + remainingPropertyPart + " not found on object " + objectToInjectInto);
+            }
+        }
     }
 
-    private void setValueStatic(String property, Class targetClass, Object value) {
-        // TODO
+    private Object getValueStatic(String staticProperty, Class targetClass) {
+        Method staticGetter = ReflectionUtils.getGetter(staticProperty, targetClass, true);
+        if (staticGetter != null) {
+            return ReflectionUtils.invokeMethod(targetClass, staticGetter);
+        } else {
+            return null;
+        }
+    }
+
+    private void setValueStatic(String staticProperty, Class targetClass, Object value) {
+        Method staticSetter = ReflectionUtils.getSetter(staticProperty, targetClass, value.getClass(), true);
+        if (staticSetter != null) {
+            ReflectionUtils.invokeMethod(targetClass, staticSetter, value);
+        } else {
+            Field staticField = ReflectionUtils.getFieldWithName(staticProperty, targetClass, true);
+            ReflectionUtils.setFieldValue(targetClass, staticField, value);
+        }
     }
 
     private void autoInjectStatic(Object test, Field fieldToAutoInjectStatic) {
@@ -170,7 +197,9 @@ public class InjectModule implements UnitilsModule {
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToAutoInjectStatic);
         Class objectToInjectType = fieldToAutoInjectStatic.getType();
         Class targetClass = autoInjectStaticAnnotation.target();
-        if (autoInjectStaticAnnotation.propertyAccessType() == AutoInjectStatic.PropertyAccessType.FIELD) {
+        AutoInjectStatic.PropertyAccessType propertyAccessType = AnnotationUtils.getValueReplaceDefault(
+                autoInjectStaticAnnotation.propertyAccessType());
+        if (propertyAccessType == AutoInjectStatic.PropertyAccessType.FIELD) {
             Field fieldToInjectTo = ReflectionUtils.getFieldOfType(targetClass, objectToInjectType, true);
             if (fieldToInjectTo == null) {
                 // If one field exist that has a type which is more specific than all other fields of the given type,
@@ -225,17 +254,17 @@ public class InjectModule implements UnitilsModule {
         if ("".equals(targetName)) {
             targets = getTestedObjects(test);
         } else {
-            try {
-                Object target = ReflectionUtils.getFieldValueWithName(test, targetName);
-                targets = Collections.singletonList(target);
-            } catch (NoSuchFieldException e) {
+            Field field = ReflectionUtils.getFieldWithName(targetName, test.getClass(), false);
+            if (field == null) {
                 throw new IllegalArgumentException("Target with name " + targetName + " does not exist");
             }
+            Object target = ReflectionUtils.getFieldValue(test, field);
+            targets = Collections.singletonList(target);
         }
         return targets;
     }
 
-    private void setValue(String ognlExprStr, Object target, Object objectToInject) throws OgnlException {
+    private void setValueUsingOgnl(String ognlExprStr, Object target, Object objectToInject) throws OgnlException {
         OgnlContext ognlContext = new OgnlContext();
         ognlContext.setMemberAccess(new DefaultMemberAccess(true));
         Object ognlExpression = Ognl.parseExpression(ognlExprStr);
@@ -244,22 +273,6 @@ public class InjectModule implements UnitilsModule {
 
     private List getTestedObjects(Object test) {
         return AnnotationUtils.getFieldValuesAnnotatedWith(test, TestedObject.class);
-    }
-
-    private PropertyAccessType getPropertyAccessType(PropertyAccessType annotatedAccessType) {
-        if (annotatedAccessType == PropertyAccessType.DEFAULT) {
-            String accessTypeStr = (String) UnitilsConfiguration.getInstance().getProperty(PROPKEY_PROPERTYACCESSTYPE_DEFAULT);
-            if ("setter".equals(accessTypeStr)) {
-                return PropertyAccessType.SETTER;
-            } else if ("field".equals(accessTypeStr)) {
-                return PropertyAccessType.FIELD;
-            } else {
-                throw new IllegalArgumentException("Invalid value for option " + PROPKEY_PROPERTYACCESSTYPE_DEFAULT +
-                        ": should be 'setter' or 'field'");
-            }
-        } else {
-            return annotatedAccessType;
-        }
     }
 
 }
