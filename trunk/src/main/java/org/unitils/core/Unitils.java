@@ -4,12 +4,12 @@
  * Distributable under LGPL license.
  * See terms of license at gnu.org.
  */
-package org.unitils;
+package org.unitils.core;
 
-import org.unitils.module.TestContext;
-import org.unitils.module.TestListener;
-import org.unitils.module.UnitilsModule;
-import org.unitils.module.UnitilsModulesLoader;
+import org.unitils.core.TestContext;
+import org.unitils.core.TestListener;
+import org.unitils.core.UnitilsModule;
+import org.unitils.core.UnitilsModulesLoader;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,14 +29,14 @@ public class Unitils {
 
     public void beforeAll() {
 
-        // Loading module will be done the first time only
+        // Loading core will be done the first time only
         UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
         modules = unitilsModulesLoader.loadModules();
         testListeners = createTestListeners(modules);
 
         setTestContextValue(null, null, null);
 
-        // For each module, invoke the beforeAll method
+        // For each core, invoke the beforeAll method
         for (UnitilsModule module : modules) {
             getTestListener(module).beforeAll();
         }
@@ -57,7 +57,7 @@ public class Unitils {
 
         setTestContextValue(test.getClass(), test, methodName);
 
-        // For each module, invoke the beforeTestMethod method
+        // For each core, invoke the beforeTestMethod method
         for (UnitilsModule module : modules) {
             getTestListener(module).beforeTestMethod();
         }
@@ -68,7 +68,7 @@ public class Unitils {
 
         setTestContextValue(test.getClass(), test, methodName);
 
-        // For each module, invoke the afterTestMethod method
+        // For each core, invoke the afterTestMethod method
         for (UnitilsModule module : modules) {
             getTestListener(module).afterTestMethod();
         }

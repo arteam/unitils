@@ -11,7 +11,7 @@ import org.junit.internal.runners.TestClassMethodsRunner;
 import org.junit.internal.runners.TestClassRunner;
 import org.junit.internal.runners.TestMethodRunner;
 import org.junit.runner.notification.RunNotifier;
-import org.unitils.Unitils;
+import org.unitils.core.Unitils;
 
 import java.lang.reflect.Method;
 

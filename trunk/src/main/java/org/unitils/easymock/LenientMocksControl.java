@@ -1,11 +1,11 @@
 package org.unitils.easymock;
 
-import org.unitils.reflectionassert.ReflectionComparatorModes;
 import org.easymock.ArgumentsMatcher;
 import org.easymock.IAnswer;
 import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.*;
+import org.unitils.reflectionassert.ReflectionComparatorModes;
 
 import java.lang.reflect.Method;
 import java.util.List;

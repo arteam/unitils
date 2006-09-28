@@ -1,6 +1,6 @@
 package org.unitils.dbunit;
 
-import org.unitils.module.TestContext;
+import org.unitils.core.TestContext;
 import org.apache.commons.dbutils.DbUtils;
 import org.dbunit.Assertion;
 import org.dbunit.database.IDatabaseConnection;

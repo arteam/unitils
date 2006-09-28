@@ -25,8 +25,8 @@ import java.util.Map;
  * {@link @Mock} annotation. A hook method is foreseen (<code>injectMock</code>) for injecting mock objects in the
  * tested objects immediately after they are created.
  * <p/>
- * Switching mocks to the replay state and verifying expectations on mocks is simplified by the methods <code>replay()
- * </code> and <code>verify</code>, that call replay/verify on all mocks that are used in the test at once.
+ * Switching mocks to the replayAll state and verifying expectations on mocks is simplified by the methods <code>replayAll()
+ * </code> and <code>verifyAll</code>, that call replayAll/verifyAll on all mocks that are used in the test at once.
  */
 public class EasyMockTestCase extends TestCase {
 
@@ -95,7 +95,7 @@ public class EasyMockTestCase extends TestCase {
 
     /**
      * Unit tests should call this method after having set their expectations on the mock objects. This method will
-     * make sure EasyMock's replay method is called on every mock object that was supplied to the fields annotated
+     * make sure EasyMock's replayAll method is called on every mock object that was supplied to the fields annotated
      * with {@link @Mock}, or directly created by the <code>getMock</code> method
      */
     protected void replay() {
@@ -106,7 +106,7 @@ public class EasyMockTestCase extends TestCase {
 
     /**
      * Unit tests should call this method after having executed the tested method on the object under test. This method
-     * will make sure EasyMock's verify method is called on every mock object that was supplied to the fields annotated
+     * will make sure EasyMock's verifyAll method is called on every mock object that was supplied to the fields annotated
      * with {@link @Mock}, or directly created by the <code>getMock</code> method
      */
     protected void verify() {

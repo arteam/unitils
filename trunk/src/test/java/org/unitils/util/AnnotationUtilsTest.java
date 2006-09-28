@@ -49,7 +49,7 @@ public class AnnotationUtilsTest extends TestCase {
     }
 
     /**
-     * Test for get value for a default value that is not all upper case (Default).
+     * Test for get value for a default value that is not all upper case (DEFAULT).
      */
     public void testGetValueReplaceDefault_defaultButOtherCase() {
 

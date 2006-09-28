@@ -37,6 +37,9 @@ import org.apache.log4j.Logger;
  */
 public class UnitilsConfiguration {
 
+    //todo use new version of commons-config
+    //todo property to disable a core
+
 
     /**
      * Name of the fixed configuration file that contains all defaults

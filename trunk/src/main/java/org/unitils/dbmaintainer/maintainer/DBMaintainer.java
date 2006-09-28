@@ -33,7 +33,7 @@ import java.util.List;
  * <code>javax.sql.DataSource</code>.
  * <p/>
  * The {@link DBMaintainer#updateDatabase()} method will use the {@link VersionSource} to check what is
- * the current version of the database, and use the {@link ScriptSource} to verify if there are scripts
+ * the current version of the database, and use the {@link ScriptSource} to verifyAll if there are scripts
  * available with a higher version number. If yes, the statements in these scripts will org passed to the
  * {@link StatementHandler}, and the version will org set to the new value using the {@link VersionSource}.
  * <p/>

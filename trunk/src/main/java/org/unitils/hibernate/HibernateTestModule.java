@@ -1,9 +1,9 @@
 package org.unitils.hibernate;
 
 import org.unitils.dbunit.DatabaseTestModule;
-import org.unitils.module.TestContext;
-import org.unitils.module.TestListener;
-import org.unitils.module.UnitilsModule;
+import org.unitils.core.TestContext;
+import org.unitils.core.TestListener;
+import org.unitils.core.UnitilsModule;
 import org.unitils.util.PropertiesUtils;
 import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.ConfigurationConverter;
