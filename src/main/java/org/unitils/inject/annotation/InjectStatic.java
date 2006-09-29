@@ -1,7 +1,5 @@
 package org.unitils.inject.annotation;
 
-import org.unitils.inject.PropertyAccessType;
-
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,7 +15,5 @@ public @interface InjectStatic {
     Class target();
 
     String property();
-
-    PropertyAccessType propertyAccessType() default PropertyAccessType.DEFAULT;
 
 }
