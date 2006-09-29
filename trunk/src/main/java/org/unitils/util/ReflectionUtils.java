@@ -100,13 +100,14 @@ public class ReflectionUtils {
      * Returns all declared fields of the given class that are assignable from the given type
      * @param clazz
      * @param type
+     * @param isStatic
      * @return A List of Fields
      */
-    public static List<Field> getFieldsAssignableFrom(Class clazz, Class type) {
+    public static List<Field> getFieldsAssignableFrom(Class clazz, Class type, boolean isStatic) {
         List<Field> fieldsOfType = new ArrayList<Field>();
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
-            if (field.getType().isAssignableFrom(type)) {
+            if (field.getType().isAssignableFrom(type) && Modifier.isStatic(field.getModifiers()) == isStatic) {
                 fieldsOfType.add(field);
             }
         }
