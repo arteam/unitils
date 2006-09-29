@@ -7,9 +7,8 @@
 package org.unitils.easymock;
 
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.inject.AutoInjector;
 import junit.framework.TestCase;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.*;
 import org.easymock.classextension.internal.ClassExtensionHelper;
 
 import java.lang.reflect.Field;
@@ -32,19 +31,6 @@ public class EasyMockTestCase extends TestCase {
 
     /* All mocks that are used by this test are held in this Set */
     private Map<String, Object> mocks = new HashMap<String, Object>();
-
-    /* Implementation of AutoInjector for automatically injecting mocks into objects */
-    private static AutoInjector autoInjector;
-
-    /* Property key for the default mode of auto injection that is used */
-    private static final String PROPKEY_AUTOINJECTION_DEAULTMODE = "mocks.autoinjection.defaultMode";
-
-    /* Possible values for the property key 'mocks.autoinjection.defaultMode' */
-    private static final String AUTOINJECTIONMODE_NOINJECTION = "no";
-    private static final String AUTOINJECTIONMODE_BYNAME = "byName";
-    private static final String AUTOINJECTIONMODE_BYTYPE = "byType";
-    private static final String AUTOINJECTIONMODE_CONSTRUCTOR = "constructor";
-    private static final String AUTOINJECTIONMODE_AUTODETECT = "autodetect";
 
     /**
      * Setup method. Makes sure a EasyMock generated mock is supplied to the fields annotated with @Mock
