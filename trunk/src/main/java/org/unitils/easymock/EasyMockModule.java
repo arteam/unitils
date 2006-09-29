@@ -108,6 +108,7 @@ public class EasyMockModule implements UnitilsModule {
 
     /**
      * todo javadoc
+     * todo keep all mocks in a set, to enable replay / verify of explicitly created mocks
      *
      * @param testObject
      */
@@ -179,7 +180,7 @@ public class EasyMockModule implements UnitilsModule {
      * <p/>
      * If returns is set to NICE, a nice mock is created, else a default mock is created
      * If arguments is lenient a lenient control is create, else an EasyMock control is created
-     * If order is set to strict, invocation order checking is enable
+     * If order is set to strict, invocation order checking is enabled
      *
      * @param type           the class/interface, not null
      * @param mockAnnotation the mock annotation, not null
