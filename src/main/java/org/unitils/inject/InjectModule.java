@@ -16,12 +16,6 @@ import java.util.List;
  */
 public class InjectModule implements UnitilsModule {
 
-    private Injector injector;
-
-    public InjectModule() {
-        injector = new Injector();
-    }
-
     public TestListener createTestListener() {
         return new InjectTestListener();
     }
@@ -82,7 +76,7 @@ public class InjectModule implements UnitilsModule {
 
         for (Object target : targets) {
             try {
-                injector.inject(objectToInject, target, ognlExpression);
+                InjectionUtils.inject(objectToInject, target, ognlExpression);
             } catch (UnitilsException e) {
                 throw new UnitilsException(getSituatedErrorMessage(injectAnnotation, fieldToInject, e.getMessage()), e);
             }
@@ -100,7 +94,7 @@ public class InjectModule implements UnitilsModule {
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToInjectStatic);
 
         try {
-            injector.injectStatic(objectToInject, targetClass, property);
+            InjectionUtils.injectStatic(objectToInject, targetClass, property);
         } catch (UnitilsException e) {
             throw new UnitilsException(getSituatedErrorMessage(injectStaticAnnotation, fieldToInjectStatic, e.getMessage()), e);
         }
@@ -116,7 +110,7 @@ public class InjectModule implements UnitilsModule {
 
         for (Object target : targets) {
             try {
-                injector.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccessType);
+                InjectionUtils.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccessType);
             } catch (UnitilsException e) {
                 throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject, e.getMessage()), e);
             }
@@ -133,7 +127,7 @@ public class InjectModule implements UnitilsModule {
                 autoInjectStaticAnnotation.propertyAccessType()).name());
 
         try {
-            injector.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
+            InjectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
         } catch (UnitilsException e) {
             throw new UnitilsException(getSituatedErrorMessage(autoInjectStaticAnnotation, fieldToAutoInjectStatic,
                     e.getMessage()), e);

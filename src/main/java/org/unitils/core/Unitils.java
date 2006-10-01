@@ -7,6 +7,7 @@
 package org.unitils.core;
 
 import java.util.List;
+import java.lang.reflect.Method;
 
 /**
  * todo javadoc
@@ -23,7 +24,7 @@ public class Unitils {
     //todo javadoc
     private ModulesRepository modulesRepository;
 
-    private static ThreadLocal<TestContext> testContextHolder = new ThreadLocal<TestContext>();
+    private ThreadLocal<TestContext> testContextHolder = new ThreadLocal<TestContext>();
 
 
     // Loading core will be done the first time only
@@ -34,7 +35,7 @@ public class Unitils {
     }
 
 
-    public static TestContext getTestContext() {
+    public TestContext getTestContextImpl() {
 
         TestContext testContext = testContextHolder.get();
         if (testContext == null) {
@@ -43,10 +44,17 @@ public class Unitils {
         return testContext;
     }
 
+    public static TestContext getTestContext() {
+        return getInstance().getTestContextImpl();
+    }
 
-    public ModulesRepository getModulesRepository() {
 
+    public ModulesRepository getModulesRepositoryImpl() {
         return modulesRepository;
+    }
+
+    public static ModulesRepository getModulesRepository() {
+        return getInstance().getModulesRepositoryImpl();
     }
 
 
@@ -78,9 +86,9 @@ public class Unitils {
     }
 
 
-    public void beforeTestMethod(Object test, String methodName) {
+    public void beforeTestMethod(Object test, Method method) {
 
-        setTestContextValue(test.getClass(), test, methodName);
+        setTestContextValue(test.getClass(), test, method);
 
         // For each core, invoke the beforeTestMethod method
         List<UnitilsModule> modules = modulesRepository.getModules();
@@ -90,9 +98,9 @@ public class Unitils {
     }
 
 
-    public void afterTestMethod(Object test, String methodName) {
+    public void afterTestMethod(Object test, Method method) {
 
-        setTestContextValue(test.getClass(), test, methodName);
+        setTestContextValue(test.getClass(), test, method);
 
         // For each core, invoke the afterTestMethod method
         List<UnitilsModule> modules = modulesRepository.getModules();
@@ -123,12 +131,12 @@ public class Unitils {
     }
 
 
-    private void setTestContextValue(Class testClass, Object testObject, String testMethodName) {
+    private void setTestContextValue(Class testClass, Object testObject, Method testMethod) {
 
         TestContext testContext = getTestContext();
         testContext.setTestClass(testClass);
         testContext.setTestObject(testObject);
-        testContext.setTestMethodName(testMethodName);
+        testContext.setTestMethod(testMethod);
     }
 
 

@@ -1,5 +1,7 @@
 package org.unitils.core;
 
+import java.lang.reflect.Method;
+
 /**
  * todo javadoc
  */
@@ -9,7 +11,7 @@ public class TestContext {
 
     private Object testObject;
 
-    private String testMethodName;
+    private Method testMethod;
 
 
     public Class getTestClass() {
@@ -28,12 +30,12 @@ public class TestContext {
         this.testObject = testObject;
     }
 
-    public String getTestMethodName() {
-        return testMethodName;
+    public Method getTestMethod() {
+        return testMethod;
     }
 
-    public void setTestMethodName(String testMethodName) {
-        this.testMethodName = testMethodName;
+    public void setTestMethod(Method testMethod) {
+        this.testMethod = testMethod;
     }
 
 }

@@ -214,7 +214,7 @@ public class EasyMockModule implements UnitilsModule {
     //todo refactor
     private static EasyMockModule getInstance() {
 
-        ModulesRepository modulesRepository = Unitils.getInstance().getModulesRepository();
+        ModulesRepository modulesRepository = Unitils.getInstance().getModulesRepositoryImpl();
         EasyMockModule module = modulesRepository.getModule(EasyMockModule.class);
         if (module == null) {
             //todo

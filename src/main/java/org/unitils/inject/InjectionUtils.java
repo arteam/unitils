@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * @author Filip Neven
  */
-public class Injector {
+public class InjectionUtils {
 
-    public void inject(Object objectToInject, Object target, String property) {
+    public static void inject(Object objectToInject, Object target, String property) {
         try {
             OgnlContext ognlContext = new OgnlContext();
             ognlContext.setMemberAccess(new DefaultMemberAccess(true));
@@ -28,7 +28,7 @@ public class Injector {
         }
     }
 
-    public void injectStatic(Object objectToInject, Class targetClass, String property) {
+    public static void injectStatic(Object objectToInject, Class targetClass, String property) {
         String staticProperty = StringUtils.substringBefore(property, ".");
         if (property.equals(staticProperty)) {
             // Simple property: directly set value on this property
@@ -49,7 +49,7 @@ public class Injector {
         }
     }
 
-    public void autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccessType propertyAccessType) {
+    public static void autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccessType propertyAccessType) {
         if (propertyAccessType == PropertyAccessType.FIELD) {
             autoInjectToField(objectToInject, objectToInjectType, target, target.getClass(), false);
         } else {
@@ -57,7 +57,7 @@ public class Injector {
         }
     }
 
-    public void autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccessType propertyAccessType) {
+    public static void autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccessType propertyAccessType) {
         if (propertyAccessType == PropertyAccessType.FIELD) {
             autoInjectToField(objectToInject, objectToInjectType, null, targetClass, true);
         } else {
@@ -65,7 +65,7 @@ public class Injector {
         }
     }
 
-    private void autoInjectToField(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
+    private static void autoInjectToField(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
         // Try to find a field with an exact matching type
         Field fieldToInjectTo = ReflectionUtils.getFieldOfType(targetClass, objectToInjectType, isStatic);
         if (fieldToInjectTo == null) {
@@ -102,7 +102,7 @@ public class Injector {
         ReflectionUtils.setFieldValue(target, fieldToInjectTo, objectToInject);
     }
 
-    private void autoInjectToSetter(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
+    private static void autoInjectToSetter(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
         // Try to find a method with an exact matching type
         Method setterToInjectTo = ReflectionUtils.getSetterOfType(targetClass, objectToInjectType, false);
 
@@ -140,7 +140,7 @@ public class Injector {
         ReflectionUtils.invokeMethod(target, setterToInjectTo, objectToInject);
     }
 
-    private Object getValueStatic(Class targetClass, String staticProperty) {
+    private static Object getValueStatic(Class targetClass, String staticProperty) {
         Method staticGetter = ReflectionUtils.getGetter(staticProperty, targetClass, true);
         if (staticGetter != null) {
             return ReflectionUtils.invokeMethod(targetClass, staticGetter);
@@ -150,7 +150,7 @@ public class Injector {
         }
     }
 
-    private boolean setValueStatic(Class targetClass, String staticProperty, Object value) {
+    private static boolean setValueStatic(Class targetClass, String staticProperty, Object value) {
         Method staticSetter = ReflectionUtils.getSetter(staticProperty, targetClass, value.getClass(), true);
         if (staticSetter != null) {
             ReflectionUtils.invokeMethod(targetClass, staticSetter, value);
