@@ -304,8 +304,8 @@ public abstract class BaseDatabaseTestCase extends DatabaseTestCase {
     }
 
     /**
-     * Compares the contents of the expected DataSet with the contents of the database. Only the tables that occur in
-     * the expected DataSet are compared with the database content.
+     * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables that occur in
+     * the expected DbUnitDataSet are compared with the database content.
      */
     protected void assertDBContentAsExpected() throws Exception {
         IDatabaseConnection databaseConnection = null;

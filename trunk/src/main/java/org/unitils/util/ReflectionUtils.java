@@ -8,6 +8,7 @@ package org.unitils.util;
 
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
+import org.unitils.hibernate.HibernateSessionManager;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
@@ -243,4 +244,5 @@ public class ReflectionUtils {
             return null;
         }
     }
+    
 }

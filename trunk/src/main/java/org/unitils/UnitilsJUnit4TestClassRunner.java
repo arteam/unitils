@@ -61,14 +61,14 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
         protected TestMethodRunner createMethodRunner(Object test, Method method, RunNotifier notifier) {
 
             testObject = test;
-            unitils.beforeTestMethod(testObject, method.getName());
+            unitils.beforeTestMethod(testObject, method);
             return new TestMethodRunner(testObject, method, notifier, methodDescription(method));
         }
 
         protected void invokeTestMethod(Method method, RunNotifier notifier) {
 
             super.invokeTestMethod(method, notifier);
-            unitils.afterTestMethod(testObject, method.getName());
+            unitils.afterTestMethod(testObject, method);
         }
 
 

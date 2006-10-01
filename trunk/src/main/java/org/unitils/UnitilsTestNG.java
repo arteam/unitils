@@ -52,8 +52,8 @@ public class UnitilsTestNG implements IHookable {
      */
     public void run(IHookCallBack callBack, ITestResult testResult) {
 
-        unitils.beforeTestMethod(this, testResult.getName());
+        unitils.beforeTestMethod(this, testResult.getMethod().getMethod());
         callBack.runTestMethod(testResult);
-        unitils.afterTestMethod(this, testResult.getName());
+        unitils.afterTestMethod(this,testResult.getMethod().getMethod());
     }
 }

@@ -9,6 +9,9 @@ package org.unitils;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+
+import java.lang.reflect.Method;
 
 /**
  * javadoc
@@ -49,9 +52,20 @@ public class UnitilsJUnit3 extends TestCase {
     }
 
     public void runBare() throws Throwable {
-        unitils.beforeTestMethod(this, getName());
+        unitils.beforeTestMethod(this, getCurrentTestMethod());
         super.runBare();
-        unitils.afterTestMethod(this, getName());
+        unitils.afterTestMethod(this, getCurrentTestMethod());
+    }
+
+    private Method getCurrentTestMethod() {
+        String methodName = getName();
+        Method method = null;
+        try {
+            method = getClass().getMethod(methodName);
+        } catch (NoSuchMethodException e) {
+            throw new UnitilsException(e);
+        }
+        return method;
     }
 
 
