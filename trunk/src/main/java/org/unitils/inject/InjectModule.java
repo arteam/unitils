@@ -1,22 +1,20 @@
 package org.unitils.inject;
 
-
-import ognl.DefaultMemberAccess;
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.OgnlException;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.TestContext;
 import org.unitils.core.TestListener;
-import org.unitils.core.UnitilsModule;
 import org.unitils.core.UnitilsException;
-import org.unitils.inject.annotation.*;
+import org.unitils.core.UnitilsModule;
+import org.unitils.inject.annotation.AutoInject;
+import org.unitils.inject.annotation.AutoInjectStatic;
+import org.unitils.inject.annotation.Inject;
+import org.unitils.inject.annotation.InjectStatic;
+import org.unitils.inject.annotation.TestedObject;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,6 +23,11 @@ import java.util.List;
  */
 public class InjectModule implements UnitilsModule {
 
+    private Injector injector;
+
+    public InjectModule() {
+        injector = new Injector();
+    }
 
     public TestListener createTestListener() {
         return new InjectTestListener();
@@ -75,18 +78,18 @@ public class InjectModule implements UnitilsModule {
         Inject injectAnnotation = fieldToInject.getAnnotation(Inject.class);
 
         List targets = getTargets(injectAnnotation, fieldToInject, injectAnnotation.target(), test);
-        String property = injectAnnotation.property();
-        if (StringUtils.isEmpty(property)) {
+        String ognlExpression = injectAnnotation.property();
+        if (StringUtils.isEmpty(ognlExpression)) {
             throw new UnitilsException(getSituatedErrorMessage(injectAnnotation, fieldToInject, "Property cannot be empty"));
         }
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToInject);
 
-        try {
-            for (Object target : targets) {
-                setValueUsingOgnl(target, property, objectToInject);
+        for (Object target : targets) {
+            try {
+                injector.inject(objectToInject, target, ognlExpression);
+            } catch (UnitilsException e) {
+                throw new UnitilsException(getSituatedErrorMessage(injectAnnotation, fieldToInject, e.getMessage()), e);
             }
-        } catch (OgnlException e) {
-            throw new UnitilsException(getSituatedErrorMessage(injectAnnotation, fieldToInject, "Property could not be parsed"), e);
         }
     }
 
@@ -100,24 +103,10 @@ public class InjectModule implements UnitilsModule {
         }
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToInjectStatic);
 
-        String staticProperty = StringUtils.substringBefore(property, ".");
-        if (property.equals(staticProperty)) {
-            // Simple property: directly set value on this property
-            boolean succeeded = setValueStatic(targetClass, staticProperty, objectToInject);
-            if (!succeeded) {
-                throw new UnitilsException(getSituatedErrorMessage(injectStaticAnnotation, fieldToInjectStatic,
-                        "Static property named " + property + " not found on " + objectToInject.getClass().getSimpleName()));
-            }
-        } else {
-            // Multipart property: use ognl for remaining property part
-            Object objectToInjectInto = getValueStatic(targetClass, staticProperty);
-            String remainingPropertyPart = StringUtils.substringAfter(property, ".");
-            try {
-                setValueUsingOgnl(objectToInjectInto, remainingPropertyPart, objectToInject);
-            } catch (OgnlException e) {
-                throw new UnitilsException(getSituatedErrorMessage(injectStaticAnnotation, fieldToInjectStatic,
-                        "Property named " + remainingPropertyPart + " not found on " + objectToInjectInto.getClass().getSimpleName()));
-            }
+        try {
+            injector.injectStatic(objectToInject, targetClass, property);
+        } catch (UnitilsException e) {
+            throw new UnitilsException(getSituatedErrorMessage(injectStaticAnnotation, fieldToInjectStatic, e.getMessage()), e);
         }
     }
 
@@ -127,13 +116,13 @@ public class InjectModule implements UnitilsModule {
         List targets = getTargets(autoInjectAnnotation, fieldToInject, autoInjectAnnotation.target(), test);
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToInject);
 
-        AutoInject.PropertyAccessType propertyAccessType = AnnotationUtils.getValueReplaceDefault(autoInjectAnnotation.propertyAccessType());
+       PropertyAccessType propertyAccessType = PropertyAccessType.valueOf(AnnotationUtils.getValueReplaceDefault(autoInjectAnnotation.propertyAccessType()).name());
 
         for (Object target : targets) {
-            if (propertyAccessType == AutoInject.PropertyAccessType.FIELD) {
-                autoInjectToField(autoInjectAnnotation, target, target.getClass(), fieldToInject, objectToInject, false);
-            } else {
-                autoInjectToSetter(autoInjectAnnotation, target, target.getClass(), fieldToInject, objectToInject, false);
+            try {
+                injector.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccessType);
+            } catch (UnitilsException e) {
+                throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject, e.getMessage()), e);
             }
         }
     }
@@ -144,118 +133,14 @@ public class InjectModule implements UnitilsModule {
         Class targetClass = autoInjectStaticAnnotation.target();
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToAutoInjectStatic);
 
-        AutoInjectStatic.PropertyAccessType propertyAccessType = AnnotationUtils.getValueReplaceDefault(
-                autoInjectStaticAnnotation.propertyAccessType());
+        PropertyAccessType propertyAccessType = PropertyAccessType.valueOf(AnnotationUtils.getValueReplaceDefault(
+                autoInjectStaticAnnotation.propertyAccessType()).name());
 
-        if (propertyAccessType == AutoInjectStatic.PropertyAccessType.FIELD) {
-            autoInjectToField(autoInjectStaticAnnotation, null, targetClass, fieldToAutoInjectStatic, objectToInject, true);
-        } else {
-            autoInjectToSetter(autoInjectStaticAnnotation, null, targetClass, fieldToAutoInjectStatic, objectToInject, true);
-        }
-
-    }
-
-    private void autoInjectToField(Annotation autoInjectAnnotation, Object target, Class targetClass, Field fieldToInject, Object objectToInject, boolean isStatic) {
-
-        // Try to find a field with an exact matching type
-        Field fieldToInjectTo = ReflectionUtils.getFieldOfType(targetClass, fieldToInject.getType(), isStatic);
-        if (fieldToInjectTo == null) {
-            // Try to find a supertype field:
-            // If one field exist that has a type which is more specific than all other fields of the given type,
-            // this one is taken. Otherwise, an exception is thrown
-            List<Field> fieldsOfType = ReflectionUtils.getFieldsAssignableFrom(targetClass, fieldToInject.getType(), isStatic);
-            if (fieldsOfType.size() == 0) {
-                throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject,
-                        "No " + (isStatic?"static ":"") + "field with (super)type " + fieldToInject.getClass().getSimpleName() +
-                        " found in " + targetClass.getSimpleName()));
-            }
-            for (Field field : fieldsOfType) {
-                boolean moreSpecific = true;
-                for (Field compareToField : fieldsOfType) {
-                    if (field != compareToField) {
-                        if (!compareToField.getClass().isAssignableFrom(field.getClass())) {
-                            moreSpecific = false;
-                            break;
-                        }
-                    }
-                }
-                if (moreSpecific) {
-                    fieldToInjectTo = field;
-                    break;
-                }
-            }
-            if (fieldToInjectTo == null) {
-                throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject,
-                        "Multiple candidate target " + (isStatic?"static ":"") + "fields found in " + target.getClass().getSimpleName() +
-                        ", with none of them more specific than all others: " + StringUtils.join(fieldsOfType.iterator(), ", ")));
-            }
-        }
-        // Field to inject into found, inject the object
-        ReflectionUtils.setFieldValue(target, fieldToInjectTo, objectToInject);
-    }
-
-    private void autoInjectToSetter(Annotation autoInjectAnnotation, Object target, Class targetClass, Field fieldToInject, Object objectToInject, boolean isStatic) {
-        // Try to find a method with an exact matching type
-        Method setterToInjectTo = ReflectionUtils.getSetterOfType(targetClass, fieldToInject.getType(), false);
-
-        if (setterToInjectTo == null) {
-            // Try to find a supertype setter:
-            // If one setter exist that has a type which is more specific than all other setters of the given type,
-            // this one is taken. Otherwise, an exception is thrown
-            List<Method> settersOfType = ReflectionUtils.getSettersAssignableFrom(targetClass, fieldToInject.getType(), false);
-            if (settersOfType.size() == 0) {
-                throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject,
-                    "No " + (isStatic?"static ":"") + "setter with (super)type " + fieldToInject.getClass().getSimpleName() +
-                    " found in " + targetClass.getSimpleName()));
-            }
-            for (Method setter : settersOfType) {
-                boolean moreSpecific = true;
-                for (Method compareToSetter : settersOfType) {
-                    if (setter != compareToSetter) {
-                        if (!compareToSetter.getClass().isAssignableFrom(setter.getClass())) {
-                            moreSpecific = false;
-                            break;
-                        }
-                    }
-                }
-                if (moreSpecific) {
-                    setterToInjectTo = setter;
-                    break;
-                }
-            }
-            if (setterToInjectTo == null) {
-                throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject,
-                    "Multiple candidate target " + (isStatic?"static ":"") + " setters found in " + targetClass.getSimpleName() +
-                    ", with none of them more specific than all others: " + StringUtils.join(settersOfType.iterator(), ", ")));
-            }
-        }
-        // Setter to inject into found, inject the object
-        ReflectionUtils.invokeMethod(target, setterToInjectTo, objectToInject);
-    }
-
-    private Object getValueStatic(Class targetClass, String staticProperty) {
-        Method staticGetter = ReflectionUtils.getGetter(staticProperty, targetClass, true);
-        if (staticGetter != null) {
-            return ReflectionUtils.invokeMethod(targetClass, staticGetter);
-        } else {
-            Field staticField = ReflectionUtils.getFieldWithName(staticProperty, targetClass, true);
-            return ReflectionUtils.getFieldValue(targetClass, staticField);
-        }
-    }
-
-    private boolean setValueStatic(Class targetClass, String staticProperty, Object value) {
-        Method staticSetter = ReflectionUtils.getSetter(staticProperty, targetClass, value.getClass(), true);
-        if (staticSetter != null) {
-            ReflectionUtils.invokeMethod(targetClass, staticSetter, value);
-            return true;
-        } else {
-            Field staticField = ReflectionUtils.getFieldWithName(staticProperty, targetClass, true);
-            if (staticField != null) {
-                ReflectionUtils.setFieldValue(targetClass, staticField, value);
-                return true;
-            } else {
-                return false;
-            }
+        try {
+            injector.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
+        } catch (UnitilsException e) {
+                throw new UnitilsException(getSituatedErrorMessage(autoInjectStaticAnnotation, fieldToAutoInjectStatic,
+                        e.getMessage()), e);
         }
     }
 
@@ -276,18 +161,9 @@ public class InjectModule implements UnitilsModule {
         return targets;
     }
 
-    private void setValueUsingOgnl(Object target, String ognlExprStr, Object objectToInject) throws OgnlException {
-        OgnlContext ognlContext = new OgnlContext();
-        ognlContext.setMemberAccess(new DefaultMemberAccess(true));
-        Object ognlExpression = Ognl.parseExpression(ognlExprStr);
-        Ognl.setValue(ognlExpression, ognlContext, target, objectToInject);
-    }
-
     private String getSituatedErrorMessage(Annotation processedAnnotation, Field annotatedField, String errorDescription) {
         return "Error while processing @" + processedAnnotation.getClass().getSimpleName() + " annotation on field " +
                 annotatedField.getName() + ": " + errorDescription;
     }
-
-
 
 }
