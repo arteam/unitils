@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 
 /**
- * @author Filip Neven
+ *
  */
 public class DatabaseTestModule implements UnitilsModule {
 
