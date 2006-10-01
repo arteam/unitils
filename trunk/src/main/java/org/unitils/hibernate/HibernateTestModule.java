@@ -1,13 +1,13 @@
 package org.unitils.hibernate;
 
-import org.unitils.dbunit.DatabaseTestModule;
-import org.unitils.core.TestContext;
-import org.unitils.core.TestListener;
-import org.unitils.core.UnitilsModule;
-import org.unitils.util.PropertiesUtils;
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.ConfigurationConverter;
 import org.hibernate.cfg.Configuration;
+import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsModule;
+import org.unitils.dbunit.DatabaseTestModule;
+import org.unitils.util.PropertiesUtils;
+import org.unitils.util.UnitilsConfiguration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -107,8 +107,7 @@ public class HibernateTestModule implements UnitilsModule {
                 UnitTestHibernateSessionManager unitTestHibernateSessionManager = new UnitTestHibernateSessionManager(configuration);
                 HibernateSessionManager.injectInstance(unitTestHibernateSessionManager);
 
-                //todo refactor
-                Object testObject = TestContext.getTestObject();
+                Object testObject = Unitils.getTestContext().getTestObject();
                 injectSessionManager(testObject, unitTestHibernateSessionManager);
             }
         }

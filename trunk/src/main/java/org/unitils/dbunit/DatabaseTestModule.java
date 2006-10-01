@@ -1,13 +1,5 @@
 package org.unitils.dbunit;
 
-import org.unitils.dbmaintainer.config.DataSourceFactory;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.core.TestContext;
-import org.unitils.core.TestListener;
-import org.unitils.core.UnitilsModule;
-import org.unitils.util.ReflectionUtils;
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
@@ -18,6 +10,15 @@ import org.dbunit.ext.db2.Db2DataTypeFactory;
 import org.dbunit.ext.mysql.MySqlDataTypeFactory;
 import org.dbunit.ext.oracle.OracleDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
+import org.unitils.core.TestContext;
+import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsModule;
+import org.unitils.dbmaintainer.config.DataSourceFactory;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.maintainer.DBMaintainer;
+import org.unitils.util.ReflectionUtils;
+import org.unitils.util.UnitilsConfiguration;
 
 import javax.sql.DataSource;
 import java.io.FileNotFoundException;
@@ -215,7 +216,8 @@ public class DatabaseTestModule implements UnitilsModule {
         public void beforeTestClass() {
 
             try {
-                if (isDatabaseTest(TestContext.getTestObject()) && firstTime) {
+                TestContext testContext = Unitils.getTestContext();
+                if (isDatabaseTest(testContext.getTestObject()) && firstTime) {
                     firstTime = false;
                     //create the singleton datasource
                     dataSource = createDataSource();
@@ -234,7 +236,8 @@ public class DatabaseTestModule implements UnitilsModule {
         public void beforeTestMethod() {
             try {
 
-                DatabaseOperation.CLEAN_INSERT.execute(getConnection(), getDataSet(TestContext.getTestObject(), TestContext.getTestMethodName()));
+                TestContext testContext = Unitils.getTestContext();
+                DatabaseOperation.CLEAN_INSERT.execute(getConnection(), getDataSet(testContext.getTestObject(), testContext.getTestMethodName()));
 
             } catch (Exception e) {
                 throw new RuntimeException("Error while trying to insert test data in database", e);

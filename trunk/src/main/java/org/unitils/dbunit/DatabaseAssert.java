@@ -1,11 +1,12 @@
 package org.unitils.dbunit;
 
-import org.unitils.core.TestContext;
 import org.apache.commons.dbutils.DbUtils;
 import org.dbunit.Assertion;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
+import org.unitils.core.TestContext;
+import org.unitils.core.Unitils;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -17,18 +18,20 @@ public class DatabaseAssert {
 
     public static void assertDBContentAsExpected() throws Exception {
 
-        String currentMethodName = TestContext.getTestMethodName();
+        TestContext testContext = Unitils.getTestContext();
+        String currentMethodName = testContext.getTestMethodName();
         if (currentMethodName == null) {
             throw new RuntimeException("This method is not supported when using a test framework that doesn't " +
                     "support resolving the name of the current test, such as JUnit4 or TestNG, use the version of " +
                     "this method that takes the method name as parameter");
         }
-        assertDBContentAsExpected(TestContext.getTestObject(), currentMethodName);
+        assertDBContentAsExpected(testContext.getTestObject(), currentMethodName);
     }
 
     public static void assertDBContentAsExpected(String testMethodName) throws Exception {
 
-        assertDBContentAsExpected(TestContext.getTestMethodName(), testMethodName);
+        TestContext testContext = Unitils.getTestContext();
+        assertDBContentAsExpected(testContext.getTestMethodName(), testMethodName);
     }
 
     /**

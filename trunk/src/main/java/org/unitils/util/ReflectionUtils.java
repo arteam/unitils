@@ -7,14 +7,11 @@
 package org.unitils.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.List;
+import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility methods that use reflection in some way.
@@ -37,18 +34,19 @@ public class ReflectionUtils {
             return (T) constructor.newInstance();
 
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Class " + className + " not found", e);
+            throw new UnitilsException("Class " + className + " not found", e);
 
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException("Class " + className + " does not contain no-argument constructor", e);
+            throw new UnitilsException("Class " + className + " does not contain no-argument constructor", e);
 
         } catch (Exception e) {
-            throw new RuntimeException("Error while trying to create object of class " + className, e);
+            throw new UnitilsException("Error while trying to create object of class " + className, e);
         }
     }
 
     /**
      * Returns the value of the given field in the given object
+     *
      * @param object
      * @param field
      * @return the value of the given field in the given object
@@ -59,13 +57,14 @@ public class ReflectionUtils {
             field.setAccessible(true);
             fieldValue = field.get(object);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Error while trying to access field " + field, e);
+            throw new UnitilsException("Error while trying to access field " + field, e);
         }
         return fieldValue;
     }
 
     /**
      * Sets the given value to the given field on the given object
+     *
      * @param object
      * @param field
      * @param value
@@ -75,12 +74,13 @@ public class ReflectionUtils {
             field.setAccessible(true);
             field.set(object, value);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Error while trying to access field " + field, e);
+            throw new UnitilsException("Error while trying to access field " + field, e);
         }
     }
 
     /**
      * Invokes the given method with the given parameters on the given target object
+     *
      * @param target
      * @param method
      * @param params
@@ -90,14 +90,15 @@ public class ReflectionUtils {
             method.setAccessible(true);
             return method.invoke(target, params);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Error while invoking method " + method, e);
+            throw new UnitilsException("Error while invoking method " + method, e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException("Error while invoking method " + method, e);
+            throw new UnitilsException("Error while invoking method " + method, e);
         }
     }
 
     /**
      * Returns all declared fields of the given class that are assignable from the given type
+     *
      * @param clazz
      * @param type
      * @param isStatic
@@ -116,6 +117,7 @@ public class ReflectionUtils {
 
     /**
      * Returns the given class's field that has the exact given type, if it exists, or null otherwise
+     *
      * @param clazz
      * @param type
      * @return a field, or null
@@ -145,7 +147,7 @@ public class ReflectionUtils {
         List<Method> settersAssignableFrom = new ArrayList<Method>();
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method method : declaredMethods) {
-            if (isSetter(method)&& method.getParameterTypes()[0].isAssignableFrom(type)
+            if (isSetter(method) && method.getParameterTypes()[0].isAssignableFrom(type)
                     && isStatic == Modifier.isStatic(method.getModifiers())) {
                 settersAssignableFrom.add(method);
             }
@@ -161,6 +163,7 @@ public class ReflectionUtils {
      * <li>The fourth character is in uppercase</li>
      * <li>The method has one parameter, with the type of the property to set</li>
      * </ul>
+     *
      * @param method
      * @return true if the given method is a setter, false otherwise
      */
@@ -172,12 +175,13 @@ public class ReflectionUtils {
                 return true;
             }
         }
-       return false;
+        return false;
     }
 
     /**
      * From the given class, returns the setter for the property with the given name and type. If isStatic == true,
      * a static setter is searched. If no such setter exists in the given class, null is returned
+     *
      * @param propertyName
      * @param type
      * @param isStatic
@@ -198,6 +202,7 @@ public class ReflectionUtils {
     /**
      * From the given class, returns the getter for the given propertyname. If isStatic == true, the getter must be
      * static
+     *
      * @param propertyName
      * @param clazz
      * @param isStatic
@@ -220,6 +225,7 @@ public class ReflectionUtils {
     /**
      * From the given class, returns the field with the given name. isStatic indicates if it should be a static
      * field or not.
+     *
      * @param fieldName
      * @param clazz
      * @param isStatic
