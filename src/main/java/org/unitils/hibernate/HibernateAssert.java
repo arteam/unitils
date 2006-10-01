@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import org.unitils.core.Unitils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,8 +23,9 @@ public class HibernateAssert {
      * <code>BaseHibernateTestCase</code> is used as test superclass.
      */
     public static void assertMappingToDatabase() {
-        Configuration configuration = HibernateSessionManager.getConfiguration();
-        Session session = HibernateSessionManager.getSession();
+        HibernateModule hibernateModule = Unitils.getModulesRepository().getModule(HibernateModule.class);
+        Configuration configuration = hibernateModule.getHibernateConfiguration();
+        Session session = hibernateModule.getCurrentSession();
 
         assertMappingToDatabase(configuration, session);
     }

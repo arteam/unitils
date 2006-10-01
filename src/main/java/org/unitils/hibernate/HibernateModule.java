@@ -10,6 +10,8 @@ import org.unitils.core.UnitilsException;
 import org.unitils.util.UnitilsConfiguration;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.db.DatabaseModule;
+import org.unitils.hibernate.annotation.HibernateConfiguration;
+import org.unitils.hibernate.annotation.InjectHibernateSession;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -28,6 +30,14 @@ public class HibernateModule implements UnitilsModule {
     private SessionFactory hibernateSessionFactory;
 
     private ThreadLocal<Session> currentHibernateSessionHolder = new ThreadLocal<Session>();
+
+    public Configuration getHibernateConfiguration() {
+        return hibernateConfiguration;
+    }
+
+    public Session getCurrentSession() {
+        return currentHibernateSessionHolder.get();
+    }
 
     private void configureHibernate() {
         Object testObject = Unitils.getTestContext().getTestObject();

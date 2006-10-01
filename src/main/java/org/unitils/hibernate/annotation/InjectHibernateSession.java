@@ -1,4 +1,4 @@
-package org.unitils.hibernate;
+package org.unitils.hibernate.annotation;
 
 /**
  * @author Filip Neven
