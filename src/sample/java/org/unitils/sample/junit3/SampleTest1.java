@@ -35,12 +35,12 @@ public class SampleTest1 extends UnitilsJUnit3 {
         System.out.println("SampleTest1.test1");
 
         expect(mock.someBehavior(false, 0, null, null)).andReturn("Result");
-        EasyMockModule.replayAll();
+        EasyMockModule.replay();
 
         String result = mock.someBehavior(true, 999, "Test", new ArrayList());
 
         assertEquals("Result", result);
-        EasyMockModule.verifyAll();
+        EasyMockModule.verify();
     }
 
 

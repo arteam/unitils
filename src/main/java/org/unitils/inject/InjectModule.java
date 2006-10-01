@@ -1,15 +1,8 @@
 package org.unitils.inject;
 
 import org.apache.commons.lang.StringUtils;
-import org.unitils.core.TestContext;
-import org.unitils.core.TestListener;
-import org.unitils.core.UnitilsException;
-import org.unitils.core.UnitilsModule;
-import org.unitils.inject.annotation.AutoInject;
-import org.unitils.inject.annotation.AutoInjectStatic;
-import org.unitils.inject.annotation.Inject;
-import org.unitils.inject.annotation.InjectStatic;
-import org.unitils.inject.annotation.TestedObject;
+import org.unitils.core.*;
+import org.unitils.inject.annotation.*;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -34,8 +27,11 @@ public class InjectModule implements UnitilsModule {
     }
 
     private class InjectTestListener extends TestListener {
+
         public void beforeTestMethod() {
-            injectObjects(TestContext.getTestObject());
+
+            TestContext testContext = Unitils.getTestContext();
+            injectObjects(testContext.getTestObject());
         }
     }
 
@@ -116,7 +112,7 @@ public class InjectModule implements UnitilsModule {
         List targets = getTargets(autoInjectAnnotation, fieldToInject, autoInjectAnnotation.target(), test);
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToInject);
 
-       PropertyAccessType propertyAccessType = PropertyAccessType.valueOf(AnnotationUtils.getValueReplaceDefault(autoInjectAnnotation.propertyAccessType()).name());
+        PropertyAccessType propertyAccessType = PropertyAccessType.valueOf(AnnotationUtils.getValueReplaceDefault(autoInjectAnnotation.propertyAccessType()).name());
 
         for (Object target : targets) {
             try {
@@ -139,8 +135,8 @@ public class InjectModule implements UnitilsModule {
         try {
             injector.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
         } catch (UnitilsException e) {
-                throw new UnitilsException(getSituatedErrorMessage(autoInjectStaticAnnotation, fieldToAutoInjectStatic,
-                        e.getMessage()), e);
+            throw new UnitilsException(getSituatedErrorMessage(autoInjectStaticAnnotation, fieldToAutoInjectStatic,
+                    e.getMessage()), e);
         }
     }
 

@@ -6,40 +6,64 @@
  */
 package org.unitils.core;
 
-import org.unitils.core.TestContext;
-import org.unitils.core.TestListener;
-import org.unitils.core.UnitilsModule;
-import org.unitils.core.UnitilsModulesLoader;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * todo javadoc
  */
 public class Unitils {
 
+    private static Unitils unitils = new Unitils();
+
+    public static Unitils getInstance() {
+
+        return unitils;
+    }
 
     //todo javadoc
-    private List<UnitilsModule> modules;
+    private ModulesRepository modulesRepository;
 
-    private Map<UnitilsModule, TestListener> testListeners;
+    private static ThreadLocal<TestContext> testContextHolder = new ThreadLocal<TestContext>();
+
+
+    // Loading core will be done the first time only
+    //todo
+    public Unitils() {
+
+        modulesRepository = createModulesRepository();
+    }
+
+
+    public static TestContext getTestContext() {
+
+        TestContext testContext = testContextHolder.get();
+        if (testContext == null) {
+            testContextHolder.set(new TestContext());
+        }
+        return testContext;
+    }
+
+
+    public ModulesRepository getModulesRepository() {
+
+        return modulesRepository;
+    }
 
 
     public void beforeAll() {
 
-        // Loading core will be done the first time only
-        UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
-        modules = unitilsModulesLoader.loadModules();
-        testListeners = createTestListeners(modules);
-
-        setTestContextValue(null, null, null);
-
         // For each core, invoke the beforeAll method
+        List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            getTestListener(module).beforeAll();
+            modulesRepository.getTestListener(module).beforeAll();
         }
+    }
+
+    protected ModulesRepository createModulesRepository() {
+
+        UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
+        List<UnitilsModule> modules = unitilsModulesLoader.loadModules();
+        return new ModulesRepository(modules);
     }
 
 
@@ -47,8 +71,9 @@ public class Unitils {
 
         setTestContextValue(test.getClass(), test, null);
 
+        List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            getTestListener(module).beforeTestClass();
+            modulesRepository.getTestListener(module).beforeTestClass();
         }
     }
 
@@ -58,8 +83,9 @@ public class Unitils {
         setTestContextValue(test.getClass(), test, methodName);
 
         // For each core, invoke the beforeTestMethod method
+        List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            getTestListener(module).beforeTestMethod();
+            modulesRepository.getTestListener(module).beforeTestMethod();
         }
     }
 
@@ -69,8 +95,9 @@ public class Unitils {
         setTestContextValue(test.getClass(), test, methodName);
 
         // For each core, invoke the afterTestMethod method
+        List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            getTestListener(module).afterTestMethod();
+            modulesRepository.getTestListener(module).afterTestMethod();
         }
     }
 
@@ -78,8 +105,9 @@ public class Unitils {
 
         setTestContextValue(test.getClass(), test, null);
 
+        List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            getTestListener(module).afterTestClass();
+            modulesRepository.getTestListener(module).afterTestClass();
         }
     }
 
@@ -88,34 +116,20 @@ public class Unitils {
 
         setTestContextValue(null, null, null);
 
+        List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            getTestListener(module).afterAll();
+            modulesRepository.getTestListener(module).afterAll();
         }
-    }
-
-
-    private TestListener getTestListener(UnitilsModule module) {
-
-        return testListeners.get(module);
-    }
-
-
-    private Map<UnitilsModule, TestListener> createTestListeners(List<UnitilsModule> modules) {
-        Map<UnitilsModule, TestListener> result = new HashMap<UnitilsModule, TestListener>(modules.size());
-
-        for (UnitilsModule module : modules) {
-
-            result.put(module, module.createTestListener());
-        }
-        return result;
     }
 
 
     private void setTestContextValue(Class testClass, Object testObject, String testMethodName) {
 
-        TestContext.setTestClass(testClass);
-        TestContext.setTestObject(testObject);
-        TestContext.setTestMethodName(testMethodName);
+        TestContext testContext = getTestContext();
+        testContext.setTestClass(testClass);
+        testContext.setTestObject(testObject);
+        testContext.setTestMethodName(testMethodName);
     }
+
 
 }

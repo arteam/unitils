@@ -5,36 +5,35 @@ package org.unitils.core;
  */
 public class TestContext {
 
-    private static ThreadLocal<Class> testClassHolder = new ThreadLocal<Class>();
+    private Class testClass;
 
-    private static ThreadLocal<Object> testObjectHolder = new ThreadLocal<Object>();
+    private Object testObject;
 
-    private static ThreadLocal<String> testMethodNameHolder = new ThreadLocal<String>();
+    private String testMethodName;
 
-    private TestContext() {
+
+    public Class getTestClass() {
+        return testClass;
     }
 
-    public static Class getTestClass() {
-        return testClassHolder.get();
+    public void setTestClass(Class testClass) {
+        this.testClass = testClass;
     }
 
-    public static void setTestClass(Class testClass) {
-        testClassHolder.set(testClass);
+    public Object getTestObject() {
+        return testObject;
     }
 
-    public static Object getTestObject() {
-        return testObjectHolder.get();
+    public void setTestObject(Object testObject) {
+        this.testObject = testObject;
     }
 
-    public static void setTestObject(Object testObject) {
-        testObjectHolder.set(testObject);
+    public String getTestMethodName() {
+        return testMethodName;
     }
 
-    public static String getTestMethodName() {
-        return testMethodNameHolder.get();
+    public void setTestMethodName(String testMethodName) {
+        this.testMethodName = testMethodName;
     }
 
-    public static void setTestMethodName(String testMethodName) {
-        testMethodNameHolder.set(testMethodName);
-    }
 }
