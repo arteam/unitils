@@ -119,7 +119,7 @@ public class UnitilsModulesLoader {
                 Object module = ReflectionUtils.createInstanceOfType(className);
                 if (!(module instanceof UnitilsModule)) {
 
-                    throw new RuntimeException("Unable to load core. Module class is not of type UnitilsModule: " + className);
+                    throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
                 }
                 modules.add((UnitilsModule) module);
             }

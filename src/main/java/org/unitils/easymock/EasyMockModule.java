@@ -238,6 +238,10 @@ public class EasyMockModule implements UnitilsModule {
             TestContext testContext = Unitils.getTestContext();
             createAndInjectMocksIntoTest(testContext.getTestObject());
         }
+
+        public void afterTestMethod() {
+            verify();
+        }
     }
 
 }

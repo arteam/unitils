@@ -16,19 +16,6 @@ import java.util.List;
  */
 public class InjectModule implements UnitilsModule {
 
-    public TestListener createTestListener() {
-        return new InjectTestListener();
-    }
-
-    private class InjectTestListener extends TestListener {
-
-        public void beforeTestMethod() {
-
-            TestContext testContext = Unitils.getTestContext();
-            injectObjects(testContext.getTestObject());
-        }
-    }
-
     void injectObjects(Object test) {
         injectAll(test);
         autoInjectAll(test);
@@ -154,6 +141,18 @@ public class InjectModule implements UnitilsModule {
     private String getSituatedErrorMessage(Annotation processedAnnotation, Field annotatedField, String errorDescription) {
         return "Error while processing @" + processedAnnotation.getClass().getSimpleName() + " annotation on field " +
                 annotatedField.getName() + ": " + errorDescription;
+    }
+
+    public TestListener createTestListener() {
+        return new InjectTestListener();
+    }
+
+    private class InjectTestListener extends TestListener {
+
+        public void beforeTestMethod() {
+            TestContext testContext = Unitils.getTestContext();
+            injectObjects(testContext.getTestObject());
+        }
     }
 
 }

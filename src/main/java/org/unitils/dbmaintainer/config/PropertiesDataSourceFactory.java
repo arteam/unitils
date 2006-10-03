@@ -40,6 +40,7 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
 
     /**
      * todo javadoc
+     * todo initialize in constructor
      * <p/>
      * Initializes itself using the properties in the given <code>Properties</code> object.
      *

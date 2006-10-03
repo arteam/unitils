@@ -60,7 +60,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectExplicitTarget {
 
-        @AutoInject(target = "injectOn", propertyAccessType = AutoInject.PropertyAccessType.SETTER)
+        @AutoInject(target = "injectOn", propertyAccessType = PropertyAccessType.SETTER)
         private ToInjectSuper toInject;
         private InjectOn injectOn;
 
@@ -81,7 +81,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectFieldAccess {
 
-        @AutoInject(propertyAccessType = AutoInject.PropertyAccessType.FIELD)
+        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOnField injectOnField;
@@ -103,7 +103,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectAnnotatedTarget {
 
-        @AutoInject(propertyAccessType = AutoInject.PropertyAccessType.SETTER)
+        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOn injectOn1;
@@ -132,7 +132,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInject_targetFieldIsSuperType {
 
-        @AutoInject(propertyAccessType = AutoInject.PropertyAccessType.SETTER)
+        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
         private ToInjectSub toInject;
         @TestedObject
         private InjectOn injectOn;
@@ -153,7 +153,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInject_targetFieldIsSuperType_fieldAccess {
 
-        @AutoInject(propertyAccessType = AutoInject.PropertyAccessType.FIELD)
+        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
         private ToInjectSub toInject;
         @TestedObject
         private InjectOnField injectOn;
@@ -174,9 +174,9 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectToMostSpecificallyTypedProperty {
 
-        @AutoInject(propertyAccessType = AutoInject.PropertyAccessType.SETTER)
+        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
         private ToInjectSuper toInjectSuper;
-        @AutoInject(propertyAccessType = AutoInject.PropertyAccessType.SETTER)
+        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
         private ToInjectSub toInjectSub;
         @TestedObject
         private InjectOnSuperSub injectOn;
@@ -202,9 +202,9 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectToMostSpecificallyTypedProperty_fieldAccess {
 
-        @AutoInject(propertyAccessType = AutoInject.PropertyAccessType.FIELD)
+        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
         private ToInjectSuper toInjectSuper;
-        @AutoInject(propertyAccessType = AutoInject.PropertyAccessType.FIELD)
+        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
         private ToInjectSub toInjectSub;
         @TestedObject
         private InjectOnSuperSubFieldAccess injectOn;
