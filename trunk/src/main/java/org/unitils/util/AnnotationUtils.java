@@ -93,7 +93,7 @@ public class AnnotationUtils {
 
         T[] enumValues = enumClass.getEnumConstants();
         for (T enumValue : enumValues) {
-            if (defaultValueName.equals(enumValue.name())) {
+            if (defaultValueName.equalsIgnoreCase(enumValue.name())) {
 
                 return enumValue;
             }

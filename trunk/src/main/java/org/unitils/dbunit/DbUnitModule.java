@@ -59,16 +59,6 @@ public class DbUnitModule implements UnitilsModule {
     }
 
     /**
-     * If this is the first time that we encounter a test class annotated with {@link DatabaseTest}, a new instance
-     * of the dbUnit's <code>IDatabaseConnection</code> is created, that is used througout the whole test run.
-     */
-    private void initDbUnitConnection() {
-        if (isDatabaseTest(Unitils.getTestContext().getTestClass()) && dbUnitDatabaseConnection == null) {
-            dbUnitDatabaseConnection = createDbUnitConnection();
-        }
-    }
-
-    /**
      *
      * @param testClass
      * @return True if the test class is a database test, i.e. is annotated with the {@link DatabaseTest} annotation,
@@ -76,6 +66,16 @@ public class DbUnitModule implements UnitilsModule {
      */
     protected boolean isDatabaseTest(Class testClass) {
         return testClass.getAnnotation(DatabaseTest.class) != null;
+    }
+
+    /**
+     * If this is the first time that we encounter a test class annotated with {@link DatabaseTest}, a new instance
+     * of the dbUnit's <code>IDatabaseConnection</code> is created, that is used througout the whole test run.
+     */
+    protected void initDbUnitConnection() {
+        if (dbUnitDatabaseConnection == null) {
+            dbUnitDatabaseConnection = createDbUnitConnection();
+        }
     }
 
     /**
@@ -90,10 +90,11 @@ public class DbUnitModule implements UnitilsModule {
      * Creates a new instance of dbUnit's <code>IDatabaseConnection</code>
      * @return a new instance of dbUnit's <code>IDatabaseConnection</code>
      */
-    private IDatabaseConnection createDbUnitConnection() {
-            Configuration configuration = UnitilsConfiguration.getInstance();
+    protected IDatabaseConnection createDbUnitConnection() {
+        Configuration configuration = UnitilsConfiguration.getInstance();
 
-        IDatabaseConnection connection = new DatabaseConnection(getCurrentConnection(), configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase());
+        IDatabaseConnection connection = new DatabaseConnection(getCurrentConnection(),
+                configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase());
         // todo externalize
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         if ("oracle".equals(databaseDialect)) {
@@ -121,9 +122,11 @@ public class DbUnitModule implements UnitilsModule {
     /**
      * Closes the DbUnit connection, and also the wrapped Jdbc Connection object
      */
-    private void closeDbUnitConnection() {
+    protected void closeDbUnitConnection() {
         try {
-            dbUnitDatabaseConnection.close();
+            if (dbUnitDatabaseConnection != null) {
+                dbUnitDatabaseConnection.close();
+            }
         } catch (SQLException e) {
             throw new UnitilsException("Error while closing database connection");
         }
@@ -136,13 +139,20 @@ public class DbUnitModule implements UnitilsModule {
      * does not exist, the default dataset is loaded (see {@link #getDefaultDataSetFileName(Class)}. If neither of
      * these files exists, a <code>UnitilsException</code> is thrown.
      */
-    private void insertTestData() {
+    protected void insertTestData() {
         try {
-            DatabaseOperation.CLEAN_INSERT.execute(dbUnitDatabaseConnection, getDataSet(Unitils.getTestContext().getTestClass(),
+            getInsertDatabaseOperation().execute(dbUnitDatabaseConnection, getDataSet(Unitils.getTestContext().getTestClass(),
                     Unitils.getTestContext().getTestMethod()));
         } catch (Exception e) {
             throw new UnitilsException("Error when trying to insert test data", e);
         }
+    }
+
+    /**
+     * @return The DbUnit <code>DatabaseOperation</code> that is used for loading the data file
+     */
+    protected DatabaseOperation getInsertDatabaseOperation() {
+        return DatabaseOperation.CLEAN_INSERT;
     }
 
     /**
@@ -337,7 +347,9 @@ public class DbUnitModule implements UnitilsModule {
 
         @Override
         public void beforeTestClass() {
-            initDbUnitConnection();
+            if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
+                initDbUnitConnection();
+        }
         }
 
         @Override

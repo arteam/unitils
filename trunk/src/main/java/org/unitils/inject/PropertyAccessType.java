@@ -5,6 +5,6 @@ package org.unitils.inject;
  */
 public enum PropertyAccessType {
 
-    FIELD, SETTER;
+    FIELD, SETTER, DEFAULT;
 
 }

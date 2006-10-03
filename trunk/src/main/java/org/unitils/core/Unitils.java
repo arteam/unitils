@@ -39,7 +39,8 @@ public class Unitils {
 
         TestContext testContext = testContextHolder.get();
         if (testContext == null) {
-            testContextHolder.set(new TestContext());
+            testContext = new TestContext();
+            testContextHolder.set(testContext);
         }
         return testContext;
     }

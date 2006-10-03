@@ -12,6 +12,7 @@ import org.unitils.util.AnnotationUtils;
 import org.unitils.db.DatabaseModule;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.InjectHibernateSession;
+import org.unitils.hibernate.annotation.HibernateTest;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -31,18 +32,16 @@ public class HibernateModule implements UnitilsModule {
 
     private ThreadLocal<Session> currentHibernateSessionHolder = new ThreadLocal<Session>();
 
-    public Configuration getHibernateConfiguration() {
-        return hibernateConfiguration;
-    }
-
-    public Session getCurrentSession() {
-        return currentHibernateSessionHolder.get();
+    protected boolean isHibernateTest(Class testClass) {
+        return testClass.getAnnotation(HibernateTest.class) != null;
     }
 
     private void configureHibernate() {
-        Object testObject = Unitils.getTestContext().getTestObject();
-        createHibernateConfiguration(testObject);
-        createHibernateSessionFactory();
+        if (hibernateConfiguration == null) {
+            Object testObject = Unitils.getTestContext().getTestObject();
+            createHibernateConfiguration(testObject);
+            createHibernateSessionFactory();
+        }
     }
 
     private void createHibernateConfiguration(Object test) {
@@ -105,6 +104,14 @@ public class HibernateModule implements UnitilsModule {
         hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
     }
 
+    public Configuration getHibernateConfiguration() {
+        return hibernateConfiguration;
+    }
+
+    public Session getCurrentSession() {
+        return currentHibernateSessionHolder.get();
+    }
+
     public TestListener createTestListener() {
         return new HibernateTestListener();
     }
@@ -113,7 +120,7 @@ public class HibernateModule implements UnitilsModule {
 
         @Override
         public void beforeTestClass() {
-            if (hibernateConfiguration == null) {
+            if (isHibernateTest(Unitils.getTestContext().getTestClass())) {
                 configureHibernate();
             }
         }
