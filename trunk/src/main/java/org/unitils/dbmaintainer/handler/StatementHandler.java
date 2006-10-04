@@ -9,7 +9,8 @@ package org.unitils.dbmaintainer.handler;
 import javax.sql.DataSource;
 
 /**
- * Interface for classes that handle SQL statements.
+ * Defines the contract for classes that handle SQL statements. E.g. by logging these statements or by executing them
+ * on a database.
  */
 public interface StatementHandler {
 
