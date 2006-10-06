@@ -127,7 +127,9 @@ public class HibernateModule implements UnitilsModule {
 
         @Override
         public void beforeTestMethod() {
-            createAndInjectHibernateSessionIfNecessary(Unitils.getTestContext().getTestObject());
+            if (isHibernateTest(Unitils.getTestContext().getTestClass())) {
+                createAndInjectHibernateSessionIfNecessary(Unitils.getTestContext().getTestObject());
+            }
         }
 
     }
