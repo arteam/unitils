@@ -8,7 +8,9 @@ package org.unitils.dbmaintainer.constraints;
 
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.core.UnitilsException;
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.configuration.Configuration;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,12 +18,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Implementation of {@link ConstraintsDisabler} for an Oracle database.
+ */
 public class OracleConstraintsDisabler implements ConstraintsDisabler {
 
     /**
      * SQL statement to select the database constraints
      */
-    private static final String DISABLE_CONSTRAINTS_SQL = "select table_name, constraint_name "
+    private static final String SELECT_CONSTRAINTS_SQL = "select table_name, constraint_name "
             + " from user_constraints where constraint_type <> 'P'";
 
     /**
@@ -35,9 +40,9 @@ public class OracleConstraintsDisabler implements ConstraintsDisabler {
     private StatementHandler statementHandler;
 
     /**
-     * @see ConstraintsDisabler#init(javax.sql.DataSource, org.unitils.dbmaintainer.handler.StatementHandler)
+     * @see ConstraintsDisabler#init(org.apache.commons.configuration.Configuration,javax.sql.DataSource,org.unitils.dbmaintainer.handler.StatementHandler)
      */
-    public void init(DataSource dataSource, StatementHandler statementHandler) {
+    public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
     }
@@ -50,10 +55,22 @@ public class OracleConstraintsDisabler implements ConstraintsDisabler {
     }
 
     /**
+     * @see ConstraintsDisabler#enableConstraintsOnConnection(java.sql.Connection)
+     */
+    public void enableConstraintsOnConnection(Connection conn) {
+    }
+
+    /**
      * @see ConstraintsDisabler#disableConstraints()
      */
     public void disableConstraints() {
         generateConstraintsScript("disable");
+    }
+
+    /**
+     * @see ConstraintsDisabler#disableConstraintsOnConnection(java.sql.Connection)
+     */
+    public void disableConstraintsOnConnection(Connection conn) {
     }
 
     private void generateConstraintsScript(String enableDisable) {
@@ -63,12 +80,12 @@ public class OracleConstraintsDisabler implements ConstraintsDisabler {
         try {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
-            resultSet = statement.executeQuery(DISABLE_CONSTRAINTS_SQL);
+            resultSet = statement.executeQuery(SELECT_CONSTRAINTS_SQL);
             output(resultSet, enableDisable);
         } catch (SQLException e) {
-            throw new RuntimeException("Error while disabling constraints", e);
+            throw new UnitilsException("Error while " + enableDisable + "ing constraints", e);
         } catch (StatementHandlerException e) {
-            throw new RuntimeException("Error while disabling constraints", e);
+            throw new UnitilsException("Error while " + enableDisable + "ing constraints", e);
         } finally {
             DbUtils.closeQuietly(connection, statement, resultSet);
         }

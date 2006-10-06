@@ -11,6 +11,7 @@ import org.dbunit.dataset.ITableIterator;
 import org.dbunit.dataset.ITableMetaData;
 import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.dataset.SortedTable;
+import org.dbunit.dataset.datatype.DefaultDataTypeFactory;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.ext.db2.Db2DataTypeFactory;
@@ -108,6 +109,10 @@ public class DbUnitModule implements UnitilsModule {
         if ("mysql".equals(databaseDialect)) {
             DatabaseConfig config = connection.getConfig();
             config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
+        }
+        if ("hsqldb".equals(databaseDialect)) {
+            DatabaseConfig config = connection.getConfig();
+            config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new DefaultDataTypeFactory());
         }
         return connection;
     }
@@ -354,12 +359,14 @@ public class DbUnitModule implements UnitilsModule {
 
         @Override
         public void beforeTestMethod() {
-            insertTestData();
+            if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
+                insertTestData();
+            }
         }
 
         @Override
         public void afterAll() {
-            closeDbUnitConnection();
+                closeDbUnitConnection();
         }
 
     }

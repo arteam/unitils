@@ -35,6 +35,7 @@ public class EasyMockModule implements UnitilsModule {
 
     private List<MocksControl> mocksControls;
 
+    private boolean inReplayState;
 
     public EasyMockModule() {
         this.mocksControls = new ArrayList<MocksControl>();
@@ -86,14 +87,17 @@ public class EasyMockModule implements UnitilsModule {
         for (MocksControl mocksControl : mocksControls) {
             mocksControl.replay();
         }
+        inReplayState = true;
     }
 
 
     //todo javadoc
     protected void verifyImpl() {
 
-        for (MocksControl mocksControl : mocksControls) {
-            mocksControl.verify();
+        if (inReplayState) {
+            for (MocksControl mocksControl : mocksControls) {
+                mocksControl.verify();
+            }
         }
     }
 
@@ -235,8 +239,8 @@ public class EasyMockModule implements UnitilsModule {
          */
         public void beforeTestMethod() {
 
-            TestContext testContext = Unitils.getTestContext();
-            createAndInjectMocksIntoTest(testContext.getTestObject());
+            inReplayState = false;
+            createAndInjectMocksIntoTest(Unitils.getTestContext().getTestObject());
         }
 
         public void afterTestMethod() {

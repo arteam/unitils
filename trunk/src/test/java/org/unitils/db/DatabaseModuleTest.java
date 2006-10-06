@@ -56,7 +56,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
         mockDbMaintainer.updateDatabase();
         EasyMockModule.replay();
 
-        databaseModule.initDataSource();
+        databaseModule.initDatabase(new DbTest());
         assertSame(mockDataSource, databaseModule.getDataSource());
     }
 

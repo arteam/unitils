@@ -9,6 +9,7 @@ package org.unitils.dbmaintainer.constraints;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.configuration.Configuration;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -20,6 +21,8 @@ import java.sql.Statement;
  * TODO test me
  * TODO javadoc me
  *
+ * Implementation of {@link ConstraintsDisabler} for an DB2 database.
+ *
  * @author BaVe
  */
 public class DB2ConstraintsDisabler implements ConstraintsDisabler {
@@ -30,7 +33,7 @@ public class DB2ConstraintsDisabler implements ConstraintsDisabler {
       * C --> check constraint (NOT_NULL)
       * V --> view constraint (???)
       */
-    private static final String DISABLE_CONSTRAINTS_SQL = "select TABNAME, CONSTNAME from SYSCAT.TABCONST";
+    private static final String SELECT_CONSTRAINTS_SQL = "select TABNAME, CONSTNAME from SYSCAT.TABCONST";
 
     /**
      * The DataSource
@@ -43,9 +46,9 @@ public class DB2ConstraintsDisabler implements ConstraintsDisabler {
     private StatementHandler statementHandler;
 
     /**
-     * @see ConstraintsDisabler#init(javax.sql.DataSource, org.unitils.dbmaintainer.handler.StatementHandler)
+     * @see ConstraintsDisabler#init(org.apache.commons.configuration.Configuration,javax.sql.DataSource,org.unitils.dbmaintainer.handler.StatementHandler)
      */
-    public void init(DataSource dataSource, StatementHandler statementHandler) {
+    public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
     }
@@ -58,10 +61,24 @@ public class DB2ConstraintsDisabler implements ConstraintsDisabler {
     }
 
     /**
+     * @see ConstraintsDisabler#enableConstraintsOnConnection(java.sql.Connection)
+     */
+    public void enableConstraintsOnConnection(Connection conn) {
+
+    }
+
+    /**
      * @see org.unitils.dbmaintainer.constraints.ConstraintsDisabler#disableConstraints()
      */
     public void disableConstraints() {
         generateConstraintsScript("disable");
+    }
+
+    /**
+     * @see ConstraintsDisabler#disableConstraintsOnConnection(java.sql.Connection)
+     */
+    public void disableConstraintsOnConnection(Connection conn) {
+
     }
 
     private void generateConstraintsScript(String enableDisable) {
@@ -71,7 +88,7 @@ public class DB2ConstraintsDisabler implements ConstraintsDisabler {
         try {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
-            resultSet = statement.executeQuery(DISABLE_CONSTRAINTS_SQL);
+            resultSet = statement.executeQuery(SELECT_CONSTRAINTS_SQL);
             output(resultSet, enableDisable);
         } catch (SQLException e) {
             throw new RuntimeException("Error while disabling constraints", e);

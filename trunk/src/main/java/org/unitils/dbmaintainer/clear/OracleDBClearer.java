@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Filip Neven
+ * todo remove views, triggers, functions, stored procedures
  */
 public class OracleDBClearer implements DBClearer {
 

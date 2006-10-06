@@ -159,7 +159,7 @@ public class DBMaintainer {
         boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         if (disableConstraints) {
             constraintsDisabler = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect));
-            constraintsDisabler.init(dataSource, statementHandler);
+            constraintsDisabler.init(configuration, dataSource, statementHandler);
         }
 
         boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
@@ -224,6 +224,13 @@ public class DBMaintainer {
      */
     void setFromScratchEnabled(boolean fromScratchEnabled) {
         this.fromScratchEnabled = fromScratchEnabled;
+    }
+
+    /**
+     * @return The {@link ConstraintsDisabler} that is used. If constraints disabling is not active, null is returned
+     */
+    public ConstraintsDisabler getConstraintsDisabler() {
+        return constraintsDisabler;
     }
 
 }
