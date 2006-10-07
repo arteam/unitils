@@ -29,7 +29,7 @@ public class UnitilsJUnit3 extends TestCase {
         super(name);
 
         if (unitils == null) {
-            unitils = new Unitils();
+            unitils = Unitils.getInstance();
             unitils.beforeAll();
             createShutdownHook();
         }

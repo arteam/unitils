@@ -17,6 +17,7 @@ import org.unitils.util.UnitilsConfiguration;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.dbunit.DatabaseTest;
 import org.unitils.db.annotations.AfterCreateDataSource;
+import org.unitils.db.annotations.AfterCreateConnection;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -79,8 +80,10 @@ public class DatabaseModule implements UnitilsModule {
                 dataSource = createDataSource();
                 //call methods annotated with AfterCreateDataSource, if any
                 callAfterCreateDataSourceMethods(testObject);
-                //create the connection instance
+                //check if the database must be updated using the DBMaintainer
                 updateDatabaseSchemaIfNeeded();
+                //call methods annotated with AfterCreateConnection, if any
+                callAfterCreateConnectionMethods(testObject);
             }
         } catch (Exception e) {
             throw new UnitilsException("Error while intializing database connection", e);
@@ -92,7 +95,7 @@ public class DatabaseModule implements UnitilsModule {
      *
      * @return the datasource
      */
-    private DataSource createDataSource() {
+    protected DataSource createDataSource() {
         DataSourceFactory dataSourceFactory = getDataSourceFactory();
         dataSourceFactory.init();
         DataSource ds = dataSourceFactory.createDataSource();
@@ -115,7 +118,7 @@ public class DatabaseModule implements UnitilsModule {
      * @param ds
      * @return The configured instance of the {@link ConstraintsDisabler}
      */
-    private ConstraintsDisabler createConstraintsDisabler(Configuration configuration, DataSource ds) {
+    protected ConstraintsDisabler createConstraintsDisabler(Configuration configuration, DataSource ds) {
         StatementHandler statementHandler = new JDBCStatementHandler();
         statementHandler.init(ds);
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
@@ -161,7 +164,7 @@ public class DatabaseModule implements UnitilsModule {
      * Calls all methods annotated with {@link AfterCreateDataSource}
      * @param testObject
      */
-    private void callAfterCreateDataSourceMethods(Object testObject) {
+    protected void callAfterCreateDataSourceMethods(Object testObject) {
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateDataSource.class);
         for (Method method : methods) {
             try {
@@ -170,7 +173,25 @@ public class DatabaseModule implements UnitilsModule {
             } catch (UnitilsException e) {
 
                 throw new UnitilsException("Unable to invoke after create DataSource method. Ensure that this method has " +
-                        "following signature: void myMethod(DataSource dataSource, String name)", e);
+                        "following signature: void myMethod(DataSource dataSource)", e);
+            }
+        }
+    }
+
+    /**
+     * Calls all methods annotated with {@link AfterCreateConnection}
+     * @param testObject
+     */
+    protected void callAfterCreateConnectionMethods(Object testObject) {
+        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateConnection.class);
+        for (Method method : methods) {
+            try {
+                ReflectionUtils.invokeMethod(testObject, method, getCurrentConnection());
+
+            } catch (UnitilsException e) {
+
+                throw new UnitilsException("Unable to invoke after create Connection method. Ensure that this method has " +
+                        "following signature: void myMethod(Connection conn)", e);
             }
         }
     }

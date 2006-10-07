@@ -1,25 +1,22 @@
 package org.unitils.db;
 
-import org.easymock.EasyMock;
+import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.dbmaintainer.config.DataSourceFactory;
+import org.unitils.db.annotations.AfterCreateConnection;
+import org.unitils.db.annotations.AfterCreateDataSource;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbunit.DatabaseTest;
-import org.unitils.easymock.EasyMockModule;
+import static org.unitils.easymock.EasyMockModule.replay;
 import org.unitils.easymock.annotation.Mock;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
- * @author Filip Neven
  */
 public class DatabaseModuleTest extends UnitilsJUnit3 {
 
     private DatabaseModule databaseModule;
-
-    @Mock
-    private DataSourceFactory mockDataSourceFactory = null;
 
     @Mock
     private DataSource mockDataSource = null;
@@ -35,16 +32,18 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
 
         databaseModule = new DatabaseModule() {
 
-            protected DataSourceFactory getDataSourceFactory() {
-                return mockDataSourceFactory;
-            }
-
+            @Override
             protected DBMaintainer createDbMaintainer() {
                 return mockDbMaintainer;
             }
+
+            @Override
+            protected DataSource createDataSource() {
+                return mockDataSource;
+            }
         };
 
-        EasyMock.expect(mockDataSource.getConnection()).andStubReturn(mockConnection);
+        expect(mockDataSource.getConnection()).andStubReturn(mockConnection);
     }
 
     public void testIsDatabaseTest() {
@@ -52,25 +51,40 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
     }
 
     public void testInitDataSource() throws Exception {
-        EasyMock.expect(mockDataSourceFactory.createDataSource()).andReturn(mockDataSource);
         mockDbMaintainer.updateDatabase();
-        EasyMockModule.replay();
+        replay();
 
-        databaseModule.initDatabase(new DbTest());
+        DbTest dbTest = new DbTest();
+        databaseModule.initDatabase(dbTest);
         assertSame(mockDataSource, databaseModule.getDataSource());
-    }
-
-    public void testGetConnection() {
-        EasyMock.expect(mockDataSourceFactory.createDataSource()).andReturn(mockDataSource);
-        EasyMockModule.replay();
-
-        Connection conn = databaseModule.getCurrentConnection();
-        assertSame(mockConnection, conn);
+        assertSame(mockDataSource, dbTest.getDataSource());
+        assertSame(mockConnection, dbTest.getConnection());
     }
 
     @DatabaseTest
     public static class DbTest {
 
+        private DataSource dataSource;
+
+        private Connection connection;
+
+        @AfterCreateDataSource
+        public void afterCreateDataSource(DataSource dataSource) {
+            this.dataSource = dataSource;
+        }
+
+        @AfterCreateConnection
+        public void afterCreateConnection(Connection conn) {
+            this.connection = conn;
+        }
+
+        public DataSource getDataSource() {
+            return dataSource;
+        }
+
+        public Connection getConnection() {
+            return connection;
+        }
     }
 
 }
