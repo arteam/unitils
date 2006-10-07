@@ -11,7 +11,7 @@ import org.unitils.util.UnitilsConfiguration;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.db.DatabaseModule;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
-import org.unitils.hibernate.annotation.InjectHibernateSession;
+import org.unitils.hibernate.annotation.AfterCreateHibernateSession;
 import org.unitils.hibernate.annotation.HibernateTest;
 
 import java.lang.reflect.Method;
@@ -36,29 +36,35 @@ public class HibernateModule implements UnitilsModule {
         return testClass.getAnnotation(HibernateTest.class) != null;
     }
 
-    private void configureHibernate() {
+    protected void configureHibernate(Object testObject) {
         if (hibernateConfiguration == null) {
-            Object testObject = Unitils.getTestContext().getTestObject();
-            createHibernateConfiguration(testObject);
+            hibernateConfiguration = createHibernateConfiguration(testObject);
             createHibernateSessionFactory();
         }
     }
 
-    private void createHibernateConfiguration(Object test) {
-        String configurationClassName = UnitilsConfiguration.getInstance().getString(PROPKEY_HIBERNATE_CONFIGURATION_CLASS);
-        List<String> configFiles = UnitilsConfiguration.getInstance().getList(PROPKEY_HIBERNATE_CONFIGFILES);
-        try {
-            hibernateConfiguration = (Configuration) Class.forName(configurationClassName).newInstance();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid configuration class " + configurationClassName, e);
-        }
-        for (String configFile : configFiles) {
-            hibernateConfiguration.configure(configFile);
-        }
-        performExtraHibernateConfiguration(test, hibernateConfiguration);
+    private Configuration createHibernateConfiguration(Object test) {
+        Configuration hbnConfiguration = createHibernateConfiguration();
+        callHibernateConfigurationMethods(test, hbnConfiguration);
+        return hbnConfiguration;
     }
 
-    private void performExtraHibernateConfiguration(Object test, Configuration configuration) {
+    protected Configuration createHibernateConfiguration() {
+        String configurationClassName = UnitilsConfiguration.getInstance().getString(PROPKEY_HIBERNATE_CONFIGURATION_CLASS);
+        List<String> configFiles = UnitilsConfiguration.getInstance().getList(PROPKEY_HIBERNATE_CONFIGFILES);
+        Configuration hbnConfiguration;
+        try {
+            hbnConfiguration = (Configuration) Class.forName(configurationClassName).newInstance();
+        } catch (Exception e) {
+            throw new UnitilsException("Invalid configuration class " + configurationClassName, e);
+        }
+        for (String configFile : configFiles) {
+            hbnConfiguration.configure(configFile);
+        }
+        return hbnConfiguration;
+    }
+
+    private void callHibernateConfigurationMethods(Object test, Configuration configuration) {
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(test.getClass(), HibernateConfiguration.class);
         for (Method method : methods) {
             try {
@@ -71,31 +77,29 @@ public class HibernateModule implements UnitilsModule {
         }
     }
 
-    private void createAndInjectHibernateSessionIfNecessary(Object testObject) {
+    protected void createHibernateSession(Object testObject) {
         Session currentHibernateSession = currentHibernateSessionHolder.get();
-        if (currentHibernateSession == null || !currentHibernateSession.isConnected()) {
-            if (currentHibernateSession != null && currentHibernateSession.isOpen()) {
-                currentHibernateSession.close();
-            }
-            currentHibernateSessionHolder.set(hibernateSessionFactory.openSession(getConnection()));
-            injectHibernateSession(testObject);
+        if (currentHibernateSession != null && (currentHibernateSession.isConnected() || currentHibernateSession.isOpen())) {
+            currentHibernateSession.close();
         }
+        currentHibernateSessionHolder.set(hibernateSessionFactory.openSession(getConnection()));
+        callAfterCreateHibernateSessionMethods(testObject);
     }
 
-    private void injectHibernateSession(Object testObject) {
-        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), InjectHibernateSession.class);
+    private void callAfterCreateHibernateSessionMethods(Object testObject) {
+        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateHibernateSession.class);
         for (Method method : methods) {
             try {
-                method.invoke(testObject, currentHibernateSessionHolder);
+                method.invoke(testObject, currentHibernateSessionHolder.get());
             } catch (Exception e) {
                 throw new UnitilsException("Error while calling method annotated with @" +
-                        InjectHibernateSession.class.getSimpleName() + ". Ensure that this method has following signature: " +
+                        AfterCreateHibernateSession.class.getSimpleName() + ". Ensure that this method has following signature: " +
                         "void myMethod(org.hibernate.Session session)", e);
             }
         }
     }
 
-    private Connection getConnection() {
+    protected Connection getConnection() {
         DatabaseModule dbModule = Unitils.getModulesRepository().getModule(DatabaseModule.class);
         return dbModule.getCurrentConnection();
     }
@@ -121,14 +125,14 @@ public class HibernateModule implements UnitilsModule {
         @Override
         public void beforeTestClass() {
             if (isHibernateTest(Unitils.getTestContext().getTestClass())) {
-                configureHibernate();
+                configureHibernate(Unitils.getTestContext().getTestObject());
             }
         }
 
         @Override
         public void beforeTestMethod() {
             if (isHibernateTest(Unitils.getTestContext().getTestClass())) {
-                createAndInjectHibernateSessionIfNecessary(Unitils.getTestContext().getTestObject());
+                createHibernateSession(Unitils.getTestContext().getTestObject());
             }
         }
 

@@ -27,7 +27,7 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
         super(testClass, new CustomTestClassMethodsRunner(testClass));
 
         if (unitils == null) {
-            unitils = new Unitils();
+            unitils = Unitils.getInstance();
             unitils.beforeAll();
             createShutdownHook();
         }

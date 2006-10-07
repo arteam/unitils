@@ -3,6 +3,7 @@ package org.unitils.easymock;
 import org.easymock.internal.MocksControl;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
 import static org.easymock.internal.MocksControl.MockType.NICE;
+import org.easymock.classextension.internal.MocksClassControl;
 import org.unitils.core.*;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.Mock;
@@ -38,7 +39,6 @@ public class EasyMockModule implements UnitilsModule {
     private boolean inReplayState;
 
     public EasyMockModule() {
-        this.mocksControls = new ArrayList<MocksControl>();
     }
 
 
@@ -112,13 +112,14 @@ public class EasyMockModule implements UnitilsModule {
      */
     protected void createAndInjectMocksIntoTest(Object testObject) {
 
+        mocksControls = new ArrayList<MocksControl>();
         List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
         for (Field field : fields) {
 
             Class<?> mockType = field.getType();
 
             Mock mockAnnotation = field.getAnnotation(Mock.class);
-            Object mockObject = createMock(mockType, mockAnnotation.order(), mockAnnotation.returns(), mockAnnotation.arguments());
+            Object mockObject = createMockImpl(mockType, mockAnnotation.order(), mockAnnotation.returns(), mockAnnotation.arguments());
             ReflectionUtils.setFieldValue(testObject, field, mockObject);
 
             callAfterCreateMockMethods(testObject, mockObject, field.getName(), mockType);
@@ -204,7 +205,7 @@ public class EasyMockModule implements UnitilsModule {
             mocksControl = new LenientMocksControl(mockType, IGNORE_DEFAULTS, LENIENT_DATES, LENIENT_ORDER);
 
         } else {
-            mocksControl = new MocksControl(mockType);
+            mocksControl = new MocksClassControl(mockType);
         }
 
         // Check order
@@ -244,7 +245,7 @@ public class EasyMockModule implements UnitilsModule {
         }
 
         public void afterTestMethod() {
-            verify();
+            verifyImpl();
         }
     }
 

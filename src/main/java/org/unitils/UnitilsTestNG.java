@@ -24,7 +24,7 @@ public class UnitilsTestNG implements IHookable {
 
     @BeforeSuite
     protected void unitilsBeforeSuite() {
-        unitils = new Unitils();
+        unitils = Unitils.getInstance();
         unitils.beforeAll();
     }
 
