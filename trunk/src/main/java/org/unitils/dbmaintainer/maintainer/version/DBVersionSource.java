@@ -27,22 +27,32 @@ public class DBVersionSource implements VersionSource {
      * The key of the property that specifies the name of the datase table in which the
      * DB version is stored
      */
-    private static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
+    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
 
     /**
      * The key of the property that specifies the name of the column in which the DB version index is stored
      */
-    private static final String PROPKEY_VERSION_INDEX_COLUMN_NAME = "dbMaintainer.dbVersionSource.versionIndexColumnName";
+    public static final String PROPKEY_VERSION_INDEX_COLUMN_NAME = "dbMaintainer.dbVersionSource.versionIndexColumnName";
 
     /**
      * The key of the property that specifies the name of the column in which the DB version index is stored
      */
-    private static final String PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME = "dbMaintainer.dbVersionSource.versionTimeStampColumnName";
+    public static final String PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME = "dbMaintainer.dbVersionSource.versionTimeStampColumnName";
+
+    /**
+     * The start of the key of the property that specifies the type of the column in which the database version is stored.
+     */
+    public static final String PROPKEY_VERSION_COLUMN_DATATYPE_START = "dbMaintainer.dbVersionSource.versionColumnDataType";
 
     /**
      * The key of the property that specifies the schema name of the database
      */
-    private static final String PROPKEY_DATABASE_USERNAME = "dataSource.userName";
+    public static final String PROPKEY_SCHEMANAME = "dataSource.schemaName";
+
+    /**
+     *  Property key of the SQL dialect of the underlying DBMS implementation
+     */
+    private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /**
      * The name of the database schema
@@ -65,7 +75,12 @@ public class DBVersionSource implements VersionSource {
     private String versionTimestampColumnName;
 
     /**
-     * todo javadoc
+     * The type of the database columns in which the version index and version timestamps are stored. This data type
+     * should be sufficiently large to be able to store values of the <code>long</code> Java type.
+     */
+    private String versionColumnType;
+
+    /**
      * Initializes with the given <code>Properties</code> and <code>DataSource</code>.
      *
      * @param dataSource
@@ -73,10 +88,12 @@ public class DBVersionSource implements VersionSource {
     public void init(DataSource dataSource) {
 
         Configuration configuration = UnitilsConfiguration.getInstance();
-        this.schemaName = configuration.getString(PROPKEY_DATABASE_USERNAME).toUpperCase();
+        this.schemaName = configuration.getString(PROPKEY_SCHEMANAME).toUpperCase();
         this.tableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
         this.versionIndexColumnName = configuration.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();
         this.versionTimestampColumnName = configuration.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME).toUpperCase();
+        this.versionColumnType = configuration.getString(PROPKEY_VERSION_COLUMN_DATATYPE_START + '.' +
+                configuration.getString(PROPKEY_DATABASE_DIALECT));
         this.dataSource = dataSource;
     }
 
@@ -117,26 +134,27 @@ public class DBVersionSource implements VersionSource {
             rs = metadata.getTables(null, schemaName, tableName, null);
             if (!rs.next()) {
                 // The version table does not exist. Create it
-                st.execute("create table " + tableName + " ( " + versionIndexColumnName + " number(20), " +
-                        versionTimestampColumnName + " number(20) )");
+                st.execute("create table " + tableName + " ( " + versionIndexColumnName + " " + versionColumnType +
+                        ", " + versionTimestampColumnName + " " + versionColumnType + " )");
             } else {
                 // Check if the version table has the expected column
                 rs = metadata.getColumns(null, schemaName, tableName, versionIndexColumnName);
                 if (!rs.next()) {
                     // The version table exists but the column does not. Create it
-                    st.execute("alter table " + tableName + " add " + versionIndexColumnName + " number(20)");
+                    st.execute("alter table " + tableName + " add " + versionIndexColumnName + " " + versionColumnType);
                 }
                 rs = metadata.getColumns(null, schemaName, tableName, versionTimestampColumnName);
                 if (!rs.next()) {
                     // The version table exists but the column does not. Create it
-                    st.execute("alter table " + tableName + " add " + versionTimestampColumnName + " number(20)");
+                    st.execute("alter table " + tableName + " add " + versionTimestampColumnName + " " + versionColumnType);
                 }
             }
             // The version table and column exist. Check if a record with the version is available
             rs = st.executeQuery("select * from " + tableName);
             if (!rs.next()) {
                 // The version table is empty. Insert a record with version number 0.
-                st.execute("insert into " + tableName + " (" + versionIndexColumnName + ", " + versionTimestampColumnName + ") values (0, 0)");
+                st.execute("insert into " + tableName + " (" + versionIndexColumnName + ", " + versionTimestampColumnName +
+                        ") values (0, 0)");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error while checking version table", e);

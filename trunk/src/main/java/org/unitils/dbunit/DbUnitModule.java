@@ -43,7 +43,7 @@ import java.lang.reflect.Method;
 public class DbUnitModule implements UnitilsModule {
 
     /* Property key of the name of the database schema */
-    private static final String PROPKEY_SCHEMA_NAME = "dataSource.userName";
+    private static final String PROPKEY_SCHEMA_NAME = "dataSource.schemaName";
 
     /* Property key of the SQL dialect of the underlying DBMS implementation */
     private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
@@ -143,13 +143,17 @@ public class DbUnitModule implements UnitilsModule {
      * First, we try to load a test specific dataset (see {@link #getTestDataSetFileName(Class,Method)}. If that file
      * does not exist, the default dataset is loaded (see {@link #getDefaultDataSetFileName(Class)}. If neither of
      * these files exists, a <code>UnitilsException</code> is thrown.
+     * @param testClass
+     * @param testMethod
      */
-    protected void insertTestData() {
+    protected void insertTestData(Class testClass, Method testMethod) {
         try {
-            getInsertDatabaseOperation().execute(dbUnitDatabaseConnection, getDataSet(Unitils.getTestContext().getTestClass(),
-                    Unitils.getTestContext().getTestMethod()));
+            IDataSet dataSet = getDataSet(testClass, testMethod);
+            if (dataSet != null) { // Dataset is null when there is no data xml file.
+                getInsertDatabaseOperation().execute(dbUnitDatabaseConnection, dataSet);
+            }
         } catch (Exception e) {
-            throw new UnitilsException("Error when trying to insert test data", e);
+            throw new UnitilsException("Error when trying to insert test data from DBUnit xml file", e);
         }
     }
 
@@ -177,11 +181,6 @@ public class DbUnitModule implements UnitilsModule {
             //load the default dataset
             String defaultDataSetFileName = getDefaultDataSetFileName(testClass);
             dataSet = loadDataSet(testClass, defaultDataSetFileName);
-            if (dataSet == null) {
-
-                throw new UnitilsException("Unable to find test dataset with file name: " +
-                        testDataSetFileName + " or " + defaultDataSetFileName);
-            }
         }
         return dataSet;
     }
@@ -271,11 +270,11 @@ public class DbUnitModule implements UnitilsModule {
     /**
      * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
      * that occur in the expected DbUnitDataSet are compared with the database contents.
+     * @param testClass
+     * @param testMethod
      */
-    public void assertDBContentAsExpected() {
-        Class testClass = Unitils.getTestContext().getTestClass();
-        String testMethodName = Unitils.getTestContext().getTestMethod().getName();
-        assertDBContentAsExpected(testClass, testMethodName);
+    public void assertDBContentAsExpected(Class testClass, Method testMethod) {
+        assertDBContentAsExpected(testClass, testMethod.getName());
     }
 
     /**
@@ -360,7 +359,7 @@ public class DbUnitModule implements UnitilsModule {
         @Override
         public void beforeTestMethod() {
             if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
-                insertTestData();
+                insertTestData(Unitils.getTestContext().getTestClass(), Unitils.getTestContext().getTestMethod());
             }
         }
 

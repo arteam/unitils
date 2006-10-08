@@ -78,12 +78,8 @@ public class DatabaseModule implements UnitilsModule {
             if (dataSource == null) {
                 //create the singleton datasource
                 dataSource = createDataSource();
-                //call methods annotated with AfterCreateDataSource, if any
-                callAfterCreateDataSourceMethods(testObject);
                 //check if the database must be updated using the DBMaintainer
                 updateDatabaseSchemaIfNeeded();
-                //call methods annotated with AfterCreateConnection, if any
-                callAfterCreateConnectionMethods(testObject);
             }
         } catch (Exception e) {
             throw new UnitilsException("Error while intializing database connection", e);
@@ -233,6 +229,15 @@ public class DatabaseModule implements UnitilsModule {
             if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
                 initDatabase(Unitils.getTestContext().getTestObject());
            }
+        }
+
+        // todo these calls must be done each time a new test object is created. For JUnit this is before every test
+        // for TestNG this is before every test class.
+        public void beforeTestMethod() {
+            //call methods annotated with AfterCreateDataSource, if any
+            callAfterCreateDataSourceMethods(Unitils.getTestContext().getTestObject());
+            //call methods annotated with AfterCreateConnection, if any
+            callAfterCreateConnectionMethods(Unitils.getTestContext().getTestObject());
         }
 
     }

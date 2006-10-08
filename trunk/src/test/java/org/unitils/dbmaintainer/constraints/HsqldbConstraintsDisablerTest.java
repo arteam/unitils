@@ -1,6 +1,8 @@
 package org.unitils.dbmaintainer.constraints;
 
 import org.unitils.UnitilsJUnit3;
+import org.unitils.dbunit.DatabaseTest;
+import org.unitils.db.annotations.AfterCreateDataSource;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -16,11 +18,17 @@ import java.sql.Statement;
 /**
  *
  */
+@DatabaseTest
 public class HsqldbConstraintsDisablerTest extends UnitilsJUnit3 {
 
     private HsqldbConstraintsDisabler hsqldbConstraintsDisabler;
 
     private DataSource dataSource;
+
+    @AfterCreateDataSource
+    protected void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -28,7 +36,7 @@ public class HsqldbConstraintsDisablerTest extends UnitilsJUnit3 {
         hsqldbConstraintsDisabler = new HsqldbConstraintsDisabler();
         Configuration config = new PropertiesConfiguration();
         config.setProperty(HsqldbConstraintsDisabler.PROPKEY_SCHEMANAME, "public");
-        dataSource = getDataSource();
+
         StatementHandler st = new JDBCStatementHandler();
         st.init(dataSource);
         hsqldbConstraintsDisabler.init(config, dataSource, st);
@@ -40,15 +48,6 @@ public class HsqldbConstraintsDisablerTest extends UnitilsJUnit3 {
         dropTables();
 
         super.tearDown();
-    }
-
-    private DataSource getDataSource() {
-        BasicDataSource ds = new BasicDataSource();
-        ds.setDriverClassName("org.hsqldb.jdbcDriver");
-        ds.setUrl("jdbc:hsqldb:mem:unitils");
-        ds.setUsername("sa");
-        ds.setPassword("");
-        return ds;
     }
 
     private void createTables() throws SQLException {
