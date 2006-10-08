@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * @author Filip Neven
@@ -22,35 +23,19 @@ public class AnnotationUtils {
      * @return A List containing fields annotated with the given annotation
      */
     public static <T extends Annotation> List<Field> getFieldsAnnotatedWith(Class clazz, Class<T> annotation) {
-        List<Field> annotatedFields = new ArrayList<Field>();
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getAnnotation(annotation) != null) {
-                annotatedFields.add(field);
+        if (Object.class.equals(clazz)) {
+            return Collections.EMPTY_LIST;
+        } else {
+            List<Field> annotatedFields = new ArrayList<Field>();
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getAnnotation(annotation) != null) {
+                    annotatedFields.add(field);
+                }
             }
+            annotatedFields.addAll(getFieldsAnnotatedWith(clazz.getSuperclass(), annotation));
+            return annotatedFields;
         }
-        return annotatedFields;
-    }
-
-    /**
-     * Returns the values of all the given objects' fields that are annotated with the given annotation
-     *
-     * @param object
-     * @param annotation
-     * @return the values of all the given objects' fields that are annotated with the given annotation
-     */
-    public static <T extends Annotation> List getFieldValuesAnnotatedWith(Object object, Class<T> annotation) {
-        List fieldValues = new ArrayList();
-        List<Field> annotatedFields = getFieldsAnnotatedWith(object.getClass(), annotation);
-        for (Field annotatedField : annotatedFields) {
-            try {
-                annotatedField.setAccessible(true);
-                fieldValues.add(annotatedField.get(object));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error while accessing field", e);
-            }
-        }
-        return fieldValues;
     }
 
     /**
@@ -62,14 +47,39 @@ public class AnnotationUtils {
      */
     public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation) {
 
-        List<Method> annotatedMethods = new ArrayList<Method>();
-        Method[] methods = clazz.getDeclaredMethods();
-        for (Method method : methods) {
-            if (method.getAnnotation(annotation) != null) {
-                annotatedMethods.add(method);
+        if (Object.class.equals(clazz)) {
+            return Collections.EMPTY_LIST;
+        } else {
+            List<Method> annotatedMethods = new ArrayList<Method>();
+            Method[] methods = clazz.getDeclaredMethods();
+            for (Method method : methods) {
+                if (method.getAnnotation(annotation) != null) {
+                    annotatedMethods.add(method);
+                }
+            }
+            annotatedMethods.addAll(getMethodsAnnotatedWith(clazz.getSuperclass(), annotation));
+            return annotatedMethods;
+        }
+    }
+
+    /**
+     * todo javadoc
+     * @param clazz
+     * @param annotation
+     * @return
+     */
+    public static <T extends Annotation> T getClassAnnotation(Class clazz, Class<T> annotation) {
+
+        if (Object.class.equals(clazz)) {
+            return null;
+        } else {
+            T foundAnnotation = (T) clazz.getAnnotation(annotation);
+            if (foundAnnotation != null) {
+                return foundAnnotation;
+            } else {
+                return getClassAnnotation(clazz.getSuperclass(), annotation);
             }
         }
-        return annotatedMethods;
     }
 
 

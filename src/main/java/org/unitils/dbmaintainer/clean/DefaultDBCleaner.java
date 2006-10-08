@@ -2,6 +2,8 @@ package org.unitils.dbmaintainer.clean;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Closure;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -15,21 +17,26 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Collections;
+import java.util.List;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * todo Configuration object should be supplied externally
  * todo Use same naming pattern for property name constants
  */
-public class OracleDBCleaner implements DBCleaner {
+public class DefaultDBCleaner implements DBCleaner {
 
-    /* Property keys of the database schema name */
-    private static final String PROPKEY_DATABASE_USERNAME = "dataSource.userName";
+    /* Property key for the database schema name */
+    public static final String PROPKEY_DATABASE_SCHEMANAME = "dataSource.schemaName";
 
-    private static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.tablesToPreserve";
+    /* Property key for the tables that should not be cleaned */
+    public static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.tablesToPreserve";
 
     /* The key of the property that specifies the name of the datase table in which the
      * DB version is stored. This table should not be deleted */
-    private static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
+    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
 
     /**
      * The DataSource
@@ -52,11 +59,11 @@ public class OracleDBCleaner implements DBCleaner {
         this.statementHandler = statementHandler;
 
         Configuration configuration = UnitilsConfiguration.getInstance();
-        schemaName = configuration.getString(PROPKEY_DATABASE_USERNAME);
+        schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
 
         tablesToPreserve = new HashSet<String>();
         tablesToPreserve.add(configuration.getString(PROPKEY_VERSION_TABLE_NAME));
-        tablesToPreserve.addAll(Arrays.asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE)));
+        tablesToPreserve.addAll(toUpperCaseList(Arrays.asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
     }
 
     public void cleanDatabase() throws StatementHandlerException {
@@ -64,9 +71,9 @@ public class OracleDBCleaner implements DBCleaner {
         try {
             conn = dataSource.getConnection();
 
-            Set<String> tableNames = getTableNames(conn);
-            tableNames.removeAll(tablesToPreserve);
-            clearTables(tableNames);
+            Set<String> tables = getTableNames(conn);
+            tables.removeAll(tablesToPreserve);
+            clearTables(tables);
         } catch (SQLException e) {
             throw new UnitilsException("Error while cleaning database", e);
         } finally {
@@ -82,7 +89,7 @@ public class OracleDBCleaner implements DBCleaner {
             rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, null);
             while (rset.next()) {
                 String tableName = rset.getString("TABLE_NAME");
-                tableNames.add(tableName);
+                tableNames.add(tableName.toUpperCase());
             }
             return tableNames;
         } finally {
@@ -94,5 +101,13 @@ public class OracleDBCleaner implements DBCleaner {
         for (String tableName : tableNames) {
             statementHandler.handle("delete from " + tableName);
         }
+    }
+
+    private List<String> toUpperCaseList(List<String> strings) {
+        List<String> toUpperCaseList = new ArrayList<String>();
+        for (String string : strings) {
+            toUpperCaseList.add(string.toUpperCase());
+        }
+        return toUpperCaseList;
     }
 }

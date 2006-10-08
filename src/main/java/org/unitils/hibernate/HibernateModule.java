@@ -33,7 +33,7 @@ public class HibernateModule implements UnitilsModule {
     private ThreadLocal<Session> currentHibernateSessionHolder = new ThreadLocal<Session>();
 
     protected boolean isHibernateTest(Class testClass) {
-        return testClass.getAnnotation(HibernateTest.class) != null;
+        return AnnotationUtils.getClassAnnotation(testClass, HibernateTest.class) != null;
     }
 
     protected void configureHibernate(Object testObject) {

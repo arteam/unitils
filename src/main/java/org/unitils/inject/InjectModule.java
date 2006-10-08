@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * todo javadoc
@@ -126,7 +127,11 @@ public class InjectModule implements UnitilsModule {
         if ("".equals(targetName)) {
             // Default targetName, so it is probably not specfied. Return all objects that are annotated with the
             // TestedObject annotation.
-            targets = AnnotationUtils.getFieldValuesAnnotatedWith(test, TestedObject.class);
+            List<Field> testedObjectFields = AnnotationUtils.getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
+            targets = new ArrayList(testedObjectFields.size());
+            for (Field testedObjectField : testedObjectFields) {
+                targets.add(ReflectionUtils.getFieldValue(test, testedObjectField));
+            }
         } else {
             Field field = ReflectionUtils.getFieldWithName(targetName, test.getClass(), false);
             if (field == null) {

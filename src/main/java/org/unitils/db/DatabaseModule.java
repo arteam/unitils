@@ -66,7 +66,7 @@ public class DatabaseModule implements UnitilsModule {
      * false otherwise
      */
     protected boolean isDatabaseTest(Class testClass) {
-        return testClass.getAnnotation(DatabaseTest.class) != null;
+        return AnnotationUtils.getClassAnnotation(testClass, DatabaseTest.class) != null;
     }
 
     /**
@@ -234,10 +234,12 @@ public class DatabaseModule implements UnitilsModule {
         // todo these calls must be done each time a new test object is created. For JUnit this is before every test
         // for TestNG this is before every test class.
         public void beforeTestMethod() {
-            //call methods annotated with AfterCreateDataSource, if any
-            callAfterCreateDataSourceMethods(Unitils.getTestContext().getTestObject());
-            //call methods annotated with AfterCreateConnection, if any
-            callAfterCreateConnectionMethods(Unitils.getTestContext().getTestObject());
+            if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
+                //call methods annotated with AfterCreateDataSource, if any
+                callAfterCreateDataSourceMethods(Unitils.getTestContext().getTestObject());
+                //call methods annotated with AfterCreateConnection, if any
+                callAfterCreateConnectionMethods(Unitils.getTestContext().getTestObject());
+            }
         }
 
     }

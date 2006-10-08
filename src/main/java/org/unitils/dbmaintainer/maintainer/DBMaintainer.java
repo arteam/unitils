@@ -61,40 +61,40 @@ public class DBMaintainer {
     private static final Logger logger = Logger.getLogger(DBMaintainer.class);
 
     /* Property key indicating if updating the database from scratch is enabled */
-    private static final String PROPKEY_FROMSCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
+    public static final String PROPKEY_FROMSCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
 
     /* Property key of the implementation class of {@link VersionSource} */
-    private static final String PROPKEY_VERSIONSOURCE = "dbMaintainer.versionSource.className";
+    public static final String PROPKEY_VERSIONSOURCE = "dbMaintainer.versionSource.className";
 
     /* Property key of the implementation class of {@link ScriptSource} */
-    private static final String PROPKEY_SCRIPTSOURCE = "dbMaintainer.scriptSource.className";
+    public static final String PROPKEY_SCRIPTSOURCE = "dbMaintainer.scriptSource.className";
 
     /* Property key of the implementation class of {@link VersionSource}  */
-    private static final String PROPKEY_STATEMENTHANDLER = "dbMaintainer.statementHandler.className";
+    public static final String PROPKEY_STATEMENTHANDLER = "dbMaintainer.statementHandler.className";
 
     /* Property key of the implementation class of the {@link DBClearer} */
-    private static final String PROPKEY_DBCLEARER_START = "dbMaintainer.dbClearer.className";
+    public static final String PROPKEY_DBCLEARER_START = "dbMaintainer.dbClearer.className";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
-    private static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
+    public static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
 
     /* Property key of the implementation class of {@link ConstraintsDisabler} */
-    private static final String PROPKEY_CONSTRAINTSDISABLER_START = "constraintsDisabler.className";
+    public static final String PROPKEY_CONSTRAINTSDISABLER_START = "constraintsDisabler.className";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
-    private static final String PROPKEY_UPDATESEQUENCES_ENABLED = "dbMaintainer.updateSequences.enabled";
+    public static final String PROPKEY_UPDATESEQUENCES_ENABLED = "dbMaintainer.updateSequences.enabled";
 
     /* Property key that indicates if a DTD is to be generated or not */
-    private static final String PROPKEY_GENERATEDTD_ENABLED = "dbMaintainer.generateDTD.enabled";
+    public static final String PROPKEY_GENERATEDTD_ENABLED = "dbMaintainer.generateDTD.enabled";
 
     /* Property key of the implementation class of {@link SequenceDisabler} */
-    private static final String PROPKEY_SEQUENCEUPDATER_START = "sequenceUpdater.className";
+    public static final String PROPKEY_SEQUENCEUPDATER_START = "sequenceUpdater.className";
 
     /* Property key of the implementation class of {@link DtdGenerator} */
-    private static final String PROPKEY_DTDGENERATOR_CLASSNAME = "dbMaintainer.database.dtdGenerator.className";
+    public static final String PROPKEY_DTDGENERATOR_CLASSNAME = "dbMaintainer.database.dtdGenerator.className";
 
     /* Property key of the SQL dialect of the underlying DBMS implementation */
-    private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
+    public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
 
     /* Provider of the current version of the database, and means to increment it */
