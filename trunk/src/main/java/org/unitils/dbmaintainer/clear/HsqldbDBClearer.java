@@ -8,24 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * todo remove materialized views, triggers, functions, stored procedures
+ * todo remove views, triggers, functions, stored procedures
  */
-public class OracleDBClearer extends BaseDBClearer {
+public class HsqldbDBClearer extends BaseDBClearer {
 
     protected void dropView(String viewName) throws SQLException, StatementHandlerException {
-        String dropTableSQL = "drop table " + viewName + " cascade constraints";
+        String dropTableSQL = "drop view " + viewName + " cascade";
         statementHandler.handle(dropTableSQL);
     }
 
     protected void dropTable(String tableName) throws StatementHandlerException {
-        String dropTableSQL = "drop table " + tableName + " cascade constraints";
+        String dropTableSQL = "drop table " + tableName + " cascade";
         statementHandler.handle(dropTableSQL);
     }
 
     protected void dropSequences(Statement st) throws SQLException, StatementHandlerException {
         ResultSet rset = null;
         try {
-            rset = st.executeQuery("select SEQUENCE_NAME from USER_SEQUENCES");
+            rset = st.executeQuery("select SEQUENCE_NAME from INFORMATION_SCHEMA.SYSTEM_SEQUENCES");
             List<String> dropStatements = new ArrayList<String>();
             while (rset.next()) {
                 dropStatements.add("drop sequence " + rset.getString("SEQUENCE_NAME"));
@@ -37,5 +37,6 @@ public class OracleDBClearer extends BaseDBClearer {
             DbUtils.closeQuietly(rset);
         }
     }
+
 
 }
