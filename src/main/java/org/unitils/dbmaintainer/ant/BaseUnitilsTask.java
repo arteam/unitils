@@ -18,7 +18,7 @@ public abstract class BaseUnitilsTask extends Task {
     private static final String PROPKEY_DATASOURCEFACTORY_CLASSNAME = "dataSourceFactory.className";
 
     /* Property keys of the database schema name */
-    private static final String PROPKEY_DATABASE_USERNAME = "dataSource.userName";
+    private static final String PROPKEY_DATABASE_SCHEMANAME = "dataSource.schemaName";
 
     /* The pooled datasource instance */
     protected DataSource dataSource;
@@ -33,7 +33,7 @@ public abstract class BaseUnitilsTask extends Task {
         DataSourceFactory dataSourceFactory = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME));
         dataSourceFactory.init();
         dataSource = dataSourceFactory.createDataSource();
-        schemaName = configuration.getString(PROPKEY_DATABASE_USERNAME);
+        schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
         doExecute();
     }
 

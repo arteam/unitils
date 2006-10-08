@@ -1,8 +1,15 @@
 package org.unitils.dbmaintainer.ant;
 
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
+import org.unitils.dbmaintainer.clear.DBClearer;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.util.UnitilsConfiguration;
+import org.unitils.util.ReflectionUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,51 +22,29 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
 
     private static final Logger logger = Logger.getLogger(ClearDatabaseTask.class);
 
+    /* Property key of the implementation class of the {@link DBClearer} */
+    public static final String PROPKEY_DBCLEARER_START = "dbMaintainer.dbClearer.className";
+
+    /* Property key of the SQL dialect of the underlying DBMS implementation */
+    private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
+
     public void doExecute() throws BuildException {
-        Connection conn = null;
         try {
-            conn = dataSource.getConnection();
-            Statement st = conn.createStatement();
-
-            dropTables(conn, st);
-            dropSequences(conn, st);
-        } catch (Exception e) {
+            DBClearer dbClearer = createDBClearer();
+            dbClearer.clearDatabase();
+        } catch (StatementHandlerException e) {
             logger.error(e);
-            throw new BuildException("Error clearning database", e);
-        } finally {
-            DbUtils.closeQuietly(conn);
+            throw new BuildException("Error while clearing database", e);
         }
     }
 
-    private void dropTables(Connection conn, Statement st) throws SQLException {
-        ResultSet rset = null;
-        try {
-            DatabaseMetaData databaseMetadata = conn.getMetaData();
-            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, null);
-            while (rset.next()) {
-                String dropTableSQL = "drop table " + rset.getString("TABLE_NAME") + " cascade constraints";
-                logger.info(dropTableSQL);
-                st.execute(dropTableSQL);
-            }
-        } finally {
-            DbUtils.closeQuietly(rset);
-        }
-    }
-
-    private void dropSequences(Connection conn, Statement st) throws SQLException {
-        ResultSet rset = null;
-        try {
-            rset = st.executeQuery("select SEQUENCE_NAME from USER_SEQUENCES");
-            List<String> dropStatements = new ArrayList<String>();
-            while (rset.next()) {
-                dropStatements.add("drop sequence " + rset.getString("SEQUENCE_NAME"));
-            }
-            for (String dropStatement : dropStatements) {
-                logger.info(dropStatement);
-                st.execute(dropStatement);
-            }
-        } finally {
-            DbUtils.closeQuietly(rset);
-        }
+    private DBClearer createDBClearer() {
+        Configuration config = UnitilsConfiguration.getInstance();
+        StatementHandler statementHandler = new JDBCStatementHandler();
+        statementHandler.init(dataSource);
+        DBClearer dbClearer = ReflectionUtils.createInstanceOfType(config.getString(PROPKEY_DBCLEARER_START +
+            config.getString(PROPKEY_DATABASE_DIALECT)));
+        dbClearer.init(dataSource, statementHandler);
+        return dbClearer;
     }
 }

@@ -13,7 +13,7 @@ public class DatabaseAssert {
      */
     public static void assertDBContentAsExpected() throws Exception {
         DbUnitModule dbUnitModule = Unitils.getInstance().getModulesRepositoryImpl().getModule(DbUnitModule.class);
-        dbUnitModule.assertDBContentAsExpected();
+        dbUnitModule.assertDBContentAsExpected(Unitils.getTestContext().getTestClass(), Unitils.getTestContext().getTestMethod());
     }
 
 }

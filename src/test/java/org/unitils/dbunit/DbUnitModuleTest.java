@@ -65,7 +65,7 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
         mockInsertDatabaseOperation.execute(mockDbUnitDatabaseConnection, mockDbUnitDataSet);
         EasyMockModule.replay();
 
-        dbUnitModule.insertTestData();
+        dbUnitModule.insertTestData(null, null);
     }
 
     @DatabaseTest

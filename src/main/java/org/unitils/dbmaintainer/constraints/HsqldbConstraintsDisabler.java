@@ -63,7 +63,7 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
         ResultSet rs = null;
         try {
             conn = dataSource.getConnection();
-            rs = removeNotNullConstraints(conn, rs);
+            removeNotNullConstraints(conn);
         } catch (SQLException e) {
             throw new UnitilsException("Error while disabling constraints", e);
         } catch (StatementHandlerException e) {
@@ -74,30 +74,38 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
     }
 
     /**
-     * Remove all not-null constraints
+     * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
      * @param conn
-     * @param rs
-     * @return
      * @throws SQLException
      * @throws StatementHandlerException
      */
-    private ResultSet removeNotNullConstraints(Connection conn, ResultSet rs) throws SQLException, StatementHandlerException {
+    private void removeNotNullConstraints(Connection conn) throws SQLException, StatementHandlerException {
         // Iterate of all table names
         List<String> tableNames = getTableNames(conn);
-        DatabaseMetaData metaData = conn.getMetaData();
         for (String tableName : tableNames) {
+            removeNotNullConstraints(conn, tableName);
+        }
+    }
+
+    /**
+     * Sends statements to the StatementHandler that make sure all not-null constraints for the table with the given
+     * name are disabled.
+     * @param conn
+     * @throws SQLException
+     * @throws StatementHandlerException
+     */
+    private void removeNotNullConstraints(Connection conn, String tableName) throws SQLException, StatementHandlerException {
+        ResultSet rs = null;
+        try {
             // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
-            String primaryKeyColumnName = null;
-            rs = metaData.getPrimaryKeys(null, schemaName, tableName);
-            if (rs.next()) {
-                primaryKeyColumnName = rs.getString("COLUMN_NAME");
-            }
+            List<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(conn, tableName);
             // Iterate over all column names
+            DatabaseMetaData metaData = conn.getMetaData();
             rs = metaData.getColumns(null, schemaName, tableName, null);
             while (rs.next()) {
                 String columnName = rs.getString("COLUMN_NAME");
                 // Check if the column is not the primary key column
-                if (!columnName.equals(primaryKeyColumnName)) {
+                if (!primaryKeyColumnNames.contains(columnName)) {
                     // Check if the column has a not-null constraint
                     boolean nullable = rs.getBoolean("NULLABLE");
                     if (!nullable) {
@@ -107,8 +115,31 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
                     }
                 }
             }
+        } finally {
+            DbUtils.closeQuietly(rs);
         }
-        return rs;
+    }
+
+    /**
+     * Returns the names of the primary key columns of the table with the given tableName
+     * @param conn
+     * @param tableName
+     * @return the names of the primary key columns of the table with the given tableName
+     * @throws SQLException
+     */
+    private List<String> getPrimaryKeyColumnNames(Connection conn, String tableName) throws SQLException {
+        ResultSet rs = null;
+        try {
+            DatabaseMetaData metaData = conn.getMetaData();
+            List<String> primaryKeyColumnNames = new ArrayList<String>(1);
+            rs = metaData.getPrimaryKeys(null, schemaName, tableName);
+            while (rs.next()) {
+                primaryKeyColumnNames.add(rs.getString("COLUMN_NAME"));
+            }
+            return primaryKeyColumnNames;
+        } finally {
+            DbUtils.closeQuietly(rs);
+        }
     }
 
     /**

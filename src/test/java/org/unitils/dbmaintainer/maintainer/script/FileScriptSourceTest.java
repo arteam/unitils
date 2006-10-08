@@ -3,6 +3,7 @@ package org.unitils.dbmaintainer.maintainer.script;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
 import org.unitils.util.PropertiesUtils;
+import org.unitils.reflectionassert.ReflectionAssert;
 import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -21,13 +22,13 @@ public class FileScriptSourceTest extends TestCase {
 
     private static final String DBCHANGE_FILE_DIRECTORY = System.getProperty("java.io.tmpdir") + "/FileScriptSourceTest";
 
-    private static final String DBCHANGE_FILE1_CLASSPATH = "/be/ordina/unitils/dbmaintainer/maintainer/script/001_script.sql";
+    private static final String DBCHANGE_FILE1 = "001_script.sql";
 
-    private static final String DBCHANGE_FILE2_CLASSPATH = "/be/ordina/unitils/dbmaintainer/maintainer/script/002_script.sql";
+    private static final String DBCHANGE_FILE2 = "002_script.sql";
 
-    private static final String DBCHANGE_FILE1_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + "/001_script.sql";
+    private static final String DBCHANGE_FILE1_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE1;
 
-    private static final String DBCHANGE_FILE2_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + "/002_script.sql";
+    private static final String DBCHANGE_FILE2_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE2;
 
     private static final String[][] scriptSourceProperties = {
             {"dbMaintainer.fileScriptSource.dir", DBCHANGE_FILE_DIRECTORY},
@@ -37,7 +38,10 @@ public class FileScriptSourceTest extends TestCase {
     private Version versionIndex0, versionIndex1, versionIndex2, versionTimestampOld;
 
     private ScriptSource fromScratchFileScriptSource;
+
     private long file2Timestamp;
+
+    private static ReflectionAssert reflectionAssert = new ReflectionAssert();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -48,9 +52,9 @@ public class FileScriptSourceTest extends TestCase {
         testDir.mkdirs();
 
         // Copy test files
-        File f1 = copyFile(DBCHANGE_FILE1_CLASSPATH, DBCHANGE_FILE1_FILESYSTEM);
+        File f1 = copyFile(DBCHANGE_FILE1, DBCHANGE_FILE1_FILESYSTEM);
         long file1Timestamp = f1.lastModified();
-        File f2 = copyFile(DBCHANGE_FILE2_CLASSPATH, DBCHANGE_FILE2_FILESYSTEM);
+        File f2 = copyFile(DBCHANGE_FILE2, DBCHANGE_FILE2_FILESYSTEM);
         file2Timestamp = f2.lastModified();
 
         // Initialize version objects
@@ -107,12 +111,14 @@ public class FileScriptSourceTest extends TestCase {
         assertTrue(fromScratchFileScriptSource.shouldRunFromScratch(versionTimestampOld));
     }
 
-    private void checkScript1(VersionScriptPair script) {
-        checkScript(script, 1L, file2Timestamp, "Contents of script 1");
+    private void checkScript1(VersionScriptPair versionScriptPair) {
+        reflectionAssert.assertEquals(new VersionScriptPair(new Version(1L, file2Timestamp), "Contents of script 1"),
+                versionScriptPair);
     }
 
-    private void checkScript2(VersionScriptPair script) {
-        checkScript(script, 2L, file2Timestamp, "Contents of script 2");
+    private void checkScript2(VersionScriptPair versionScriptPair) {
+        reflectionAssert.assertEquals(new VersionScriptPair(new Version(2L, file2Timestamp), "Contents of script 2"),
+                versionScriptPair);
     }
 
     private void checkScript(VersionScriptPair script, long versionIndex, long versionTimestamp, String scriptContents) {
