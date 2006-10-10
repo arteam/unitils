@@ -19,6 +19,8 @@ import java.util.Collection;
 
 
 /**
+ * todo Better error messages when comparing collections.
+ *
  * A class for asserting that 2 objects are equal by comparing all fields of the objects using reflection.
  * <p/>
  * The (combination of) comparator modes specify how strict the comparison must be:<ul>
