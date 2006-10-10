@@ -22,9 +22,11 @@ public class OracleDBClearer extends BaseDBClearer {
         statementHandler.handle(dropTableSQL);
     }
 
-    protected void dropSequences(Statement st) throws SQLException, StatementHandlerException {
+    protected void dropSequences(Connection conn) throws SQLException, StatementHandlerException {
         ResultSet rset = null;
+        Statement st = null;
         try {
+            st = conn.createStatement();
             rset = st.executeQuery("select SEQUENCE_NAME from USER_SEQUENCES");
             List<String> dropStatements = new ArrayList<String>();
             while (rset.next()) {
@@ -34,8 +36,13 @@ public class OracleDBClearer extends BaseDBClearer {
                 statementHandler.handle(dropStatement);
             }
         } finally {
-            DbUtils.closeQuietly(rset);
+            DbUtils.closeQuietly(null, st, rset);
         }
+    }
+
+    // todo: implement
+    protected void dropTriggers(Connection conn) throws StatementHandlerException, SQLException {
+        throw new UnsupportedOperationException("todo: implement");
     }
 
 }

@@ -1,11 +1,14 @@
 package org.unitils.dbmaintainer.constraints;
 
 import org.unitils.UnitilsJUnit3;
+import org.unitils.core.Unitils;
+import org.unitils.util.ReflectionUtils;
+import org.unitils.util.UnitilsConfiguration;
 import org.unitils.dbunit.DatabaseTest;
 import org.unitils.db.annotations.AfterCreateDataSource;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.dbutils.DbUtils;
@@ -19,9 +22,9 @@ import java.sql.Statement;
  *
  */
 @DatabaseTest
-public class HsqldbConstraintsDisablerTest extends UnitilsJUnit3 {
+public class ConstraintsDisablerTest extends UnitilsJUnit3 {
 
-    private HsqldbConstraintsDisabler hsqldbConstraintsDisabler;
+    private ConstraintsDisabler constraintsDisabler;
 
     private DataSource dataSource;
 
@@ -33,13 +36,15 @@ public class HsqldbConstraintsDisablerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        hsqldbConstraintsDisabler = new HsqldbConstraintsDisabler();
-        Configuration config = new PropertiesConfiguration();
-        config.setProperty(HsqldbConstraintsDisabler.PROPKEY_SCHEMANAME, "public");
+        Configuration config = UnitilsConfiguration.getInstance();
 
         StatementHandler st = new JDBCStatementHandler();
         st.init(dataSource);
-        hsqldbConstraintsDisabler.init(config, dataSource, st);
+
+        constraintsDisabler = ReflectionUtils.createInstanceOfType(config.getString(DBMaintainer.PROPKEY_CONSTRAINTSDISABLER_START + '.' +
+                config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
+        constraintsDisabler.init(config, dataSource, st);
+        constraintsDisabler.init(config, dataSource, st);
 
         createTables();
     }
@@ -74,9 +79,9 @@ public class HsqldbConstraintsDisablerTest extends UnitilsJUnit3 {
             // Foreign key violation, should throw SQLException
         }
 
-        hsqldbConstraintsDisabler.disableConstraints();
+        constraintsDisabler.disableConstraints();
         Connection conn = dataSource.getConnection();
-        hsqldbConstraintsDisabler.disableConstraintsOnConnection(conn);
+        constraintsDisabler.disableConstraintsOnConnection(conn);
         // Should not throw exception anymore
         insertForeignKeyViolation(conn);
     }
@@ -95,9 +100,9 @@ public class HsqldbConstraintsDisablerTest extends UnitilsJUnit3 {
             // Foreign key violation, should throw SQLException
         }
 
-        hsqldbConstraintsDisabler.disableConstraints();
+        constraintsDisabler.disableConstraints();
         Connection conn = dataSource.getConnection();
-        hsqldbConstraintsDisabler.disableConstraintsOnConnection(conn);
+        constraintsDisabler.disableConstraintsOnConnection(conn);
         // Should not throw exception anymore
         insertNotNullViolation(conn);
     }
