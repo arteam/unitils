@@ -28,11 +28,6 @@ abstract public class BaseDBClearer implements DBClearer {
     public static final String PROPKEY_DATABASE_SCHEMANAME = "dataSource.schemaName";
 
     /**
-     *  Property key for the tables that should not be deleted
-     */
-    public static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.tablesToPreserve";
-
-    /**
      * The key of the property that specifies the name of the datase table in which the
      * DB version is stored. This table should not be deleted
      */
@@ -51,8 +46,8 @@ abstract public class BaseDBClearer implements DBClearer {
     /* The name of the database schema */
     protected String schemaName;
 
-    /* The tables that should not be cleaned */
-    protected Set<String> tablesToPreserve;
+    /* The name of the version table. This table will not be removed */
+    protected String versionTableName;
 
     public void init(DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
@@ -60,29 +55,18 @@ abstract public class BaseDBClearer implements DBClearer {
 
         Configuration configuration = UnitilsConfiguration.getInstance();
         schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
-
-        tablesToPreserve = new HashSet<String>();
-        tablesToPreserve.add(configuration.getString(PROPKEY_VERSION_TABLE_NAME));
-        tablesToPreserve.addAll(toUpperCaseList(Arrays.asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
-    }
-
-    private List<String> toUpperCaseList(List<String> strings) {
-        List<String> toUpperCaseList = new ArrayList<String>();
-        for (String string : strings) {
-            toUpperCaseList.add(string.toUpperCase());
-        }
-        return toUpperCaseList;
+        versionTableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME);
     }
 
     public void clearDatabase() throws StatementHandlerException {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            Statement st = conn.createStatement();
 
             dropViews(conn);
             dropTables(conn);
-            dropSequences(st);
+            dropSequences(conn);
+            dropTriggers(conn);
         } catch (SQLException e) {
             throw new RuntimeException("Error while clearing database", e);
         } finally {
@@ -93,16 +77,14 @@ abstract public class BaseDBClearer implements DBClearer {
     private void dropViews(Connection conn) throws SQLException, StatementHandlerException {
         List<String> viewNames = getViewNames(conn);
         for (String viewName : viewNames) {
-            if (!tablesToPreserve.contains(viewName)) {
-                dropView(viewName);
-            }
+            dropView(viewName);
         }
     }
 
     private void dropTables(Connection conn) throws SQLException, StatementHandlerException {
         List<String> tableNames = getTableNames(conn);
         for (String tableName : tableNames) {
-            if (!tablesToPreserve.contains(tableName)) {
+            if (!tableName.equalsIgnoreCase(versionTableName)) {
                 dropTable(tableName);
             }
         }
@@ -144,5 +126,8 @@ abstract public class BaseDBClearer implements DBClearer {
         }
     }
 
-    abstract protected void dropSequences(Statement st) throws SQLException, StatementHandlerException;
+    abstract protected void dropSequences(Connection conn) throws StatementHandlerException, SQLException;
+
+    abstract protected void dropTriggers(Connection conn) throws StatementHandlerException, SQLException;
+
 }

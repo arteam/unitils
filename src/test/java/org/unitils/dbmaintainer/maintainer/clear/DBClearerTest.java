@@ -51,50 +51,100 @@ public class DBClearerTest extends UnitilsJUnit3 {
         dbClearer = ReflectionUtils.createInstanceOfType(config.getString(DBMaintainer.PROPKEY_DBCLEARER_START + '.' +
                 config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
         dbClearer.init(dataSource, statementHandler);
+
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            createTestTables(conn);
+            createTestIndex(conn);
+            createTestView(conn);
+        } finally{
+            DbUtils.closeQuietly(conn);
+        }
+
+    }
+
+    protected void tearDown() throws Exception {
+       Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            dropTestView(conn);
+            dropTestTables(conn);
+        } finally{
+            DbUtils.closeQuietly(conn);
+        }
+
+        super.tearDown();
     }
 
     public void testClearDatabase_tables() throws Exception {
-        createTestTables();
         assertTrue(tableExists("testtable1"));
-        assertTrue(tableExists("testtable2"));
+        assertTrue(tableExists("db_version"));
         dbClearer.clearDatabase();
         assertFalse(tableExists("testtable1"));
-        assertTrue(tableExists("testtable2"));
+        assertTrue(tableExists("db_version"));
     }
 
     public void testClearDatabase_views() throws Exception {
-        createTestTables();
-        createTestView();
         assertTrue(tableExists("testview"));
         dbClearer.clearDatabase();
         assertFalse(tableExists("testview"));
     }
 
-    private void createTestTables() throws SQLException {
-        Connection conn = null;
+    private void createTestTables(Connection conn) throws SQLException {
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            st.execute("create table testtable1 (col1 varchar(10))");
+            st.execute("create table db_version (col1 varchar(10))");
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    private void createTestIndex(Connection conn) throws SQLException {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            st.execute("create index testindex on testtable1(col1)");
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    private void dropTestTables(Connection conn) throws SQLException {
         Statement st = null;
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("drop table testtable1 if exists");
-            st.execute("drop table testtable2 if exists");
-            st.execute("create table testtable1 (col1 varchar(10))");
-            st.execute("create table testtable2 (col1 varchar(10))");
+            st.execute("drop table db_version if exists");
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    private void createTestView(Connection conn) throws SQLException {
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            // Make sure previous setup is cleaned up
+            st.execute("create view testview as select col1 from db_version");
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
 
-    private void createTestView() throws SQLException {
-        Connection conn = null;
+    private void dropTestView(Connection conn) throws SQLException {
         Statement st = null;
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("drop view testview if exists");
-            st.execute("create view testview as select col1 from testtable2");
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }
