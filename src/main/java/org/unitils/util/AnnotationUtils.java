@@ -68,18 +68,9 @@ public class AnnotationUtils {
      * @param annotation
      * @return
      */
-    public static <T extends Annotation> T getClassAnnotation(Class clazz, Class<T> annotation) {
+    public static <T extends Annotation> T getClassAnnotation(Class<? extends Object> clazz, Class<T> annotation) {
 
-        if (Object.class.equals(clazz)) {
-            return null;
-        } else {
-            T foundAnnotation = (T) clazz.getAnnotation(annotation);
-            if (foundAnnotation != null) {
-                return foundAnnotation;
-            } else {
-                return getClassAnnotation(clazz.getSuperclass(), annotation);
-            }
-        }
+        return clazz.getAnnotation(annotation);
     }
 
 
