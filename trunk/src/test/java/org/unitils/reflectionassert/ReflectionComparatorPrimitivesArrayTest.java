@@ -6,8 +6,9 @@
  */
 package org.unitils.reflectionassert;
 
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
 import junit.framework.TestCase;
+import org.unitils.reflectionassert.ReflectionComparator.Difference;
+import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
 
 
 /**
@@ -21,6 +22,9 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
 
     /* Same as A but different instance */
     private int[] arrayB;
+
+    /* Same as A but different order of values*/
+    private int[] arrayDifferentOrder;
 
     /* Same as A and B but different int value for element 2 */
     private int[] arrayDifferentValue;
@@ -43,6 +47,9 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
     /* Class under test */
     private ReflectionComparator reflectionComparator;
 
+    /* Class under test lenient order version */
+    private ReflectionComparator reflectionComparatorLenientOrder;
+
     /**
      * Initializes the test fixture.
      */
@@ -51,6 +58,7 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
 
         arrayA = new int[]{1, 2, 3};
         arrayB = new int[]{1, 2, 3};
+        arrayDifferentOrder = new int[]{3, 1, 2};
         arrayDifferentValue = new int[]{1, 9999, 3};
         arrayDifferentSize = new int[]{1, 2};
 
@@ -60,6 +68,7 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
         arrayInnerDifferentSize = new Element(arrayDifferentSize);
 
         reflectionComparator = new ReflectionComparator();
+        reflectionComparatorLenientOrder = new ReflectionComparator(LENIENT_ORDER);
     }
 
 
@@ -86,6 +95,30 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
 
 
     /**
+     * Test for two equal arrays with different order and no lenient order.
+     */
+    public void testCheckEquals_notEqualsDifferentOrder() {
+
+        Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentOrder);
+
+        assertNotNull(result);
+        assertEquals("0", result.getFieldStack().get(0));
+        assertEquals(1, result.getLeftValue());
+        assertEquals(3, result.getRightValue());
+    }
+
+    /**
+     * Test for two equal arrays with different order but with lenient order.
+     */
+    public void testCheckEquals_equalsLenientOrder() {
+
+        Difference result = reflectionComparatorLenientOrder.getDifference(arrayA, arrayDifferentOrder);
+
+        assertNull(result);
+    }
+
+
+    /**
      * Test for two arrays that contain different values.
      */
     public void testCheckEquals_notEqualsDifferentValues() {
@@ -93,9 +126,9 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentValue);
 
         assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
-        assertSame(arrayA, result.getLeftValue());
-        assertSame(arrayDifferentValue, result.getRightValue());
+        assertEquals("1", result.getFieldStack().get(0));
+        assertEquals(2, result.getLeftValue());
+        assertEquals(9999, result.getRightValue());
     }
 
 
@@ -122,8 +155,9 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
 
         assertNotNull(result);
         assertEquals("inner", result.getFieldStack().get(0));
-        assertSame(arrayA, result.getLeftValue());
-        assertSame(arrayDifferentValue, result.getRightValue());
+        assertEquals("1", result.getFieldStack().get(1));
+        assertEquals(2, result.getLeftValue());
+        assertEquals(9999, result.getRightValue());
     }
 
 

@@ -1,9 +1,9 @@
 package org.unitils.reflectionassert;
 
-import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,14 +27,15 @@ public class ReflectionAssertCollectionsTest extends TestCase {
 
     private List<String> listOneElementMore = Arrays.asList("el1", "el2", "el3");
 
-    private List<TestObject> listObjects = Arrays.asList(new TestObject("el1"), new TestObject("el2"));
+    private List<TestObject> listObjects = Arrays.asList(new TestObject(1, "el1"), new TestObject(2, "el2"));
 
-    private List<TestObject> listObjectsDifferentSequence = Arrays.asList(new TestObject("el2"), new TestObject("el1"));
+    private List<TestObject> listObjectsDifferentSequence = Arrays.asList(new TestObject(2, "el2"), new TestObject(1, "el1"));
 
-    private List<TestObject> differentListObjects = Arrays.asList(new TestObject("el2"), new TestObject("el3"));
+    private List<TestObject> differentListObjects = Arrays.asList(new TestObject(2, "el2"), new TestObject(3, "el3"));
 
     /* Class under test */
     private ReflectionAssert reflectionAssert;
+    private ReflectionAssert reflectionAssertLenientOrder;
 
     /**
      * Initializes the test fixture.
@@ -43,6 +44,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
         super.setUp();
 
         reflectionAssert = new ReflectionAssert();
+        reflectionAssertLenientOrder = new ReflectionAssert(LENIENT_ORDER);
     }
 
 
@@ -51,7 +53,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     }
 
     public void testAssertEquals_differentSequence() {
-        new ReflectionAssert(LENIENT_ORDER).assertEquals(list, listDifferentSequence);
+        reflectionAssertLenientOrder.assertEquals(list, listDifferentSequence);
     }
 
     public void testAssertEquals_differentListSameSize() {
@@ -182,21 +184,36 @@ public class ReflectionAssertCollectionsTest extends TestCase {
         Assert.fail("Expected AssertionFailedError");
     }
 
+    public void testAssertPropertyEquals_equalsPrimitivesList() {
+
+        reflectionAssertLenientOrder.assertPropertyEquals("testPrimitive", Arrays.asList(2L, 1L), listObjects);
+    }
+
+    public void testAssertPropertyEquals_notEqualsPrimitivesList() {
+
+        reflectionAssertLenientOrder.assertPropertyEquals("testPrimitive", Arrays.asList(999L, 1L), listObjects);
+    }
+
+
     public class TestObject {
+
+        private long testPrimitive;
 
         private String testProperty;
 
-        public TestObject(String testProperty) {
+        public TestObject(long testPrimitive, String testProperty) {
+            this.testPrimitive = testPrimitive;
             this.testProperty = testProperty;
+        }
+
+        public long getTestPrimitive() {
+            return testPrimitive;
         }
 
         public String getTestProperty() {
             return testProperty;
         }
 
-        public void setTestProperty(String testProperty) {
-            this.testProperty = testProperty;
-        }
 
     }
 
