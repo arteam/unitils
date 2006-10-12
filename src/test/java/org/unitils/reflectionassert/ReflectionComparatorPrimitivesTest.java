@@ -6,8 +6,8 @@
  */
 package org.unitils.reflectionassert;
 
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
 import junit.framework.TestCase;
+import org.unitils.reflectionassert.ReflectionComparator.Difference;
 
 
 /**
@@ -69,6 +69,18 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertNull(result);
     }
 
+    /**
+     * Test for two equal autoboxing.
+     * An autoboxed primitive should be considered equals to the object version.
+     */
+    public void testCheckEquals_equalsAutoboxing() {
+
+        //noinspection UnnecessaryBoxing
+        Difference result = reflectionComparator.getDifference(5L, new Long(5));
+
+        assertNull(result);
+    }
+
 
     /**
      * Test for two equal primitives as an inner field of an object.
@@ -90,8 +102,8 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
 
         assertNotNull(result);
         assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(new Integer(2), result.getLeftValue());
-        assertEquals(new Integer(9999), result.getRightValue());
+        assertEquals(2, result.getLeftValue());
+        assertEquals(9999, result.getRightValue());
     }
 
 
@@ -104,8 +116,8 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
 
         assertNotNull(result);
         assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(new Integer(2), result.getLeftValue());
-        assertEquals(new Integer(0), result.getRightValue());
+        assertEquals(2, result.getLeftValue());
+        assertEquals(0, result.getRightValue());
     }
 
 
@@ -118,8 +130,8 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
 
         assertNotNull(result);
         assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(new Integer(0), result.getLeftValue());
-        assertEquals(new Integer(2), result.getRightValue());
+        assertEquals(0, result.getLeftValue());
+        assertEquals(2, result.getRightValue());
     }
 
 
@@ -133,8 +145,8 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertNotNull(result);
         assertEquals("inner", result.getFieldStack().get(0));
         assertEquals("intValue2", result.getFieldStack().get(1));
-        assertEquals(new Integer(2), result.getLeftValue());
-        assertEquals(new Integer(9999), result.getRightValue());
+        assertEquals(2, result.getLeftValue());
+        assertEquals(9999, result.getRightValue());
     }
 
 
