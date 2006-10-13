@@ -7,8 +7,10 @@
 package org.unitils.dbmaintainer.config;
 
 import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp.BasicDataSource;
 import static org.easymock.classextension.EasyMock.*;
+import org.unitils.core.UnitilsConfigurationLoader;
 
 /**
  * todo
@@ -20,13 +22,16 @@ public class PropertiesDataSourceFactoryTest extends TestCase {
     private BasicDataSource mockBasicDataSource;
 
     public void setUp() throws Exception {
+
+        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+
         mockBasicDataSource = createMock(BasicDataSource.class);
         propertiesFileDataSourceConfig = new PropertiesDataSourceFactory() {
             protected BasicDataSource getNewDataSource() {
                 return mockBasicDataSource;
             }
         };
-        propertiesFileDataSourceConfig.init();
+        propertiesFileDataSourceConfig.init(configuration);
     }
 
     public void testCreateDataSource() {

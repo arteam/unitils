@@ -2,20 +2,27 @@ package org.unitils.dbmaintainer.maintainer.clear;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
-import org.unitils.util.UnitilsConfiguration;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
+import org.unitils.core.UnitilsConfigurationLoader;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.ResultSet;
 
 /**
  */
 public class HsqldbDBClearerTest extends DBClearerTest {
 
+
+    private boolean hsqldbDialectActivated;
+
     protected void setUp() throws Exception {
-        if (hsqldbDialectActivated()) {
+
+        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        hsqldbDialectActivated = "hsqldb".equals(configuration.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
+
+        if (hsqldbDialectActivated) {
             super.setUp();
 
             createTrigger();
@@ -23,7 +30,7 @@ public class HsqldbDBClearerTest extends DBClearerTest {
     }
 
     protected void tearDown() throws Exception {
-        if (hsqldbDialectActivated()) {
+        if (hsqldbDialectActivated) {
             if (triggerExists()) {
                 dropTrigger();
             }
@@ -33,7 +40,7 @@ public class HsqldbDBClearerTest extends DBClearerTest {
     }
 
     public void testClearDatabase_triggers() throws Exception {
-        if (hsqldbDialectActivated()) {
+        if (hsqldbDialectActivated) {
             assertTrue(triggerExists());
             dbClearer.clearDatabase();
             assertFalse(triggerExists());
@@ -85,8 +92,4 @@ public class HsqldbDBClearerTest extends DBClearerTest {
         }
     }
 
-    private boolean hsqldbDialectActivated() {
-        Configuration config = UnitilsConfiguration.getInstance();
-        return "hsqldb".equals(config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
-    }
 }

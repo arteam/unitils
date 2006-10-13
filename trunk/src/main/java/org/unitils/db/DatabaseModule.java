@@ -1,28 +1,27 @@
 package org.unitils.db;
 
 import org.apache.commons.configuration.Configuration;
+import org.unitils.core.TestContext;
 import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.UnitilsModule;
+import org.unitils.db.annotations.AfterCreateConnection;
+import org.unitils.db.annotations.AfterCreateDataSource;
 import org.unitils.dbmaintainer.config.DataSourceFactory;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbmaintainer.constraints.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
-import org.unitils.util.ReflectionUtils;
-import org.unitils.util.UnitilsConfiguration;
-import org.unitils.util.AnnotationUtils;
+import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbunit.DatabaseTest;
-import org.unitils.db.annotations.AfterCreateDataSource;
-import org.unitils.db.annotations.AfterCreateConnection;
+import org.unitils.util.AnnotationUtils;
+import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -54,18 +53,31 @@ public class DatabaseModule implements UnitilsModule {
     /* The pooled datasource instance */
     private DataSource dataSource;
 
+    private Configuration configuration;
+
+    private boolean disableConstraints;
+
+    private boolean updateDatabaseSchemaEnabled;
+
     /*
     * Database connection holder: ensures that if the method getCurrentConnection is always used for getting
     * a connection to the database, at most one database connection exists per thread
     */
     private ThreadLocal<Connection> connectionHolder = new ThreadLocal<Connection>();
 
+    public void init(Configuration configuration) {
+        this.configuration = configuration;
+
+        disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
+        updateDatabaseSchemaEnabled = configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED);
+    }
+
     /**
      * @param testClass
      * @return True if the test class is a database test, i.e. is annotated with the {@link DatabaseTest} annotation,
-     * false otherwise
+     *         false otherwise
      */
-    protected boolean isDatabaseTest(Class testClass) {
+    protected boolean isDatabaseTest(Class<?> testClass) {
         return AnnotationUtils.getClassAnnotation(testClass, DatabaseTest.class) != null;
     }
 
@@ -92,46 +104,38 @@ public class DatabaseModule implements UnitilsModule {
      * @return the datasource
      */
     protected DataSource createDataSource() {
-        DataSourceFactory dataSourceFactory = getDataSourceFactory();
-        dataSourceFactory.init();
-        DataSource ds = dataSourceFactory.createDataSource();
+        DataSourceFactory dataSourceFactory = createDataSourceFactory();
+        dataSourceFactory.init(configuration);
+        DataSource dataSource = dataSourceFactory.createDataSource();
 
-        // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is returned that wrappes the
-        // DataSource object
-        Configuration configuration = UnitilsConfiguration.getInstance();
-        boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
+        // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is
+        // returned that wrappes the DataSource object
         if (disableConstraints) {
-            ConstraintsDisabler constraintsDisabler = createConstraintsDisabler(configuration, ds);
-            return new ConstraintsCheckDisablingDataSource(ds, constraintsDisabler);
-        } else {
-            return ds;
+            ConstraintsDisabler constraintsDisabler = createConstraintsDisabler(dataSource);
+            dataSource = new ConstraintsCheckDisablingDataSource(dataSource, constraintsDisabler);
         }
+        return dataSource;
     }
 
     /**
      * Creates the configured instance of the {@link ConstraintsDisabler}
-     * @param configuration
-     * @param ds
+     *
+     * @param dataSource
      * @return The configured instance of the {@link ConstraintsDisabler}
      */
-    protected ConstraintsDisabler createConstraintsDisabler(Configuration configuration, DataSource ds) {
-        StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(ds);
+    protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
+
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
-        ConstraintsDisabler constraintsDisabler = ReflectionUtils.createInstanceOfType(configuration.getString(
-                PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect));
-        constraintsDisabler.init(configuration, ds, statementHandler);
+        String constraintsDisablerClassName = configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect);
+
+        StatementHandler statementHandler = new JDBCStatementHandler();
+        statementHandler.init(configuration, dataSource);
+
+        ConstraintsDisabler constraintsDisabler = ReflectionUtils.createInstanceOfType(constraintsDisablerClassName);
+        constraintsDisabler.init(configuration, dataSource, statementHandler);
         return constraintsDisabler;
     }
 
-    /**
-     * Returns an instance of the configured {@link DataSourceFactory}
-     * @return The configured {@link DataSourceFactory}
-     */
-    protected DataSourceFactory getDataSourceFactory() {
-        return ReflectionUtils.createInstanceOfType(
-                UnitilsConfiguration.getInstance().getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME));
-    }
 
     /**
      * @return The <code>DataSource</code>
@@ -158,6 +162,7 @@ public class DatabaseModule implements UnitilsModule {
 
     /**
      * Calls all methods annotated with {@link AfterCreateDataSource}
+     *
      * @param testObject
      */
     protected void callAfterCreateDataSourceMethods(Object testObject) {
@@ -176,6 +181,7 @@ public class DatabaseModule implements UnitilsModule {
 
     /**
      * Calls all methods annotated with {@link AfterCreateConnection}
+     *
      * @param testObject
      */
     protected void callAfterCreateConnectionMethods(Object testObject) {
@@ -197,20 +203,20 @@ public class DatabaseModule implements UnitilsModule {
      * latest changes. See {@link org.unitils.dbmaintainer.maintainer.DBMaintainer} for more information.
      */
     protected void updateDatabaseSchemaIfNeeded() throws StatementHandlerException {
-        Configuration configuration = UnitilsConfiguration.getInstance();
 
-        if (configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED)) {
-            DBMaintainer dbMaintainer = createDbMaintainer();
+        if (updateDatabaseSchemaEnabled) {
+            DBMaintainer dbMaintainer = createDbMaintainer(configuration);
             dbMaintainer.updateDatabase();
         }
     }
 
     /**
      * Creates a new instance of the DBMaintainer for the given <code>DataSource</code>
+     *
      * @return a new instance of the DBMaintainer
      */
-    protected DBMaintainer createDbMaintainer() {
-        return new DBMaintainer(dataSource);
+    protected DBMaintainer createDbMaintainer(Configuration configuration) {
+        return new DBMaintainer(configuration, dataSource);
     }
 
     /**
@@ -221,24 +227,37 @@ public class DatabaseModule implements UnitilsModule {
     }
 
     /**
+     * Returns an instance of the configured {@link DataSourceFactory}
+     *
+     * @return The configured {@link DataSourceFactory}
+     */
+    protected DataSourceFactory createDataSourceFactory() {
+        String dataSourceFactoryClassName = configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME);
+        return ReflectionUtils.createInstanceOfType(dataSourceFactoryClassName);
+    }
+
+
+    /**
      * DatabaseTestListener that makes callbacks to methods of this module while running tests.
      */
     private class DatabaseTestListener extends TestListener {
 
-        public void beforeTestClass() {
-            if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
-                initDatabase(Unitils.getTestContext().getTestObject());
-           }
+        @Override
+        public void beforeTestClass(TestContext testContext) {
+            if (isDatabaseTest(testContext.getTestClass())) {
+                initDatabase(testContext.getTestObject());
+            }
         }
 
         // todo these calls must be done each time a new test object is created. For JUnit this is before every test
         // for TestNG this is before every test class.
-        public void beforeTestMethod() {
-            if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
+        @Override
+        public void beforeTestMethod(TestContext testContext) {
+            if (isDatabaseTest(testContext.getTestClass())) {
                 //call methods annotated with AfterCreateDataSource, if any
-                callAfterCreateDataSourceMethods(Unitils.getTestContext().getTestObject());
+                callAfterCreateDataSourceMethods(testContext.getTestObject());
                 //call methods annotated with AfterCreateConnection, if any
-                callAfterCreateConnectionMethods(Unitils.getTestContext().getTestObject());
+                callAfterCreateConnectionMethods(testContext.getTestObject());
             }
         }
 

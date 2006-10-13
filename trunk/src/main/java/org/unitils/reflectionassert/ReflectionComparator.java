@@ -163,7 +163,7 @@ public class ReflectionComparator {
         // check primitive and object arrays
         Class clazz = left.getClass();
         if (clazz.isArray()) {
-            return compareArrays(left, right, clazz, fieldStack, traversedInstanceMap);
+            return compareArrays(left, right, fieldStack, traversedInstanceMap);
         }
 
         // check objects
@@ -215,7 +215,7 @@ public class ReflectionComparator {
      * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
      * @return the difference, null if there is no difference
      */
-    private Difference compareArrays(Object left, Object right, Class clazz, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
+    private Difference compareArrays(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         // If needed convert primitive array to object array
         Object[] leftObjectArray;
@@ -344,7 +344,6 @@ public class ReflectionComparator {
         // Create copy from which we can remove elements.
         ArrayList rightCopy = new ArrayList<Object>(right);
 
-        int i = 0;
         for (Object lhsValue : left) {
 
             boolean found = false;

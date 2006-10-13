@@ -164,7 +164,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
         try {
             reflectionAssert.assertPropertyEquals("testProperty", list, differentListObjects);
         } catch (AssertionFailedError e) {
-            // Excpected
+            // Expected
             return;
         }
         Assert.fail("Expected AssertionFailedError");
@@ -178,7 +178,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
         try {
             reflectionAssert.assertPropertyEquals("testProperty", list, listObjectsDifferentSequence);
         } catch (AssertionFailedError e) {
-            // Excpected
+            // Expected
             return;
         }
         Assert.fail("Expected AssertionFailedError");
@@ -191,7 +191,13 @@ public class ReflectionAssertCollectionsTest extends TestCase {
 
     public void testAssertPropertyEquals_notEqualsPrimitivesList() {
 
-        reflectionAssertLenientOrder.assertPropertyEquals("testPrimitive", Arrays.asList(999L, 1L), listObjects);
+        try {
+            reflectionAssertLenientOrder.assertPropertyEquals("testPrimitive", Arrays.asList(999L, 1L), listObjects);
+        } catch (AssertionFailedError e) {
+            // Expected
+            return;
+        }
+        Assert.fail("Expected AssertionFailedError");
     }
 
 

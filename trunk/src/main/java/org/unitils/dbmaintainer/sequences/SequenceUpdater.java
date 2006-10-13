@@ -2,6 +2,7 @@ package org.unitils.dbmaintainer.sequences;
 
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.apache.commons.configuration.Configuration;
 
 import javax.sql.DataSource;
 
@@ -17,7 +18,7 @@ public interface SequenceUpdater {
      * @param dataSource
      * @param statementHandler
      */
-    void init(DataSource dataSource, StatementHandler statementHandler);
+    void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler);
 
     /**
      * Updates the database sequences

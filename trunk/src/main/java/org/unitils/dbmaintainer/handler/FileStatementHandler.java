@@ -6,7 +6,6 @@
  */
 package org.unitils.dbmaintainer.handler;
 
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.Configuration;
 
 import javax.sql.DataSource;
@@ -32,11 +31,10 @@ public class FileStatementHandler implements StatementHandler {
     private String fileName;
 
     /**
-     * @see StatementHandler#init(javax.sql.DataSource)
+     * @see StatementHandler#init(Configuration, DataSource)
      */
-    public void init(DataSource dataSource) {
+    public void init(Configuration configuration, DataSource dataSource) {
 
-        Configuration configuration = UnitilsConfiguration.getInstance();
         fileName = configuration.getString(PROPKEY_FILENAME);
     }
 

@@ -1,25 +1,21 @@
 package org.unitils.dbmaintainer.maintainer.clear;
 
-import org.unitils.UnitilsJUnit3;
-import org.unitils.util.UnitilsConfiguration;
-import org.unitils.util.ReflectionUtils;
-import org.unitils.dbmaintainer.clear.DBClearer;
-import org.unitils.dbmaintainer.clear.BaseDBClearer;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.dbmaintainer.clean.DefaultDBCleaner;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
-import org.unitils.db.annotations.AfterCreateDataSource;
-import org.unitils.dbunit.DatabaseTest;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.db.annotations.AfterCreateDataSource;
+import org.unitils.dbmaintainer.clean.DefaultDBCleaner;
+import org.unitils.dbmaintainer.clear.BaseDBClearer;
+import org.unitils.dbmaintainer.clear.DBClearer;
+import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.maintainer.DBMaintainer;
+import org.unitils.dbunit.DatabaseTest;
+import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  */
@@ -40,17 +36,17 @@ public class DBClearerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration config = UnitilsConfiguration.getInstance();
-        config.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "testtable2");
+        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "testtable2");
 
-        schemaName = config.getString(BaseDBClearer.PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
+        schemaName = configuration.getString(BaseDBClearer.PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
 
         StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(dataSource);
+        statementHandler.init(configuration, dataSource);
 
-        dbClearer = ReflectionUtils.createInstanceOfType(config.getString(DBMaintainer.PROPKEY_DBCLEARER_START + '.' +
-                config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
-        dbClearer.init(dataSource, statementHandler);
+        dbClearer = ReflectionUtils.createInstanceOfType(configuration.getString(DBMaintainer.PROPKEY_DBCLEARER_START + '.' +
+                configuration.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
+        dbClearer.init(configuration, dataSource, statementHandler);
 
         Connection conn = null;
         try {
@@ -58,19 +54,19 @@ public class DBClearerTest extends UnitilsJUnit3 {
             createTestTables(conn);
             createTestIndex(conn);
             createTestView(conn);
-        } finally{
+        } finally {
             DbUtils.closeQuietly(conn);
         }
 
     }
 
     protected void tearDown() throws Exception {
-       Connection conn = null;
+        Connection conn = null;
         try {
             conn = dataSource.getConnection();
             dropTestView(conn);
             dropTestTables(conn);
-        } finally{
+        } finally {
             DbUtils.closeQuietly(conn);
         }
 

@@ -1,22 +1,17 @@
 package org.unitils.dbmaintainer.clear;
 
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 import javax.sql.DataSource;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
 import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  */
@@ -49,11 +44,10 @@ abstract public class BaseDBClearer implements DBClearer {
     /* The name of the version table. This table will not be removed */
     protected String versionTableName;
 
-    public void init(DataSource dataSource, StatementHandler statementHandler) {
+    public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
 
-        Configuration configuration = UnitilsConfiguration.getInstance();
         schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
         versionTableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME);
     }
@@ -99,7 +93,7 @@ abstract public class BaseDBClearer implements DBClearer {
         try {
             List<String> tableNames = new ArrayList<String>();
             DatabaseMetaData databaseMetadata = conn.getMetaData();
-            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, new String[] {"VIEW"});
+            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, new String[]{"VIEW"});
             while (rset.next()) {
                 String tableName = rset.getString("TABLE_NAME");
                 tableNames.add(tableName);
@@ -115,7 +109,7 @@ abstract public class BaseDBClearer implements DBClearer {
         try {
             List<String> tableNames = new ArrayList<String>();
             DatabaseMetaData databaseMetadata = conn.getMetaData();
-            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, new String[] {"TABLE"});
+            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, new String[]{"TABLE"});
             while (rset.next()) {
                 String tableName = rset.getString("TABLE_NAME");
                 tableNames.add(tableName);

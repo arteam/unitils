@@ -1,11 +1,11 @@
 package org.unitils.dbmaintainer.ant;
 
-import org.unitils.dbmaintainer.config.DataSourceFactory;
-import org.unitils.util.ReflectionUtils;
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.unitils.core.Unitils;
+import org.unitils.dbmaintainer.config.DataSourceFactory;
+import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
 
@@ -29,9 +29,10 @@ public abstract class BaseUnitilsTask extends Task {
 
     public final void execute() throws BuildException {
 
-        Configuration configuration = UnitilsConfiguration.getInstance();
+        //todo move implementation to module?
+        Configuration configuration = Unitils.getInstance().getConfiguration();
         DataSourceFactory dataSourceFactory = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME));
-        dataSourceFactory.init();
+        dataSourceFactory.init(configuration);
         dataSource = dataSourceFactory.createDataSource();
         schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
         doExecute();

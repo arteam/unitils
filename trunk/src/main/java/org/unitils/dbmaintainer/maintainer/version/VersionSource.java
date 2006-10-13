@@ -6,6 +6,8 @@
  */
 package org.unitils.dbmaintainer.maintainer.version;
 
+import org.apache.commons.configuration.Configuration;
+
 import javax.sql.DataSource;
 
 /**
@@ -18,7 +20,7 @@ public interface VersionSource {
      *
      * @param dataSource
      */
-    void init(DataSource dataSource);
+    void init(Configuration configuration, DataSource dataSource);
 
     /**
      * Returns the current version of the underlying database

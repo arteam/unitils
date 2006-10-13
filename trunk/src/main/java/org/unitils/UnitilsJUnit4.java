@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
  * todo javadoc
  */
 @RunWith(UnitilsJUnit4TestClassRunner.class)
-public class UnitilsJUnit4 {
+public abstract class UnitilsJUnit4 {
 
 
 }

@@ -1,19 +1,19 @@
 package org.unitils.dbmaintainer.clean;
 
-import org.unitils.dbunit.DatabaseTest;
-import org.unitils.db.annotations.AfterCreateDataSource;
-import org.unitils.UnitilsJUnit3;
-import org.unitils.util.UnitilsConfiguration;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbutils.DbUtils;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.db.annotations.AfterCreateDataSource;
+import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbunit.DatabaseTest;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.ResultSet;
 
 /**
  */
@@ -32,14 +32,14 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration config = UnitilsConfiguration.getInstance();
-        config.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "testtable2,testtable3");
+        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "testtable2,testtable3");
 
         StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(dataSource);
+        statementHandler.init(configuration, dataSource);
 
         dbCleaner = new DefaultDBCleaner();
-        dbCleaner.init(dataSource, statementHandler);
+        dbCleaner.init(configuration, dataSource, statementHandler);
 
         createTestTables();
         insertTestRecords();

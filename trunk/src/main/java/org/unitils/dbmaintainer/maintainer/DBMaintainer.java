@@ -6,6 +6,8 @@
  */
 package org.unitils.dbmaintainer.maintainer;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.unitils.dbmaintainer.clear.DBClearer;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
 import org.unitils.dbmaintainer.dtd.DtdGenerator;
@@ -19,9 +21,6 @@ import org.unitils.dbmaintainer.script.SQLScriptRunner;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
 import org.unitils.util.ReflectionUtils;
-import org.unitils.util.UnitilsConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -134,26 +133,24 @@ public class DBMaintainer {
      *
      * @param dataSource
      */
-    public DBMaintainer(DataSource dataSource) {
-
-        Configuration configuration = UnitilsConfiguration.getInstance();
+    public DBMaintainer(Configuration configuration, DataSource dataSource) {
 
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
 
         versionSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_VERSIONSOURCE));
-        versionSource.init(dataSource);
+        versionSource.init(configuration, dataSource);
 
         scriptSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_SCRIPTSOURCE));
-        scriptSource.init();
+        scriptSource.init(configuration);
 
         StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler) ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_STATEMENTHANDLER)));
-        statementHandler.init(dataSource);
+        statementHandler.init(configuration, dataSource);
         scriptRunner = new SQLScriptRunner(statementHandler);
 
         fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
         if (fromScratchEnabled) {
             dbClearer = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DBCLEARER_START + "." + databaseDialect));
-            dbClearer.init(dataSource, statementHandler);
+            dbClearer.init(configuration, dataSource, statementHandler);
         }
 
         boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
@@ -165,13 +162,13 @@ public class DBMaintainer {
         boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
         if (updateSequences) {
             sequenceUpdater = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
-            sequenceUpdater.init(dataSource, statementHandler);
+            sequenceUpdater.init(configuration, dataSource, statementHandler);
         }
 
         boolean generateDtd = configuration.getBoolean(PROPKEY_GENERATEDTD_ENABLED);
         if (generateDtd) {
             dtdGenerator = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DTDGENERATOR_CLASSNAME));
-            dtdGenerator.init(dataSource);
+            dtdGenerator.init(configuration, dataSource);
         }
     }
 

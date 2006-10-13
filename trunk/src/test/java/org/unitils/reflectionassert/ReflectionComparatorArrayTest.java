@@ -6,9 +6,9 @@
  */
 package org.unitils.reflectionassert;
 
+import junit.framework.TestCase;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
 import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
-import junit.framework.TestCase;
 
 
 /**
@@ -187,9 +187,9 @@ public class ReflectionComparatorArrayTest extends TestCase {
         Difference result = new ReflectionComparator(LENIENT_ORDER).getDifference(arrayA, arrayDifferentOrderDifferentValue);
 
         assertNotNull(result);
-        assertEquals("1", result.getFieldStack().get(0));
-        assertSame(arrayA[1], result.getLeftValue());
-        assertNull(result.getRightValue());
+        assertTrue(result.getFieldStack().isEmpty());
+        assertSame(arrayA, result.getLeftValue());
+        assertSame(arrayDifferentOrderDifferentValue, result.getRightValue());
     }
 
 

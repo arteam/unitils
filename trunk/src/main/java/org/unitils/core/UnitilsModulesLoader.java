@@ -8,7 +8,6 @@ package org.unitils.core;
 
 import org.apache.commons.configuration.Configuration;
 import org.unitils.util.ReflectionUtils;
-import org.unitils.util.UnitilsConfiguration;
 
 import java.util.*;
 
@@ -19,12 +18,12 @@ import java.util.*;
  * be used to construct properties that define the classnames and optionally the dependencies of these modules. E.g.
  * <pre><code>
  * unitils.modules= a, b, c, d
- * unitils.core.a.className= be.ordina.A
- * unitils.core.a.runAfter= b, c
- * unitils.core.b.className= be.ordina.B
- * unitils.core.b.runAfter= c
- * unitils.core.c.className= be.ordina.C
- * unitils.core.d.enabled= false
+ * unitils.module.a.className= be.ordina.A
+ * unitils.module.a.runAfter= b, c
+ * unitils.module.b.className= be.ordina.B
+ * unitils.module.b.runAfter= c
+ * unitils.module.c.className= be.ordina.C
+ * unitils.module.d.enabled= false
  * </code></pre>
  * The above configuration will load 3 core classes A, B and C and will always perform processing in
  * order C, B, A.
@@ -41,7 +40,7 @@ public class UnitilsModulesLoader {
     /**
      * First part of all core specific properties
      */
-    public static final String PROPERTY_MODULE_PREFIX = "unitils.core.";
+    public static final String PROPERTY_MODULE_PREFIX = "unitils.module.";
 
     /**
      * Last part of the core specific property that specifies whehter the core should be loaded
@@ -64,9 +63,7 @@ public class UnitilsModulesLoader {
      *
      * @return the modules, not null
      */
-    public List<UnitilsModule> loadModules() {
-
-        Configuration configuration = UnitilsConfiguration.getInstance();
+    public List<UnitilsModule> loadModules(Configuration configuration) {
 
         // get all declared modules (filter doubles)
         Set<String> moduleNames = new TreeSet<String>(Arrays.asList(configuration.getStringArray(PROPERTY_MODULES)));
@@ -121,6 +118,8 @@ public class UnitilsModulesLoader {
 
                     throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
                 }
+                // run initializer
+                ((UnitilsModule) module).init(configuration);
                 modules.add((UnitilsModule) module);
             }
         }

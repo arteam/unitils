@@ -6,7 +6,6 @@
  */
 package org.unitils.dbmaintainer.config;
 
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
@@ -18,24 +17,16 @@ import javax.sql.DataSource;
  */
 public class PropertiesDataSourceFactory implements DataSourceFactory {
 
-    /**
-     * The name of the <code>java.sql.Driver</code> class
-     */
+    /* The name of the <code>java.sql.Driver</code> class. */
     private String driverClassName;
 
-    /**
-     * The url of the database
-     */
+    /* The url of the database. */
     private String databaseUrl;
 
-    /**
-     * The database username
-     */
+    /* The database username. */
     private String userName;
 
-    /**
-     * The database password
-     */
+    /* The database password. */
     private String password;
 
     /**
@@ -46,9 +37,8 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
      *
      * @throws IllegalArgumentException When the given <code>Properties</code> misses one or more required properties.
      */
-    public void init() throws IllegalArgumentException {
+    public void init(Configuration configuration) throws IllegalArgumentException {
 
-        Configuration configuration = UnitilsConfiguration.getInstance();
         driverClassName = configuration.getString("dataSource.driverClassName");
         databaseUrl = configuration.getString("dataSource.url");
         userName = configuration.getString("dataSource.userName");

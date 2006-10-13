@@ -1,11 +1,13 @@
 package org.unitils.util;
 
+import org.unitils.core.Unitils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Filip Neven
@@ -64,6 +66,7 @@ public class AnnotationUtils {
 
     /**
      * todo javadoc
+     *
      * @param clazz
      * @param annotation
      * @return
@@ -90,7 +93,9 @@ public class AnnotationUtils {
     private static <T extends Enum> T getDefaultValue(Class<T> enumClass) {
 
         String enumClassName = enumClass.getName();
-        String defaultValueName = UnitilsConfiguration.getInstance().getString(enumClassName);
+
+        //Todo refactor
+        String defaultValueName = Unitils.getInstance().getConfiguration().getString(enumClassName);
 
         T[] enumValues = enumClass.getEnumConstants();
         for (T enumValue : enumValues) {

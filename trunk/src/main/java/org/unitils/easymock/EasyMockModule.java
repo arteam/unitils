@@ -1,9 +1,10 @@
 package org.unitils.easymock;
 
+import org.apache.commons.configuration.Configuration;
+import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.MocksControl;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
 import static org.easymock.internal.MocksControl.MockType.NICE;
-import org.easymock.classextension.internal.MocksClassControl;
 import org.unitils.core.*;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.Mock;
@@ -28,32 +29,50 @@ import java.util.List;
  * <p/>
  * Mocks can also be created explicitly by using the {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method.
  * <p/>
- * Switching to the replayAll state and verifying expectations of all mocks (including the mocks created with
+ * Switching to the replay state and verifying expectations of all mocks (including the mocks created with
  * the {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method can be done by calling
  * the {@link EasyMockModule#replay()} and {@link EasyMockModule#verify()} methods.
  */
 public class EasyMockModule implements UnitilsModule {
 
+    /* All created mocks controls */
     private List<MocksControl> mocksControls;
 
-    private boolean inReplayState;
 
-    public EasyMockModule() {
+    /**
+     * Initializes the module
+     */
+    public void init(Configuration configuration) {
+        this.mocksControls = new ArrayList<MocksControl>();
     }
 
 
+    /**
+     * Creates an EasyMock mock object of the given type.
+     * <p/>
+     * An instance of the mock control is stored, so that it can be set to the replay/verify state when
+     * {@link #replay()} or {@link #verify()} is called.
+     *
+     * @param mockType  the class type for the mock, not null
+     * @param order     the order setting, not null
+     * @param returns   the returns setting, not null
+     * @param arguments the arguments setting, not null
+     * @return a mock for the given class or interface, not null
+     */
     public static <T> T createMock(Class<T> mockType, Mock.Order order, Mock.Returns returns, Mock.Arguments arguments) {
 
         return getInstance().createMockImpl(mockType, order, returns, arguments);
     }
 
     /**
-     * todo javadoc
+     * Unit tests should call this method after having set their recorded expected behavior on the mock objects.
      * <p/>
-     * Unit tests should call this method after having set their expectations on the mock objects.
+     * This method will make sure EasyMock's replay method is called on every mock object that was supplied to the
+     * fields annotated with {@link @Mock}, or directly created by the
+     * {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method.
      * <p/>
-     * This method will make sure EasyMock's replayAll method is called on every mock object that was supplied to the
-     * fields annotated with {@link @Mock}, or directly created by the {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method
+     * After each test, the expected behavior will be verified automatically. Verification can also be performed
+     * explicitly by calling the {@link #verify()} method.
      */
     public static void replay() {
 
@@ -62,11 +81,15 @@ public class EasyMockModule implements UnitilsModule {
 
 
     /**
-     * todo javadoc
+     * Unit tests should call this method to check whether all recorded expected behavior was actually observed during
+     * the test.
      * <p/>
-     * Unit tests should call this method after having executed the tested method on the object under test. This method
-     * will make sure EasyMock's verifyAll method is called on every mock object that was supplied to the fields annotated
-     * with {@link @Mock}, or directly created by the <code>getMock</code> method
+     * This method will make sure EasyMock's verify method is called on every mock mock object that was supplied to the
+     * fields annotated with {@link @Mock}, or directly created by the
+     * {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method.
+     * <p/>
+     * After each test, the expected behavior will be verified automatically. Verification can also be performed
+     * explicitly by calling this method.
      */
     public static void verify() {
 
@@ -74,30 +97,35 @@ public class EasyMockModule implements UnitilsModule {
     }
 
 
-    //todo javadoc
+    /**
+     * Creates the listener for plugging in the behavior of this module into the test runs.
+     *
+     * @return the listener
+     */
     public TestListener createTestListener() {
 
         return new EasyMockTestListener();
     }
 
 
-    //todo javadoc
+    /**
+     * Implements the setting of the recorded behavior. See {@link #replay()}.
+     */
     protected void replayImpl() {
 
         for (MocksControl mocksControl : mocksControls) {
             mocksControl.replay();
         }
-        inReplayState = true;
     }
 
 
-    //todo javadoc
+    /**
+     * Implements the verification of the recorded behavior. See {@link #verify()}.
+     */
     protected void verifyImpl() {
 
-        if (inReplayState) {
-            for (MocksControl mocksControl : mocksControls) {
-                mocksControl.verify();
-            }
+        for (MocksControl mocksControl : mocksControls) {
+            mocksControl.verify();
         }
     }
 
@@ -216,14 +244,20 @@ public class EasyMockModule implements UnitilsModule {
         return mocksControl;
     }
 
-    //todo refactor
+    /**
+     * Gets the first instance of an EasyMockModule that is stored in the modules repository.
+     * This instance implements the actual behavior of the static methods, such as {@link #replay()}.
+     * This way, other implementations can be plugged in, while keeping the simplicity of using static methods.
+     *
+     * @return the instance, not null
+     * @throws UnitilsException when no such module could be found
+     */
     private static EasyMockModule getInstance() {
 
-        ModulesRepository modulesRepository = Unitils.getInstance().getModulesRepositoryImpl();
-        EasyMockModule module = modulesRepository.getModule(EasyMockModule.class);
+        EasyMockModule module = Unitils.getModulesRepository().getModule(EasyMockModule.class);
         if (module == null) {
-            //todo
-            throw new UnitilsException("todo");
+
+            throw new UnitilsException("Unable to find an instance of an EasyMockModule in the modules repository.");
         }
         return module;
     }
@@ -238,13 +272,22 @@ public class EasyMockModule implements UnitilsModule {
          * Before the test is executed this calls {@link EasyMockModule#createAndInjectMocksIntoTest(Object)} to
          * create and inject all mocks on the class.
          */
-        public void beforeTestMethod() {
+        @Override
+        public void beforeTestMethod(TestContext testContext) {
 
-            inReplayState = false;
-            createAndInjectMocksIntoTest(Unitils.getTestContext().getTestObject());
+            // Clear all previously created mocks controls
+            mocksControls.clear();
+
+            createAndInjectMocksIntoTest(testContext.getTestObject());
         }
 
-        public void afterTestMethod() {
+        /**
+         * After each test is executed this calls {@link EasyMockModule#verifyImpl()} to verify the recorded behavior
+         * of all created mocks.
+         */
+        @Override
+        public void afterTestMethod(TestContext testContext) {
+
             verifyImpl();
         }
     }

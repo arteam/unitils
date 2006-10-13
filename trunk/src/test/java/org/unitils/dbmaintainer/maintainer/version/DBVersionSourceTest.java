@@ -6,6 +6,7 @@
  */
 package org.unitils.dbmaintainer.maintainer.version;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
@@ -13,6 +14,7 @@ import org.unitils.db.annotations.AfterCreateDataSource;
 import org.unitils.dbunit.DatabaseTest;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparatorModes;
+import org.unitils.core.UnitilsConfigurationLoader;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -53,8 +55,10 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
+        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+
         dbVersionSource = new DBVersionSource();
-        dbVersionSource.init(dataSource);
+        dbVersionSource.init(configuration, dataSource);
     }
 
     /**

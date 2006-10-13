@@ -1,22 +1,18 @@
 package org.unitils.hibernate;
 
-import org.hibernate.cfg.Configuration;
-import org.hibernate.SessionFactory;
 import org.hibernate.Session;
-import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsModule;
-import org.unitils.core.UnitilsException;
-import org.unitils.util.UnitilsConfiguration;
-import org.unitils.util.AnnotationUtils;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.unitils.core.*;
 import org.unitils.db.DatabaseModule;
-import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.AfterCreateHibernateSession;
+import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateTest;
+import org.unitils.util.AnnotationUtils;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.sql.Connection;
+import java.util.List;
 
 /**
  */
@@ -32,7 +28,19 @@ public class HibernateModule implements UnitilsModule {
 
     private ThreadLocal<Session> currentHibernateSessionHolder = new ThreadLocal<Session>();
 
-    protected boolean isHibernateTest(Class testClass) {
+
+    private String configurationClassName;
+
+    private List<String> configFiles;
+
+    public void init(org.apache.commons.configuration.Configuration configuration) {
+        //noinspection unchecked
+        configFiles = configuration.getList(PROPKEY_HIBERNATE_CONFIGFILES);
+        configurationClassName = configuration.getString(PROPKEY_HIBERNATE_CONFIGURATION_CLASS);
+    }
+
+
+    protected boolean isHibernateTest(Class<?> testClass) {
         return AnnotationUtils.getClassAnnotation(testClass, HibernateTest.class) != null;
     }
 
@@ -50,8 +58,7 @@ public class HibernateModule implements UnitilsModule {
     }
 
     protected Configuration createHibernateConfiguration() {
-        String configurationClassName = UnitilsConfiguration.getInstance().getString(PROPKEY_HIBERNATE_CONFIGURATION_CLASS);
-        List<String> configFiles = UnitilsConfiguration.getInstance().getList(PROPKEY_HIBERNATE_CONFIGFILES);
+
         Configuration hbnConfiguration;
         try {
             hbnConfiguration = (Configuration) Class.forName(configurationClassName).newInstance();
@@ -79,7 +86,8 @@ public class HibernateModule implements UnitilsModule {
 
     protected void createHibernateSession(Object testObject) {
         Session currentHibernateSession = currentHibernateSessionHolder.get();
-        if (currentHibernateSession != null && (currentHibernateSession.isConnected() || currentHibernateSession.isOpen())) {
+        if (currentHibernateSession != null && (currentHibernateSession.isConnected() || currentHibernateSession.isOpen()))
+        {
             currentHibernateSession.close();
         }
         currentHibernateSessionHolder.set(hibernateSessionFactory.openSession(getConnection()));
@@ -123,16 +131,16 @@ public class HibernateModule implements UnitilsModule {
     private class HibernateTestListener extends TestListener {
 
         @Override
-        public void beforeTestClass() {
-            if (isHibernateTest(Unitils.getTestContext().getTestClass())) {
-                configureHibernate(Unitils.getTestContext().getTestObject());
+        public void beforeTestClass(TestContext testContext) {
+            if (isHibernateTest(testContext.getTestClass())) {
+                configureHibernate(testContext.getTestObject());
             }
         }
 
         @Override
-        public void beforeTestMethod() {
-            if (isHibernateTest(Unitils.getTestContext().getTestClass())) {
-                createHibernateSession(Unitils.getTestContext().getTestObject());
+        public void beforeTestMethod(TestContext testContext) {
+            if (isHibernateTest(testContext.getTestClass())) {
+                createHibernateSession(testContext.getTestObject());
             }
         }
 

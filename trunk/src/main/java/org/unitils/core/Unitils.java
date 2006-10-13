@@ -6,8 +6,10 @@
  */
 package org.unitils.core;
 
-import java.util.List;
+import org.apache.commons.configuration.Configuration;
+
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * todo javadoc
@@ -24,6 +26,9 @@ public class Unitils {
     //todo javadoc
     private ModulesRepository modulesRepository;
 
+    //todo javadoc
+    private Configuration configuration;
+
     private ThreadLocal<TestContext> testContextHolder = new ThreadLocal<TestContext>();
 
 
@@ -31,11 +36,22 @@ public class Unitils {
     //todo
     public Unitils() {
 
-        modulesRepository = createModulesRepository();
+        configuration = createConfiguration();
+        modulesRepository = createModulesRepository(configuration);
     }
 
 
-    public TestContext getTestContextImpl() {
+    public static ModulesRepository getModulesRepository() {
+        return getInstance().getModulesRepositoryImpl();
+    }
+
+
+    public ModulesRepository getModulesRepositoryImpl() {
+        return modulesRepository;
+    }
+
+
+    public TestContext getTestContext() {
 
         TestContext testContext = testContextHolder.get();
         if (testContext == null) {
@@ -45,99 +61,109 @@ public class Unitils {
         return testContext;
     }
 
-    public static TestContext getTestContext() {
-        return getInstance().getTestContextImpl();
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
 
-    public ModulesRepository getModulesRepositoryImpl() {
-        return modulesRepository;
+    protected ModulesRepository createModulesRepository(Configuration configuration) {
+
+        UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
+        List<UnitilsModule> modules = unitilsModulesLoader.loadModules(configuration);
+        return new ModulesRepository(modules);
     }
 
-    public static ModulesRepository getModulesRepository() {
-        return getInstance().getModulesRepositoryImpl();
+    protected Configuration createConfiguration() {
+
+        UnitilsConfigurationLoader unitilsConfigurationLoader = new UnitilsConfigurationLoader();
+        return unitilsConfigurationLoader.loadConfiguration();
     }
 
 
     public void beforeAll() {
 
+        TestContext testContext = getTestContext();
+        testContext.setTestClass(null);
+        testContext.setTestObject(null);
+        testContext.setTestMethod(null);
+
         // For each core, invoke the beforeAll method
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).beforeAll();
+            modulesRepository.getTestListener(module).beforeAll(testContext);
         }
-    }
-
-    protected ModulesRepository createModulesRepository() {
-
-        UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
-        List<UnitilsModule> modules = unitilsModulesLoader.loadModules();
-        return new ModulesRepository(modules);
     }
 
 
     public void beforeTestClass(Object test) {
 
-        setTestContextValue(test.getClass(), test, null);
+        TestContext testContext = getTestContext();
+        testContext.setTestClass(test.getClass());
+        testContext.setTestObject(test);
+        testContext.setTestMethod(null);
 
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).beforeTestClass();
+            modulesRepository.getTestListener(module).beforeTestClass(testContext);
         }
     }
 
 
     public void beforeTestMethod(Object test, Method method) {
 
-        setTestContextValue(test.getClass(), test, method);
+        TestContext testContext = getTestContext();
+        testContext.setTestClass(test.getClass());
+        testContext.setTestObject(test);
+        testContext.setTestMethod(method);
 
         // For each core, invoke the beforeTestMethod method
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).beforeTestMethod();
+            modulesRepository.getTestListener(module).beforeTestMethod(testContext);
         }
     }
 
 
     public void afterTestMethod(Object test, Method method) {
 
-        setTestContextValue(test.getClass(), test, method);
+        TestContext testContext = getTestContext();
+        testContext.setTestClass(test.getClass());
+        testContext.setTestObject(test);
+        testContext.setTestMethod(method);
 
         // For each core, invoke the afterTestMethod method
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).afterTestMethod();
+            modulesRepository.getTestListener(module).afterTestMethod(testContext);
         }
     }
 
     public void afterTestClass(Object test) {
 
-        setTestContextValue(test.getClass(), test, null);
+        TestContext testContext = getTestContext();
+        testContext.setTestClass(test.getClass());
+        testContext.setTestObject(test);
+        testContext.setTestMethod(null);
 
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).afterTestClass();
+            modulesRepository.getTestListener(module).afterTestClass(testContext);
         }
     }
 
 
     public void afterAll() {
 
-        setTestContextValue(null, null, null);
+        TestContext testContext = getTestContext();
+        testContext.setTestClass(null);
+        testContext.setTestObject(null);
+        testContext.setTestMethod(null);
 
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).afterAll();
+            modulesRepository.getTestListener(module).afterAll(testContext);
         }
-    }
-
-
-    private void setTestContextValue(Class testClass, Object testObject, Method testMethod) {
-
-        TestContext testContext = getTestContext();
-        testContext.setTestClass(testClass);
-        testContext.setTestObject(testObject);
-        testContext.setTestMethod(testMethod);
     }
 
 

@@ -6,6 +6,8 @@
  */
 package org.unitils.dbmaintainer.maintainer;
 
+import static org.easymock.classextension.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.expectLastCall;
 import org.unitils.dbmaintainer.clear.DBClearer;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
 import org.unitils.dbmaintainer.dtd.DtdGenerator;
@@ -17,8 +19,6 @@ import org.unitils.dbmaintainer.script.SQLScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
 import org.unitils.easymock.EasyMockTestCase;
 import org.unitils.easymock.annotation.Mock;
-import static org.easymock.classextension.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.expectLastCall;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +61,8 @@ public class DBMaintainerTest extends EasyMockTestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
+
+        dbMaintainer = new DBMaintainer();
         dbMaintainer.setFromScratchEnabled(true);
 
         versionScriptPairs = new ArrayList<VersionScriptPair>();

@@ -6,6 +6,8 @@
  */
 package org.unitils.dbmaintainer.handler;
 
+import org.apache.commons.configuration.Configuration;
+
 import javax.sql.DataSource;
 
 /**
@@ -19,7 +21,7 @@ public interface StatementHandler {
      *
      * @param dataSource
      */
-    void init(DataSource dataSource);
+    void init(Configuration configuration, DataSource dataSource);
 
     /**
      * Handles the given SQL statement

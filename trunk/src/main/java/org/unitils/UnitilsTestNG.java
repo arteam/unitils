@@ -18,7 +18,7 @@ import org.unitils.core.Unitils;
 /**
  * todo javadoc
  */
-public class UnitilsTestNG implements IHookable {
+public abstract class UnitilsTestNG implements IHookable {
 
     private static Unitils unitils;
 
@@ -54,6 +54,6 @@ public class UnitilsTestNG implements IHookable {
 
         unitils.beforeTestMethod(this, testResult.getMethod().getMethod());
         callBack.runTestMethod(testResult);
-        unitils.afterTestMethod(this,testResult.getMethod().getMethod());
+        unitils.afterTestMethod(this, testResult.getMethod().getMethod());
     }
 }

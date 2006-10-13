@@ -6,7 +6,6 @@
  */
 package org.unitils.dbmaintainer.maintainer.version;
 
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 
@@ -85,9 +84,8 @@ public class DBVersionSource implements VersionSource {
      *
      * @param dataSource
      */
-    public void init(DataSource dataSource) {
+    public void init(Configuration configuration, DataSource dataSource) {
 
-        Configuration configuration = UnitilsConfiguration.getInstance();
         this.schemaName = configuration.getString(PROPKEY_SCHEMANAME).toUpperCase();
         this.tableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
         this.versionIndexColumnName = configuration.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();

@@ -6,21 +6,19 @@
  */
 package org.unitils.reflectionassert;
 
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.unitils.reflectionassert.ReflectionComparator.Difference;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 
 /**
- * todo Better error messages when comparing collections.
- *
  * A class for asserting that 2 objects are equal by comparing all fields of the objects using reflection.
  * <p/>
  * The (combination of) comparator modes specify how strict the comparison must be:<ul>
