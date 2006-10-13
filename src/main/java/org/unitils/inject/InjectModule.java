@@ -1,21 +1,30 @@
 package org.unitils.inject;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.unitils.core.*;
+import org.unitils.core.TestContext;
+import org.unitils.core.TestListener;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.UnitilsModule;
 import org.unitils.inject.annotation.*;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * todo javadoc
  */
 public class InjectModule implements UnitilsModule {
+
+
+    public void init(Configuration configuration) {
+
+    }
 
     void injectObjects(Object test) {
         injectAll(test);
@@ -122,13 +131,13 @@ public class InjectModule implements UnitilsModule {
         }
     }
 
-    private List getTargets(Annotation annotation, Field annotatedField, String targetName, Object test) {
-        List targets;
+    private List<Object> getTargets(Annotation annotation, Field annotatedField, String targetName, Object test) {
+        List<Object> targets;
         if ("".equals(targetName)) {
             // Default targetName, so it is probably not specfied. Return all objects that are annotated with the
             // TestedObject annotation.
             List<Field> testedObjectFields = AnnotationUtils.getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
-            targets = new ArrayList(testedObjectFields.size());
+            targets = new ArrayList<Object>(testedObjectFields.size());
             for (Field testedObjectField : testedObjectFields) {
                 targets.add(ReflectionUtils.getFieldValue(test, testedObjectField));
             }
@@ -154,8 +163,9 @@ public class InjectModule implements UnitilsModule {
 
     private class InjectTestListener extends TestListener {
 
-        public void beforeTestMethod() {
-            TestContext testContext = Unitils.getTestContext();
+        @Override
+        public void beforeTestMethod(TestContext testContext) {
+
             injectObjects(testContext.getTestObject());
         }
     }

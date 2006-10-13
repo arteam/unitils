@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import static org.unitils.core.UnitilsModulesLoader.*;
-import org.unitils.util.UnitilsConfiguration;
+import org.unitils.inject.InjectionUtils;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "c" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "a");
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "d" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestUnitilsModuleD.class.getName());
 
-        UnitilsConfiguration.setInstance(configuration);
+        InjectionUtils.injectStatic(configuration, Unitils.class, "unitils.configuration");
     }
 
 
@@ -48,7 +48,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
      */
     public void testLoadModules() {
 
-        List<UnitilsModule> result = unitilsModulesLoader.loadModules();
+        List<UnitilsModule> result = unitilsModulesLoader.loadModules(configuration);
 
         assertNotNull(result);
         assertEquals(4, result.size());
@@ -67,7 +67,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
         configuration.setProperty(PROPERTY_MODULES, "a, b, d");
 
-        List<UnitilsModule> result = unitilsModulesLoader.loadModules();
+        List<UnitilsModule> result = unitilsModulesLoader.loadModules(configuration);
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -84,7 +84,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "d" + PROPERTY_MODULE_SUFFIX_ENABLED, "false");
 
-        List<UnitilsModule> result = unitilsModulesLoader.loadModules();
+        List<UnitilsModule> result = unitilsModulesLoader.loadModules(configuration);
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -103,7 +103,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
         configuration.setProperty(PROPERTY_MODULES, "a, b, c, d, a, b");
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "b, b, d, b, d");
 
-        List<UnitilsModule> result = unitilsModulesLoader.loadModules();
+        List<UnitilsModule> result = unitilsModulesLoader.loadModules(configuration);
 
         assertNotNull(result);
         assertEquals(4, result.size());
@@ -121,7 +121,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
 
         configuration.clear();
 
-        List<UnitilsModule> result = unitilsModulesLoader.loadModules();
+        List<UnitilsModule> result = unitilsModulesLoader.loadModules(configuration);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -137,7 +137,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, "java.lang.String");
 
         try {
-            unitilsModulesLoader.loadModules();
+            unitilsModulesLoader.loadModules(configuration);
             fail();
 
         } catch (RuntimeException e) {
@@ -155,7 +155,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "b" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "c");
 
         try {
-            unitilsModulesLoader.loadModules();
+            unitilsModulesLoader.loadModules(configuration);
             fail();
 
         } catch (RuntimeException e) {
@@ -173,7 +173,7 @@ public class UnitilsModulesLoaderTest extends TestCase {
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestUnitilsModulePrivate.class.getName());
 
         try {
-            unitilsModulesLoader.loadModules();
+            unitilsModulesLoader.loadModules(configuration);
             fail();
 
         } catch (RuntimeException e) {
@@ -187,6 +187,10 @@ public class UnitilsModulesLoaderTest extends TestCase {
      */
     public static class TestUnitilsModuleA implements UnitilsModule {
 
+        public void init(Configuration configuration) {
+            // do nothing
+        }
+
         public TestListener createTestListener() {
             return null;
         }
@@ -196,6 +200,10 @@ public class UnitilsModulesLoaderTest extends TestCase {
      * A test unitils core type
      */
     public static class TestUnitilsModuleB implements UnitilsModule {
+
+        public void init(Configuration configuration) {
+            // do nothing
+        }
 
         public TestListener createTestListener() {
             return null;
@@ -207,6 +215,10 @@ public class UnitilsModulesLoaderTest extends TestCase {
      */
     public static class TestUnitilsModuleC implements UnitilsModule {
 
+        public void init(Configuration configuration) {
+            // do nothing
+        }
+
         public TestListener createTestListener() {
             return null;
         }
@@ -216,6 +228,10 @@ public class UnitilsModulesLoaderTest extends TestCase {
      * A test unitils core type
      */
     public static class TestUnitilsModuleD implements UnitilsModule {
+
+        public void init(Configuration configuration) {
+            // do nothing
+        }
 
         public TestListener createTestListener() {
             return null;
@@ -227,6 +243,10 @@ public class UnitilsModulesLoaderTest extends TestCase {
      * A test unitils core type having a private constructor
      */
     public static class TestUnitilsModulePrivate implements UnitilsModule {
+
+        public void init(Configuration configuration) {
+            // do nothing
+        }
 
         private TestUnitilsModulePrivate() {
         }

@@ -5,12 +5,7 @@ import org.dbunit.Assertion;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.ITable;
-import org.dbunit.dataset.ITableIterator;
-import org.dbunit.dataset.ITableMetaData;
-import org.dbunit.dataset.ReplacementDataSet;
-import org.dbunit.dataset.SortedTable;
+import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.DefaultDataTypeFactory;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
@@ -18,19 +13,15 @@ import org.dbunit.ext.db2.Db2DataTypeFactory;
 import org.dbunit.ext.mysql.MySqlDataTypeFactory;
 import org.dbunit.ext.oracle.OracleDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
-import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
-import org.unitils.core.UnitilsModule;
-import org.unitils.util.UnitilsConfiguration;
+import org.unitils.core.*;
 import org.unitils.db.DatabaseModule;
 import org.unitils.dbunit.annotation.DbUnitDataSet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.lang.reflect.Method;
 
 /**
  * todo javadoc
@@ -52,6 +43,17 @@ public class DbUnitModule implements UnitilsModule {
        caching is time-consuming, this object is created only once and used througout the test run. */
     private IDatabaseConnection dbUnitDatabaseConnection;
 
+
+    private String databaseSchemaName;
+
+    private String databaseDialect;
+
+
+    public void init(Configuration configuration) {
+        databaseSchemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
+        databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+    }
+
     /**
      * @return The TestListener object that implements Unitils' DbUnit support
      */
@@ -60,12 +62,11 @@ public class DbUnitModule implements UnitilsModule {
     }
 
     /**
-     *
      * @param testClass
      * @return True if the test class is a database test, i.e. is annotated with the {@link DatabaseTest} annotation,
-     * false otherwise
+     *         false otherwise
      */
-    protected boolean isDatabaseTest(Class testClass) {
+    protected boolean isDatabaseTest(Class<?> testClass) {
         return testClass.getAnnotation(DatabaseTest.class) != null;
     }
 
@@ -89,15 +90,15 @@ public class DbUnitModule implements UnitilsModule {
 
     /**
      * Creates a new instance of dbUnit's <code>IDatabaseConnection</code>
+     *
      * @return a new instance of dbUnit's <code>IDatabaseConnection</code>
      */
     protected IDatabaseConnection createDbUnitConnection() {
-        Configuration configuration = UnitilsConfiguration.getInstance();
 
-        IDatabaseConnection connection = new DatabaseConnection(getCurrentConnection(),
-                configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase());
-        // todo externalize
-        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+        // Create connection
+        IDatabaseConnection connection = new DatabaseConnection(getCurrentConnection(), databaseSchemaName);
+
+        // Set correct dialect
         if ("oracle".equals(databaseDialect)) {
             DatabaseConfig config = connection.getConfig();
             config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new OracleDataTypeFactory());
@@ -143,6 +144,7 @@ public class DbUnitModule implements UnitilsModule {
      * First, we try to load a test specific dataset (see {@link #getTestDataSetFileName(Class,Method)}. If that file
      * does not exist, the default dataset is loaded (see {@link #getDefaultDataSetFileName(Class)}. If neither of
      * these files exists, a <code>UnitilsException</code> is thrown.
+     *
      * @param testClass
      * @param testMethod
      */
@@ -212,8 +214,8 @@ public class DbUnitModule implements UnitilsModule {
      * @param testClass
      * @return the default filename
      */
-    protected String getDefaultDataSetFileName(Class testClass) {
-        DbUnitDataSet dbUnitDataSetAnnotation = (DbUnitDataSet) testClass.getAnnotation(DbUnitDataSet.class);
+    protected String getDefaultDataSetFileName(Class<?> testClass) {
+        DbUnitDataSet dbUnitDataSetAnnotation = testClass.getAnnotation(DbUnitDataSet.class);
         if (dbUnitDataSetAnnotation != null) {
             return dbUnitDataSetAnnotation.fileName();
         } else {
@@ -270,10 +272,13 @@ public class DbUnitModule implements UnitilsModule {
     /**
      * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
      * that occur in the expected DbUnitDataSet are compared with the database contents.
-     * @param testClass
-     * @param testMethod
      */
-    public void assertDBContentAsExpected(Class testClass, Method testMethod) {
+    public void assertDBContentAsExpected() {
+
+        TestContext testContext = Unitils.getInstance().getTestContext();
+        Class testClass = testContext.getTestClass();
+        Method testMethod = testContext.getTestMethod();
+
         assertDBContentAsExpected(testClass, testMethod.getName());
     }
 
@@ -342,7 +347,7 @@ public class DbUnitModule implements UnitilsModule {
     private class DbUnitListener extends TestListener {
 
         @Override
-        public void beforeAll() {
+        public void beforeAll(TestContext testContext) {
             if (getDatabaseTestModule() == null) {
                 throw new UnitilsException("Invalid configuration: DatabaseModule should be enabled and DbUnitModule " +
                         "should be configured to run after DatabaseModule");
@@ -350,22 +355,22 @@ public class DbUnitModule implements UnitilsModule {
         }
 
         @Override
-        public void beforeTestClass() {
-            if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
+        public void beforeTestClass(TestContext testContext) {
+            if (isDatabaseTest(testContext.getTestClass())) {
                 initDbUnitConnection();
-        }
-        }
-
-        @Override
-        public void beforeTestMethod() {
-            if (isDatabaseTest(Unitils.getTestContext().getTestClass())) {
-                insertTestData(Unitils.getTestContext().getTestClass(), Unitils.getTestContext().getTestMethod());
             }
         }
 
         @Override
-        public void afterAll() {
-                closeDbUnitConnection();
+        public void beforeTestMethod(TestContext testContext) {
+            if (isDatabaseTest(testContext.getTestClass())) {
+                insertTestData(testContext.getTestClass(), testContext.getTestMethod());
+            }
+        }
+
+        @Override
+        public void afterAll(TestContext testContext) {
+            closeDbUnitConnection();
         }
 
     }

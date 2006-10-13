@@ -6,10 +6,10 @@
  */
 package org.unitils.easymock;
 
-import org.unitils.easymock.annotation.Mock;
 import junit.framework.TestCase;
-import static org.easymock.classextension.EasyMock.*;
+import static org.easymock.classextension.EasyMock.createMock;
 import org.easymock.classextension.internal.ClassExtensionHelper;
+import org.unitils.easymock.annotation.Mock;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ import java.util.Map;
  * Switching mocks to the replayAll state and verifying expectations on mocks is simplified by the methods <code>replayAll()
  * </code> and <code>verifyAll</code>, that call replayAll/verifyAll on all mocks that are used in the test at once.
  */
-public class EasyMockTestCase extends TestCase {
+public abstract class EasyMockTestCase extends TestCase {
 
     /* All mocks that are used by this test are held in this Set */
     private Map<String, Object> mocks = new HashMap<String, Object>();

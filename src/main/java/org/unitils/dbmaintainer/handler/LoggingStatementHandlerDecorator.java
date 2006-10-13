@@ -1,5 +1,6 @@
 package org.unitils.dbmaintainer.handler;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
@@ -17,8 +18,8 @@ public class LoggingStatementHandlerDecorator implements StatementHandler {
         this.decoratedStatementHandler = decoratedStatementHandler;
     }
 
-    public void init(DataSource dataSource) {
-        decoratedStatementHandler.init(dataSource);
+    public void init(Configuration configuration, DataSource dataSource) {
+        decoratedStatementHandler.init(configuration, dataSource);
     }
 
     public void handle(String statement) throws StatementHandlerException {

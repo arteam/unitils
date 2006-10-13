@@ -1,5 +1,7 @@
 package org.unitils.dbmaintainer.dtd;
 
+import org.apache.commons.configuration.Configuration;
+
 import javax.sql.DataSource;
 
 /**
@@ -9,7 +11,7 @@ import javax.sql.DataSource;
  */
 public interface DtdGenerator {
 
-    void init(DataSource dataSource);
+    void init(Configuration configuration, DataSource dataSource);
 
     void generateDtd();
 

@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 /**
  * javadoc
  */
-public class UnitilsJUnit3 extends TestCase {
+public abstract class UnitilsJUnit3 extends TestCase {
 
     private static Unitils unitils;
 

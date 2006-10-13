@@ -20,6 +20,7 @@ public class EasyMockModuleTest extends TestCase {
     }
 
 
+    
     public void testCreateMocksControl() {
 
         MocksControl mocksControl = easyMockModule.createMocksControl(TestMockType.class, Mock.Order.NONE, Mock.Returns.NICE, Mock.Arguments.LENIENT);

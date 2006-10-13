@@ -12,8 +12,8 @@ public class DatabaseAssert {
      * that occur in the expected DbUnitDataSet are compared with the database contents.
      */
     public static void assertDBContentAsExpected() throws Exception {
-        DbUnitModule dbUnitModule = Unitils.getInstance().getModulesRepositoryImpl().getModule(DbUnitModule.class);
-        dbUnitModule.assertDBContentAsExpected(Unitils.getTestContext().getTestClass(), Unitils.getTestContext().getTestMethod());
+        DbUnitModule dbUnitModule = Unitils.getModulesRepository().getModule(DbUnitModule.class);
+        dbUnitModule.assertDBContentAsExpected();
     }
 
 }

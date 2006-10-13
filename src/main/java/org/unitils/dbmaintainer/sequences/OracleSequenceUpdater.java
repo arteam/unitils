@@ -1,10 +1,9 @@
 package org.unitils.dbmaintainer.sequences;
 
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -35,13 +34,12 @@ public class OracleSequenceUpdater implements SequenceUpdater {
     private long lowestAcceptableSequenceValue;
 
     /**
-     * @see SequenceUpdater#init(javax.sql.DataSource,org.unitils.dbmaintainer.handler.StatementHandler)
+     * @see SequenceUpdater#init(Configuration, DataSource, StatementHandler)
      */
-    public void init(DataSource dataSource, StatementHandler statementHandler) {
+    public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
 
-        Configuration configuration = UnitilsConfiguration.getInstance();
         lowestAcceptableSequenceValue = configuration.getLong(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE);
     }
 

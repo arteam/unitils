@@ -6,6 +6,7 @@
  */
 package org.unitils.dbmaintainer.maintainer.script;
 
+import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
 
@@ -19,7 +20,7 @@ public interface ScriptSource {
     /**
      * Initialize using the properties in the given <code>Properties</code> object
      */
-    void init();
+    void init(Configuration configuration);
 
     /**
      * This methods returns true if, given the current database version, the scripts should be run from scratch, or

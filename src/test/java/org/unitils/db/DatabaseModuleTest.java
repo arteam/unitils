@@ -1,5 +1,6 @@
 package org.unitils.db;
 
+import org.apache.commons.configuration.Configuration;
 import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.db.annotations.AfterCreateConnection;
@@ -33,7 +34,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
         databaseModule = new DatabaseModule() {
 
             @Override
-            protected DBMaintainer createDbMaintainer() {
+            protected DBMaintainer createDbMaintainer(Configuration configuration) {
                 return mockDbMaintainer;
             }
 

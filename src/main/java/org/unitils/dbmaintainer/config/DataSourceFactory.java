@@ -6,6 +6,8 @@
  */
 package org.unitils.dbmaintainer.config;
 
+import org.apache.commons.configuration.Configuration;
+
 import javax.sql.DataSource;
 
 /**
@@ -20,7 +22,7 @@ public interface DataSourceFactory {
      *
      * @throws IllegalArgumentException When the given <code>Properties</code> misses one or more required properties.
      */
-    public void init();
+    public void init(Configuration configuration);
 
 
     /**

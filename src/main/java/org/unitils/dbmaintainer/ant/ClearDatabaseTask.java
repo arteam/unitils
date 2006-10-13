@@ -1,19 +1,14 @@
 package org.unitils.dbmaintainer.ant;
 
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
+import org.unitils.core.Unitils;
 import org.unitils.dbmaintainer.clear.DBClearer;
-import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.util.UnitilsConfiguration;
 import org.unitils.util.ReflectionUtils;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Ant tasks that drops all database tables in the current database
@@ -39,12 +34,13 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
     }
 
     private DBClearer createDBClearer() {
-        Configuration config = UnitilsConfiguration.getInstance();
+        Configuration configuration = Unitils.getInstance().getConfiguration();
+
         StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(dataSource);
-        DBClearer dbClearer = ReflectionUtils.createInstanceOfType(config.getString(PROPKEY_DBCLEARER_START +
-            config.getString(PROPKEY_DATABASE_DIALECT)));
-        dbClearer.init(dataSource, statementHandler);
+        statementHandler.init(configuration, dataSource);
+
+        DBClearer dbClearer = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DBCLEARER_START + configuration.getString(PROPKEY_DATABASE_DIALECT)));
+        dbClearer.init(configuration, dataSource, statementHandler);
         return dbClearer;
     }
 }

@@ -2,25 +2,16 @@ package org.unitils.dbmaintainer.clean;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Closure;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.util.UnitilsConfiguration;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Collections;
-import java.util.List;
-import java.util.Collection;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * todo Configuration object should be supplied externally
@@ -54,11 +45,10 @@ public class DefaultDBCleaner implements DBCleaner {
     /* The tables that should not be cleaned */
     private Set<String> tablesToPreserve;
 
-    public void init(DataSource dataSource, StatementHandler statementHandler) {
+    public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
 
-        Configuration configuration = UnitilsConfiguration.getInstance();
         schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
 
         tablesToPreserve = new HashSet<String>();

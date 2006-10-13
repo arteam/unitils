@@ -3,18 +3,16 @@ package org.unitils.util;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.unitils.core.Unitils;
+import org.unitils.inject.InjectionUtils;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.reflectionassert.ReflectionComparatorModes;
 
-import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Inherited;
+import java.lang.annotation.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Test for {@link AnnotationUtils}.
@@ -36,7 +34,7 @@ public class AnnotationUtilsTest extends TestCase {
         configuration.setProperty(TestEnum.class.getName(), "VALUE2");
         configuration.setProperty(TestEnumOtherCase.class.getName(), "Value2");
 
-        UnitilsConfiguration.setInstance(configuration);
+        InjectionUtils.injectStatic(configuration, Unitils.class, "unitils.configuration");
     }
 
     public void testGetFieldsAnnotatedWith() {
@@ -194,15 +192,18 @@ public class AnnotationUtilsTest extends TestCase {
 
     @Target({ElementType.FIELD, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface TestAnnotation {}
+    public @interface TestAnnotation {
+    }
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface TestClassAnnotation {}
+    public @interface TestClassAnnotation {
+    }
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     @Inherited
-    public @interface TestInheritedClassAnntation {}
+    public @interface TestInheritedClassAnntation {
+    }
 
 }

@@ -1,17 +1,15 @@
 package org.unitils.dbmaintainer.constraints;
 
-import org.unitils.UnitilsJUnit3;
-import org.unitils.core.Unitils;
-import org.unitils.util.ReflectionUtils;
-import org.unitils.util.UnitilsConfiguration;
-import org.unitils.dbunit.DatabaseTest;
-import org.unitils.db.annotations.AfterCreateDataSource;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.dbutils.DbUtils;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.db.annotations.AfterCreateDataSource;
+import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.maintainer.DBMaintainer;
+import org.unitils.dbunit.DatabaseTest;
+import org.unitils.util.ReflectionUtils;
+import org.unitils.core.UnitilsConfigurationLoader;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -36,15 +34,15 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration config = UnitilsConfiguration.getInstance();
+        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
 
         StatementHandler st = new JDBCStatementHandler();
-        st.init(dataSource);
+        st.init(configuration, dataSource);
 
-        constraintsDisabler = ReflectionUtils.createInstanceOfType(config.getString(DBMaintainer.PROPKEY_CONSTRAINTSDISABLER_START + '.' +
-                config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
-        constraintsDisabler.init(config, dataSource, st);
-        constraintsDisabler.init(config, dataSource, st);
+        constraintsDisabler = ReflectionUtils.createInstanceOfType(configuration.getString(DBMaintainer.PROPKEY_CONSTRAINTSDISABLER_START + '.' +
+                configuration.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
+        constraintsDisabler.init(configuration, dataSource, st);
+        constraintsDisabler.init(configuration, dataSource, st);
 
         createTables();
     }
@@ -90,6 +88,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         Statement st = conn.createStatement();
         st.executeUpdate("insert into table2 values ('test')");
     }
+
 
     public void testDisableConstraints_notNull() throws SQLException {
         try {

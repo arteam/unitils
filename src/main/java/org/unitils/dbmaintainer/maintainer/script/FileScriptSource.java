@@ -6,14 +6,13 @@
  */
 package org.unitils.dbmaintainer.maintainer.script;
 
-import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
-import org.unitils.dbmaintainer.maintainer.version.Version;
-import org.unitils.util.UnitilsConfiguration;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
+import org.unitils.dbmaintainer.maintainer.version.Version;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -45,11 +44,10 @@ public class FileScriptSource implements ScriptSource {
     private String fileExtension;
 
     /**
-     * @see ScriptSource#init()
+     * @see ScriptSource#init(Configuration)
      */
-    public void init() {
+    public void init(Configuration configuration) {
 
-        Configuration configuration = UnitilsConfiguration.getInstance();
         scriptFilesDir = configuration.getString(PROPKEY_SCRIPTFILES_DIR);
         if (!new File(scriptFilesDir).exists()) {
             throw new IllegalArgumentException("Script files directory '" + scriptFilesDir + "' does not exist");

@@ -3,29 +3,29 @@ package org.unitils.core;
 /**
  * todo javadoc
  */
-public class TestListener {
+public abstract class TestListener {
 
-    public void beforeAll() {
+    public void beforeAll(TestContext testContext) {
         // empty
     }
 
-    public void beforeTestClass() {
+    public void beforeTestClass(TestContext testContext) {
         // empty
     }
 
-    public void beforeTestMethod() {
+    public void beforeTestMethod(TestContext testContext) {
         // empty
     }
 
-    public void afterTestMethod() {
+    public void afterTestMethod(TestContext testContext) {
         // empty
     }
 
-    public void afterTestClass() {
+    public void afterTestClass(TestContext testContext) {
         // empty
     }
 
-    public void afterAll() {
+    public void afterAll(TestContext testContext) {
         // empty
     }
 
