@@ -1,7 +1,5 @@
 package org.unitils.util;
 
-import org.unitils.core.Unitils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,8 +12,6 @@ import java.util.List;
  */
 public class AnnotationUtils {
 
-    //todo javadoc
-    public static final String DEFAULT_ENUM_VALUE_NAME = "DEFAULT";
 
     /**
      * Returns the given class's declared fields that are marked with the given annotation
@@ -26,7 +22,7 @@ public class AnnotationUtils {
      */
     public static <T extends Annotation> List<Field> getFieldsAnnotatedWith(Class clazz, Class<T> annotation) {
         if (Object.class.equals(clazz)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } else {
             List<Field> annotatedFields = new ArrayList<Field>();
             Field[] fields = clazz.getDeclaredFields();
@@ -50,7 +46,7 @@ public class AnnotationUtils {
     public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation) {
 
         if (Object.class.equals(clazz)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } else {
             List<Method> annotatedMethods = new ArrayList<Method>();
             Method[] methods = clazz.getDeclaredMethods();
@@ -69,7 +65,7 @@ public class AnnotationUtils {
      *
      * @param clazz
      * @param annotation
-     * @return
+     * @return the
      */
     public static <T extends Annotation> T getClassAnnotation(Class<? extends Object> clazz, Class<T> annotation) {
 
@@ -77,33 +73,4 @@ public class AnnotationUtils {
     }
 
 
-    // todo javadoc
-    @SuppressWarnings({"unchecked"})
-    public static <T extends Enum> T getValueReplaceDefault(T enumValue) {
-
-        if (DEFAULT_ENUM_VALUE_NAME.equalsIgnoreCase(enumValue.name())) {
-
-            return getDefaultValue((Class<T>) enumValue.getClass());
-        }
-        return enumValue;
-    }
-
-
-    // todo javadoc
-    private static <T extends Enum> T getDefaultValue(Class<T> enumClass) {
-
-        String enumClassName = enumClass.getName();
-
-        //Todo refactor
-        String defaultValueName = Unitils.getInstance().getConfiguration().getString(enumClassName);
-
-        T[] enumValues = enumClass.getEnumConstants();
-        for (T enumValue : enumValues) {
-            if (defaultValueName.equalsIgnoreCase(enumValue.name())) {
-
-                return enumValue;
-            }
-        }
-        throw new RuntimeException("todo");
-    }
 }

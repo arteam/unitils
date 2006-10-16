@@ -9,11 +9,7 @@ package org.unitils.util;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +17,11 @@ import java.util.List;
  * Utility methods that use reflection in some way.
  */
 public class ReflectionUtils {
+
+
+    //todo javadoc
+    public static final String DEFAULT_ENUM_VALUE_NAME = "DEFAULT";
+
 
     /**
      * Creates an instance of the class with the given name. The class's no argument constructor is used to create an
@@ -247,5 +248,32 @@ public class ReflectionUtils {
             return null;
         }
     }
-    
+
+
+    // todo javadoc
+    public static <T extends Enum> T getEnumValue(Class<T> enumClass, String enumValueName) {
+
+        T[] enumValues = enumClass.getEnumConstants();
+        for (T enumValue : enumValues) {
+            if (enumValueName.equalsIgnoreCase(enumValue.name())) {
+
+                return enumValue;
+            }
+        }
+        throw new RuntimeException("todo");
+    }
+
+
+    // todo javadoc
+    @SuppressWarnings({"unchecked"})
+    public static <T extends Enum> T getValueReplaceDefault(T enumValue, T defaultValueName) {
+
+        if (DEFAULT_ENUM_VALUE_NAME.equalsIgnoreCase(enumValue.name())) {
+
+            return defaultValueName;
+        }
+        return enumValue;
+    }
+
+
 }

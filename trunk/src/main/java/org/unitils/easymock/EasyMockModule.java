@@ -8,6 +8,9 @@ import static org.easymock.internal.MocksControl.MockType.NICE;
 import org.unitils.core.*;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.annotation.Mock.Arguments;
+import org.unitils.easymock.annotation.Mock.Order;
+import org.unitils.easymock.annotation.Mock.Returns;
 import static org.unitils.reflectionassert.ReflectionComparatorModes.*;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
@@ -38,12 +41,22 @@ public class EasyMockModule implements UnitilsModule {
     /* All created mocks controls */
     private List<MocksControl> mocksControls;
 
+    //todo javadoc
+    private Order defaultOrder;
+
+    private Returns defaultReturns;
+
+    private Arguments defaultArguments;
 
     /**
      * Initializes the module
      */
     public void init(Configuration configuration) {
         this.mocksControls = new ArrayList<MocksControl>();
+
+        defaultOrder = ReflectionUtils.getEnumValue(Order.class, configuration.getString(Order.class.getName()));
+        defaultReturns = ReflectionUtils.getEnumValue(Returns.class, configuration.getString(Returns.class.getName()));
+        defaultArguments = ReflectionUtils.getEnumValue(Arguments.class, configuration.getString(Arguments.class.getName()));
     }
 
 
@@ -141,6 +154,7 @@ public class EasyMockModule implements UnitilsModule {
     protected void createAndInjectMocksIntoTest(Object testObject) {
 
         mocksControls = new ArrayList<MocksControl>();
+
         List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
         for (Field field : fields) {
 
@@ -190,7 +204,7 @@ public class EasyMockModule implements UnitilsModule {
      * @param arguments the arguments setting, not null
      * @return a mock for the given class or interface, not null
      */
-    protected <T> T createMockImpl(Class<T> mockType, Mock.Order order, Mock.Returns returns, Mock.Arguments arguments) {
+    protected <T> T createMockImpl(Class<T> mockType, Order order, Returns returns, Arguments arguments) {
 
         MocksControl mocksControl = createMocksControl(mockType, order, returns, arguments);
         mocksControls.add(mocksControl);
@@ -211,12 +225,12 @@ public class EasyMockModule implements UnitilsModule {
      * @param arguments the arguments setting, not null
      * @return a mockcontrol for the given class or interface, not null
      */
-    protected MocksControl createMocksControl(Class type, Mock.Order order, Mock.Returns returns, Mock.Arguments arguments) {
+    protected MocksControl createMocksControl(Class type, Order order, Returns returns, Arguments arguments) {
 
         // Get anotation arguments and replace default values if needed
-        order = AnnotationUtils.getValueReplaceDefault(order);
-        returns = AnnotationUtils.getValueReplaceDefault(returns);
-        arguments = AnnotationUtils.getValueReplaceDefault(arguments);
+        order = ReflectionUtils.getValueReplaceDefault(order, defaultOrder);
+        returns = ReflectionUtils.getValueReplaceDefault(returns, defaultReturns);
+        arguments = ReflectionUtils.getValueReplaceDefault(arguments, defaultArguments);
 
         // Check returns
         MocksControl.MockType mockType = DEFAULT;

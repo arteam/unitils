@@ -140,10 +140,13 @@ public class LenientMocksControl extends MocksClassControl {
          */
         private void createMatchers(Invocation invocation) {
             List<IArgumentMatcher> matchers = LastControl.pullMatchers();
-            if (matchers != null && matchers.size() > 0) {
-                throw new IllegalStateException("This mock control does not support per-argument matchers.");
+            if (matchers != null) {
+                if (matchers.size() != invocation.getArguments().length) {
+                    throw new IllegalStateException("This mock control does not support mixing of no-argument matchers and per-argument matchers. " +
+                            "Either no matchers are defined and the reflection argument matcher is used by default or all matchers are defined explicitly (Eg by using refEq()).");
+                }
+                return;
             }
-
             Object[] arguments = invocation.getArguments();
             if (arguments == null) {
                 return;

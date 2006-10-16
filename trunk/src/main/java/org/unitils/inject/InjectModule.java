@@ -22,8 +22,12 @@ import java.util.List;
 public class InjectModule implements UnitilsModule {
 
 
+    private PropertyAccessType defaultPropertyAccessType;
+
+
     public void init(Configuration configuration) {
 
+        defaultPropertyAccessType = ReflectionUtils.getEnumValue(PropertyAccessType.class, configuration.getString(PropertyAccessType.class.getName()));
     }
 
     void injectObjects(Object test) {
@@ -103,7 +107,7 @@ public class InjectModule implements UnitilsModule {
         List targets = getTargets(autoInjectAnnotation, fieldToInject, autoInjectAnnotation.target(), test);
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToInject);
 
-        PropertyAccessType propertyAccessType = PropertyAccessType.valueOf(AnnotationUtils.getValueReplaceDefault(autoInjectAnnotation.propertyAccessType()).name());
+        PropertyAccessType propertyAccessType = ReflectionUtils.getValueReplaceDefault(autoInjectAnnotation.propertyAccessType(), defaultPropertyAccessType);
 
         for (Object target : targets) {
             try {
@@ -120,11 +124,11 @@ public class InjectModule implements UnitilsModule {
         Class targetClass = autoInjectStaticAnnotation.target();
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToAutoInjectStatic);
 
-        PropertyAccessType propertyAccessType = PropertyAccessType.valueOf(AnnotationUtils.getValueReplaceDefault(
-                autoInjectStaticAnnotation.propertyAccessType()).name());
+        PropertyAccessType propertyAccessType = ReflectionUtils.getValueReplaceDefault(autoInjectStaticAnnotation.propertyAccessType(), defaultPropertyAccessType);
 
         try {
             InjectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
+
         } catch (UnitilsException e) {
             throw new UnitilsException(getSituatedErrorMessage(autoInjectStaticAnnotation, fieldToAutoInjectStatic,
                     e.getMessage()), e);
