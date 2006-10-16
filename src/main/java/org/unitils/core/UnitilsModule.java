@@ -7,8 +7,11 @@ import org.apache.commons.configuration.Configuration;
  */
 public interface UnitilsModule {
 
+
     public void init(Configuration configuration);
 
+
     public TestListener createTestListener();
+
 
 }

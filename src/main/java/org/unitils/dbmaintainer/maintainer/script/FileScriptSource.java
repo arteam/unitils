@@ -29,19 +29,19 @@ public class FileScriptSource implements ScriptSource {
     /**
      * Property key for the directory in which the script files are located
      */
-    private static final String PROPKEY_SCRIPTFILES_DIR = "dbMaintainer.fileScriptSource.dir";
+    public static final String PROPKEY_SCRIPTFILES_DIR = "dbMaintainer.fileScriptSource.dir";
+
     /**
      * Property key for the extension of the script files
      */
-    private static final String PROPKEY_SCRIPTFILES_FILEEXTENSION = "dbMaintainer.fileScriptSource.fileExtension";
-    /**
-     * The directory in which the script files are located
-     */
+    public static final String PROPKEY_SCRIPTFILES_FILEEXTENSION = "dbMaintainer.fileScriptSource.fileExtension";
+
+    /* The directory in which the script files are located */
     private String scriptFilesDir;
-    /**
-     * The extension of the script files
-     */
+
+    /* The extension of the script files */
     private String fileExtension;
+
 
     /**
      * @see ScriptSource#init(Configuration)

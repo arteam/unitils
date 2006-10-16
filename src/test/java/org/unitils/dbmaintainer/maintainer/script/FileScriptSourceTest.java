@@ -1,26 +1,26 @@
 package org.unitils.dbmaintainer.maintainer.script;
 
-import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
-import org.unitils.dbmaintainer.maintainer.version.Version;
-import org.unitils.util.PropertiesUtils;
-import org.unitils.reflectionassert.ReflectionAssert;
 import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
+import org.unitils.dbmaintainer.maintainer.version.Version;
+import org.unitils.reflectionassert.ReflectionAssert;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Filip Neven
  */
 public class FileScriptSourceTest extends TestCase {
 
-    private static final String DBCHANGE_FILE_DIRECTORY = System.getProperty("java.io.tmpdir") + "/FileScriptSourceTest";
+    private static final String DBCHANGE_FILE_DIRECTORY = System.getProperty("java.io.tmpdir") + "/FileScriptSourceTest/";
 
     private static final String DBCHANGE_FILE1 = "001_script.sql";
 
@@ -29,11 +29,6 @@ public class FileScriptSourceTest extends TestCase {
     private static final String DBCHANGE_FILE1_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE1;
 
     private static final String DBCHANGE_FILE2_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE2;
-
-    private static final String[][] scriptSourceProperties = {
-            {"dbMaintainer.fileScriptSource.dir", DBCHANGE_FILE_DIRECTORY},
-            {"dbMaintainer.fileScriptSource.fileExtension", "sql"}
-    };
 
     private Version versionIndex0, versionIndex1, versionIndex2, versionTimestampOld;
 
@@ -64,9 +59,11 @@ public class FileScriptSourceTest extends TestCase {
         versionTimestampOld = new Version(1L, file1Timestamp - 1L);
 
         // Initialize FileScriptSourceObject
-        Properties testProperties = PropertiesUtils.asProperties(scriptSourceProperties);
+        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_DIR, DBCHANGE_FILE_DIRECTORY);
+        configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_FILEEXTENSION, "sql");
         fromScratchFileScriptSource = new FileScriptSource();
-        //fromScratchFileScriptSource.init(testProperties); //todo implement
+        fromScratchFileScriptSource.init(configuration);
     }
 
     private File copyFile(String fileInClassPath, String systemPath) throws Exception {
@@ -121,9 +118,5 @@ public class FileScriptSourceTest extends TestCase {
                 versionScriptPair);
     }
 
-    private void checkScript(VersionScriptPair script, long versionIndex, long versionTimestamp, String scriptContents) {
-        assertEquals(new Long(versionIndex), new Long(script.getVersion().getIndex()));
-        assertEquals(new Long(versionTimestamp), new Long(script.getVersion().getTimeStamp()));
-        assertEquals(scriptContents, script.getScript());
-    }
+
 }
