@@ -15,6 +15,7 @@ import org.dbunit.ext.oracle.OracleDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
 import org.unitils.core.*;
 import org.unitils.db.DatabaseModule;
+import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbunit.annotation.DbUnitDataSet;
 
 import java.io.IOException;
@@ -62,7 +63,7 @@ public class DbUnitModule implements UnitilsModule {
     }
 
     /**
-     * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
+     * Checks whether the given test instance is a database test, i.e. is annotated with the {@link org.unitils.db.annotations.DatabaseTest} annotation.
      *
      * @param testObject the test instance, not null
      * @return true if the test class is a database test false otherwise
@@ -72,7 +73,7 @@ public class DbUnitModule implements UnitilsModule {
     }
 
     /**
-     * If this is the first time that we encounter a test class annotated with {@link DatabaseTest}, a new instance
+     * If this is the first time that we encounter a test class annotated with {@link org.unitils.db.annotations.DatabaseTest}, a new instance
      * of the dbUnit's <code>IDatabaseConnection</code> is created, that is used througout the whole test run.
      */
     protected void initDbUnitConnection() {

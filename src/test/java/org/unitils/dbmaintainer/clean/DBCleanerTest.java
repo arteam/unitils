@@ -5,9 +5,9 @@ import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.UnitilsConfigurationLoader;
 import org.unitils.db.annotations.TestDataSource;
+import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbunit.DatabaseTest;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
