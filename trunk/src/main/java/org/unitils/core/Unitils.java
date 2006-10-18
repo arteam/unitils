@@ -105,7 +105,7 @@ public class Unitils {
 
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).beforeTestClass(test.getClass());
+            modulesRepository.getTestListener(module).beforeTestClass(test);
         }
     }
 
