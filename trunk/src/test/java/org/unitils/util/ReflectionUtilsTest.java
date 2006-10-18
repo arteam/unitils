@@ -1,6 +1,10 @@
 package org.unitils.util;
 
 import junit.framework.TestCase;
+import org.unitils.core.UnitilsException;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * Test for {@link ReflectionUtils}.
@@ -8,105 +12,194 @@ import junit.framework.TestCase;
 public class ReflectionUtilsTest extends TestCase {
 
 
+    /* A test object instance */
+    private TestObject testObject;
+
+    /* A field in the test object */
+    private Field field;
+
+    /* A setter method in the test object */
+    private Method fieldSetterMethod;
+
+
     /**
-     * Creates the test instance and initializes the fixture.
+     * Sets up the test fixture.
      */
     protected void setUp() throws Exception {
         super.setUp();
+
+        testObject = new TestObject();
+        field = TestObject.class.getDeclaredField("field");
+        fieldSetterMethod = TestObject.class.getDeclaredMethod("setField", String.class);
     }
 
 
     /**
-     * Test for get value with normal (no default) value.
+     * Test for creating a class instance.
      */
-    public void testGetValueReplaceDefault() {
-
-        TestEnum value = ReflectionUtils.getValueReplaceDefault(TestEnum.VALUE1, TestEnum.VALUE2);
-
-        assertEquals(TestEnum.VALUE1, value);
+    public void testCreateInstanceOfType() {
+        String result = ReflectionUtils.createInstanceOfType("java.lang.String");
+        assertNotNull(result);
     }
 
 
     /**
-     * Test for get value for a default value (DEFAULT).
+     * Test for creating a class instance, but with an unexisting class name.
      */
-    public void testGetValueReplaceDefault_default() {
-
-        TestEnum value = ReflectionUtils.getValueReplaceDefault(TestEnum.DEFAULT, TestEnum.VALUE2);
-
-        assertEquals(TestEnum.VALUE2, value);
-    }
-
-
-    /**
-     * Test for get value for a default value that is not all upper case (DEFAULT).
-     */
-    public void testGetValueReplaceDefault_defaultButOtherCase() {
-
-        TestEnumOtherCase value = ReflectionUtils.getValueReplaceDefault(TestEnumOtherCase.Default, TestEnumOtherCase.Value2);
-
-        assertEquals(TestEnumOtherCase.Value2, value);
-    }
-
-
-    /**
-     * Test for get enum value.
-     */
-    public void testGetEnumValue() {
-
-        TestEnum result = ReflectionUtils.getEnumValue(TestEnum.class, "VALUE1");
-        assertSame(TestEnum.VALUE1, result);
-    }
-
-
-    /**
-     * Test for get enum value, but an unknown value name.
-     * Should fail with a runtime exception.
-     */
-    public void testGetEnumValue_unexisting() {
-
+    public void testCreateInstanceOfType_classNotFound() {
         try {
-            ReflectionUtils.getEnumValue(TestEnum.class, "xxxxxxxxx");
-            fail();
+            ReflectionUtils.createInstanceOfType("xxxxxx");
+            fail("UnitilsException expected");
 
-        } catch (RuntimeException e) {
+        } catch (UnitilsException e) {
             //expected
         }
     }
 
 
     /**
-     * Test for get enum value, but an unknown value name.
-     * Should fail with a runtime exception.
+     * Test for getting the value of a field.
      */
-    public void testGetEnumValue_null() {
+    public void testGetFieldValue() {
+        Object result = ReflectionUtils.getFieldValue(testObject, field);
+        assertEquals("testValue", result);
+    }
+
+
+    /**
+     * Test for getting the value of a field that is not of the test object.
+     */
+    public void testGetFieldValue_unexistingField() throws Exception {
+
+        //get another field
+        Field anotherField = getClass().getDeclaredField("testObject");
 
         try {
-            ReflectionUtils.getEnumValue(TestEnum.class, null);
-            fail();
+            ReflectionUtils.getFieldValue(testObject, anotherField);
+            fail("UnitilsException expected");
 
-        } catch (RuntimeException e) {
+        } catch (UnitilsException e) {
             //expected
         }
     }
 
 
     /**
-     * Test enumeration with a default value.
+     * Test for setting the value of a field.
      */
-    private enum TestEnum {
-
-        DEFAULT, VALUE1, VALUE2
-
+    public void testSetFieldValue() {
+        ReflectionUtils.setFieldValue(testObject, field, "newValue");
+        assertEquals("newValue", testObject.getField());
     }
 
 
     /**
-     * Test enumeration with a default value and not all upper case values.
+     * Test for setting the value of a field. Null value.
      */
-    private enum TestEnumOtherCase {
+    public void testSetFieldValue_null() {
+        ReflectionUtils.setFieldValue(testObject, field, null);
+        assertNull(testObject.getField());
+    }
 
-        Default, Value1, Value2
 
+    /**
+     * Test for setting the value of a field that is not of the test object.
+     */
+    public void testSetFieldValue_unexistingField() throws Exception {
+
+        //get another field
+        Field anotherField = getClass().getDeclaredField("testObject");
+
+        try {
+            ReflectionUtils.setFieldValue(testObject, anotherField, "newValue");
+            fail("UnitilsException expected");
+
+        } catch (UnitilsException e) {
+            //expected
+        }
+    }
+
+
+    /**
+     * Test for setting the value of a field that is of a wrong type.
+     */
+    public void testSetFieldValue_wrongType() throws Exception {
+
+        try {
+            ReflectionUtils.setFieldValue(testObject, field, 0);
+            fail("UnitilsException expected");
+
+        } catch (UnitilsException e) {
+            //expected
+        }
+    }
+
+
+    /**
+     * Test for performing a method invocation.
+     */
+    public void testInvokeMethod() {
+        Object result = ReflectionUtils.invokeMethod(testObject, fieldSetterMethod, "newValue");
+        assertNull(result);
+        assertEquals("newValue", testObject.getField());
+    }
+
+
+    /**
+     * Test for performing a method invocation. Null value
+     */
+    public void testInvokeMethod_null() {
+        Object result = ReflectionUtils.invokeMethod(testObject, fieldSetterMethod, (Object) null);
+        assertNull(result);
+        assertNull(testObject.getField());
+    }
+
+    /**
+     * Test for performing a method invocation of a method that is not of the test object.
+     */
+    public void testInvokeMethod_unexistingMethod() throws Exception {
+
+        //get another field
+        Method anotherMethod = getClass().getDeclaredMethod("testInvokeMethod_unexistingMethod");
+
+        try {
+            ReflectionUtils.invokeMethod(testObject, anotherMethod);
+            fail("UnitilsException expected");
+
+        } catch (UnitilsException e) {
+            //expected
+        }
+    }
+
+
+    /**
+     * Test for performing a method invocation of a field that is of a wrong type.
+     */
+    public void testInvokeMethod_wrongType() throws Exception {
+
+        try {
+            ReflectionUtils.invokeMethod(testObject, fieldSetterMethod, 0);
+            fail("UnitilsException expected");
+
+        } catch (UnitilsException e) {
+            //expected
+        }
+    }
+
+
+    /**
+     * A test object containing a private field.
+     */
+    private static class TestObject {
+
+        private String field = "testValue";
+
+        public String getField() {
+            return field;
+        }
+
+        public void setField(String field) {
+            this.field = field;
+        }
     }
 }

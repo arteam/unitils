@@ -1,12 +1,12 @@
 package org.unitils.inject;
 
-import ognl.OgnlException;
-import ognl.OgnlContext;
 import ognl.DefaultMemberAccess;
 import ognl.Ognl;
+import ognl.OgnlContext;
+import ognl.OgnlException;
+import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.util.ReflectionUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -67,14 +67,15 @@ public class InjectionUtils {
 
     private static void autoInjectToField(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
         // Try to find a field with an exact matching type
-        Field fieldToInjectTo = ReflectionUtils.getFieldOfType(targetClass, objectToInjectType, isStatic);
+        // todo what if there is more than 1 such field?
+        Field fieldToInjectTo = ReflectionUtils.getFirstFieldOfType(targetClass, objectToInjectType, isStatic);
         if (fieldToInjectTo == null) {
             // Try to find a supertype field:
             // If one field exist that has a type which is more specific than all other fields of the given type,
             // this one is taken. Otherwise, an exception is thrown
             List<Field> fieldsOfType = ReflectionUtils.getFieldsAssignableFrom(targetClass, objectToInjectType, isStatic);
             if (fieldsOfType.size() == 0) {
-                throw new UnitilsException("No " + (isStatic?"static ":"") + "field with (super)type " + objectToInjectType.getSimpleName() +
+                throw new UnitilsException("No " + (isStatic ? "static " : "") + "field with (super)type " + objectToInjectType.getSimpleName() +
                         " found in " + targetClass.getSimpleName());
             }
             for (Field field : fieldsOfType) {
@@ -93,7 +94,7 @@ public class InjectionUtils {
                 }
             }
             if (fieldToInjectTo == null) {
-                throw new UnitilsException("Multiple candidate target " + (isStatic?"static ":"") + "fields found in " +
+                throw new UnitilsException("Multiple candidate target " + (isStatic ? "static " : "") + "fields found in " +
                         target.getClass().getSimpleName() + ", with none of them more specific than all others: " +
                         StringUtils.join(fieldsOfType.iterator(), ", "));
             }
@@ -104,7 +105,8 @@ public class InjectionUtils {
 
     private static void autoInjectToSetter(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
         // Try to find a method with an exact matching type
-        Method setterToInjectTo = ReflectionUtils.getSetterOfType(targetClass, objectToInjectType, false);
+        // todo what if there is more than 1 such setter?
+        Method setterToInjectTo = ReflectionUtils.getFirstSetterOfType(targetClass, objectToInjectType, false);
 
         if (setterToInjectTo == null) {
             // Try to find a supertype setter:
@@ -112,7 +114,7 @@ public class InjectionUtils {
             // this one is taken. Otherwise, an exception is thrown
             List<Method> settersOfType = ReflectionUtils.getSettersAssignableFrom(targetClass, objectToInjectType, false);
             if (settersOfType.size() == 0) {
-                throw new UnitilsException("No " + (isStatic?"static ":"") + "setter with (super)type " +
+                throw new UnitilsException("No " + (isStatic ? "static " : "") + "setter with (super)type " +
                         objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
             }
             for (Method setter : settersOfType) {
@@ -131,8 +133,8 @@ public class InjectionUtils {
                 }
             }
             if (setterToInjectTo == null) {
-                throw new UnitilsException("Multiple candidate target " + (isStatic?"static ":"") + " setters found in " +
-                    targetClass.getSimpleName() +", with none of them more specific than all others: " +
+                throw new UnitilsException("Multiple candidate target " + (isStatic ? "static " : "") + " setters found in " +
+                        targetClass.getSimpleName() + ", with none of them more specific than all others: " +
                         StringUtils.join(settersOfType.iterator(), ", "));
             }
         }
@@ -141,22 +143,22 @@ public class InjectionUtils {
     }
 
     private static Object getValueStatic(Class targetClass, String staticProperty) {
-        Method staticGetter = ReflectionUtils.getGetter(staticProperty, targetClass, true);
+        Method staticGetter = ReflectionUtils.getGetter(targetClass, staticProperty, true);
         if (staticGetter != null) {
             return ReflectionUtils.invokeMethod(targetClass, staticGetter);
         } else {
-            Field staticField = ReflectionUtils.getFieldWithName(staticProperty, targetClass, true);
+            Field staticField = ReflectionUtils.getFieldWithName(targetClass, staticProperty, true);
             return ReflectionUtils.getFieldValue(targetClass, staticField);
         }
     }
 
     private static boolean setValueStatic(Class targetClass, String staticProperty, Object value) {
-        Method staticSetter = ReflectionUtils.getSetter(staticProperty, targetClass, value.getClass(), true);
+        Method staticSetter = ReflectionUtils.getSetter(targetClass, staticProperty, value.getClass(), true);
         if (staticSetter != null) {
             ReflectionUtils.invokeMethod(targetClass, staticSetter, value);
             return true;
         } else {
-            Field staticField = ReflectionUtils.getFieldWithName(staticProperty, targetClass, true);
+            Field staticField = ReflectionUtils.getFieldWithName(targetClass, staticProperty, true);
             if (staticField != null) {
                 ReflectionUtils.setFieldValue(targetClass, staticField, value);
                 return true;

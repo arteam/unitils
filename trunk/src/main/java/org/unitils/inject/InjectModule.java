@@ -146,7 +146,7 @@ public class InjectModule implements UnitilsModule {
                 targets.add(ReflectionUtils.getFieldValue(test, testedObjectField));
             }
         } else {
-            Field field = ReflectionUtils.getFieldWithName(targetName, test.getClass(), false);
+            Field field = ReflectionUtils.getFieldWithName(test.getClass(), targetName, false);
             if (field == null) {
                 throw new UnitilsException(getSituatedErrorMessage(annotation, annotatedField, "Target with name " + targetName + " does not exist"));
             }
