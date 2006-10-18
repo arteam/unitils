@@ -338,7 +338,7 @@ public class DbUnitModule implements UnitilsModule {
      * @return Implementation of DatabaseModule, on which this module is dependent
      */
     private DatabaseModule getDatabaseTestModule() {
-        return Unitils.getModulesRepository().getModule(DatabaseModule.class);
+        return Unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
     }
 
     /**

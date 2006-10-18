@@ -108,7 +108,7 @@ public class HibernateModule implements UnitilsModule {
     }
 
     protected Connection getConnection() {
-        DatabaseModule dbModule = Unitils.getModulesRepository().getModule(DatabaseModule.class);
+        DatabaseModule dbModule = Unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
         return dbModule.getCurrentConnection();
     }
 

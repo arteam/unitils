@@ -61,6 +61,7 @@ public class UnitilsModulesLoader {
     /**
      * Loads all unitils modules as described in the class javadoc.
      *
+     * @param configuration the configuration, not null
      * @return the modules, not null
      */
     public List<UnitilsModule> loadModules(Configuration configuration) {
