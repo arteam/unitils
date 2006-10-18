@@ -78,7 +78,8 @@ public class DatabaseModule implements UnitilsModule {
      *         false otherwise
      */
     protected boolean isDatabaseTest(Class<?> testClass) {
-        return AnnotationUtils.getClassAnnotation(testClass, DatabaseTest.class) != null;
+
+        return testClass.getAnnotation(DatabaseTest.class) != null;
     }
 
     /**

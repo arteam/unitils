@@ -41,7 +41,8 @@ public class HibernateModule implements UnitilsModule {
 
 
     protected boolean isHibernateTest(Class<?> testClass) {
-        return AnnotationUtils.getClassAnnotation(testClass, HibernateTest.class) != null;
+
+        return testClass.getAnnotation(HibernateTest.class) != null;
     }
 
     protected void configureHibernate(Object testObject) {
@@ -86,8 +87,7 @@ public class HibernateModule implements UnitilsModule {
 
     protected void createHibernateSession(Object testObject) {
         Session currentHibernateSession = currentHibernateSessionHolder.get();
-        if (currentHibernateSession != null && (currentHibernateSession.isConnected() || currentHibernateSession.isOpen()))
-        {
+        if (currentHibernateSession != null && (currentHibernateSession.isConnected() || currentHibernateSession.isOpen())) {
             currentHibernateSession.close();
         }
         currentHibernateSessionHolder.set(hibernateSessionFactory.openSession(getConnection()));
