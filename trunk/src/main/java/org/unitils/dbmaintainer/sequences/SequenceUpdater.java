@@ -1,20 +1,27 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.dbmaintainer.sequences;
-
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.apache.commons.configuration.Configuration;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.configuration.Configuration;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+
 /**
- * Interface for implementation classes that update the sequence of the unit testing database to a sufficiently
- * high value, so that test data can be inserted without problems.
+ * Defines the contract for implementation classes that update the sequence of a unit testing database to a sufficiently
+ * high value, so that test data be inserted easily.
  */
 public interface SequenceUpdater {
 
     /**
      * Initializes the VersionSource
-     *
+
+     * @param configuration 
      * @param dataSource
      * @param statementHandler
      */
@@ -22,6 +29,8 @@ public interface SequenceUpdater {
 
     /**
      * Updates the database sequences
+     * 
+     * @throws StatementHandlerException 
      */
     void updateSequences() throws StatementHandlerException;
 

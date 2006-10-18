@@ -6,9 +6,9 @@
  */
 package org.unitils.dbmaintainer.handler;
 
-import org.apache.commons.configuration.Configuration;
-
 import javax.sql.DataSource;
+
+import org.apache.commons.configuration.Configuration;
 
 /**
  * Defines the contract for classes that handle SQL statements. E.g. by logging these statements or by executing them
@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 public interface StatementHandler {
 
     /**
-     * Provides a <code>Properties</code> and a <code>DataSource</code> object for initialization
+     * Provides a <code>Configuration</code> and a <code>TestDataSource</code> object for initialization
      *
      * @param dataSource
      */

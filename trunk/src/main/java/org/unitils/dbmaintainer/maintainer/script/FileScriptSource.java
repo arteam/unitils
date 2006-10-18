@@ -6,23 +6,35 @@
  */
 package org.unitils.dbmaintainer.maintainer.script;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.*;
-
 /**
- * Implementation of <code>ScriptSource</code> that reads script files from the filesystem.
- * <p/>
- * The directory and the file extension are configured using a Properties object by invoking the init method
+ * Implementation of {@link ScriptSource} that reads script files from the filesystem. This implementation can work
+ * both incrementally and from scratch.
+ * <p>Script files should be located in the directory configured by {@link #PROPKEY_SCRIPTFILES_DIR}. Valid script files
+ * start with a version number followed by an underscore, and end with the extension configured by 
+ * {@link #PROPKEY_SCRIPTFILES_FILEEXTENSION}.
+ * <p>
+ * When script files have been added having a higher version number, {@link #existingScriptsModified(Version)} will return false,
+ * and only the newer version scripts are returned by {@link #getNewScripts(Version)}. When existing scripts
+ * have been modified, {@link #existingScriptsModified(Version)} returns true, and {@link #getNewScripts(Version)} returns all 
+ * scripts.
  */
 public class FileScriptSource implements ScriptSource {
 
@@ -44,61 +56,46 @@ public class FileScriptSource implements ScriptSource {
 
 
     /**
+     * Uses the given <code>Configuration</code> to initialize the script files directory, and the file extension
+     * of the script files.
      * @see ScriptSource#init(Configuration)
      */
     public void init(Configuration configuration) {
 
         scriptFilesDir = configuration.getString(PROPKEY_SCRIPTFILES_DIR);
         if (!new File(scriptFilesDir).exists()) {
-            throw new IllegalArgumentException("Script files directory '" + scriptFilesDir + "' does not exist");
+            throw new UnitilsException("Script files directory '" + scriptFilesDir + "' does not exist");
         }
         fileExtension = configuration.getString(PROPKEY_SCRIPTFILES_FILEEXTENSION);
         if (fileExtension.startsWith(".")) {
-            throw new IllegalArgumentException("Extension should not start with a '.'");
+            throw new UnitilsException("Extension should not start with a '.'");
         }
     }
 
     /**
-     * @see ScriptSource#shouldRunFromScratch(org.unitils.dbmaintainer.maintainer.version.Version)
+     * Given the current {@link Version} of the database, returns true if the database should be rebuilt from 
+     * scratch, or if it can be updated incrementally to the latest version.
+     * 
+     * @see ScriptSource#existingScriptsModified(org.unitils.dbmaintainer.maintainer.version.Version)
      */
-    public boolean shouldRunFromScratch(Version currentVersion) {
+    public boolean existingScriptsModified(Version currentVersion) {
         Long scriptsTimestamp = getTimestampOfAlreadyExecutedScripts(currentVersion);
         return (scriptsTimestamp > currentVersion.getTimeStamp());
     }
 
     /**
-     * @see ScriptSource#getScripts(org.unitils.dbmaintainer.maintainer.version.Version)
-     */
-    public List<VersionScriptPair> getScripts(Version currentVersion) {
-        boolean shouldRunFromScratch = shouldRunFromScratch(currentVersion);
-        if (shouldRunFromScratch) {
-            return getScriptsFromScratch();
-        } else {
-            return getScriptsIncremental(currentVersion);
-        }
-    }
-
-    /**
-     * @return the scripts that should be run to update the database to the latest version from scratch
-     */
-    private List<VersionScriptPair> getScriptsFromScratch() {
-        return getStatementsFromFiles(getScriptFilesSorted());
-    }
-
-    /**
      * @return the scripts that should be run to update the database to the latest version incrementally
      */
-    private List<VersionScriptPair> getScriptsIncremental(Version currentVersion) {
+    public List<VersionScriptPair> getNewScripts(Version currentVersion) {
         List<File> filesWithNewerVersion = getFilesWithHigherIndex(currentVersion.getIndex());
         return getStatementsFromFiles(filesWithNewerVersion);
     }
-
+    
     /**
-     * @return the highest timestamp of all the scripts
+     * @return the scripts that should be run to update the database to the latest version from scratch
      */
-    private long getScriptsTimestamp() {
-        List<File> scriptFiles = getScriptFiles();
-        return getHighestScriptTimestamp(scriptFiles);
+    public List<VersionScriptPair> getAllScripts() {
+        return getStatementsFromFiles(getScriptFilesSorted());
     }
 
     /**

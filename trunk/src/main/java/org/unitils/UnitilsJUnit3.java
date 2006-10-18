@@ -10,13 +10,18 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Method;
 
 /**
+ * todo test logging of exceptions in different hook methods (already fixed in runbare: exceptions were not logged)
  * javadoc
  */
 public abstract class UnitilsJUnit3 extends TestCase {
+
+    /* Logger */
+    private static final Logger logger = Logger.getLogger(UnitilsJUnit3.class);
 
     private static Unitils unitils;
 
@@ -46,15 +51,35 @@ public abstract class UnitilsJUnit3 extends TestCase {
     }
 
     public void run(TestResult result) {
-        unitils.beforeTestClass(this);
+        try {
+            unitils.beforeTestClass(this);
+        } catch (UnitilsException e) {
+            logger.error("Error in Unitils beforeTestClass", e);
+            throw e;
+        }
         super.run(result);
-        unitils.afterTestClass(this);
+        try {
+            unitils.afterTestClass(this);
+        } catch (UnitilsException e) {
+            logger.error("Error in Unitils afterTestClass", e);
+            throw e;
+        }
     }
 
     public void runBare() throws Throwable {
-        unitils.beforeTestMethod(this, getCurrentTestMethod());
+        try {
+            unitils.beforeTestMethod(this, getCurrentTestMethod());
+        } catch (Throwable e) {
+            logger.error(e);
+            throw e;
+        }
         super.runBare();
-        unitils.afterTestMethod(this, getCurrentTestMethod());
+        try {
+            unitils.afterTestMethod(this, getCurrentTestMethod());
+        } catch (Throwable e) {
+            logger.error(e);
+            throw e;
+        }
     }
 
     private Method getCurrentTestMethod() {

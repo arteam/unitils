@@ -6,11 +6,6 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,8 +13,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+
 /**
- * Implementation of {@link ScriptRunner} that runs an SQL script
+ * Implementation of {@link ScriptRunner} that runs an SQL script. All statements are passed on to 
+ * a {@link StatementHandler}
  */
 public class SQLScriptRunner implements ScriptRunner {
 
@@ -29,7 +30,7 @@ public class SQLScriptRunner implements ScriptRunner {
     private StatementHandler statementHandler;
 
     /**
-     * Constructs a new <code>SQLScriptRunner</code>. The SQL statements in the scripts will org handled by the given
+     * Constructs a new {@link SQLScriptRunner}. The SQL statements will be handled by the given
      * {@link StatementHandler}
      *
      * @param statementHandler Will handle the SQL statements in the executed scripts

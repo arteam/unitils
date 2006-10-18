@@ -80,8 +80,8 @@ public class DBMaintainerTest extends EasyMockTestCase {
     public void testDBMaintainer_incremental() throws Exception {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
-        expect(mockScriptSource.shouldRunFromScratch(version0)).andReturn(false);
-        expect(mockScriptSource.getScripts(version0)).andReturn(versionScriptPairs);
+        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);
         mockScriptRunner.execute("Script 2");
@@ -106,9 +106,9 @@ public class DBMaintainerTest extends EasyMockTestCase {
     public void testDBMaintainer_fromScratch() throws Exception {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
-        expect(mockScriptSource.shouldRunFromScratch(version0)).andReturn(true);
+        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
         mockDbClearer.clearDatabase();
-        expect(mockScriptSource.getScripts(version0)).andReturn(versionScriptPairs);
+        expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);
         mockScriptRunner.execute("Script 2");
@@ -132,8 +132,8 @@ public class DBMaintainerTest extends EasyMockTestCase {
      */
     public void testDBMaintainer_errorInScript() throws Exception {
         expect(mockVersionSource.getDbVersion()).andReturn(version0).anyTimes();
-        expect(mockScriptSource.shouldRunFromScratch(version0)).andReturn(false);
-        expect(mockScriptSource.getScripts(version0)).andReturn(versionScriptPairs);
+        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         expectLastCall().andThrow(new StatementHandlerException("Test exception"));
 

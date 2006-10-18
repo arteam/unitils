@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.dbmaintainer.maintainer;
 
 import org.unitils.dbmaintainer.maintainer.version.Version;
@@ -13,7 +19,7 @@ public class VersionScriptPair {
     private Version version;
 
     /**
-     * The list of DDL scripts that will bring the database into the version
+     * The list of DDL scripts that will update the database to this version
      */
     private String script;
 

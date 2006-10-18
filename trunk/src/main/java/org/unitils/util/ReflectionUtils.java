@@ -112,10 +112,8 @@ public class ReflectionUtils {
 
         } catch (IllegalArgumentException e) {
             throw new UnitilsException("Error while invoking method " + method, e);
-
         } catch (IllegalAccessException e) {
             throw new UnitilsException("Error while invoking method " + method, e);
-
         } catch (InvocationTargetException e) {
             throw new UnitilsException("Error while invoking method " + method, e);
         }

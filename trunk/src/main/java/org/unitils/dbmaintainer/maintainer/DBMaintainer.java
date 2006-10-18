@@ -6,8 +6,13 @@
  */
 package org.unitils.dbmaintainer.maintainer;
 
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
+import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clear.DBClearer;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
 import org.unitils.dbmaintainer.dtd.DtdGenerator;
@@ -22,37 +27,29 @@ import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
 import org.unitils.util.ReflectionUtils;
 
-import javax.sql.DataSource;
-import java.util.List;
-
 /**
  * A class for performing automatic maintenance of a database.<br>
- * This class can org injected with implementations of a {@link VersionSource}, {@link ScriptSource} and a
- * {@link StatementHandler} to customize it's behavior, or a <code>java.lang.Properties</code> object and a
- * <code>javax.sql.DataSource</code>.
- * <p/>
- * The {@link DBMaintainer#updateDatabase()} method will use the {@link VersionSource} to check what is
- * the current version of the database, and use the {@link ScriptSource} to verifyAll if there are scripts
- * available with a higher version number. If yes, the statements in these scripts will org passed to the
- * {@link StatementHandler}, and the version will org set to the new value using the {@link VersionSource}.
- * <p/>
- * To obtain a properly configured <code>DBMaintainer</code>, invoke the contructor
- * {@link DBMaintainer(java.util.Properties, javax.sql.DataSource)} with a <code>DataSource</code> providing access
- * to the database and a <code>Properties</code> object containing following properties:
+ * This class must be configured with implementations of a {@link VersionSource}, {@link ScriptSource}, a
+ * {@link ScriptRunner}, {@link DBClearer}, {@link ConstraintsDisabler}, {@link SequenceUpdater} and a 
+ * {@link DtdGenerator}
+ * <p>
+ * The {@link #updateDatabase()} method will use the {@link VersionSource} to check what is
+ * the current version of the database. The {@link ScriptSource} is used to check if existing scripts have
+ * been modified. If yes, the database is cleared by invoking the {@link DBClearer} and all database scripts,
+ * obtained from the {@link ScriptSource} are executed on the database. If no existing scripts have been 
+ * modified, but new scripts have been added, only the new scripts are executed.
+ * <p>
+ * After updating the database, following steps are optionally executed on the database (depending on the configuration):
  * <ul>
- * <li>dbMaintainer.versionSource.className: Fully qualified name of the implementation of {@link VersionSource}
- * that is used. The recommeded value is {@link org.unitils.dbmaintainer.maintainer.version.DBVersionSource}, which will retrieve
- * the database version from the updated database schema itself. Another implementation could e.g. retrieve the version
- * from a file.</li>
- * <li>dbMaintainer.scriptSource.className: Fully qualified name of the implementation of {@link ScriptSource} that is
- * used. The recommeded value is {@link org.unitils.dbmaintainer.maintainer.script.FileScriptSource}, which will retrieve the
- * scripts from the local file system. Another implementation could e.g. retrieve the scripts directly from the
- * Version Control System.</li>
- * <li>dbMaintainer.statementHandler.className: Fully qualified name of the implementation of {@link StatementHandler}
- * that is used. The recommeded value is {@link org.unitils.dbmaintainer.handler.JDBCStatementHandler}, which will execute the
- * scripts using JDBC. Another implementation could e.g. execute these scripts with a vendor specific script executer.
- * </li>
+ * <li>Foreign key and not null constraints are disabled</li>
+ * <li>Sequences that have a value lower than a configured treshold, are updated to a value equal to or largen than this 
+ * treshold</li>
+ * <li>A DTD is generated that describes the database's table structure, to use in test data XML files</li>
  * </ul>
+ * <p> 
+ * To obtain a properly configured <code>DBMaintainer</code>, invoke the contructor
+ * {@link #DBMaintainer(Configuration, DataSource)} with a <code>TestDataSource</code> providing access
+ * to the database and a <code>Configuration</code> object containing all necessary properties.
  */
 public class DBMaintainer {
 
@@ -127,24 +124,25 @@ public class DBMaintainer {
 
     /**
      * Create a new instance of <code>DBMaintainer</code>, The concrete implementations of {@link VersionSource},
-     * {@link ScriptSource} and {@link StatementHandler} are derived from the given <code>Properties</code> object.
-     * These objects are initialized too using their init method and the given <code>Properties</code> and
-     * <code>DataSource</code> object.
-     *
+     * {@link ScriptSource} and {@link StatementHandler} are derived from the given <code>Configuration</code> object.
+     * These objects are initialized using their init method and the given <code>Configuration</code> and
+     * <code>TestDataSource</code> object.
+
+     * @param configuration 
      * @param dataSource
      */
     public DBMaintainer(Configuration configuration, DataSource dataSource) {
 
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler) ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_STATEMENTHANDLER)));
+        statementHandler.init(configuration, dataSource);
 
         versionSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_VERSIONSOURCE));
-        versionSource.init(configuration, dataSource);
+        versionSource.init(configuration, dataSource, statementHandler);
 
         scriptSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_SCRIPTSOURCE));
         scriptSource.init(configuration);
 
-        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler) ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_STATEMENTHANDLER)));
-        statementHandler.init(configuration, dataSource);
         scriptRunner = new SQLScriptRunner(statementHandler);
 
         fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
@@ -174,23 +172,26 @@ public class DBMaintainer {
 
     /**
      * Checks if the new scripts are available to update the version of the database. If yes, these scripts are
-     * executed and the version number is increased. If an error occurs with one of the scripts, a
-     * {@link StatementHandlerException} is thrown
+     * executed and the version number is increased. If an existing script has been modified, the database is 
+     * cleared and completely rebuilt from scratch. If an error occurs with one of the scripts, a
+     * {@link StatementHandlerException} is thrown.
      *
      * @throws StatementHandlerException If an error occurs with one of the scripts
      */
     public void updateDatabase() throws StatementHandlerException {
         Version currentVersion = versionSource.getDbVersion();
-        List<VersionScriptPair> versionScriptPairs = scriptSource.getScripts(currentVersion);
-        if (versionScriptPairs.size() > 0) {
-            if (scriptSource.shouldRunFromScratch(currentVersion)) {
-                if (fromScratchEnabled) {
-                    dbClearer.clearDatabase();
-                } else {
-                    throw new RuntimeException("Existing database update script has been modified, but updateing " +
-                            "from scratch is not enabled");
-                }
+        List<VersionScriptPair> versionScriptPairs;
+        if (scriptSource.existingScriptsModified(currentVersion)) {
+            if (!fromScratchEnabled) {
+                throw new UnitilsException("Existing database update scripts have been modified, but updating " +
+                        "from scratch is disabled");
             }
+            dbClearer.clearDatabase();
+            versionScriptPairs = scriptSource.getAllScripts();
+        } else {
+            versionScriptPairs = scriptSource.getNewScripts(currentVersion);
+        }
+        if (versionScriptPairs.size() > 0) {
             for (VersionScriptPair versionScriptPair : versionScriptPairs) {
                 try {
                     scriptRunner.execute(versionScriptPair.getScript());
@@ -215,19 +216,12 @@ public class DBMaintainer {
     }
 
     /**
-     * Allows to set fromScratchEnabled property for unittesting purposes
+     * Allows setting fromScratchEnabled property programmatically
      *
      * @param fromScratchEnabled
      */
     void setFromScratchEnabled(boolean fromScratchEnabled) {
         this.fromScratchEnabled = fromScratchEnabled;
     }
-
-    /**
-     * @return The {@link ConstraintsDisabler} that is used. If constraints disabling is not active, null is returned
-     */
-    public ConstraintsDisabler getConstraintsDisabler() {
-        return constraintsDisabler;
-    }
-
+    
 }

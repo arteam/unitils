@@ -1,19 +1,20 @@
 package org.unitils.dbmaintainer.constraints;
 
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.core.UnitilsException;
-import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.configuration.Configuration;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.util.List;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbutils.DbUtils;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
  * Implementation of {@link ConstraintsDisabler} for a hsqldb database.
@@ -91,6 +92,7 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
      * Sends statements to the StatementHandler that make sure all not-null constraints for the table with the given
      * name are disabled.
      * @param conn
+     * @param tableName 
      * @throws SQLException
      * @throws StatementHandlerException
      */
