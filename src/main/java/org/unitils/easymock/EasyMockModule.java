@@ -5,7 +5,10 @@ import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.MocksControl;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
 import static org.easymock.internal.MocksControl.MockType.NICE;
-import org.unitils.core.*;
+import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.UnitilsModule;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.annotation.Mock.Arguments;
@@ -30,10 +33,10 @@ import java.util.List;
  * you with a hook method for custom handling of the mock (e.g. adding the mocks to a service locator repository).
  * A method can only be called if it has following signature <code>void myMethod(Object mock, String name, Class type)</code>.
  * <p/>
- * Mocks can also be created explicitly by using the {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method.
+ * Mocks can also be created explicitly by using the {@link #createMock(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method.
  * <p/>
  * Switching to the replay state and verifying expectations of all mocks (including the mocks created with
- * the {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method can be done by calling
+ * the {@link #createMock(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method can be done by calling
  * the {@link EasyMockModule#replay()} and {@link EasyMockModule#verify()} methods.
  */
 public class EasyMockModule implements UnitilsModule {
@@ -82,7 +85,7 @@ public class EasyMockModule implements UnitilsModule {
      * <p/>
      * This method will make sure EasyMock's replay method is called on every mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method.
+     * {@link #createMock(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method.
      * <p/>
      * After each test, the expected behavior will be verified automatically. Verification can also be performed
      * explicitly by calling the {@link #verify()} method.
@@ -99,7 +102,7 @@ public class EasyMockModule implements UnitilsModule {
      * <p/>
      * This method will make sure EasyMock's verify method is called on every mock mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createMock(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method.
+     * {@link #createMock(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method.
      * <p/>
      * After each test, the expected behavior will be verified automatically. Verification can also be performed
      * explicitly by calling this method.
@@ -146,7 +149,7 @@ public class EasyMockModule implements UnitilsModule {
     /**
      * Creates and sets a mock for all {@link @Mock} annotated fields.
      * <p/>
-     * The {@link #createMockImpl(Class, Mock.Order, Mock.Returns, Mock.Arguments)} method is called for creating the
+     * The {@link #createMockImpl(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method is called for creating the
      * mocks. Ones the mock is created, all methods annotated with {@link @AfterCreateMock} will be called passing the created mock.
      *
      * @param testObject the test, not null
@@ -287,12 +290,12 @@ public class EasyMockModule implements UnitilsModule {
          * create and inject all mocks on the class.
          */
         @Override
-        public void beforeTestMethod(TestContext testContext) {
+        public void beforeTestMethod(Object testObject, Method testMethod) {
 
             // Clear all previously created mocks controls
             mocksControls.clear();
 
-            createAndInjectMocksIntoTest(testContext.getTestObject());
+            createAndInjectMocksIntoTest(testObject);
         }
 
         /**
@@ -300,7 +303,7 @@ public class EasyMockModule implements UnitilsModule {
          * of all created mocks.
          */
         @Override
-        public void afterTestMethod(TestContext testContext) {
+        public void afterTestMethod(Object testObject, Method testMethod) {
 
             verifyImpl();
         }
