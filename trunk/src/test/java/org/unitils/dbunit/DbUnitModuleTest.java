@@ -2,6 +2,7 @@ package org.unitils.dbunit;
 
 import org.unitils.UnitilsJUnit3;
 import org.unitils.db.DatabaseModule;
+import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.inject.annotation.Inject;
 import org.unitils.core.ModulesRepository;
 import org.unitils.core.Unitils;

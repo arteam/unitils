@@ -11,11 +11,11 @@ import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.UnitilsConfigurationLoader;
 import org.unitils.db.annotations.TestDataSource;
+import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbmaintainer.clear.DBClearer;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.dbunit.DatabaseTest;
 import org.unitils.util.ReflectionUtils;
 
 /**

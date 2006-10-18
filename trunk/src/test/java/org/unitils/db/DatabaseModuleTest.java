@@ -5,7 +5,6 @@ import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.dbunit.DatabaseTest;
 import static org.unitils.easymock.EasyMockModule.replay;
 import org.unitils.easymock.annotation.Mock;
 
@@ -49,7 +48,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
 
         replay();
 
-        boolean result = databaseModule.isDatabaseTest(DbTest.class);
+        boolean result = databaseModule.isDatabaseTest(new DbTest());
         assertTrue(result);
     }
 
@@ -60,13 +59,13 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
 
         DbTest dbTest = new DbTest();
         databaseModule.initDatabase(dbTest);
-        databaseModule.createTestListener().beforeTestMethod(dbTest, null);
+        databaseModule.injectDataSource(dbTest);
         assertSame(mockDataSource, databaseModule.getDataSource());
         assertSame(mockDataSource, dbTest.getDataSourceFromMethod());
         assertSame(mockDataSource, dbTest.getDataSourceFromField());
     }
 
-    @DatabaseTest
+    @org.unitils.db.annotations.DatabaseTest
     public static class DbTest {
 
         private javax.sql.DataSource dataSourceFromMethod;

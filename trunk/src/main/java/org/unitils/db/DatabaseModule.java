@@ -11,6 +11,7 @@ import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.UnitilsModule;
 import org.unitils.db.annotations.TestDataSource;
+import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbmaintainer.config.DataSourceFactory;
 import org.unitils.dbmaintainer.constraints.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
@@ -18,7 +19,6 @@ import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.dbunit.DatabaseTest;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -264,7 +264,7 @@ public class DatabaseModule implements UnitilsModule {
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
 		
-		    if (isDatabaseTest(testObject.getClass())) {
+		    if (isDatabaseTest(testObject)) {
                 //call methods annotated with TestDataSource, if any
                 injectDataSource(testObject);
             }
