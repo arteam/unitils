@@ -49,7 +49,7 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
             }
         };
 
-        EasyMock.expect(mockModulesRepository.getModule(DatabaseModule.class)).andStubReturn(mockDatabaseModule);
+        EasyMock.expect(mockModulesRepository.getFirstModule(DatabaseModule.class)).andStubReturn(mockDatabaseModule);
     }
 
     public void testIsDatabaseTest() throws Exception {

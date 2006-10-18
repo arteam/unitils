@@ -23,7 +23,7 @@ public class HibernateAssert {
      * <code>BaseHibernateTestCase</code> is used as test superclass.
      */
     public static void assertMappingToDatabase() {
-        HibernateModule hibernateModule = Unitils.getModulesRepository().getModule(HibernateModule.class);
+        HibernateModule hibernateModule = Unitils.getModulesRepository().getFirstModule(HibernateModule.class);
         Configuration configuration = hibernateModule.getHibernateConfiguration();
         Session session = hibernateModule.getCurrentSession();
 

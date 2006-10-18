@@ -268,7 +268,7 @@ public class EasyMockModule implements UnitilsModule {
      */
     private static EasyMockModule getInstance() {
 
-        EasyMockModule module = Unitils.getModulesRepository().getModule(EasyMockModule.class);
+        EasyMockModule module = Unitils.getModulesRepository().getFirstModule(EasyMockModule.class);
         if (module == null) {
 
             throw new UnitilsException("Unable to find an instance of an EasyMockModule in the modules repository.");
