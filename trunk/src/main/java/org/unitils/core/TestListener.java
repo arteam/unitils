@@ -1,31 +1,33 @@
 package org.unitils.core;
 
+import java.lang.reflect.Method;
+
 /**
  * todo javadoc
  */
 public abstract class TestListener {
 
-    public void beforeAll(TestContext testContext) {
+    public void beforeAll() {
         // empty
     }
 
-    public void beforeTestClass(TestContext testContext) {
+    public void beforeTestClass(Object testObject) {
         // empty
     }
 
-    public void beforeTestMethod(TestContext testContext) {
+    public void beforeTestMethod(Object testObject, Method testMethod) {
         // empty
     }
 
-    public void afterTestMethod(TestContext testContext) {
+    public void afterTestMethod(Object testObject, Method testMethod) {
         // empty
     }
 
-    public void afterTestClass(TestContext testContext) {
+    public void afterTestClass(Object testObject) {
         // empty
     }
 
-    public void afterAll(TestContext testContext) {
+    public void afterAll() {
         // empty
     }
 

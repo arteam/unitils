@@ -2,7 +2,6 @@ package org.unitils.inject;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.unitils.core.TestContext;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.UnitilsModule;
@@ -12,6 +11,7 @@ import org.unitils.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -168,9 +168,9 @@ public class InjectModule implements UnitilsModule {
     private class InjectTestListener extends TestListener {
 
         @Override
-        public void beforeTestMethod(TestContext testContext) {
+        public void beforeTestMethod(Object testObject, Method testMethod) {
 
-            injectObjects(testContext.getTestObject());
+            injectObjects(testObject);
         }
     }
 

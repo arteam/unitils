@@ -91,7 +91,7 @@ public class Unitils {
         // For each core, invoke the beforeAll method
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).beforeAll(testContext);
+            modulesRepository.getTestListener(module).beforeAll();
         }
     }
 
@@ -105,37 +105,37 @@ public class Unitils {
 
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).beforeTestClass(testContext);
+            modulesRepository.getTestListener(module).beforeTestClass(test.getClass());
         }
     }
 
 
-    public void beforeTestMethod(Object test, Method method) {
+    public void beforeTestMethod(Object testObject, Method testMethod) {
 
         TestContext testContext = getTestContext();
-        testContext.setTestClass(test.getClass());
-        testContext.setTestObject(test);
-        testContext.setTestMethod(method);
+        testContext.setTestClass(testObject.getClass());
+        testContext.setTestObject(testObject);
+        testContext.setTestMethod(testMethod);
 
         // For each core, invoke the beforeTestMethod method
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).beforeTestMethod(testContext);
+            modulesRepository.getTestListener(module).beforeTestMethod(testObject, testMethod);
         }
     }
 
 
-    public void afterTestMethod(Object test, Method method) {
+    public void afterTestMethod(Object testObject, Method testMethod) {
 
         TestContext testContext = getTestContext();
-        testContext.setTestClass(test.getClass());
-        testContext.setTestObject(test);
-        testContext.setTestMethod(method);
+        testContext.setTestClass(testObject.getClass());
+        testContext.setTestObject(testObject);
+        testContext.setTestMethod(testMethod);
 
         // For each core, invoke the afterTestMethod method
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).afterTestMethod(testContext);
+            modulesRepository.getTestListener(module).afterTestMethod(testObject, testMethod);
         }
     }
 
@@ -148,7 +148,7 @@ public class Unitils {
 
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).afterTestClass(testContext);
+            modulesRepository.getTestListener(module).afterTestClass(test.getClass());
         }
     }
 
@@ -162,7 +162,7 @@ public class Unitils {
 
         List<UnitilsModule> modules = modulesRepository.getModules();
         for (UnitilsModule module : modules) {
-            modulesRepository.getTestListener(module).afterAll(testContext);
+            modulesRepository.getTestListener(module).afterAll();
         }
     }
 

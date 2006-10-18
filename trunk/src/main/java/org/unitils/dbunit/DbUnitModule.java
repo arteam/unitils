@@ -62,12 +62,13 @@ public class DbUnitModule implements UnitilsModule {
     }
 
     /**
-     * @param testClass
-     * @return True if the test class is a database test, i.e. is annotated with the {@link DatabaseTest} annotation,
-     *         false otherwise
+     * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
+     *
+     * @param testObject the test instance, not null
+     * @return true if the test class is a database test false otherwise
      */
-    protected boolean isDatabaseTest(Class<?> testClass) {
-        return testClass.getAnnotation(DatabaseTest.class) != null;
+    protected boolean isDatabaseTest(Object testObject) {
+        return testObject.getClass().getAnnotation(DatabaseTest.class) != null;
     }
 
     /**
@@ -309,7 +310,7 @@ public class DbUnitModule implements UnitilsModule {
     }
 
     /**
-     * Gets the result dataset with a filename specified by {@link #getExpectedDataSetFileName(Class, String)}.
+     * Gets the result dataset with a filename specified by {@link #getExpectedDataSetFileName(Class,String)}.
      * If the file does not exist, a file not found exception is thrown.
      *
      * @return the dataset, not null
@@ -347,7 +348,7 @@ public class DbUnitModule implements UnitilsModule {
     private class DbUnitListener extends TestListener {
 
         @Override
-        public void beforeAll(TestContext testContext) {
+        public void beforeAll() {
             if (getDatabaseTestModule() == null) {
                 throw new UnitilsException("Invalid configuration: DatabaseModule should be enabled and DbUnitModule " +
                         "should be configured to run after DatabaseModule");
@@ -355,21 +356,21 @@ public class DbUnitModule implements UnitilsModule {
         }
 
         @Override
-        public void beforeTestClass(TestContext testContext) {
-            if (isDatabaseTest(testContext.getTestClass())) {
+        public void beforeTestClass(Object testObject) {
+            if (isDatabaseTest(testObject.getClass())) {
                 initDbUnitConnection();
             }
         }
 
         @Override
-        public void beforeTestMethod(TestContext testContext) {
-            if (isDatabaseTest(testContext.getTestClass())) {
-                insertTestData(testContext.getTestClass(), testContext.getTestMethod());
+        public void beforeTestMethod(Object testObject, Method testMethod) {
+            if (isDatabaseTest(testObject)) {
+                insertTestData(testObject.getClass(), testMethod);
             }
         }
 
         @Override
-        public void afterAll(TestContext testContext) {
+        public void afterAll() {
             closeDbUnitConnection();
         }
 

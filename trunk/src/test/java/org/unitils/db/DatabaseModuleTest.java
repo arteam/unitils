@@ -3,7 +3,6 @@ package org.unitils.db;
 import org.apache.commons.configuration.Configuration;
 import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.core.TestContext;
 import org.unitils.db.annotations.AfterCreateConnection;
 import org.unitils.db.annotations.AfterCreateDataSource;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
@@ -63,10 +62,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
 
         DbTest dbTest = new DbTest();
         databaseModule.initDatabase(dbTest);
-        TestContext testContext = new TestContext();
-        testContext.setTestClass(DbTest.class);
-        testContext.setTestObject(dbTest);
-        databaseModule.createTestListener().beforeTestMethod(testContext);
+        databaseModule.createTestListener().beforeTestMethod(dbTest, null);
         assertSame(mockDataSource, databaseModule.getDataSource());
         assertSame(mockDataSource, dbTest.getDataSource());
         assertSame(mockConnection, dbTest.getConnection());

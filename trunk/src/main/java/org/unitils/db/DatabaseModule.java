@@ -1,7 +1,6 @@
 package org.unitils.db;
 
 import org.apache.commons.configuration.Configuration;
-import org.unitils.core.TestContext;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.UnitilsModule;
@@ -73,18 +72,21 @@ public class DatabaseModule implements UnitilsModule {
     }
 
     /**
-     * @param testClass
-     * @return True if the test class is a database test, i.e. is annotated with the {@link DatabaseTest} annotation,
-     *         false otherwise
+     * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
+     *
+     * @param testObject the test instance, not null
+     * @return true if the test class is a database test false otherwise
      */
-    protected boolean isDatabaseTest(Class<?> testClass) {
+    protected boolean isDatabaseTest(Object testObject) {
 
-        return testClass.getAnnotation(DatabaseTest.class) != null;
+        return testObject.getClass().getAnnotation(DatabaseTest.class) != null;
     }
 
     /**
      * Inializes the database setup. I.e., creates a <code>DataSource</code> and updates the database schema if needed
      * using the {@link DBMaintainer}
+     *
+     * @param testObject the test instance, not null
      */
     protected void initDatabase(Object testObject) {
         try {
@@ -164,7 +166,7 @@ public class DatabaseModule implements UnitilsModule {
     /**
      * Calls all methods annotated with {@link AfterCreateDataSource}
      *
-     * @param testObject
+     * @param testObject testObject the test instance, not null
      */
     protected void callAfterCreateDataSourceMethods(Object testObject) {
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateDataSource.class);
@@ -183,7 +185,7 @@ public class DatabaseModule implements UnitilsModule {
     /**
      * Calls all methods annotated with {@link AfterCreateConnection}
      *
-     * @param testObject
+     * @param testObject the test instance, not null
      */
     protected void callAfterCreateConnectionMethods(Object testObject) {
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateConnection.class);
@@ -244,21 +246,23 @@ public class DatabaseModule implements UnitilsModule {
     private class DatabaseTestListener extends TestListener {
 
         @Override
-        public void beforeTestClass(TestContext testContext) {
-            if (isDatabaseTest(testContext.getTestClass())) {
-                initDatabase(testContext.getTestObject());
+        public void beforeTestClass(Object testObject) {
+
+            if (isDatabaseTest(testObject)) {
+                initDatabase(testObject);
             }
         }
 
         // todo these calls must be done each time a new test object is created. For JUnit this is before every test
         // for TestNG this is before every test class.
         @Override
-        public void beforeTestMethod(TestContext testContext) {
-            if (isDatabaseTest(testContext.getTestClass())) {
+        public void beforeTestMethod(Object testObject, Method testMethod) {
+
+            if (isDatabaseTest(testObject.getClass())) {
                 //call methods annotated with AfterCreateDataSource, if any
-                callAfterCreateDataSourceMethods(testContext.getTestObject());
+                callAfterCreateDataSourceMethods(testObject);
                 //call methods annotated with AfterCreateConnection, if any
-                callAfterCreateConnectionMethods(testContext.getTestObject());
+                callAfterCreateConnectionMethods(testObject);
             }
         }
 

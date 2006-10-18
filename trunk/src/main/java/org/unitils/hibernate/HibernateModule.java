@@ -3,7 +3,10 @@ package org.unitils.hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.unitils.core.*;
+import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.UnitilsModule;
 import org.unitils.db.DatabaseModule;
 import org.unitils.hibernate.annotation.AfterCreateHibernateSession;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
@@ -15,6 +18,7 @@ import java.sql.Connection;
 import java.util.List;
 
 /**
+ * todo javadoc
  */
 public class HibernateModule implements UnitilsModule {
 
@@ -40,10 +44,17 @@ public class HibernateModule implements UnitilsModule {
     }
 
 
-    protected boolean isHibernateTest(Class<?> testClass) {
+    /**
+     * Checks whether the given test instance is a hibernate test, i.e. is annotated with the {@link HibernateTest} annotation.
+     *
+     * @param testObject the test instance, not null
+     * @return true if the test class is a hibernate test false otherwise
+     */
+    protected boolean isHibernateTest(Object testObject) {
 
-        return testClass.getAnnotation(HibernateTest.class) != null;
+        return testObject.getClass().getAnnotation(HibernateTest.class) != null;
     }
+
 
     protected void configureHibernate(Object testObject) {
         if (hibernateConfiguration == null) {
@@ -52,11 +63,13 @@ public class HibernateModule implements UnitilsModule {
         }
     }
 
+
     private Configuration createHibernateConfiguration(Object test) {
         Configuration hbnConfiguration = createHibernateConfiguration();
         callHibernateConfigurationMethods(test, hbnConfiguration);
         return hbnConfiguration;
     }
+
 
     protected Configuration createHibernateConfiguration() {
 
@@ -131,16 +144,17 @@ public class HibernateModule implements UnitilsModule {
     private class HibernateTestListener extends TestListener {
 
         @Override
-        public void beforeTestClass(TestContext testContext) {
-            if (isHibernateTest(testContext.getTestClass())) {
-                configureHibernate(testContext.getTestObject());
+        public void beforeTestClass(Object testObject) {
+            if (isHibernateTest(testObject.getClass())) {
+                configureHibernate(testObject);
             }
         }
 
         @Override
-        public void beforeTestMethod(TestContext testContext) {
-            if (isHibernateTest(testContext.getTestClass())) {
-                createHibernateSession(testContext.getTestObject());
+        public void beforeTestMethod(Object testObject, Method testMethod) {
+
+            if (isHibernateTest(testObject)) {
+                createHibernateSession(testObject);
             }
         }
 
