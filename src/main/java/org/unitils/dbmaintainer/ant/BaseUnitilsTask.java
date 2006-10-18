@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.dbmaintainer.ant;
 
 import org.apache.commons.configuration.Configuration;
@@ -10,7 +16,7 @@ import org.unitils.util.ReflectionUtils;
 import javax.sql.DataSource;
 
 /**
- * @author Filip Neven
+ * Base ant task for Unitils database operations
  */
 public abstract class BaseUnitilsTask extends Task {
 
@@ -26,7 +32,10 @@ public abstract class BaseUnitilsTask extends Task {
     /* The name of the database schema */
     protected String schemaName;
 
-
+    /**
+     * Configures the connection to the database, and executes the ant task
+     * @throws BuildException
+     */
     public final void execute() throws BuildException {
 
         //todo move implementation to module?
@@ -38,6 +47,10 @@ public abstract class BaseUnitilsTask extends Task {
         doExecute();
     }
 
+    /**
+     * Executes the ant task
+     * @throws BuildException
+     */
     protected abstract void doExecute() throws BuildException;
 
 }

@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.dbmaintainer.ant;
 
 import org.apache.commons.configuration.Configuration;
@@ -11,10 +17,12 @@ import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.util.ReflectionUtils;
 
 /**
- * Ant tasks that drops all database tables in the current database
+ * Ant task that drops all database tables in the current database. Invokes the implementation of {@link DBClearer}
+ * that is configured in the Unitils configuration.
  */
 public class ClearDatabaseTask extends BaseUnitilsTask {
 
+    /* Logger for this class */
     private static final Logger logger = Logger.getLogger(ClearDatabaseTask.class);
 
     /* Property key of the implementation class of the {@link DBClearer} */
@@ -23,6 +31,11 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
     /* Property key of the SQL dialect of the underlying DBMS implementation */
     private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
+    /**
+     * Clears the database, using the implementation of <code>DBClearer</code> that is configured in the Unitils
+     * configuration.
+     * @throws BuildException
+     */
     public void doExecute() throws BuildException {
         try {
             DBClearer dbClearer = createDBClearer();
@@ -33,6 +46,10 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
         }
     }
 
+    /**
+     * @return the implementation of <code>DBClearer</code> that is configured in the Unitils
+     * configuration.
+     */
     private DBClearer createDBClearer() {
         Configuration configuration = Unitils.getInstance().getConfiguration();
 

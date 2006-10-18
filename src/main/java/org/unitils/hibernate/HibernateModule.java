@@ -7,6 +7,7 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.UnitilsModule;
+import org.unitils.util.ReflectionUtils;
 import org.unitils.db.DatabaseModule;
 import org.unitils.hibernate.annotation.AfterCreateHibernateSession;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
@@ -89,8 +90,8 @@ public class HibernateModule implements UnitilsModule {
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(test.getClass(), HibernateConfiguration.class);
         for (Method method : methods) {
             try {
-                method.invoke(test, configuration);
-            } catch (Exception e) {
+                ReflectionUtils.invokeMethod(test, method, configuration);
+            } catch (UnitilsException e) {
                 throw new UnitilsException("Error while calling method annotated with @" +
                         HibernateConfiguration.class.getSimpleName() + ". Ensure that this method has following signature: " +
                         "void myMethod(Configuration hibernateConfiguration)", e);
@@ -111,7 +112,7 @@ public class HibernateModule implements UnitilsModule {
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateHibernateSession.class);
         for (Method method : methods) {
             try {
-                method.invoke(testObject, currentHibernateSessionHolder.get());
+                ReflectionUtils.invokeMethod(testObject, method, currentHibernateSessionHolder.get());
             } catch (Exception e) {
                 throw new UnitilsException("Error while calling method annotated with @" +
                         AfterCreateHibernateSession.class.getSimpleName() + ". Ensure that this method has following signature: " +

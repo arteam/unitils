@@ -1,11 +1,16 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.db;
 
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.UnitilsModule;
-import org.unitils.db.annotations.AfterCreateConnection;
-import org.unitils.db.annotations.AfterCreateDataSource;
+import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.config.DataSourceFactory;
 import org.unitils.dbmaintainer.constraints.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
@@ -17,8 +22,8 @@ import org.unitils.dbunit.DatabaseTest;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
-import javax.sql.DataSource;
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -26,8 +31,8 @@ import java.util.List;
 /**
  * Module that provides basic support for database testing. This module provides the following services to unit tests
  * <ul>
- * <li>Connection pooling: A connection pooled DataSource is created, and supplied to methods annotated with
- * {@link AfterCreateDataSource}</li>
+ * <li>Connection pooling: A connection pooled TestDataSource is created, and supplied to methods annotated with
+ * {@link TestDataSource}</li>
  * <li>A 'current connection' is associated with each thread from which the method #getCurrentConnection is called</li>
  * <li>If the updateDataBaseSchema.enabled property is set to true, the {@link DBMaintainer} is invoked to update the
  * database and prepare it for unit testing (see {@link DBMaintainer} Javadoc)</li>
@@ -50,12 +55,15 @@ public class DatabaseModule implements UnitilsModule {
     private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /* The pooled datasource instance */
-    private DataSource dataSource;
+    private javax.sql.DataSource dataSource;
 
+    /* The Configuration of Unitils */
     private Configuration configuration;
 
+    /* Indicates if database constraints should be disabled */
     private boolean disableConstraints;
 
+    /* Indicates if the DBMaintainer should be invoked to update the database */
     private boolean updateDatabaseSchemaEnabled;
 
     /*
@@ -64,6 +72,10 @@ public class DatabaseModule implements UnitilsModule {
     */
     private ThreadLocal<Connection> connectionHolder = new ThreadLocal<Connection>();
 
+    /**
+     * Initializes this module using the given <code>Configuration</code>
+     * @param configuration
+     */
     public void init(Configuration configuration) {
         this.configuration = configuration;
 
@@ -83,7 +95,7 @@ public class DatabaseModule implements UnitilsModule {
     }
 
     /**
-     * Inializes the database setup. I.e., creates a <code>DataSource</code> and updates the database schema if needed
+     * Inializes the database setup. I.e., creates a <code>TestDataSource</code> and updates the database schema if needed
      * using the {@link DBMaintainer}
      *
      * @param testObject the test instance, not null
@@ -106,13 +118,13 @@ public class DatabaseModule implements UnitilsModule {
      *
      * @return the datasource
      */
-    protected DataSource createDataSource() {
+    protected javax.sql.DataSource createDataSource() {
         DataSourceFactory dataSourceFactory = createDataSourceFactory();
         dataSourceFactory.init(configuration);
-        DataSource dataSource = dataSourceFactory.createDataSource();
+        javax.sql.DataSource dataSource = dataSourceFactory.createDataSource();
 
         // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is
-        // returned that wrappes the DataSource object
+        // returned that wrappes the TestDataSource object
         if (disableConstraints) {
             ConstraintsDisabler constraintsDisabler = createConstraintsDisabler(dataSource);
             dataSource = new ConstraintsCheckDisablingDataSource(dataSource, constraintsDisabler);
@@ -126,7 +138,7 @@ public class DatabaseModule implements UnitilsModule {
      * @param dataSource
      * @return The configured instance of the {@link ConstraintsDisabler}
      */
-    protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
+    protected ConstraintsDisabler createConstraintsDisabler(javax.sql.DataSource dataSource) {
 
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         String constraintsDisablerClassName = configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect);
@@ -141,9 +153,9 @@ public class DatabaseModule implements UnitilsModule {
 
 
     /**
-     * @return The <code>DataSource</code>
+     * @return The <code>TestDataSource</code>
      */
-    public DataSource getDataSource() {
+    public javax.sql.DataSource getDataSource() {
         return dataSource;
     }
 
@@ -163,43 +175,38 @@ public class DatabaseModule implements UnitilsModule {
         return currentConnection;
     }
 
-    /**
-     * Calls all methods annotated with {@link AfterCreateDataSource}
+     /**
+     * Assigns the <code>TestDataSource</code> to every field annotated with {@link TestDataSource} and calls all methods
+     * annotated with {@link TestDataSource}
      *
-     * @param testObject testObject the test instance, not null
+     * @param testObject The test instance, not null
      */
-    protected void callAfterCreateDataSourceMethods(Object testObject) {
-        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateDataSource.class);
+    protected void injectDataSource(Object testObject) {
+        List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.setFieldValue(testObject, field, dataSource);
+
+            } catch (UnitilsException e) {
+
+                throw new UnitilsException("Unable to assign the TestDataSource to field annotated with @TestDataSource. " +
+                        "Ensure that this field is of type javax.sql.TestDataSource", e);
+            }
+        }
+
+        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         for (Method method : methods) {
             try {
                 ReflectionUtils.invokeMethod(testObject, method, dataSource);
 
             } catch (UnitilsException e) {
 
-                throw new UnitilsException("Unable to invoke after create DataSource method. Ensure that this method has " +
-                        "following signature: void myMethod(DataSource dataSource)", e);
+                throw new UnitilsException("Unable to invoke method annotated with @TestDataSource. Ensure that this method has " +
+                        "following signature: void myMethod(javax.sql.TestDataSource dataSource)", e);
             }
         }
     }
 
-    /**
-     * Calls all methods annotated with {@link AfterCreateConnection}
-     *
-     * @param testObject the test instance, not null
-     */
-    protected void callAfterCreateConnectionMethods(Object testObject) {
-        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateConnection.class);
-        for (Method method : methods) {
-            try {
-                ReflectionUtils.invokeMethod(testObject, method, getCurrentConnection());
-
-            } catch (UnitilsException e) {
-
-                throw new UnitilsException("Unable to invoke after create Connection method. Ensure that this method has " +
-                        "following signature: void myMethod(Connection conn)", e);
-            }
-        }
-    }
 
     /**
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
@@ -214,19 +221,12 @@ public class DatabaseModule implements UnitilsModule {
     }
 
     /**
-     * Creates a new instance of the DBMaintainer for the given <code>DataSource</code>
+     * Creates a new instance of the {@link DBMaintainer}
      *
      * @return a new instance of the DBMaintainer
      */
     protected DBMaintainer createDbMaintainer(Configuration configuration) {
         return new DBMaintainer(configuration, dataSource);
-    }
-
-    /**
-     * @return The {@link TestListener} associated with this module
-     */
-    public TestListener createTestListener() {
-        return new DatabaseTestListener();
     }
 
     /**
@@ -239,6 +239,12 @@ public class DatabaseModule implements UnitilsModule {
         return ReflectionUtils.createInstanceOfType(dataSourceFactoryClassName);
     }
 
+    /**
+     * @return The {@link TestListener} associated with this module
+     */
+    public TestListener createTestListener() {
+        return new DatabaseTestListener();
+    }
 
     /**
      * DatabaseTestListener that makes callbacks to methods of this module while running tests.
@@ -257,12 +263,10 @@ public class DatabaseModule implements UnitilsModule {
         // for TestNG this is before every test class.
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-
-            if (isDatabaseTest(testObject.getClass())) {
-                //call methods annotated with AfterCreateDataSource, if any
-                callAfterCreateDataSourceMethods(testObject);
-                //call methods annotated with AfterCreateConnection, if any
-                callAfterCreateConnectionMethods(testObject);
+		
+		    if (isDatabaseTest(testObject.getClass())) {
+                //call methods annotated with TestDataSource, if any
+                injectDataSource(testObject);
             }
         }
 

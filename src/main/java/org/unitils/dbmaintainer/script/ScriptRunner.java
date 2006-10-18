@@ -9,10 +9,16 @@ package org.unitils.dbmaintainer.script;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
- * Interface for an executer of a script, written in some language
+ * Defines the contract for an executer of a database update script.
  */
 public interface ScriptRunner {
 
+    /**
+     * Executes the given script
+     * 
+     * @param script
+     * @throws StatementHandlerException
+     */
     void execute(String script) throws StatementHandlerException;
 
 }

@@ -1,36 +1,32 @@
 package org.unitils.dbmaintainer.constraints;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.db.annotations.AfterCreateDataSource;
+import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbunit.DatabaseTest;
 import org.unitils.util.ReflectionUtils;
-import org.unitils.core.UnitilsConfigurationLoader;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
- *
+ * 
  */
 @DatabaseTest
 public class ConstraintsDisablerTest extends UnitilsJUnit3 {
 
     private ConstraintsDisabler constraintsDisabler;
 
-    private DataSource dataSource;
+    @TestDataSource
+    private javax.sql.DataSource dataSource;
 
-    @AfterCreateDataSource
-    protected void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -42,11 +38,11 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         constraintsDisabler = ReflectionUtils.createInstanceOfType(configuration.getString(DBMaintainer.PROPKEY_CONSTRAINTSDISABLER_START + '.' +
                 configuration.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
         constraintsDisabler.init(configuration, dataSource, st);
-        constraintsDisabler.init(configuration, dataSource, st);
 
         createTables();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         dropTables();
 

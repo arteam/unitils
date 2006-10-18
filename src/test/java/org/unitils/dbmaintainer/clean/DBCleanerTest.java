@@ -4,12 +4,11 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.UnitilsConfigurationLoader;
-import org.unitils.db.annotations.AfterCreateDataSource;
+import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbunit.DatabaseTest;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,12 +19,12 @@ import java.sql.Statement;
 @DatabaseTest
 public class DBCleanerTest extends UnitilsJUnit3 {
 
-    private DataSource dataSource;
+    private javax.sql.DataSource dataSource;
 
     private DBCleaner dbCleaner;
 
-    @AfterCreateDataSource
-    public void setDataSource(DataSource dataSource) {
+    @TestDataSource
+    public void setDataSource(javax.sql.DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

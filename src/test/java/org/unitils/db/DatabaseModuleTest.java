@@ -3,14 +3,12 @@ package org.unitils.db;
 import org.apache.commons.configuration.Configuration;
 import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.db.annotations.AfterCreateConnection;
-import org.unitils.db.annotations.AfterCreateDataSource;
+import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbunit.DatabaseTest;
 import static org.unitils.easymock.EasyMockModule.replay;
 import org.unitils.easymock.annotation.Mock;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
@@ -20,7 +18,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
     private DatabaseModule databaseModule;
 
     @Mock
-    private DataSource mockDataSource = null;
+    private javax.sql.DataSource mockDataSource = null;
 
     @Mock
     private Connection mockConnection = null;
@@ -39,7 +37,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
             }
 
             @Override
-            protected DataSource createDataSource() {
+            protected javax.sql.DataSource createDataSource() {
                 return mockDataSource;
             }
         };
@@ -64,34 +62,31 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
         databaseModule.initDatabase(dbTest);
         databaseModule.createTestListener().beforeTestMethod(dbTest, null);
         assertSame(mockDataSource, databaseModule.getDataSource());
-        assertSame(mockDataSource, dbTest.getDataSource());
-        assertSame(mockConnection, dbTest.getConnection());
+        assertSame(mockDataSource, dbTest.getDataSourceFromMethod());
+        assertSame(mockDataSource, dbTest.getDataSourceFromField());
     }
 
     @DatabaseTest
     public static class DbTest {
 
-        private DataSource dataSource;
+        private javax.sql.DataSource dataSourceFromMethod;
 
-        private Connection connection;
+        @TestDataSource
+        private javax.sql.DataSource dataSourceFromField;
 
-        @AfterCreateDataSource
-        public void afterCreateDataSource(DataSource dataSource) {
-            this.dataSource = dataSource;
+        @TestDataSource
+        public void afterCreateDataSource(javax.sql.DataSource dataSource) {
+            this.dataSourceFromMethod = dataSource;
         }
 
-        @AfterCreateConnection
-        public void afterCreateConnection(Connection conn) {
-            this.connection = conn;
+        public javax.sql.DataSource getDataSourceFromMethod() {
+            return dataSourceFromMethod;
         }
 
-        public DataSource getDataSource() {
-            return dataSource;
+        public javax.sql.DataSource getDataSourceFromField() {
+            return dataSourceFromField;
         }
 
-        public Connection getConnection() {
-            return connection;
-        }
     }
 
 }

@@ -187,10 +187,9 @@ public class EasyMockModule implements UnitilsModule {
         for (Method method : methods) {
             try {
                 ReflectionUtils.invokeMethod(testObject, method, mockObject, name, type);
-
-            } catch (UnitilsException e) {
-
-                throw new UnitilsException("Unable to invoke after create mock method. Ensure that this method has following signature: void myMethod(Object mock, String name, Class type)", e);
+            } catch (Exception e) {
+                throw new UnitilsException("Unable to invoke after create mock method. Ensure that this method has following signature: " +
+                        "void myMethod(Object mock, String name, Class type)", e);
             }
         }
     }

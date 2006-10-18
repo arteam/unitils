@@ -6,16 +6,17 @@
  */
 package org.unitils.dbmaintainer.constraints;
 
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.configuration.Configuration;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbutils.DbUtils;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
  * TODO test me
@@ -36,7 +37,7 @@ public class DB2ConstraintsDisabler implements ConstraintsDisabler {
     private static final String SELECT_CONSTRAINTS_SQL = "select TABNAME, CONSTNAME from SYSCAT.TABCONST";
 
     /**
-     * The DataSource
+     * The TestDataSource
      */
     private DataSource dataSource;
 
@@ -51,20 +52,6 @@ public class DB2ConstraintsDisabler implements ConstraintsDisabler {
     public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
-    }
-
-    /**
-     * @see org.unitils.dbmaintainer.constraints.ConstraintsDisabler#enableConstraints()
-     */
-    public void enableConstraints() {
-        generateConstraintsScript("enable");
-    }
-
-    /**
-     * @see ConstraintsDisabler#enableConstraintsOnConnection(java.sql.Connection)
-     */
-    public void enableConstraintsOnConnection(Connection conn) {
-
     }
 
     /**

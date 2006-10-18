@@ -6,29 +6,29 @@
  */
 package org.unitils.dbmaintainer.config;
 
-import org.apache.commons.configuration.Configuration;
-
 import javax.sql.DataSource;
 
+import org.apache.commons.configuration.Configuration;
+
 /**
- * Interface for different sorts of Factories of a DataSource.
+ * Interface for different sorts of Factories of a TestDataSource.
  * <p/>
  * todo javadoc
  */
 public interface DataSourceFactory {
 
     /**
-     * Initializes itself using the properties in the given <code>Properties</code> object.
-     *
-     * @throws IllegalArgumentException When the given <code>Properties</code> misses one or more required properties.
+     * Initializes itself using the properties in the given <code>Configuration</code> object.
+
+     * @param configuration 
      */
     public void init(Configuration configuration);
 
 
     /**
-     * Retrieve the DataSource
+     * Creates a new <code>TestDataSource</code>
      *
-     * @return the DataSource
+     * @return the TestDataSource
      */
     public DataSource createDataSource();
 

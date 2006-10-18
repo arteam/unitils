@@ -1,47 +1,24 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.dbmaintainer.sequences;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbutils.DbUtils;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.commons.dbutils.DbUtils;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+
 /**
- * @author Filip Neven
+ * Implementation of {@link SequenceUpdater} for an Oracle database
  */
-public class OracleSequenceUpdater implements SequenceUpdater {
-
-    private static final String PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE = "sequenceUpdater.sequencevalue.lowestacceptable";
-
-    /**
-     * The <code>DataSource</code> that provides the connection to the database
-     */
-    private DataSource dataSource;
-
-    /**
-     * The StatementHandler on which the sequence update statements will be executed
-     */
-    private StatementHandler statementHandler;
-
-    /**
-     * The lowest acceptable sequence value
-     */
-    private long lowestAcceptableSequenceValue;
-
-    /**
-     * @see SequenceUpdater#init(Configuration, DataSource, StatementHandler)
-     */
-    public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
-        this.dataSource = dataSource;
-        this.statementHandler = statementHandler;
-
-        lowestAcceptableSequenceValue = configuration.getLong(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE);
-    }
+public class OracleSequenceUpdater extends BaseSequenceUpdater {
 
     /**
      * @see SequenceUpdater#updateSequences()
@@ -51,26 +28,26 @@ public class OracleSequenceUpdater implements SequenceUpdater {
         Statement st = null;
         try {
             conn = dataSource.getConnection();
-            st = conn.createStatement();
-            incrementSequencesWithLowValue(conn, st);
+            incrementSequencesWithLowValue(conn);
         } catch (SQLException e) {
-            throw new RuntimeException("Error while retrieving database version", e);
+            throw new UnitilsException("Error while retrieving database version", e);
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
-
+    
     /**
      * Makes sure the value of all sequences is equal or higher than <code>lowestAcceptableSequenceValue</code>
-     *
-     * @param st
+     * 
+     * @param conn 
      * @throws SQLException
+     * @throws StatementHandlerException 
      */
-    private void incrementSequencesWithLowValue(Connection conn, Statement st) throws SQLException, StatementHandlerException {
+    protected void incrementSequencesWithLowValue(Connection conn) throws SQLException, StatementHandlerException {
         ResultSet rs = null;
-        Statement st1 = null;
+        Statement st = null;
         try {
-            st1 = conn.createStatement();
+            st = conn.createStatement();
             rs = st.executeQuery("select SEQUENCE_NAME, LAST_NUMBER, INCREMENT_BY from USER_SEQUENCES where LAST_NUMBER < "
                     + lowestAcceptableSequenceValue);
             while (rs.next()) {
@@ -86,7 +63,7 @@ public class OracleSequenceUpdater implements SequenceUpdater {
                 statementHandler.handle(sqlResetIncrement);
             }
         } finally {
-            DbUtils.closeQuietly(null, st1, rs);
+            DbUtils.closeQuietly(null, st, rs);
         }
     }
 

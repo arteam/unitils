@@ -1,12 +1,16 @@
 package org.unitils.dbmaintainer.maintainer.clear;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.UnitilsConfigurationLoader;
-import org.unitils.db.annotations.AfterCreateDataSource;
-import org.unitils.dbmaintainer.clean.DefaultDBCleaner;
-import org.unitils.dbmaintainer.clear.BaseDBClearer;
+import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clear.DBClearer;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
@@ -14,32 +18,23 @@ import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbunit.DatabaseTest;
 import org.unitils.util.ReflectionUtils;
 
-import javax.sql.DataSource;
-import java.sql.*;
-
 /**
  */
 @DatabaseTest
 public class DBClearerTest extends UnitilsJUnit3 {
 
-    protected DataSource dataSource;
+    @TestDataSource
+    protected javax.sql.DataSource dataSource;
 
     protected DBClearer dbClearer;
 
     protected String schemaName;
 
-    @AfterCreateDataSource
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
         Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
-        configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "testtable2");
-
-        schemaName = configuration.getString(BaseDBClearer.PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
 
         StatementHandler statementHandler = new JDBCStatementHandler();
         statementHandler.init(configuration, dataSource);
@@ -51,24 +46,29 @@ public class DBClearerTest extends UnitilsJUnit3 {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
+            dropTestView(conn);
+            dropTestTables(conn);
+            dropTestSequence(conn);
             createTestTables(conn);
             createTestIndex(conn);
             createTestView(conn);
+            createTestSequence(conn);
         } finally {
             DbUtils.closeQuietly(conn);
         }
 
     }
 
+    @Override
     protected void tearDown() throws Exception {
-        Connection conn = null;
+       /*Connection conn = null;
         try {
             conn = dataSource.getConnection();
             dropTestView(conn);
             dropTestTables(conn);
         } finally {
             DbUtils.closeQuietly(conn);
-        }
+        }*/
 
         super.tearDown();
     }
@@ -78,7 +78,6 @@ public class DBClearerTest extends UnitilsJUnit3 {
         assertTrue(tableExists("db_version"));
         dbClearer.clearDatabase();
         assertFalse(tableExists("testtable1"));
-        assertTrue(tableExists("db_version"));
     }
 
     public void testClearDatabase_views() throws Exception {
@@ -86,11 +85,10 @@ public class DBClearerTest extends UnitilsJUnit3 {
         dbClearer.clearDatabase();
         assertFalse(tableExists("testview"));
     }
-
+    
     private void createTestTables(Connection conn) throws SQLException {
         Statement st = null;
         try {
-            conn = dataSource.getConnection();
             st = conn.createStatement();
             st.execute("create table testtable1 (col1 varchar(10))");
             st.execute("create table db_version (col1 varchar(10))");
@@ -112,12 +110,19 @@ public class DBClearerTest extends UnitilsJUnit3 {
     private void dropTestTables(Connection conn) throws SQLException {
         Statement st = null;
         try {
-            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
-            st.execute("drop table testtable1 if exists");
-            st.execute("drop table db_version if exists");
-        } finally {
+            try {
+                st.execute("drop table testtable1");
+            } catch (SQLException e) {
+                // no action taken
+            }
+            try {
+                st.execute("drop table db_version");
+            } catch (SQLException e) {
+                // no action taken
+            }
+        }  finally {
             DbUtils.closeQuietly(st);
         }
     }
@@ -125,24 +130,50 @@ public class DBClearerTest extends UnitilsJUnit3 {
     private void createTestView(Connection conn) throws SQLException {
         Statement st = null;
         try {
-            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("create view testview as select col1 from db_version");
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            DbUtils.closeQuietly(st);
         }
     }
 
-    private void dropTestView(Connection conn) throws SQLException {
+    private void dropTestView(Connection conn) {
         Statement st = null;
         try {
-            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
-            st.execute("drop view testview if exists");
+            st.execute("drop view testview");
+        } catch (SQLException e) {
+            // No action is taken
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    private void createTestSequence(Connection conn) {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            // Make sure previous setup is cleaned up
+            st.execute("create sequence testsequence");
+        } catch (SQLException e) {
+            // No action is taken
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    private void dropTestSequence(Connection conn) {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            // Make sure previous setup is cleaned up
+            st.execute("drop sequence testsequence");
+        } catch (SQLException e) {
+            // No action is taken
+        } finally {
+            DbUtils.closeQuietly(st);
         }
     }
 

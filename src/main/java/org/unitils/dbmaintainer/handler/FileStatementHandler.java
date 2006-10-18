@@ -6,17 +6,18 @@
  */
 package org.unitils.dbmaintainer.handler;
 
-import org.apache.commons.configuration.Configuration;
-
-import javax.sql.DataSource;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.sql.DataSource;
+
+import org.apache.commons.configuration.Configuration;
+
 /**
  * Implementation of {@link StatementHandler} that writes each statement to a file. The fileName is specified
- * on invocation of the <code>init</code> method with a <code>Properties</code> object that contains the property
- * with the key <code>PROPKEY_FILENAME</code>.
+ * on invocation of the {@link #init} method with a <code>Configuration</code> object that contains the property
+ * with the key {@link #PROPKEY_FILENAME}.
  */
 public class FileStatementHandler implements StatementHandler {
 
@@ -39,6 +40,7 @@ public class FileStatementHandler implements StatementHandler {
     }
 
     /**
+     * Writes the given statement to the file, configured by the property {@link #PROPKEY_FILENAME}
      * @see StatementHandler#handle(String)
      */
     public void handle(String statement) throws StatementHandlerException {

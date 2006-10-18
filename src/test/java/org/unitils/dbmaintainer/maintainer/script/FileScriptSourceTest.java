@@ -77,35 +77,35 @@ public class FileScriptSourceTest extends TestCase {
     }
 
     public void testGetScripts_incremental_fromVersionIndex0() {
-        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getScripts(versionIndex0); // Should load script1.sql and script2.sql
+        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex0); // Should load script1.sql and script2.sql
         checkScript1(scripts.get(0));
         checkScript2(scripts.get(1));
     }
 
     public void testGetScripts_incremental_fromVersionIndex1() {
-        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getScripts(versionIndex1); // Should load script2.sql
+        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex1); // Should load script2.sql
         checkScript2(scripts.get(0));
     }
 
     public void testGetScripts_noMoreChanges() {
-        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getScripts(versionIndex2); // There is no script2.sql, should return null
+        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex2); // There is no script2.sql, should return null
         assertTrue(scripts.isEmpty());
     }
 
     public void testGetNextDbChange_fromScratch() {
-        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getScripts(versionTimestampOld);
+        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionTimestampOld);
         checkScript1(scripts.get(0));
         checkScript2(scripts.get(1));
     }
 
     public void testShouldRunFromScratch_incremental() {
-        assertFalse(fromScratchFileScriptSource.shouldRunFromScratch(versionIndex0));
-        assertFalse(fromScratchFileScriptSource.shouldRunFromScratch(versionIndex1));
-        assertFalse(fromScratchFileScriptSource.shouldRunFromScratch(versionIndex2));
+        assertFalse(fromScratchFileScriptSource.existingScriptsModified(versionIndex0));
+        assertFalse(fromScratchFileScriptSource.existingScriptsModified(versionIndex1));
+        assertFalse(fromScratchFileScriptSource.existingScriptsModified(versionIndex2));
     }
 
     public void testShouldRunFromScratch_fromScratch() {
-        assertTrue(fromScratchFileScriptSource.shouldRunFromScratch(versionTimestampOld));
+        assertTrue(fromScratchFileScriptSource.existingScriptsModified(versionTimestampOld));
     }
 
     private void checkScript1(VersionScriptPair versionScriptPair) {

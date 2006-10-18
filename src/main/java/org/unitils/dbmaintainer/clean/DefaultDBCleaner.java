@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.dbmaintainer.clean;
 
 import org.apache.commons.configuration.Configuration;
@@ -14,8 +20,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * todo Configuration object should be supplied externally
- * todo Use same naming pattern for property name constants
+ * Implementation of {@link DBCleaner}. This implementation doesn't use any DBMS specific features, so it should work
+ * for every database.
  */
 public class DefaultDBCleaner implements DBCleaner {
 
@@ -29,14 +35,10 @@ public class DefaultDBCleaner implements DBCleaner {
      * DB version is stored. This table should not be deleted */
     public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
 
-    /**
-     * The DataSource
-     */
+    /* The TestDataSource */
     private DataSource dataSource;
 
-    /**
-     * The StatementHandler
-     */
+    /* The StatementHandler */
     private StatementHandler statementHandler;
 
     /* The name of the database schema */
@@ -45,6 +47,12 @@ public class DefaultDBCleaner implements DBCleaner {
     /* The tables that should not be cleaned */
     private Set<String> tablesToPreserve;
 
+    /**
+     * Configures this object
+     * @param configuration
+     * @param dataSource
+     * @param statementHandler
+     */
     public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
@@ -56,6 +64,10 @@ public class DefaultDBCleaner implements DBCleaner {
         tablesToPreserve.addAll(toUpperCaseList(Arrays.asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
     }
 
+    /**
+     * Deletes all data from all tables in the database, except
+     * @throws StatementHandlerException
+     */
     public void cleanDatabase() throws StatementHandlerException {
         Connection conn = null;
         try {
@@ -71,6 +83,12 @@ public class DefaultDBCleaner implements DBCleaner {
         }
     }
 
+    /**
+     * Returns the names of all tables in the database.
+     * @param conn
+     * @return the names of all tables in the database.
+     * @throws SQLException
+     */
     private Set<String> getTableNames(Connection conn) throws SQLException {
         ResultSet rset = null;
         try {
@@ -87,12 +105,22 @@ public class DefaultDBCleaner implements DBCleaner {
         }
     }
 
+    /**
+     * Deletes the data in the database tables with the given table names.
+     * @param tableNames
+     * @throws StatementHandlerException
+     */
     private void clearTables(Set<String> tableNames) throws StatementHandlerException {
         for (String tableName : tableNames) {
             statementHandler.handle("delete from " + tableName);
         }
     }
 
+    /**
+     * Converts the given list of strings to uppercase.
+     * @param strings
+     * @return the given string list, converted to uppercase
+     */
     private List<String> toUpperCaseList(List<String> strings) {
         List<String> toUpperCaseList = new ArrayList<String>();
         for (String string : strings) {
