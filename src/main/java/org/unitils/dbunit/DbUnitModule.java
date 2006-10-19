@@ -275,24 +275,11 @@ public class DbUnitModule implements UnitilsModule {
      * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
      * that occur in the expected DbUnitDataSet are compared with the database contents.
      */
-    public void assertDBContentAsExpected() {
-
-        TestContext testContext = Unitils.getInstance().getTestContext();
-        Class testClass = testContext.getTestClass();
-        Method testMethod = testContext.getTestMethod();
-
-        assertDBContentAsExpected(testClass, testMethod.getName());
-    }
-
-    /**
-     * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
-     * that occur in the expected DbUnitDataSet are compared with the database contents.
-     */
-    private void assertDBContentAsExpected(Class testClass, String testMethodName) {
+    public void assertDBContentAsExpected(Object testObject, String testMethodName) {
         try {
             IDatabaseConnection databaseConnection = getDbUnitDatabaseConnection();
 
-            IDataSet expectedDataSet = getExpectedDataSet(testClass, testMethodName);
+            IDataSet expectedDataSet = getExpectedDataSet(testObject.getClass(), testMethodName);
             IDataSet actualDataSet = databaseConnection.createDataSet(expectedDataSet.getTableNames());
             ITableIterator tables = expectedDataSet.iterator();
 
