@@ -60,7 +60,7 @@ public class DefaultDBCleaner implements DBCleaner {
         schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
 
         tablesToPreserve = new HashSet<String>();
-        tablesToPreserve.add(configuration.getString(PROPKEY_VERSION_TABLE_NAME));
+        tablesToPreserve.add(configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase());
         tablesToPreserve.addAll(toUpperCaseList(Arrays.asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
     }
 

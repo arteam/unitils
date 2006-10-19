@@ -13,6 +13,8 @@ import org.apache.commons.configuration.Configuration;
 import javax.sql.DataSource;
 
 /**
+ * TODO use this class
+ *
  * Defines the contract for implementations that delete all data from the database, except for the tables that have been
  * configured as <i>tablesToPreserve</i>, and the table in which the database version is stored.
  */
