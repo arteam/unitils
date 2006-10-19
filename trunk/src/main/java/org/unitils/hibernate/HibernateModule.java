@@ -51,7 +51,7 @@ public class HibernateModule implements UnitilsModule {
      * @param testObject the test instance, not null
      * @return true if the test class is a hibernate test false otherwise
      */
-    protected boolean isHibernateTest(Object testObject) {
+    public boolean isHibernateTest(Object testObject) {
 
         return testObject.getClass().getAnnotation(HibernateTest.class) != null;
     }
