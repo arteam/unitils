@@ -99,20 +99,11 @@ public class HibernateModule implements UnitilsModule {
         }
     }
 
-    protected void createHibernateSession(Object testObject) {
-        Session currentHibernateSession = currentHibernateSessionHolder.get();
-        if (currentHibernateSession != null && (currentHibernateSession.isConnected() || currentHibernateSession.isOpen())) {
-            currentHibernateSession.close();
-        }
-        currentHibernateSessionHolder.set(hibernateSessionFactory.openSession(getConnection()));
-        callAfterCreateHibernateSessionMethods(testObject);
-    }
-
-    private void callAfterCreateHibernateSessionMethods(Object testObject) {
+    protected void injectHibernateSession(Object testObject) {
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), AfterCreateHibernateSession.class);
         for (Method method : methods) {
             try {
-                ReflectionUtils.invokeMethod(testObject, method, currentHibernateSessionHolder.get());
+                ReflectionUtils.invokeMethod(testObject, method, getCurrentSession());
             } catch (Exception e) {
                 throw new UnitilsException("Error while calling method annotated with @" +
                         AfterCreateHibernateSession.class.getSimpleName() + ". Ensure that this method has following signature: " +
@@ -135,8 +126,32 @@ public class HibernateModule implements UnitilsModule {
     }
 
     public Session getCurrentSession() {
-        return currentHibernateSessionHolder.get();
+
+        Session currentSession = currentHibernateSessionHolder.get();
+        if (currentSession == null || !currentSession.isOpen()) {
+            currentSession = hibernateSessionFactory.openSession(getConnection());
+            currentHibernateSessionHolder.set(currentSession);
+        } else {
+            if (!currentSession.isConnected()) {
+                currentSession.reconnect(getConnection());
+            }
+        }
+        return currentSession;
     }
+
+    public void closeHibernateSession() {
+
+        Session currentSession = currentHibernateSessionHolder.get();
+        if (currentSession != null && currentSession.isOpen()) {
+            currentSession.close();
+        }
+    }
+
+    public void flushDatabaseUpdates() {
+
+        getCurrentSession().flush();
+    }
+
 
     public TestListener createTestListener() {
         return new HibernateTestListener();
@@ -155,7 +170,14 @@ public class HibernateModule implements UnitilsModule {
         public void beforeTestMethod(Object testObject, Method testMethod) {
 
             if (isHibernateTest(testObject)) {
-                createHibernateSession(testObject);
+                injectHibernateSession(testObject);
+            }
+        }
+
+        public void afterTestMethod(Object testObject, Method testMethod) {
+
+            if (isHibernateTest(testObject)) {
+                closeHibernateSession();
             }
         }
 

@@ -53,13 +53,14 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
 
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
         expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
-        expect(mockHibernateSessionFactory.openSession(null, (Interceptor)notNull()));
 
         hbnTest = new HbnTest();
     }
 
     public void testIsHibernateTest() {
-        assertTrue(hibernateModule.isHibernateTest(HbnTest.class));
+        replay();
+
+        assertTrue(hibernateModule.isHibernateTest(new HbnTest()));
     }
 
     public void testConfigureHibernate() {
@@ -74,9 +75,19 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         replay();
 
         hibernateModule.configureHibernate(hbnTest);
-        hibernateModule.createHibernateSession(hbnTest);
+        hibernateModule.injectHibernateSession(hbnTest);
 
         assertSame(mockHibernateSession, hbnTest.getSession());
+    }
+
+    public void testCloseSession() {
+        expect(mockHibernateSession.isOpen()).andReturn(true);
+        expect(mockHibernateSession.close()).andReturn(null);
+        replay();
+
+        hibernateModule.configureHibernate(hbnTest);
+        hibernateModule.getCurrentSession();
+        hibernateModule.closeHibernateSession();
     }
 
     @HibernateTest
