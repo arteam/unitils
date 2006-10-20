@@ -9,24 +9,25 @@ package org.unitils.reflectionassert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import junitx.framework.StringAssert;
+import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
+
+import java.util.Arrays;
 
 
 /**
- * Test class for {@link org.unitils.reflectionassert.ReflectionAssert}.
+ * Test class for {@link ReflectionAssert}.
  */
 public class ReflectionAssertTest extends TestCase {
 
     /* Test object */
-    private Objects objectsA;
+    private TestObject testObjectA;
 
     /* Same as A but different instance */
-    private Objects objectsB;
+    private TestObject testObjectB;
 
     /* Same as A and B but different string value for stringValue2 */
-    private Objects objectsDifferentValue;
-
-    /* Class under test */
-    private ReflectionAssert reflectionAssert;
+    private TestObject testObjectDifferentValue;
 
 
     /**
@@ -35,32 +36,56 @@ public class ReflectionAssertTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        objectsA = new Objects("test 1", "test 2");
-        objectsB = new Objects("test 1", "test 2");
-        objectsDifferentValue = new Objects("test 1", "XXXXXX");
-
-        reflectionAssert = new ReflectionAssert();
+        testObjectA = new TestObject("test 1", "test 2");
+        testObjectB = new TestObject("test 1", "test 2");
+        testObjectDifferentValue = new TestObject("test 1", "XXXXXX");
     }
 
-    //todo tests for lenient stuff
 
     /**
      * Test for two equal objects.
      */
-    public void testAssertEquals_equals() {
+    public void testAssertRefEquals_equals() {
 
-        reflectionAssert.assertEquals(objectsA, objectsB);
+        ReflectionAssert.assertRefEquals(testObjectA, testObjectB);
+    }
+
+
+    /**
+     * Test for two equal objects (message version).
+     */
+    public void testAssertRefEquals_equalsMessage() {
+
+        ReflectionAssert.assertRefEquals("a message", testObjectA, testObjectB);
+    }
+
+
+    /**
+     * Test for two equal objects.
+     */
+    public void testAssertLenEquals_equals() {
+
+        ReflectionAssert.assertLenEquals(testObjectA, testObjectB);
+    }
+
+
+    /**
+     * Test for two equal objects (message version).
+     */
+    public void testAssertLenEquals_equalsMessage() {
+
+        ReflectionAssert.assertLenEquals("a message", testObjectA, testObjectB);
     }
 
 
     /**
      * Test for two objects that contain different values.
      */
-    public void testCheckEquals_notEqualsDifferentValues() {
+    public void testAssertRefEquals_notEqualsDifferentValues() {
 
         String message = null;
         try {
-            reflectionAssert.assertEquals(objectsA, objectsDifferentValue);
+            ReflectionAssert.assertRefEquals(testObjectA, testObjectDifferentValue);
 
         } catch (AssertionFailedError a) {
             message = a.getMessage();
@@ -76,91 +101,112 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test case for a null left-argument.
      */
-    public void testCheckEquals_leftNull() {
+    public void testAssertRefEquals_leftNull() {
 
-        String message = null;
         try {
-            reflectionAssert.assertEquals(null, objectsA);
+            ReflectionAssert.assertRefEquals(null, testObjectA);
+            fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError a) {
-            message = a.getMessage();
+            // expected
         }
-
-        assertNotNull("An assertion exception should have been thrown", message);
-        StringAssert.assertContains("top-level", message);
-        StringAssert.assertContains("null", message);
-        StringAssert.assertContains("org.unitils.reflectionassert.ReflectionAssertTest$Objects", message);
     }
 
 
     /**
      * Test case for a null right-argument.
      */
-    public void testCheckEquals_rightNull() {
+    public void testAssertRefEquals_rightNull() {
 
-        String message = null;
         try {
-            reflectionAssert.assertEquals(objectsA, null);
+            ReflectionAssert.assertRefEquals(testObjectA, null);
+            fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError a) {
-            message = a.getMessage();
+            // expected
         }
-
-        assertNotNull("An assertion exception should have been thrown", message);
-        StringAssert.assertContains("null", message);
-        StringAssert.assertContains("top-level", message);
-        StringAssert.assertContains("org.unitils.reflectionassert.ReflectionAssertTest$Objects", message);
     }
 
 
     /**
      * Test case for both null arguments.
      */
-    public void testCheckEquals_null() {
+    public void testAssertRefEquals_null() {
 
-        reflectionAssert.assertEquals(null, null);
+        ReflectionAssert.assertRefEquals(null, null);
+    }
+
+
+    /**
+     * Test for two equal collections but with different order.
+     */
+    public void testAssertRefEquals_equalsLenientOrder() {
+
+        ReflectionAssert.assertRefEquals(Arrays.asList("element1", "element2", "element3"), Arrays.asList("element3", "element1", "element2"), LENIENT_ORDER);
+    }
+
+
+    /**
+     * Test for two equal collections but with different order.
+     */
+    public void testAssertLenEquals_equalsLenientOrder() {
+
+        ReflectionAssert.assertLenEquals(Arrays.asList("element1", "element2", "element3"), Arrays.asList("element3", "element1", "element2"));
+    }
+
+
+    /**
+     * Test for ignored default left value.
+     */
+    public void testAssertRefEquals_equalsIgnoredDefault() {
+
+        testObjectA.setString1(null);
+        testObjectB.setString1("xxxxxx");
+
+        ReflectionAssert.assertRefEquals(testObjectA, testObjectB, IGNORE_DEFAULTS);
+    }
+
+
+    /**
+     * Test for ignored default left value.
+     */
+    public void testAssertLenEquals_equalsIgnoredDefault() {
+
+        testObjectA.setString1(null);
+        testObjectB.setString1("xxxxxx");
+
+        ReflectionAssert.assertLenEquals(testObjectA, testObjectB);
     }
 
 
     /**
      * Test class with failing equals.
      */
-    private class Objects {
+    private class TestObject {
 
-        /* A fist object value */
         private String string1;
 
-        /* A second object value */
         private String string2;
 
-
-        /**
-         * Creates and initializes the objects instance.
-         *
-         * @param stringValue1 the first object value
-         * @param stringValue2 the second object value
-         */
-        public Objects(String stringValue1, String stringValue2) {
+        public TestObject(String stringValue1, String stringValue2) {
             this.string1 = stringValue1;
             this.string2 = stringValue2;
         }
 
-        /**
-         * Gets the first object value
-         *
-         * @return the value
-         */
         public String getString1() {
             return string1;
         }
 
-        /**
-         * Gets the second object value
-         *
-         * @return the value
-         */
+        public void setString1(String string1) {
+            this.string1 = string1;
+        }
+
         public String getString2() {
             return string2;
+        }
+
+        public void setString2(String string2) {
+            this.string2 = string2;
         }
 
         /**

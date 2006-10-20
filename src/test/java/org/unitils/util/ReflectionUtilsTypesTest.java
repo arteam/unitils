@@ -7,8 +7,7 @@
 package org.unitils.util;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.ReflectionAssert;
-import org.unitils.reflectionassert.ReflectionComparatorModes;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -20,16 +19,13 @@ import java.util.List;
  */
 public class ReflectionUtilsTypesTest extends TestCase {
 
-    /* Assertion through reflection */
-    private ReflectionAssert reflectionAssert = new ReflectionAssert(ReflectionComparatorModes.LENIENT_ORDER);
-
 
     /**
      * Test for getting all non-static fields assignable from.
      */
     public void testGetFieldsAssignableFrom() {
         List<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestObject.class, String.class, false);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("objectField", "stringField"), fields);
+        assertPropertyLenEquals("name", Arrays.asList("objectField", "stringField"), fields);
     }
 
 
@@ -38,7 +34,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFieldsAssignableFrom_static() {
         List<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestObject.class, String.class, true);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("staticObjectField", "staticStringField"), fields);
+        assertPropertyLenEquals("name", Arrays.asList("staticObjectField", "staticStringField"), fields);
     }
 
 
@@ -58,7 +54,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFieldsAssignableFrom_primitive() {
         List<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestObject.class, Integer.TYPE, false);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("intField"), fields);
+        assertPropertyLenEquals("name", Arrays.asList("intField"), fields);
     }
 
 
@@ -67,7 +63,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFirstFieldOfType() {
         Field field = ReflectionUtils.getFirstFieldOfType(TestObject.class, String.class, false);
-        reflectionAssert.assertPropertyEquals("name", "stringField", field);
+        assertPropertyLenEquals("name", "stringField", field);
     }
 
 
@@ -76,7 +72,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFirstFieldOfType_static() {
         Field field = ReflectionUtils.getFirstFieldOfType(TestObject.class, String.class, true);
-        reflectionAssert.assertPropertyEquals("name", "staticStringField", field);
+        assertPropertyLenEquals("name", "staticStringField", field);
     }
 
 
@@ -95,7 +91,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFirstFieldOfType_primitive() {
         Field field = ReflectionUtils.getFirstFieldOfType(TestObject.class, Integer.TYPE, false);
-        reflectionAssert.assertPropertyEquals("name", "intField", field);
+        assertPropertyLenEquals("name", "intField", field);
     }
 
 
@@ -104,7 +100,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetSettersAssignableFrom() {
         List<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestObject.class, String.class, false);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("setObjectField", "setStringField"), methods);
+        assertPropertyLenEquals("name", Arrays.asList("setObjectField", "setStringField"), methods);
     }
 
 
@@ -113,7 +109,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetSettersAssignableFrom_static() {
         List<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestObject.class, String.class, true);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("setStaticObjectField", "setStaticStringField"), methods);
+        assertPropertyLenEquals("name", Arrays.asList("setStaticObjectField", "setStaticStringField"), methods);
     }
 
 
@@ -133,7 +129,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetSettersAssignableFrom_primitive() {
         List<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestObject.class, Integer.TYPE, false);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("setIntField"), methods);
+        assertPropertyLenEquals("name", Arrays.asList("setIntField"), methods);
     }
 
 
@@ -142,7 +138,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFirstSetterOfType() {
         Method method = ReflectionUtils.getFirstSetterOfType(TestObject.class, String.class, false);
-        reflectionAssert.assertPropertyEquals("name", "setStringField", method);
+        assertPropertyLenEquals("name", "setStringField", method);
     }
 
 
@@ -151,7 +147,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFirstSetterOfType_static() {
         Method method = ReflectionUtils.getFirstSetterOfType(TestObject.class, String.class, true);
-        reflectionAssert.assertPropertyEquals("name", "setStaticStringField", method);
+        assertPropertyLenEquals("name", "setStaticStringField", method);
     }
 
 
@@ -169,7 +165,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFirstSetterOfType_primitive() {
         Method method = ReflectionUtils.getFirstSetterOfType(TestObject.class, Integer.TYPE, false);
-        reflectionAssert.assertPropertyEquals("name", "setIntField", method);
+        assertPropertyLenEquals("name", "setIntField", method);
     }
 
 
@@ -178,7 +174,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetSetter() {
         Method method = ReflectionUtils.getSetter(TestObject.class, "stringField", String.class, false);
-        reflectionAssert.assertPropertyEquals("name", "setStringField", method);
+        assertPropertyLenEquals("name", "setStringField", method);
     }
 
 
@@ -187,7 +183,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetSetter_static() {
         Method method = ReflectionUtils.getSetter(TestObject.class, "staticStringField", String.class, true);
-        reflectionAssert.assertPropertyEquals("name", "setStaticStringField", method);
+        assertPropertyLenEquals("name", "setStaticStringField", method);
     }
 
 
@@ -214,7 +210,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetGetter() {
         Method method = ReflectionUtils.getGetter(TestObject.class, "stringField", false);
-        reflectionAssert.assertPropertyEquals("name", "getStringField", method);
+        assertPropertyLenEquals("name", "getStringField", method);
     }
 
 
@@ -223,7 +219,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetGetter_static() {
         Method method = ReflectionUtils.getGetter(TestObject.class, "staticStringField", true);
-        reflectionAssert.assertPropertyEquals("name", "getStaticStringField", method);
+        assertPropertyLenEquals("name", "getStaticStringField", method);
     }
 
 
@@ -241,7 +237,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFieldWithName() {
         Field field = ReflectionUtils.getFieldWithName(TestObject.class, "stringField", false);
-        reflectionAssert.assertPropertyEquals("name", "stringField", field);
+        assertPropertyLenEquals("name", "stringField", field);
     }
 
 
@@ -250,7 +246,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      */
     public void testGetFieldWithName_static() {
         Field field = ReflectionUtils.getFieldWithName(TestObject.class, "staticStringField", true);
-        reflectionAssert.assertPropertyEquals("name", "staticStringField", field);
+        assertPropertyLenEquals("name", "staticStringField", field);
     }
 
 

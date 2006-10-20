@@ -9,8 +9,7 @@ package org.unitils.core;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.db.DatabaseModule;
-import org.unitils.reflectionassert.ReflectionAssert;
-import org.unitils.reflectionassert.ReflectionComparatorModes;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +31,6 @@ public class ModulesRepositoryTest extends TestCase {
 
     /* Class under test */
     private ModulesRepository modulesRepository;
-
-    /* Assertion through reflection */
-    private ReflectionAssert reflectionAssert = new ReflectionAssert(ReflectionComparatorModes.LENIENT_ORDER);
 
 
     /**
@@ -66,7 +62,7 @@ public class ModulesRepositoryTest extends TestCase {
     public void testGetFirstModule() {
 
         TestModule2 result = modulesRepository.getFirstModule(TestModule2.class);
-        reflectionAssert.assertEquals(testModule2a, result);
+        assertLenEquals(testModule2a, result);
     }
 
     /**
@@ -76,7 +72,7 @@ public class ModulesRepositoryTest extends TestCase {
     public void testGetFirstModule_subType() {
 
         TestModule1 result = modulesRepository.getFirstModule(TestModule1.class);
-        reflectionAssert.assertEquals(testModule2a, result);
+        assertLenEquals(testModule2a, result);
     }
 
 
@@ -96,7 +92,7 @@ public class ModulesRepositoryTest extends TestCase {
     public void testGetModules() {
 
         List<TestModule2> result = modulesRepository.getModules(TestModule2.class);
-        reflectionAssert.assertEquals(Arrays.asList(testModule2a, testModule2b), result);
+        assertLenEquals(Arrays.asList(testModule2a, testModule2b), result);
     }
 
 
@@ -107,7 +103,7 @@ public class ModulesRepositoryTest extends TestCase {
     public void testGetModules_subType() {
 
         List<TestModule1> result = modulesRepository.getModules(TestModule1.class);
-        reflectionAssert.assertEquals(Arrays.asList(testModule1, testModule2a, testModule2b), result);
+        assertLenEquals(Arrays.asList(testModule1, testModule2a, testModule2b), result);
     }
 
 

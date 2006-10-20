@@ -9,33 +9,31 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * todo javadoc
+ * Test class for {@link ReflectionAssert} tests for with assertProperty methods with collection arguments.
  */
 public class ReflectionAssertCollectionsTest extends TestCase {
 
-    private List<String> list = Arrays.asList("el1", "el2");
+    /* A test collection */
+    private List<String> listA;
 
-    private List<String> sameList = Arrays.asList("el1", "el2");
+    /* Same as listA but different instance */
+    private List<String> listB;
 
-    private List<String> listDifferentSequence = Arrays.asList("el2", "el1");
+    /* Same as listA but with a different order */
+    private List<String> listDifferentOrder;
 
-    private List<String> differentListSameSize = Arrays.asList("el2", "el3");
+    /* A list having same size as listA but containing different values */
+    private List<String> listDifferentValues;
 
-    private List<String> listDuplicateElement = Arrays.asList("el2", "el2", "el1");
+    /* A list containing 1 extra element as listA, a double of another element */
+    private List<String> listDuplicateElement;
 
-    private List<String> listOneElementLess = Arrays.asList("el1");
+    /* A list with one element less than listA */
+    private List<String> listOneElementLess;
 
-    private List<String> listOneElementMore = Arrays.asList("el1", "el2", "el3");
+    /* A list with one element more than listA */
+    private List<String> listOneElementMore;
 
-    private List<TestObject> listObjects = Arrays.asList(new TestObject(1, "el1"), new TestObject(2, "el2"));
-
-    private List<TestObject> listObjectsDifferentSequence = Arrays.asList(new TestObject(2, "el2"), new TestObject(1, "el1"));
-
-    private List<TestObject> differentListObjects = Arrays.asList(new TestObject(2, "el2"), new TestObject(3, "el3"));
-
-    /* Class under test */
-    private ReflectionAssert reflectionAssert;
-    private ReflectionAssert reflectionAssertLenientOrder;
 
     /**
      * Initializes the test fixture.
@@ -43,184 +41,112 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        reflectionAssert = new ReflectionAssert();
-        reflectionAssertLenientOrder = new ReflectionAssert(LENIENT_ORDER);
+        listA = Arrays.asList("el1", "el2");
+        listB = Arrays.asList("el1", "el2");
+        listDifferentOrder = Arrays.asList("el2", "el1");
+        listDifferentValues = Arrays.asList("el2", "el3");
+        listDuplicateElement = Arrays.asList("el2", "el2", "el1");
+        listOneElementLess = Arrays.asList("el1");
+        listOneElementMore = Arrays.asList("el1", "el2", "el3");
     }
 
 
-    public void testAssertEquals_sameSequence() {
-        reflectionAssert.assertEquals(list, sameList);
+    /**
+     * Test for two equal collections.
+     */
+    public void testAssertRefEquals() {
+        ReflectionAssert.assertRefEquals(listA, listB);
     }
 
-    public void testAssertEquals_differentSequence() {
-        reflectionAssertLenientOrder.assertEquals(list, listDifferentSequence);
+
+    /**
+     * Test for two equal collections but with different order.
+     */
+    public void testAssertRefEquals_notEqualsDifferentOrder() {
+
+        try {
+            ReflectionAssert.assertRefEquals(listA, listDifferentOrder);
+            Assert.fail("Expected AssertionFailedError");
+
+        } catch (AssertionFailedError e) {
+            // Expected
+        }
     }
 
+
+    /**
+     * Test for two equal collections but with different order.
+     */
+    public void testAssertRefEquals_equalsDifferentOrder() {
+        ReflectionAssert.assertRefEquals(listA, listDifferentOrder, LENIENT_ORDER);
+    }
+
+
+    /**
+     * Test for two equal collections but with different order.
+     */
+    public void testAssertLenEquals_equalsDifferentOrder() {
+        ReflectionAssert.assertLenEquals(listA, listDifferentOrder);
+    }
+
+
+    /**
+     * Test for two collections with different elements.
+     */
     public void testAssertEquals_differentListSameSize() {
+
         try {
-            reflectionAssert.assertEquals(list, differentListSameSize);
+            ReflectionAssert.assertRefEquals(listA, listDifferentValues);
+            Assert.fail("Expected AssertionFailedError");
+
         } catch (AssertionFailedError e) {
             // Expected
-            return;
         }
-        Assert.fail("Expected AssertionFailedError");
     }
 
+
+    /**
+     * Test for a collection with a duplicate element.
+     */
     public void testAssertEquals_duplicateElement() {
+
         try {
-            reflectionAssert.assertEquals(list, listDuplicateElement);
+            ReflectionAssert.assertRefEquals(listA, listDuplicateElement);
+            Assert.fail("Expected AssertionFailedError");
+
         } catch (AssertionFailedError e) {
             // Expected
-            return;
         }
-        Assert.fail("Expected AssertionFailedError");
     }
 
+
+    /**
+     * Test for with a collection that has one element less.
+     */
     public void testAssertEquals_oneElementLess() {
+
         try {
-            reflectionAssert.assertEquals(list, listOneElementLess);
+            ReflectionAssert.assertRefEquals(listA, listOneElementLess);
+            Assert.fail("Expected AssertionFailedError");
+
         } catch (AssertionFailedError e) {
             // Expected
-            return;
         }
-        Assert.fail("Expected AssertionFailedError");
     }
 
+
+    /**
+     * Test for with a collection that has one element more.
+     */
     public void testAssertEquals_oneElementMore() {
-        try {
-            reflectionAssert.assertEquals(list, listOneElementMore);
-        } catch (AssertionFailedError e) {
-            // Expected
-            return;
-        }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-    public void testAssertEquals_strictSequence_sameSequence() {
-        reflectionAssert.assertEquals(list, sameList);
-    }
-
-    public void testAssertEquals_strictSequence_differentSequence() {
-        try {
-            reflectionAssert.assertEquals(list, listDifferentSequence);
-        } catch (AssertionFailedError e) {
-            // Expected
-            return;
-        }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-    public void testAssertEquals_strictSequence_differentListSameSize() {
-        try {
-            reflectionAssert.assertEquals(list, differentListSameSize);
-        } catch (AssertionFailedError e) {
-            // Expected
-            return;
-        }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-    public void testAssertEquals_strictSequence_duplicateElement() {
-        try {
-            reflectionAssert.assertEquals(list, listDuplicateElement);
-        } catch (AssertionFailedError e) {
-            // Expected
-            return;
-        }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-    public void testAssertEquals_strictSequence_oneElementLess() {
-        try {
-            reflectionAssert.assertEquals(list, listOneElementLess);
-        } catch (AssertionFailedError e) {
-            // Expected
-            return;
-        }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-    public void testAssertEquals_strictSequence_oneElementMore() {
-        try {
-            reflectionAssert.assertEquals(list, listOneElementMore);
-        } catch (AssertionFailedError e) {
-            // Expected
-            return;
-        }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-    //todo other test class
-
-    public void testAssertPropertyEquals_sameSequence() {
-        reflectionAssert.assertPropertyEquals("testProperty", list, listObjects);
-    }
-
-    public void testAssertPropertyEquals_differentSequence() {
-        reflectionAssert.assertPropertyEquals("testProperty", list, listObjects);
-    }
-
-    public void testAssertPropertyEquals_differentList() {
-        try {
-            reflectionAssert.assertPropertyEquals("testProperty", list, differentListObjects);
-        } catch (AssertionFailedError e) {
-            // Expected
-            return;
-        }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-    public void testAssertPropertyEquals_strictSequence_sameSequence() {
-        reflectionAssert.assertPropertyEquals("testProperty", list, listObjects);
-    }
-
-    public void testAssertPropertyEquals_strictSequence_differentSequence() {
-        try {
-            reflectionAssert.assertPropertyEquals("testProperty", list, listObjectsDifferentSequence);
-        } catch (AssertionFailedError e) {
-            // Expected
-            return;
-        }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-    public void testAssertPropertyEquals_equalsPrimitivesList() {
-
-        reflectionAssertLenientOrder.assertPropertyEquals("testPrimitive", Arrays.asList(2L, 1L), listObjects);
-    }
-
-    public void testAssertPropertyEquals_notEqualsPrimitivesList() {
 
         try {
-            reflectionAssertLenientOrder.assertPropertyEquals("testPrimitive", Arrays.asList(999L, 1L), listObjects);
+            ReflectionAssert.assertRefEquals(listA, listOneElementMore);
+            Assert.fail("Expected AssertionFailedError");
+
         } catch (AssertionFailedError e) {
             // Expected
-            return;
         }
-        Assert.fail("Expected AssertionFailedError");
-    }
-
-
-    public class TestObject {
-
-        private long testPrimitive;
-
-        private String testProperty;
-
-        public TestObject(long testPrimitive, String testProperty) {
-            this.testPrimitive = testPrimitive;
-            this.testProperty = testProperty;
-        }
-
-        public long getTestPrimitive() {
-            return testPrimitive;
-        }
-
-        public String getTestProperty() {
-            return testProperty;
-        }
-
-
     }
 
 }
