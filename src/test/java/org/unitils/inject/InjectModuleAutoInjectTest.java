@@ -3,6 +3,7 @@ package org.unitils.inject;
 import junit.framework.TestCase;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.inject.annotation.AutoInject;
+import org.unitils.inject.util.PropertyAccessType;
 
 public class InjectModuleAutoInjectTest extends TestCase {
 

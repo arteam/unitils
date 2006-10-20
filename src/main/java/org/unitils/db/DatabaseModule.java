@@ -9,7 +9,7 @@ package org.unitils.db;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.UnitilsModule;
+import org.unitils.core.Module;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbmaintainer.config.DataSourceFactory;
@@ -37,7 +37,7 @@ import java.util.List;
  * <li>If the updateDataBaseSchema.enabled property is set to true, the {@link DBMaintainer} is invoked to update the
  * database and prepare it for unit testing (see {@link DBMaintainer} Javadoc)</li>
  */
-public class DatabaseModule implements UnitilsModule {
+public class DatabaseModule implements Module {
 
     /* Property keys indicating if the database schema should be updated before performing the tests */
     static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";

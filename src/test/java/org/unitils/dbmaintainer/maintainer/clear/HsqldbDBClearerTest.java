@@ -7,7 +7,7 @@ import java.sql.Statement;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
-import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 
 /**
@@ -19,7 +19,7 @@ public class HsqldbDBClearerTest extends DBClearerTest {
     @Override
     protected void setUp() throws Exception {
 
-        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
         hsqldbDialectActivated = "hsqldb".equals(configuration
                 .getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
 

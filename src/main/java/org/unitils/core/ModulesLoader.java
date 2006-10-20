@@ -30,7 +30,7 @@ import java.util.*;
  * <p/>
  * If a circular dependency is found in the runAfter configuration, a runtime exception will be thrown.
  */
-public class UnitilsModulesLoader {
+public class ModulesLoader {
 
     /**
      * Property that contains the names of the modules that are to be loaded
@@ -64,7 +64,7 @@ public class UnitilsModulesLoader {
      * @param configuration the configuration, not null
      * @return the modules, not null
      */
-    public List<UnitilsModule> loadModules(Configuration configuration) {
+    public List<Module> loadModules(Configuration configuration) {
 
         // get all declared modules (filter doubles)
         Set<String> moduleNames = new TreeSet<String>(Arrays.asList(configuration.getStringArray(PROPERTY_MODULES)));
@@ -106,7 +106,7 @@ public class UnitilsModulesLoader {
         }
 
         // Create core instances in the correct sequence
-        List<UnitilsModule> modules = new ArrayList<UnitilsModule>();
+        List<Module> modules = new ArrayList<Module>();
         for (List<String> moduleNameList : runAfterCounts.values()) {
             for (String moduleName : moduleNameList) {
 
@@ -115,13 +115,13 @@ public class UnitilsModulesLoader {
 
                 // create core instance
                 Object module = ReflectionUtils.createInstanceOfType(className);
-                if (!(module instanceof UnitilsModule)) {
+                if (!(module instanceof Module)) {
 
                     throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
                 }
                 // run initializer
-                ((UnitilsModule) module).init(configuration);
-                modules.add((UnitilsModule) module);
+                ((Module) module).init(configuration);
+                modules.add((Module) module);
             }
         }
         return modules;

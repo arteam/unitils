@@ -18,10 +18,10 @@ public class ModulesRepository {
 
 
     /* All modules */
-    private List<UnitilsModule> modules;
+    private List<Module> modules;
 
     /* A map containing the test listeners of each module */
-    private Map<UnitilsModule, TestListener> testListeners;
+    private Map<Module, TestListener> testListeners;
 
 
     /**
@@ -29,7 +29,7 @@ public class ModulesRepository {
      *
      * @param modules the modules, not null
      */
-    public ModulesRepository(List<UnitilsModule> modules) {
+    public ModulesRepository(List<Module> modules) {
         this.modules = modules;
         this.testListeners = createTestListeners(modules);
     }
@@ -40,7 +40,7 @@ public class ModulesRepository {
      *
      * @return the modules, not null
      */
-    public List<UnitilsModule> getModules() {
+    public List<Module> getModules() {
         return modules;
     }
 
@@ -50,7 +50,7 @@ public class ModulesRepository {
      *
      * @return the listeners per module, not null
      */
-    public Map<UnitilsModule, TestListener> getTestListeners() {
+    public Map<Module, TestListener> getTestListeners() {
         return testListeners;
     }
 
@@ -62,9 +62,9 @@ public class ModulesRepository {
      * @return the module, null if not found
      */
     @SuppressWarnings({"unchecked"})
-    public <T extends UnitilsModule> T getFirstModule(Class<T> type) {
+    public <T extends Module> T getFirstModule(Class<T> type) {
 
-        for (UnitilsModule module : modules) {
+        for (Module module : modules) {
 
             if (type.isAssignableFrom(module.getClass())) {
                 return (T) module;
@@ -81,11 +81,11 @@ public class ModulesRepository {
      * @return the modules, an empty list if none found
      */
     @SuppressWarnings({"unchecked"})
-    public <T extends UnitilsModule> List<T> getModules(Class<T> type) {
+    public <T extends Module> List<T> getModules(Class<T> type) {
 
         List<T> result = new ArrayList<T>();
 
-        for (UnitilsModule module : modules) {
+        for (Module module : modules) {
 
             if (type.isAssignableFrom(module.getClass())) {
                 result.add((T) module);
@@ -101,7 +101,7 @@ public class ModulesRepository {
      * @param module the module, not null
      * @return the listener, null if the module could not be found
      */
-    public TestListener getTestListener(UnitilsModule module) {
+    public TestListener getTestListener(Module module) {
 
         return testListeners.get(module);
     }
@@ -113,11 +113,11 @@ public class ModulesRepository {
      * @param modules the modules, not null
      * @return the listeners for each module, not null
      */
-    private Map<UnitilsModule, TestListener> createTestListeners(List<UnitilsModule> modules) {
+    private Map<Module, TestListener> createTestListeners(List<Module> modules) {
 
-        Map<UnitilsModule, TestListener> result = new HashMap<UnitilsModule, TestListener>(modules.size());
+        Map<Module, TestListener> result = new HashMap<Module, TestListener>(modules.size());
 
-        for (UnitilsModule module : modules) {
+        for (Module module : modules) {
             result.put(module, module.createTestListener());
         }
         return result;

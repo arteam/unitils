@@ -21,13 +21,13 @@ public class ModulesRepositoryTest extends TestCase {
 
 
     /* A test module */
-    private UnitilsModule testModule1 = new TestModule1();
+    private Module testModule1 = new TestModule1();
 
     /* Another test module */
-    private UnitilsModule testModule2a = new TestModule2();
+    private Module testModule2a = new TestModule2();
 
     /* A test module with same type as testModule2a */
-    private UnitilsModule testModule2b = new TestModule2();
+    private Module testModule2b = new TestModule2();
 
     /* Class under test */
     private ModulesRepository modulesRepository;
@@ -39,7 +39,7 @@ public class ModulesRepositoryTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        List<UnitilsModule> modules = Arrays.asList(testModule2a, testModule1, testModule2b);
+        List<Module> modules = Arrays.asList(testModule2a, testModule1, testModule2b);
         modulesRepository = new ModulesRepository(modules);
     }
 
@@ -120,7 +120,7 @@ public class ModulesRepositoryTest extends TestCase {
     /**
      * A test module, creating its own test listener.
      */
-    private static class TestModule1 implements UnitilsModule {
+    private static class TestModule1 implements Module {
 
         public void init(Configuration configuration) {
         }
@@ -137,7 +137,7 @@ public class ModulesRepositoryTest extends TestCase {
     /**
      * A test module that is a subtype of TestModule1 and also creates its own test listener.
      */
-    private static class TestModule2 extends TestModule1 implements UnitilsModule {
+    private static class TestModule2 extends TestModule1 implements Module {
 
         public TestListener createTestListener() {
             return new TestListener2();

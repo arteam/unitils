@@ -38,7 +38,7 @@ import java.sql.SQLException;
  * - expected dataset
  * - (if possible) clear database completely before every test
  */
-public class DbUnitModule implements UnitilsModule {
+public class DbUnitModule implements Module {
 
     /* Property key of the name of the database schema */
     private static final String PROPKEY_SCHEMA_NAME = "dataSource.schemaName";

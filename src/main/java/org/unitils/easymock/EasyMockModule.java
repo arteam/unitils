@@ -8,7 +8,7 @@ import static org.easymock.internal.MocksControl.MockType.NICE;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.UnitilsModule;
+import org.unitils.core.Module;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.LenientMock;
 import org.unitils.easymock.annotation.Mock;
@@ -39,7 +39,7 @@ import java.util.List;
  * the createMock() method can be done by calling
  * the {@link EasyMockModule#replay()} and {@link EasyMockModule#verify()} methods.
  */
-public class EasyMockModule implements UnitilsModule {
+public class EasyMockModule implements Module {
 
     /* All created mocks controls */
     private List<MocksControl> mocksControls;

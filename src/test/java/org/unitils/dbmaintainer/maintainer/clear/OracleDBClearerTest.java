@@ -7,7 +7,7 @@ import java.sql.Statement;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
-import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 
 /**
@@ -148,7 +148,7 @@ public class OracleDBClearerTest extends DBClearerTest {
     }
 
     private boolean oracleDialectActivated() {
-        Configuration config = new UnitilsConfigurationLoader().loadConfiguration();
+        Configuration config = new ConfigurationLoader().loadConfiguration();
         return "oracle".equals(config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
     }
 }

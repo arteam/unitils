@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.hibernate;
 
 import org.hibernate.Session;
@@ -6,13 +12,13 @@ import org.hibernate.cfg.Configuration;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.UnitilsModule;
-import org.unitils.util.ReflectionUtils;
+import org.unitils.core.Module;
 import org.unitils.db.DatabaseModule;
 import org.unitils.hibernate.annotation.AfterCreateHibernateSession;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateTest;
 import org.unitils.util.AnnotationUtils;
+import org.unitils.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -21,7 +27,7 @@ import java.util.List;
 /**
  * todo javadoc
  */
-public class HibernateModule implements UnitilsModule {
+public class HibernateModule implements Module {
 
     private static final String PROPKEY_HIBERNATE_CONFIGFILES = "hibernatetestcase.hibernate.cfg.configfiles";
 

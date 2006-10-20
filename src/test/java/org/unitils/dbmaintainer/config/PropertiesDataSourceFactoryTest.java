@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp.BasicDataSource;
 import static org.easymock.classextension.EasyMock.*;
-import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.core.ConfigurationLoader;
 
 /**
  * todo
@@ -23,7 +23,7 @@ public class PropertiesDataSourceFactoryTest extends TestCase {
 
     public void setUp() throws Exception {
 
-        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
 
         mockBasicDataSource = createMock(BasicDataSource.class);
         propertiesFileDataSourceConfig = new PropertiesDataSourceFactory() {
