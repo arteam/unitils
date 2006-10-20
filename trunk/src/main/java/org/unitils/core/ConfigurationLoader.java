@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * A warning is logged when the custom propreties cannot be loaded.
  * A debug message is logged when the local configuration cannot be loaded.
  */
-public class UnitilsConfigurationLoader {
+public class ConfigurationLoader {
 
     /**
      * Name of the fixed configuration file that contains all defaults
@@ -55,7 +55,7 @@ public class UnitilsConfigurationLoader {
 
 
     /* The logger instance for this class */
-    private static final Logger logger = Logger.getLogger(UnitilsConfigurationLoader.class);
+    private static final Logger logger = Logger.getLogger(ConfigurationLoader.class);
 
 
     /**

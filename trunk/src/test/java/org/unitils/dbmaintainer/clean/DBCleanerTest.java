@@ -3,7 +3,7 @@ package org.unitils.dbmaintainer.clean;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
@@ -31,7 +31,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
         configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "testtable2,testtable3");
 
         StatementHandler statementHandler = new JDBCStatementHandler();

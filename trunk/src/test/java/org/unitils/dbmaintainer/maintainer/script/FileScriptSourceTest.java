@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
@@ -58,7 +58,7 @@ public class FileScriptSourceTest extends TestCase {
         versionTimestampOld = new Version(1L, file1Timestamp - 1L);
 
         // Initialize FileScriptSourceObject
-        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_DIR, DBCHANGE_FILE_DIRECTORY);
         configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_FILEEXTENSION, "sql");
         fromScratchFileScriptSource = new FileScriptSource();

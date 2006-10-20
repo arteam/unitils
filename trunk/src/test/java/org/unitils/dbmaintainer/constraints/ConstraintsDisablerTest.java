@@ -7,7 +7,7 @@ import java.sql.Statement;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.core.UnitilsConfigurationLoader;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
@@ -30,7 +30,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new UnitilsConfigurationLoader().loadConfiguration();
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
 
         StatementHandler st = new JDBCStatementHandler();
         st.init(configuration, dataSource);

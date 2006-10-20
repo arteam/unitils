@@ -1,4 +1,10 @@
-package org.unitils.inject;
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
+package org.unitils.inject.util;
 
 import ognl.DefaultMemberAccess;
 import ognl.Ognl;
@@ -7,12 +13,15 @@ import ognl.OgnlException;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.util.ReflectionUtils;
+import org.unitils.inject.util.PropertyAccessType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  */
 public class InjectionUtils {

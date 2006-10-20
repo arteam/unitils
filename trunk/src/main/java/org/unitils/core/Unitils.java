@@ -69,15 +69,15 @@ public class Unitils {
 
     protected ModulesRepository createModulesRepository(Configuration configuration) {
 
-        UnitilsModulesLoader unitilsModulesLoader = new UnitilsModulesLoader();
-        List<UnitilsModule> modules = unitilsModulesLoader.loadModules(configuration);
+        ModulesLoader modulesLoader = new ModulesLoader();
+        List<Module> modules = modulesLoader.loadModules(configuration);
         return new ModulesRepository(modules);
     }
 
     protected Configuration createConfiguration() {
 
-        UnitilsConfigurationLoader unitilsConfigurationLoader = new UnitilsConfigurationLoader();
-        return unitilsConfigurationLoader.loadConfiguration();
+        ConfigurationLoader configurationLoader = new ConfigurationLoader();
+        return configurationLoader.loadConfiguration();
     }
 
 
@@ -89,8 +89,8 @@ public class Unitils {
         testContext.setTestMethod(null);
 
         // For each core, invoke the beforeAll method
-        List<UnitilsModule> modules = modulesRepository.getModules();
-        for (UnitilsModule module : modules) {
+        List<Module> modules = modulesRepository.getModules();
+        for (Module module : modules) {
             modulesRepository.getTestListener(module).beforeAll();
         }
     }
@@ -103,8 +103,8 @@ public class Unitils {
         testContext.setTestObject(test);
         testContext.setTestMethod(null);
 
-        List<UnitilsModule> modules = modulesRepository.getModules();
-        for (UnitilsModule module : modules) {
+        List<Module> modules = modulesRepository.getModules();
+        for (Module module : modules) {
             modulesRepository.getTestListener(module).beforeTestClass(test);
         }
     }
@@ -118,8 +118,8 @@ public class Unitils {
         testContext.setTestMethod(testMethod);
 
         // For each core, invoke the beforeTestMethod method
-        List<UnitilsModule> modules = modulesRepository.getModules();
-        for (UnitilsModule module : modules) {
+        List<Module> modules = modulesRepository.getModules();
+        for (Module module : modules) {
             modulesRepository.getTestListener(module).beforeTestMethod(testObject, testMethod);
         }
     }
@@ -133,8 +133,8 @@ public class Unitils {
         testContext.setTestMethod(testMethod);
 
         // For each core, invoke the afterTestMethod method
-        List<UnitilsModule> modules = modulesRepository.getModules();
-        for (UnitilsModule module : modules) {
+        List<Module> modules = modulesRepository.getModules();
+        for (Module module : modules) {
             modulesRepository.getTestListener(module).afterTestMethod(testObject, testMethod);
         }
     }
@@ -146,8 +146,8 @@ public class Unitils {
         testContext.setTestObject(test);
         testContext.setTestMethod(null);
 
-        List<UnitilsModule> modules = modulesRepository.getModules();
-        for (UnitilsModule module : modules) {
+        List<Module> modules = modulesRepository.getModules();
+        for (Module module : modules) {
             modulesRepository.getTestListener(module).afterTestClass(test.getClass());
         }
     }
@@ -160,8 +160,8 @@ public class Unitils {
         testContext.setTestObject(null);
         testContext.setTestMethod(null);
 
-        List<UnitilsModule> modules = modulesRepository.getModules();
-        for (UnitilsModule module : modules) {
+        List<Module> modules = modulesRepository.getModules();
+        for (Module module : modules) {
             modulesRepository.getTestListener(module).afterAll();
         }
     }

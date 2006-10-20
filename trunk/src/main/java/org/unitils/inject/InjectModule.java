@@ -1,11 +1,19 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.inject;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.UnitilsModule;
+import org.unitils.core.Module;
 import org.unitils.inject.annotation.*;
+import org.unitils.inject.util.InjectionUtils;
+import org.unitils.inject.util.PropertyAccessType;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -19,7 +27,7 @@ import java.util.List;
 /**
  * todo javadoc
  */
-public class InjectModule implements UnitilsModule {
+public class InjectModule implements Module {
 
 
     private PropertyAccessType defaultPropertyAccessType;
