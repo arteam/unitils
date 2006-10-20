@@ -7,7 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.unitils.core.UnitilsConfigurationLoader;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
-import org.unitils.reflectionassert.ReflectionAssert;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,7 +36,6 @@ public class FileScriptSourceTest extends TestCase {
 
     private long file2Timestamp;
 
-    private static ReflectionAssert reflectionAssert = new ReflectionAssert();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -109,13 +108,11 @@ public class FileScriptSourceTest extends TestCase {
     }
 
     private void checkScript1(VersionScriptPair versionScriptPair) {
-        reflectionAssert.assertEquals(new VersionScriptPair(new Version(1L, file2Timestamp), "Contents of script 1"),
-                versionScriptPair);
+        assertLenEquals(new VersionScriptPair(new Version(1L, file2Timestamp), "Contents of script 1"), versionScriptPair);
     }
 
     private void checkScript2(VersionScriptPair versionScriptPair) {
-        reflectionAssert.assertEquals(new VersionScriptPair(new Version(2L, file2Timestamp), "Contents of script 2"),
-                versionScriptPair);
+        assertLenEquals(new VersionScriptPair(new Version(2L, file2Timestamp), "Contents of script 2"), versionScriptPair);
     }
 
 

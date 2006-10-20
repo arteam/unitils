@@ -7,8 +7,7 @@
 package org.unitils.util;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.ReflectionAssert;
-import org.unitils.reflectionassert.ReflectionComparatorModes;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,18 +23,13 @@ import java.util.List;
  */
 public class AnnotationUtilsTest extends TestCase {
 
-    //todo assertPropertyRefEquals
-
-    /* Assertion through reflection */
-    private ReflectionAssert reflectionAssert = new ReflectionAssert(ReflectionComparatorModes.LENIENT_ORDER);
-
 
     /**
      * Test to get all annotated fields.
      */
     public void testGetFieldsAnnotatedWith() {
         List<Field> annotatedFields = AnnotationUtils.getFieldsAnnotatedWith(TestClass.class, TestAnnotation.class);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("field"), annotatedFields);
+        assertPropertyLenEquals("name", Arrays.asList("field"), annotatedFields);
     }
 
 
@@ -52,7 +46,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetFieldsAnnotatedWith_fieldFromSuperClass() {
         List<Field> annotatedFields = AnnotationUtils.getFieldsAnnotatedWith(TestSubClass.class, TestAnnotation.class);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("field", "subField"), annotatedFields);
+        assertPropertyLenEquals("name", Arrays.asList("field", "subField"), annotatedFields);
     }
 
 
@@ -61,7 +55,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith() {
         List<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestClass.class, TestAnnotation.class);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("method"), annotatedMethods);
+        assertPropertyLenEquals("name", Arrays.asList("method"), annotatedMethods);
     }
 
     /**
@@ -78,7 +72,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith_methodFromSuperClass() {
         List<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class);
-        reflectionAssert.assertPropertyEquals("name", Arrays.asList("method", "subMethod"), annotatedMethods);
+        assertPropertyLenEquals("name", Arrays.asList("method", "subMethod"), annotatedMethods);
     }
 
 

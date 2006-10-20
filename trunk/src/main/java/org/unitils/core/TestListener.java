@@ -15,12 +15,20 @@ public abstract class TestListener {
         // empty
     }
 
+    public void beforeTestSetUp(Object testObject) {
+        
+    }
+
     public void beforeTestMethod(Object testObject, Method testMethod) {
         // empty
     }
 
     public void afterTestMethod(Object testObject, Method testMethod) {
         // empty
+    }
+
+    public void afterTestTearDown(Object testObject) {
+
     }
 
     public void afterTestClass(Object testObject) {
