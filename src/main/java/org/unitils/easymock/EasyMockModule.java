@@ -10,10 +10,9 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.UnitilsModule;
 import org.unitils.easymock.annotation.AfterCreateMock;
+import org.unitils.easymock.annotation.LenientMock;
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.easymock.annotation.Mock.Arguments;
-import org.unitils.easymock.annotation.Mock.Order;
-import org.unitils.easymock.annotation.Mock.Returns;
+import org.unitils.reflectionassert.ReflectionComparatorModes;
 import static org.unitils.reflectionassert.ReflectionComparatorModes.*;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
@@ -33,10 +32,11 @@ import java.util.List;
  * you with a hook method for custom handling of the mock (e.g. adding the mocks to a service locator repository).
  * A method can only be called if it has following signature <code>void myMethod(Object mock, String name, Class type)</code>.
  * <p/>
- * Mocks can also be created explicitly by using the {@link #createMock(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method.
+ * Mocks can also be created explicitly by using the {@link #createMock(Class,Mock.InvocationOrder,Mock.Returns)} and
+ * {@link #createLenientMock(Class,LenientMock.InvocationOrder,LenientMock.Returns,LenientMock.Order,LenientMock.Dates,LenientMock.Defaults)} methods.
  * <p/>
  * Switching to the replay state and verifying expectations of all mocks (including the mocks created with
- * the {@link #createMock(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method can be done by calling
+ * the createMock() method can be done by calling
  * the {@link EasyMockModule#replay()} and {@link EasyMockModule#verify()} methods.
  */
 public class EasyMockModule implements UnitilsModule {
@@ -45,11 +45,20 @@ public class EasyMockModule implements UnitilsModule {
     private List<MocksControl> mocksControls;
 
     //todo javadoc
-    private Order defaultOrder;
+    private Mock.InvocationOrder defaultMockInvocationOrder;
 
-    private Returns defaultReturns;
+    private Mock.Returns defaultMockReturns;
 
-    private Arguments defaultArguments;
+    private LenientMock.InvocationOrder defaultLenientMockInvocationOrder;
+
+    private LenientMock.Returns defaultLenientMockReturns;
+
+    private LenientMock.Order defaultLenientMockOrder;
+
+    private LenientMock.Dates defaultLenientMockDates;
+
+    private LenientMock.Defaults defaultLenientMockDefaults;
+
 
     /**
      * Initializes the module
@@ -57,9 +66,13 @@ public class EasyMockModule implements UnitilsModule {
     public void init(Configuration configuration) {
         this.mocksControls = new ArrayList<MocksControl>();
 
-        defaultOrder = ReflectionUtils.getEnumValue(Order.class, configuration.getString(Order.class.getName()));
-        defaultReturns = ReflectionUtils.getEnumValue(Returns.class, configuration.getString(Returns.class.getName()));
-        defaultArguments = ReflectionUtils.getEnumValue(Arguments.class, configuration.getString(Arguments.class.getName()));
+        defaultMockInvocationOrder = ReflectionUtils.getEnumValue(Mock.InvocationOrder.class, configuration.getString(Mock.InvocationOrder.class.getName()));
+        defaultMockReturns = ReflectionUtils.getEnumValue(Mock.Returns.class, configuration.getString(Mock.Returns.class.getName()));
+        defaultLenientMockInvocationOrder = ReflectionUtils.getEnumValue(LenientMock.InvocationOrder.class, configuration.getString(LenientMock.InvocationOrder.class.getName()));
+        defaultLenientMockReturns = ReflectionUtils.getEnumValue(LenientMock.Returns.class, configuration.getString(LenientMock.Returns.class.getName()));
+        defaultLenientMockOrder = ReflectionUtils.getEnumValue(LenientMock.Order.class, configuration.getString(LenientMock.Order.class.getName()));
+        defaultLenientMockDates = ReflectionUtils.getEnumValue(LenientMock.Dates.class, configuration.getString(LenientMock.Dates.class.getName()));
+        defaultLenientMockDefaults = ReflectionUtils.getEnumValue(LenientMock.Defaults.class, configuration.getString(LenientMock.Defaults.class.getName()));
     }
 
 
@@ -69,15 +82,22 @@ public class EasyMockModule implements UnitilsModule {
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()} is called.
      *
-     * @param mockType  the class type for the mock, not null
-     * @param order     the order setting, not null
-     * @param returns   the returns setting, not null
-     * @param arguments the arguments setting, not null
+     * @param mockType the class type for the mock, not null
+     * @param order    the order setting, not null
+     * @param returns  the returns setting, not null
      * @return a mock for the given class or interface, not null
      */
-    public static <T> T createMock(Class<T> mockType, Mock.Order order, Mock.Returns returns, Mock.Arguments arguments) {
+    public static <T> T createMock(Class<T> mockType, Mock.InvocationOrder order, Mock.Returns returns) {
 
-        return getInstance().createMockImpl(mockType, order, returns, arguments);
+        return getInstance().createMockImpl(mockType, order, returns);
+    }
+
+
+    //todo javadoc
+    public static <T> T createLenientMock(Class<T> mockType, LenientMock.InvocationOrder invocationOrder, LenientMock.Returns returns,
+                                          LenientMock.Order order, LenientMock.Dates dates, LenientMock.Defaults defaults) {
+
+        return getInstance().createLenientMockImpl(mockType, invocationOrder, returns, order, dates, defaults);
     }
 
     /**
@@ -85,7 +105,8 @@ public class EasyMockModule implements UnitilsModule {
      * <p/>
      * This method will make sure EasyMock's replay method is called on every mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createMock(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method.
+     * {@link #createMock(Class,Mock.InvocationOrder,Mock.Returns)} and
+     * {@link #createLenientMock(Class,LenientMock.InvocationOrder,LenientMock.Returns,LenientMock.Order,LenientMock.Dates,LenientMock.Defaults)} methods.
      * <p/>
      * After each test, the expected behavior will be verified automatically. Verification can also be performed
      * explicitly by calling the {@link #verify()} method.
@@ -102,7 +123,8 @@ public class EasyMockModule implements UnitilsModule {
      * <p/>
      * This method will make sure EasyMock's verify method is called on every mock mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createMock(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method.
+     * {@link #createMock(Class,Mock.InvocationOrder,Mock.Returns)} and
+     * {@link #createLenientMock(Class,LenientMock.InvocationOrder,LenientMock.Returns,LenientMock.Order,LenientMock.Dates,LenientMock.Defaults)} methods.
      * <p/>
      * After each test, the expected behavior will be verified automatically. Verification can also be performed
      * explicitly by calling this method.
@@ -147,10 +169,11 @@ public class EasyMockModule implements UnitilsModule {
 
 
     /**
-     * Creates and sets a mock for all {@link @Mock} annotated fields.
+     * Creates and sets a mock for all {@link @Mock} and {@link @LenientMock} annotated fields.
      * <p/>
-     * The {@link #createMockImpl(Class,Mock.Order,Mock.Returns,Mock.Arguments)} method is called for creating the
-     * mocks. Ones the mock is created, all methods annotated with {@link @AfterCreateMock} will be called passing the created mock.
+     * The {@link #createMock(Class,Mock.InvocationOrder,Mock.Returns)} or
+     * {@link #createLenientMock(Class,LenientMock.InvocationOrder,LenientMock.Returns,LenientMock.Order,LenientMock.Dates,LenientMock.Defaults)}
+     * method is called for creating the mocks. Ones the mock is created, all methods annotated with {@link @AfterCreateMock} will be called passing the created mock.
      *
      * @param testObject the test, not null
      */
@@ -164,7 +187,8 @@ public class EasyMockModule implements UnitilsModule {
             Class<?> mockType = field.getType();
 
             Mock mockAnnotation = field.getAnnotation(Mock.class);
-            Object mockObject = createMockImpl(mockType, mockAnnotation.order(), mockAnnotation.returns(), mockAnnotation.arguments());
+            //todo lenient mock
+            Object mockObject = createMockImpl(mockType, mockAnnotation.invocationOrder(), mockAnnotation.returns());
             ReflectionUtils.setFieldValue(testObject, field, mockObject);
 
             callAfterCreateMockMethods(testObject, mockObject, field.getName(), mockType);
@@ -200,20 +224,38 @@ public class EasyMockModule implements UnitilsModule {
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()} is called.
      *
-     * @param mockType  the class type for the mock, not null
-     * @param order     the order setting, not null
-     * @param returns   the returns setting, not null
-     * @param arguments the arguments setting, not null
+     * @param mockType        the class type for the mock, not null
+     * @param invocationOrder the order setting, not null
+     * @param returns         the returns setting, not null
      * @return a mock for the given class or interface, not null
      */
-    protected <T> T createMockImpl(Class<T> mockType, Order order, Returns returns, Arguments arguments) {
+    protected <T> T createMockImpl(Class<T> mockType, Mock.InvocationOrder invocationOrder, Mock.Returns returns) {
 
-        MocksControl mocksControl = createMocksControl(mockType, order, returns, arguments);
+        // Get anotation arguments and replace default values if needed
+        invocationOrder = ReflectionUtils.getValueReplaceDefault(invocationOrder, defaultMockInvocationOrder);
+        returns = ReflectionUtils.getValueReplaceDefault(returns, defaultMockReturns);
+
+        MocksControl mocksControl;
+        if (Mock.Returns.NICE == returns) {
+            mocksControl = new MocksClassControl(NICE);
+
+        } else {
+            mocksControl = new MocksClassControl(DEFAULT);
+        }
+
+        // Check order
+        if (Mock.InvocationOrder.STRICT == invocationOrder) {
+            mocksControl.checkOrder(true);
+        }
+
         mocksControls.add(mocksControl);
         return mocksControl.createMock(mockType);
     }
 
+
     /**
+     * todo javadoc
+     * <p/>
      * Creates an EasyMock mock instance of the given type (class/interface). The type of mock is determined
      * as follows:
      * <p/>
@@ -221,44 +263,52 @@ public class EasyMockModule implements UnitilsModule {
      * If arguments is lenient a lenient control is create, else an EasyMock control is created
      * If order is set to strict, invocation order checking is enabled
      *
-     * @param type      the class/interface, not null
-     * @param order     the order setting, not null
-     * @param returns   the returns setting, not null
-     * @param arguments the arguments setting, not null
+     * @param mockType        the class/interface, not null
+     * @param invocationOrder the order setting, not null
+     * @param returns         the returns setting, not null
+     * @param order           todo
+     * @param dates           todo
+     * @param defaults        todo
      * @return a mockcontrol for the given class or interface, not null
      */
-    protected MocksControl createMocksControl(Class type, Order order, Returns returns, Arguments arguments) {
+    protected <T> T createLenientMockImpl(Class<T> mockType, LenientMock.InvocationOrder invocationOrder, LenientMock.Returns returns,
+                                          LenientMock.Order order, LenientMock.Dates dates, LenientMock.Defaults defaults) {
 
         // Get anotation arguments and replace default values if needed
-        order = ReflectionUtils.getValueReplaceDefault(order, defaultOrder);
-        returns = ReflectionUtils.getValueReplaceDefault(returns, defaultReturns);
-        arguments = ReflectionUtils.getValueReplaceDefault(arguments, defaultArguments);
+        invocationOrder = ReflectionUtils.getValueReplaceDefault(invocationOrder, defaultLenientMockInvocationOrder);
+        returns = ReflectionUtils.getValueReplaceDefault(returns, defaultLenientMockReturns);
+        order = ReflectionUtils.getValueReplaceDefault(order, defaultLenientMockOrder);
+        dates = ReflectionUtils.getValueReplaceDefault(dates, defaultLenientMockDates);
+        defaults = ReflectionUtils.getValueReplaceDefault(defaults, defaultLenientMockDefaults);
 
-        // Check returns
-        MocksControl.MockType mockType = DEFAULT;
-        if (Mock.Returns.NICE == returns) {
-            mockType = NICE;
-
-        } else if (Mock.Returns.STRICT == returns) {
-            mockType = DEFAULT;
+        List<ReflectionComparatorModes> comparatorModes = new ArrayList<ReflectionComparatorModes>();
+        if (LenientMock.Order.LENIENT == order) {
+            comparatorModes.add(LENIENT_ORDER);
+        }
+        if (LenientMock.Dates.LENIENT == dates) {
+            comparatorModes.add(LENIENT_DATES);
+        }
+        if (LenientMock.Defaults.IGNORE_DEFAULTS == defaults) {
+            comparatorModes.add(IGNORE_DEFAULTS);
         }
 
-        // Check arguments
-        MocksControl mocksControl;
-        if (Mock.Arguments.LENIENT == arguments) {
-            mocksControl = new LenientMocksControl(mockType, IGNORE_DEFAULTS, LENIENT_DATES, LENIENT_ORDER);
+        LenientMocksControl mocksControl;
+        if (LenientMock.Returns.NICE == returns) {
+            mocksControl = new LenientMocksControl(NICE, comparatorModes.toArray(new ReflectionComparatorModes[0]));
 
         } else {
-            mocksControl = new MocksClassControl(mockType);
+            mocksControl = new LenientMocksControl(DEFAULT, comparatorModes.toArray(new ReflectionComparatorModes[0]));
         }
 
         // Check order
-        if (Mock.Order.STRICT == order) {
+        if (LenientMock.InvocationOrder.STRICT == invocationOrder) {
             mocksControl.checkOrder(true);
         }
 
-        return mocksControl;
+        mocksControls.add(mocksControl);
+        return mocksControl.createMock(mockType);
     }
+
 
     /**
      * Gets the first instance of an EasyMockModule that is stored in the modules repository.
@@ -309,3 +359,4 @@ public class EasyMockModule implements UnitilsModule {
     }
 
 }
+
