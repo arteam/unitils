@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
+
 package org.unitils.easymock;
 
 import org.easymock.ArgumentsMatcher;
@@ -17,15 +24,15 @@ import java.util.List;
  * lenient reflection argument matchers. These matchers can apply some leniency when comparing expected and actual
  * argument values.
  * <p/>
- * Setting the {@link ReflectionComparatorModes.IGNORE_DEFAULTS} mode will for example ignore all fields that
+ * Setting the {@link ReflectionComparatorModes#IGNORE_DEFAULTS} mode will for example ignore all fields that
  * have default values as expected values. E.g. if a null value is recorded as argument it will not be checked when
  * the actual invocation occurs. The same applies for inner-fields of object arguments that contain default java values.
  * <p/>
- * Setting the {@link ReflectionComparatorModes.LENIENT_DATES} mode will ignore the actual date values of arguments and
+ * Setting the {@link ReflectionComparatorModes#LENIENT_DATES} mode will ignore the actual date values of arguments and
  * inner fields of arguments. It will only check whether both dates are null or both dates are not null. The actual
  * date and hour do not matter.
  * <p/>
- * Setting the {@link org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER} mode will ignore the actual order of collections and
+ * Setting the {@link ReflectionComparatorModes#LENIENT_ORDER} mode will ignore the actual order of collections and
  * arrays arguments and inner fields of arguments. It will only check whether they both contain the same elements.
  *
  * @see ReflectionComparatorModes

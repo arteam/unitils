@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2006, Ordina
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.unitils.easymock;
 
 import org.apache.commons.lang.StringUtils;
@@ -23,8 +29,8 @@ import java.lang.reflect.Method;
  * <li>lenient order: order is not important when comparing collections or arrays</li>
  * </ul>
  *
- * @see org.unitils.reflectionassert.ReflectionComparator
- * @see org.unitils.reflectionassert.ReflectionComparatorModes
+ * @see ReflectionComparator
+ * @see ReflectionComparatorModes
  */
 public class ReflectionArgumentMatcher<T> implements IArgumentMatcher {
 
@@ -45,11 +51,13 @@ public class ReflectionArgumentMatcher<T> implements IArgumentMatcher {
      * Expects the given object argument but uses a reflection argument matcher to compare
      * the given value with the actual value during the test. The comparator modes are set to
      * ignore defaults and lenient order.
+     * <p/>
+     * Same as refEq with ignore defaults and lenient order as comparator modes.
      *
      * @param object the value
      * @return null
      */
-    public static <T> T refEq(T object) {
+    public static <T> T lenEq(T object) {
 
         return refEq(object, IGNORE_DEFAULTS, LENIENT_ORDER);
     }
@@ -60,6 +68,7 @@ public class ReflectionArgumentMatcher<T> implements IArgumentMatcher {
      * to compare the given value with the actual value during the test.
      *
      * @param object the value
+     * @param modes  the comparator modes
      * @return null
      */
     public static <T> T refEq(T object, ReflectionComparatorModes... modes) {
@@ -205,8 +214,7 @@ public class ReflectionArgumentMatcher<T> implements IArgumentMatcher {
                 if (found) {
                     return stackTraceElement.toString();
                 }
-                if (stackTraceElement.getClassName().contains(className) && stackTraceElement.getMethodName().contains(methodName))
-                {
+                if (stackTraceElement.getClassName().contains(className) && stackTraceElement.getMethodName().contains(methodName)) {
                     found = true;
                 }
             }

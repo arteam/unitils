@@ -24,6 +24,8 @@ import java.util.List;
  */
 public class AnnotationUtilsTest extends TestCase {
 
+    //todo assertPropertyRefEquals
+
     /* Assertion through reflection */
     private ReflectionAssert reflectionAssert = new ReflectionAssert(ReflectionComparatorModes.LENIENT_ORDER);
 
