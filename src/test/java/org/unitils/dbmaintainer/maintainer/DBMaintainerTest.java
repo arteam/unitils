@@ -8,6 +8,7 @@ package org.unitils.dbmaintainer.maintainer;
 
 import static org.easymock.classextension.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.expectLastCall;
+import org.unitils.UnitilsJUnit3;
 import org.unitils.dbmaintainer.clear.DBClearer;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
 import org.unitils.dbmaintainer.dtd.DtdGenerator;
@@ -17,8 +18,10 @@ import org.unitils.dbmaintainer.maintainer.version.Version;
 import org.unitils.dbmaintainer.maintainer.version.VersionSource;
 import org.unitils.dbmaintainer.script.SQLScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
-import org.unitils.easymock.EasyMockTestCase;
-import org.unitils.easymock.annotation.Mock;
+import static org.unitils.easymock.EasyMockUnitils.replay;
+import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.inject.annotation.AutoInject;
+import org.unitils.inject.annotation.TestedObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,25 +29,39 @@ import java.util.List;
 /**
  * @author Filip Neven
  */
-public class DBMaintainerTest extends EasyMockTestCase {
+@SuppressWarnings({"UnusedDeclaration"})
+public class DBMaintainerTest extends UnitilsJUnit3 {
 
-    @Mock
-    private VersionSource mockVersionSource = null;
-    @Mock
-    private ScriptSource mockScriptSource = null;
-    @Mock
-    private SQLScriptRunner mockScriptRunner = null;
-    @Mock
-    private DBClearer mockDbClearer = null;
-    @Mock
-    private ConstraintsDisabler mockConstraintsDisabler = null;
-    @Mock
-    private SequenceUpdater mockSequenceUpdater = null;
-    @Mock
-    private DtdGenerator mockDtdGenerator = null;
+    @LenientMock
+    @AutoInject
+    private VersionSource mockVersionSource;
 
-    /* Tested object */
-    private DBMaintainer dbMaintainer = null;
+    @LenientMock
+    @AutoInject
+    private ScriptSource mockScriptSource;
+
+    @LenientMock
+    @AutoInject
+    private SQLScriptRunner mockScriptRunner;
+
+    @LenientMock
+    @AutoInject
+    private DBClearer mockDbClearer;
+
+    @LenientMock
+    @AutoInject
+    private ConstraintsDisabler mockConstraintsDisabler;
+
+    @LenientMock
+    @AutoInject
+    private SequenceUpdater mockSequenceUpdater;
+
+    @LenientMock
+    @AutoInject
+    private DtdGenerator mockDtdGenerator;
+
+    @TestedObject
+    private DBMaintainer dbMaintainer;
 
     /* Test database update scripts */
     private List<VersionScriptPair> versionScriptPairs;
@@ -89,14 +106,10 @@ public class DBMaintainerTest extends EasyMockTestCase {
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDtdGenerator.generateDtd();
-
         replay();
 
         // Execute test
         dbMaintainer.updateDatabase();
-
-        // Verify results
-        verify();
     }
 
     /**
@@ -116,14 +129,10 @@ public class DBMaintainerTest extends EasyMockTestCase {
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDtdGenerator.generateDtd();
-
         replay();
 
         // Execute test
         dbMaintainer.updateDatabase();
-
-        // Verify results
-        verify();
     }
 
     /**
@@ -145,8 +154,6 @@ public class DBMaintainerTest extends EasyMockTestCase {
         } catch (StatementHandlerException e) {
             // Expected
         }
-
-        verify();
     }
 
 }

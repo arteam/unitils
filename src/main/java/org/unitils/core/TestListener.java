@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
  */
 public abstract class TestListener {
 
+
     public void beforeAll() {
         // empty
     }
@@ -16,7 +17,7 @@ public abstract class TestListener {
     }
 
     public void beforeTestSetUp(Object testObject) {
-        
+        // empty
     }
 
     public void beforeTestMethod(Object testObject, Method testMethod) {
@@ -28,7 +29,7 @@ public abstract class TestListener {
     }
 
     public void afterTestTearDown(Object testObject) {
-
+        // empty
     }
 
     public void afterTestClass(Object testObject) {

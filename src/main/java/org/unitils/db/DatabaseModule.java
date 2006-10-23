@@ -7,11 +7,11 @@
 package org.unitils.db;
 
 import org.apache.commons.configuration.Configuration;
+import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.Module;
-import org.unitils.db.annotations.TestDataSource;
 import org.unitils.db.annotations.DatabaseTest;
+import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.config.DataSourceFactory;
 import org.unitils.dbmaintainer.constraints.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
@@ -22,8 +22,8 @@ import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -74,6 +74,7 @@ public class DatabaseModule implements Module {
 
     /**
      * Initializes this module using the given <code>Configuration</code>
+     *
      * @param configuration
      */
     public void init(Configuration configuration) {
@@ -175,7 +176,7 @@ public class DatabaseModule implements Module {
         return currentConnection;
     }
 
-     /**
+    /**
      * Assigns the <code>TestDataSource</code> to every field annotated with {@link TestDataSource} and calls all methods
      * annotated with {@link TestDataSource}
      *
@@ -262,9 +263,9 @@ public class DatabaseModule implements Module {
         // todo these calls must be done each time a new test object is created. For JUnit this is before every test
         // for TestNG this is before every test class.
         @Override
-        public void beforeTestMethod(Object testObject, Method testMethod) {
-		
-		    if (isDatabaseTest(testObject)) {
+        public void beforeTestSetUp(Object testObject) {
+
+            if (isDatabaseTest(testObject)) {
                 //call methods annotated with TestDataSource, if any
                 injectDataSource(testObject);
             }

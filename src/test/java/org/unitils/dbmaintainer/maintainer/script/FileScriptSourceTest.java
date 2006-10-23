@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
+ * todo javadoc + fix test
+ *
  * @author Filip Neven
  */
 public class FileScriptSourceTest extends TestCase {
@@ -55,7 +57,7 @@ public class FileScriptSourceTest extends TestCase {
         versionIndex0 = new Version(0L, file2Timestamp);
         versionIndex1 = new Version(1L, file2Timestamp);
         versionIndex2 = new Version(2L, file2Timestamp);
-        versionTimestampOld = new Version(1L, file1Timestamp - 1L);
+        versionTimestampOld = new Version(1L, 0L);
 
         // Initialize FileScriptSourceObject
         Configuration configuration = new ConfigurationLoader().loadConfiguration();

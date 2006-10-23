@@ -1,39 +1,40 @@
 package org.unitils.hibernate;
 
-import org.unitils.UnitilsJUnit3;
-import org.unitils.easymock.annotation.Mock;
-import org.unitils.hibernate.annotation.HibernateTest;
-import org.unitils.hibernate.annotation.HibernateConfiguration;
-import org.unitils.hibernate.annotation.AfterCreateHibernateSession;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.SessionFactory;
+import static org.easymock.EasyMock.expect;
 import org.hibernate.Session;
-import org.hibernate.Interceptor;
-
-import static org.easymock.EasyMock.*;
-import static org.unitils.easymock.EasyMockModule.*;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.unitils.UnitilsJUnit3;
+import static org.unitils.easymock.EasyMockUnitils.replay;
+import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.hibernate.annotation.AfterCreateHibernateSession;
+import org.unitils.hibernate.annotation.HibernateConfiguration;
+import org.unitils.hibernate.annotation.HibernateTest;
 
 import java.sql.Connection;
 
 /**
+ * todo javadoc
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class HibernateModuleTest extends UnitilsJUnit3 {
 
     private HibernateModule hibernateModule;
 
-    @Mock
+    @LenientMock
     private Configuration mockHibernateConfiguration;
 
-    @Mock
+    @LenientMock
     private SessionFactory mockHibernateSessionFactory;
 
-    @Mock
+    @LenientMock
     private org.hibernate.classic.Session mockHibernateSession;
 
-    @Mock
+    @LenientMock
     private Connection mockConnection;
 
     protected HbnTest hbnTest;
+
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -51,19 +52,20 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
             }
         };
 
-        expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
-        expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
-
         hbnTest = new HbnTest();
     }
 
+
     public void testIsHibernateTest() {
-        replay();
 
         assertTrue(hibernateModule.isHibernateTest(new HbnTest()));
     }
 
+
     public void testConfigureHibernate() {
+
+        expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
+        expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
         replay();
 
         hibernateModule.configureHibernate(hbnTest);
@@ -71,7 +73,11 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         assertSame(mockHibernateConfiguration, hbnTest.getConfiguration());
     }
 
+
     public void testCreateSession() {
+
+        expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
+        expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
         replay();
 
         hibernateModule.configureHibernate(hbnTest);
@@ -80,7 +86,10 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         assertSame(mockHibernateSession, hbnTest.getSession());
     }
 
+
     public void testCloseSession() {
+        expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
+        expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
         expect(mockHibernateSession.isOpen()).andReturn(true);
         expect(mockHibernateSession.close()).andReturn(null);
         replay();
@@ -89,6 +98,7 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         hibernateModule.getCurrentSession();
         hibernateModule.closeHibernateSession();
     }
+
 
     @HibernateTest
     public static class HbnTest {

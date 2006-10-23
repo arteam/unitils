@@ -290,40 +290,6 @@ public class ReflectionUtils {
 
 
     /**
-     * Replaces default enum value with the given default enum value.
-     * If enumValue contains the value {@link #DEFAULT_ENUM_VALUE_NAME} the defaultValue will be returned otherwise
-     * the enumValue itself will be returned.
-     *
-     * @param enumValue    the value to check, not null
-     * @param defaultValue the value to return in case of a default
-     * @return the enumValue or the defaultValue in case of a default
-     */
-    public static <T extends Enum> T getValueReplaceDefault(T enumValue, T defaultValue) {
-
-        return getValueReplaceDefault(enumValue, DEFAULT_ENUM_VALUE_NAME, defaultValue);
-    }
-
-    /**
-     * Replaces default enum values with the given default enum value.
-     * If enumValue contains the value defaultValueName, the defaultValue will be returned otherwise
-     * the enumValue itself will be returned.
-     *
-     * @param enumValue        the value to check, not null
-     * @param defaultValueName the name of the default value, eg DEFAULT, not null
-     * @param defaultValue     the value to return in case of a default
-     * @return the enumValue or the defaultValue in case of a default
-     */
-    public static <T extends Enum> T getValueReplaceDefault(T enumValue, String defaultValueName, T defaultValue) {
-
-        if (defaultValueName.equalsIgnoreCase(enumValue.name())) {
-
-            return defaultValue;
-        }
-        return enumValue;
-    }
-
-
-    /**
      * For each method, check if it can be a setter for an object of the given type. A setter is a method with
      * the following properties:
      * <ul>

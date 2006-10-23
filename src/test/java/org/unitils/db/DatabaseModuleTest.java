@@ -5,7 +5,7 @@ import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import static org.unitils.easymock.EasyMockModule.replay;
+import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
 
 import java.sql.Connection;

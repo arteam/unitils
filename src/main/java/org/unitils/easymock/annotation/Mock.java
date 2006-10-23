@@ -1,5 +1,8 @@
 package org.unitils.easymock.annotation;
 
+import org.unitils.easymock.util.InvocationOrder;
+import org.unitils.easymock.util.Returns;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,51 +14,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Mock {
-
-
-    /**
-     * Possible values for checking the order of method invocation on the mock.
-     */
-    public enum InvocationOrder {
-
-
-        /**
-         * Defaults to the value of the org.unitils.easymock.annotation.Mock$InvocationOrder configuration setting.
-         */
-        DEFAULT,
-
-        /**
-         * No order checking of method invocations.
-         */
-        NONE,
-
-        /**
-         * Strict order checking of method invocations.
-         */
-        STRICT
-
-    }
-
-    /**
-     * Possible values for default return values for non-void method invocations on the mock.
-     */
-    public enum Returns {
-
-        /**
-         * Defaults to the value of the org.unitils.easymock.annotation.Mock$Returns configuration setting.
-         */
-        DEFAULT,
-
-        /**
-         * Return default values (null, 0…) when no return type is specified.
-         */
-        NICE,
-
-        /**
-         * Throw an exception when no return type is specified
-         */
-        STRICT
-    }
 
 
     /**
