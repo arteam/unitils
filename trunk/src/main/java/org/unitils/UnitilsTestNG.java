@@ -13,6 +13,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
+import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 
 /**
@@ -20,40 +21,35 @@ import org.unitils.core.Unitils;
  */
 public abstract class UnitilsTestNG implements IHookable {
 
-    private static Unitils unitils;
+    private static TestListener testListener;
 
     @BeforeSuite
     protected void unitilsBeforeSuite() {
-        unitils = Unitils.getInstance();
-        unitils.beforeAll();
+        testListener = Unitils.getInstance().getTestListener();
+        testListener.beforeAll();
     }
 
     @AfterSuite
     protected void unitilsAfterSuite() {
-        unitils.afterAll();
+        testListener.afterAll();
     }
 
 
     @BeforeClass
     protected void unitilsBeforeClass() {
-        unitils.beforeTestClass(this);
+        testListener.beforeTestClass(this);
     }
 
     @AfterClass
     protected void unitilsAfterClass() {
-        unitils.afterTestClass(this);
+        testListener.afterTestClass(this);
     }
 
-    /**
-     * This method is invoked automatically by the TestNG framework. We use this
-     *
-     * @param callBack
-     * @param testResult
-     */
+
     public void run(IHookCallBack callBack, ITestResult testResult) {
 
-        unitils.beforeTestMethod(this, testResult.getMethod().getMethod());
+        testListener.beforeTestMethod(this, testResult.getMethod().getMethod());
         callBack.runTestMethod(testResult);
-        unitils.afterTestMethod(this, testResult.getMethod().getMethod());
+        testListener.afterTestMethod(this, testResult.getMethod().getMethod());
     }
 }

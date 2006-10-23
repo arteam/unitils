@@ -8,14 +8,17 @@ package org.unitils.inject;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.Module;
 import org.unitils.inject.annotation.*;
 import org.unitils.inject.util.InjectionUtils;
 import org.unitils.inject.util.PropertyAccessType;
-import org.unitils.util.AnnotationUtils;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
+import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
 import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.getFieldWithName;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -23,6 +26,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * todo javadoc
@@ -30,12 +34,13 @@ import java.util.List;
 public class InjectModule implements Module {
 
 
-    private PropertyAccessType defaultPropertyAccessType;
+    //todo javadoc
+    private Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues;
 
 
     public void init(Configuration configuration) {
 
-        defaultPropertyAccessType = ReflectionUtils.getEnumValue(PropertyAccessType.class, configuration.getString(PropertyAccessType.class.getName()));
+        defaultEnumValues = getAnnotationEnumDefaults(InjectModule.class, configuration, Inject.class, InjectStatic.class, AutoInject.class, AutoInjectStatic.class);
     }
 
     void injectObjects(Object test) {
@@ -46,28 +51,28 @@ public class InjectModule implements Module {
     }
 
     private void injectAll(Object test) {
-        List<Field> fieldsToInject = AnnotationUtils.getFieldsAnnotatedWith(test.getClass(), Inject.class);
+        List<Field> fieldsToInject = getFieldsAnnotatedWith(test.getClass(), Inject.class);
         for (Field fieldToInject : fieldsToInject) {
             inject(test, fieldToInject);
         }
     }
 
     private void autoInjectAll(Object test) {
-        List<Field> fieldsToAutoInject = AnnotationUtils.getFieldsAnnotatedWith(test.getClass(), AutoInject.class);
+        List<Field> fieldsToAutoInject = getFieldsAnnotatedWith(test.getClass(), AutoInject.class);
         for (Field fieldToAutoInject : fieldsToAutoInject) {
             autoInject(test, fieldToAutoInject);
         }
     }
 
     private void injectAllStatic(Object test) {
-        List<Field> fieldsToInjectStatic = AnnotationUtils.getFieldsAnnotatedWith(test.getClass(), InjectStatic.class);
+        List<Field> fieldsToInjectStatic = getFieldsAnnotatedWith(test.getClass(), InjectStatic.class);
         for (Field fieldToInjectStatic : fieldsToInjectStatic) {
             injectStatic(test, fieldToInjectStatic);
         }
     }
 
     private void autoInjectAllStatic(Object test) {
-        List<Field> fieldsToAutoInjectStatic = AnnotationUtils.getFieldsAnnotatedWith(test.getClass(), AutoInjectStatic.class);
+        List<Field> fieldsToAutoInjectStatic = getFieldsAnnotatedWith(test.getClass(), AutoInjectStatic.class);
         for (Field fieldToAutoInjectStatic : fieldsToAutoInjectStatic) {
             autoInjectStatic(test, fieldToAutoInjectStatic);
         }
@@ -115,7 +120,7 @@ public class InjectModule implements Module {
         List targets = getTargets(autoInjectAnnotation, fieldToInject, autoInjectAnnotation.target(), test);
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToInject);
 
-        PropertyAccessType propertyAccessType = ReflectionUtils.getValueReplaceDefault(autoInjectAnnotation.propertyAccessType(), defaultPropertyAccessType);
+        PropertyAccessType propertyAccessType = getValueReplaceDefault(AutoInject.class, autoInjectAnnotation.propertyAccessType(), defaultEnumValues);
 
         for (Object target : targets) {
             try {
@@ -132,7 +137,7 @@ public class InjectModule implements Module {
         Class targetClass = autoInjectStaticAnnotation.target();
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToAutoInjectStatic);
 
-        PropertyAccessType propertyAccessType = ReflectionUtils.getValueReplaceDefault(autoInjectStaticAnnotation.propertyAccessType(), defaultPropertyAccessType);
+        PropertyAccessType propertyAccessType = getValueReplaceDefault(AutoInjectStatic.class, autoInjectStaticAnnotation.propertyAccessType(), defaultEnumValues);
 
         try {
             InjectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
@@ -148,13 +153,13 @@ public class InjectModule implements Module {
         if ("".equals(targetName)) {
             // Default targetName, so it is probably not specfied. Return all objects that are annotated with the
             // TestedObject annotation.
-            List<Field> testedObjectFields = AnnotationUtils.getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
+            List<Field> testedObjectFields = getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
             targets = new ArrayList<Object>(testedObjectFields.size());
             for (Field testedObjectField : testedObjectFields) {
                 targets.add(ReflectionUtils.getFieldValue(test, testedObjectField));
             }
         } else {
-            Field field = ReflectionUtils.getFieldWithName(test.getClass(), targetName, false);
+            Field field = getFieldWithName(test.getClass(), targetName, false);
             if (field == null) {
                 throw new UnitilsException(getSituatedErrorMessage(annotation, annotatedField, "Target with name " + targetName + " does not exist"));
             }

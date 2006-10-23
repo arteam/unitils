@@ -23,6 +23,8 @@ public class Unitils {
         return unitils;
     }
 
+    private TestListener testListener;
+
     //todo javadoc
     private ModulesRepository modulesRepository;
 
@@ -36,8 +38,13 @@ public class Unitils {
     //todo
     public Unitils() {
 
+        testListener = new UnitilsTestListener();
         configuration = createConfiguration();
         modulesRepository = createModulesRepository(configuration);
+    }
+
+    public TestListener getTestListener() {
+        return testListener;
     }
 
 
@@ -81,90 +88,130 @@ public class Unitils {
     }
 
 
-    public void beforeAll() {
+    private class UnitilsTestListener extends TestListener {
 
-        TestContext testContext = getTestContext();
-        testContext.setTestClass(null);
-        testContext.setTestObject(null);
-        testContext.setTestMethod(null);
 
-        // For each core, invoke the beforeAll method
-        List<Module> modules = modulesRepository.getModules();
-        for (Module module : modules) {
-            modulesRepository.getTestListener(module).beforeAll();
+        @Override
+        public void beforeAll() {
+
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(null);
+            testContext.setTestObject(null);
+            testContext.setTestMethod(null);
+
+            // For each core, invoke the beforeAll method
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).beforeAll();
+            }
+        }
+
+
+        @Override
+        public void beforeTestClass(Object testObject) {
+
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).beforeTestClass(testObject);
+            }
+        }
+
+
+        @Override
+        public void beforeTestSetUp(Object testObject) {
+
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).beforeTestSetUp(testObject);
+            }
+        }
+
+
+        @Override
+        public void beforeTestMethod(Object testObject, Method testMethod) {
+
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(testMethod);
+
+            // For each core, invoke the beforeTestMethod method
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).beforeTestMethod(testObject, testMethod);
+            }
+        }
+
+
+        @Override
+        public void afterTestMethod(Object testObject, Method testMethod) {
+
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(testMethod);
+
+            // For each core, invoke the afterTestMethod method
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).afterTestMethod(testObject, testMethod);
+            }
+        }
+
+
+        @Override
+        public void afterTestTearDown(Object testObject) {
+
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).afterTestTearDown(testObject);
+            }
+        }
+
+
+        @Override
+        public void afterTestClass(Object testObject) {
+
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).afterTestClass(testObject);
+            }
+        }
+
+
+        @Override
+        public void afterAll() {
+
+            TestContext testContext = getTestContext();
+            testContext.setTestClass(null);
+            testContext.setTestObject(null);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).afterAll();
+            }
         }
     }
-
-
-    public void beforeTestClass(Object test) {
-
-        TestContext testContext = getTestContext();
-        testContext.setTestClass(test.getClass());
-        testContext.setTestObject(test);
-        testContext.setTestMethod(null);
-
-        List<Module> modules = modulesRepository.getModules();
-        for (Module module : modules) {
-            modulesRepository.getTestListener(module).beforeTestClass(test);
-        }
-    }
-
-
-    public void beforeTestMethod(Object testObject, Method testMethod) {
-
-        TestContext testContext = getTestContext();
-        testContext.setTestClass(testObject.getClass());
-        testContext.setTestObject(testObject);
-        testContext.setTestMethod(testMethod);
-
-        // For each core, invoke the beforeTestMethod method
-        List<Module> modules = modulesRepository.getModules();
-        for (Module module : modules) {
-            modulesRepository.getTestListener(module).beforeTestMethod(testObject, testMethod);
-        }
-    }
-
-
-    public void afterTestMethod(Object testObject, Method testMethod) {
-
-        TestContext testContext = getTestContext();
-        testContext.setTestClass(testObject.getClass());
-        testContext.setTestObject(testObject);
-        testContext.setTestMethod(testMethod);
-
-        // For each core, invoke the afterTestMethod method
-        List<Module> modules = modulesRepository.getModules();
-        for (Module module : modules) {
-            modulesRepository.getTestListener(module).afterTestMethod(testObject, testMethod);
-        }
-    }
-
-    public void afterTestClass(Object test) {
-
-        TestContext testContext = getTestContext();
-        testContext.setTestClass(test.getClass());
-        testContext.setTestObject(test);
-        testContext.setTestMethod(null);
-
-        List<Module> modules = modulesRepository.getModules();
-        for (Module module : modules) {
-            modulesRepository.getTestListener(module).afterTestClass(test.getClass());
-        }
-    }
-
-
-    public void afterAll() {
-
-        TestContext testContext = getTestContext();
-        testContext.setTestClass(null);
-        testContext.setTestObject(null);
-        testContext.setTestMethod(null);
-
-        List<Module> modules = modulesRepository.getModules();
-        for (Module module : modules) {
-            modulesRepository.getTestListener(module).afterAll();
-        }
-    }
-
 
 }

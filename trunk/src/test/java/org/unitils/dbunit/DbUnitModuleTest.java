@@ -1,45 +1,44 @@
 package org.unitils.dbunit;
 
+import static org.easymock.EasyMock.expect;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.operation.DatabaseOperation;
+import org.easymock.EasyMock;
 import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ModulesRepository;
 import org.unitils.db.DatabaseModule;
 import org.unitils.db.annotations.DatabaseTest;
-import org.unitils.inject.annotation.Inject;
-import org.unitils.core.ModulesRepository;
-import org.unitils.core.Unitils;
-import org.unitils.easymock.annotation.Mock;
-import org.unitils.easymock.EasyMockModule;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.operation.DatabaseOperation;
-import org.dbunit.dataset.IDataSet;
-import org.easymock.EasyMock;
+import org.unitils.easymock.annotation.LenientMock;
 
 /**
  * todo fix: injection happens before setUp execution, should be afterwards -> causes tests to fail
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class DbUnitModuleTest extends UnitilsJUnit3 {
 
     private DbUnitModule dbUnitModule;
 
-    private Unitils unitils;
 
-    @Mock
-    private IDatabaseConnection mockDbUnitDatabaseConnection = null;
+    @LenientMock
+    private IDatabaseConnection mockDbUnitDatabaseConnection;
 
-    @Mock @Inject(target = "unitils", property = "moduleRepository")
-    private ModulesRepository mockModulesRepository = null;
+    @LenientMock
+    private ModulesRepository mockModulesRepository;
 
-    @Mock
-    private DatabaseModule mockDatabaseModule = null;
+    @LenientMock
+    private DatabaseModule mockDatabaseModule;
 
-    @Mock
-    private DatabaseOperation mockInsertDatabaseOperation = null;
+    @LenientMock
+    private DatabaseOperation mockInsertDatabaseOperation;
 
-    @Mock
-    private IDataSet mockDbUnitDataSet = null;
+    @LenientMock
+    private IDataSet mockDbUnitDataSet;
+
 
     protected void setUp() throws Exception {
         super.setUp();
-        unitils = Unitils.getInstance();
+
         dbUnitModule = new DbUnitModule() {
             protected IDatabaseConnection createDbUnitConnection() {
                 return mockDbUnitDatabaseConnection;
@@ -50,28 +49,34 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
             }
         };
 
-        EasyMock.expect(mockModulesRepository.getFirstModule(DatabaseModule.class)).andStubReturn(mockDatabaseModule);
+        expect(mockModulesRepository.getFirstModule(DatabaseModule.class)).andStubReturn(mockDatabaseModule);
     }
 
+
     public void testIsDatabaseTest() throws Exception {
-        assertTrue(dbUnitModule.isDatabaseTest(DbTest.class));
+
+        assertTrue(dbUnitModule.isDatabaseTest(new DbTest()));
     }
+
 
     public void testInitDbUnitConnection() {
         dbUnitModule.initDbUnitConnection();
         assertSame(mockDbUnitDatabaseConnection, dbUnitModule.getDbUnitDatabaseConnection());
     }
 
-    public void testInsertTestData() throws Exception {
-        mockInsertDatabaseOperation.execute(mockDbUnitDatabaseConnection, mockDbUnitDataSet);
-        EasyMockModule.replay();
 
-        dbUnitModule.insertTestData(null, null);
+    //Todo implement
+    public void testInsertTestData() throws Exception {
+
+        dbUnitModule.insertTestData(DbTest.class, DbTest.class.getDeclaredMethod("testMethod"));
     }
+
 
     @DatabaseTest
     public static class DbTest {
 
+        public void testMethod() {
+        }
     }
 
 }

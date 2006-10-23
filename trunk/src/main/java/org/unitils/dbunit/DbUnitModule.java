@@ -19,7 +19,10 @@ import org.dbunit.ext.db2.Db2DataTypeFactory;
 import org.dbunit.ext.mysql.MySqlDataTypeFactory;
 import org.dbunit.ext.oracle.OracleDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
-import org.unitils.core.*;
+import org.unitils.core.Module;
+import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
 import org.unitils.db.DatabaseModule;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbunit.annotation.DbUnitDataSet;
@@ -69,7 +72,7 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * Checks whether the given test instance is a database test, i.e. is annotated with the {@link org.unitils.db.annotations.DatabaseTest} annotation.
+     * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
      *
      * @param testObject the test instance, not null
      * @return true if the test class is a database test false otherwise
@@ -79,8 +82,8 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * If this is the first time that we encounter a test class annotated with {@link org.unitils.db.annotations.DatabaseTest}, a new instance
-     * of the dbUnit's <code>IDatabaseConnection</code> is created, that is used througout the whole test run.
+     * If this is the first time that we encounter a test class annotated with {@link DatabaseTest}, a new instance
+     * of the dbUnit's {@link IDatabaseConnection} is created, that is used througout the whole test run.
      */
     protected void initDbUnitConnection() {
         if (dbUnitDatabaseConnection == null) {
@@ -344,14 +347,13 @@ public class DbUnitModule implements Module {
         @Override
         public void beforeAll() {
             if (getDatabaseTestModule() == null) {
-                throw new UnitilsException("Invalid configuration: DatabaseModule should be enabled and DbUnitModule " +
-                        "should be configured to run after DatabaseModule");
+                throw new UnitilsException("Invalid configuration: DatabaseModule should be enabled and DbUnitModule should be configured to run after DatabaseModule");
             }
         }
 
         @Override
         public void beforeTestClass(Object testObject) {
-            if (isDatabaseTest(testObject.getClass())) {
+            if (isDatabaseTest(testObject)) {
                 initDbUnitConnection();
             }
         }
