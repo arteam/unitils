@@ -7,10 +7,9 @@
 package org.unitils.easymock;
 
 import junit.framework.TestCase;
-import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
-import static org.unitils.easymock.ReflectionArgumentMatcher.lenEq;
-import static org.unitils.easymock.ReflectionArgumentMatcher.refEq;
+import static org.unitils.easymock.EasyMockUnitils.lenEq;
+import static org.unitils.easymock.EasyMockUnitils.refEq;
 import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
 
@@ -42,7 +41,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
      */
     public void testRefEq() {
 
-        testMock.method(refEq("stringValue"), EasyMock.eq(3), refEq("objectValue1"), refEq("objectValue2"));
+        testMock.method(refEq("stringValue"), refEq(3), refEq("objectValue1"), refEq("objectValue2"));
         replay(testMock);
 
         testMock.method("stringValue", 3, "objectValue1", "objectValue2");
@@ -55,7 +54,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
      */
     public void testRefEq_notEquals() {
 
-        testMock.method(refEq("stringValue"), EasyMock.eq(3), refEq("objectValue1"), refEq("objectValue2"));
+        testMock.method(refEq("stringValue"), refEq(3), refEq("objectValue1"), refEq("objectValue2"));
         replay(testMock);
 
 
@@ -74,7 +73,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
      */
     public void testRefEq_notEqualsVarArgs() {
 
-        testMock.method(refEq("stringValue"), EasyMock.eq(3), refEq("objectValue1"), refEq("objectValue2"));
+        testMock.method(refEq("stringValue"), refEq(3), refEq("objectValue1"), refEq("objectValue2"));
         replay(testMock);
 
         try {

@@ -22,6 +22,7 @@ import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -55,7 +56,7 @@ public class DatabaseModule implements Module {
     private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /* The pooled datasource instance */
-    private javax.sql.DataSource dataSource;
+    private DataSource dataSource;
 
     /* The Configuration of Unitils */
     private Configuration configuration;
@@ -122,7 +123,7 @@ public class DatabaseModule implements Module {
     protected javax.sql.DataSource createDataSource() {
         DataSourceFactory dataSourceFactory = createDataSourceFactory();
         dataSourceFactory.init(configuration);
-        javax.sql.DataSource dataSource = dataSourceFactory.createDataSource();
+        DataSource dataSource = dataSourceFactory.createDataSource();
 
         // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is
         // returned that wrappes the TestDataSource object
@@ -139,7 +140,7 @@ public class DatabaseModule implements Module {
      * @param dataSource
      * @return The configured instance of the {@link ConstraintsDisabler}
      */
-    protected ConstraintsDisabler createConstraintsDisabler(javax.sql.DataSource dataSource) {
+    protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
 
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         String constraintsDisablerClassName = configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect);
