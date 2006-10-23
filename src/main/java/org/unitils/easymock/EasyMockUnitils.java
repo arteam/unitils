@@ -6,14 +6,50 @@
  */
 package org.unitils.easymock;
 
+import static org.easymock.EasyMock.reportMatcher;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.util.*;
+import org.unitils.reflectionassert.ReflectionComparatorModes;
+import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
 
 /**
  * todo javadoc
  */
 public class EasyMockUnitils {
+
+
+    /**
+     * Expects the given object argument but uses a reflection argument matcher to compare
+     * the given value with the actual value during the test. The comparator modes are set to
+     * ignore defaults and lenient order.
+     * <p/>
+     * Same as refEq with ignore defaults and lenient order as comparator modes.
+     *
+     * @param object the value
+     * @return null
+     */
+    public static <T> T lenEq(T object) {
+
+        return refEq(object, IGNORE_DEFAULTS, LENIENT_ORDER);
+    }
+
+
+    /**
+     * Expects the given object argument but uses a reflection argument matcher with the given comparator modes
+     * to compare the given value with the actual value during the test.
+     *
+     * @param object the value
+     * @param modes  the comparator modes
+     * @return null
+     */
+    public static <T> T refEq(T object, ReflectionComparatorModes... modes) {
+
+        ReflectionArgumentMatcher<T> reflectionArgumentMatcher = new ReflectionArgumentMatcher<T>(object, modes);
+        reportMatcher(reflectionArgumentMatcher);
+        return object;
+    }
 
 
     /**
