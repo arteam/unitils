@@ -140,21 +140,22 @@ public class ReflectionUtils {
     }
 
     /**
-     * Returns the first field in the given class that has the exact given type, if it exists, or null otherwise
+     * Returns the fields in the given class that have the exact given type
      *
      * @param clazz    the class to get the field from, not null
      * @param type     the type, not null
      * @param isStatic true if static fields are to be returned, false for non-static
-     * @return a first field, null if not found
+     * @return The fields with the given type
      */
-    public static Field getFirstFieldOfType(Class clazz, Class type, boolean isStatic) {
+    public static List<Field> getFieldsOfType(Class clazz, Class type, boolean isStatic) {
+        List<Field> fields = new ArrayList<Field>();
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
             if (field.getType().equals(type) && isStatic == Modifier.isStatic(field.getModifiers())) {
-                return field;
+                fields.add(field);
             }
         }
-        return null;
+        return fields;
     }
 
 
@@ -180,23 +181,23 @@ public class ReflectionUtils {
 
 
     /**
-     * Returns the first setter method in the given class that has an argument with the exact given type,
-     * if it exists, or null otherwise
+     * Returns the setter methods in the given class that have an argument with the exact given type
      *
      * @param clazz    the class to get the setter from, not null
      * @param type     the type, not null
      * @param isStatic true if static setters are to be returned, false for non-static
-     * @return a first setter method, null if not found
+     * @return All setters for an object of the given type
      */
-    public static Method getFirstSetterOfType(Class clazz, Class type, boolean isStatic) {
+    public static List<Method> getSettersOfType(Class clazz, Class type, boolean isStatic) {
+        List<Method> settersOfType = new ArrayList<Method>();
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method method : declaredMethods) {
             if (isSetter(method) && method.getParameterTypes()[0].equals(type)
                     && isStatic == Modifier.isStatic(method.getModifiers())) {
-                return method;
+                settersOfType.add(method);
             }
         }
-        return null;
+        return settersOfType;
     }
 
 

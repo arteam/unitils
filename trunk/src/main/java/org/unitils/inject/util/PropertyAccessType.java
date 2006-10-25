@@ -7,9 +7,8 @@
 package org.unitils.inject.util;
 
 /**
- * todo javadoc
- *
- * @author Filip Neven
+ * The type of accessing properties: by field or by setter. If default is chosen, the property access type is defined
+ * in the Unitils configuration file.
  */
 public enum PropertyAccessType {
 
