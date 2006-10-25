@@ -50,7 +50,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
 
     /**
      * Test for getting all non-static primitive fields assignable from.
-     * Note: {@Integer#TYPE} is the class type of a primitive int.
+     * Note: {@link Integer#TYPE} is the class type of a primitive int.
      */
     public void testGetFieldsAssignableFrom_primitive() {
         List<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestObject.class, Integer.TYPE, false);
@@ -62,8 +62,8 @@ public class ReflectionUtilsTypesTest extends TestCase {
      * Test for getting the first non-static field having exact same type.
      */
     public void testGetFirstFieldOfType() {
-        Field field = ReflectionUtils.getFirstFieldOfType(TestObject.class, String.class, false);
-        assertPropertyLenEquals("name", "stringField", field);
+        List<Field> fields = ReflectionUtils.getFieldsOfType(TestObject.class, String.class, false);
+        assertPropertyLenEquals("name", Arrays.asList("stringField"), fields);
     }
 
 
@@ -71,27 +71,27 @@ public class ReflectionUtilsTypesTest extends TestCase {
      * Test for getting the first static field having exact same type.
      */
     public void testGetFirstFieldOfType_static() {
-        Field field = ReflectionUtils.getFirstFieldOfType(TestObject.class, String.class, true);
-        assertPropertyLenEquals("name", "staticStringField", field);
+        List<Field> field = ReflectionUtils.getFieldsOfType(TestObject.class, String.class, true);
+        assertPropertyLenEquals("name", Arrays.asList("staticStringField"), field);
     }
 
 
     /**
      * Test for getting the first non-static field but none has exact same type.
      */
-    public void testGetFirstFieldOfType_noneFound() {
-        Field field = ReflectionUtils.getFirstFieldOfType(TestObject.class, List.class, false);
-        assertNull(field);
+    public void testGetFieldsOfType_noneFound() {
+        List<Field> fields = ReflectionUtils.getFieldsOfType(TestObject.class, List.class, false);
+        assertEquals(0, fields.size());
     }
 
 
     /**
      * Test for getting the first non-static primitive field.
-     * Note: {@Integer#TYPE} is the class type of a primitive int.
+     * Note: {@link Integer#TYPE} is the class type of a primitive int.
      */
-    public void testGetFirstFieldOfType_primitive() {
-        Field field = ReflectionUtils.getFirstFieldOfType(TestObject.class, Integer.TYPE, false);
-        assertPropertyLenEquals("name", "intField", field);
+    public void testGetFieldsOfType_primitive() {
+        List<Field> fields = ReflectionUtils.getFieldsOfType(TestObject.class, Integer.TYPE, false);
+        assertPropertyLenEquals("name", Arrays.asList("intField"), fields);
     }
 
 
@@ -137,8 +137,8 @@ public class ReflectionUtilsTypesTest extends TestCase {
      * Test for getting the first non-static setter for a field having exact same type.
      */
     public void testGetFirstSetterOfType() {
-        Method method = ReflectionUtils.getFirstSetterOfType(TestObject.class, String.class, false);
-        assertPropertyLenEquals("name", "setStringField", method);
+        List<Method> methods = ReflectionUtils.getSettersOfType(TestObject.class, String.class, false);
+        assertPropertyLenEquals("name", Arrays.asList("setStringField"), methods);
     }
 
 
@@ -146,8 +146,8 @@ public class ReflectionUtilsTypesTest extends TestCase {
      * Test for getting the first static setter for a field having exact same type.
      */
     public void testGetFirstSetterOfType_static() {
-        Method method = ReflectionUtils.getFirstSetterOfType(TestObject.class, String.class, true);
-        assertPropertyLenEquals("name", "setStaticStringField", method);
+        List<Method> methods = ReflectionUtils.getSettersOfType(TestObject.class, String.class, true);
+        assertPropertyLenEquals("name", Arrays.asList("setStaticStringField"), methods);
     }
 
 
@@ -155,17 +155,17 @@ public class ReflectionUtilsTypesTest extends TestCase {
      * Test for getting the first non-static primitive setter for a field but none has exact same type.
      */
     public void testGetFirstSetterOfType_noneFound() {
-        Method method = ReflectionUtils.getFirstSetterOfType(TestObject.class, List.class, false);
-        assertNull(method);
+        List<Method> methods = ReflectionUtils.getSettersOfType(TestObject.class, List.class, false);
+        assertEquals(0, methods.size());
     }
 
 
     /**
      * Test for getting the first non-static primitive setter for a field having exact same type.
      */
-    public void testGetFirstSetterOfType_primitive() {
-        Method method = ReflectionUtils.getFirstSetterOfType(TestObject.class, Integer.TYPE, false);
-        assertPropertyLenEquals("name", "setIntField", method);
+    public void testGetSettersOfType_primitive() {
+        List<Method> methods = ReflectionUtils.getSettersOfType(TestObject.class, Integer.TYPE, false);
+        assertPropertyLenEquals("name", Arrays.asList("setIntField"), methods);
     }
 
 

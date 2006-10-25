@@ -20,13 +20,19 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * todo javadoc
- *
- * @author Filip Neven
+ * General utility class that implements explicit injection using OGNL expressions, or auto-injection by type.
  */
 public class InjectionUtils {
 
-    public static void inject(Object objectToInject, Object target, String property) {
+    /**
+     * Explicit injection of the objectToInject into the specified property of the target. The property should be a
+     * correct OGNL expression.
+     *
+     * @param objectToInject The object that is injected
+     * @param target The target object
+     * @param property The OGNL expression that defines where the object will be injected
+     */
+    public void inject(Object objectToInject, Object target, String property) {
         try {
             OgnlContext ognlContext = new OgnlContext();
             ognlContext.setMemberAccess(new DefaultMemberAccess(true));
@@ -37,7 +43,15 @@ public class InjectionUtils {
         }
     }
 
-    public static void injectStatic(Object objectToInject, Class targetClass, String property) {
+    /**
+     * Explicit injection of the objectToInject into the specified static property of the target class. The property
+     * should be a correct OGNL expression.
+     *
+     * @param objectToInject
+     * @param targetClass
+     * @param property
+     */
+    public void injectStatic(Object objectToInject, Class targetClass, String property) {
         String staticProperty = StringUtils.substringBefore(property, ".");
         if (property.equals(staticProperty)) {
             // Simple property: directly set value on this property
@@ -58,7 +72,16 @@ public class InjectionUtils {
         }
     }
 
-    public static void autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccessType propertyAccessType) {
+    /**
+     * Performs auto-injection by type of the objectToInject on the target object.
+     *
+     * @param objectToInject The object that is injected
+     * @param objectToInjectType The type of the object. This should be the type of the object or one of his super-types
+     *                          or implemented interfaces. This type is used for property type matching on the target object
+     * @param target The object into which the objectToInject is injected
+     * @param propertyAccessType Defines if field or setter injection is used
+     */
+    public void autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccessType propertyAccessType) {
         if (propertyAccessType == PropertyAccessType.FIELD) {
             autoInjectToField(objectToInject, objectToInjectType, target, target.getClass(), false);
         } else {
@@ -66,7 +89,16 @@ public class InjectionUtils {
         }
     }
 
-    public static void autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccessType propertyAccessType) {
+    /**
+     * Performs auto-injection by type of the objectToInject into the target class.
+     *
+     * @param objectToInject The object that is injected
+     * @param objectToInjectType The type of the object. This should be the type of the object or one of his super-types
+     *                          or implemented interfaces. This type is used for property type matching on the target class
+     * @param targetClass The class into which the objectToInject is injected
+     * @param propertyAccessType Defines if field or setter injection is used
+     */
+    public void autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccessType propertyAccessType) {
         if (propertyAccessType == PropertyAccessType.FIELD) {
             autoInjectToField(objectToInject, objectToInjectType, null, targetClass, true);
         } else {
@@ -74,11 +106,30 @@ public class InjectionUtils {
         }
     }
 
-    private static void autoInjectToField(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
+    /**
+     * Performs auto-injection on a field by type of the objectToInject into the given target object or targetClass,
+     * depending on the value of isStatic. The object is injected on one single field, if there is more than one
+     * candidate field, a {@link UnitilsException} is thrown. We try to inject the object on the most specific field,
+     * this means that when there are muliple fields of one of the super-types or implemented interfaces of the field,
+     * the one that is lowest in the hierarchy is chosen (if possible, otherwise, a {@link UnitilsException} is thrown.
+     *
+     * @param objectToInject The object that is injected
+     * @param objectToInjectType The type of the object that is injected
+     * @param target The target object (only used when isStatic is false)
+     * @param targetClass The target class (only used when isStatis is true)
+     * @param isStatic Indicates wether injection should be performed on the target object or on the target class
+     */
+    private void autoInjectToField(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
+
         // Try to find a field with an exact matching type
-        // todo what if there is more than 1 such field?
-        Field fieldToInjectTo = ReflectionUtils.getFirstFieldOfType(targetClass, objectToInjectType, isStatic);
-        if (fieldToInjectTo == null) {
+        Field fieldToInjectTo = null;
+        List<Field> fieldsWithExactType = ReflectionUtils.getFieldsOfType(targetClass, objectToInjectType, isStatic);
+        if (fieldsWithExactType.size() > 1) {
+            throw new UnitilsException("More than one " + (isStatic ? "static " : "") + "field with exact type " +
+                    objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
+        } else if (fieldsWithExactType.size() == 1) {
+            fieldToInjectTo = fieldsWithExactType.get(0);
+        } else {
             // Try to find a supertype field:
             // If one field exist that has a type which is more specific than all other fields of the given type,
             // this one is taken. Otherwise, an exception is thrown
@@ -112,12 +163,31 @@ public class InjectionUtils {
         ReflectionUtils.setFieldValue(target, fieldToInjectTo, objectToInject);
     }
 
-    private static void autoInjectToSetter(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
-        // Try to find a method with an exact matching type
-        // todo what if there is more than 1 such setter?
-        Method setterToInjectTo = ReflectionUtils.getFirstSetterOfType(targetClass, objectToInjectType, false);
+    /**
+     * Performs auto-injection on a setter by type of the objectToInject into the given target object or targetClass,
+     * depending on the value of isStatic. The object is injected to one single setter, if there is more than one
+     * candidate setter, a {@link UnitilsException} is thrown. We try to inject the object on the most specific type,
+     * this means that when there are muliple setters for one of the super-types or implemented interfaces of the setter
+     * type, the one that is lowest in the hierarchy is chosen (if possible, otherwise, a {@link UnitilsException} is
+     * thrown.
+     *
+     * @param objectToInject The object that is injected
+     * @param objectToInjectType The type of the object that is injected
+     * @param target The target object (only used when isStatic is false)
+     * @param targetClass The target class (only used when isStatis is true)
+     * @param isStatic Indicates wether injection should be performed on the target object or on the target class
+     */
+    private void autoInjectToSetter(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
 
-        if (setterToInjectTo == null) {
+        // Try to find a method with an exact matching type
+        Method setterToInjectTo = null;
+        List<Method> settersWithExactType = ReflectionUtils.getSettersOfType(targetClass, objectToInjectType, false);
+        if (settersWithExactType.size() > 1) {
+            throw new UnitilsException("More than one " + (isStatic ? "static " : "") + "setter with exact type " +
+                    objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
+        } else if (settersWithExactType.size() == 1) {
+            setterToInjectTo = settersWithExactType.get(0);
+        } else {
             // Try to find a supertype setter:
             // If one setter exist that has a type which is more specific than all other setters of the given type,
             // this one is taken. Otherwise, an exception is thrown
@@ -151,17 +221,39 @@ public class InjectionUtils {
         ReflectionUtils.invokeMethod(target, setterToInjectTo, objectToInject);
     }
 
-    private static Object getValueStatic(Class targetClass, String staticProperty) {
+    /**
+     * Retrieves the value of the static property from the given class
+     *
+     * @param targetClass the class from which the static property value is retrieved
+     * @param staticProperty the name of the property (simple name, not a composite expression)
+     * @return The value of the static property from the given class
+     */
+    private Object getValueStatic(Class targetClass, String staticProperty) {
+
         Method staticGetter = ReflectionUtils.getGetter(targetClass, staticProperty, true);
         if (staticGetter != null) {
             return ReflectionUtils.invokeMethod(targetClass, staticGetter);
         } else {
             Field staticField = ReflectionUtils.getFieldWithName(targetClass, staticProperty, true);
-            return ReflectionUtils.getFieldValue(targetClass, staticField);
+            if (staticField != null) {
+                return ReflectionUtils.getFieldValue(targetClass, staticField);
+            } else {
+                throw new UnitilsException("Static property named " + staticProperty + " not found on class " +
+                        targetClass.getSimpleName());
+            }
         }
     }
 
-    private static boolean setValueStatic(Class targetClass, String staticProperty, Object value) {
+    /**
+     * Sets the given value on the static property of the given targetClass
+     *
+     * @param targetClass
+     * @param staticProperty
+     * @param value
+     * @return True if a static property with the given property name was found and the value could be set, false
+     *      otherwise
+     */
+    private boolean setValueStatic(Class targetClass, String staticProperty, Object value) {
         Method staticSetter = ReflectionUtils.getSetter(targetClass, staticProperty, value.getClass(), true);
         if (staticSetter != null) {
             ReflectionUtils.invokeMethod(targetClass, staticSetter, value);
