@@ -42,7 +42,7 @@ abstract public class BaseSequenceUpdater implements SequenceUpdater {
         this.statementHandler = statementHandler;
 
         lowestAcceptableSequenceValue = configuration.getLong(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE);
-        schemaName = configuration.getString(PROPKEY_SCHEMA_NAME);
+        schemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
     }
 
 }

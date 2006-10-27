@@ -25,7 +25,7 @@
 	<classpathentry kind="lib" path="trunk/lib/commons-lang-2.2.jar"/>
 	<classpathentry kind="lib" path="trunk/lib/easymock2.2-.jar"/>
 	<classpathentry kind="lib" path="trunk/lib/easymockclassextension-2.2.jar"/>
-	<classpathentry kind="lib" path="trunk/lib/junit-3.8.1.jar"/>
+	<classpathentry sourcepath="C:/javadists/junit" kind="lib" path="trunk/lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="trunk/lib/testng-5.1-jdk15.jar"/>
 	<classpathentry kind="lib" path="trunk/lib/ognl-2.6.9.jar"/>
 	<classpathentry kind="lib" path="trunk/lib/hsqldb.jar"/>
