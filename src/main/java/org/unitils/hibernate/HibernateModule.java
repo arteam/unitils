@@ -83,8 +83,12 @@ public class HibernateModule implements Module {
         Configuration hbnConfiguration;
         try {
             hbnConfiguration = (Configuration) Class.forName(configurationClassName).newInstance();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             throw new UnitilsException("Invalid configuration class " + configurationClassName, e);
+        } catch (IllegalAccessException e) {
+            throw new UnitilsException("Illegal access to configuration class " + configurationClassName, e);
+        } catch (InstantiationException e) {
+            throw new UnitilsException("Exception while instantiating instance of class " + configurationClassName, e);
         }
         for (String configFile : configFiles) {
             hbnConfiguration.configure(configFile);
