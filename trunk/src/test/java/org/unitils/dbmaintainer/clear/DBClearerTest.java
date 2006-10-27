@@ -21,7 +21,7 @@ import org.unitils.util.ReflectionUtils;
 /**
  */
 @DatabaseTest
-public class DBClearerTest extends UnitilsJUnit3 {
+abstract public class DBClearerTest extends UnitilsJUnit3 {
 
     @TestDataSource
     protected javax.sql.DataSource dataSource;
@@ -74,16 +74,20 @@ public class DBClearerTest extends UnitilsJUnit3 {
     }
 
     public void testClearDatabase_tables() throws Exception {
-        assertTrue(tableExists("testtable1"));
-        assertTrue(tableExists("db_version"));
-        dbClearer.clearDatabase();
-        assertFalse(tableExists("testtable1"));
+        if (isTestedDialectActivated()) {
+            assertTrue(tableExists("testtable1"));
+            assertTrue(tableExists("db_version"));
+            dbClearer.clearDatabase();
+            assertFalse(tableExists("testtable1"));
+        }
     }
 
     public void testClearDatabase_views() throws Exception {
-        assertTrue(tableExists("testview"));
-        dbClearer.clearDatabase();
-        assertFalse(tableExists("testview"));
+        if (isTestedDialectActivated()) {
+            assertTrue(tableExists("testview"));
+            dbClearer.clearDatabase();
+            assertFalse(tableExists("testview"));
+        }
     }
     
     private void createTestTables(Connection conn) throws SQLException {
@@ -195,4 +199,5 @@ public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+    abstract protected boolean isTestedDialectActivated();
 }

@@ -20,11 +20,7 @@ public class HsqldbDBClearerTest extends DBClearerTest {
     @Override
     protected void setUp() throws Exception {
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        hsqldbDialectActivated = "hsqldb".equals(configuration
-                .getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
-
-        if (hsqldbDialectActivated) {
+        if (isTestedDialectActivated()) {
             super.setUp();
 
             if (triggerExists()) {
@@ -36,13 +32,13 @@ public class HsqldbDBClearerTest extends DBClearerTest {
 
     @Override
     protected void tearDown() throws Exception {
-        if (hsqldbDialectActivated) {
+        if (isTestedDialectActivated()) {
             super.tearDown();
         }
     }
 
     public void testClearDatabase_triggers() throws Exception {
-        if (hsqldbDialectActivated) {
+        if (isTestedDialectActivated()) {
             assertTrue(triggerExists());
             dbClearer.clearDatabase();
             assertFalse(triggerExists());
@@ -95,4 +91,8 @@ public class HsqldbDBClearerTest extends DBClearerTest {
         }
     }
 
+    protected boolean isTestedDialectActivated() {
+        Configuration config = new ConfigurationLoader().loadConfiguration();
+        return "oracle".equals(config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
+    }
 }

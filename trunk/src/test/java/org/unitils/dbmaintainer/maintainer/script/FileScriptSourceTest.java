@@ -16,9 +16,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * todo javadoc + fix test
- *
- * @author Filip Neven
+ * 
  */
 public class FileScriptSourceTest extends TestCase {
 
@@ -77,36 +75,36 @@ public class FileScriptSourceTest extends TestCase {
         return new File(systemPath);
     }
 
-    public void testGetScripts_incremental_fromVersionIndex0() {
-        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex0); // Should load script1.sql and script2.sql
-        checkScript1(scripts.get(0));
-        checkScript2(scripts.get(1));
-    }
-
-    public void testGetScripts_incremental_fromVersionIndex1() {
-        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex1); // Should load script2.sql
-        checkScript2(scripts.get(0));
-    }
-
-    public void testGetScripts_noMoreChanges() {
-        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex2); // There is no script2.sql, should return null
-        assertTrue(scripts.isEmpty());
-    }
-
-    public void testGetNextDbChange_fromScratch() {
-        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionTimestampOld);
-        checkScript1(scripts.get(0));
-        checkScript2(scripts.get(1));
-    }
-
-    public void testShouldRunFromScratch_incremental() {
+    public void testExistingScriptsModfied_notModified() {
         assertFalse(fromScratchFileScriptSource.existingScriptsModified(versionIndex0));
         assertFalse(fromScratchFileScriptSource.existingScriptsModified(versionIndex1));
         assertFalse(fromScratchFileScriptSource.existingScriptsModified(versionIndex2));
     }
 
-    public void testShouldRunFromScratch_fromScratch() {
+    public void testExistingScriptsModfied_modified() {
         assertTrue(fromScratchFileScriptSource.existingScriptsModified(versionTimestampOld));
+    }
+
+    public void testGetNewScripts_fromVersionIndex0() {
+        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex0); // Should load script1.sql and script2.sql
+        checkScript1(scripts.get(0));
+        checkScript2(scripts.get(1));
+    }
+
+    public void testGetNewScripts_fromVersionIndex1() {
+        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex1); // Should load script2.sql
+        checkScript2(scripts.get(0));
+    }
+
+    public void testGetNewScripts_noMoreChanges() {
+        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getNewScripts(versionIndex2); // There is no script2.sql, should return null
+        assertTrue(scripts.isEmpty());
+    }
+
+    public void testGetAllScripts() {
+        List<VersionScriptPair> scripts = fromScratchFileScriptSource.getAllScripts();
+        checkScript1(scripts.get(0));
+        checkScript2(scripts.get(1));
     }
 
     private void checkScript1(VersionScriptPair versionScriptPair) {
