@@ -18,7 +18,7 @@ public class OracleDBClearerTest extends DBClearerTest {
 
     @Override
     protected void setUp() throws Exception {
-        if (oracleDialectActivated()) {
+        if (isTestedDialectActivated()) {
             super.setUp();
 
             Connection conn = null;
@@ -40,13 +40,13 @@ public class OracleDBClearerTest extends DBClearerTest {
 
     @Override
     protected void tearDown() throws Exception {
-        if (oracleDialectActivated()) {
+        if (isTestedDialectActivated()) {
             super.tearDown();
         }
     }
 
     public void testClearDatabase_triggers() throws Exception {
-        if (oracleDialectActivated()) {
+        if (isTestedDialectActivated()) {
             Connection conn = null;
             try {
                 conn = dataSource.getConnection();
@@ -60,7 +60,7 @@ public class OracleDBClearerTest extends DBClearerTest {
     }
 
     public void testClearDatabase_sequences() throws Exception {
-        if (oracleDialectActivated()) {
+        if (isTestedDialectActivated()) {
             Connection conn = null;
             try {
                 conn = dataSource.getConnection();
@@ -148,7 +148,7 @@ public class OracleDBClearerTest extends DBClearerTest {
         }
     }
 
-    private boolean oracleDialectActivated() {
+    protected boolean isTestedDialectActivated() {
         Configuration config = new ConfigurationLoader().loadConfiguration();
         return "oracle".equals(config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
     }

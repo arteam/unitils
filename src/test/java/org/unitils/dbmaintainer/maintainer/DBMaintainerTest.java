@@ -121,7 +121,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
         mockDbClearer.clearDatabase();
-        expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
+        expect(mockScriptSource.getAllScripts()).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);
         mockScriptRunner.execute("Script 2");
