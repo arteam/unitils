@@ -1,14 +1,17 @@
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.configuration.Configuration;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.db.annotations.TestDataSource;
+import org.unitils.core.Unitils;
 import org.unitils.db.annotations.DatabaseTest;
+import org.unitils.db.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.DBCleaner;
+import org.unitils.dbmaintainer.clean.DefaultDBCleaner;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,90 +22,150 @@ import java.sql.Statement;
 @DatabaseTest
 public class DBCleanerTest extends UnitilsJUnit3 {
 
-    private javax.sql.DataSource dataSource;
-
     private DBCleaner dbCleaner;
 
     @TestDataSource
-    public void setDataSource(javax.sql.DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    private DataSource dataSource;
 
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "testtable2,testtable3");
+        Configuration configuration = Unitils.getInstance().getConfiguration();
+        configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "tabletopreserve");
 
-        StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(configuration, dataSource);
+        StatementHandler st = new JDBCStatementHandler();
+        st.init(configuration, dataSource);
 
         dbCleaner = new DefaultDBCleaner();
-        dbCleaner.init(configuration, dataSource, statementHandler);
+        dbCleaner.init(configuration, dataSource, st);
 
-        createTestTables();
-        insertTestRecords();
-    }
-
-    private void createTestTables() throws SQLException {
         Connection conn = null;
-        Statement st = null;
         try {
             conn = dataSource.getConnection();
-            st = conn.createStatement();
-            // Make sure previous setup is cleaned up
-            st.execute("drop table testtable1 if exists");
-            st.execute("drop table testtable2 if exists");
-            st.execute("drop table testtable3 if exists");
-            st.execute("create table testtable1 (col1 varchar(10))");
-            st.execute("create table testtable2 (col1 varchar(10))");
-            st.execute("create table testtable3 (col1 varchar(10))");
+            createTestTables(conn);
+            insertTestData(conn);
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            DbUtils.closeQuietly(conn);
+        }
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            dropTestTables(conn);
+        } finally {
+            DbUtils.closeQuietly(conn);
+        }
+    }
+
+    private void dropTestTables(Connection conn) throws SQLException {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            st.executeUpdate("drop table tabletoclear");
+            st.executeUpdate("drop table db_version");
+            st.executeUpdate("drop table tabletopreserve");
+        } finally {
+            DbUtils.closeQuietly(st);
         }
     }
 
     public void testCleanDatabase() throws Exception {
-        assertFalse(isTestTableEmpty("testtable1"));
-        dbCleaner.cleanDatabase();
-        assertTrue(isTestTableEmpty("testtable1"));
-    }
-
-    public void testCleanDatabase_tablesToPreserve() throws Exception {
-        assertFalse(isTestTableEmpty("testtable1"));
-        assertFalse(isTestTableEmpty("testtable2"));
-        assertFalse(isTestTableEmpty("testtable3"));
-        dbCleaner.cleanDatabase();
-        assertTrue(isTestTableEmpty("testtable1"));
-        assertFalse(isTestTableEmpty("testtable2"));
-        assertFalse(isTestTableEmpty("testtable3"));
-    }
-
-    private void insertTestRecords() throws SQLException {
         Connection conn = null;
-        Statement st = null;
         try {
             conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("insert into testtable1 values('value1')");
-            st.execute("insert into testtable2 values('value1')");
-            st.execute("insert into testtable3 values('value1')");
+            assertTrue(testDataExists(conn));
+            dbCleaner.cleanDatabase();
+            assertFalse(testDataExists(conn));
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            DbUtils.closeQuietly(conn);
         }
     }
 
-    private boolean isTestTableEmpty(String tableName) throws SQLException {
+    public void testCleanDatabase_preserveDbVersionTable() throws Exception {
         Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            assertTrue(dbVersionDataExists(conn));
+            dbCleaner.cleanDatabase();
+            assertTrue(dbVersionDataExists(conn));
+        } finally {
+            DbUtils.closeQuietly(conn);
+        }
+    }
+
+    public void testCleanDatabase_preserveTablesToPreserve() throws Exception {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            assertTrue(dataToPreserveExists(conn));
+            dbCleaner.cleanDatabase();
+            assertTrue(dataToPreserveExists(conn));
+        } finally {
+            DbUtils.closeQuietly(conn);
+        }
+    }
+
+    private void createTestTables(Connection conn) throws SQLException {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            st.execute("create table tabletoclear(testcolumn varchar(10))");
+            st.execute("create table db_version(testcolumn varchar(10))");
+            st.execute("create table tabletopreserve(testcolumn varchar(10))");
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    private void insertTestData(Connection conn) throws SQLException {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            st.execute("insert into tabletoclear values('test')");
+            st.execute("insert into db_version values('test')");
+            st.execute("insert into tabletopreserve values('test')");
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    private boolean testDataExists(Connection conn) throws SQLException {
         Statement st = null;
         ResultSet rs = null;
         try {
-            conn = dataSource.getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select * from " + tableName);
-            return !rs.next();
+            rs = st.executeQuery("select * from tabletoclear");
+            return rs.next();
         } finally {
-            DbUtils.closeQuietly(conn, st, rs);
+            DbUtils.closeQuietly(null, st, rs);
+        }
+    }
+
+    private boolean dbVersionDataExists(Connection conn) throws SQLException {
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery("select * from db_version");
+            return rs.next();
+        } finally {
+            DbUtils.closeQuietly(null, st, rs);
+        }
+    }
+
+    private boolean dataToPreserveExists(Connection conn) throws SQLException {
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery("select * from tabletopreserve");
+            return rs.next();
+        } finally {
+            DbUtils.closeQuietly(null, st, rs);
         }
     }
 
