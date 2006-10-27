@@ -3,19 +3,26 @@ package org.unitils.inject;
 import junit.framework.TestCase;
 import org.unitils.inject.annotation.Inject;
 import org.unitils.inject.annotation.TestedObject;
+import org.unitils.core.ConfigurationLoader;
+import org.apache.commons.configuration.Configuration;
 
 /**
  * @author Filip Neven
  */
 public class InjectModuleInjectTest extends TestCase {
 
-    InjectModule injectModule = new InjectModule();
+    InjectModule injectModule;
 
     private TestInjectExplicitTarget testInjectExplicitTarget = new TestInjectExplicitTarget();
     private TestInjectAnnotatedTarget testInjectAnnotatedTarget = new TestInjectAnnotatedTarget();
 
     protected void setUp() throws Exception {
         super.setUp();
+
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+
+        injectModule = new InjectModule();
+        injectModule.init(configuration);
     }
 
     public void testInject_explicitTarget() {
