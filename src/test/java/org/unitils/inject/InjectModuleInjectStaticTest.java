@@ -1,6 +1,8 @@
 package org.unitils.inject;
 
 import org.unitils.inject.annotation.InjectStatic;
+import org.unitils.core.ConfigurationLoader;
+import org.apache.commons.configuration.Configuration;
 import junit.framework.TestCase;
 
 /**
@@ -8,7 +10,7 @@ import junit.framework.TestCase;
  */
 public class InjectModuleInjectStaticTest extends TestCase {
 
-    InjectModule injectModule = new InjectModule();
+    InjectModule injectModule;
 
     private TestInjectStatic_simpleSetter testInjectStatic_simpleSetter = new TestInjectStatic_simpleSetter();
     private TestInjectStatic_simpleField testInjectStatic_simpleField = new TestInjectStatic_simpleField();
@@ -17,6 +19,11 @@ public class InjectModuleInjectStaticTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
+
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+
+        injectModule = new InjectModule();
+        injectModule.init(configuration);
     }
 
     public void testInject_simpleSetter() {

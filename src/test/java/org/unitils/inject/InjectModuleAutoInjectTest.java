@@ -4,10 +4,12 @@ import junit.framework.TestCase;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.inject.annotation.AutoInject;
 import org.unitils.inject.util.PropertyAccessType;
+import org.unitils.core.ConfigurationLoader;
+import org.apache.commons.configuration.Configuration;
 
 public class InjectModuleAutoInjectTest extends TestCase {
 
-    InjectModule injectModule = new InjectModule();
+    InjectModule injectModule;
 
     private TestAutoInjectExplicitTarget testAutoInjectExplicitTarget = new TestAutoInjectExplicitTarget();
     private TestAutoInjectFieldAccess testAutoInjectFieldAccess = new TestAutoInjectFieldAccess();
@@ -19,6 +21,11 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
+
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+
+        injectModule = new InjectModule();
+        injectModule.init(configuration);
     }
 
     public void testAutoInject_explicitTarget() {
