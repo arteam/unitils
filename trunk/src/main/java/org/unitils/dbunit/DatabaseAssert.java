@@ -1,7 +1,7 @@
 package org.unitils.dbunit;
 
-import org.unitils.core.Unitils;
 import org.unitils.core.TestContext;
+import org.unitils.core.Unitils;
 import org.unitils.hibernate.HibernateModule;
 
 /**
@@ -19,7 +19,7 @@ public class DatabaseAssert {
 
         HibernateModule hibernateModule = Unitils.getModulesRepository().getFirstModule(HibernateModule.class);
         if (hibernateModule != null) { // If Hibernate support is not activated in the Unitils configuration, the Hibernate module will be null
-            if (hibernateModule.isHibernateTest(testContext.getTestObject())) {
+            if (hibernateModule.isHibernateTest(testContext.getTestClass())) {  //todo check null
                 hibernateModule.flushDatabaseUpdates();
             }
         }

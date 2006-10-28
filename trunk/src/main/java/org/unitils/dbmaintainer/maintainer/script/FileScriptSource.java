@@ -6,15 +6,6 @@
  */
 package org.unitils.dbmaintainer.maintainer.script;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.configuration.Configuration;
@@ -24,16 +15,21 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.*;
+
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem. This implementation can work
  * both incrementally and from scratch.
  * <p>Script files should be located in the directory configured by {@link #PROPKEY_SCRIPTFILES_DIR}. Valid script files
- * start with a version number followed by an underscore, and end with the extension configured by 
+ * start with a version number followed by an underscore, and end with the extension configured by
  * {@link #PROPKEY_SCRIPTFILES_FILEEXTENSION}.
- * <p>
+ * <p/>
  * When script files have been added having a higher version number, {@link #existingScriptsModified(Version)} will return false,
  * and only the newer version scripts are returned by {@link #getNewScripts(Version)}. When existing scripts
- * have been modified, {@link #existingScriptsModified(Version)} returns true, and {@link #getNewScripts(Version)} returns all 
+ * have been modified, {@link #existingScriptsModified(Version)} returns true, and {@link #getNewScripts(Version)} returns all
  * scripts.
  */
 public class FileScriptSource implements ScriptSource {
@@ -58,6 +54,7 @@ public class FileScriptSource implements ScriptSource {
     /**
      * Uses the given <code>Configuration</code> to initialize the script files directory, and the file extension
      * of the script files.
+     *
      * @see ScriptSource#init(Configuration)
      */
     public void init(Configuration configuration) {
@@ -73,9 +70,9 @@ public class FileScriptSource implements ScriptSource {
     }
 
     /**
-     * Given the current {@link Version} of the database, returns true if the database should be rebuilt from 
+     * Given the current {@link Version} of the database, returns true if the database should be rebuilt from
      * scratch, or if it can be updated incrementally to the latest version.
-     * 
+     *
      * @see ScriptSource#existingScriptsModified(org.unitils.dbmaintainer.maintainer.version.Version)
      */
     public boolean existingScriptsModified(Version currentVersion) {
@@ -90,7 +87,7 @@ public class FileScriptSource implements ScriptSource {
         List<File> filesWithNewerVersion = getFilesWithHigherIndex(currentVersion.getIndex());
         return getStatementsFromFiles(filesWithNewerVersion);
     }
-    
+
     /**
      * @return the scripts that should be run to update the database to the latest version from scratch
      */
@@ -182,7 +179,7 @@ public class FileScriptSource implements ScriptSource {
                 String script = FileUtils.readFileToString(scriptFile, System.getProperty("file.encoding"));
                 scripts.add(script);
             } catch (IOException e) {
-                throw new RuntimeException("Error while trying to read file " + scriptFile);
+                throw new UnitilsException("Error while trying to read file " + scriptFile);
             }
         }
         return scripts;
@@ -235,7 +232,7 @@ public class FileScriptSource implements ScriptSource {
                 scripts.add(new VersionScriptPair(new Version(getIndex(file), timeStamp),
                         FileUtils.readFileToString(file, System.getProperty("file.encoding"))));
             } catch (IOException e) {
-                throw new RuntimeException("Error while trying to read file " + file);
+                throw new UnitilsException("Error while trying to read file " + file);
             }
         }
         return scripts;

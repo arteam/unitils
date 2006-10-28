@@ -12,7 +12,7 @@ public abstract class TestListener {
         // empty
     }
 
-    public void beforeTestClass(Object testObject) {
+    public void beforeTestClass(Class<?> testClass) {
         // empty
     }
 
@@ -32,7 +32,7 @@ public abstract class TestListener {
         // empty
     }
 
-    public void afterTestClass(Object testObject) {
+    public void afterTestClass(Class<?> testClass) {
         // empty
     }
 

@@ -1,10 +1,9 @@
 package org.unitils.dbunit;
 
-import static org.easymock.EasyMock.expect;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
-import org.easymock.EasyMock;
+import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ModulesRepository;
 import org.unitils.db.DatabaseModule;
@@ -55,7 +54,7 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
 
     public void testIsDatabaseTest() throws Exception {
 
-        assertTrue(dbUnitModule.isDatabaseTest(new DbTest()));
+        assertTrue(dbUnitModule.isDatabaseTest(DbTest.class));
     }
 
 

@@ -6,6 +6,7 @@
  */
 package org.unitils;
 
+import org.junit.Ignore;
 import org.junit.internal.runners.InitializationError;
 import org.junit.internal.runners.TestClassMethodsRunner;
 import org.junit.internal.runners.TestClassRunner;
@@ -45,6 +46,13 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
     }
 
 
+    @Override
+    public void run(RunNotifier notifier) {
+        testListener.beforeTestClass(getTestClass());
+        super.run(notifier);
+        testListener.afterTestClass(getTestClass());
+    }
+
     protected TestListener createTestListener() {
         return Unitils.getInstance().getTestListener();
     }
@@ -60,23 +68,29 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
         }
 
 
-        public void run(RunNotifier notifier) {
-            testListener.beforeTestClass(getTestClass());
-            super.run(notifier);
-            testListener.afterTestClass(getTestClass());
-        }
-
+        @Override
         protected TestMethodRunner createMethodRunner(Object test, Method method, RunNotifier notifier) {
 
-            testObject = test;
-            testListener.beforeTestSetUp(testObject);
-            return new CustomTestMethodRunner(testObject, method, notifier, methodDescription(method));
+            if (!isIgnored(method)) {
+                testObject = test;
+                testListener.beforeTestSetUp(testObject);
+            }
+            return new CustomTestMethodRunner(test, method, notifier, methodDescription(method));
         }
 
+        @Override
         protected void invokeTestMethod(Method method, RunNotifier notifier) {
 
             super.invokeTestMethod(method, notifier);
-            testListener.afterTestTearDown(testObject);
+            if (!isIgnored(method)) {
+                testListener.afterTestTearDown(testObject);
+                testObject = null;
+            }
+        }
+
+
+        public boolean isIgnored(Method testMethod) {
+            return testMethod.getAnnotation(Ignore.class) != null;
         }
     }
 

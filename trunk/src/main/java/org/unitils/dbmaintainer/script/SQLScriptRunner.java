@@ -6,6 +6,12 @@
  */
 package org.unitils.dbmaintainer.script;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,13 +19,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-
 /**
- * Implementation of {@link ScriptRunner} that runs an SQL script. All statements are passed on to 
+ * Implementation of {@link ScriptRunner} that runs an SQL script. All statements are passed on to
  * a {@link StatementHandler}
  */
 public class SQLScriptRunner implements ScriptRunner {
@@ -99,7 +100,7 @@ public class SQLScriptRunner implements ScriptRunner {
             }
             return statements;
         } catch (IOException e) {
-            throw new RuntimeException("Error while reading script", e);
+            throw new UnitilsException("Error while reading script", e);
         } finally {
             IOUtils.closeQuietly(br);
         }

@@ -9,10 +9,10 @@ package org.unitils.hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.Module;
 import org.unitils.db.DatabaseModule;
 import org.unitils.hibernate.annotation.AfterCreateHibernateSession;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
@@ -54,12 +54,12 @@ public class HibernateModule implements Module {
     /**
      * Checks whether the given test instance is a hibernate test, i.e. is annotated with the {@link HibernateTest} annotation.
      *
-     * @param testObject the test instance, not null
+     * @param testClass the test class, not null
      * @return true if the test class is a hibernate test false otherwise
      */
-    public boolean isHibernateTest(Object testObject) {
+    public boolean isHibernateTest(Class<?> testClass) {
 
-        return testObject.getClass().getAnnotation(HibernateTest.class) != null;
+        return testClass.getAnnotation(HibernateTest.class) != null;
     }
 
 
@@ -170,7 +170,7 @@ public class HibernateModule implements Module {
     private class HibernateTestListener extends TestListener {
 
         @Override
-        public void beforeTestClass(Object testObject) {
+        public void beforeTestSetUp(Object testObject) {
             if (isHibernateTest(testObject.getClass())) {
                 configureHibernate(testObject);
             }
@@ -179,14 +179,14 @@ public class HibernateModule implements Module {
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
 
-            if (isHibernateTest(testObject)) {
+            if (isHibernateTest(testObject.getClass())) {
                 injectHibernateSession(testObject);
             }
         }
 
         public void afterTestMethod(Object testObject, Method testMethod) {
 
-            if (isHibernateTest(testObject)) {
+            if (isHibernateTest(testObject.getClass())) {
                 closeHibernateSession();
             }
         }

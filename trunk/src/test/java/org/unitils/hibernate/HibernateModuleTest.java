@@ -58,7 +58,7 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
 
     public void testIsHibernateTest() {
 
-        assertTrue(hibernateModule.isHibernateTest(new HbnTest()));
+        assertTrue(hibernateModule.isHibernateTest(HbnTest.class));
     }
 
 

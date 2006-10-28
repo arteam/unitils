@@ -145,7 +145,7 @@ public class ModulesLoader {
         // Check for infinite loops
         if (traversedModuleNames.containsKey(moduleName)) {
 
-            throw new RuntimeException("Unable to load modules. Circular dependency found for modules: " + traversedModuleNames.keySet());
+            throw new UnitilsException("Unable to load modules. Circular dependency found for modules: " + traversedModuleNames.keySet());
         }
         traversedModuleNames.put(moduleName, moduleName);
 

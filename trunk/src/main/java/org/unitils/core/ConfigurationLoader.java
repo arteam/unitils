@@ -95,7 +95,7 @@ public class ConfigurationLoader {
 
         } catch (ConfigurationException e) {
 
-            throw new RuntimeException("Initialisation error. Unable to load main configuration file: " + DEFAULT_PROPERTIES_FILE_NAME, e);
+            throw new UnitilsException("Initialisation error. Unable to load main configuration file: " + DEFAULT_PROPERTIES_FILE_NAME, e);
         }
     }
 

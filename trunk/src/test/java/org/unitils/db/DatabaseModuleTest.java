@@ -3,26 +3,28 @@ package org.unitils.db;
 import org.apache.commons.configuration.Configuration;
 import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
+import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import static org.unitils.easymock.EasyMockUnitils.replay;
-import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.annotation.LenientMock;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class DatabaseModuleTest extends UnitilsJUnit3 {
 
     private DatabaseModule databaseModule;
 
-    @Mock
-    private javax.sql.DataSource mockDataSource = null;
+    @LenientMock
+    private DataSource mockDataSource = null;
 
-    @Mock
+    @LenientMock
     private Connection mockConnection = null;
 
-    @Mock
+    @LenientMock
     private DBMaintainer mockDbMaintainer = null;
 
     public void setUp() throws Exception {
@@ -36,7 +38,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
             }
 
             @Override
-            protected javax.sql.DataSource createDataSource() {
+            protected DataSource createDataSource() {
                 return mockDataSource;
             }
         };
@@ -46,16 +48,12 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
 
     public void testIsDatabaseTest() {
 
-        replay();
-
-        boolean result = databaseModule.isDatabaseTest(new DbTest());
+        boolean result = databaseModule.isDatabaseTest(DbTest.class);
         assertTrue(result);
     }
 
     //todo refactor + add tests
     public void testInitDataSource() throws Exception {
-
-        replay();
 
         DbTest dbTest = new DbTest();
         databaseModule.initDatabase(dbTest);
@@ -65,20 +63,21 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
         assertSame(mockDataSource, dbTest.getDataSourceFromField());
     }
 
-    @org.unitils.db.annotations.DatabaseTest
+
+    @DatabaseTest
     public static class DbTest {
 
-        private javax.sql.DataSource dataSourceFromMethod;
+        private DataSource dataSourceFromMethod;
 
         @TestDataSource
-        private javax.sql.DataSource dataSourceFromField;
+        private DataSource dataSourceFromField;
 
         @TestDataSource
         public void afterCreateDataSource(javax.sql.DataSource dataSource) {
             this.dataSourceFromMethod = dataSource;
         }
 
-        public javax.sql.DataSource getDataSourceFromMethod() {
+        public DataSource getDataSourceFromMethod() {
             return dataSourceFromMethod;
         }
 

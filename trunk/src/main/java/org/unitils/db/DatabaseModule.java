@@ -76,7 +76,7 @@ public class DatabaseModule implements Module {
     /**
      * Initializes this module using the given <code>Configuration</code>
      *
-     * @param configuration
+     * @param configuration the config, not null
      */
     public void init(Configuration configuration) {
         this.configuration = configuration;
@@ -88,12 +88,12 @@ public class DatabaseModule implements Module {
     /**
      * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
      *
-     * @param testObject the test instance, not null
+     * @param testClass the test class, not null
      * @return true if the test class is a database test false otherwise
      */
-    protected boolean isDatabaseTest(Object testObject) {
+    protected boolean isDatabaseTest(Class<?> testClass) {
 
-        return testObject.getClass().getAnnotation(DatabaseTest.class) != null;
+        return testClass.getAnnotation(DatabaseTest.class) != null;
     }
 
     /**
@@ -120,7 +120,7 @@ public class DatabaseModule implements Module {
      *
      * @return the datasource
      */
-    protected javax.sql.DataSource createDataSource() {
+    protected DataSource createDataSource() {
         DataSourceFactory dataSourceFactory = createDataSourceFactory();
         dataSourceFactory.init(configuration);
         DataSource dataSource = dataSourceFactory.createDataSource();
@@ -137,7 +137,7 @@ public class DatabaseModule implements Module {
     /**
      * Creates the configured instance of the {@link ConstraintsDisabler}
      *
-     * @param dataSource
+     * @param dataSource the datasource, not null
      * @return The configured instance of the {@link ConstraintsDisabler}
      */
     protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
@@ -157,7 +157,7 @@ public class DatabaseModule implements Module {
     /**
      * @return The <code>TestDataSource</code>
      */
-    public javax.sql.DataSource getDataSource() {
+    public DataSource getDataSource() {
         return dataSource;
     }
 
@@ -225,6 +225,7 @@ public class DatabaseModule implements Module {
     /**
      * Creates a new instance of the {@link DBMaintainer}
      *
+     * @param configuration the config, not null
      * @return a new instance of the DBMaintainer
      */
     protected DBMaintainer createDbMaintainer(Configuration configuration) {
@@ -254,10 +255,10 @@ public class DatabaseModule implements Module {
     private class DatabaseTestListener extends TestListener {
 
         @Override
-        public void beforeTestClass(Object testObject) {
+        public void beforeTestClass(Class<?> testClass) {
 
-            if (isDatabaseTest(testObject)) {
-                initDatabase(testObject);
+            if (isDatabaseTest(testClass)) {
+                initDatabase(testClass);
             }
         }
 
@@ -266,7 +267,7 @@ public class DatabaseModule implements Module {
         @Override
         public void beforeTestSetUp(Object testObject) {
 
-            if (isDatabaseTest(testObject)) {
+            if (isDatabaseTest(testObject.getClass())) {
                 //call methods annotated with TestDataSource, if any
                 injectDataSource(testObject);
             }
