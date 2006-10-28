@@ -2,6 +2,8 @@ package org.unitils.core;
 
 /**
  * todo javadoc
+ * <p/>
+ * todo switch IllegalArgumentExceptions to UnitilsException
  */
 public class UnitilsException extends RuntimeException {
 

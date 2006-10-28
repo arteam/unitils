@@ -1,13 +1,11 @@
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.Unitils;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBCleaner;
-import org.unitils.dbmaintainer.clean.DefaultDBCleaner;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 
@@ -20,6 +18,7 @@ import java.sql.Statement;
 /**
  */
 @DatabaseTest
+@SuppressWarnings({"UnusedDeclaration"})
 public class DBCleanerTest extends UnitilsJUnit3 {
 
     private DBCleaner dbCleaner;
@@ -27,6 +26,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     @TestDataSource
     private DataSource dataSource;
 
+    
     protected void setUp() throws Exception {
         super.setUp();
 

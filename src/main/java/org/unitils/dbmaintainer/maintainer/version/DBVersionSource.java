@@ -6,11 +6,11 @@
  */
 package org.unitils.dbmaintainer.maintainer.version;
 
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.core.UnitilsException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -57,7 +57,7 @@ public class DBVersionSource implements VersionSource {
     public static final String PROPKEY_SCHEMANAME = "dataSource.schemaName";
 
     /**
-     *  Property key of the SQL dialect of the underlying DBMS implementation
+     * Property key of the SQL dialect of the underlying DBMS implementation
      */
     private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
@@ -119,7 +119,7 @@ public class DBVersionSource implements VersionSource {
             rs.next();
             return new Version(rs.getLong(versionIndexColumnName), rs.getLong(versionTimestampColumnName));
         } catch (SQLException e) {
-            throw new RuntimeException("Error while retrieving database version", e);
+            throw new UnitilsException("Error while retrieving database version", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }
@@ -164,7 +164,7 @@ public class DBVersionSource implements VersionSource {
                         ") values (0, 0)");
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error while checking version table", e);
+            throw new UnitilsException("Error while checking version table", e);
         } finally {
             DbUtils.closeQuietly(null, st, rs);
         }

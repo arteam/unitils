@@ -99,7 +99,6 @@ public class Unitils {
             testContext.setTestObject(null);
             testContext.setTestMethod(null);
 
-            // For each core, invoke the beforeAll method
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
                 modulesRepository.getTestListener(module).beforeAll();
@@ -108,16 +107,16 @@ public class Unitils {
 
 
         @Override
-        public void beforeTestClass(Object testObject) {
+        public void beforeTestClass(Class testClass) {
 
             TestContext testContext = getTestContext();
-            testContext.setTestClass(testObject.getClass());
-            testContext.setTestObject(testObject);
+            testContext.setTestClass(testClass);
+            testContext.setTestObject(null);
             testContext.setTestMethod(null);
 
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
-                modulesRepository.getTestListener(module).beforeTestClass(testObject);
+                modulesRepository.getTestListener(module).beforeTestClass(testClass);
             }
         }
 
@@ -145,7 +144,6 @@ public class Unitils {
             testContext.setTestObject(testObject);
             testContext.setTestMethod(testMethod);
 
-            // For each core, invoke the beforeTestMethod method
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
                 modulesRepository.getTestListener(module).beforeTestMethod(testObject, testMethod);
@@ -161,7 +159,6 @@ public class Unitils {
             testContext.setTestObject(testObject);
             testContext.setTestMethod(testMethod);
 
-            // For each core, invoke the afterTestMethod method
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
                 modulesRepository.getTestListener(module).afterTestMethod(testObject, testMethod);
@@ -185,16 +182,16 @@ public class Unitils {
 
 
         @Override
-        public void afterTestClass(Object testObject) {
+        public void afterTestClass(Class testClass) {
 
             TestContext testContext = getTestContext();
-            testContext.setTestClass(testObject.getClass());
-            testContext.setTestObject(testObject);
+            testContext.setTestClass(testClass);
+            testContext.setTestObject(null);
             testContext.setTestMethod(null);
 
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
-                modulesRepository.getTestListener(module).afterTestClass(testObject);
+                modulesRepository.getTestListener(module).afterTestClass(testClass);
             }
         }
 

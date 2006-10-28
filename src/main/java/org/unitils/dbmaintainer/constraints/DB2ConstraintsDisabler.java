@@ -6,22 +6,22 @@
  */
 package org.unitils.dbmaintainer.constraints;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbutils.DbUtils;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbutils.DbUtils;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-
 /**
  * TODO test me
  * TODO javadoc me
- *
+ * <p/>
  * Implementation of {@link ConstraintsDisabler} for an DB2 database.
  *
  * @author BaVe
@@ -78,9 +78,9 @@ public class DB2ConstraintsDisabler implements ConstraintsDisabler {
             resultSet = statement.executeQuery(SELECT_CONSTRAINTS_SQL);
             output(resultSet, enableDisable);
         } catch (SQLException e) {
-            throw new RuntimeException("Error while disabling constraints", e);
+            throw new UnitilsException("Error while disabling constraints", e);
         } catch (StatementHandlerException e) {
-            throw new RuntimeException("Error while disabling constraints", e);
+            throw new UnitilsException("Error while disabling constraints", e);
         } finally {
             DbUtils.closeQuietly(connection, statement, resultSet);
         }

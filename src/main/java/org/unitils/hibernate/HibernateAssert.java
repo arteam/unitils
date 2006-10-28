@@ -13,6 +13,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -86,7 +87,7 @@ public class HibernateAssert {
             DatabaseMetadata dbm = new DatabaseMetadata(session.connection(), dialect);
             return configuration.generateSchemaUpdateScript(dialect, dbm);
         } catch (SQLException e) {
-            throw new RuntimeException("Could not retrieve database metadata", e);
+            throw new UnitilsException("Could not retrieve database metadata", e);
         }
     }
 

@@ -12,6 +12,7 @@ import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
 import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
@@ -202,13 +203,13 @@ public class ReflectionAssert {
             assertRefEquals(formattedMessage, expectedPropertyValue, propertyValue, modes);
 
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
+            throw new UnitilsException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
 
         } catch (InvocationTargetException e) {
-            throw new RuntimeException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
+            throw new UnitilsException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
 
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
+            throw new UnitilsException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
         }
     }
 

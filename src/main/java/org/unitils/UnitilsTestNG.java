@@ -9,15 +9,14 @@ package org.unitils;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.*;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 
 /**
  * todo javadoc
+ * <p/>
+ * todo implement
  */
 public abstract class UnitilsTestNG implements IHookable {
 
@@ -25,7 +24,7 @@ public abstract class UnitilsTestNG implements IHookable {
 
     @BeforeSuite
     protected void unitilsBeforeSuite() {
-        testListener = Unitils.getInstance().getTestListener();
+        testListener = createTestListener();
         testListener.beforeAll();
     }
 
@@ -34,15 +33,24 @@ public abstract class UnitilsTestNG implements IHookable {
         testListener.afterAll();
     }
 
-
     @BeforeClass
     protected void unitilsBeforeClass() {
-        testListener.beforeTestClass(this);
+        testListener.beforeTestClass(getClass());
     }
 
     @AfterClass
     protected void unitilsAfterClass() {
-        testListener.afterTestClass(this);
+        testListener.afterTestClass(getClass());
+    }
+
+    @BeforeMethod
+    protected void unitilsBeforeTestSetUp() {
+        testListener.beforeTestSetUp(this);
+    }
+
+    @AfterMethod
+    protected void unitilsAfterTestTearDown() {
+        testListener.afterTestTearDown(this);
     }
 
 
@@ -52,4 +60,10 @@ public abstract class UnitilsTestNG implements IHookable {
         callBack.runTestMethod(testResult);
         testListener.afterTestMethod(this, testResult.getMethod().getMethod());
     }
+
+
+    protected TestListener createTestListener() {
+        return Unitils.getInstance().getTestListener();
+    }
+
 }

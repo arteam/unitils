@@ -14,8 +14,6 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * todo test logging of exceptions in different hook methods (already fixed in runbare: exceptions were not logged)
@@ -28,7 +26,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
     private TestListener testListener;
 
-    private static Map<Class, Class> testClasses;
+    private static Class<?> lastTestClass;
 
 
     public UnitilsJUnit3() {
@@ -38,23 +36,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
     public UnitilsJUnit3(String name) {
         super(name);
         testListener = createTestListener();
-
-        if (testClasses == null) {
-            testClasses = new HashMap<Class, Class>();
-            testListener.beforeAll();
-            createShutdownHook();
-        }
-
-        if (!testClasses.containsKey(getClass())) {
-            testClasses.put(getClass(), getClass());
-
-            try {
-                testListener.beforeTestClass(this);
-            } catch (UnitilsException e) {
-                logger.error("Error in Unitils beforeTestClass", e);
-                throw e;
-            }
-        }
     }
 
 
@@ -62,6 +43,9 @@ public abstract class UnitilsJUnit3 extends TestCase {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 super.run();
+                if (lastTestClass != null) {
+                    testListener.afterTestClass(lastTestClass);
+                }
                 testListener.afterAll();
             }
         });
@@ -69,9 +53,25 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
 
     public void runBare() throws Throwable {
+
+        Class testClass = getClass();
+
+        if (lastTestClass == null) {
+            testListener.beforeAll();
+            createShutdownHook();
+        }
+
+        if (lastTestClass != testClass) {
+            if (lastTestClass != null) {
+                testListener.afterTestClass(lastTestClass);
+            }
+            testListener.beforeTestClass(testClass);
+            lastTestClass = testClass;
+        }
+
         try {
             testListener.beforeTestSetUp(this);
-        } catch (Throwable e) {
+        } catch (Throwable e) {  //todo remove??
             logger.error(e);
             throw e;
         }

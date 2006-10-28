@@ -7,66 +7,175 @@ import org.junit.runner.notification.RunNotifier;
 import org.unitils.core.TestListener;
 
 import java.lang.reflect.Method;
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * Test for {@link org.unitils.UnitilsJUnit4}.
- * <p/>
- * todo implement
+ * Test for {@link UnitilsJUnit4} and {@link UnitilsJUnit4TestClassRunner}.
  */
 public class UnitilsJUnit4Test extends TestCase {
 
 
-    private static Stack<String> callStack = new Stack<String>();
+    /* List that will contain a string representation of each method call */
+    private static List<String> callList = new ArrayList<String>();
 
 
+    /**
+     * Tests the correct invocation sequence of listener methods for a JUnit 4 test.
+     * <p/>
+     * 3 tests are performed: TestClass1 and TestClass2 both with 2 test methods and EmptyTestClass
+     * that does not contain any methods.
+     */
     public void testUnitilsJUnit4() throws Exception {
 
-        TestUnitilsJUnit4TestClassRunner testRunner = new TestUnitilsJUnit4TestClassRunner(TestClass1.class);
-        testRunner.run(new RunNotifier());
+        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(TestClass1.class);
+        TestUnitilsJUnit4TestClassRunner testRunner2 = new TestUnitilsJUnit4TestClassRunner(TestClass2.class);
+        TestUnitilsJUnit4TestClassRunner testRunner3 = new TestUnitilsJUnit4TestClassRunner(EmptyTestClass.class);
+        testRunner1.run(new RunNotifier());
+        testRunner2.run(new RunNotifier());
+        testRunner3.run(new RunNotifier());
 
-        for (String element : callStack) {
-            System.out.println(element);
-        }
+        Iterator iterator = callList.iterator();
+        assertEquals("[Unitils] beforeAll", iterator.next());
+
+        assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+        assertEquals("[JUnit]   beforeTestClass   - TestClass1", iterator.next());
+        assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+        assertEquals("[JUnit]   testMethod        - TestClass1 - test1", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
+        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+        assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
+        assertEquals("[JUnit]   testMethod        - TestClass1 - test2", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
+        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+        assertEquals("[JUnit]   afterTestClass    - TestClass1", iterator.next());
+        assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+
+        assertEquals("[Unitils] beforeTestClass   - TestClass2", iterator.next());
+        assertEquals("[JUnit]   beforeTestClass   - TestClass2", iterator.next());
+        assertEquals("[Unitils] beforeTestSetUp   - TestClass2", iterator.next());
+        assertEquals("[JUnit]   testSetUp         - TestClass2", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - TestClass2 - test1", iterator.next());
+        assertEquals("[JUnit]   testMethod        - TestClass2 - test1", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - TestClass2 - test1", iterator.next());
+        assertEquals("[JUnit]   testTearDown      - TestClass2", iterator.next());
+        assertEquals("[Unitils] afterTestTearDown - TestClass2", iterator.next());
+        assertEquals("[Unitils] beforeTestSetUp   - TestClass2", iterator.next());
+        assertEquals("[JUnit]   testSetUp         - TestClass2", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - TestClass2 - test2", iterator.next());
+        assertEquals("[JUnit]   testMethod        - TestClass2 - test2", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - TestClass2 - test2", iterator.next());
+        assertEquals("[JUnit]   testTearDown      - TestClass2", iterator.next());
+        assertEquals("[Unitils] afterTestTearDown - TestClass2", iterator.next());
+        assertEquals("[JUnit]   afterTestClass    - TestClass2", iterator.next());
+        assertEquals("[Unitils] afterTestClass    - TestClass2", iterator.next());
+
+        assertEquals("[Unitils] beforeTestClass   - EmptyTestClass", iterator.next());
+        assertEquals("[Unitils] afterTestClass    - EmptyTestClass", iterator.next());
+
+        // afterAll is called when the runtime exits
+        assertFalse(iterator.hasNext());
     }
 
 
+    /**
+     * JUnit 4 test class containing 2 active and 1 ignored test method
+     */
     public static class TestClass1 extends UnitilsJUnit4 {
 
         @BeforeClass
-        public static void beforeClass() throws Exception {
-            callStack.push("TestClass1.beforeClass");
+        public static void beforeClass() {
+            callList.add("[JUnit]   beforeTestClass   - TestClass1");
         }
 
         @AfterClass
-        public static void afterClass() throws Exception {
-            callStack.push("TestClass1.afterClass");
+        public static void afterClass() {
+            callList.add("[JUnit]   afterTestClass    - TestClass1");
         }
 
         @Before
-        public void setUp() throws Exception {
-            callStack.push("TestClass1.setUp");
+        public void setUp() {
+            callList.add("[JUnit]   testSetUp         - TestClass1");
         }
 
         @After
-        public void tearDown() throws Exception {
-            callStack.push("TestClass1.tearDown");
+        public void tearDown() {
+            callList.add("[JUnit]   testTearDown      - TestClass1");
         }
 
         @Test
         public void test1() {
-            callStack.push("TestClass1.test1");
+            callList.add("[JUnit]   testMethod        - TestClass1 - test1");
         }
 
         @Test
         public void test2() {
-            callStack.push("TestClass1.test2");
+            callList.add("[JUnit]   testMethod        - TestClass1 - test2");
         }
 
+        @Ignore
+        @Test
+        public void test3() {
+            callList.add("[JUnit]   testMethod        - TestClass1 - test2");
+        }
+    }
+
+
+    /**
+     * JUnit 4 test class containing 2 test methods
+     */
+    public static class TestClass2 extends UnitilsJUnit4 {
+
+        @BeforeClass
+        public static void beforeClass() {
+            callList.add("[JUnit]   beforeTestClass   - TestClass2");
+        }
+
+        @AfterClass
+        public static void afterClass() {
+            callList.add("[JUnit]   afterTestClass    - TestClass2");
+        }
+
+        @Before
+        public void setUp() {
+            callList.add("[JUnit]   testSetUp         - TestClass2");
+        }
+
+        @After
+        public void tearDown() {
+            callList.add("[JUnit]   testTearDown      - TestClass2");
+        }
+
+        @Test
+        public void test1() {
+            callList.add("[JUnit]   testMethod        - TestClass2 - test1");
+        }
+
+        @Test
+        public void test2() {
+            callList.add("[JUnit]   testMethod        - TestClass2 - test2");
+        }
+    }
+
+
+    /**
+     * Empty JUnit 4 test class
+     */
+    public static class EmptyTestClass extends UnitilsJUnit4 {
 
     }
 
 
+    /**
+     * Overridden test class runner to be able to use the {@link TracingTestListener} as test listener.
+     */
     private static class TestUnitilsJUnit4TestClassRunner extends UnitilsJUnit4TestClassRunner {
 
         public TestUnitilsJUnit4TestClassRunner(Class<?> testClass) throws InitializationError {
@@ -79,38 +188,54 @@ public class UnitilsJUnit4Test extends TestCase {
     }
 
 
+    /**
+     * Test listener that records all method invocations.
+     */
     private static class TracingTestListener extends TestListener {
 
+        @Override
         public void beforeAll() {
-            callStack.push("beforeAll");
+            callList.add("[Unitils] beforeAll");
         }
 
-        public void beforeTestClass(Object testObject) {
-            callStack.push("beforeTestClass - testObject: " + testObject);
+        @Override
+        public void beforeTestClass(Class testClass) {
+            callList.add("[Unitils] beforeTestClass   - " + getClassName(testClass));
         }
 
+        @Override
         public void beforeTestSetUp(Object testObject) {
-            callStack.push("beforeTestSetUp - testObject: " + testObject);
+            callList.add("[Unitils] beforeTestSetUp   - " + getClassName(testObject));
         }
 
+        @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-            callStack.push("beforeTestMethod - testObject: " + testObject + ", testMethod: " + testMethod);
+            callList.add("[Unitils] beforeTestMethod  - " + getClassName(testObject) + " - " + testMethod.getName());
         }
 
+        @Override
         public void afterTestMethod(Object testObject, Method testMethod) {
-            callStack.push("afterTestMethod - testObject: " + testObject + ", testMethod: " + testMethod);
+            callList.add("[Unitils] afterTestMethod   - " + getClassName(testObject) + " - " + testMethod.getName());
         }
 
+        @Override
         public void afterTestTearDown(Object testObject) {
-            callStack.push("afterTestTearDown - testObject: " + testObject);
+            callList.add("[Unitils] afterTestTearDown - " + getClassName(testObject));
         }
 
-        public void afterTestClass(Object testObject) {
-            callStack.push("afterTestClass - testObject: " + testObject);
+        @Override
+        public void afterTestClass(Class testClass) {
+            callList.add("[Unitils] afterTestClass    - " + getClassName(testClass));
         }
 
+        @Override
         public void afterAll() {
-            callStack.push("afterAll");
+            // called during Runtime exit
+        }
+
+        private String getClassName(Object object) {
+            String className = (object instanceof Class) ? ((Class) object).getName() : object.getClass().getName();
+            return className.substring(className.lastIndexOf('$') + 1);
         }
     }
 

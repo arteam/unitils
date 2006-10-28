@@ -74,11 +74,11 @@ public class DbUnitModule implements Module {
     /**
      * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
      *
-     * @param testObject the test instance, not null
+     * @param testClass the test class, not null
      * @return true if the test class is a database test false otherwise
      */
-    protected boolean isDatabaseTest(Object testObject) {
-        return testObject.getClass().getAnnotation(DatabaseTest.class) != null;
+    protected boolean isDatabaseTest(Class<?> testClass) {
+        return testClass.getAnnotation(DatabaseTest.class) != null;
     }
 
     /**
@@ -352,15 +352,15 @@ public class DbUnitModule implements Module {
         }
 
         @Override
-        public void beforeTestClass(Object testObject) {
-            if (isDatabaseTest(testObject)) {
+        public void beforeTestClass(Class<?> testClass) {
+            if (isDatabaseTest(testClass)) {
                 initDbUnitConnection();
             }
         }
 
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-            if (isDatabaseTest(testObject)) {
+            if (isDatabaseTest(testObject.getClass())) {
                 insertTestData(testObject.getClass(), testMethod);
             }
         }

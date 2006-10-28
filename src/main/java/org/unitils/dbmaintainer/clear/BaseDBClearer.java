@@ -6,19 +6,19 @@
  */
 package org.unitils.dbmaintainer.clear;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbutils.DbUtils;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbutils.DbUtils;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
  * Base implementation of {@link DBClearer}. This implementation uses plain JDBC and standard SQL
@@ -46,7 +46,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Initializes the connection to the database
-     * 
+     *
      * @param configuration
      * @param ds
      * @param sh
@@ -60,7 +60,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Clears the database schema.
-     * 
+     *
      * @throws StatementHandlerException
      */
     public void clearDatabase() throws StatementHandlerException {
@@ -73,7 +73,7 @@ abstract public class BaseDBClearer implements DBClearer {
             dropSequences(conn);
             dropTriggers(conn);
         } catch (SQLException e) {
-            throw new RuntimeException("Error while clearing database", e);
+            throw new UnitilsException("Error while clearing database", e);
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -81,7 +81,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Drops all views.
-     * 
+     *
      * @param conn
      * @throws SQLException
      * @throws StatementHandlerException
@@ -95,7 +95,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Drops all tables.
-     * 
+     *
      * @param conn
      * @throws SQLException
      * @throws StatementHandlerException
@@ -109,7 +109,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Removes the view with the given name from the database
-     * 
+     *
      * @param viewName
      * @throws SQLException
      * @throws StatementHandlerException
@@ -119,7 +119,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Removes the table with the given name from the database
-     * 
+     *
      * @param tableName
      * @throws SQLException
      * @throws StatementHandlerException
@@ -129,7 +129,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Retrieves the names of all the views in the database schema.
-     * 
+     *
      * @param conn
      * @return the names of all views
      * @throws SQLException
@@ -140,7 +140,7 @@ abstract public class BaseDBClearer implements DBClearer {
             List<String> tableNames = new ArrayList<String>();
             DatabaseMetaData databaseMetadata = conn.getMetaData();
             rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null,
-                    new String[] {"VIEW"});
+                    new String[]{"VIEW"});
             while (rset.next()) {
                 String tableName = rset.getString("TABLE_NAME");
                 tableNames.add(tableName);
@@ -153,7 +153,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Retrieves the names of all tables in the database schema.
-     * 
+     *
      * @param conn
      * @return
      * @throws SQLException
@@ -164,7 +164,7 @@ abstract public class BaseDBClearer implements DBClearer {
             List<String> tableNames = new ArrayList<String>();
             DatabaseMetaData databaseMetadata = conn.getMetaData();
             rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null,
-                    new String[] {"TABLE"});
+                    new String[]{"TABLE"});
             while (rset.next()) {
                 String tableName = rset.getString("TABLE_NAME");
                 tableNames.add(tableName);
@@ -177,7 +177,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Drops all sequences in the database
-     * 
+     *
      * @param conn
      * @throws StatementHandlerException
      * @throws SQLException
@@ -187,7 +187,7 @@ abstract public class BaseDBClearer implements DBClearer {
 
     /**
      * Drops all database triggers
-     * 
+     *
      * @param conn
      * @throws StatementHandlerException
      * @throws SQLException
