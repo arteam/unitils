@@ -25,14 +25,23 @@ import org.unitils.util.ReflectionUtils;
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
- * Module that provides basic support for database testing. This module provides the following services to unit tests
+ * Module that provides basic support for database testing.
+ * <p/>
+ * This module only provides services to unit test classes that are annotated with an annotation that identifies it as a
+ * database test. By default, the annotation {@link DatabaseTest} is supported, but other annotations can be added as
+ * well by invoking {@link #registerDatabaseTestAnnotation(Class<? extends java.lang.annotation.Annotation>)}
+ * <p/>
+ * Following services are provided:
  * <ul>
- * <li>Connection pooling: A connection pooled TestDataSource is created, and supplied to methods annotated with
+ * <li>Connection pooling: A connection pooled DataSource is created, and supplied to methods annotated with
  * {@link TestDataSource}</li>
  * <li>A 'current connection' is associated with each thread from which the method #getCurrentConnection is called</li>
  * <li>If the updateDataBaseSchema.enabled property is set to true, the {@link DBMaintainer} is invoked to update the
@@ -73,6 +82,17 @@ public class DatabaseModule implements Module {
     */
     private ThreadLocal<Connection> connectionHolder = new ThreadLocal<Connection>();
 
+    /* Set of annotations that identify a test as a DatabaseTest */
+    private Set<Class<? extends Annotation>> databaseTestAnnotations = new HashSet<Class<? extends Annotation>>();
+
+    /**
+     * Creates a new instance of the module, and registers the {@link DatabaseTest} annotation as an annotation that
+     * identifies a test class as a database test.
+     */
+    public DatabaseModule() {
+        registerDatabaseTestAnnotation(DatabaseTest.class);
+    }
+
     /**
      * Initializes this module using the given <code>Configuration</code>
      *
@@ -83,6 +103,16 @@ public class DatabaseModule implements Module {
 
         disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         updateDatabaseSchemaEnabled = configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED);
+
+    }
+
+    /**
+     * Registers the given annotation as an annotation that identifies a test class as being a database test.
+     * @param databaseTestAnnotation
+     */
+    public void registerDatabaseTestAnnotation(Class<? extends Annotation> databaseTestAnnotation) {
+
+        databaseTestAnnotations.add(databaseTestAnnotation);
     }
 
     /**
@@ -93,7 +123,12 @@ public class DatabaseModule implements Module {
      */
     protected boolean isDatabaseTest(Class<?> testClass) {
 
-        return testClass.getAnnotation(DatabaseTest.class) != null;
+        for (Class<? extends Annotation> databaseTestAnnotation : databaseTestAnnotations) {
+            if (testClass.getAnnotation(databaseTestAnnotation) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -191,8 +226,9 @@ public class DatabaseModule implements Module {
 
             } catch (UnitilsException e) {
 
-                throw new UnitilsException("Unable to assign the TestDataSource to field annotated with @TestDataSource. " +
-                        "Ensure that this field is of type javax.sql.TestDataSource", e);
+                throw new UnitilsException("Unable to assign the DataSource to field annotated with @" +
+                        TestDataSource.class.getSimpleName() + "Ensure that this field is of type " +
+                        DataSource.class.getName(), e);
             }
         }
 
@@ -203,8 +239,9 @@ public class DatabaseModule implements Module {
 
             } catch (UnitilsException e) {
 
-                throw new UnitilsException("Unable to invoke method annotated with @TestDataSource. Ensure that this method has " +
-                        "following signature: void myMethod(javax.sql.TestDataSource dataSource)", e);
+                throw new UnitilsException("Unable to invoke method annotated with @" + TestDataSource.class.getSimpleName() +
+                        " Ensure that this method has following signature: void myMethod(" + DataSource.class.getName() +
+                        " dataSource)", e);
             }
         }
     }
@@ -250,7 +287,10 @@ public class DatabaseModule implements Module {
     }
 
     /**
-     * DatabaseTestListener that makes callbacks to methods of this module while running tests.
+     * TestListener that makes callbacks to methods of this module while running tests. This TestListener makes
+     * sure that before running the first DatabaseTest, the database connection is initialized, and that before doing
+     * the setup of every test, the DataSource is injected to fields and methods annotated with the TestDataSource
+     * annotation.
      */
     private class DatabaseTestListener extends TestListener {
 
@@ -262,8 +302,6 @@ public class DatabaseModule implements Module {
             }
         }
 
-        // todo these calls must be done each time a new test object is created. For JUnit this is before every test
-        // for TestNG this is before every test class.
         @Override
         public void beforeTestSetUp(Object testObject) {
 

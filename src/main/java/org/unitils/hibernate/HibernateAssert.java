@@ -26,27 +26,30 @@ public class HibernateAssert {
 
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method assumes
-     * that the <code>HibernateSessionManager</code> is correctly configured. This is automatically the case when the
-     * <code>BaseHibernateTestCase</code> is used as test superclass.
+     * that the {@link HibernateModule} is enabled and correctly configured.
      */
     public static void assertMappingToDatabase() {
+
         HibernateModule hibernateModule = Unitils.getModulesRepository().getFirstModule(HibernateModule.class);
         Configuration configuration = hibernateModule.getHibernateConfiguration();
         Session session = hibernateModule.getCurrentSession();
+        Dialect databaseDialect = getDatabaseDialect(configuration);
 
-        assertMappingToDatabase(configuration, session);
+        assertMappingToDatabase(configuration, session, databaseDialect);
     }
 
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method does the
-     * same as <code>assertMappingToDatabase</code> without parameters, but can also be used if the
-     * <code>HibernateSessionManager</code> is not used for unit test session management.
+     * same as {@link #assertMappingToDatabase} without parameters, but can also be used without the using the
+     * {@link HibernateModule} or the {@link org.unitils.db.DatabaseModule} (this means it can be used separately without
+     * using any other feature of Unitils).
      *
      * @param configuration
      * @param session
+     * @param databaseDialect
      */
-    public static void assertMappingToDatabase(Configuration configuration, Session session) {
-        String[] script = generateScript(configuration, session);
+    public static void assertMappingToDatabase(Configuration configuration, Session session, Dialect databaseDialect) {
+        String[] script = generateScript(configuration, session, databaseDialect);
 
         List<String> differences = new ArrayList<String>();
         for (String line : script) {
@@ -61,29 +64,14 @@ public class HibernateAssert {
     }
 
     /**
-     * Formats the given list of messages.
-     *
-     * @param messageParts The different parts of the message
-     * @return A formatted message, containing the different message parts.
-     */
-    private static String formatMessage(List<String> messageParts) {
-        StringBuffer message = new StringBuffer();
-        for (String messagePart : messageParts) {
-            message.append(messagePart);
-            message.append(";\n");
-        }
-        return message.toString();
-    }
-
-    /**
      * Generates a <code>String</code> array with DML statements based on the Hibernate mapping files.
      *
+     * @param dialect
      * @param configuration
      * @return String[] array of DDL statements that were needed to keep the database in sync with the mapping file
      */
-    private static String[] generateScript(Configuration configuration, Session session) {
+    private static String[] generateScript(Configuration configuration, Session session, Dialect dialect) {
         try {
-            Dialect dialect = getDatabaseDialect(configuration);
             DatabaseMetadata dbm = new DatabaseMetadata(session.connection(), dialect);
             return configuration.generateSchemaUpdateScript(dialect, dbm);
         } catch (SQLException e) {
@@ -107,6 +95,21 @@ public class HibernateAssert {
         } catch (Exception e) {
             throw new IllegalArgumentException("Could not instantiate dialect class " + dialectClassName, e);
         }
+    }
+
+    /**
+     * Formats the given list of messages.
+     *
+     * @param messageParts The different parts of the message
+     * @return A formatted message, containing the different message parts.
+     */
+    private static String formatMessage(List<String> messageParts) {
+        StringBuffer message = new StringBuffer();
+        for (String messagePart : messageParts) {
+            message.append(messagePart);
+            message.append(";\n");
+        }
+        return message.toString();
     }
 
 }
