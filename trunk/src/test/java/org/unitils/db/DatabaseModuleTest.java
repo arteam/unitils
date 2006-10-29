@@ -43,6 +43,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
             }
         };
 
+        databaseModule.registerDatabaseTestAnnotation(DatabaseTest.class);
         expect(mockDataSource.getConnection()).andStubReturn(mockConnection);
     }
 
