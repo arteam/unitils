@@ -29,6 +29,8 @@ import java.util.*;
  * order C, B, A.
  * <p/>
  * If a circular dependency is found in the runAfter configuration, a runtime exception will be thrown.
+ *
+ * todo only warning if configuration cannot be loaded
  */
 public class ModulesLoader {
 

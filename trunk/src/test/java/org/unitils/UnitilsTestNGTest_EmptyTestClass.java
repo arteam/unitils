@@ -2,6 +2,8 @@ package org.unitils;
 
 import org.unitils.core.TestListener;
 
+import java.util.List;
+
 /**
  * Empty TestNG test class
  * <p/>
@@ -11,8 +13,16 @@ import org.unitils.core.TestListener;
 public class UnitilsTestNGTest_EmptyTestClass extends UnitilsTestNG {
 
 
+    private static List<String> callList;
+
+    public static void setCallList(List<String> list) {
+        callList = list;
+    }
+
+
+    @Override
     protected TestListener createTestListener() {
-        return new UnitilsTestNGTest.TracingTestListener();
+        return new TracingTestListener(callList);
     }
 
 }

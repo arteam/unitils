@@ -1,18 +1,14 @@
 package org.unitils;
 
-import org.testng.annotations.*;
-import org.unitils.core.TestListener;
+import org.junit.*;
 
 import java.util.List;
 
-/**
- * TestNG test class containing 2 test methods
- * <p/>
- * Test class used in the {@link UnitilsTestNGTest} tests.
- * This is a public class because there is a bug in TestNG that does not allow tests on inner classes.
- */
-public class UnitilsTestNGTest_TestClass2 extends UnitilsTestNG {
 
+/**
+ * JUnit 4 test class containing 2 test methods
+ */
+public class UnitilsJUnit4Test_TestClass2 extends UnitilsJUnit4 {
 
     private static List<String> callList;
 
@@ -22,21 +18,21 @@ public class UnitilsTestNGTest_TestClass2 extends UnitilsTestNG {
 
 
     @BeforeClass
-    public void beforeClass() {
+    public static void beforeClass() {
         callList.add("[Test]    beforeTestClass   - TestClass2");
     }
 
     @AfterClass
-    public void afterClass() {
+    public static void afterClass() {
         callList.add("[Test]    afterTestClass    - TestClass2");
     }
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         callList.add("[Test]    testSetUp         - TestClass2");
     }
 
-    @AfterMethod
+    @After
     public void tearDown() {
         callList.add("[Test]    testTearDown      - TestClass2");
     }
@@ -49,11 +45,5 @@ public class UnitilsTestNGTest_TestClass2 extends UnitilsTestNG {
     @Test
     public void test2() {
         callList.add("[Test]    testMethod        - TestClass2 - test2");
-    }
-
-
-    @Override
-    protected TestListener createTestListener() {
-        return new TracingTestListener(callList);
     }
 }

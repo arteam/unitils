@@ -116,12 +116,12 @@ public class EasyMockUnitils {
      * This way, other implementations can be plugged in, while keeping the simplicity of using static methods.
      *
      * @return the instance, not null
-     * @throws org.unitils.core.UnitilsException
-     *          when no such module could be found
+     * @throws UnitilsException when no such module could be found
      */
     private static EasyMockModule getEasyMockModule() {
 
-        EasyMockModule module = Unitils.getModulesRepository().getFirstModule(EasyMockModule.class);
+        Unitils unitils = Unitils.getInstance();
+        EasyMockModule module = unitils.getModulesRepository().getFirstModule(EasyMockModule.class);
         if (module == null) {
 
             throw new UnitilsException("Unable to find an instance of an EasyMockModule in the modules repository.");
