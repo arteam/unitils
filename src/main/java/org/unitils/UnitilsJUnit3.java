@@ -26,6 +26,8 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
     private TestListener testListener;
 
+    private static boolean beforeAllCalled;
+
     private static Class<?> lastTestClass;
 
 
@@ -56,8 +58,10 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
         Class testClass = getClass();
 
-        if (lastTestClass == null) {
+        if (!beforeAllCalled) {
             testListener.beforeAll();
+            beforeAllCalled = true;
+
             createShutdownHook();
         }
 
@@ -69,37 +73,23 @@ public abstract class UnitilsJUnit3 extends TestCase {
             lastTestClass = testClass;
         }
 
+        testListener.beforeTestSetUp(this);
         try {
-            testListener.beforeTestSetUp(this);
-        } catch (Throwable e) {  //todo remove??
-            logger.error(e);
-            throw e;
-        }
-        super.runBare();
-        try {
+            super.runBare();
+
+        } finally {
             testListener.afterTestTearDown(this);
-        } catch (Throwable e) {
-            logger.error(e);
-            throw e;
         }
     }
 
 
     protected void runTest() throws Throwable {
-        try {
-            testListener.beforeTestMethod(this, getCurrentTestMethod());
-        } catch (Throwable e) {
-            logger.error(e);
-            throw e;
-        }
+
+        testListener.beforeTestMethod(this, getCurrentTestMethod());
         super.runTest();
-        try {
-            testListener.afterTestMethod(this, getCurrentTestMethod());
-        } catch (Throwable e) {
-            logger.error(e);
-            throw e;
-        }
+        testListener.afterTestMethod(this, getCurrentTestMethod());
     }
+
 
     protected TestListener createTestListener() {
         return Unitils.getInstance().getTestListener();

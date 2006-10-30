@@ -14,15 +14,14 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.db.DatabaseModule;
-import org.unitils.db.annotations.TestDataSource;
-import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
+import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateTest;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.List;
 
@@ -97,6 +96,7 @@ public class HibernateModule implements Module {
     /**
      * Configurates Hibernate, i.e. creates a Hibernate configuration object, and instantiates the Hibernate
      * <code>SessionFactory</code>. The class-level JavaDoc explains how Hibernate is to be configured.
+     *
      * @param testObject
      */
     protected void configureHibernate(Object testObject) {
@@ -198,11 +198,13 @@ public class HibernateModule implements Module {
 
     /**
      * Retries the currently active <code>Connection</code> to the unit test database
+     *
      * @return the connection to the database
      */
     protected Connection getConnection() {
 
-        DatabaseModule dbModule = Unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
+        Unitils unitils = Unitils.getInstance();
+        DatabaseModule dbModule = unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
         return dbModule.getCurrentConnection();
     }
 
@@ -280,14 +282,15 @@ public class HibernateModule implements Module {
 
         @Override
         public void beforeAll() {
-            DatabaseModule databaseModule = Unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
+            Unitils unitils = Unitils.getInstance();
+            DatabaseModule databaseModule = unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
             databaseModule.registerDatabaseTestAnnotation(HibernateTest.class);
         }
 
         @Override
-        public void beforeTestClass(Class testClass) {
-            if (isHibernateTest(testClass)) {
-                configureHibernate(testClass);
+        public void beforeTestSetUp(Object testObject) {
+            if (isHibernateTest(testObject.getClass())) {
+                configureHibernate(testObject);
             }
         }
 

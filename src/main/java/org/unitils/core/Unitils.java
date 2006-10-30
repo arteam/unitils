@@ -13,13 +13,15 @@ import java.util.List;
 
 /**
  * todo javadoc
+ * <p/>
+ * todo implement module
+ * todo remove test context
  */
 public class Unitils {
 
     private static Unitils unitils = new Unitils();
 
     public static Unitils getInstance() {
-
         return unitils;
     }
 
@@ -31,40 +33,31 @@ public class Unitils {
     //todo javadoc
     private Configuration configuration;
 
-    private ThreadLocal<TestContext> testContextHolder = new ThreadLocal<TestContext>();
+    private TestContext testContext;
 
 
     // Loading core will be done the first time only
     //todo
     public Unitils() {
 
+        testContext = new TestContext();
         testListener = new UnitilsTestListener();
         configuration = createConfiguration();
         modulesRepository = createModulesRepository(configuration);
     }
+
 
     public TestListener getTestListener() {
         return testListener;
     }
 
 
-    public static ModulesRepository getModulesRepository() {
-        return getInstance().getModulesRepositoryImpl();
-    }
-
-
-    public ModulesRepository getModulesRepositoryImpl() {
+    public ModulesRepository getModulesRepository() {
         return modulesRepository;
     }
 
 
     public TestContext getTestContext() {
-
-        TestContext testContext = testContextHolder.get();
-        if (testContext == null) {
-            testContext = new TestContext();
-            testContextHolder.set(testContext);
-        }
         return testContext;
     }
 
