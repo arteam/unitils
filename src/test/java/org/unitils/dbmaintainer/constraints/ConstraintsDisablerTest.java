@@ -50,60 +50,88 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     }
 
     private void createTables() throws SQLException {
-        Connection conn = dataSource.getConnection();
-        Statement st = conn.createStatement();
-        st.execute("create table table1 (col1 varchar(10) primary key, col2 varchar(12) not null)");
-        st.execute("create table table2 (col1 varchar(10), foreign key (col1) references table1(col1))");
-        DbUtils.closeQuietly(conn, st, null);
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            st.execute("create table table1 (col1 varchar(10) primary key, col2 varchar(12) not null)");
+            st.execute("create table table2 (col1 varchar(10), foreign key (col1) references table1(col1))");
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
     }
 
     private void dropTables() throws SQLException {
-        Connection conn = dataSource.getConnection();
-        Statement st = conn.createStatement();
-        st.execute("drop table table2 cascade");
-        st.execute("drop table table1 cascade");
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            st.execute("drop table table2 cascade");
+            st.execute("drop table table1 cascade");
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
     }
 
     public void testDisableConstraints_foreignKey() throws SQLException {
+        Connection conn = null;
         try {
-            Connection conn = dataSource.getConnection();
-            insertForeignKeyViolation(conn);
-            fail("SQLException should have been thrown");
-        } catch (SQLException e) {
-            // Foreign key violation, should throw SQLException
-        }
+            try {
+                conn = dataSource.getConnection();
+                insertForeignKeyViolation(conn);
+                fail("SQLException should have been thrown");
+            } catch (SQLException e) {
+                // Foreign key violation, should throw SQLException
+            }
 
-        constraintsDisabler.disableConstraints();
-        Connection conn = dataSource.getConnection();
-        constraintsDisabler.disableConstraintsOnConnection(conn);
-        // Should not throw exception anymore
-        insertForeignKeyViolation(conn);
+            constraintsDisabler.disableConstraints();
+            constraintsDisabler.disableConstraintsOnConnection(conn);
+            // Should not throw exception anymore
+            insertForeignKeyViolation(conn);
+        } finally {
+            DbUtils.closeQuietly(conn);
+        }
     }
 
     private void insertForeignKeyViolation(Connection conn) throws SQLException {
-        Statement st = conn.createStatement();
-        st.executeUpdate("insert into table2 values ('test')");
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            st.executeUpdate("insert into table2 values ('test')");
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
     }
 
-
     public void testDisableConstraints_notNull() throws SQLException {
+        Connection conn = null;
         try {
-            Connection conn = dataSource.getConnection();
-            insertNotNullViolation(conn);
-            fail("SQLException should have been thrown");
-        } catch (SQLException e) {
-            // Foreign key violation, should throw SQLException
-        }
+            try {
+                conn = dataSource.getConnection();
+                insertNotNullViolation(conn);
+                fail("SQLException should have been thrown");
+            } catch (SQLException e) {
+                // Foreign key violation, should throw SQLException
+            }
 
-        constraintsDisabler.disableConstraints();
-        Connection conn = dataSource.getConnection();
-        constraintsDisabler.disableConstraintsOnConnection(conn);
-        // Should not throw exception anymore
-        insertNotNullViolation(conn);
+            constraintsDisabler.disableConstraints();
+            constraintsDisabler.disableConstraintsOnConnection(conn);
+            // Should not throw exception anymore
+            insertNotNullViolation(conn);
+        } finally {
+            DbUtils.closeQuietly(conn);
+        }
     }
 
     private void insertNotNullViolation(Connection conn) throws SQLException {
-        Statement st = conn.createStatement();
-        st.execute("insert into table1 values ('test', null)");
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            st.execute("insert into table1 values ('test', null)");
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
     }
 }
