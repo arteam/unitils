@@ -12,10 +12,14 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
+ * Tests for the DatabaseModule
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class DatabaseModuleTest extends UnitilsJUnit3 {
 
+    /**
+     * Tested object
+     */
     private DatabaseModule databaseModule;
 
     @LenientMock
@@ -47,14 +51,20 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
         expect(mockDataSource.getConnection()).andStubReturn(mockConnection);
     }
 
+    /**
+     * Tests if isDatabaseTest returns true for a class annotated with DatabaseTest
+     */
     public void testIsDatabaseTest() {
 
         boolean result = databaseModule.isDatabaseTest(DbTest.class);
         assertTrue(result);
     }
 
-    //todo refactor + add tests
-    public void testInitDataSource() throws Exception {
+    /**
+     * Test the injection of the dataSource into a test object
+     * @throws Exception
+     */
+    public void testInjectDataSource() throws Exception {
 
         DbTest dbTest = new DbTest();
         databaseModule.initDatabase(dbTest);
@@ -64,17 +74,29 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
         assertSame(mockDataSource, dbTest.getDataSourceFromField());
     }
 
-
+    /**
+     * Object that plays the role of database test object in this class's tests.
+     */
     @DatabaseTest
     public static class DbTest {
 
+        /**
+         * DataSource that can be injected by calling the method setDataSource
+         */
         private DataSource dataSourceFromMethod;
 
+        /**
+         * Field on which a DataSource should be injected
+         */
         @TestDataSource
         private DataSource dataSourceFromField;
 
+        /**
+         * Method on which a DataSource should be injected
+         * @param dataSource
+         */
         @TestDataSource
-        public void afterCreateDataSource(javax.sql.DataSource dataSource) {
+        public void setDataSource(javax.sql.DataSource dataSource) {
             this.dataSourceFromMethod = dataSource;
         }
 

@@ -16,17 +16,28 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
+ * Test class for the DBCleaner
  */
 @DatabaseTest
 @SuppressWarnings({"UnusedDeclaration"})
 public class DBCleanerTest extends UnitilsJUnit3 {
 
+    /**
+     * Tested object
+     */
     private DBCleaner dbCleaner;
 
+    /**
+     * DataSource for the test database, is injected
+     */
     @TestDataSource
     private DataSource dataSource;
 
-    
+    /**
+     * Test fixture. The DefaultDBCleaner is instantiated and configured. Test tables are created and filled with test
+     * data. One of these tables is configured as 'tabletopreserve'.
+     * @throws Exception
+     */
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -49,6 +60,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Removes the test database tables from the test database, to avoid inference with other tests
+     *
+     * @throws Exception
+     */
     protected void tearDown() throws Exception {
         super.tearDown();
 
@@ -61,6 +77,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Removes the test database tables
+     * @param conn
+     * @throws SQLException
+     */
     private void dropTestTables(Connection conn) throws SQLException {
         Statement st = null;
         try {
@@ -73,42 +94,63 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Tests if the tables that are not configured as tables to preserve are correctly cleaned
+     *
+     * @throws Exception
+     */
     public void testCleanDatabase() throws Exception {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            assertTrue(testDataExists(conn));
+            assertFalse(isEmpty(conn, "tabletoclear"));
             dbCleaner.cleanDatabase();
-            assertFalse(testDataExists(conn));
+            assertTrue(isEmpty(conn, "tabletoclear"));
         } finally {
             DbUtils.closeQuietly(conn);
         }
     }
 
+    /**
+     * Tests if the tables that are configured as tables to preserve are left untouched
+     *
+     * @throws Exception
+     */
     public void testCleanDatabase_preserveDbVersionTable() throws Exception {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            assertTrue(dbVersionDataExists(conn));
+            assertFalse(isEmpty(conn, "db_version"));
             dbCleaner.cleanDatabase();
-            assertTrue(dbVersionDataExists(conn));
+            assertFalse(isEmpty(conn, "db_version"));
         } finally {
             DbUtils.closeQuietly(conn);
         }
     }
 
+    /**
+     * Tests if db_version table is left untouched
+     *
+     * @throws Exception
+     */
     public void testCleanDatabase_preserveTablesToPreserve() throws Exception {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            assertTrue(dataToPreserveExists(conn));
+            assertFalse(isEmpty(conn, "tabletopreserve"));
             dbCleaner.cleanDatabase();
-            assertTrue(dataToPreserveExists(conn));
+            assertFalse(isEmpty(conn, "tabletopreserve"));
         } finally {
             DbUtils.closeQuietly(conn);
         }
     }
 
+    /**
+     * Creates the test tables
+     *
+     * @param conn
+     * @throws SQLException
+     */
     private void createTestTables(Connection conn) throws SQLException {
         Statement st = null;
         try {
@@ -121,6 +163,12 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Inserts a test record in each test table
+     *
+     * @param conn
+     * @throws SQLException
+     */
     private void insertTestData(Connection conn) throws SQLException {
         Statement st = null;
         try {
@@ -133,37 +181,19 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
-    private boolean testDataExists(Connection conn) throws SQLException {
+    /**
+     *
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    private boolean isEmpty(Connection conn, String tableName) throws SQLException {
         Statement st = null;
         ResultSet rs = null;
         try {
             st = conn.createStatement();
-            rs = st.executeQuery("select * from tabletoclear");
-            return rs.next();
-        } finally {
-            DbUtils.closeQuietly(null, st, rs);
-        }
-    }
-
-    private boolean dbVersionDataExists(Connection conn) throws SQLException {
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            st = conn.createStatement();
-            rs = st.executeQuery("select * from db_version");
-            return rs.next();
-        } finally {
-            DbUtils.closeQuietly(null, st, rs);
-        }
-    }
-
-    private boolean dataToPreserveExists(Connection conn) throws SQLException {
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            st = conn.createStatement();
-            rs = st.executeQuery("select * from tabletopreserve");
-            return rs.next();
+            rs = st.executeQuery("select * from " + tableName);
+            return !rs.next();
         } finally {
             DbUtils.closeQuietly(null, st, rs);
         }

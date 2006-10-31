@@ -11,13 +11,15 @@ import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.easymock.annotation.LenientMock;
 
 /**
- * todo fix: injection happens before setUp execution, should be afterwards -> causes tests to fail
+ * Test class for the DbUnitModule
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class DbUnitModuleTest extends UnitilsJUnit3 {
 
+    /**
+     * Tested object
+     */
     private DbUnitModule dbUnitModule;
-
 
     @LenientMock
     private IDatabaseConnection mockDbUnitDatabaseConnection;
@@ -34,7 +36,10 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
     @LenientMock
     private IDataSet mockDbUnitDataSet;
 
-
+    /**
+     * Configures the tested instance. Makes sure it uses the correct mock objects.
+     * @throws Exception
+     */
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -51,13 +56,18 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
         expect(mockModulesRepository.getFirstModule(DatabaseModule.class)).andStubReturn(mockDatabaseModule);
     }
 
-
+    /**
+     * Tests wether the test object is correctly regarded as a database test
+     * @throws Exception
+     */
     public void testIsDatabaseTest() throws Exception {
 
         assertTrue(dbUnitModule.isDatabaseTest(DbTest.class));
     }
 
-
+    /**
+     * Tests that the DbUnitDatabaseConnection is correctly returned
+     */
     public void testInitDbUnitConnection() {
         dbUnitModule.initDbUnitConnection();
         assertSame(mockDbUnitDatabaseConnection, dbUnitModule.getDbUnitDatabaseConnection());

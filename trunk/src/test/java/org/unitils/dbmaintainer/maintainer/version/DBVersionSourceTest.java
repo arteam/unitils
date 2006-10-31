@@ -15,14 +15,15 @@ import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Test class for {@link org.unitils.dbmaintainer.maintainer.version.DBVersionSource}
+ * Test class for {@link org.unitils.dbmaintainer.maintainer.version.DBVersionSource}. The implementation is tested using
+ * a test database. The dbms that is used depends on the database configuration in test/resources/unitils.properties
  */
 @DatabaseTest
 public class DBVersionSourceTest extends UnitilsJUnit3 {
@@ -57,7 +58,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testGetDBVersion_noVersionTable() throws Exception {
-        assertLenEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
+        assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
     }
 
     /**
@@ -67,18 +68,28 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      */
     public void testGetDBVersion_emptyTable() throws Exception {
         clearDBVersionTable();
-        assertLenEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
+        assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
     }
 
+    /**
+     * Test normal retrieval of the version
+     *
+     * @throws Exception
+     */
     public void testGetDBVersion() throws Exception {
         Version expectedVersion = new Version(3L, DateUtils.parseDate("2006-10-08 12:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
-        assertLenEquals(expectedVersion, dbVersionSource.getDbVersion());
+        assertRefEquals(expectedVersion, dbVersionSource.getDbVersion());
     }
 
+    /**
+     * Tests setting the version
+     *
+     * @throws Exception
+     */
     public void testSetDBVersion() throws Exception {
         Version version = new Version(2L, DateUtils.parseDate("2006-10-09 14:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
         dbVersionSource.setDbVersion(version);
-        assertLenEquals(version, dbVersionSource.getDbVersion());
+        assertRefEquals(version, dbVersionSource.getDbVersion());
     }
 
     public void testSetDBVersion_emptyTable() throws Exception {

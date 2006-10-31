@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Filip Neven
+ * Tests the main algorithm of the DBMaintainer, using mocks for all implementation classes.
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class DBMaintainerTest extends UnitilsJUnit3 {
@@ -71,8 +71,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
 
 
     /**
-     * Create an instance of DBMaintainer, linked with mock versions of VersionSource, ScriptSource and
-     * SQLScriptRunner
+     * Create an instance of DBMaintainer
      *
      * @throws Exception
      */
@@ -91,8 +90,8 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
     }
 
     /**
-     * Test the default behavior of the test runner: Check if there are scripts available to increment the version
-     * of the database, execute them, and increment the version.
+     * Tests incremental update of a database: No existing scripts are modified, but new ones are added. The database
+     * is not cleared but the new scripts are executed on by one, incrementing the database version each time.
      */
     public void testDBMaintainer_incremental() throws Exception {
         // Record behavior
@@ -113,8 +112,8 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
     }
 
     /**
-     * Test the default behavior of the test runner: Check if there are scripts available to increment the version
-     * of the database, execute them, and increment the version.
+     * Tests updating the database from scratch: Existing scripts have been modified. The database is cleared first
+     * and all scripts are executed.
      */
     public void testDBMaintainer_fromScratch() throws Exception {
         // Record behavior
