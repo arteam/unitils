@@ -31,13 +31,8 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
     private DBVersionSource dbVersionSource;
 
     /* The dataSource */
-    private javax.sql.DataSource dataSource;
-
-
     @TestDataSource
-    public void setDataSource(javax.sql.DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    private javax.sql.DataSource dataSource;
 
     /**
      * Initialize test fixture

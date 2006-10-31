@@ -83,7 +83,8 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         hibernateModule.configureHibernate(hbnTest);
         hibernateModule.injectHibernateSession(hbnTest);
 
-        assertSame(mockHibernateSession, hbnTest.getSession());
+        assertSame(mockHibernateSession, hbnTest.getSessionMethod());
+        assertSame(mockHibernateSession, hbnTest.getSessionField());
     }
 
 
@@ -105,7 +106,10 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
 
         private Configuration configuration;
 
-        private Session session;
+        @HibernateSession
+        private Session sessionField;
+
+        private Session sessionMethod;
 
         @HibernateConfiguration
         public void configureHibernate(Configuration configuration) {
@@ -114,15 +118,19 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
 
         @HibernateSession
         public void afterCreateHibernateSession(Session session) {
-            this.session = session;
+            this.sessionMethod = session;
         }
 
         public Configuration getConfiguration() {
             return configuration;
         }
 
-        public Session getSession() {
-            return session;
+        public Session getSessionField() {
+            return sessionField;
+        }
+
+        public Session getSessionMethod() {
+            return sessionMethod;
         }
     }
 
