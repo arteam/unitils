@@ -19,17 +19,36 @@ import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.util.ReflectionUtils;
 
 /**
+ * Base test class for the DBClearer. Contains tests that can be implemented generally for all different database dialects.
+ * Extended with implementations for each supported database dialect.
+ * <p/>
+ * Tests are only executed for the currently activated database dialect. By default, a hsqldb in-memory database is used,
+ * to avoid the need for setting up a database instance. If you want to run unit tests for other dbms's, change the
+ * configuration in test/resources/unitils.properties
  */
 @DatabaseTest
 abstract public class DBClearerTest extends UnitilsJUnit3 {
 
+    /**
+     * DataSource for the test database, is injected
+     */
     @TestDataSource
     protected javax.sql.DataSource dataSource;
 
+    /**
+     * Tested object
+     */
     protected DBClearer dbClearer;
 
+    /**
+     * Test database schema name
+     */
     protected String schemaName;
 
+    /**
+     * Configures the tested object. Creates a test table, injex, view and sequence
+     * @throws Exception
+     */
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -59,29 +78,24 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
 
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-       /*Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            dropTestView(conn);
-            dropTestTables(conn);
-        } finally {
-            DbUtils.closeQuietly(conn);
-        }*/
-
-        super.tearDown();
-    }
-
+    /**
+     * Checks if the tables are correctly dropped.
+     *
+     * @throws Exception
+     */
     public void testClearDatabase_tables() throws Exception {
         if (isTestedDialectActivated()) {
             assertTrue(tableExists("testtable1"));
-            assertTrue(tableExists("db_version"));
             dbClearer.clearDatabase();
             assertFalse(tableExists("testtable1"));
         }
     }
 
+    /**
+     * Checks if the views are correctly dropped
+     *
+     * @throws Exception
+     */
     public void testClearDatabase_views() throws Exception {
         if (isTestedDialectActivated()) {
             assertTrue(tableExists("testview"));
@@ -89,18 +103,29 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             assertFalse(tableExists("testview"));
         }
     }
-    
+
+    /**
+     * Creates the test tables
+     *
+     * @param conn
+     * @throws SQLException
+     */
     private void createTestTables(Connection conn) throws SQLException {
         Statement st = null;
         try {
             st = conn.createStatement();
             st.execute("create table testtable1 (col1 varchar(10))");
-            st.execute("create table db_version (col1 varchar(10))");
         } finally {
             DbUtils.closeQuietly(st);
         }
     }
 
+    /**
+     * Creates the test index
+     *
+     * @param conn
+     * @throws SQLException
+     */
     private void createTestIndex(Connection conn) throws SQLException {
         Statement st = null;
         try {
@@ -111,37 +136,46 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
-    private void dropTestTables(Connection conn) throws SQLException {
+    /**
+     * Drops the test tables
+     *
+     * @param conn
+     */
+    private void dropTestTables(Connection conn) {
         Statement st = null;
         try {
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
-            try {
                 st.execute("drop table testtable1");
-            } catch (SQLException e) {
-                // no action taken
-            }
-            try {
-                st.execute("drop table db_version");
-            } catch (SQLException e) {
-                // no action taken
-            }
+        } catch (SQLException e) {
+            // no action taken
         }  finally {
             DbUtils.closeQuietly(st);
         }
     }
 
+    /**
+     * Creates the test view
+     *
+     * @param conn
+     * @throws SQLException
+     */
     private void createTestView(Connection conn) throws SQLException {
         Statement st = null;
         try {
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
-            st.execute("create view testview as select col1 from db_version");
+            st.execute("create view testview as select col1 from testtable1");
         } finally {
             DbUtils.closeQuietly(st);
         }
     }
 
+    /**
+     * Drops the test view
+     *
+     * @param conn
+     */
     private void dropTestView(Connection conn) {
         Statement st = null;
         try {
@@ -155,6 +189,11 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Creates the test sequence
+     *
+     * @param conn
+     */
     private void createTestSequence(Connection conn) {
         Statement st = null;
         try {
@@ -168,6 +207,11 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Drops the test sequence
+     *
+     * @param conn
+     */
     private void dropTestSequence(Connection conn) {
         Statement st = null;
         try {
@@ -181,6 +225,13 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Checks whether the table with the given name exists
+     *
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
     private boolean tableExists(String tableName) throws SQLException {
         Connection conn = null;
         ResultSet rs = null;
@@ -199,5 +250,11 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Checks whether the database dialect that is tested in the current implementation is the currenlty configured
+     * database dialect.
+     *
+     * @return True if the tested dbms is equal to the configured one, false otherwise
+     */
     abstract protected boolean isTestedDialectActivated();
 }

@@ -11,7 +11,7 @@ import org.unitils.easymock.EasyMockTestCase;
 import org.unitils.easymock.annotation.Mock;
 
 /**
- * @author Filip Neven
+ * Tests the SQL script runner
  */
 public class SQLScriptRunnerTest extends EasyMockTestCase {
 

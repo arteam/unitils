@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- *
+ * Test class for the HsqldbSequenceUpdater 
  */
 public class HsqldbSequenceUpdaterTest extends SequenceUpdaterTest {
 

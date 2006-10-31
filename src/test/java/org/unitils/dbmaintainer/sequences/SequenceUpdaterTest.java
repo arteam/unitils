@@ -18,15 +18,36 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.SQLException;
 
+/**
+ * Test class for the SequenceUpdater. Contains tests that can be implemented generally for all different database dialects.
+ * Extended with implementations for each supported database dialect.
+ * <p/>
+ * Tests are only executed for the currently activated database dialect. By default, a hsqldb in-memory database is used,
+ * to avoid the need for setting up a database instance. If you want to run unit tests for other dbms's, change the
+ * configuration in test/resources/unitils.properties
+ */
 @DatabaseTest
 public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     @TestDataSource
     private DataSource dataSource;
 
+    /**
+     * Tested object
+     */
     private SequenceUpdater sequenceUpdater;
+
+    /**
+     * Value that sequences should at least have after updating the sequences
+     */
     private static final int LOWEST_ACCEPTACLE_SEQUENCE_VALUE = 1000;
 
+    /**
+     * Test fixture. Configures the implementation of the SequenceUpdater that matches the currenlty configured dialect.
+     * Creates a test table and test sequence.
+     *
+     * @throws Exception
+     */
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -50,6 +71,11 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Clears the database, to avoid interference with other tests
+     *
+     * @throws Exception
+     */
     protected void tearDown() throws Exception {
         super.tearDown();
         Connection conn = null;
@@ -62,6 +88,11 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Inserts a test record
+     *
+     * @param conn
+     */
     private void insertTestRecord(Connection conn) {
         Statement st = null;
         try {
@@ -75,6 +106,11 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Creates a test table
+     *
+     * @param conn
+     */
     private void createTestTable(Connection conn) {
         Statement st = null;
         try {
@@ -88,6 +124,11 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Drops the test table
+     *
+     * @param conn
+     */
     private void dropTestTable(Connection conn) {
         Statement st = null;
         try {
@@ -101,6 +142,11 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Creates a test sequence
+     *
+     * @param conn
+     */
     private void createTestSequence(Connection conn) {
         Statement st = null;
         try {
@@ -114,6 +160,11 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Drops the test sequence
+     *
+     * @param conn
+     */
     private void dropTestSequence(Connection conn) {
         Statement st = null;
         try {
@@ -127,6 +178,11 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Tests the update sequences behavior
+     *
+     * @throws Exception
+     */
     public void testUpdateSequences() throws Exception {
         Connection conn = null;
         try {
@@ -141,6 +197,7 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     /**
      * Verifies that if a sequence has a value already high enough, the value is not being set to a lower value
+     *
      * @throws Exception
      */
     public void testUpdateSequences_valueAlreadyHighEnough() throws Exception {
@@ -156,6 +213,12 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Abstract method, since it is dbms dependent
+     * @param conn
+     * @return The next value of the test sequence
+     * @throws SQLException
+     */
     protected abstract long getNextSequenceValue(Connection conn) throws SQLException;
 
 }

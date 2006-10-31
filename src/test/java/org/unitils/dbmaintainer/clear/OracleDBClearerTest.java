@@ -12,10 +12,15 @@ import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbmaintainer.clear.DBClearerTest;
 
 /**
- * 
+ * DbClearer test for an Oracle database
  */
 public class OracleDBClearerTest extends DBClearerTest {
 
+    /**
+     *
+     *
+     * @throws Exception
+     */
     @Override
     protected void setUp() throws Exception {
         if (isTestedDialectActivated()) {
@@ -27,11 +32,7 @@ public class OracleDBClearerTest extends DBClearerTest {
                 if (triggerExists(conn)) {
                     dropTestTrigger(conn);
                 }
-                if (sequenceExists(conn)) {
-                    dropTestSequence(conn);
-                }
                 createTestTrigger(conn);
-                createTestSequence(conn);
             } finally {
                 DbUtils.closeQuietly(conn);
             }
@@ -89,26 +90,6 @@ public class OracleDBClearerTest extends DBClearerTest {
         try {
             st = conn.createStatement();
             st.execute("drop trigger testtrigger");
-        } finally {
-            DbUtils.closeQuietly(st);
-        }
-    }
-
-    private void createTestSequence(Connection conn) throws SQLException {
-        Statement st = null;
-        try {
-            st = conn.createStatement();
-            st.execute("create sequence testsequence");
-        } finally {
-            DbUtils.closeQuietly(st);
-        }
-    }
-
-    private void dropTestSequence(Connection conn) throws SQLException {
-        Statement st = null;
-        try {
-            st = conn.createStatement();
-            st.execute("drop sequence testsequence");
         } finally {
             DbUtils.closeQuietly(st);
         }
