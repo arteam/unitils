@@ -14,11 +14,14 @@ import org.unitils.hibernate.annotation.HibernateTest;
 import java.sql.Connection;
 
 /**
- * todo javadoc
+ * Test class for the HibernateModule
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class HibernateModuleTest extends UnitilsJUnit3 {
 
+    /**
+     * Tested object
+     */
     private HibernateModule hibernateModule;
 
     @LenientMock
@@ -28,14 +31,22 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
     private SessionFactory mockHibernateSessionFactory;
 
     @LenientMock
-    private org.hibernate.classic.Session mockHibernateSession;
+    private Session mockHibernateSession;
 
     @LenientMock
     private Connection mockConnection;
 
+    /**
+     * Fake unit test
+     */
     protected HbnTest hbnTest;
 
-
+    /**
+     * Test fixture. Intialize HibernateModule, that creates a mock Hibernate Configuration and uses a mock
+     * database connection.
+     *
+     * @throws Exception
+     */
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -55,13 +66,19 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         hbnTest = new HbnTest();
     }
 
-
+    /**
+     * Tests whether the isHibernateTest returns true when passing a class annotated with @HibernateTest
+     */
     public void testIsHibernateTest() {
 
         assertTrue(hibernateModule.isHibernateTest(HbnTest.class));
     }
 
-
+    /**
+     * Tests the configuration of Hibernate: Verifies that the session factory is built and a session is opened, and
+     * that methods on the test object that are annotated with @HibernateConfiguration are called with the correct
+     * Hibernate Configuration object
+     */
     public void testConfigureHibernate() {
 
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
@@ -73,8 +90,11 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         assertSame(mockHibernateConfiguration, hbnTest.getConfiguration());
     }
 
-
-    public void testCreateSession() {
+    /**
+     * Tests hibernate session injection: A Hibernate Session must be retrieved from the Hibernate SessionManager
+     * and injected into the testobject's fields and methods that are annotated with @HibernateSession
+     */
+    public void testInjectHibernateSession() {
 
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
         expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
@@ -87,7 +107,9 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         assertSame(mockHibernateSession, hbnTest.getSessionField());
     }
 
-
+    /**
+     * Tests the correct closing of the active Hibernate Session
+     */
     public void testCloseSession() {
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
         expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
@@ -100,7 +122,10 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         hibernateModule.closeHibernateSession();
     }
 
-
+    /**
+     * Fake test class. Contains field and method annotated with @HibernateSession (session should be injected) and
+     * a method annotated with @HibernateConfiguration (should be called when configuring Hibernate)
+     */
     @HibernateTest
     public static class HbnTest {
 

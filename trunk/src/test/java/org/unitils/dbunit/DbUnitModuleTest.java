@@ -17,6 +17,31 @@ import org.unitils.easymock.annotation.LenientMock;
 public class DbUnitModuleTest extends UnitilsJUnit3 {
 
     /**
+     * Temp dir where test script files are put during the tests
+     */
+    private static final String DBCHANGE_FILE_DIRECTORY = System.getProperty("java.io.tmpdir") + "/FileScriptSourceTest/";
+
+    /**
+     * First test script file
+     */
+    private static final String DBCHANGE_FILE1 = "001_script.sql";
+
+    /**
+     * Second test script file
+     */
+    private static final String DBCHANGE_FILE2 = "002_script.sql";
+
+    /**
+     * Path of first test script file on the file system
+     */
+    private static final String DBCHANGE_FILE1_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE1;
+
+    /**
+     * Path of second test script file on the file system
+     */
+    private static final String DBCHANGE_FILE2_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE2;
+
+    /**
      * Tested object
      */
     private DbUnitModule dbUnitModule;
@@ -75,9 +100,10 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
 
 
     //Todo implement
-    public void testInsertTestData() throws Exception {
+    public void testInsertTestData_noDbUnitDataSetAnnotation() throws Exception {
 
         dbUnitModule.insertTestData(DbTest.class, DbTest.class.getDeclaredMethod("testMethod"));
+
     }
 
 

@@ -45,6 +45,9 @@ public class FileScriptSourceTest extends TestCase {
      */
     private static final String DBCHANGE_FILE2_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE2;
 
+    /**
+     * Version objects: represent the different versions of the scripts and the database
+     */
     private Version versionIndex0, versionIndex1, versionIndex2, versionTimestampOld;
 
     /**
