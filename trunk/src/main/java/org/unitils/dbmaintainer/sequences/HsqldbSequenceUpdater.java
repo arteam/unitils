@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.handler.StatementHandler;
@@ -24,8 +25,14 @@ import javax.sql.DataSource;
 
 /**
  * Implementation of {@link SequenceUpdater} for an Hsqldb database
+ *
+ * // todo javadoc
+ * // todo finish updating of identity columns
+ * // todo test
  */
 public class HsqldbSequenceUpdater extends BaseSequenceUpdater {
+
+    Logger logger = Logger.getLogger(HsqldbSequenceUpdater.class);
 
     public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         super.init(configuration, dataSource, statementHandler);
@@ -42,7 +49,7 @@ public class HsqldbSequenceUpdater extends BaseSequenceUpdater {
             String dummyTableName = createDummyTableWithDummyRecord(conn);
             incrementSequencesWithLowValue(conn, dummyTableName);
             dropTable(conn, dummyTableName);
-//            incrementIdentityColumnsWithLowValue(conn);
+            incrementIdentityColumnsWithLowValue(conn);
         } catch (SQLException e) {
             throw new UnitilsException("Error while updating sequences", e);
         } finally {
@@ -161,6 +168,51 @@ public class HsqldbSequenceUpdater extends BaseSequenceUpdater {
      */
     private void incrementSequence(String sequenceName) throws StatementHandlerException {
         statementHandler.handle("alter sequence " + sequenceName + " restart with " + lowestAcceptableSequenceValue);
+    }
+
+    private void incrementIdentityColumnsWithLowValue(Connection conn) throws SQLException {
+        List<String> tableNames = getTableNames(conn);
+        for (String tableName : tableNames) {
+            List<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName);
+            if (primaryKeyColumnNames.size() == 1 && isNumericColumn(conn, tableName, primaryKeyColumnNames.get(0)) &&
+                    getMaxValueForColumn(conn, tableName, primaryKeyColumnNames.get(0))) {
+                try {
+                    statementHandler.handle("alter table " + tableName + " alter column " + " RESTART WITH " + lowestAcceptableSequenceValue);
+                } catch (StatementHandlerException e) {
+                    logger.info("Column " + primaryKeyColumnNames.get(0) + " on table " + tableName + " is apperantly " +
+                            "not an identity column");
+                }
+            }
+        }
+    }
+
+    private List<String> getPrimaryKeyColumnNames(String tableName) {
+        return null; // todo
+    }
+
+    private boolean isNumericColumn(Connection conn, String tableName, String s) {
+        return false;  // todo
+    }
+
+    private boolean getMaxValueForColumn(Connection conn, String tableName, String s) {
+        return false;  // todo
+    }
+
+    private List<String> getTableNames(Connection conn) throws SQLException {
+        ResultSet rset = null;
+        try {
+            List<String> tableNames = new ArrayList<String>();
+            DatabaseMetaData databaseMetadata = conn.getMetaData();
+            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null,
+                    new String[]{"TABLE"});
+            while (rset.next()) {
+                String tableName = rset.getString("TABLE_NAME");
+                tableNames.add(tableName);
+            }
+            return tableNames;
+        } finally {
+            DbUtils.closeQuietly(rset);
+        }
     }
 
 }
