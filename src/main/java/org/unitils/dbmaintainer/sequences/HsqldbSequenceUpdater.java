@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.configuration.Configuration;
@@ -175,7 +176,7 @@ public class HsqldbSequenceUpdater extends BaseSequenceUpdater {
         for (String tableName : tableNames) {
             List<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName);
             if (primaryKeyColumnNames.size() == 1 && isNumericColumn(conn, tableName, primaryKeyColumnNames.get(0)) &&
-                    getMaxValueForColumn(conn, tableName, primaryKeyColumnNames.get(0))) {
+                    getMaxValueForColumn(conn, tableName, primaryKeyColumnNames.get(0)) < lowestAcceptableSequenceValue) {
                 try {
                     statementHandler.handle("alter table " + tableName + " alter column " + " RESTART WITH " + lowestAcceptableSequenceValue);
                 } catch (StatementHandlerException e) {
@@ -187,15 +188,15 @@ public class HsqldbSequenceUpdater extends BaseSequenceUpdater {
     }
 
     private List<String> getPrimaryKeyColumnNames(String tableName) {
-        return null; // todo
+        return Collections.emptyList(); // todo
     }
 
     private boolean isNumericColumn(Connection conn, String tableName, String s) {
         return false;  // todo
     }
 
-    private boolean getMaxValueForColumn(Connection conn, String tableName, String s) {
-        return false;  // todo
+    private long getMaxValueForColumn(Connection conn, String tableName, String s) {
+        return 0L;  // todo
     }
 
     private List<String> getTableNames(Connection conn) throws SQLException {
