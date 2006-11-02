@@ -55,7 +55,7 @@ abstract public class BaseDBClearer implements DBClearer {
         this.dataSource = ds;
         this.statementHandler = sh;
 
-        schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
+        schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
     }
 
     /**

@@ -25,4 +25,8 @@ public class Version {
         return timeStamp;
     }
 
+    public String toString() {
+        return "Index " + index + "; timestamp = " + timeStamp;
+    }
+
 }

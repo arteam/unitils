@@ -167,7 +167,7 @@ public class FileScriptSourceTest extends TestCase {
         assertRefEquals(new VersionScriptPair(new Version(1L, file2Timestamp), "Contents of script 1"), versionScriptPair);
     }
 
-     /**
+    /**
      * Checks if script 1 is returned with the correct version
      *
      * @param versionScriptPair

@@ -50,6 +50,8 @@ import org.unitils.util.ReflectionUtils;
  * To obtain a properly configured <code>DBMaintainer</code>, invoke the contructor
  * {@link #DBMaintainer(Configuration, DataSource)} with a <code>TestDataSource</code> providing access
  * to the database and a <code>Configuration</code> object containing all necessary properties.
+ *
+ * todo clear database before updating
  */
 public class DBMaintainer {
 
@@ -180,29 +182,48 @@ public class DBMaintainer {
      */
     public void updateDatabase() throws StatementHandlerException {
         Version currentVersion = versionSource.getDbVersion();
-        List<VersionScriptPair> versionScriptPairs;
-        if (scriptSource.existingScriptsModified(currentVersion)) {
-            if (!fromScratchEnabled) {
-                throw new UnitilsException("Existing database update scripts have been modified, but updating " +
-                        "from scratch is disabled");
+        boolean rebuildDatabaseFromScratch = false;
+        if (!versionSource.lastUpdateSucceeded()) {
+            if (fromScratchEnabled) {
+                logger.info("Last update didn't succeed. Database will be cleared and rebuilt from scratch");
+                rebuildDatabaseFromScratch = true;
+            } else {
+                logger.warn("Last update didn't succeed, but updating the database from scratch is not enabled. Trying" +
+                        " incremental update anyway");
             }
+        } else {
+            if (scriptSource.existingScriptsModified(currentVersion)) {
+                if (fromScratchEnabled) {
+                    rebuildDatabaseFromScratch = true;
+                } else {
+                    throw new UnitilsException("Existing database update scripts have been modified, but updating " +
+                            "from scratch is disabled");
+                }
+            }
+        }
+
+        List<VersionScriptPair> versionScriptPairs;
+        if (rebuildDatabaseFromScratch) {
             dbClearer.clearDatabase();
             versionScriptPairs = scriptSource.getAllScripts();
         } else {
             versionScriptPairs = scriptSource.getNewScripts(currentVersion);
         }
+
         if (versionScriptPairs.size() > 0) {
             for (VersionScriptPair versionScriptPair : versionScriptPairs) {
                 try {
                     scriptRunner.execute(versionScriptPair.getScript());
                 } catch (StatementHandlerException e) {
-                    logger.error("Error while executing script: " + versionScriptPair + "\nDatabase version not incremented", e);
+                    logger.error("Error while executing script: " + versionScriptPair.getScript() + "\nDatabase version not incremented", e);
                     logger.error("Current database version is " + versionSource.getDbVersion());
+                    versionSource.registerUpdateSucceeded(false);
                     throw e;
                 }
                 versionSource.setDbVersion(versionScriptPair.getVersion());
                 logger.info("Database version incremented to " + versionScriptPair.getVersion());
             }
+            versionSource.registerUpdateSucceeded(true);
             if (constraintsDisabler != null) {
                 constraintsDisabler.disableConstraints();
             }
