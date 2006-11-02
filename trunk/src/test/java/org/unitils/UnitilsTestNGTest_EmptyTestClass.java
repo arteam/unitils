@@ -2,27 +2,24 @@ package org.unitils;
 
 import org.unitils.core.TestListener;
 
-import java.util.List;
-
 /**
  * Empty TestNG test class
  * <p/>
- * Test class used in the {@link org.unitils.UnitilsTestNGTest} tests.
+ * Test class used in the {@link UnitilsInvocationTest} tests.
  * This is a public class because there is a bug in TestNG that does not allow tests on inner classes.
  */
 public class UnitilsTestNGTest_EmptyTestClass extends UnitilsTestNG {
 
 
-    private static List<String> callList;
+    private static TracingTestListener tracingTestListener;
 
-    public static void setCallList(List<String> list) {
-        callList = list;
+    public static void setTracingTestListener(TracingTestListener testListener) {
+        tracingTestListener = testListener;
     }
-
 
     @Override
     protected TestListener createTestListener() {
-        return new TracingTestListener(callList);
+        return tracingTestListener;
     }
 
 }

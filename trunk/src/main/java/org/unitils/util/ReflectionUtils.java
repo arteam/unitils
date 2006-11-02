@@ -202,20 +202,19 @@ public class ReflectionUtils {
 
 
     /**
-     * From the given class, returns the setter for the property with the given name and type. If isStatic == true,
+     * From the given class, returns the setter for the property with the given name and 1 argument. If isStatic == true,
      * a static setter is searched. If no such setter exists in the given class, null is returned
      *
      * @param clazz        the class to get the setter from, not null
      * @param propertyName the name of the property, not null
-     * @param type         the type of the property, not null
      * @param isStatic     true if a static setter is to be returned, false for non-static
      * @return the setter method that matches the given parameters, null if not found
      */
-    public static Method getSetter(Class clazz, String propertyName, Class type, boolean isStatic) {
+    public static Method getSetter(Class clazz, String propertyName, boolean isStatic) {
         String setterName = "set" + StringUtils.capitalize(propertyName);
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method method : declaredMethods) {
-            if (isSetter(method) && setterName.equals(method.getName()) && method.getParameterTypes()[0].isAssignableFrom(type)
+            if (isSetter(method) && setterName.equals(method.getName())
                     && isStatic == Modifier.isStatic(method.getModifiers())) {
                 return method;
             }

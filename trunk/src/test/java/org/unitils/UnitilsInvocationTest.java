@@ -11,10 +11,9 @@ import org.junit.runner.notification.RunNotifier;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
 import org.unitils.core.TestListener;
+import org.unitils.inject.util.InjectionUtils;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * todo javadoc
@@ -24,25 +23,29 @@ import java.util.List;
 public class UnitilsInvocationTest extends TestCase {
 
 
-    /* List that will contain a string representation of each method call */
-    private List<String> callList;
+    /* Listener that records all test method invocations */
+    private TracingTestListener tracingTestListener;
 
 
     protected void setUp() throws Exception {
         super.setUp();
-        callList = new ArrayList<String>();
+        tracingTestListener = new TracingTestListener();
 
-        TracingTestListener tracingTestListener = new TracingTestListener(callList);
+        // clear state so that beforeAll is called
+        InjectionUtils.injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
+        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
+        InjectionUtils.injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
+
         UnitilsJUnit3Test_TestClass1.setTracingTestListener(tracingTestListener);
         UnitilsJUnit3Test_TestClass2.setTracingTestListener(tracingTestListener);
         UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(tracingTestListener);
 
-        UnitilsJUnit4Test_TestClass1.setCallList(callList);
-        UnitilsJUnit4Test_TestClass2.setCallList(callList);
+        UnitilsJUnit4Test_TestClass1.setTracingTestListener(tracingTestListener);
+        UnitilsJUnit4Test_TestClass2.setTracingTestListener(tracingTestListener);
 
-        UnitilsTestNGTest_TestClass1.setCallList(callList);
-        UnitilsTestNGTest_TestClass2.setCallList(callList);
-        UnitilsTestNGTest_EmptyTestClass.setCallList(callList);
+        UnitilsTestNGTest_TestClass1.setTracingTestListener(tracingTestListener);
+        UnitilsTestNGTest_TestClass2.setTracingTestListener(tracingTestListener);
+        UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(tracingTestListener);
     }
 
 
@@ -68,7 +71,7 @@ public class UnitilsInvocationTest extends TestCase {
         TestRunner testRunner = new TestRunner();
         TestResult testResult = testRunner.doRun(suite);
 
-        assertInvocationOrder("JUnit3", callList);
+        assertInvocationOrder("JUnit3", tracingTestListener);
 
         // EmptyTestClass has caused a failure and will not be run
         assertEquals(0, testResult.errorCount());
@@ -95,7 +98,7 @@ public class UnitilsInvocationTest extends TestCase {
         testRunner2.run(runNotifier);
         testRunner3.run(runNotifier);
 
-        assertInvocationOrder("JUnit4", callList);
+        assertInvocationOrder("JUnit4", tracingTestListener);
 
         // EmptyTestClass has caused a failure
         assertEquals(1, failureRunListener.getFailureCount());
@@ -117,14 +120,14 @@ public class UnitilsInvocationTest extends TestCase {
         testng.addListener(testListenerAdapter);
         testng.run();
 
-        assertInvocationOrder("TestNG", callList);
+        assertInvocationOrder("TestNG", tracingTestListener);
 
         assertEquals(0, testListenerAdapter.getFailedTests().size());
     }
 
 
-    private void assertInvocationOrder(String type, List<String> callList) {
-        Iterator iterator = callList.iterator();
+    private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
 
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
@@ -198,7 +201,7 @@ public class UnitilsInvocationTest extends TestCase {
         }
 
         public TestListener createTestListener() {
-            return new TracingTestListener(callList);
+            return tracingTestListener;
         }
     }
 

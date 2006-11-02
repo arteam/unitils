@@ -17,6 +17,9 @@ public class UnitilsJUnit3Test_EmptyTestClass extends UnitilsJUnit3 {
 
     @Override
     protected TestListener createTestListener() {
-        return tracingTestListener;
+        if (tracingTestListener != null) {
+            return tracingTestListener;
+        }
+        return super.createTestListener();
     }
 }

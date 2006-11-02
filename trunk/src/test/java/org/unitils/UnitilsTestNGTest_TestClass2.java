@@ -3,57 +3,55 @@ package org.unitils;
 import org.testng.annotations.*;
 import org.unitils.core.TestListener;
 
-import java.util.List;
-
 /**
  * TestNG test class containing 2 test methods
  * <p/>
- * Test class used in the {@link UnitilsTestNGTest} tests.
+ * Test class used in the {@link UnitilsInvocationTest} tests.
  * This is a public class because there is a bug in TestNG that does not allow tests on inner classes.
  */
 public class UnitilsTestNGTest_TestClass2 extends UnitilsTestNG {
 
 
-    private static List<String> callList;
+    private static TracingTestListener tracingTestListener;
 
-    public static void setCallList(List<String> list) {
-        callList = list;
+    public static void setTracingTestListener(TracingTestListener testListener) {
+        tracingTestListener = testListener;
     }
 
 
     @BeforeClass
     public void beforeClass() {
-        callList.add("[Test]    beforeTestClass   - TestClass2");
+        tracingTestListener.addTestInvocation("beforeTestClass", this, null);
     }
 
     @AfterClass
     public void afterClass() {
-        callList.add("[Test]    afterTestClass    - TestClass2");
+        tracingTestListener.addTestInvocation("afterTestClass", this, null);
     }
 
     @BeforeMethod
     public void setUp() {
-        callList.add("[Test]    testSetUp         - TestClass2");
+        tracingTestListener.addTestInvocation("testSetUp", this, null);
     }
 
     @AfterMethod
     public void tearDown() {
-        callList.add("[Test]    testTearDown      - TestClass2");
+        tracingTestListener.addTestInvocation("testTearDown", this, null);
     }
 
     @Test
     public void test1() {
-        callList.add("[Test]    testMethod        - TestClass2 - test1");
+        tracingTestListener.addTestInvocation("testMethod", this, "test1");
     }
 
     @Test
     public void test2() {
-        callList.add("[Test]    testMethod        - TestClass2 - test2");
+        tracingTestListener.addTestInvocation("testMethod", this, "test2");
     }
 
 
     @Override
     protected TestListener createTestListener() {
-        return new TracingTestListener(callList);
+        return tracingTestListener;
     }
 }

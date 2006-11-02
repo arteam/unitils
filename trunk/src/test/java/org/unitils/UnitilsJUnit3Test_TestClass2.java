@@ -16,26 +16,29 @@ public class UnitilsJUnit3Test_TestClass2 extends UnitilsJUnit3 {
 
     protected void setUp() throws Exception {
         super.setUp();
-        tracingTestListener.addTestInvocation("[Test]    testSetUp         - TestClass2");
+        tracingTestListener.addTestInvocation("testSetUp", this, null);
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        tracingTestListener.addTestInvocation("[Test]    testTearDown      - TestClass2");
+        tracingTestListener.addTestInvocation("testTearDown", this, null);
     }
 
     public void test1() {
-        tracingTestListener.addTestInvocation("[Test]    testMethod        - TestClass2 - test1");
+        tracingTestListener.addTestInvocation("testMethod", this, "test1");
     }
 
     public void test2() {
-        tracingTestListener.addTestInvocation("[Test]    testMethod        - TestClass2 - test2");
+        tracingTestListener.addTestInvocation("testMethod", this, "test2");
     }
 
 
     @Override
     protected TestListener createTestListener() {
-        return tracingTestListener;
+        if (tracingTestListener != null) {
+            return tracingTestListener;
+        }
+        return super.createTestListener();
     }
 }
 
