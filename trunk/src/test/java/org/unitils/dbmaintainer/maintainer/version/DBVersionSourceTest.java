@@ -15,6 +15,7 @@ import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 
 import java.sql.Connection;
@@ -92,9 +93,24 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         assertRefEquals(version, dbVersionSource.getDbVersion());
     }
 
+    /**
+     * Tests whether the dbVersion can be correctly set when the db_version table is empty
+     *
+     * @throws Exception
+     */
     public void testSetDBVersion_emptyTable() throws Exception {
         clearDBVersionTable();
         testSetDBVersion();
+    }
+
+    public void testRegisterUpdateSucceeded_succeeded() throws Exception {
+        dbVersionSource.registerUpdateSucceeded(true);
+        assertTrue(dbVersionSource.lastUpdateSucceeded());
+    }
+
+    public void testRegisterUpdateSucceeded_notSucceeded() throws Exception {
+        dbVersionSource.registerUpdateSucceeded(false);
+        assertFalse(dbVersionSource.lastUpdateSucceeded());
     }
 
     /**

@@ -38,4 +38,17 @@ public interface VersionSource {
      * @param version The new version that the database should be updated to
      */
     void setDbVersion(Version version) throws StatementHandlerException;
+
+    /**
+     * Tells us whether the last database version update succeeded or not
+     *
+     * @return true if the last database version update succeeded, false otherwise
+     */
+    boolean lastUpdateSucceeded();
+
+    /**
+     * Notifies the VersionSource of the fact that the lastest version update has succeeded (succeeded == true) or
+     * failed (succeeded = false)
+     */
+    void registerUpdateSucceeded(boolean succeeded) throws StatementHandlerException;
 }
