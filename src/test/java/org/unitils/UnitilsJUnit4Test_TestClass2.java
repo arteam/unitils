@@ -2,48 +2,46 @@ package org.unitils;
 
 import org.junit.*;
 
-import java.util.List;
-
 
 /**
  * JUnit 4 test class containing 2 test methods
  */
 public class UnitilsJUnit4Test_TestClass2 extends UnitilsJUnit4 {
 
-    private static List<String> callList;
+    private static TracingTestListener tracingTestListener;
 
-    public static void setCallList(List<String> list) {
-        callList = list;
+    public static void setTracingTestListener(TracingTestListener testListener) {
+        tracingTestListener = testListener;
     }
 
 
     @BeforeClass
     public static void beforeClass() {
-        callList.add("[Test]    beforeTestClass   - TestClass2");
+        tracingTestListener.addTestInvocation("beforeTestClass", UnitilsJUnit4Test_TestClass2.class, null);
     }
 
     @AfterClass
     public static void afterClass() {
-        callList.add("[Test]    afterTestClass    - TestClass2");
+        tracingTestListener.addTestInvocation("afterTestClass", UnitilsJUnit4Test_TestClass2.class, null);
     }
 
     @Before
     public void setUp() {
-        callList.add("[Test]    testSetUp         - TestClass2");
+        tracingTestListener.addTestInvocation("testSetUp", this, null);
     }
 
     @After
     public void tearDown() {
-        callList.add("[Test]    testTearDown      - TestClass2");
+        tracingTestListener.addTestInvocation("testTearDown", this, null);
     }
 
     @Test
     public void test1() {
-        callList.add("[Test]    testMethod        - TestClass2 - test1");
+        tracingTestListener.addTestInvocation("testMethod", this, "test1");
     }
 
     @Test
     public void test2() {
-        callList.add("[Test]    testMethod        - TestClass2 - test2");
+        tracingTestListener.addTestInvocation("testMethod", this, "test2");
     }
 }

@@ -173,7 +173,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      * Test for getting a setter of a property.
      */
     public void testGetSetter() {
-        Method method = ReflectionUtils.getSetter(TestObject.class, "stringField", String.class, false);
+        Method method = ReflectionUtils.getSetter(TestObject.class, "stringField", false);
         assertPropertyLenEquals("name", "setStringField", method);
     }
 
@@ -182,17 +182,8 @@ public class ReflectionUtilsTypesTest extends TestCase {
      * Test for getting a setter of a static property.
      */
     public void testGetSetter_static() {
-        Method method = ReflectionUtils.getSetter(TestObject.class, "staticStringField", String.class, true);
+        Method method = ReflectionUtils.getSetter(TestObject.class, "staticStringField", true);
         assertPropertyLenEquals("name", "setStaticStringField", method);
-    }
-
-
-    /**
-     * Test for getting a setter of a property with a wrong type. Null should be returned.
-     */
-    public void testGetSetter_wrongType() {
-        Method method = ReflectionUtils.getSetter(TestObject.class, "stringField", Integer.class, false);
-        assertNull(method);
     }
 
 
@@ -200,7 +191,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
      * Test for getting a setter of an unexisting property. Null should be returned.
      */
     public void testGetSetter_unexistingField() {
-        Method method = ReflectionUtils.getSetter(TestObject.class, "xxxx", String.class, false);
+        Method method = ReflectionUtils.getSetter(TestObject.class, "xxxx", false);
         assertNull(method);
     }
 

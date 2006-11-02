@@ -15,8 +15,6 @@ import org.unitils.core.Unitils;
 
 /**
  * todo javadoc
- * <p/>
- * todo implement
  */
 public abstract class UnitilsTestNG implements IHookable {
 

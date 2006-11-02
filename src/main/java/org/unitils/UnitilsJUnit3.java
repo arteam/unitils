@@ -8,7 +8,6 @@ package org.unitils;
 
 import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
@@ -16,13 +15,10 @@ import org.unitils.core.UnitilsException;
 import java.lang.reflect.Method;
 
 /**
- * todo test logging of exceptions in different hook methods (already fixed in runbare: exceptions were not logged)
- * javadoc
+ * todo javadoc
  */
 public abstract class UnitilsJUnit3 extends TestCase {
 
-    /* Logger */
-    private static final Logger logger = Logger.getLogger(UnitilsJUnit3.class);
 
     private TestListener testListener;
 

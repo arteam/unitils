@@ -45,7 +45,7 @@ public class ModulesLoaderTest extends TestCase {
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "c" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "a");
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "d" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModuleD.class.getName());
 
-        new InjectionUtils().injectStatic(configuration, Unitils.class, "unitils.configuration");
+        InjectionUtils.injectStatic(configuration, Unitils.class, "unitils.configuration");
     }
 
 

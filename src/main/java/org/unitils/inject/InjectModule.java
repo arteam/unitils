@@ -48,10 +48,6 @@ public class InjectModule implements Module {
      */
     private Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues;
 
-    /**
-     * The core injection implementation
-     */
-    private InjectionUtils injectionUtils;
 
     /**
      * Initializes this module using the given <code>Configuration</code> object
@@ -60,7 +56,6 @@ public class InjectModule implements Module {
      */
     public void init(Configuration configuration) {
 
-        injectionUtils = new InjectionUtils();
         defaultEnumValues = getAnnotationEnumDefaults(InjectModule.class, configuration, Inject.class, InjectStatic.class,
                 AutoInject.class, AutoInjectStatic.class);
     }
@@ -129,7 +124,7 @@ public class InjectModule implements Module {
      * Injects the fieldToInject. The target is either an explicitly specified target field of the test, or into the
      * field(s) that is/are annotated with {@link TestedObject}
      *
-     * @param test The test object, not null
+     * @param test           The test object, not null
      * @param fieldToInject, The field from which the value is injected into the target, not null
      */
     private void inject(Object test, Field fieldToInject) {
@@ -144,7 +139,7 @@ public class InjectModule implements Module {
 
         for (Object target : targets) {
             try {
-                injectionUtils.inject(objectToInject, target, ognlExpression);
+                InjectionUtils.inject(objectToInject, target, ognlExpression);
             } catch (UnitilsException e) {
                 throw new UnitilsException(getSituatedErrorMessage(injectAnnotation, fieldToInject, e.getMessage()), e);
             }
@@ -168,7 +163,7 @@ public class InjectModule implements Module {
         Object objectToInject = ReflectionUtils.getFieldValue(test, fieldToInjectStatic);
 
         try {
-            injectionUtils.injectStatic(objectToInject, targetClass, property);
+            InjectionUtils.injectStatic(objectToInject, targetClass, property);
         } catch (UnitilsException e) {
             throw new UnitilsException(getSituatedErrorMessage(injectStaticAnnotation, fieldToInjectStatic, e.getMessage()), e);
         }
@@ -179,7 +174,7 @@ public class InjectModule implements Module {
      * The target is either an explicitly specified target field of the test, or the field(s) that is/are annotated with
      * {@link TestedObject}
      *
-     * @param test The test object, not null
+     * @param test           The test object, not null
      * @param fieldToInject, The field from which the value is injected into the target, not null
      */
     private void autoInject(Object test, Field fieldToInject) {
@@ -192,7 +187,7 @@ public class InjectModule implements Module {
 
         for (Object target : targets) {
             try {
-                injectionUtils.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccessType);
+                InjectionUtils.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccessType);
             } catch (UnitilsException e) {
                 throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject, e.getMessage()), e);
             }
@@ -204,7 +199,7 @@ public class InjectModule implements Module {
      * The target is either an explicitly specified target field of the test, or the field that is annotated with
      * {@link TestedObject}
      *
-     * @param test The test object, not null
+     * @param test                     The test object, not null
      * @param fieldToAutoInjectStatic, The field from which the value is injected into the target, not null
      */
     private void autoInjectStatic(Object test, Field fieldToAutoInjectStatic) {
@@ -216,7 +211,7 @@ public class InjectModule implements Module {
         PropertyAccessType propertyAccessType = getValueReplaceDefault(AutoInjectStatic.class, autoInjectStaticAnnotation.propertyAccessType(), defaultEnumValues);
 
         try {
-            injectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
+            InjectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
 
         } catch (UnitilsException e) {
             throw new UnitilsException(getSituatedErrorMessage(autoInjectStaticAnnotation, fieldToAutoInjectStatic,
@@ -260,6 +255,7 @@ public class InjectModule implements Module {
     /**
      * Given the errorDescription, returns a situated error message, i.e. specifying the annotated field and the
      * annotation type that was used.
+     *
      * @param processedAnnotation
      * @param annotatedField
      * @param errorDescription
@@ -285,6 +281,7 @@ public class InjectModule implements Module {
         /**
          * Before executing a test method (i.e. after the fixture methods), the injection is performed, since
          * objects to inject or targets are possibly instantiated during the fixture.
+         *
          * @param testObject The test object, not null
          * @param testMethod The test method, not null
          */

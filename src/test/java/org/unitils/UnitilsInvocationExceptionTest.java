@@ -6,9 +6,7 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 import org.unitils.inject.util.InjectionUtils;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Test for {@link UnitilsJUnit3}.
@@ -18,35 +16,30 @@ import java.util.List;
 public class UnitilsInvocationExceptionTest extends TestCase {
 
 
-    //todo move call list to tracing test listener
-    /* List that will contain a string representation of each method call */
-    private List<String> callList;
-
+    /* Listener that records all test method invocations */
     private TracingTestListener tracingTestListener;
 
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        callList = new ArrayList<String>();
-        tracingTestListener = new TracingTestListener(callList);
+        tracingTestListener = new TracingTestListener();
 
         // clear state so that beforeAll is called
-        InjectionUtils injectionUtils = new InjectionUtils();
-        injectionUtils.injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
-        //todo fix nullpointer
-//        injectionUtils.injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
+        InjectionUtils.injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
+        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
+        InjectionUtils.injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
 
         UnitilsJUnit3Test_TestClass1.setTracingTestListener(tracingTestListener);
         UnitilsJUnit3Test_TestClass2.setTracingTestListener(tracingTestListener);
         UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(tracingTestListener);
 
-        UnitilsJUnit4Test_TestClass1.setCallList(callList);
-        UnitilsJUnit4Test_TestClass2.setCallList(callList);
+        UnitilsJUnit4Test_TestClass1.setTracingTestListener(tracingTestListener);
+        UnitilsJUnit4Test_TestClass2.setTracingTestListener(tracingTestListener);
 
-        UnitilsTestNGTest_TestClass1.setCallList(callList);
-        UnitilsTestNGTest_TestClass2.setCallList(callList);
-        UnitilsTestNGTest_EmptyTestClass.setCallList(callList);
+        UnitilsTestNGTest_TestClass1.setTracingTestListener(tracingTestListener);
+        UnitilsTestNGTest_TestClass2.setTracingTestListener(tracingTestListener);
+        UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(tracingTestListener);
     }
 
 
@@ -59,7 +52,7 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next()); // once for each test
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertFalse(iterator.hasNext());
@@ -75,7 +68,7 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next()); // once for each test
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertFalse(iterator.hasNext());
@@ -94,7 +87,7 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
@@ -114,7 +107,7 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
@@ -134,7 +127,7 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
@@ -155,7 +148,7 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
@@ -176,18 +169,18 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         assertFalse(iterator.hasNext());
         assertEquals(0, result.failureCount());
@@ -204,20 +197,20 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         assertFalse(iterator.hasNext());
 
@@ -235,24 +228,24 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testMethod        - TestClass1 - test1", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
         assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testMethod        - TestClass1 - test2", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
         assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         assertFalse(iterator.hasNext());
 
@@ -270,24 +263,24 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testMethod        - TestClass1 - test1", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
         assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testMethod        - TestClass1 - test2", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
         assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         assertFalse(iterator.hasNext());
 
@@ -305,24 +298,24 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testMethod        - TestClass1 - test1", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
         assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testMethod        - TestClass1 - test2", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
         assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         assertFalse(iterator.hasNext());
 
@@ -340,24 +333,24 @@ public class UnitilsInvocationExceptionTest extends TestCase {
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        Iterator iterator = callList.iterator();
+        Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testMethod        - TestClass1 - test1", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
         assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[JUnit]   testSetUp         - TestClass1", iterator.next());
+        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testMethod        - TestClass1 - test2", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
         assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
-        assertEquals("[JUnit]   testTearDown      - TestClass1", iterator.next());
+        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         assertFalse(iterator.hasNext());
 

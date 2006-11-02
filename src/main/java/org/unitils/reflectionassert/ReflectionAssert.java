@@ -178,7 +178,6 @@ public class ReflectionAssert {
         assertPropertyRefEquals(message, propertyName, expectedPropertyValue, actualObject, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
 
-    //todo should we have message versions? 
 
     /**
      * Asserts that the value of a property of an object is equal to the given value.
