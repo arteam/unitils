@@ -39,23 +39,7 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
         schemaName = configuration.getString(PROPKEY_SCHEMANAME).toUpperCase();
     }
 
-    public void enableConstraints() {
-
-    }
-
-    public void enableConstraintsOnConnection(Connection conn) {
-        Statement st = null;
-        try {
-            st = conn.createStatement();
-            st.executeUpdate("set referential_integrity true");
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while disabling constraints", e);
-        } finally {
-            DbUtils.closeQuietly(st);
-        }
-    }
-
-    /**
+   /**
      * Remove all not-null constraints. Foreign key constraints are disabled directly on the connection (see method
      * disableConstraintsOnConnection)
      */
