@@ -9,7 +9,7 @@ package org.unitils.dbunit.annotation;
 /**
  * todo javadoc
  */
-public @interface ExpectedDataSet {
+public @interface ExpectedDbUnitDataSet {
 
     String fileName() default "";
 
