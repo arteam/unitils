@@ -121,7 +121,7 @@ public class DatabaseModule implements Module {
      * @param testClass the test class, not null
      * @return true if the test class is a database test false otherwise
      */
-    protected boolean isDatabaseTest(Class<?> testClass) {
+    public boolean isDatabaseTest(Class<?> testClass) {
 
         for (Class<? extends Annotation> databaseTestAnnotation : databaseTestAnnotations) {
             if (testClass.getAnnotation(databaseTestAnnotation) != null) {

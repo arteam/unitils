@@ -14,13 +14,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
- * Utility for keeping all configuration settings of unitils.
+ * Utility that loads the configuration of unitils.
  * <p/>
  * Unitils settings can be defined in 3 files:<ul>
  * <li><b>unitils-default.properties</b> - a fixed file packaged in the unitils jar that contains all predefined defaults.
- * This file should typically not be modified.</li>
+ * This file should normally not be modified.</li>
  * <li><b>unitils.properties</b> - a file somewhere in the classpath or user.home dir that contains all custom configuration
- * settings. Settings in this file will override the unitil default settings. This is where you should put your project
+ * settings. Settings in this file will override the default settings. This is where you should put your project
  * specific configuration</li>
  * <li><b>unitils-local.properties</b> - a file somewhere in the classpath or user.home that contains machine/user local
  * configuration. Eg the database schema specific to the local user could be defined here. Settings in this file
@@ -28,12 +28,14 @@ import org.apache.log4j.Logger;
  * </ul>
  * The name of the custom settings file (unitils.properties) is defined by the {@link #PROPERTY_CUSTOM_CONFIGURATION}
  * property in the default settings. The name of the local settings file (unitils-local.propeties) is defined
- * by the {@link #PROPERTY_LOCAL_CONFIGURATION} in the custom or default settings. If these configuration are set to
+ * by the {@link #PROPERTY_LOCAL_CONFIGURATION} in the custom or default settings. If these properties are set to
  * null or empty, the corresponding property file will not be loaded.
  * <p/>
  * A runtime exception is thrown when the default settings cannot be loaded.
  * A warning is logged when the custom propreties cannot be loaded.
  * A debug message is logged when the local configuration cannot be loaded.
+ *
+ * todo Make sure an error is given when a custom or local properties file has been found but could not be correctly loaded
  */
 public class ConfigurationLoader {
 

@@ -26,6 +26,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.db.DatabaseModule;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbunit.annotation.DbUnitDataSet;
+import org.unitils.dbunit.annotation.ExpectedDbUnitDataSet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,12 +35,34 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * todo javadoc
- * todo implement following:
- * - overriding class-level dataset filename using annotation on class
- * - overriding of dataset filename using annotation on method
- * - expected dataset
- * - (if possible) clear database completely before every test
+ * Module that provides support for managing database test data using DBUnit.
+ * <p/>
+ * This module depends on the {@link DatabaseModule} for database connection management and identificatiof database test
+ * classes.
+ * <p/>
+ * This module only provides services to unit test classes that are annotated with an annotation that identifies it as
+ * a database test (see {@link DatabaseModule} for more information)
+ * <p/>
+ * For each database test method, this module will try to find a test dataset file in the classpath and, if found, insert
+ * this dataset into the test database. DbUnits <code>DatabaseOperation.CLEAN_INSERT</code> is used for inserting this
+ * dataset. This means that the tables specified in the dataset are cleared before inserting the test records. As dataset
+ * file format, DbUnit's <code>FlatXmlDataSet</code> is used.
+ * <p/>
+ * For each database test method, the dataset file is found as follows:
+ * <ol><li>If the test method is annotated with {@link DbUnitDataSet}, the file with the name specified by the fileName
+ * property of this annotation is used</li>
+ * <li>If a file can be found in the classpath in the same package as the testclass, with the name
+ * 'classname without packagename'.'test method name'.xml, this file is used</li>
+ * <li>If the test class is annotated with {@link DbUnitDataSet}, the file with the name specified by the fileName
+ * property of this annotation is used</li>
+ * <li>If a file can be found in the classpath in the same package as the testclass, with the name
+ * 'classname without packagename'.xml, this file is used</li>
+ * <p/>
+ * Using the method {@link #assertDBContentAsExpected(Object, String)}, the contents of the database can be compared with
+ * the contents of a dataset. The expected dataset file should be located in the classpath in the same package as the
+ * testclass, with the name 'classname without packagename'.'test method name'-result.xml.
+ * <p/>
+ * todo expected dataset annotation
  */
 public class DbUnitModule implements Module {
 
@@ -49,36 +72,43 @@ public class DbUnitModule implements Module {
     /* Property key of the SQL dialect of the underlying DBMS implementation */
     private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
-    /* Object that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
-       caching is time-consuming, this object is created only once and used througout the test run. */
+    /**
+     * Object that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
+     * caching is time-consuming, this object is created only once and used througout the entire test run.
+     */
     private IDatabaseConnection dbUnitDatabaseConnection;
 
-
+    /**
+     * Name of the database schema, needed to configure DBUnit
+     */
     private String databaseSchemaName;
 
+    /**
+     * The database dialect, needed to configure DBUnit
+     */
     private String databaseDialect;
 
-
+    /**
+     * Initializes the DbUnitModule using the given Configuration
+     *
+     * @param configuration
+     */
     public void init(Configuration configuration) {
+
         databaseSchemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
         databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
     }
 
     /**
-     * @return The TestListener object that implements Unitils' DbUnit support
-     */
-    public TestListener createTestListener() {
-        return new DbUnitListener();
-    }
-
-    /**
-     * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
+     * Checks whether the given test instance is a database test.
      *
+     * @see DatabaseModule#isDatabaseTest(Class<?>)
      * @param testClass the test class, not null
      * @return true if the test class is a database test false otherwise
      */
     protected boolean isDatabaseTest(Class<?> testClass) {
-        return testClass.getAnnotation(DatabaseTest.class) != null;
+
+        return getDatabaseModule().isDatabaseTest(testClass);
     }
 
     /**
@@ -86,6 +116,7 @@ public class DbUnitModule implements Module {
      * of the dbUnit's {@link IDatabaseConnection} is created, that is used througout the whole test run.
      */
     protected void initDbUnitConnection() {
+
         if (dbUnitDatabaseConnection == null) {
             dbUnitDatabaseConnection = createDbUnitConnection();
         }
@@ -95,7 +126,8 @@ public class DbUnitModule implements Module {
      * @return The current JDBC database connection, as provided by the {@link DatabaseModule}
      */
     private Connection getCurrentConnection() {
-        DatabaseModule databaseModule = getDatabaseTestModule();
+
+        DatabaseModule databaseModule = getDatabaseModule();
         return databaseModule.getCurrentConnection();
     }
 
@@ -133,13 +165,15 @@ public class DbUnitModule implements Module {
      * @return The DbUnit connection
      */
     public IDatabaseConnection getDbUnitDatabaseConnection() {
+
         return dbUnitDatabaseConnection;
     }
 
     /**
-     * Closes the DbUnit connection, and also the wrapped Jdbc Connection object
+     * Closes the DbUnit connection to the database
      */
     protected void closeDbUnitConnection() {
+
         try {
             if (dbUnitDatabaseConnection != null) {
                 dbUnitDatabaseConnection.close();
@@ -150,23 +184,24 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * Uses dbUnit to insert test data in the database. The dbUnit data file that is loaded is defined by the following
+     * Uses DbUnit to insert test data in the database. The DbUnit data file that is loaded is defined by the following
      * rules:
-     * First, we try to load a test specific dataset (see {@link #getTestDataSetFileName(Class,Method)}. If that file
+     * First, we try to load a test specific dataset (see {@link #getTestDataSetFileName(Class,Method)}. If such a file
      * does not exist, the default dataset is loaded (see {@link #getDefaultDataSetFileName(Class)}. If neither of
-     * these files exists, a <code>UnitilsException</code> is thrown.
+     * these exists, a <code>UnitilsException</code> is thrown.
      *
      * @param testClass
      * @param testMethod
      */
     protected void insertTestData(Class testClass, Method testMethod) {
+
         try {
             IDataSet dataSet = getDataSet(testClass, testMethod);
             if (dataSet != null) { // Dataset is null when there is no data xml file.
                 getInsertDatabaseOperation().execute(dbUnitDatabaseConnection, dataSet);
             }
         } catch (Exception e) {
-            throw new UnitilsException("Error when trying to insert test data from DBUnit xml file", e);
+            throw new UnitilsException("Error while trying to insert test data from DbUnit xml file", e);
         }
     }
 
@@ -174,6 +209,7 @@ public class DbUnitModule implements Module {
      * @return The DbUnit <code>DatabaseOperation</code> that is used for loading the data file
      */
     protected DatabaseOperation getInsertDatabaseOperation() {
+
         return DatabaseOperation.CLEAN_INSERT;
     }
 
@@ -187,6 +223,7 @@ public class DbUnitModule implements Module {
      * @return the dataset, can be null if the files were not found
      */
     private IDataSet getDataSet(Class testClass, Method method) {
+
         //load the test specific dataset
         String testDataSetFileName = getTestDataSetFileName(testClass, method);
         IDataSet dataSet = loadDataSet(testClass, testDataSetFileName);
@@ -208,6 +245,7 @@ public class DbUnitModule implements Module {
      * @return the test specific filename
      */
     protected String getTestDataSetFileName(Class testClass, Method method) {
+
         DbUnitDataSet dbUnitDataSetAnnotation = method.getAnnotation(DbUnitDataSet.class);
         if (dbUnitDataSetAnnotation != null) {
             return dbUnitDataSetAnnotation.fileName();
@@ -226,6 +264,7 @@ public class DbUnitModule implements Module {
      * @return the default filename
      */
     protected String getDefaultDataSetFileName(Class<?> testClass) {
+
         DbUnitDataSet dbUnitDataSetAnnotation = testClass.getAnnotation(DbUnitDataSet.class);
         if (dbUnitDataSetAnnotation != null) {
             return dbUnitDataSetAnnotation.fileName();
@@ -236,7 +275,7 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * Loads a dataset from the file with the given name.
+     * Loads a dataset from the file in the classpath with the given name.
      * Filenames that start with '/' are treated absolute. Filenames that do not start with '/', are relative
      * to the current class.
      *
@@ -244,6 +283,7 @@ public class DbUnitModule implements Module {
      * @return the data set, or null if the file did not exist
      */
     private IDataSet loadDataSet(Class testClass, String dataSetFilename) {
+
         try {
             if (dataSetFilename == null) {
                 return null;
@@ -272,7 +312,14 @@ public class DbUnitModule implements Module {
         }
     }
 
+    /**
+     * Constructs a DbUnit DataSet object from the given InputStream
+     *
+     * @param in
+     * @return a DbUnit DataSet object
+     */
     protected IDataSet createDbUnitDataSet(InputStream in) {
+
         try {
             return new FlatXmlDataSet(in);
         } catch (Exception e) {
@@ -285,6 +332,7 @@ public class DbUnitModule implements Module {
      * that occur in the expected DbUnitDataSet are compared with the database contents.
      */
     public void assertDBContentAsExpected(Object testObject, String testMethodName) {
+
         try {
             IDatabaseConnection databaseConnection = getDbUnitDatabaseConnection();
 
@@ -307,12 +355,13 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * Gets the result dataset with a filename specified by {@link #getExpectedDataSetFileName(Class,String)}.
+     * Gets the expected dataset with a filename specified by {@link #getExpectedDataSetFileName(Class,String)}.
      * If the file does not exist, a file not found exception is thrown.
      *
      * @return the dataset, not null
      */
     private IDataSet getExpectedDataSet(Class testClass, String methodName) {
+
         String dataSetFileName = getExpectedDataSetFileName(testClass, methodName);
         IDataSet dataSet = loadDataSet(testClass, dataSetFileName);
         if (dataSet == null) {
@@ -322,23 +371,40 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * Gets the name of the result testdata file.
-     * The name will org constructed as follows: 'classname without packagename'.'testname'-result.xml
+     * Gets the name of the expected dataset file.
+     * The default name of this file is constructed as follows: 'classname without packagename'.'testname'-result.xml.
+     * This default name can be overridden by annotating the test method with the {@link ExpectedDbUnitDataSet}
+     * annotation.
      *
-     * @return the result filename
+     * @return the expected dataset filename
      */
-    protected static String getExpectedDataSetFileName(Class testClass, String methodName) {
-        String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + "." + methodName + "-result.xml";
+    protected static String getExpectedDataSetFileName(Class<?> testClass, String methodName) {
+
+        ExpectedDbUnitDataSet expectedDbUnitDataSetAnnotation = testClass.getAnnotation(ExpectedDbUnitDataSet.class);
+        if (expectedDbUnitDataSetAnnotation != null) {
+            return expectedDbUnitDataSetAnnotation.fileName();
+        } else {
+            String className = testClass.getName();
+            return className.substring(className.lastIndexOf(".") + 1) + "." + methodName + "-result.xml";
+        }
     }
 
     /**
      * @return Implementation of DatabaseModule, on which this module is dependent
      */
-    private DatabaseModule getDatabaseTestModule() {
+    protected DatabaseModule getDatabaseModule() {
+
         Unitils unitils = Unitils.getInstance();
-        //todo test for null
         return unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
+    }
+
+
+    /**
+     * @return The TestListener object that implements Unitils' DbUnit support
+     */
+    public TestListener createTestListener() {
+
+        return new DbUnitListener();
     }
 
     /**
@@ -348,8 +414,9 @@ public class DbUnitModule implements Module {
 
         @Override
         public void beforeAll() {
-            if (getDatabaseTestModule() == null) {
-                throw new UnitilsException("Invalid configuration: DatabaseModule should be enabled and DbUnitModule should be configured to run after DatabaseModule");
+            if (getDatabaseModule() == null) {
+                throw new UnitilsException("Invalid configuration: When the DbUnitModule is enabled, the DatabaseModule " +
+                        "should also be enabled and the DbUnitModule should be configured to run after the DatabaseModule");
             }
         }
 
