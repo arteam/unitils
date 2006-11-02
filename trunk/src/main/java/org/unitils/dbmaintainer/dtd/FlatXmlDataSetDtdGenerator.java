@@ -22,6 +22,8 @@ import org.unitils.core.UnitilsException;
 
 /**
  * Implementation of {@link DtdGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format
+ *
+ * todo test and fix for hsqldb (see sample project)
  */
 public class FlatXmlDataSetDtdGenerator implements DtdGenerator {
 
@@ -49,7 +51,7 @@ public class FlatXmlDataSetDtdGenerator implements DtdGenerator {
         this.dataSource = dataSource;
 
         dtdFileName = configuration.getString(PROPKEY_DTD_FILENAME);
-        schemaName = configuration.getString(PROPKEY_SCHEMA_NAME);
+        schemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
     }
 
     /**
