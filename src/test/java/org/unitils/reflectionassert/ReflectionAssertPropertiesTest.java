@@ -2,7 +2,7 @@ package org.unitils.reflectionassert;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 
 /**
  * Test class for {@link ReflectionAssert} tests for with assertProperty methods.

@@ -2,6 +2,7 @@ package org.unitils;
 
 import org.testng.annotations.*;
 import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
 
 /**
  * TestNG test class containing 2 active and 1 ignored test method
@@ -20,43 +21,58 @@ public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNG {
 
     @BeforeClass
     public void beforeClass() {
-        tracingTestListener.addTestInvocation("beforeTestClass", this, null);
+        addTestInvocation("beforeTestClass", null);
     }
 
     @AfterClass
     public void afterClass() {
-        tracingTestListener.addTestInvocation("afterTestClass", this, null);
+        addTestInvocation("afterTestClass", null);
     }
 
     @BeforeMethod
     public void setUp() {
-        tracingTestListener.addTestInvocation("testSetUp", this, null);
+        addTestInvocation("testSetUp", null);
     }
 
     @AfterMethod
     public void tearDown() {
-        tracingTestListener.addTestInvocation("testTearDown", this, null);
+        addTestInvocation("testTearDown", null);
     }
 
     @Test
     public void test1() {
-        tracingTestListener.addTestInvocation("testMethod", this, "test1");
+        addTestInvocation("testMethod", "test1");
     }
 
     @Test
     public void test2() {
-        tracingTestListener.addTestInvocation("testMethod", this, "test2");
+        addTestInvocation("testMethod", "test2");
     }
 
     @Test(enabled = false)
     public void test3() {
-        tracingTestListener.addTestInvocation("testMethod", this, "test3");
+        addTestInvocation("testMethod", "test3");
+    }
+
+
+    private void addTestInvocation(String invocation, String testMethodName) {
+        if (tracingTestListener != null) {
+            tracingTestListener.addTestInvocation(invocation, this, testMethodName);
+        }
     }
 
 
     @Override
-    protected TestListener createTestListener() {
-        return tracingTestListener;
+    protected Unitils getUnitils() {
+        if (tracingTestListener != null) {
+            return new Unitils() {
+
+                public TestListener createTestListener() {
+                    return tracingTestListener;
+                }
+            };
+        }
+        return super.getUnitils();
     }
 
 }

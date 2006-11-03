@@ -23,14 +23,14 @@ import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.annotation.Annotation;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * Module that provides basic support for database testing.
@@ -108,6 +108,7 @@ public class DatabaseModule implements Module {
 
     /**
      * Registers the given annotation as an annotation that identifies a test class as being a database test.
+     *
      * @param databaseTestAnnotation
      */
     public void registerDatabaseTestAnnotation(Class<? extends Annotation> databaseTestAnnotation) {

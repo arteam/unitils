@@ -55,7 +55,7 @@ public class ReflectionUtils {
     /**
      * Returns the value of the given field (may be private) in the given object
      *
-     * @param object the object containing the field, not null
+     * @param object the object containing the field, null for static fields
      * @param field  the field, not null
      * @return the value of the given field in the given object
      * @throws UnitilsException if the field could not be accessed

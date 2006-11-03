@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 public abstract class UnitilsJUnit3 extends TestCase {
 
 
-    private TestListener testListener;
+    private static TestListener testListener;
 
     private static boolean beforeAllCalled;
 
@@ -33,7 +33,11 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
     public UnitilsJUnit3(String name) {
         super(name);
-        testListener = createTestListener();
+
+        if (testListener == null) {
+            testListener = getUnitils().createTestListener();
+            createShutdownHook();
+        }
     }
 
 
@@ -52,15 +56,12 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
     public void runBare() throws Throwable {
 
-        Class testClass = getClass();
-
         if (!beforeAllCalled) {
             testListener.beforeAll();
             beforeAllCalled = true;
-
-            createShutdownHook();
         }
 
+        Class testClass = getClass();
         if (lastTestClass != testClass) {
             if (lastTestClass != null) {
                 testListener.afterTestClass(lastTestClass);
@@ -87,8 +88,13 @@ public abstract class UnitilsJUnit3 extends TestCase {
     }
 
 
-    protected TestListener createTestListener() {
-        return Unitils.getInstance().getTestListener();
+    protected Unitils getUnitils() {
+        Unitils unitils = Unitils.getInstance();
+        if (unitils == null) {
+            Unitils.initSingletonInstance();
+            unitils = Unitils.getInstance();
+        }
+        return unitils;
     }
 
 

@@ -97,6 +97,7 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
     public void testInjectHibernateSession() {
 
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
+        expect(mockHibernateSession.isOpen()).andReturn(false);
         expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
         replay();
 

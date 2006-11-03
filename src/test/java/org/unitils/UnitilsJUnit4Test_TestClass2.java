@@ -17,31 +17,38 @@ public class UnitilsJUnit4Test_TestClass2 extends UnitilsJUnit4 {
 
     @BeforeClass
     public static void beforeClass() {
-        tracingTestListener.addTestInvocation("beforeTestClass", UnitilsJUnit4Test_TestClass2.class, null);
+        addTestInvocation("beforeTestClass", UnitilsJUnit4Test_TestClass2.class, null);
     }
 
     @AfterClass
     public static void afterClass() {
-        tracingTestListener.addTestInvocation("afterTestClass", UnitilsJUnit4Test_TestClass2.class, null);
+        addTestInvocation("afterTestClass", UnitilsJUnit4Test_TestClass2.class, null);
     }
 
     @Before
     public void setUp() {
-        tracingTestListener.addTestInvocation("testSetUp", this, null);
+        addTestInvocation("testSetUp", this, null);
     }
 
     @After
     public void tearDown() {
-        tracingTestListener.addTestInvocation("testTearDown", this, null);
+        addTestInvocation("testTearDown", this, null);
     }
 
     @Test
     public void test1() {
-        tracingTestListener.addTestInvocation("testMethod", this, "test1");
+        addTestInvocation("testMethod", this, "test1");
     }
 
     @Test
     public void test2() {
-        tracingTestListener.addTestInvocation("testMethod", this, "test2");
+        addTestInvocation("testMethod", this, "test2");
+    }
+
+
+    private static void addTestInvocation(String invocation, Object test, String testMethodName) {
+        if (tracingTestListener != null) {
+            tracingTestListener.addTestInvocation(invocation, test, testMethodName);
+        }
     }
 }

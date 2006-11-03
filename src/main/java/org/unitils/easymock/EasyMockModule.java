@@ -19,8 +19,8 @@ import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.LenientMock;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.util.*;
-import org.unitils.reflectionassert.ReflectionComparatorModes;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.*;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
@@ -144,7 +144,7 @@ public class EasyMockModule implements Module {
         dates = getValueReplaceDefault(LenientMock.class, dates, defaultEnumValues);
         defaults = getValueReplaceDefault(LenientMock.class, defaults, defaultEnumValues);
 
-        List<ReflectionComparatorModes> comparatorModes = new ArrayList<ReflectionComparatorModes>();
+        List<ReflectionComparatorMode> comparatorModes = new ArrayList<ReflectionComparatorMode>();
         if (Order.LENIENT == order) {
             comparatorModes.add(LENIENT_ORDER);
         }
@@ -157,10 +157,10 @@ public class EasyMockModule implements Module {
 
         LenientMocksControl mocksControl;
         if (Returns.NICE == returns) {
-            mocksControl = new LenientMocksControl(NICE, comparatorModes.toArray(new ReflectionComparatorModes[0]));
+            mocksControl = new LenientMocksControl(NICE, comparatorModes.toArray(new ReflectionComparatorMode[0]));
 
         } else {
-            mocksControl = new LenientMocksControl(DEFAULT, comparatorModes.toArray(new ReflectionComparatorModes[0]));
+            mocksControl = new LenientMocksControl(DEFAULT, comparatorModes.toArray(new ReflectionComparatorMode[0]));
         }
 
         // Check order

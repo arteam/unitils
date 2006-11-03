@@ -25,13 +25,14 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
 
     private static TestListener testListener;
 
+    private static boolean beforeAllCalled;
+
 
     public UnitilsJUnit4TestClassRunner(Class<?> testClass) throws InitializationError {
         super(testClass, new CustomTestClassMethodsRunner(testClass));
 
         if (testListener == null) {
-            testListener = createTestListener();
-            testListener.beforeAll();
+            testListener = getUnitils().createTestListener();
             createShutdownHook();
         }
     }
@@ -48,13 +49,25 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
 
     @Override
     public void run(RunNotifier notifier) {
+
+        if (!beforeAllCalled) {
+            testListener.beforeAll();
+            beforeAllCalled = true;
+        }
+
         testListener.beforeTestClass(getTestClass());
         super.run(notifier);
         testListener.afterTestClass(getTestClass());
     }
 
-    protected TestListener createTestListener() {
-        return Unitils.getInstance().getTestListener();
+
+    protected Unitils getUnitils() {
+        Unitils unitils = Unitils.getInstance();
+        if (unitils == null) {
+            Unitils.initSingletonInstance();
+            unitils = Unitils.getInstance();
+        }
+        return unitils;
     }
 
 

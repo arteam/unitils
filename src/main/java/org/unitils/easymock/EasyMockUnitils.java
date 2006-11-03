@@ -10,9 +10,9 @@ import static org.easymock.EasyMock.reportMatcher;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.util.*;
-import org.unitils.reflectionassert.ReflectionComparatorModes;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 /**
  * todo javadoc
@@ -44,7 +44,7 @@ public class EasyMockUnitils {
      * @param modes  the comparator modes
      * @return null
      */
-    public static <T> T refEq(T object, ReflectionComparatorModes... modes) {
+    public static <T> T refEq(T object, ReflectionComparatorMode... modes) {
 
         ReflectionArgumentMatcher<T> reflectionArgumentMatcher = new ReflectionArgumentMatcher<T>(object, modes);
         reportMatcher(reflectionArgumentMatcher);
