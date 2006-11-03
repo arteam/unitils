@@ -1,6 +1,7 @@
 package org.unitils;
 
 import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
 
 /**
  * Empty TestNG test class
@@ -18,8 +19,16 @@ public class UnitilsTestNGTest_EmptyTestClass extends UnitilsTestNG {
     }
 
     @Override
-    protected TestListener createTestListener() {
-        return tracingTestListener;
+    protected Unitils getUnitils() {
+        if (tracingTestListener != null) {
+            return new Unitils() {
+
+                public TestListener createTestListener() {
+                    return tracingTestListener;
+                }
+            };
+        }
+        return super.getUnitils();
     }
 
 }

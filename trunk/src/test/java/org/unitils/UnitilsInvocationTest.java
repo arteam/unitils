@@ -1,9 +1,14 @@
 package org.unitils;
 
-import junit.framework.TestCase;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
@@ -11,7 +16,9 @@ import org.junit.runner.notification.RunNotifier;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
 import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
 import org.unitils.inject.util.InjectionUtils;
+import org.unitils.util.ReflectionUtils;
 
 import java.util.Iterator;
 
@@ -20,21 +27,25 @@ import java.util.Iterator;
  * <p/>
  * Test for {@link UnitilsJUnit4} and {@link UnitilsJUnit4TestClassRunner}.
  */
-public class UnitilsInvocationTest extends TestCase {
-
+public class UnitilsInvocationTest {
 
     /* Listener that records all test method invocations */
-    private TracingTestListener tracingTestListener;
+    private static TracingTestListener tracingTestListener;
+
+    private static TestListener oldTestListenerUnitilsJUnit3;
+
+    private static TestListener oldTestListenerUnitilsJUnit4;
 
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        tracingTestListener = new TracingTestListener();
+    @BeforeClass
+    public static void classSetup() {
+        oldTestListenerUnitilsJUnit3 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit3.class, "testListener", true));
+        oldTestListenerUnitilsJUnit4 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit4TestClassRunner.class, "testListener", true));
 
-        // clear state so that beforeAll is called
-        InjectionUtils.injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
-        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
+        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "testListener");
         InjectionUtils.injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
+
+        tracingTestListener = new TracingTestListener();
 
         UnitilsJUnit3Test_TestClass1.setTracingTestListener(tracingTestListener);
         UnitilsJUnit3Test_TestClass2.setTracingTestListener(tracingTestListener);
@@ -46,6 +57,26 @@ public class UnitilsInvocationTest extends TestCase {
         UnitilsTestNGTest_TestClass1.setTracingTestListener(tracingTestListener);
         UnitilsTestNGTest_TestClass2.setTracingTestListener(tracingTestListener);
         UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(tracingTestListener);
+    }
+
+
+    @AfterClass
+    public static void classTearDown() {
+
+        InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit3, UnitilsJUnit3.class, "testListener");
+        InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
+    }
+
+    @Before
+    public void setUp() throws Exception {
+
+        tracingTestListener.getCallList().clear();
+
+        // clear state so that beforeAll is called
+        InjectionUtils.injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
+        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
+        InjectionUtils.injectStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
+
     }
 
 
@@ -61,6 +92,7 @@ public class UnitilsInvocationTest extends TestCase {
      * the last afterTestClass method will be run during the runtime exit. This is because we cannot determine which test
      * is going to be the last test in the class
      */
+    @Test
     public void testUnitilsJUnit3() {
 
         TestSuite suite = new TestSuite();
@@ -85,6 +117,7 @@ public class UnitilsInvocationTest extends TestCase {
      * 3 tests are performed: TestClass1 and TestClass2 both with 2 test methods and EmptyTestClass
      * that does not contain any methods.
      */
+    @Test
     public void testUnitilsJUnit4() throws Exception {
 
         FailureRunListener failureRunListener = new FailureRunListener();
@@ -111,6 +144,7 @@ public class UnitilsInvocationTest extends TestCase {
      * 3 tests are performed: UnitilsTestNGTest_TestClass1 and UnitilsTestNGTest_TestClass2 both with 2 test methods
      * and UnitilsTestNGTest_EmptyTestClass that does not contain any methods.
      */
+    @Test
     public void testUnitilsTestNG() {
 
         TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
@@ -126,6 +160,7 @@ public class UnitilsInvocationTest extends TestCase {
     }
 
 
+    // todo javadoc
     private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
         Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
@@ -200,8 +235,14 @@ public class UnitilsInvocationTest extends TestCase {
             super(testClass);
         }
 
-        public TestListener createTestListener() {
-            return tracingTestListener;
+        protected Unitils getUnitils() {
+
+            return new Unitils() {
+
+                public TestListener createTestListener() {
+                    return tracingTestListener;
+                }
+            };
         }
     }
 
@@ -217,6 +258,34 @@ public class UnitilsInvocationTest extends TestCase {
 
         public int getFailureCount() {
             return failureCount;
+        }
+    }
+
+
+    /**
+     * Empty JUnit 3 test class
+     */
+    private static class UnitilsJUnit3Test_EmptyTestClass extends UnitilsJUnit3 {
+
+
+        private static TracingTestListener tracingTestListener;
+
+        public static void setTracingTestListener(TracingTestListener testListener) {
+            tracingTestListener = testListener;
+        }
+
+
+        @Override
+        protected Unitils getUnitils() {
+            if (tracingTestListener != null) {
+                return new Unitils() {
+
+                    public TestListener createTestListener() {
+                        return tracingTestListener;
+                    }
+                };
+            }
+            return super.getUnitils();
         }
     }
 

@@ -1,17 +1,18 @@
 package org.unitils.easymock;
 
-import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
 import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.*;
-import static org.easymock.internal.MocksControl.MockType.NICE;
+import static org.easymock.internal.MocksControl.MockType.DEFAULT;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * A test for {@link org.unitils.easymock.LenientMocksControl}
  * <p/>
- * todo javadoc
+ * todo javadoc  + method javadoc
  */
 public class LenientMocksControlTest extends TestCase {
 
@@ -25,7 +26,7 @@ public class LenientMocksControlTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        lenientMocksControl = new LenientMocksControl(NICE, IGNORE_DEFAULTS);
+        lenientMocksControl = new LenientMocksControl(DEFAULT, IGNORE_DEFAULTS);
     }
 
     /**
@@ -55,6 +56,25 @@ public class LenientMocksControlTest extends TestCase {
         mock.someBehavior();
 
         verify(mock);
+    }
+
+
+    /**
+     * Test for two equal objects without java defaults.
+     */
+    public void testCheckEquals_equalsDoubleInvocation() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
+        expect(mock.someBehavior(true, 111, "Test1", Arrays.asList("1"))).andReturn("Result1");
+        expect(mock.someBehavior(false, 222, "Test2", Arrays.asList("2"))).andReturn("Result2");
+        replay(mock);
+
+        String result1 = mock.someBehavior(true, 111, "Test1", Arrays.asList("1"));
+        String result2 = mock.someBehavior(false, 222, "Test2", Arrays.asList("2"));
+
+        verify(mock);
+        assertEquals("Result1", result1);
+        assertEquals("Result2", result2);
     }
 
     /**

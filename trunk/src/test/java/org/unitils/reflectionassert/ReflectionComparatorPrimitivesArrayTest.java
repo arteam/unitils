@@ -8,7 +8,7 @@ package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 
 /**

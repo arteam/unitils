@@ -1,10 +1,18 @@
 package org.unitils;
 
-import junit.framework.TestCase;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.unitils.TracingTestListener.*;
+import org.unitils.core.TestListener;
 import org.unitils.inject.util.InjectionUtils;
+import org.unitils.util.ReflectionUtils;
 
 import java.util.Iterator;
 
@@ -13,42 +21,59 @@ import java.util.Iterator;
  * <p/>
  * todo afterTestClass + afterAll explain
  */
-public class UnitilsInvocationExceptionTest extends TestCase {
+public class UnitilsInvocationExceptionTest {
 
 
     /* Listener that records all test method invocations */
-    private TracingTestListener tracingTestListener;
+    private static TracingTestListener tracingTestListener;
+
+    private static TestListener oldTestListenerUnitilsJUnit3;
+
+    private static TestListener oldTestListenerUnitilsJUnit4;
 
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @BeforeClass
+    public static void classSetUp() {
+        oldTestListenerUnitilsJUnit3 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit3.class, "testListener", true));
+        oldTestListenerUnitilsJUnit4 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit4TestClassRunner.class, "testListener", true));
+
+        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "testListener");
+        InjectionUtils.injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
+
         tracingTestListener = new TracingTestListener();
+
+        UnitilsJUnit3Test_TestClass1.setTracingTestListener(tracingTestListener);
+        UnitilsJUnit4Test_TestClass1.setTracingTestListener(tracingTestListener);
+        UnitilsTestNGTest_TestClass1.setTracingTestListener(tracingTestListener);
+    }
+
+    @AfterClass
+    public static void classTearDown() {
+
+        InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit3, UnitilsJUnit3.class, "testListener");
+        InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
+    }
+
+
+    @Before
+    public void setUp() throws Exception {
+
+        tracingTestListener.getCallList().clear();
 
         // clear state so that beforeAll is called
         InjectionUtils.injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
         InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
-        InjectionUtils.injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
-
-        UnitilsJUnit3Test_TestClass1.setTracingTestListener(tracingTestListener);
-        UnitilsJUnit3Test_TestClass2.setTracingTestListener(tracingTestListener);
-        UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(tracingTestListener);
-
-        UnitilsJUnit4Test_TestClass1.setTracingTestListener(tracingTestListener);
-        UnitilsJUnit4Test_TestClass2.setTracingTestListener(tracingTestListener);
-
-        UnitilsTestNGTest_TestClass1.setTracingTestListener(tracingTestListener);
-        UnitilsTestNGTest_TestClass2.setTracingTestListener(tracingTestListener);
-        UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(tracingTestListener);
+        InjectionUtils.injectStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
     }
 
 
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsBeforeAll_RuntimeException() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.BEFORE_ALL, false);
+        tracingTestListener.setExceptionMethod(BEFORE_ALL, false);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -62,9 +87,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     }
 
 
+    @Test
     public void testUnitilsBeforeAll_AssertionFailedError() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.BEFORE_ALL, true);
+        tracingTestListener.setExceptionMethod(BEFORE_ALL, true);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -81,9 +107,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsBeforeTestClass_RuntimeException() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.BEFORE_TEST_CLASS, false);
+        tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, false);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -101,9 +128,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsBeforeTestClass_AssertionFailedError() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.BEFORE_TEST_CLASS, true);
+        tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, true);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -121,9 +149,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsBeforeTestSetUp_RuntimeException() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.BEFORE_TEST_SET_UP, false);
+        tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, false);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -142,9 +171,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsBeforeTestSetUp_AssertionFailedError() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.BEFORE_TEST_SET_UP, true);
+        tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, true);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -163,9 +193,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsBeforeTestMethod_RuntimeException() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.BEFORE_TEST_METHOD, false);
+        tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, false);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -191,9 +222,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsBeforeTestMethod_AssertionFailedError() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.BEFORE_TEST_METHOD, true);
+        tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, true);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -222,9 +254,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsAfterTestMethod_RuntimeException() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.AFTER_TEST_METHOD, false);
+        tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, false);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -257,9 +290,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsAfterTestMethod_AssertionFailedError() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.AFTER_TEST_METHOD, true);
+        tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, true);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -292,9 +326,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsAfterTestTearDown_RuntimeException() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.AFTER_TEST_TEAR_DOWN, false);
+        tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -327,9 +362,10 @@ public class UnitilsInvocationExceptionTest extends TestCase {
     /**
      * todo javadoc
      */
+    @Test
     public void testUnitilsAfterTestTearDown_AssertionFailedError() {
 
-        tracingTestListener.setExceptionMethod(TracingTestListener.AFTER_TEST_TEAR_DOWN, true);
+        tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, true);
 
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 

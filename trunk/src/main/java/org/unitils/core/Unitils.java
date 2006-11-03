@@ -17,15 +17,28 @@ import java.util.List;
  * todo implement module
  * todo remove test context
  */
-public class Unitils {
+public class Unitils implements Module {
 
-    private static Unitils unitils = new Unitils();
+    private static Unitils unitils;
 
     public static Unitils getInstance() {
         return unitils;
     }
 
-    private TestListener testListener;
+    public static void setInstance(Unitils unitils) {
+        Unitils.unitils = unitils;
+    }
+
+    public static void initSingletonInstance() {
+
+        ConfigurationLoader configurationLoader = new ConfigurationLoader();
+        Configuration configuration = configurationLoader.loadConfiguration();
+
+        Unitils unitils = new Unitils();
+        unitils.init(configuration);
+        setInstance(unitils);
+    }
+
 
     //todo javadoc
     private ModulesRepository modulesRepository;
@@ -39,16 +52,17 @@ public class Unitils {
     // Loading core will be done the first time only
     //todo
     public Unitils() {
-
         testContext = new TestContext();
-        testListener = new UnitilsTestListener();
-        configuration = createConfiguration();
-        modulesRepository = createModulesRepository(configuration);
     }
 
 
-    public TestListener getTestListener() {
-        return testListener;
+    public void init(Configuration configuration) {
+        this.configuration = configuration;
+        modulesRepository = createModulesRepository(configuration);
+    }
+
+    public TestListener createTestListener() {
+        return new UnitilsTestListener();
     }
 
 
@@ -72,12 +86,6 @@ public class Unitils {
         ModulesLoader modulesLoader = new ModulesLoader();
         List<Module> modules = modulesLoader.loadModules(configuration);
         return new ModulesRepository(modules);
-    }
-
-    protected Configuration createConfiguration() {
-
-        ConfigurationLoader configurationLoader = new ConfigurationLoader();
-        return configurationLoader.loadConfiguration();
     }
 
 

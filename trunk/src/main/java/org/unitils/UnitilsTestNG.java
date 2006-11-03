@@ -22,7 +22,7 @@ public abstract class UnitilsTestNG implements IHookable {
 
     @BeforeSuite
     protected void unitilsBeforeSuite() {
-        testListener = createTestListener();
+        testListener = getUnitils().createTestListener();
         testListener.beforeAll();
     }
 
@@ -60,8 +60,13 @@ public abstract class UnitilsTestNG implements IHookable {
     }
 
 
-    protected TestListener createTestListener() {
-        return Unitils.getInstance().getTestListener();
+    protected Unitils getUnitils() {
+        Unitils unitils = Unitils.getInstance();
+        if (unitils == null) {
+            Unitils.initSingletonInstance();
+            unitils = Unitils.getInstance();
+        }
+        return unitils;
     }
 
 }

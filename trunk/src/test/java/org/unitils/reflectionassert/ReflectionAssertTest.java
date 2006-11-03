@@ -9,8 +9,8 @@ package org.unitils.reflectionassert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import junitx.framework.StringAssert;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;
 

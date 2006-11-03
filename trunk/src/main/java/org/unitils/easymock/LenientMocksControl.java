@@ -12,7 +12,7 @@ import org.easymock.IAnswer;
 import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.*;
-import org.unitils.reflectionassert.ReflectionComparatorModes;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -24,18 +24,18 @@ import java.util.List;
  * lenient reflection argument matchers. These matchers can apply some leniency when comparing expected and actual
  * argument values.
  * <p/>
- * Setting the {@link ReflectionComparatorModes#IGNORE_DEFAULTS} mode will for example ignore all fields that
+ * Setting the {@link ReflectionComparatorMode#IGNORE_DEFAULTS} mode will for example ignore all fields that
  * have default values as expected values. E.g. if a null value is recorded as argument it will not be checked when
  * the actual invocation occurs. The same applies for inner-fields of object arguments that contain default java values.
  * <p/>
- * Setting the {@link ReflectionComparatorModes#LENIENT_DATES} mode will ignore the actual date values of arguments and
+ * Setting the {@link ReflectionComparatorMode#LENIENT_DATES} mode will ignore the actual date values of arguments and
  * inner fields of arguments. It will only check whether both dates are null or both dates are not null. The actual
  * date and hour do not matter.
  * <p/>
- * Setting the {@link ReflectionComparatorModes#LENIENT_ORDER} mode will ignore the actual order of collections and
+ * Setting the {@link ReflectionComparatorMode#LENIENT_ORDER} mode will ignore the actual order of collections and
  * arrays arguments and inner fields of arguments. It will only check whether they both contain the same elements.
  *
- * @see ReflectionComparatorModes
+ * @see ReflectionComparatorMode
  * @see org.unitils.reflectionassert.ReflectionComparator
  */
 public class LenientMocksControl extends MocksClassControl {
@@ -49,7 +49,7 @@ public class LenientMocksControl extends MocksClassControl {
      *
      * @param modes the modes for the reflection argument matcher
      */
-    public LenientMocksControl(ReflectionComparatorModes... modes) {
+    public LenientMocksControl(ReflectionComparatorMode... modes) {
         this(MockType.DEFAULT, modes);
     }
 
@@ -63,7 +63,7 @@ public class LenientMocksControl extends MocksClassControl {
      * @param type  the EasyMock mock type
      * @param modes the modes for the reflection argument matcher
      */
-    public LenientMocksControl(MockType type, ReflectionComparatorModes... modes) {
+    public LenientMocksControl(MockType type, ReflectionComparatorMode... modes) {
         super(type);
         this.invocationInterceptor = new InvocationInterceptor(modes);
     }
@@ -102,7 +102,7 @@ public class LenientMocksControl extends MocksClassControl {
         private RecordState recordState;
 
         /* The modes for the reflection argument matchers */
-        private ReflectionComparatorModes[] modes;
+        private ReflectionComparatorMode[] modes;
 
 
         /**
@@ -111,7 +111,7 @@ public class LenientMocksControl extends MocksClassControl {
          *
          * @param modes the modes for the reflection argument matchers
          */
-        public InvocationInterceptor(ReflectionComparatorModes... modes) {
+        public InvocationInterceptor(ReflectionComparatorMode... modes) {
             this.modes = modes;
         }
 
@@ -160,7 +160,7 @@ public class LenientMocksControl extends MocksClassControl {
             }
 
             for (int i = 0; i < arguments.length; i++) {
-                LastControl.reportMatcher(new ReflectionArgumentMatcher<Object>(arguments[i], invocation, i, modes));
+                LastControl.reportMatcher(new ReflectionArgumentMatcher<Object>(arguments[i], modes));
             }
         }
 

@@ -63,21 +63,21 @@ public class ReflectionComparator {
      *
      * @param modes the comparator modes
      */
-    public ReflectionComparator(ReflectionComparatorModes... modes) {
+    public ReflectionComparator(ReflectionComparatorMode... modes) {
 
         if (modes == null) {
             return;
         }
 
-        for (ReflectionComparatorModes mode : modes) {
+        for (ReflectionComparatorMode mode : modes) {
 
-            if (mode == ReflectionComparatorModes.IGNORE_DEFAULTS) {
+            if (mode == ReflectionComparatorMode.IGNORE_DEFAULTS) {
                 ignoreDefaults = true;
 
-            } else if (mode == ReflectionComparatorModes.LENIENT_DATES) {
+            } else if (mode == ReflectionComparatorMode.LENIENT_DATES) {
                 lenientDates = true;
 
-            } else if (mode == ReflectionComparatorModes.LENIENT_ORDER) {
+            } else if (mode == ReflectionComparatorMode.LENIENT_ORDER) {
                 lenientOrder = true;
             }
         }

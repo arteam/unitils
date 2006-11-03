@@ -3,7 +3,7 @@ package org.unitils.reflectionassert;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_ORDER;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;
 import java.util.List;

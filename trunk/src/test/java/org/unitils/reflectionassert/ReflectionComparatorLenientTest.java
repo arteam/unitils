@@ -7,8 +7,8 @@
 package org.unitils.reflectionassert;
 
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.ReflectionComparatorModes.LENIENT_DATES;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
 import junit.framework.TestCase;
 
 import java.util.Date;
