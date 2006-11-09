@@ -16,14 +16,12 @@
 
     <menu name="Unitils">
       <item name="Summary" href="index.html"/>
-      <item name="News" href="news.html"/>
-      <item name="FAQ" href="faq.html"/>      
-    </menu>
-    <menu name="Documentation">
-      <item name="Assert utils" href="assertutils.html"/>
-      <item name="DAO unit testing" href="dbtesting.html"/>
-      <item name="Hibernate unit testing" href="hbntesting.html"/>
-      <item name="Mock objects" href="mocktesting.html"/>
+      <item name="Downloads" href="http://sourceforge.net/project/showfiles.php?group_id=167201"/>
+      <item name="Documentation" href="documentation.html"/> 
+      <item name="Guidelines" href="guidelines.html"/>     
+      <item name="API Javadoc" href="javadoc.html"/>      
+      <item name="Forum" href="forum.html"/>
+      <item name="Format" href="format.html"/>
     </menu>
   </body>
 </project>
