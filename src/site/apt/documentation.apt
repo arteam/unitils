@@ -1,0 +1,56 @@
+ -----
+ Documentation
+ -----
+ -----
+
+Introduction
+~~~~~~~~~~~~
+
+* Overview
+~~~~~~~~~~
+
+* Module system
+~~~~~~~~~~~~~~~
+
+* Configuration
+~~~~~~~~~~~~~~~
+
+* Using reflection for assertion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Database testing
+~~~~~~~~~~~~~~~~~~
+
+** Unit test database maintenance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** Managing test data with DbUnit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** Testing with Hibernate
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*** Configuration
+~~~~~~~~~~~~~~~~~
+
+*** Testing the mapping 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* Testing with mock objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** EasyMock mock creation
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** Reflection lenient argument matching
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** Mock injection
+~~~~~~~~~~~~~~~~~
+
+*** Using a Service Locator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*** Using IOC
+~~~~~~~~~~~~~
+
