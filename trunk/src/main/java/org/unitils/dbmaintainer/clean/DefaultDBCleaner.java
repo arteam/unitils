@@ -1,8 +1,17 @@
 /*
- * Copyright (C) 2006, Ordina
+ * Copyright 2006 the original author or authors.
  *
- * Distributable under LGPL license.
- * See terms of license at gnu.org.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.dbmaintainer.clean;
 
@@ -49,6 +58,7 @@ public class DefaultDBCleaner implements DBCleaner {
 
     /**
      * Configures this object
+     *
      * @param configuration
      * @param dataSource
      * @param statementHandler
@@ -66,6 +76,7 @@ public class DefaultDBCleaner implements DBCleaner {
 
     /**
      * Deletes all data from all tables in the database, except
+     *
      * @throws StatementHandlerException
      */
     public void cleanDatabase() throws StatementHandlerException {
@@ -85,6 +96,7 @@ public class DefaultDBCleaner implements DBCleaner {
 
     /**
      * Returns the names of all tables in the database.
+     *
      * @param conn
      * @return the names of all tables in the database.
      * @throws SQLException
@@ -107,6 +119,7 @@ public class DefaultDBCleaner implements DBCleaner {
 
     /**
      * Deletes the data in the database tables with the given table names.
+     *
      * @param tableNames
      * @throws StatementHandlerException
      */
@@ -118,6 +131,7 @@ public class DefaultDBCleaner implements DBCleaner {
 
     /**
      * Converts the given list of strings to uppercase.
+     *
      * @param strings
      * @return the given string list, converted to uppercase
      */

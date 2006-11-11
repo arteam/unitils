@@ -1,19 +1,28 @@
 /*
- * Copyright (C) 2006, Ordina
+ * Copyright 2006 the original author or authors.
  *
- * Distributable under LGPL license.
- * See terms of license at gnu.org.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.dbmaintainer.maintainer.script;
-
-import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
 
+import java.util.List;
+
 /**
- * Defines the contract for a source that provides scripts for updating the database to a given state.<br> 
+ * Defines the contract for a source that provides scripts for updating the database to a given state.<br>
  * Scripts are provides a {@link org.unitils.dbmaintainer.maintainer.VersionScriptPair} objects, which indicate
  * which scripts should be executed, to update the database to which state.<br>
  */
@@ -21,13 +30,14 @@ public interface ScriptSource {
 
     /**
      * Initialize using the properties in the given <code>Configuration</code> object
-     * @param configuration 
+     *
+     * @param configuration
      */
     void init(Configuration configuration);
 
     /**
      * This methods returns true if one or more scripts that have a version index equal to or lower than
-     * the index specified by the given version object has been modified since the timestamp specfied by 
+     * the index specified by the given version object has been modified since the timestamp specfied by
      * the given version.
      *
      * @param currentVersion
@@ -44,13 +54,13 @@ public interface ScriptSource {
      *         version to the latest one.
      */
     List<VersionScriptPair> getNewScripts(Version currentVersion);
-    
+
     /**
      * Returns a <code>List<VersionScriptPair></code> containing all statements that complete create the database
      * from scratch.
-     * 
+     *
      * @return a <code>List<VersionScriptPair></code> containing all statements that complete create the database
-     * from scratch.
+     *         from scratch.
      */
     List<VersionScriptPair> getAllScripts();
 

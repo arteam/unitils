@@ -1,3 +1,18 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils;
 
 import junit.framework.AssertionFailedError;
@@ -21,6 +36,12 @@ public class TracingTestListener extends TestListener {
     public static final String AFTER_TEST_TEAR_DOWN = "afterTestTearDown";
     public static final String AFTER_TEST_CLASS = "afterTestClass";
     public static final String AFTER_ALL = "afterAll";
+
+    public static final String TEST_BEFORE_CLASS = "testBeforeClass";
+    public static final String TEST_SET_UP = "testSetUp";
+    public static final String TEST_METHOD = "testMethod";
+    public static final String TEST_TEAR_DOWN = "testTearDown";
+    public static final String TEST_AFTER_CLASS = "testAfterClass";
 
     private static final String TEST = "[Test]";
     private static final String UNITILS = "[Unitils]";
@@ -51,6 +72,7 @@ public class TracingTestListener extends TestListener {
 
     public void addTestInvocation(String invocation, Object test, String testMethodName) {
         callList.add(formatString(TEST, invocation, getClassName(test), testMethodName));
+        throwExceptionIfRequested(testMethodName);
     }
 
 
@@ -112,14 +134,14 @@ public class TracingTestListener extends TestListener {
     }
 
 
-    private void throwExceptionIfRequested(String message) {
-        if (exceptionMethod == null || !exceptionMethod.equals(message)) {
+    private void throwExceptionIfRequested(String exceptionMethod) {
+        if (this.exceptionMethod == null || !this.exceptionMethod.equals(exceptionMethod)) {
             return;
         }
         if (throwAssertionFailedError) {
-            throw new AssertionFailedError(message);
+            throw new AssertionFailedError(exceptionMethod);
         }
-        throw new RuntimeException(message);
+        throw new RuntimeException(exceptionMethod);
     }
 
 

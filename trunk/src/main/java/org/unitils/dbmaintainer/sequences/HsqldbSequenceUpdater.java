@@ -1,32 +1,36 @@
 /*
- * Copyright (C) 2006, Ordina
+ * Copyright 2006 the original author or authors.
  *
- * Distributable under LGPL license.
- * See terms of license at gnu.org.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.dbmaintainer.sequences;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.DatabaseMetaData;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collections;
-
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.log4j.Logger;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 import javax.sql.DataSource;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implementation of {@link SequenceUpdater} for an Hsqldb database
- *
+ * <p/>
  * // todo javadoc
  * // todo finish updating of identity columns
  * // todo test
@@ -143,6 +147,7 @@ public class HsqldbSequenceUpdater extends BaseSequenceUpdater {
 
     /**
      * Returns the value of the sequence with the given name
+     *
      * @param sequenceName
      * @param conn
      * @param tableName
@@ -164,6 +169,7 @@ public class HsqldbSequenceUpdater extends BaseSequenceUpdater {
 
     /**
      * Sets the next value of the sequence with the given sequence name to the lowest acceptacle sequence value.
+     *
      * @param sequenceName
      * @throws StatementHandlerException
      */

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils;
 
 import static junit.framework.Assert.assertEquals;
@@ -23,20 +38,41 @@ import org.unitils.util.ReflectionUtils;
 import java.util.Iterator;
 
 /**
- * todo javadoc
+ * Test for the main flow of the unitils test listeners for JUnit3 ({@link UnitilsJUnit3}),
+ * JUnit4 (@link UnitilsJUnit4TestClassRunner}) and TestNG ({@link UnitilsTestNG}).
  * <p/>
- * Test for {@link UnitilsJUnit4} and {@link UnitilsJUnit4TestClassRunner}.
+ * Except for some minor differences (see {@link #assertInvocationOrder}, the flows for all these test frameworks
+ * are expected to be the same.
+ * <p/>
+ * 3 tests are performed: TestClass1 and TestClass2 both with 2 test methods and EmptyTestClass
+ * that does not contain any methods. TestClass1 also contains an ignored test (not for JUnit3).
+ *
+ * @see UnitilsJUnit3Test_TestClass1
+ * @see UnitilsJUnit3Test_TestClass2
+ * @see UnitilsJUnit3Test_EmptyTestClass
+ * @see UnitilsJUnit4Test_TestClass1
+ * @see UnitilsJUnit4Test_TestClass2
+ * @see UnitilsJUnit4Test_EmptyTestClass
+ * @see UnitilsTestNGTest_TestClass1
+ * @see UnitilsTestNGTest_TestClass2
+ * @see UnitilsTestNGTest_EmptyTestClass
  */
 public class UnitilsInvocationTest {
 
-    /* Listener that records all test method invocations */
+    /* Listener that records all method invocations during the tests */
     private static TracingTestListener tracingTestListener;
 
+    /* Temporary holder so that the test listener that was replaced during the test can be place back */
     private static TestListener oldTestListenerUnitilsJUnit3;
 
+    /* Temporary holder so that the test listener that was replaced during the test can be place back */
     private static TestListener oldTestListenerUnitilsJUnit4;
 
 
+    /**
+     * Sets up the test by installing the tracing test listener that will record all method invocations during the test.
+     * The current test listeners are stored so that they can be restored during the class tear down.
+     */
     @BeforeClass
     public static void classSetup() {
         oldTestListenerUnitilsJUnit3 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit3.class, "testListener", true));
@@ -60,6 +96,9 @@ public class UnitilsInvocationTest {
     }
 
 
+    /**
+     * This will put back the old test listeners that were replaced by the tracing test listener.
+     */
     @AfterClass
     public static void classTearDown() {
 
@@ -67,6 +106,11 @@ public class UnitilsInvocationTest {
         InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
     }
 
+
+    /**
+     * Sets up the test by clearing the previous recorded method invocations. This will also re-initiliaze
+     * the base-classes so that, for example beforeAll() will be called another time.
+     */
     @Before
     public void setUp() throws Exception {
 
@@ -81,16 +125,7 @@ public class UnitilsInvocationTest {
 
 
     /**
-     * Tests the correct invocation sequence of listener methods for a JUnit 3 test.
-     * <p/>
-     * 3 tests are performed: TestClass1 and TestClass2 both with 2 test methods and EmptyTestClass
-     * that does not contain any methods.
-     * <p/>
-     * NOTE: there is a difference between JUnit 3 and JUnit 4 testruns:
-     * beforeTestClass and afterTestClass no not exist in JUnit 3 (the Unitils versions will be called however)
-     * empty tests are not run in JUnit 3, in JUnit 4 the before and after will be called
-     * the last afterTestClass method will be run during the runtime exit. This is because we cannot determine which test
-     * is going to be the last test in the class
+     * Tests the correct invocation sequence of listener methods for a JUnit3 test.
      */
     @Test
     public void testUnitilsJUnit3() {
@@ -104,7 +139,6 @@ public class UnitilsInvocationTest {
         TestResult testResult = testRunner.doRun(suite);
 
         assertInvocationOrder("JUnit3", tracingTestListener);
-
         // EmptyTestClass has caused a failure and will not be run
         assertEquals(0, testResult.errorCount());
         assertEquals(1, testResult.failureCount());
@@ -112,10 +146,7 @@ public class UnitilsInvocationTest {
 
 
     /**
-     * Tests the correct invocation sequence of listener methods for a JUnit 4 test.
-     * <p/>
-     * 3 tests are performed: TestClass1 and TestClass2 both with 2 test methods and EmptyTestClass
-     * that does not contain any methods.
+     * Tests the correct invocation sequence of listener methods for a JUnit4 test.
      */
     @Test
     public void testUnitilsJUnit4() throws Exception {
@@ -132,7 +163,6 @@ public class UnitilsInvocationTest {
         testRunner3.run(runNotifier);
 
         assertInvocationOrder("JUnit4", tracingTestListener);
-
         // EmptyTestClass has caused a failure
         assertEquals(1, failureRunListener.getFailureCount());
     }
@@ -140,9 +170,6 @@ public class UnitilsInvocationTest {
 
     /**
      * Tests the correct invocation sequence of listener methods for a TestNG test.
-     * <p/>
-     * 3 tests are performed: UnitilsTestNGTest_TestClass1 and UnitilsTestNGTest_TestClass2 both with 2 test methods
-     * and UnitilsTestNGTest_EmptyTestClass that does not contain any methods.
      */
     @Test
     public void testUnitilsTestNG() {
@@ -155,19 +182,32 @@ public class UnitilsInvocationTest {
         testng.run();
 
         assertInvocationOrder("TestNG", tracingTestListener);
-
         assertEquals(0, testListenerAdapter.getFailedTests().size());
     }
 
 
-    // todo javadoc
+    /**
+     * Asserts that the given listener recorded the correct invocation sequence. Except for some minor difference, the
+     * sequence should be equal for  all test frameworks.
+     * <p/>
+     * Following difference are allowed:<ul>
+     * <li>beforeTestClass and afterTestClass no not exist in JUnit 3 (the Unitils versions will be called however)</li>
+     * <li>empty tests are not run at all in JUnit3 and TestNG, in JUnit 4 the beforeTestClass and afterTestClass will be called</li>
+     * </ul>
+     * For JUnit3 and JUnit4 afterAll will be called during the runtime exit and can therefore not be asserted here.
+     * The same is true for the last afterTestClass method of JUnit3 tests. This is because you cannot determine which test
+     * is going to be the last test in the class
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the listener, not null
+     */
     private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
         Iterator iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
 
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
         if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
         }
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
         assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
@@ -184,13 +224,13 @@ public class UnitilsInvocationTest {
         assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
         }
         assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
 
         assertEquals("[Unitils] beforeTestClass   - TestClass2", iterator.next());
         if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    beforeTestClass   - TestClass2", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass2", iterator.next());
         }
         assertEquals("[Unitils] beforeTestSetUp   - TestClass2", iterator.next());
         assertEquals("[Test]    testSetUp         - TestClass2", iterator.next());
@@ -207,7 +247,7 @@ public class UnitilsInvocationTest {
         assertEquals("[Test]    testTearDown      - TestClass2", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass2", iterator.next());
         if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    afterTestClass    - TestClass2", iterator.next());
+            assertEquals("[Test]    testAfterClass    - TestClass2", iterator.next());
             // last afterTestClass (TestClass2) will be called when the runtime exits
             assertEquals("[Unitils] afterTestClass    - TestClass2", iterator.next());
         }
@@ -247,6 +287,9 @@ public class UnitilsInvocationTest {
     }
 
 
+    /**
+     * JUnit 4 run listener for recording the nr of failures during the test.
+     */
     private class FailureRunListener extends RunListener {
 
         private int failureCount = 0;
@@ -263,10 +306,9 @@ public class UnitilsInvocationTest {
 
 
     /**
-     * Empty JUnit 3 test class
+     * JUnit 3 test class without any tests.
      */
     private static class UnitilsJUnit3Test_EmptyTestClass extends UnitilsJUnit3 {
-
 
         private static TracingTestListener tracingTestListener;
 

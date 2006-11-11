@@ -1,16 +1,24 @@
 /*
- * Copyright (C) 2006, Ordina
+ * Copyright 2006 the original author or authors.
  *
- * Distributable under LGPL license.
- * See terms of license at gnu.org.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.dbmaintainer.constraints;
 
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import javax.sql.DataSource;
 
 /**
  * Wrapper or decorator for a <code>TestDataSource</code> that makes sure that the constraints are disabled on all
@@ -27,6 +35,7 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
 
     /**
      * Creates a new instance.
+     *
      * @param wrappedDataSource
      * @param constraintsDisabler
      */
@@ -37,6 +46,7 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
 
     /**
      * Returns a new connection to the database, on which constraints checking has been disabled.
+     *
      * @see javax.sql.DataSource#getConnection()
      */
     public Connection getConnection() throws SQLException {
@@ -47,8 +57,8 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
 
     /**
      * Returns a new connection to the database, on which constraints checking has been disabled.
-     * 
-     * @see javax.sql.DataSource#getConnection(java.lang.String, java.lang.String)
+     *
+     * @see javax.sql.DataSource#getConnection(java.lang.String,java.lang.String)
      */
     public Connection getConnection(String username, String password) throws SQLException {
         Connection conn = wrappedDataSource.getConnection(username, password);

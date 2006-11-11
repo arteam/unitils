@@ -1,22 +1,35 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbmaintainer.sequences;
 
-import org.unitils.UnitilsJUnit3;
-import org.unitils.db.annotations.TestDataSource;
-import org.unitils.db.annotations.DatabaseTest;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.util.ReflectionUtils;
-import org.unitils.dbmaintainer.sequences.SequenceUpdater;
-import org.unitils.dbmaintainer.sequences.BaseSequenceUpdater;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.db.annotations.DatabaseTest;
+import org.unitils.db.annotations.TestDataSource;
+import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.maintainer.DBMaintainer;
+import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Test class for the SequenceUpdater. Contains tests that can be implemented generally for all different database dialects.
@@ -215,6 +228,7 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     /**
      * Abstract method, since it is dbms dependent
+     *
      * @param conn
      * @return The next value of the test sequence
      * @throws SQLException

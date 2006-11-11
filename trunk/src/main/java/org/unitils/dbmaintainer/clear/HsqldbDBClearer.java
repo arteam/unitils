@@ -1,7 +1,22 @@
 /*
- * Copyright (C) 2006, Ordina Distributable under LGPL license. See terms of license at gnu.org.
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.dbmaintainer.clear;
+
+import org.apache.commons.dbutils.DbUtils;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -10,9 +25,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.dbutils.DbUtils;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-
 /**
  * Implementation of {@link DBClearer} for hsqldb
  */
@@ -20,7 +32,7 @@ public class HsqldbDBClearer extends BaseDBClearer {
 
     /**
      * Removes the view with the given name from the database
-     * 
+     *
      * @param viewName
      * @throws SQLException
      * @throws StatementHandlerException
@@ -33,7 +45,7 @@ public class HsqldbDBClearer extends BaseDBClearer {
 
     /**
      * Removes the table with the given name from the database
-     * 
+     *
      * @param tableName
      * @throws StatementHandlerException
      */
@@ -45,7 +57,7 @@ public class HsqldbDBClearer extends BaseDBClearer {
 
     /**
      * Drops all sequences in the database
-     * 
+     *
      * @param conn
      * @throws SQLException
      * @throws StatementHandlerException
@@ -69,7 +81,7 @@ public class HsqldbDBClearer extends BaseDBClearer {
 
     /**
      * Drops all database triggers
-     * 
+     *
      * @param conn
      * @throws SQLException
      * @throws StatementHandlerException
@@ -87,7 +99,7 @@ public class HsqldbDBClearer extends BaseDBClearer {
     }
 
     private List<String> getDbItemsOfType(Connection conn, String dbItemColumnName,
-            String systemMetadataTableName, String schemaColumnName) throws SQLException {
+                                          String systemMetadataTableName, String schemaColumnName) throws SQLException {
         ResultSet rset = null;
         Statement st = null;
         try {
