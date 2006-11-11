@@ -1,22 +1,32 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbmaintainer.clear;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.db.annotations.TestDataSource;
 import org.unitils.db.annotations.DatabaseTest;
-import org.unitils.dbmaintainer.clear.DBClearer;
+import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.util.ReflectionUtils;
+
+import java.sql.*;
 
 /**
  * Base test class for the DBClearer. Contains tests that can be implemented generally for all different database dialects.
@@ -47,6 +57,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
 
     /**
      * Configures the tested object. Creates a test table, injex, view and sequence
+     *
      * @throws Exception
      */
     @Override
@@ -146,10 +157,10 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         try {
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
-                st.execute("drop table testtable1");
+            st.execute("drop table testtable1");
         } catch (SQLException e) {
             // no action taken
-        }  finally {
+        } finally {
             DbUtils.closeQuietly(st);
         }
     }

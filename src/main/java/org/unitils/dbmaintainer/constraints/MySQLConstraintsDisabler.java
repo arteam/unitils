@@ -1,20 +1,19 @@
 /*
- * Copyright (C) 2006, Ordina
+ * Copyright 2006 the original author or authors.
  *
- * Distributable under LGPL license.
- * See terms of license at gnu.org.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.dbmaintainer.constraints;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
@@ -22,14 +21,19 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * TODO test me
  * TODO javadoc me
- *
+ * <p/>
  * Implementation of {@link ConstraintsDisabler} for an MySQL database.
  */
 public class MySQLConstraintsDisabler implements ConstraintsDisabler {
-    
+
     public static final String PROPKEY_SCHEMANAME = "dataSource.schemaName";
 
     /**
@@ -41,7 +45,7 @@ public class MySQLConstraintsDisabler implements ConstraintsDisabler {
      * The StatementHandler
      */
     private StatementHandler statementHandler;
-    
+
     private String schemaName;
 
 
@@ -51,7 +55,7 @@ public class MySQLConstraintsDisabler implements ConstraintsDisabler {
     public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
-        
+
         schemaName = configuration.getString(PROPKEY_SCHEMANAME).toUpperCase();
     }
 
@@ -72,9 +76,10 @@ public class MySQLConstraintsDisabler implements ConstraintsDisabler {
             DbUtils.closeQuietly(conn, null, rs);
         }
     }
-    
+
     /**
      * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
+     *
      * @param conn
      * @throws SQLException
      * @throws StatementHandlerException
@@ -86,12 +91,13 @@ public class MySQLConstraintsDisabler implements ConstraintsDisabler {
             removeNotNullConstraints(conn, tableName);
         }
     }
-    
+
     /**
      * Sends statements to the StatementHandler that make sure all not-null constraints for the table with the given
      * name are disabled.
+     *
      * @param conn
-     * @param tableName 
+     * @param tableName
      * @throws SQLException
      * @throws StatementHandlerException
      */
@@ -116,8 +122,8 @@ public class MySQLConstraintsDisabler implements ConstraintsDisabler {
                         // Therefore, we use the alter table modfiy syntax to redefine the column, and leave off the 
                         // not null part. This has as a side effect that if a column default has been set, this is 
                         // also left out.
-                        String makeNullableSql = "alter table " + tableName + " modify column " + columnName 
-                            + " " + columnType;
+                        String makeNullableSql = "alter table " + tableName + " modify column " + columnName
+                                + " " + columnType;
                         statementHandler.handle(makeNullableSql);
                     }
                 }
@@ -126,11 +132,11 @@ public class MySQLConstraintsDisabler implements ConstraintsDisabler {
             DbUtils.closeQuietly(rs);
         }
     }
-    
-    
-    
+
+
     /**
      * Returns the names of the primary key columns of the table with the given tableName
+     *
      * @param conn
      * @param tableName
      * @return the names of the primary key columns of the table with the given tableName
@@ -150,13 +156,12 @@ public class MySQLConstraintsDisabler implements ConstraintsDisabler {
             DbUtils.closeQuietly(rs);
         }
     }
-    
+
     /**
      * Returns the names of all tables as a <code>List</code>
-     * @param conn
-     * The database connection
-     * @return
-     * The names of all database tables
+     *
+     * @param conn The database connection
+     * @return The names of all database tables
      * @throws SQLException
      */
     private List<String> getTableNames(Connection conn) throws SQLException {

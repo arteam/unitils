@@ -1,6 +1,22 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils;
 
 import org.testng.annotations.*;
+import static org.unitils.TracingTestListener.*;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 
@@ -22,32 +38,32 @@ public class UnitilsTestNGTest_TestClass2 extends UnitilsTestNG {
 
     @BeforeClass
     public void beforeClass() {
-        addTestInvocation("beforeTestClass", null);
+        addTestInvocation(TEST_BEFORE_CLASS, null);
     }
 
     @AfterClass
     public void afterClass() {
-        addTestInvocation("afterTestClass", null);
+        addTestInvocation(TEST_AFTER_CLASS, null);
     }
 
     @BeforeMethod
     public void setUp() {
-        addTestInvocation("testSetUp", null);
+        addTestInvocation(TEST_SET_UP, null);
     }
 
     @AfterMethod
     public void tearDown() {
-        addTestInvocation("testTearDown", null);
+        addTestInvocation(TEST_TEAR_DOWN, null);
     }
 
     @Test
     public void test1() {
-        addTestInvocation("testMethod", "test1");
+        addTestInvocation(TEST_METHOD, "test1");
     }
 
     @Test
     public void test2() {
-        addTestInvocation("testMethod", "test2");
+        addTestInvocation(TEST_METHOD, "test2");
     }
 
 

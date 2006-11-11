@@ -1,18 +1,26 @@
 /*
- * Copyright (C) 2006, Ordina
+ * Copyright 2006 the original author or authors.
  *
- * Distributable under LGPL license.
- * See terms of license at gnu.org.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.unitils.dbmaintainer.handler;
 
+import org.apache.commons.configuration.Configuration;
+
+import javax.sql.DataSource;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.configuration.Configuration;
 
 /**
  * Implementation of {@link StatementHandler} that writes each statement to a file. The fileName is specified
@@ -32,7 +40,7 @@ public class FileStatementHandler implements StatementHandler {
     private String fileName;
 
     /**
-     * @see StatementHandler#init(Configuration, DataSource)
+     * @see StatementHandler#init(Configuration,DataSource)
      */
     public void init(Configuration configuration, DataSource dataSource) {
 
@@ -41,6 +49,7 @@ public class FileStatementHandler implements StatementHandler {
 
     /**
      * Writes the given statement to the file, configured by the property {@link #PROPKEY_FILENAME}
+     *
      * @see StatementHandler#handle(String)
      */
     public void handle(String statement) throws StatementHandlerException {

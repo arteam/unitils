@@ -1,9 +1,23 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbmaintainer.clean;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.core.Unitils;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
@@ -37,6 +51,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     /**
      * Test fixture. The DefaultDBCleaner is instantiated and configured. Test tables are created and filled with test
      * data. One of these tables is configured as 'tabletopreserve'.
+     *
      * @throws Exception
      */
     protected void setUp() throws Exception {
@@ -81,6 +96,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
 
     /**
      * Removes the test database tables
+     *
      * @param conn
      * @throws SQLException
      */
@@ -184,7 +200,6 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     }
 
     /**
-     *
      * @param conn
      * @return
      * @throws SQLException

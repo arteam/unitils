@@ -1,20 +1,30 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbmaintainer.constraints;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
+
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of {@link ConstraintsDisabler} for a hsqldb database.
@@ -30,7 +40,7 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
     private String schemaName;
 
     /**
-     * @see ConstraintsDisabler#init(Configuration, DataSource, StatementHandler)
+     * @see ConstraintsDisabler#init(Configuration,DataSource,StatementHandler)
      */
     public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         this.dataSource = dataSource;
@@ -39,7 +49,7 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
         schemaName = configuration.getString(PROPKEY_SCHEMANAME).toUpperCase();
     }
 
-   /**
+    /**
      * Remove all not-null constraints. Foreign key constraints are disabled directly on the connection (see method
      * disableConstraintsOnConnection)
      */
@@ -60,6 +70,7 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
 
     /**
      * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
+     *
      * @param conn
      * @throws SQLException
      * @throws StatementHandlerException
@@ -75,8 +86,9 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
     /**
      * Sends statements to the StatementHandler that make sure all not-null constraints for the table with the given
      * name are disabled.
+     *
      * @param conn
-     * @param tableName 
+     * @param tableName
      * @throws SQLException
      * @throws StatementHandlerException
      */
@@ -108,6 +120,7 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
 
     /**
      * Returns the names of the primary key columns of the table with the given tableName
+     *
      * @param conn
      * @param tableName
      * @return the names of the primary key columns of the table with the given tableName
@@ -130,10 +143,9 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
 
     /**
      * Returns the names of all tables as a <code>List</code>
-     * @param conn
-     * The database connection
-     * @return
-     * The names of all database tables
+     *
+     * @param conn The database connection
+     * @return The names of all database tables
      * @throws SQLException
      */
     private List<String> getTableNames(Connection conn) throws SQLException {
@@ -154,6 +166,7 @@ public class HsqldbConstraintsDisabler implements ConstraintsDisabler {
 
     /**
      * Makes sure foreign key checking is disabled
+     *
      * @param conn
      */
     public void disableConstraintsOnConnection(Connection conn) {
