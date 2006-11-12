@@ -35,7 +35,6 @@ public class ModuleUtils {
      */
     public static final String DEFAULT_ENUM_VALUE_NAME = "DEFAULT";
 
-
     //todo javadoc
     public static Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> getAnnotationEnumDefaults(Class<? extends Module> moduleClass, Configuration configuration, Class<? extends Annotation>... annotationClasses) {
 

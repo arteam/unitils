@@ -22,6 +22,7 @@ import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.xml.FlatDtdDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -33,33 +34,16 @@ import java.sql.Connection;
  * <p/>
  * todo test and fix for hsqldb (see sample project)
  */
-public class FlatXmlDataSetDtdGenerator implements DtdGenerator {
+public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGenerator {
 
     /* Property key of the filename of the generated DTD  */
     private static final String PROPKEY_DTD_FILENAME = "dtdGenerator.dtd.filename";
 
-    /* Property key of the name of the database schema */
-    private static final String PROPKEY_SCHEMA_NAME = "dataSource.userName";
-
-    /* The datasource */
-    private DataSource dataSource;
-
-    /* The database schema name*/
-    private String schemaName;
-
     /* The DTD file name */
     private String dtdFileName;
 
-    /**
-     * Initializes the connection to the database, and the path of the file where the DTD should be written into
-     *
-     * @see org.unitils.dbmaintainer.dtd.DtdGenerator#init(org.apache.commons.configuration.Configuration,javax.sql.DataSource)
-     */
-    public void init(Configuration configuration, DataSource dataSource) {
-        this.dataSource = dataSource;
-
+    protected void doInit(Configuration configuration) {
         dtdFileName = configuration.getString(PROPKEY_DTD_FILENAME);
-        schemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
     }
 
     /**

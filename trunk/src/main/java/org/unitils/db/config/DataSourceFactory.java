@@ -13,21 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.dtd;
+package org.unitils.db.config;
 
 import org.apache.commons.configuration.Configuration;
 
 import javax.sql.DataSource;
 
 /**
- * Defines the contract for implementations that create a DTD that describes a database. This DTD can
- * be used in XML files containing test data for a unit test database
+ * Interface for different sorts of Factories of a TestDataSource.
+ * <p/>
+ * todo javadoc
  */
-public interface DtdGenerator {
+public interface DataSourceFactory {
 
     /**
-     * Generates the DTD
+     * Initializes itself using the properties in the given <code>Configuration</code> object.
+     *
+     * @param configuration
      */
-    void generateDtd();
+    public void init(Configuration configuration);
+
+
+    /**
+     * Creates a new <code>TestDataSource</code>
+     *
+     * @return the TestDataSource
+     */
+    public DataSource createDataSource();
 
 }

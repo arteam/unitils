@@ -19,7 +19,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.unitils.core.Unitils;
-import org.unitils.dbmaintainer.config.DataSourceFactory;
+import org.unitils.db.config.DataSourceFactory;
 import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
@@ -29,10 +29,13 @@ import javax.sql.DataSource;
  */
 public abstract class BaseUnitilsTask extends Task {
 
-    /* Property keys of the datasource factory classname */
+    /* Property key of the implementation of the DbSupport interface */
+    public static final String PROPKEY_DBSUPPORT_CLASSNAME = "dbMaintainer.dbSupport.className";
+    
+    /* Property key of the datasource factory classname */
     private static final String PROPKEY_DATASOURCEFACTORY_CLASSNAME = "dataSourceFactory.className";
 
-    /* Property keys of the database schema name */
+    /* Property key of the database schema name */
     private static final String PROPKEY_DATABASE_SCHEMANAME = "dataSource.schemaName";
 
     /* The pooled datasource instance */

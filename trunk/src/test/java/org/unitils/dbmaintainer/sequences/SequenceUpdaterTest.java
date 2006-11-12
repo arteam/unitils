@@ -23,8 +23,7 @@ import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.util.ReflectionUtils;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -43,17 +42,17 @@ import java.sql.Statement;
 public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     @TestDataSource
-    private DataSource dataSource;
+    protected DataSource dataSource;
 
     /**
      * Tested object
      */
-    private SequenceUpdater sequenceUpdater;
+    protected SequenceUpdater sequenceUpdater;
 
     /**
      * Value that sequences should at least have after updating the sequences
      */
-    private static final int LOWEST_ACCEPTACLE_SEQUENCE_VALUE = 1000;
+    protected static final int LOWEST_ACCEPTACLE_SEQUENCE_VALUE = 1000;
 
     /**
      * Test fixture. Configures the implementation of the SequenceUpdater that matches the currenlty configured dialect.
@@ -65,13 +64,13 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         super.setUp();
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(BaseSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+        configuration.setProperty(DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
 
-        String databaseDialect = configuration.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT);
         StatementHandler statementHandler = new JDBCStatementHandler();
         statementHandler.init(configuration, dataSource);
-        sequenceUpdater = ReflectionUtils.createInstanceOfType(configuration.getString(DBMaintainer.PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
-        sequenceUpdater.init(configuration, dataSource, statementHandler);
+
+        sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class,
+                configuration, dataSource, statementHandler);
 
         Connection conn = null;
         try {

@@ -23,7 +23,7 @@ import org.unitils.dbmaintainer.clear.DBClearer;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.util.ReflectionUtils;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
 /**
  * Ant task that drops all database tables in the current database. Invokes the implementation of {@link DBClearer}
@@ -36,9 +36,6 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
 
     /* Property key of the implementation class of the {@link DBClearer} */
     public static final String PROPKEY_DBCLEARER_START = "dbMaintainer.dbClearer.className";
-
-    /* Property key of the SQL dialect of the underlying DBMS implementation */
-    private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /**
      * Clears the database, using the implementation of <code>DBClearer</code> that is configured in the Unitils
@@ -66,8 +63,8 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
         StatementHandler statementHandler = new JDBCStatementHandler();
         statementHandler.init(configuration, dataSource);
 
-        DBClearer dbClearer = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DBCLEARER_START + configuration.getString(PROPKEY_DATABASE_DIALECT)));
-        dbClearer.init(configuration, dataSource, statementHandler);
+        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration,
+                dataSource, statementHandler);
         return dbClearer;
     }
 }

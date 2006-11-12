@@ -24,6 +24,7 @@ import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 
 import java.sql.Connection;
@@ -38,7 +39,7 @@ import java.sql.Statement;
 public class DBVersionSourceTest extends UnitilsJUnit3 {
 
     /* The tested instance */
-    private DBVersionSource dbVersionSource;
+    private VersionSource dbVersionSource;
 
     /* The dataSource */
     @TestDataSource
@@ -57,8 +58,8 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
 
         StatementHandler statementHandler = new JDBCStatementHandler();
         statementHandler.init(configuration, dataSource);
-        dbVersionSource = new DBVersionSource();
-        dbVersionSource.init(configuration, dataSource, statementHandler);
+        dbVersionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class,
+                configuration, dataSource, statementHandler);
     }
 
     /**

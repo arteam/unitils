@@ -57,6 +57,7 @@ public class ReflectionUtils {
             throw new UnitilsException("Class " + className + " does not contain no-argument constructor", e);
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new UnitilsException("Error while trying to create object of class " + className, e);
         }
     }

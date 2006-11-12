@@ -28,15 +28,6 @@ import javax.sql.DataSource;
 public interface SequenceUpdater {
 
     /**
-     * Initializes the VersionSource
-     *
-     * @param configuration
-     * @param dataSource
-     * @param statementHandler
-     */
-    void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler);
-
-    /**
      * Updates the database sequences
      *
      * @throws StatementHandlerException

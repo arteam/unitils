@@ -53,7 +53,7 @@ import java.sql.SQLException;
  * a database test (see {@link DatabaseModule} for more information)
  * <p/>
  * For each database test method, this module will try to find a test dataset file in the classpath and, if found, insert
- * this dataset into the test database. DbUnits <code>DatabaseOperation.CLEAN_INSERT</code> is used for inserting this
+ * this dataset into the test database. DbUnits <code>DatabaseTask.CLEAN_INSERT</code> is used for inserting this
  * dataset. This means that the tables specified in the dataset are cleared before inserting the test records. As dataset
  * file format, DbUnit's <code>FlatXmlDataSet</code> is used.
  * <p/>
@@ -215,7 +215,7 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * @return The DbUnit <code>DatabaseOperation</code> that is used for loading the data file
+     * @return The DbUnit <code>DatabaseTask</code> that is used for loading the data file
      */
     protected DatabaseOperation getInsertDatabaseOperation() {
 

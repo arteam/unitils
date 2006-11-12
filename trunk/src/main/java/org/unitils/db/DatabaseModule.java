@@ -21,15 +21,17 @@ import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
-import org.unitils.dbmaintainer.config.DataSourceFactory;
+import org.unitils.db.config.DataSourceFactory;
 import org.unitils.dbmaintainer.constraints.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
+import org.unitils.util.ConfigUtils;
 
 import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
@@ -61,17 +63,8 @@ public class DatabaseModule implements Module {
     /* Property keys indicating if the database schema should be updated before performing the tests */
     static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
 
-    /* Property keys of the datasource factory classname */
-    static final String PROPKEY_DATASOURCEFACTORY_CLASSNAME = "dataSourceFactory.className";
-
     /* Property key indicating if the database constraints should org disabled after updating the database */
     private static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
-
-    /* Property key of the implementation class of {@link ConstraintsDisabler} */
-    private static final String PROPKEY_CONSTRAINTSDISABLER_START = "constraintsDisabler.className";
-
-    /* Property key of the SQL dialect of the underlying DBMS implementation */
-    private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /* The pooled datasource instance */
     private DataSource dataSource;
@@ -187,14 +180,11 @@ public class DatabaseModule implements Module {
      */
     protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
 
-        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
-        String constraintsDisablerClassName = configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect);
-
         StatementHandler statementHandler = new JDBCStatementHandler();
         statementHandler.init(configuration, dataSource);
 
-        ConstraintsDisabler constraintsDisabler = ReflectionUtils.createInstanceOfType(constraintsDisablerClassName);
-        constraintsDisabler.init(configuration, dataSource, statementHandler);
+        ConstraintsDisabler constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
+                configuration, dataSource, statementHandler);
         return constraintsDisabler;
     }
 
@@ -285,8 +275,7 @@ public class DatabaseModule implements Module {
      * @return The configured {@link DataSourceFactory}
      */
     protected DataSourceFactory createDataSourceFactory() {
-        String dataSourceFactoryClassName = configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME);
-        return ReflectionUtils.createInstanceOfType(dataSourceFactoryClassName);
+        return ConfigUtils.getConfiguredInstance(DataSourceFactory.class, configuration);
     }
 
     /**

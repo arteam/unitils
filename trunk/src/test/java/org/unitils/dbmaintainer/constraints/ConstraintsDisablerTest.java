@@ -23,8 +23,7 @@ import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.util.ReflectionUtils;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -59,13 +58,11 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         super.setUp();
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
-
         StatementHandler st = new JDBCStatementHandler();
         st.init(configuration, dataSource);
 
-        constraintsDisabler = ReflectionUtils.createInstanceOfType(configuration.getString(DBMaintainer.PROPKEY_CONSTRAINTSDISABLER_START + '.' +
-                configuration.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
-        constraintsDisabler.init(configuration, dataSource, st);
+        constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
+                configuration, dataSource, st);
 
         createTestTables();
     }
@@ -123,7 +120,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      *
      * @throws SQLException
      */
-    public void testDisableConstraints_foreignKey() throws SQLException {
+    public void testDisableConstraints_foreignKey() throws Exception {
         Connection conn = null;
         try {
             try {
@@ -164,7 +161,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      *
      * @throws SQLException
      */
-    public void testDisableConstraints_notNull() throws SQLException {
+    public void testDisableConstraints_notNull() throws Exception {
         Connection conn = null;
         try {
             try {

@@ -30,6 +30,7 @@ import org.unitils.dbmaintainer.maintainer.version.VersionSource;
 import org.unitils.dbmaintainer.script.SQLScriptRunner;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
@@ -66,26 +67,35 @@ public class DBMaintainer {
     /* Logger */
     private static final Logger logger = Logger.getLogger(DBMaintainer.class);
 
+    /* Property key of the database dialect */
+    public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
+
+    /* Property key of the implementation of the DbSupport interface */
+    public static final String PROPKEY_DBSUPPORT_CLASSNAME = "dbMaintainer.dbSupport.className";
+
     /* Property key indicating if updating the database from scratch is enabled */
     public static final String PROPKEY_FROMSCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
 
     /* Property key of the implementation class of {@link VersionSource} */
-    public static final String PROPKEY_VERSIONSOURCE = "dbMaintainer.versionSource.className";
+    public static final String PROPKEY_VERSIONSOURCE_CLASSNAME = "dbMaintainer.versionSource.className";
 
     /* Property key of the implementation class of {@link ScriptSource} */
-    public static final String PROPKEY_SCRIPTSOURCE = "dbMaintainer.scriptSource.className";
+    public static final String PROPKEY_SCRIPTSOURCE_CLASSNAME = "dbMaintainer.scriptSource.className";
 
     /* Property key of the implementation class of {@link VersionSource}  */
-    public static final String PROPKEY_STATEMENTHANDLER = "dbMaintainer.statementHandler.className";
+    public static final String PROPKEY_STATEMENTHANDLER_CLASSNAME = "dbMaintainer.statementHandler.className";
 
     /* Property key of the implementation class of the {@link DBClearer} */
-    public static final String PROPKEY_DBCLEARER_START = "dbMaintainer.dbClearer.className";
+    public static final String PROPKEY_DBCLEARER_CLASSNAME = "dbMaintainer.dbClearer.className";
+
+    /* Property key of the implementation class of the {@link DBClearer} */
+    public static final String PROPKEY_DBCLEANER_CLASSNAME = "dbMaintainer.dbCleaner.className";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
     public static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
 
     /* Property key of the implementation class of {@link ConstraintsDisabler} */
-    public static final String PROPKEY_CONSTRAINTSDISABLER_START = "constraintsDisabler.className";
+    public static final String PROPKEY_CONSTRAINTSDISABLER_CLASSNAME = "constraintsDisabler.className";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
     public static final String PROPKEY_UPDATESEQUENCES_ENABLED = "dbMaintainer.updateSequences.enabled";
@@ -94,14 +104,10 @@ public class DBMaintainer {
     public static final String PROPKEY_GENERATEDTD_ENABLED = "dbMaintainer.generateDTD.enabled";
 
     /* Property key of the implementation class of {@link SequenceDisabler} */
-    public static final String PROPKEY_SEQUENCEUPDATER_START = "sequenceUpdater.className";
+    public static final String PROPKEY_SEQUENCEUPDATER_CLASSNAME = "sequenceUpdater.className";
 
     /* Property key of the implementation class of {@link DtdGenerator} */
     public static final String PROPKEY_DTDGENERATOR_CLASSNAME = "dbMaintainer.database.dtdGenerator.className";
-
-    /* Property key of the SQL dialect of the underlying DBMS implementation */
-    public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
-
 
     /* Provider of the current version of the database, and means to increment it */
     private VersionSource versionSource;
@@ -143,40 +149,40 @@ public class DBMaintainer {
      */
     public DBMaintainer(Configuration configuration, DataSource dataSource) {
 
-        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
-        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler) ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_STATEMENTHANDLER)));
+        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler)
+                ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_STATEMENTHANDLER_CLASSNAME)));
         statementHandler.init(configuration, dataSource);
 
-        versionSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_VERSIONSOURCE));
-        versionSource.init(configuration, dataSource, statementHandler);
+        versionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class, configuration,
+                dataSource, statementHandler);
 
-        scriptSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_SCRIPTSOURCE));
+        scriptSource = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_SCRIPTSOURCE_CLASSNAME));
         scriptSource.init(configuration);
 
         scriptRunner = new SQLScriptRunner(statementHandler);
 
         fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
         if (fromScratchEnabled) {
-            dbClearer = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DBCLEARER_START + "." + databaseDialect));
-            dbClearer.init(configuration, dataSource, statementHandler);
+            dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration,
+                    dataSource, statementHandler);
         }
 
         boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         if (disableConstraints) {
-            constraintsDisabler = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_CONSTRAINTSDISABLER_START + "." + databaseDialect));
-            constraintsDisabler.init(configuration, dataSource, statementHandler);
+            constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
+                    configuration, dataSource, statementHandler);
         }
 
         boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
         if (updateSequences) {
-            sequenceUpdater = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_SEQUENCEUPDATER_START + "." + databaseDialect));
-            sequenceUpdater.init(configuration, dataSource, statementHandler);
+            sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class,
+                    configuration, dataSource, statementHandler);
         }
 
         boolean generateDtd = configuration.getBoolean(PROPKEY_GENERATEDTD_ENABLED);
         if (generateDtd) {
-            dtdGenerator = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DTDGENERATOR_CLASSNAME));
-            dtdGenerator.init(configuration, dataSource);
+            dtdGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration,
+                    dataSource, statementHandler);
         }
     }
 
