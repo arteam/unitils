@@ -176,25 +176,6 @@ public class FileScriptSource implements ScriptSource {
     }
 
     /**
-     * Returns all scripts that the given files contain as a List of strings
-     *
-     * @param scriptFiles
-     * @return all scripts that the given files contain as a List of strings
-     */
-    private List<String> getScriptsFromFiles(List<File> scriptFiles) {
-        List<String> scripts = new ArrayList<String>();
-        for (File scriptFile : scriptFiles) {
-            try {
-                String script = FileUtils.readFileToString(scriptFile, System.getProperty("file.encoding"));
-                scripts.add(script);
-            } catch (IOException e) {
-                throw new UnitilsException("Error while trying to read file " + scriptFile);
-            }
-        }
-        return scripts;
-    }
-
-    /**
      * Returns the highest timestamp of the given scriptFiles. Only the files with an index lower than maxIndex are
      * considered.
      *

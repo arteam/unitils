@@ -27,17 +27,90 @@ import java.sql.Statement;
  */
 public class HsqldbSequenceUpdaterTest extends SequenceUpdaterTest {
 
-    protected long getNextSequenceValue(Connection conn) throws SQLException {
+    protected void setUp() throws Exception {
+        super.setUp();
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            createTestTableWithIdentityColumn(conn);
+        } finally {
+            DbUtils.closeQuietly(conn);
+        }
+    }
+
+    protected void tearDown() throws Exception {
+        Connection conn = dataSource.getConnection();
+        try {
+            conn = dataSource.getConnection();
+            dropTestTableWithIdentityColumn(conn);
+        } finally {
+            DbUtils.closeQuietly(conn);
+        }
+        super.tearDown();
+    }
+
+    private void createTestTableWithIdentityColumn(Connection conn) throws SQLException {
         Statement st = null;
-        ResultSet rset = null;
         try {
             st = conn.createStatement();
-            rset = st.executeQuery("select next value for testsequence from testtable");
-            rset.next();
-            long sequenceValue = rset.getLong(1);
+            st.execute("create table testidentity (identitycol identity, othercol varchar(1))");
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    private void dropTestTableWithIdentityColumn(Connection conn) {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            st.execute("drop table testidentity");
+        } catch (SQLException e) {
+            // Ignored
+        } finally {
+            DbUtils.closeQuietly(st);
+        }
+    }
+
+    protected long getNextSequenceValue(Connection conn) throws SQLException {
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery("select next value for testsequence from testtable");
+            rs.next();
+            long sequenceValue = rs.getLong(1);
             return sequenceValue;
         } finally {
-            DbUtils.closeQuietly(null, st, rset);
+            DbUtils.closeQuietly(null, st, rs);
+        }
+    }
+
+    public void testUpdateIdentityColumns() throws Exception {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            assertTrue(getNextIdentityColumnValue(conn) < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+            sequenceUpdater.updateSequences();
+            long nextIdentityColumnValue = getNextIdentityColumnValue(conn);
+            System.out.println("nextIdentityColumnValue = " + nextIdentityColumnValue);
+            assertTrue(nextIdentityColumnValue >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+        } finally {
+            DbUtils.closeQuietly(conn);
+        }
+    }
+
+    private long getNextIdentityColumnValue(Connection conn) throws SQLException {
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = conn.createStatement();
+            st.execute("insert into testidentity(othercol) values ('x')");
+            rs = st.executeQuery("select max(identitycol) from testidentity");
+            rs.next();
+            long identityCol = rs.getLong(1);
+            return identityCol;
+        } finally {
+            DbUtils.closeQuietly(null, st, rs);
         }
     }
 }

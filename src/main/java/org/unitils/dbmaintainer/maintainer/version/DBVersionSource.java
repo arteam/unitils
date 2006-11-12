@@ -20,6 +20,8 @@ import org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
+import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -27,17 +29,7 @@ import java.sql.*;
 /**
  * Implementation of <code>VersionSource</code> that stores the version in the database
  */
-public class DBVersionSource implements VersionSource {
-
-    /**
-     * The <code>TestDataSource</code> that provides the connection to the database
-     */
-    private DataSource dataSource;
-
-    /**
-     * The StatementHandler
-     */
-    private StatementHandler statementHandler;
+public class DBVersionSource extends DatabaseTask implements VersionSource {
 
     /**
      * The key of the property that specifies the name of the datase table in which the
@@ -61,29 +53,14 @@ public class DBVersionSource implements VersionSource {
     public static final String PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME = "dbMaintainer.dbVersionSource.lastUpdateSucceededColumnName";
 
     /**
-     * The start of the key of the property that specifies the type of the column in which the database version is stored.
-     */
-    public static final String PROPKEY_VERSION_COLUMN_DATATYPE_START = "dbMaintainer.dbVersionSource.versionColumnDataType";
-
-    /**
      * The key of the property that specifies the schema name of the database
      */
     public static final String PROPKEY_SCHEMANAME = "dataSource.schemaName";
 
     /**
-     * Property key of the SQL dialect of the underlying DBMS implementation
-     */
-    private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
-
-    /**
-     * The name of the database schema
-     */
-    private String schemaName;
-
-    /**
      * The name of the datase table in which the DB version is stored
      */
-    private String tableName;
+    private String versionTableName;
 
     /**
      * The name of the datase column in which the DB version index is stored
@@ -100,28 +77,11 @@ public class DBVersionSource implements VersionSource {
      */
     private String lastUpdateSucceededColumnName;
 
-    /**
-     * The type of the database columns in which the version index and version timestamps are stored. This data type
-     * should be sufficiently large to be able to store values of the <code>long</code> Java type.
-     */
-    private String versionColumnType;
-
-    /**
-     * Initializes with the given <code>Properties</code> and <code>TestDataSource</code>.
-     *
-     * @param dataSource
-     */
-    public void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
-
-        this.schemaName = configuration.getString(PROPKEY_SCHEMANAME).toUpperCase();
-        this.tableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
+    protected void doInit(Configuration configuration) {
+        this.versionTableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
         this.versionIndexColumnName = configuration.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();
         this.versionTimestampColumnName = configuration.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME).toUpperCase();
         this.lastUpdateSucceededColumnName = configuration.getString(PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME).toUpperCase();
-        this.versionColumnType = configuration.getString(PROPKEY_VERSION_COLUMN_DATATYPE_START + '.' +
-                configuration.getString(PROPKEY_DATABASE_DIALECT));
-        this.dataSource = dataSource;
-        this.statementHandler = statementHandler;
     }
 
     /**
@@ -135,7 +95,7 @@ public class DBVersionSource implements VersionSource {
             conn = dataSource.getConnection();
             checkVersionTable(conn);
             st = conn.createStatement();
-            rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " + tableName);
+            rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " + versionTableName);
             rs.next();
             return new Version(rs.getLong(versionIndexColumnName), rs.getLong(versionTimestampColumnName));
         } catch (SQLException e) {
@@ -158,35 +118,36 @@ public class DBVersionSource implements VersionSource {
             st = conn.createStatement();
             // Check if the version table exists
             DatabaseMetaData metadata = conn.getMetaData();
-            rs = metadata.getTables(null, schemaName, tableName, null);
+            rs = metadata.getTables(null, schemaName, versionTableName, null);
+            String longDataType = dbSupport.getLongDataType();
             if (!rs.next()) {
                 // The version table does not exist. Create it
-                statementHandler.handle("create table " + tableName + " ( " + versionIndexColumnName + " " + versionColumnType +
-                        ", " + versionTimestampColumnName + " " + versionColumnType + ", " + lastUpdateSucceededColumnName +
-                        " " + versionColumnType + " )");
+                statementHandler.handle("create table " + versionTableName + " ( " + versionIndexColumnName + " " + longDataType +
+                        ", " + versionTimestampColumnName + " " + longDataType + ", " + lastUpdateSucceededColumnName +
+                        " " + longDataType + " )");
             } else {
                 // Check if the version table has the expected column
-                rs = metadata.getColumns(null, schemaName, tableName, versionIndexColumnName);
+                rs = metadata.getColumns(null, schemaName, versionTableName, versionIndexColumnName);
                 if (!rs.next()) {
                     // The version table exists but the column does not. Create it
-                    statementHandler.handle("alter table " + tableName + " add " + versionIndexColumnName + " " + versionColumnType);
+                    statementHandler.handle("alter table " + versionTableName + " add " + versionIndexColumnName + " " + longDataType);
                 }
-                rs = metadata.getColumns(null, schemaName, tableName, versionTimestampColumnName);
+                rs = metadata.getColumns(null, schemaName, versionTableName, versionTimestampColumnName);
                 if (!rs.next()) {
                     // The version table exists but the column does not. Create it
-                    statementHandler.handle("alter table " + tableName + " add " + versionTimestampColumnName + " " + versionColumnType);
+                    statementHandler.handle("alter table " + versionTableName + " add " + versionTimestampColumnName + " " + longDataType);
                 }
-                rs = metadata.getColumns(null, schemaName, tableName, lastUpdateSucceededColumnName);
+                rs = metadata.getColumns(null, schemaName, versionTableName, lastUpdateSucceededColumnName);
                 if (!rs.next()) {
                     // The version table exists but the column does not. Create it
-                    statementHandler.handle("alter table " + tableName + " add " + lastUpdateSucceededColumnName + " " + versionColumnType);
+                    statementHandler.handle("alter table " + versionTableName + " add " + lastUpdateSucceededColumnName + " " + longDataType);
                 }
             }
             // The version table and column exist. Check if a record with the version is available
-            rs = st.executeQuery("select * from " + tableName);
+            rs = st.executeQuery("select * from " + versionTableName);
             if (!rs.next()) {
                 // The version table is empty. Insert a record with version number 0.
-                statementHandler.handle("insert into " + tableName + " (" + versionIndexColumnName + ", " + versionTimestampColumnName +
+                statementHandler.handle("insert into " + versionTableName + " (" + versionIndexColumnName + ", " + versionTimestampColumnName +
                         ") values (0, 0)");
             }
         } catch (SQLException e) {
@@ -204,7 +165,7 @@ public class DBVersionSource implements VersionSource {
         try {
             conn = dataSource.getConnection();
             checkVersionTable(conn);
-            statementHandler.handle("update " + tableName + " set " + versionIndexColumnName + " = " + version.getIndex() + ", " +
+            statementHandler.handle("update " + versionTableName + " set " + versionIndexColumnName + " = " + version.getIndex() + ", " +
                     versionTimestampColumnName + " = " + version.getTimeStamp());
         } catch (SQLException e) {
             throw new UnitilsException("Error while incrementing database version", e);
@@ -220,7 +181,7 @@ public class DBVersionSource implements VersionSource {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select " + lastUpdateSucceededColumnName + " from " + tableName);
+            rs = st.executeQuery("select " + lastUpdateSucceededColumnName + " from " + versionTableName);
             if (rs.next()) {
                 return (rs.getInt(lastUpdateSucceededColumnName) == 1);
             } else {
@@ -238,7 +199,7 @@ public class DBVersionSource implements VersionSource {
         try {
             conn = dataSource.getConnection();
             checkVersionTable(conn);
-            statementHandler.handle("update " + tableName + " set " + lastUpdateSucceededColumnName + " = " +
+            statementHandler.handle("update " + versionTableName + " set " + lastUpdateSucceededColumnName + " = " +
                     (succeeded ? "1" : "0"));
         } catch (SQLException e) {
             throw new UnitilsException("Error while registering database update success = " + succeeded, e);

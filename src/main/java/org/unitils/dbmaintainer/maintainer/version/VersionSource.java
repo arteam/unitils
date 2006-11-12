@@ -27,15 +27,6 @@ import javax.sql.DataSource;
 public interface VersionSource {
 
     /**
-     * Initializes the VersionSource
-     *
-     * @param configuration
-     * @param dataSource
-     * @param statementHandler
-     */
-    void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler);
-
-    /**
      * Returns the current version of the underlying database
      *
      * @return The current version of the underlying database

@@ -23,8 +23,7 @@ import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.util.ReflectionUtils;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
 import java.sql.*;
 
@@ -69,9 +68,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         StatementHandler statementHandler = new JDBCStatementHandler();
         statementHandler.init(configuration, dataSource);
 
-        dbClearer = ReflectionUtils.createInstanceOfType(configuration.getString(DBMaintainer.PROPKEY_DBCLEARER_START + '.' +
-                configuration.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT)));
-        dbClearer.init(configuration, dataSource, statementHandler);
+        dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class,
+                configuration, dataSource, statementHandler);
 
         Connection conn = null;
         try {

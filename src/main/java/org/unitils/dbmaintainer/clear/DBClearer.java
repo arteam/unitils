@@ -18,6 +18,7 @@ package org.unitils.dbmaintainer.clear;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 
 import javax.sql.DataSource;
 
@@ -26,15 +27,6 @@ import javax.sql.DataSource;
  * triggers and sequences are dropped, so that the database schema is empty.
  */
 public interface DBClearer {
-
-    /**
-     * Initializes the DBClearer
-     *
-     * @param configuration
-     * @param dataSource
-     * @param statementHandler
-     */
-    void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler);
 
     /**
      * Clears the database schema. This means, all the tables, views, constraints, triggers and sequences are

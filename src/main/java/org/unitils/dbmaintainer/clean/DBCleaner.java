@@ -30,18 +30,8 @@ import javax.sql.DataSource;
 public interface DBCleaner {
 
     /**
-     * Initializes this {@link DBCleaner}
-     *
-     * @param configuration
-     * @param dataSource
-     * @param statementHandler
-     */
-    void init(Configuration configuration, DataSource dataSource, StatementHandler statementHandler);
-
-    /**
-     * delete all data from the database, except for the tables that have been
-     * configured as <i>tablesToPreserve</i>, and the table in which the database version is stored,
-     * in the {@link #init} method.
+     * Deletes all data from the database, except for the tables that have been
+     * configured as <i>tablesToPreserve</i>, and the table in which the database version is stored
      *
      * @throws StatementHandlerException
      */
