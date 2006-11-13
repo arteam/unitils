@@ -94,7 +94,7 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
             }
         };
 
-        expect(mockModulesRepository.getFirstModule(DatabaseModule.class)).andStubReturn(mockDatabaseModule);
+        expect(mockModulesRepository.getModuleOfType(DatabaseModule.class)).andStubReturn(mockDatabaseModule);
     }
 
     /**

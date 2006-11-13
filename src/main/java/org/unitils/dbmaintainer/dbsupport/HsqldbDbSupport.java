@@ -1,6 +1,7 @@
 package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.log4j.Logger;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.core.UnitilsException;
@@ -17,6 +18,11 @@ import java.util.Set;
  * 
  */
 public class HsqldbDbSupport extends DbSupport {
+
+    /**
+     * Logger for this class
+     */
+    Logger logger = Logger.getLogger(HsqldbDbSupport.class);
 
     public HsqldbDbSupport() {
     }

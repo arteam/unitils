@@ -130,7 +130,7 @@ public class EasyMockUnitils {
     private static EasyMockModule getEasyMockModule() {
 
         Unitils unitils = Unitils.getInstance();
-        EasyMockModule module = unitils.getModulesRepository().getFirstModule(EasyMockModule.class);
+        EasyMockModule module = unitils.getModulesRepository().getModuleOfType(EasyMockModule.class);
         if (module == null) {
 
             throw new UnitilsException("Unable to find an instance of an EasyMockModule in the modules repository.");

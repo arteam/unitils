@@ -26,7 +26,7 @@ abstract public class DbSupport {
     /**
      * Logger instance
      */
-    Logger logger = Logger.getLogger(DbSupport.class);
+    private static Logger logger = Logger.getLogger(DbSupport.class);
 
     /**
      * The name of the database schema
@@ -53,11 +53,8 @@ abstract public class DbSupport {
     /**
      * Initializes this DbSupport object with the given schemaName, statementHandler and dataSource
      * @param dataSource
-
-
-     @param schemaName
-      * @param statementHandler
-
+     * @param schemaName
+     * @param statementHandler
      */
     public void init(DataSource dataSource, String schemaName, StatementHandler statementHandler) {
         this.schemaName = schemaName;
@@ -191,6 +188,11 @@ abstract public class DbSupport {
      */
     abstract public boolean supportsIdentityColumns();
 
+    /**
+     * @param tableName
+     * @return The names of the primary key columns of the table with the given name
+     * @throws SQLException
+     */
     public Set<String> getPrimaryKeyColumnNames(String tableName) throws SQLException {
         Connection conn = null;
         Statement st = null;

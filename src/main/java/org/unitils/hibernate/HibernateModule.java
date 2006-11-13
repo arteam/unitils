@@ -99,7 +99,11 @@ public class HibernateModule implements Module {
      */
     public boolean isHibernateTest(Class<?> testClass) {
 
-        return testClass.getAnnotation(HibernateTest.class) != null;
+        if (testClass == null) {
+            return false;
+        } else {
+            return testClass.getAnnotation(HibernateTest.class) != null;
+        }
     }
 
     /**
@@ -213,7 +217,7 @@ public class HibernateModule implements Module {
     protected Connection getConnection() {
 
         Unitils unitils = Unitils.getInstance();
-        DatabaseModule dbModule = unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
+        DatabaseModule dbModule = unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
         return dbModule.getCurrentConnection();
     }
 
@@ -292,7 +296,7 @@ public class HibernateModule implements Module {
         @Override
         public void beforeAll() {
             Unitils unitils = Unitils.getInstance();
-            DatabaseModule databaseModule = unitils.getModulesRepository().getFirstModule(DatabaseModule.class);
+            DatabaseModule databaseModule = unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
             databaseModule.registerDatabaseTestAnnotation(HibernateTest.class);
         }
 
