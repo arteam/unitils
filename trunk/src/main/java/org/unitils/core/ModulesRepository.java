@@ -71,15 +71,16 @@ public class ModulesRepository {
      * @return the module, null if not found
      */
     @SuppressWarnings({"unchecked"})
-    public <T extends Module> T getFirstModule(Class<T> type) {
+    public <T extends Module> T getModuleOfType(Class<T> type) {
 
-        for (Module module : modules) {
-
-            if (type.isAssignableFrom(module.getClass())) {
-                return (T) module;
-            }
+        List<T> modulesOfType = getModulesOfType(type);
+        if (modulesOfType.size() > 1) {
+            throw new UnitilsException("More than one module found of type " + type.getName());
+        } else if (modulesOfType.size() == 1) {
+            return modulesOfType.get(0);
+        } else {
+            return null;
         }
-        return null;
     }
 
 
@@ -90,7 +91,7 @@ public class ModulesRepository {
      * @return the modules, an empty list if none found
      */
     @SuppressWarnings({"unchecked"})
-    public <T extends Module> List<T> getModules(Class<T> type) {
+    public <T extends Module> List<T> getModulesOfType(Class<T> type) {
 
         List<T> result = new ArrayList<T>();
 
