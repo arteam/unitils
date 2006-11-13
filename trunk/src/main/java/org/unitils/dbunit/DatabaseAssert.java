@@ -33,14 +33,16 @@ public class DatabaseAssert {
         Unitils unitils = Unitils.getInstance();
         TestContext testContext = unitils.getTestContext();
 
-        HibernateModule hibernateModule = unitils.getModulesRepository().getFirstModule(HibernateModule.class);
+        HibernateModule hibernateModule = unitils.getModulesRepository().getModuleOfType(HibernateModule.class);
         if (hibernateModule != null) { // If Hibernate support is not activated in the Unitils configuration, the Hibernate module will be null
-            if (hibernateModule.isHibernateTest(testContext.getTestClass())) {  //todo check null
+            if (hibernateModule.isHibernateTest(testContext.getTestClass())) {
                 hibernateModule.flushDatabaseUpdates();
             }
         }
-        DbUnitModule dbUnitModule = unitils.getModulesRepository().getFirstModule(DbUnitModule.class);
-        dbUnitModule.assertDBContentAsExpected(testContext.getTestObject(), testContext.getTestMethod().getName());
+        DbUnitModule dbUnitModule = unitils.getModulesRepository().getModuleOfType(DbUnitModule.class);
+        dbUnitModule.assertDBContentAsExpected(testContext.getTestObject(),
+                dbUnitModule.getDefaultExpectedDataSetFileName(testContext.getTestClass(),
+                        testContext.getTestMethod().getName()));
     }
 
 }

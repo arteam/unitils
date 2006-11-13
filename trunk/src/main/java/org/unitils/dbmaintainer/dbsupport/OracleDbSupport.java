@@ -78,23 +78,22 @@ public class OracleDbSupport extends DbSupport {
     }
 
     public boolean supportsIdentityColumns() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;
     }
 
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException("Oracle doesn't support identity columns");
     }
 
     public void disableForeignKeyConstraintsCheckingOnConnection(Connection conn) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException("Oracle doesn't simple disabling of constraints checking on a connection");
     }
 
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException("Removal of not null constraints is not supported for Oracle");
     }
 
-    private Set<String> getDbItemsOfType(String dbItemName,
-                                          String systemMetadataTableName) throws SQLException {
+    private Set<String> getDbItemsOfType(String dbItemName, String systemMetadataTableName) throws SQLException {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;

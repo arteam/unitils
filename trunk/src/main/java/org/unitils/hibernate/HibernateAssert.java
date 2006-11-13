@@ -40,7 +40,7 @@ public class HibernateAssert {
     public static void assertMappingToDatabase() {
 
         Unitils unitils = Unitils.getInstance();
-        HibernateModule hibernateModule = unitils.getModulesRepository().getFirstModule(HibernateModule.class);
+        HibernateModule hibernateModule = unitils.getModulesRepository().getModuleOfType(HibernateModule.class);
         Configuration configuration = hibernateModule.getHibernateConfiguration();
         Session session = hibernateModule.getCurrentSession();
         Dialect databaseDialect = getDatabaseDialect(configuration);
