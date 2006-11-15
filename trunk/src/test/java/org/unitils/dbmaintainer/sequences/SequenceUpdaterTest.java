@@ -23,6 +23,7 @@ import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -38,7 +39,7 @@ import java.sql.Statement;
  * configuration in test/resources/unitils.properties
  */
 @DatabaseTest
-public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
+public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     @TestDataSource
     protected DataSource dataSource;
@@ -47,6 +48,9 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
      * Tested object
      */
     protected SequenceUpdater sequenceUpdater;
+
+    /* DbSupport instance */
+    private DbSupport dbSupport;
 
     /**
      * Value that sequences should at least have after updating the sequences
@@ -67,6 +71,7 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
 
         StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
                 dataSource);
+        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
         sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class,
                 configuration, dataSource, statementHandler);
 
@@ -197,9 +202,9 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            assertTrue(getNextSequenceValue(conn) < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+            assertTrue(getNextTestSequenceValue() < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
             sequenceUpdater.updateSequences();
-            assertTrue(getNextSequenceValue(conn) >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+            assertTrue(getNextTestSequenceValue() >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -215,21 +220,21 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         try {
             conn = dataSource.getConnection();
             sequenceUpdater.updateSequences();
-            long updatedSequenceValue = getNextSequenceValue(conn);
+            long updatedSequenceValue = getNextTestSequenceValue();
             sequenceUpdater.updateSequences();
-            assertFalse(getNextSequenceValue(conn) <= updatedSequenceValue);
+            assertFalse(getNextTestSequenceValue() <= updatedSequenceValue);
         } finally {
             DbUtils.closeQuietly(conn);
         }
     }
 
     /**
-     * Abstract method, since it is dbms dependent
-     *
-     * @param conn
-     * @return The next value of the test sequence
+     * Returns the next value for the test sequence
+     * @return
      * @throws SQLException
      */
-    protected abstract long getNextSequenceValue(Connection conn) throws SQLException;
+    private long getNextTestSequenceValue() throws SQLException {
+        return dbSupport.getNextValueOfSequence("testsequence");
+    }
 
 }
