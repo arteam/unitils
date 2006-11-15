@@ -21,11 +21,16 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.util.ConfigUtils;
 
-import java.sql.*;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Base test class for the DBClearer. Contains tests that can be implemented generally for all different database dialects.
@@ -38,53 +43,49 @@ import java.sql.*;
 @DatabaseTest
 abstract public class DBClearerTest extends UnitilsJUnit3 {
 
-    /**
-     * DataSource for the test database, is injected
-     */
+    /* DataSource for the test database, is injected */
     @TestDataSource
     protected javax.sql.DataSource dataSource;
 
-    /**
-     * Tested object
-     */
+    /* Tested object */
     protected DBClearer dbClearer;
 
-    /**
-     * Test database schema name
-     */
+    /* Test database schema name */
     protected String schemaName;
 
+    /* The Configuration object */
+    protected Configuration configuration;
+
+    private DbSupport dbSupport;
+
     /**
-     * Configures the tested object. Creates a test table, injex, view and sequence
+     * Configures the tested object. Creates a test table, index, view and sequence
      *
      * @throws Exception
      */
     @Override
     protected void setUp() throws Exception {
-        super.setUp();
+        if (isTestedDialectActivated()) {
+            super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+            configuration = new ConfigurationLoader().loadConfiguration();
+            configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, "testtablepreserve,testviewpreserve," +
+                    "testsequencepreserve,testtriggerpreserve");
 
-        StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(configuration, dataSource);
+            StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
+            dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+            dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class,
+                    configuration, dataSource, statementHandler);
 
-        dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class,
-                configuration, dataSource, statementHandler);
-
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            dropTestView(conn);
-            dropTestTables(conn);
-            dropTestSequence(conn);
-            createTestTables(conn);
-            createTestIndex(conn);
-            createTestView(conn);
-            createTestSequence(conn);
-        } finally {
-            DbUtils.closeQuietly(conn);
+            dropTestView();
+            dropTestTables();
+            dropTestSequences();
+            dropTestTriggers();
+            createTestTables();
+            createTestView();
+            createTestSequences();
+            createTestTriggers();
         }
-
     }
 
     /**
@@ -94,9 +95,11 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_tables() throws Exception {
         if (isTestedDialectActivated()) {
-            assertTrue(tableExists("testtable1"));
+            assertTrue(dbSupport.tableExists("testtable"));
+            assertTrue(dbSupport.tableExists("testtablepreserve"));
             dbClearer.clearDatabase();
-            assertFalse(tableExists("testtable1"));
+            assertFalse(dbSupport.tableExists("testtable"));
+            assertTrue(dbSupport.tableExists("testtablepreserve"));
         }
     }
 
@@ -107,157 +110,169 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_views() throws Exception {
         if (isTestedDialectActivated()) {
-            assertTrue(tableExists("testview"));
+            assertTrue(dbSupport.tableExists("testview"));
+            assertTrue(dbSupport.tableExists("testviewpreserve"));
             dbClearer.clearDatabase();
-            assertFalse(tableExists("testview"));
+            assertFalse(dbSupport.tableExists("testview"));
+            assertTrue(dbSupport.tableExists("testviewpreserve"));
+        }
+    }
+
+    /**
+     * Tests if the triggers are correctly dropped
+     *
+     * @throws Exception
+     */
+    public void testClearDatabase_sequences() throws Exception {
+        if (isTestedDialectActivated()) {
+            assertTrue(dbSupport.sequenceExists("testsequence"));
+            assertTrue(dbSupport.sequenceExists("testsequencepreserve"));
+            dbClearer.clearDatabase();
+            assertFalse(dbSupport.sequenceExists("testsequence"));
+            assertTrue(dbSupport.sequenceExists("testsequencepreserve"));
+        }
+    }
+
+    /**
+     * Tests if the triggers are correctly dropped
+     *
+     * @throws Exception
+     */
+    public void testClearDatabase_triggers() throws Exception {
+        if (isTestedDialectActivated()) {
+            assertTrue(dbSupport.triggerExists("testtrigger"));
+            assertTrue(dbSupport.triggerExists("testtriggerpreserve"));
+            dbClearer.clearDatabase();
+            assertFalse(dbSupport.triggerExists("testtrigger"));
+            assertTrue(dbSupport.triggerExists("testtriggerpreserve"));
         }
     }
 
     /**
      * Creates the test tables
      *
-     * @param conn
      * @throws SQLException
      */
-    private void createTestTables(Connection conn) throws SQLException {
+    private void createTestTables() throws SQLException {
+        Connection conn = null;
         Statement st = null;
         try {
+            conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("create table testtable1 (col1 varchar(10))");
+            st.execute("create table testtable (col1 varchar(10))");
+            st.execute("create table testtablepreserve (col1 varchar(10))");
         } finally {
-            DbUtils.closeQuietly(st);
-        }
-    }
-
-    /**
-     * Creates the test index
-     *
-     * @param conn
-     * @throws SQLException
-     */
-    private void createTestIndex(Connection conn) throws SQLException {
-        Statement st = null;
-        try {
-            st = conn.createStatement();
-            st.execute("create index testindex on testtable1(col1)");
-        } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
     /**
      * Drops the test tables
-     *
-     * @param conn
      */
-    private void dropTestTables(Connection conn) {
-        Statement st = null;
+    private void dropTestTables() {
         try {
-            st = conn.createStatement();
-            // Make sure previous setup is cleaned up
-            st.execute("drop table testtable1");
-        } catch (SQLException e) {
-            // no action taken
-        } finally {
-            DbUtils.closeQuietly(st);
+            dbSupport.dropTable("testtable");
+        } catch (StatementHandlerException e) {
+            // Ignored
+        }
+        try {
+            dbSupport.dropTable("testtablepreserve");
+        } catch (StatementHandlerException e) {
+            // Ignored
         }
     }
 
     /**
-     * Creates the test view
+     * Creates the test views
      *
-     * @param conn
      * @throws SQLException
      */
-    private void createTestView(Connection conn) throws SQLException {
+    private void createTestView() throws SQLException {
+        Connection conn = null;
         Statement st = null;
         try {
+            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
-            st.execute("create view testview as select col1 from testtable1");
+            st.execute("create view testview as select col1 from testtablepreserve");
+            st.execute("create view testviewpreserve as select col1 from testtablepreserve");
         } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
     /**
-     * Drops the test view
-     *
-     * @param conn
+     * Drops the test views
      */
-    private void dropTestView(Connection conn) {
-        Statement st = null;
+    private void dropTestView() {
         try {
-            st = conn.createStatement();
-            // Make sure previous setup is cleaned up
-            st.execute("drop view testview");
-        } catch (SQLException e) {
-            // No action is taken
-        } finally {
-            DbUtils.closeQuietly(st);
+            dbSupport.dropView("testview");
+        } catch (StatementHandlerException e) {
+            // Ignored
+        }
+        try {
+            dbSupport.dropView("testviewpreserve");
+        } catch (StatementHandlerException e) {
+            // Ignored
         }
     }
 
     /**
-     * Creates the test sequence
-     *
-     * @param conn
+     * Creates the test sequences
      */
-    private void createTestSequence(Connection conn) {
+    private void createTestSequences() {
+        Connection conn = null;
         Statement st = null;
         try {
+            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("create sequence testsequence");
+            st.execute("create sequence testsequencepreserve");
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
     /**
      * Drops the test sequence
-     *
-     * @param conn
      */
-    private void dropTestSequence(Connection conn) {
-        Statement st = null;
+    private void dropTestSequences() {
         try {
-            st = conn.createStatement();
-            // Make sure previous setup is cleaned up
-            st.execute("drop sequence testsequence");
-        } catch (SQLException e) {
-            // No action is taken
-        } finally {
-            DbUtils.closeQuietly(st);
+            dbSupport.dropSequence("testsequence");
+        } catch (StatementHandlerException e) {
+            // Ignored
+        }
+        try {
+            dbSupport.dropSequence("testsequencepreserve");
+        } catch (StatementHandlerException e) {
+            // Ignored
         }
     }
 
-    /**
-     * Checks whether the table with the given name exists
-     *
-     * @param tableName
-     * @return
-     * @throws SQLException
-     */
-    private boolean tableExists(String tableName) throws SQLException {
-        Connection conn = null;
-        ResultSet rs = null;
+    private void createTestTriggers() throws SQLException {
+        createTestTrigger("testtrigger");
+        createTestTrigger("testtriggerpreserve");
+    }
+
+    abstract protected void createTestTrigger(String triggerName) throws SQLException;
+
+    private void dropTestTriggers() {
         try {
-            conn = dataSource.getConnection();
-            DatabaseMetaData metaData = conn.getMetaData();
-            rs = metaData.getTables(null, schemaName, tableName.toUpperCase(), null);
-            while (rs.next()) {
-                if (tableName.equalsIgnoreCase(rs.getString("TABLE_NAME"))) {
-                    return true;
-                }
-            }
-            return false;
-        } finally {
-            DbUtils.closeQuietly(conn, null, rs);
+            dropTestTrigger("testtrigger");
+        } catch (SQLException e) {
+            // Ignored
+        }
+        try {
+            dropTestTrigger("testtriggerpreserve");
+        } catch (SQLException e) {
+            // Ignored
         }
     }
+
+    abstract protected void dropTestTrigger(String triggerName) throws SQLException;
 
     /**
      * Checks whether the database dialect that is tested in the current implementation is the currenlty configured
