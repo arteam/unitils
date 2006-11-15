@@ -56,6 +56,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     /* The Configuration object */
     protected Configuration configuration;
 
+    /* The DbSupport object */
     private DbSupport dbSupport;
 
     /**
@@ -76,6 +77,21 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
             dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class,
                     configuration, dataSource, statementHandler);
+
+            dropTestView();
+            dropTestTables();
+            dropTestSequences();
+            dropTestTriggers();
+            createTestTables();
+            createTestView();
+            createTestSequences();
+            createTestTriggers();
+        }
+    }
+
+    protected void tearDown() throws Exception {
+        if (isTestedDialectActivated()) {
+            super.tearDown();
 
             dropTestView();
             dropTestTables();
