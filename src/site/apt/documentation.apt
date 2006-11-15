@@ -8,33 +8,128 @@ Introduction
 
 * Overview
 ~~~~~~~~~~
-   Unit testing should be easy and intuitively... at least in theory. Real-life projects
-   typically span multiple layers, are data-driven and use middleware technologies such as EJBs and Hibernate.
+    Unit testing should be easy and intuitively... at least in theory. Real-life projects
+    typically span multiple layers, are data-driven and use middleware technologies such as EJBs and Hibernate.
+
+    Unitils originated out of an attempt to get a more pragmatic view on unit testing that involves some
+    typical unit testing frameworks such as DbUnit and EasyMock. It started as a set of guidelines and
+    eventually resulted in an open source library containing utilities that facilitate the application of these guidelines.
+
+    Currently Unitils offers follwing features:
+
+    * General testing utilities
+
+        * Equality assertion through reflection, with different options like ignoring Java default/null values and ignoring order of collections
+
+    []
+
+    * Database testing utilities
+
+        * Automatic maintenance and constraints disabling of unit test databases
+
+        * Simplify unit test database connection setup
+
+        * Simplify insertion of test data with DBUnit
+
+        * Simplify Hibernate session management for unit testing
+
+        * Automatically test the mapping of Hibernate mapped objects with the database
+
+    []
+
+    * Mock object utilities
+
+        * Simplify EasyMock mock object creation
+
+        * Simplify mock object injection
+
+        * EasyMock argument matching using reflection equality
+
+    []
+    
    
-   Unitils originated out of an attempt to get a more pragmatic view on unit testing that involves some
-   typical unit testing frameworks such as DbUnit and EasyMock. It started as a set of guidelines and
-   eventually resulted in an open source library containing utilities that facilitate the application of these guidelines.
-   
-   Currently Unitils offers follwing features:
+    Unitils provides extensive support for testing a project's data access layer. Unitils' approach for database testing has grown 
+    from a number of database testing guidelines, which are based on real-life project experience of different persons. 
+    For an elaborate description see the Database testing guidelines.    
 
 
 * Module system
 ~~~~~~~~~~~~~~~
+    Unitils is structured as an easily extensible system of modules. Modules are functional units that hook-up into the 
+    execution of tests using test listeners, one for each module.
+   
+[images/unitils-modules.png] Unitils modules
+   
+   This mechanism provides a uniform way for providing extra services to tests without having to change the superclass.
+   This allows us to add services in a very flexible way. An upcoming new feature will be support for JPA.
+   Currently, following modules are available in Unitils:
+   
+   * DatabaseModule: Unit test database maintenance and connection pooling
+   
+   * DbUnitModule: Test data management using DBUnit
+   
+   * HibernateModule: Hibernate configuration support and automatic database mapping checking
+   
+   * EasyMockModule: Support for creating mocks and lenient reflection argument matching
+   
+   * InjectModule: Support for injecting (mock) objects into other objects
+
+
 
 * Configuration
 ~~~~~~~~~~~~~~~
+    The default configuration mechanism in unitils depends on 3 properties files: 
 
-* Using reflection for assertion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [[1]] unitils-defaults.properties: default configuration that is shipped within the distribution of unitils
+    
+    [[2]] unitils.properties: can contain project-wide configuration
+    
+    [[3]] unitils-local.properties: can contain user-specific configuration
+    
+    []
+
+    These files provide 3 levels of configuration. Each level can override settings of a previous one.
+    
+    
+
+    unitils.propeties typically in classpath
+    unitils-local in java user.home folder
+
+    If you want to use unitils on multiple projects at the same time, thereby requiring different local config you can override the used name. 
+
+    Examples:
+    project
+
+    Link to typical config files.
+
+
+
+
+
 
 * Database testing
 ~~~~~~~~~~~~~~~~~~
+ 
+** Managing test data with DbUnit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  * Use small sets of test data, containing as few data as possible.
+
+  * Don't reuse data files too much. Make them test class or even test method specific.
+  
+  * Disable foreign key and not-null constraints
+
 
 ** Unit test database maintenance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    A powerful DBMaintainer is provided to automatically update each developer's database schema individually. 
 
-** Managing test data with DbUnit
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  * Make use of unit test databases: each developer has his own unit test database (schema)
+  
+  * Automate the maintenance of unit test databases
+  
+  * Disable foreign key and not-null constraints
+  
 
 ** Testing with Hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,8 +137,11 @@ Introduction
 *** Configuration
 ~~~~~~~~~~~~~~~~~
 
-*** Testing the mapping 
+*** Testing the mapping
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+* Using reflection for assertion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
