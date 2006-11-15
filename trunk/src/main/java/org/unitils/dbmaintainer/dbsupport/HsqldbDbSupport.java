@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,12 +28,12 @@ public class HsqldbDbSupport extends DbSupport {
     public HsqldbDbSupport() {
     }
 
-    public void dropView(String viewName) throws SQLException, StatementHandlerException {
+    public void dropView(String viewName) throws StatementHandlerException {
         String dropTableSQL = "drop view " + viewName + " cascade";
         statementHandler.handle(dropTableSQL);
     }
 
-    public void dropTable(String tableName) throws SQLException, StatementHandlerException {
+    public void dropTable(String tableName) throws StatementHandlerException {
         String dropTableSQL = "drop table " + tableName + " cascade";
         statementHandler.handle(dropTableSQL);
     }
@@ -45,6 +46,46 @@ public class HsqldbDbSupport extends DbSupport {
 
     public Set<String> getTriggerNames() throws SQLException {
         return getDbItemsOfType("TRIGGER_NAME", "SYSTEM_TRIGGERS", "TRIGGER_SCHEM");
+    }
+
+    public boolean triggerExists(String triggerName) throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rs = st.executeQuery("select TRIGGER_NAME, TRIGGER_SCHEM from INFORMATION_SCHEMA.SYSTEM_TRIGGERS");
+            while (rs.next()) {
+                if (triggerName.equalsIgnoreCase(rs.getString("TRIGGER_NAME")) &&
+                        schemaName.equalsIgnoreCase(rs.getString("TRIGGER_SCHEM"))) {
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            DbUtils.closeQuietly(conn, st, rs);
+        }
+    }
+
+    public boolean sequenceExists(String sequenceName) throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rs = st.executeQuery("select SEQUENCE_NAME, SEQUENCE_SCHEMA from INFORMATION_SCHEMA.SYSTEM_SEQUENCES");
+            while (rs.next()) {
+                if (sequenceName.equalsIgnoreCase(rs.getString("SEQUENCE_NAME")) &&
+                        schemaName.equalsIgnoreCase(rs.getString("SEQUENCE_SCHEMA"))) {
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            DbUtils.closeQuietly(conn, st, rs);
+        }
     }
 
     private Set<String> getDbItemsOfType(String dbItemColumnName,

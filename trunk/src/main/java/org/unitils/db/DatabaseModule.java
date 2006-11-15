@@ -24,14 +24,13 @@ import org.unitils.db.annotations.TestDataSource;
 import org.unitils.db.config.DataSourceFactory;
 import org.unitils.dbmaintainer.constraints.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.AnnotationUtils;
-import org.unitils.util.ReflectionUtils;
 import org.unitils.util.ConfigUtils;
+import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
@@ -180,9 +179,8 @@ public class DatabaseModule implements Module {
      */
     protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
 
-        StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(configuration, dataSource);
-
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
+                dataSource);
         ConstraintsDisabler constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
                 configuration, dataSource, statementHandler);
         return constraintsDisabler;

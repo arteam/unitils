@@ -21,7 +21,6 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
@@ -62,11 +61,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Configuration configuration = configurationLoader.loadConfiguration();
         configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "tabletopreserve");
 
-        StatementHandler st = new JDBCStatementHandler();
-        st.init(configuration, dataSource);
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
+                dataSource);
 
         dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class,
-                configuration, dataSource, st);
+                configuration, dataSource, statementHandler);
 
         Connection conn = null;
         try {

@@ -24,11 +24,19 @@ public class MySqlDbSupport extends DbSupport {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void dropView(String viewName) throws SQLException, StatementHandlerException {
+    public boolean triggerExists(String triggerName) throws SQLException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean sequenceExists(String sequenceName) throws SQLException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void dropView(String viewName) throws StatementHandlerException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void dropTable(String tableName) throws SQLException, StatementHandlerException {
+    public void dropTable(String tableName) throws StatementHandlerException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

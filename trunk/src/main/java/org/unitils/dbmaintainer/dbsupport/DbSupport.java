@@ -92,12 +92,12 @@ abstract public class DbSupport {
      * @return the names of all views
      * @throws SQLException
      */
-    public List<String> getViewNames() throws SQLException {
+    public Set<String> getViewNames() throws SQLException {
         Connection conn = null;
         ResultSet rset = null;
         try {
             conn = dataSource.getConnection();
-            List<String> tableNames = new ArrayList<String>();
+            Set<String> tableNames = new HashSet<String>();
             DatabaseMetaData databaseMetadata = conn.getMetaData();
             rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null,
                     new String[]{"VIEW"});
@@ -125,24 +125,61 @@ abstract public class DbSupport {
     abstract public Set<String> getTriggerNames() throws SQLException;
 
     /**
+     * Checks whether the table or view with the given name exists
+     *
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
+    public boolean tableExists(String tableName) throws SQLException {
+        Connection conn = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            DatabaseMetaData metaData = conn.getMetaData();
+            rs = metaData.getTables(null, schemaName, tableName.toUpperCase(), null);
+            while (rs.next()) {
+                if (tableName.equalsIgnoreCase(rs.getString("TABLE_NAME"))) {
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            DbUtils.closeQuietly(conn, null, rs);
+        }
+    }
+
+    /**
+     * Checks whether the trigger with the given name exists
+     *
+     * @param triggerName
+     * @return true if the trigger with the given name exists, false otherwise
+     * @throws SQLException
+     */
+    abstract public boolean triggerExists(String triggerName) throws SQLException;
+
+    /**
+     * Checks whether the sequence with the given name exists
+     * @param sequenceName
+     * @return true if the sequence with the given name exists
+     */
+    abstract public boolean sequenceExists(String sequenceName) throws SQLException;
+
+    /**
      * Removes the view with the given name from the database
      *
      * @param viewName
-     * @throws SQLException
      * @throws org.unitils.dbmaintainer.handler.StatementHandlerException
      */
-    abstract public void dropView(String viewName) throws SQLException,
-            StatementHandlerException;
+    abstract public void dropView(String viewName) throws StatementHandlerException;
 
     /**
      * Removes the table with the given name from the database
      *
      * @param tableName
-     * @throws SQLException
      * @throws StatementHandlerException
      */
-    abstract public void dropTable(String tableName) throws SQLException,
-            StatementHandlerException;
+    abstract public void dropTable(String tableName) throws StatementHandlerException;
 
     /**
      * Drops the sequence with the given name from the database
@@ -287,4 +324,5 @@ abstract public class DbSupport {
      * @return Column type suitable to store values of the Java <code>java.lang.Long</code> type
      */
     abstract public String getLongDataType();
+
 }

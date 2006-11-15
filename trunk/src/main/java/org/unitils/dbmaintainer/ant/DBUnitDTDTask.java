@@ -20,7 +20,6 @@ import org.apache.tools.ant.BuildException;
 import org.unitils.core.Unitils;
 import org.unitils.dbmaintainer.dtd.DtdGenerator;
 import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
 /**
@@ -40,10 +39,8 @@ public class DBUnitDTDTask extends BaseUnitilsTask {
     public void doExecute() throws BuildException {
 
         Configuration configuration = Unitils.getInstance().getConfiguration();
-
-        StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(configuration, dataSource);
-
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
+                dataSource);
         DtdGenerator dtdGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DtdGenerator.class,
                 configuration, dataSource, statementHandler);
 

@@ -133,9 +133,8 @@ public class DBMaintainer {
      */
     public DBMaintainer(Configuration configuration, DataSource dataSource) {
 
-        StatementHandler statementHandler = new LoggingStatementHandlerDecorator((StatementHandler)
-                ConfigUtils.getConfiguredInstance(StatementHandler.class, configuration));
-        statementHandler.init(configuration, dataSource);
+        StatementHandler statementHandler = new LoggingStatementHandlerDecorator(
+                DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
 
         scriptRunner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration,
                 dataSource, statementHandler);

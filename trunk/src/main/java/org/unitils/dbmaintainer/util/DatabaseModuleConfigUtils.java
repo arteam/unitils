@@ -1,9 +1,7 @@
 package org.unitils.dbmaintainer.util;
 
 import org.apache.commons.configuration.Configuration;
-import org.unitils.util.ReflectionUtils;
 import org.unitils.util.ConfigUtils;
-import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
@@ -37,11 +35,37 @@ public class DatabaseModuleConfigUtils {
 
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         DatabaseTask instance = ConfigUtils.getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
+        DbSupport dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+        instance.init(configuration, dbSupport, dataSource, statementHandler);
+        return (T) instance;
+    }
+
+    /**
+     * Returns the concrete, dbms specific instance of {@link DbSupport} which is configured by the given <code>Configuration</code>.
+     *
+     * @param configuration
+     * @param dataSource
+     * @param statementHandler
+     * @return The dbms specific instance of {@link DbSupport}
+     */
+    public static DbSupport getConfiguredDbSupportInstance(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
+        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         DbSupport dbSupport = ConfigUtils.getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
         String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
         dbSupport.init(dataSource, schemaName, statementHandler);
-        instance.init(configuration, dbSupport, dataSource, statementHandler);
-        return (T) instance;
+        return dbSupport;
+    }
+
+    /**
+     * Returns the configured instance of {@link StatementHandler} which is configured by the given <code>Configuration</code>.
+     * @param configuration
+     * @param dataSource
+     * @return Returns the configured instance of {@link StatementHandler}
+     */
+    public static StatementHandler getConfiguredStatementHandlerInstance(Configuration configuration, DataSource dataSource) {
+        StatementHandler st = ConfigUtils.getConfiguredInstance(StatementHandler.class, configuration);
+        st.init(configuration, dataSource);
+        return st;
     }
 
 }
