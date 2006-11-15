@@ -29,6 +29,8 @@ import java.util.*;
 /**
  * Implementation of {@link DBCleaner}. This implementation doesn't use any DBMS specific features, so it should work
  * for every database.
+ *
+ * // todo don't clear dbclearer itemstopreserve
  */
 public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
 

@@ -104,7 +104,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Statement st = null;
         try {
             st = conn.createStatement();
-            st.executeUpdate("drop table tabletoclear");
+            st.executeUpdate("drop table tabletoclean");
             st.executeUpdate("drop table db_version");
             st.executeUpdate("drop table tabletopreserve");
         } finally {
@@ -121,9 +121,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            assertFalse(isEmpty(conn, "tabletoclear"));
+            assertFalse(isEmpty(conn, "tabletoclean"));
             dbCleaner.cleanDatabase();
-            assertTrue(isEmpty(conn, "tabletoclear"));
+            assertTrue(isEmpty(conn, "tabletoclean"));
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -173,7 +173,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Statement st = null;
         try {
             st = conn.createStatement();
-            st.execute("create table tabletoclear(testcolumn varchar(10))");
+            st.execute("create table tabletoclean(testcolumn varchar(10))");
             st.execute("create table db_version(testcolumn varchar(10))");
             st.execute("create table tabletopreserve(testcolumn varchar(10))");
         } finally {
@@ -191,7 +191,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Statement st = null;
         try {
             st = conn.createStatement();
-            st.execute("insert into tabletoclear values('test')");
+            st.execute("insert into tabletoclean values('test')");
             st.execute("insert into db_version values('test')");
             st.execute("insert into tabletopreserve values('test')");
         } finally {
