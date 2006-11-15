@@ -150,7 +150,8 @@ public class ReflectionUtils {
     }
 
     /**
-     * Returns the fields in the given class that have the exact given type
+     * Returns the fields in the given class that have the exact given type. The class's superclasses are also
+     * investigated.
      *
      * @param clazz    the class to get the field from, not null
      * @param type     the type, not null
@@ -158,6 +159,24 @@ public class ReflectionUtils {
      * @return The fields with the given type
      */
     public static List<Field> getFieldsOfType(Class clazz, Class type, boolean isStatic) {
+        List<Field> fields = getFieldsOfTypeIgnoreSuper(clazz, type, isStatic);
+        Class superClass = clazz.getSuperclass();
+        if (!superClass.equals(Object.class)) {
+            fields.addAll(getFieldsOfType(superClass, type, isStatic));
+        }
+        return fields;
+    }
+
+    /**
+     * Returns the fields in the given class that have the exact given type. The class's superclasses are not
+     * investigated.
+     *
+     * @param clazz
+     * @param type
+     * @param isStatic
+     * @return The fields with the given type
+     */
+    private static List<Field> getFieldsOfTypeIgnoreSuper(Class clazz, Class type, boolean isStatic) {
         List<Field> fields = new ArrayList<Field>();
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
@@ -191,7 +210,8 @@ public class ReflectionUtils {
 
 
     /**
-     * Returns the setter methods in the given class that have an argument with the exact given type
+     * Returns the setter methods in the given class that have an argument with the exact given type. The class's
+     * superclasses are also investigated.
      *
      * @param clazz    the class to get the setter from, not null
      * @param type     the type, not null
@@ -199,6 +219,24 @@ public class ReflectionUtils {
      * @return All setters for an object of the given type
      */
     public static List<Method> getSettersOfType(Class clazz, Class type, boolean isStatic) {
+        List<Method> setters = getSettersOfTypeIgnoreSuper(clazz, type, isStatic);
+        Class superClass = clazz.getSuperclass();
+        if (!superClass.equals(Object.class)) {
+            setters.addAll(getSettersOfType(superClass, type, isStatic));
+        }
+        return setters;
+    }
+
+    /**
+     * Returns the setter methods in the given class that have an argument with the exact given type. The class's
+     * superclasses are not investigated.
+     *
+     * @param clazz    the class to get the setter from, not null
+     * @param type     the type, not null
+     * @param isStatic true if static setters are to be returned, false for non-static
+     * @return All setters for an object of the given type
+     */
+    private static List<Method> getSettersOfTypeIgnoreSuper(Class clazz, Class type, boolean isStatic) {
         List<Method> settersOfType = new ArrayList<Method>();
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method method : declaredMethods) {
