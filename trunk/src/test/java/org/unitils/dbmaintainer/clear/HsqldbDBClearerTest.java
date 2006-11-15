@@ -30,49 +30,13 @@ import java.sql.Statement;
  */
 public class HsqldbDBClearerTest extends DBClearerTest {
 
-    /**
-     * Calls the superclass fixture + creates a test trigger
-     *
-     * @throws Exception
-     */
-    @Override
-    protected void setUp() throws Exception {
-
-        if (isTestedDialectActivated()) {
-            super.setUp();
-
-            if (triggerExists("testtrigger")) {
-                dropTestTrigger();
-            }
-            createTestTrigger();
-        }
-    }
-
-    /**
-     * Tests if the triggers are correctly dropped
-     *
-     * @throws Exception
-     */
-    public void testClearDatabase_triggers() throws Exception {
-        if (isTestedDialectActivated()) {
-            assertTrue(triggerExists("testtrigger"));
-            dbClearer.clearDatabase();
-            assertFalse(triggerExists("testtrigger"));
-        }
-    }
-
-    /**
-     * Creates the test trigger
-     *
-     * @throws SQLException
-     */
-    private void createTestTrigger() throws SQLException {
+    protected void createTestTrigger(String triggerName) throws SQLException {
         Connection conn = null;
         Statement st = null;
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("create trigger testtrigger before insert on testtable1 call "
+            st.execute("create trigger " + triggerName + " before insert on testtablepreserve call "
                     + "\"org.unitils.dbmaintainer.clear.HsqldbTestTrigger\"");
         } finally {
             DbUtils.closeQuietly(conn, st, null);
@@ -84,43 +48,19 @@ public class HsqldbDBClearerTest extends DBClearerTest {
      *
      * @throws SQLException
      */
-    private void dropTestTrigger() throws SQLException {
+    protected void dropTestTrigger(String triggerName) throws SQLException {
         Connection conn = null;
         Statement st = null;
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("drop trigger testtrigger");
+            try {
+                st.execute("drop trigger " + triggerName);
+            } catch (SQLException e) {
+                // Ignored
+            }
         } finally {
             DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
-    /**
-     * Checks wether the trigger with the given name exists
-     *
-     * @param triggerName
-     * @return True if the trigger exists
-     * @throws SQLException
-     */
-    private boolean triggerExists(String triggerName) throws SQLException {
-        // We test if the trigger exists, by inserting a row in testtable2, and checking if the
-        // trigger has exexucted
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            rs = st.executeQuery("select trigger_name from information_schema.system_triggers");
-            while (rs.next()) {
-                if (triggerName.equalsIgnoreCase(rs.getString("TRIGGER_NAME"))) {
-                    return true;
-                }
-            }
-            return false;
-        } finally {
-            DbUtils.closeQuietly(conn, st, rs);
         }
     }
 

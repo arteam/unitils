@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Base implementation of {@link DBClearer}. This implementation uses plain JDBC and standard SQL
@@ -33,20 +34,21 @@ import java.util.Set;
  */
 public class DefaultDBClearer extends DatabaseTask implements DBClearer {
 
-    /*
-     * The key of the property that specifies the name of the datase table in which the DB version
-     * is stored. This table should not be deleted
-     */
-    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
+    /* The key of the property that specifies which database items should not be deleted when clearing the database */
+    public static final String PROPKEY_ITEMSTOPRESERVE = "dbMaintainer.cleardb.itemsToPreserve";
 
-    public DefaultDBClearer() {
-        System.out.println("DefaultDBClearer.DefaultDBClearer");
-    }
+    /* Names of database items (tables, views, sequences or triggers) that should not be deleted when clearning the
+        database */
+    private Set<String> itemsToPreserve = new HashSet<String>();
 
     /**
      * @param configuration
      */
     protected void doInit(Configuration configuration) {
+        String[] itemsToPreserveArray = configuration.getStringArray(PROPKEY_ITEMSTOPRESERVE);
+        for (String itemToPreserve : itemsToPreserveArray) {
+            itemsToPreserve.add(itemToPreserve.toUpperCase());
+        }
     }
 
     /**
@@ -62,7 +64,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
             dropTriggers();
         } catch (SQLException e) {
             throw new UnitilsException("Error while clearing database", e);
-        } 
+        }
     }
 
     /**
@@ -72,7 +74,8 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      * @throws StatementHandlerException
      */
     private void dropViews() throws SQLException, StatementHandlerException {
-        List<String> viewNames = dbSupport.getViewNames();
+        Set<String> viewNames = dbSupport.getViewNames();
+        viewNames.removeAll(itemsToPreserve);
         for (String viewName : viewNames) {
             dbSupport.dropView(viewName);
         }
@@ -86,6 +89,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      */
     private void dropTables() throws SQLException, StatementHandlerException {
         Set<String> tableNames = dbSupport.getTableNames();
+        tableNames.removeAll(itemsToPreserve);
         for (String tableName : tableNames) {
             dbSupport.dropTable(tableName);
         }
@@ -100,6 +104,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     private void dropSequences() throws StatementHandlerException,
             SQLException {
         Set<String> sequenceNames = dbSupport.getSequenceNames();
+        sequenceNames.removeAll(itemsToPreserve);
         for (String sequenceName : sequenceNames) {
             dbSupport.dropSequence(sequenceName);
         }
@@ -114,6 +119,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     private void dropTriggers() throws StatementHandlerException,
             SQLException {
         Set<String> triggerNames = dbSupport.getTriggerNames();
+        triggerNames.removeAll(itemsToPreserve);
         for (String triggerName : triggerNames) {
             dbSupport.dropTrigger(triggerName);
         }
