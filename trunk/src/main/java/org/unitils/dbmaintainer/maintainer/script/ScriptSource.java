@@ -29,13 +29,6 @@ import java.util.List;
 public interface ScriptSource {
 
     /**
-     * Initialize using the properties in the given <code>Configuration</code> object
-     *
-     * @param configuration
-     */
-    void init(Configuration configuration);
-
-    /**
      * This methods returns true if one or more scripts that have a version index equal to or lower than
      * the index specified by the given version object has been modified since the timestamp specfied by
      * the given version.

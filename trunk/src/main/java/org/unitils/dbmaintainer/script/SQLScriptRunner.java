@@ -17,9 +17,11 @@ package org.unitils.dbmaintainer.script;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.configuration.Configuration;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,21 +34,9 @@ import java.util.List;
  * Implementation of {@link ScriptRunner} that runs an SQL script. All statements are passed on to
  * a {@link StatementHandler}
  */
-public class SQLScriptRunner implements ScriptRunner {
+public class SQLScriptRunner extends DatabaseTask implements ScriptRunner {
 
-    /**
-     * StatementHandler to which the individual SQL statements in the script are passed
-     */
-    private StatementHandler statementHandler;
-
-    /**
-     * Constructs a new {@link SQLScriptRunner}. The SQL statements will be handled by the given
-     * {@link StatementHandler}
-     *
-     * @param statementHandler Will handle the SQL statements in the executed scripts
-     */
-    public SQLScriptRunner(StatementHandler statementHandler) {
-        this.statementHandler = statementHandler;
+    protected void doInit(Configuration configuration) {
     }
 
     /**

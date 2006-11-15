@@ -2,6 +2,7 @@ package org.unitils.dbmaintainer.util;
 
 import org.apache.commons.configuration.Configuration;
 import org.unitils.util.ReflectionUtils;
+import org.unitils.util.ConfigUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
@@ -33,34 +34,14 @@ public class DatabaseModuleConfigUtils {
      */
     public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType,
                   Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
-        DatabaseTask instance = getConfiguredDbmsSpecificInstance(databaseTaskType, configuration);
-        DbSupport dbSupport = DatabaseModuleConfigUtils.getConfiguredDbmsSpecificInstance(DbSupport.class, configuration);
+
+        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+        DatabaseTask instance = ConfigUtils.getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
+        DbSupport dbSupport = ConfigUtils.getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
         String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
         dbSupport.init(dataSource, schemaName, statementHandler);
         instance.init(configuration, dbSupport, dataSource, statementHandler);
         return (T) instance;
     }
 
-    /**
-     * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
-     * Tries to retrieve the database specific implementation first (propery key = fully qualified name of the interface
-     * type + '.impl.className.' + database dialect). If this key does not exist, the database dialect idendependent
-     * instance is retrieved (same property key without the database dialect).
-     *
-     * @param type The type of the instance
-     * @param configuration
-     * @return The configured instance
-     */
-    public static <T> T getConfiguredDbmsSpecificInstance(Class type, Configuration configuration) {
-        String propKey = type.getName() + ".implClassName";
-        String dialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
-        String dbSpecificImplementationPropKey = propKey + "." + dialect;
-        if (configuration.containsKey(dbSpecificImplementationPropKey)) {
-            return (T) ReflectionUtils.createInstanceOfType(configuration.getString(dbSpecificImplementationPropKey));
-        } else if (configuration.containsKey(propKey)) {
-            return (T) ReflectionUtils.createInstanceOfType(configuration.getString(propKey));
-        } else {
-            throw new UnitilsException("Missing configuration for " + propKey);
-        }
-    }
 }

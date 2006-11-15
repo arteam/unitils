@@ -68,7 +68,7 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Tested object
      */
-    private ScriptSource fileScriptSource;
+    private FileScriptSource fileScriptSource;
 
     private long file2Timestamp;
 
@@ -100,8 +100,9 @@ public class FileScriptSourceTest extends TestCase {
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_DIR, DBCHANGE_FILE_DIRECTORY);
         configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_FILEEXTENSION, "sql");
+
         fileScriptSource = new FileScriptSource();
-        fileScriptSource.init(configuration);
+        fileScriptSource.doInit(configuration);
     }
 
     /**
