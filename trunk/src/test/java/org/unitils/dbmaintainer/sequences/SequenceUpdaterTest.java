@@ -75,15 +75,12 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class,
                 configuration, dataSource, statementHandler);
 
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            createTestTable(conn);
-            insertTestRecord(conn);
-            createTestSequence(conn);
-        } finally {
-            DbUtils.closeQuietly(conn);
-        }
+        dropTestSequence();
+        dropTestTable();
+
+        createTestTable();
+        insertTestRecord();
+        createTestSequence();
     }
 
     /**
@@ -93,103 +90,103 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      */
     protected void tearDown() throws Exception {
         super.tearDown();
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            dropTestSequence(conn);
-            dropTestTable(conn);
-        } finally {
-            DbUtils.closeQuietly(conn);
-        }
+
+        dropTestSequence();
+        dropTestTable();
     }
 
     /**
      * Inserts a test record
      *
-     * @param conn
      */
-    private void insertTestRecord(Connection conn) {
+    private void insertTestRecord() {
+        Connection conn = null;
         Statement st = null;
         try {
+            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("insert into testtable values('test')");
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
     /**
      * Creates a test table
      *
-     * @param conn
      */
-    private void createTestTable(Connection conn) {
+    private void createTestTable() {
+        Connection conn = null;
         Statement st = null;
         try {
+            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("create table testtable (test varchar(10))");
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
     /**
      * Drops the test table
      *
-     * @param conn
      */
-    private void dropTestTable(Connection conn) {
+    private void dropTestTable() {
+        Connection conn = null;
         Statement st = null;
         try {
+            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("drop table testtable");
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
     /**
      * Creates a test sequence
      *
-     * @param conn
      */
-    private void createTestSequence(Connection conn) {
+    private void createTestSequence() {
+        Connection conn = null;
         Statement st = null;
         try {
+            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("create sequence testsequence");
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
     /**
      * Drops the test sequence
      *
-     * @param conn
      */
-    private void dropTestSequence(Connection conn) {
+    private void dropTestSequence() {
+        Connection conn = null;
         Statement st = null;
         try {
+            conn = dataSource.getConnection();
             st = conn.createStatement();
             // Make sure previous setup is cleaned up
             st.execute("drop sequence testsequence");
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
@@ -199,15 +196,9 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testUpdateSequences() throws Exception {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            assertTrue(getNextTestSequenceValue() < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
-            sequenceUpdater.updateSequences();
-            assertTrue(getNextTestSequenceValue() >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
-        } finally {
-            DbUtils.closeQuietly(conn);
-        }
+        assertTrue(getNextTestSequenceValue() < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+        sequenceUpdater.updateSequences();
+        assertTrue(getNextTestSequenceValue() >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
     }
 
     /**

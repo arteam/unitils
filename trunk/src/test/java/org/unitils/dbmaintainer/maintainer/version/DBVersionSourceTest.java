@@ -19,11 +19,13 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
+import org.unitils.dbunit.annotation.DbUnitDataSet;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 
 import java.sql.Connection;
@@ -35,6 +37,7 @@ import java.sql.Statement;
  * a test database. The dbms that is used depends on the database configuration in test/resources/unitils.properties
  */
 @DatabaseTest
+@DbUnitDataSet(fileName = "DBVersionSourceTest.versionTableEmpty.xml")
 public class DBVersionSourceTest extends UnitilsJUnit3 {
 
     /* The tested instance */
@@ -43,6 +46,8 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
     /* The dataSource */
     @TestDataSource
     private javax.sql.DataSource dataSource;
+
+    private DbSupport dbSupport;
 
     /**
      * Initialize test fixture
@@ -59,6 +64,50 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
                 dataSource);
         dbVersionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class,
                 configuration, dataSource, statementHandler);
+        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+
+        dropVersionTable();
+        createVersionTable();
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        dropVersionTable();
+    }
+
+    private void createVersionTable() throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            try {
+                String longDataType = dbSupport.getLongDataType();
+                st.execute("create table db_version (version_index " + longDataType + ", last_updated_on " +
+                        longDataType + ", last_update_succeeded " + longDataType + ")");
+            } catch (SQLException e) {
+                // Ignored
+            }
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+    private void dropVersionTable() throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            try {
+                st.execute("drop table db_version");
+            } catch (SQLException e) {
+                // Ignored
+            }
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
     }
 
     /**
@@ -67,6 +116,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testGetDBVersion_noVersionTable() throws Exception {
+        dropVersionTable();
         assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
     }
 
@@ -76,7 +126,6 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testGetDBVersion_emptyTable() throws Exception {
-        clearDBVersionTable();
         assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
     }
 
@@ -85,6 +134,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      *
      * @throws Exception
      */
+    @DbUnitDataSet(fileName = "DBVersionSourceTest.versionTableFilled.xml")
     public void testGetDBVersion() throws Exception {
         Version expectedVersion = new Version(3L, DateUtils.parseDate("2006-10-08 12:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
         assertRefEquals(expectedVersion, dbVersionSource.getDbVersion());
@@ -107,15 +157,24 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testSetDBVersion_emptyTable() throws Exception {
-        clearDBVersionTable();
         testSetDBVersion();
     }
 
+    /**
+     * Test whether the update succeeded value can be correclty set and retrieved, when succeeded is true
+     *
+     * @throws Exception
+     */
     public void testRegisterUpdateSucceeded_succeeded() throws Exception {
         dbVersionSource.registerUpdateSucceeded(true);
         assertTrue(dbVersionSource.lastUpdateSucceeded());
     }
 
+    /**
+     * Test whether the update succeeded value can be correclty set and retrieved, when succeeded is false
+     *
+     * @throws Exception
+     */
     public void testRegisterUpdateSucceeded_notSucceeded() throws Exception {
         dbVersionSource.registerUpdateSucceeded(false);
         assertFalse(dbVersionSource.lastUpdateSucceeded());
