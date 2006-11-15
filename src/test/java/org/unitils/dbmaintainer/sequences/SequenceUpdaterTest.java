@@ -21,7 +21,6 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
@@ -66,9 +65,8 @@ public abstract class SequenceUpdaterTest extends UnitilsJUnit3 {
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
 
-        StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(configuration, dataSource);
-
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
+                dataSource);
         sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class,
                 configuration, dataSource, statementHandler);
 

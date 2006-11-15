@@ -21,7 +21,6 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.db.annotations.TestDataSource;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
@@ -58,11 +57,11 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         super.setUp();
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        StatementHandler st = new JDBCStatementHandler();
-        st.init(configuration, dataSource);
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
+                dataSource);
 
         constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
-                configuration, dataSource, st);
+                configuration, dataSource, statementHandler);
 
         createTestTables();
     }

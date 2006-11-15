@@ -28,12 +28,50 @@ public class OracleDbSupport extends DbSupport {
         return getDbItemsOfType("TRIGGER_NAME", "USER_TRIGGERS");
     }
 
-    public void dropView(String viewName) throws SQLException, StatementHandlerException {
+    public boolean triggerExists(String triggerName) throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rs = st.executeQuery("select TRIGGER_NAME from USER_TRIGGERS");
+            while (rs.next()) {
+                if (triggerName.equalsIgnoreCase(rs.getString("TRIGGER_NAME"))) {
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            DbUtils.closeQuietly(conn, st, rs);
+        }
+    }
+
+    public boolean sequenceExists(String sequenceName) throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rs = st.executeQuery("select SEQUENCE_NAME from USER_SEQUENCES");
+            while (rs.next()) {
+                if (sequenceName.equalsIgnoreCase(rs.getString("SEQUENCE_NAME"))) {
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            DbUtils.closeQuietly(conn, st, rs);
+        }
+    }
+
+    public void dropView(String viewName) throws StatementHandlerException {
         String dropTableSQL = "drop view " + viewName + " cascade constraints";
         statementHandler.handle(dropTableSQL);
     }
 
-    public void dropTable(String tableName) throws SQLException, StatementHandlerException {
+    public void dropTable(String tableName) throws StatementHandlerException {
         String dropTableSQL = "drop table " + tableName + " cascade constraints";
         statementHandler.handle(dropTableSQL);
     }

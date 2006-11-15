@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.unitils.core.Unitils;
 import org.unitils.dbmaintainer.clear.DBClearer;
-import org.unitils.dbmaintainer.handler.JDBCStatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
@@ -60,9 +59,8 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
     private DBClearer createDBClearer() {
         Configuration configuration = Unitils.getInstance().getConfiguration();
 
-        StatementHandler statementHandler = new JDBCStatementHandler();
-        statementHandler.init(configuration, dataSource);
-
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
+                dataSource);
         DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration,
                 dataSource, statementHandler);
         return dbClearer;

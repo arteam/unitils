@@ -36,7 +36,7 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
     public static final String PROPKEY_DATABASE_SCHEMANAME = "dataSource.schemaName";
 
     /* Property key for the tables that should not be cleaned */
-    public static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.tablesToPreserve";
+    public static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.cleandb.tablesToPreserve";
 
     /* The key of the property that specifies the name of the datase table in which the
      * DB version is stored. This table should not be deleted */
