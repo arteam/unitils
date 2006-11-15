@@ -16,8 +16,11 @@
 package org.unitils.dbmaintainer.script;
 
 import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.easymock.EasyMockTestCase;
 import org.unitils.easymock.annotation.Mock;
+import org.unitils.core.ConfigurationLoader;
+import org.apache.commons.configuration.Configuration;
 
 /**
  * Tests the SQL script runner
@@ -28,7 +31,7 @@ public class SQLScriptRunnerTest extends EasyMockTestCase {
     private StatementHandler mockStatementHandler = null;
 
     /* Tested instance  */
-    private SQLScriptRunner sqlScriptRunner;
+    private ScriptRunner sqlScriptRunner;
 
     /**
      * Normal script, containing 2 statements and a blank line
@@ -90,7 +93,9 @@ public class SQLScriptRunnerTest extends EasyMockTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        sqlScriptRunner = new SQLScriptRunner(mockStatementHandler);
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        sqlScriptRunner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration,
+                null, mockStatementHandler);
     }
 
     /**

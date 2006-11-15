@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
+import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -41,7 +42,7 @@ import java.util.*;
  * have been modified, {@link #existingScriptsModified(Version)} returns true, and {@link #getNewScripts(Version)} returns all
  * scripts.
  */
-public class FileScriptSource implements ScriptSource {
+public class FileScriptSource extends DatabaseTask implements ScriptSource {
 
     /**
      * Property key for the directory in which the script files are located
@@ -63,10 +64,8 @@ public class FileScriptSource implements ScriptSource {
     /**
      * Uses the given <code>Configuration</code> to initialize the script files directory, and the file extension
      * of the script files.
-     *
-     * @see ScriptSource#init(Configuration)
      */
-    public void init(Configuration configuration) {
+    public void doInit(Configuration configuration) {
 
         scriptFilesDir = configuration.getString(PROPKEY_SCRIPTFILES_DIR);
         if (!new File(scriptFilesDir).exists()) {
@@ -74,7 +73,8 @@ public class FileScriptSource implements ScriptSource {
         }
         fileExtension = configuration.getString(PROPKEY_SCRIPTFILES_FILEEXTENSION);
         if (fileExtension.startsWith(".")) {
-            throw new UnitilsException("Extension should not start with a '.'");
+            throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSION +
+                    " should not start with a '.'");
         }
     }
 
