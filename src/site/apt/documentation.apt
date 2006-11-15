@@ -8,6 +8,15 @@ Introduction
 
 * Overview
 ~~~~~~~~~~
+   Unit testing should be easy and intuitively... at least in theory. Real-life projects
+   typically span multiple layers, are data-driven and use middleware technologies such as EJBs and Hibernate.
+   
+   Unitils originated out of an attempt to get a more pragmatic view on unit testing that involves some
+   typical unit testing frameworks such as DbUnit and EasyMock. It started as a set of guidelines and
+   eventually resulted in an open source library containing utilities that facilitate the application of these guidelines.
+   
+   Currently Unitils offers follwing features:
+
 
 * Module system
 ~~~~~~~~~~~~~~~

@@ -8,6 +8,10 @@
   <!--<bannerRight>
     <src>http://maven.apache.org/images/maven-small.gif</src>
   </bannerRight>-->
+  <skin>
+     <groupId>org.apache.maven.skins</groupId>
+     <artifactId>maven-stylus-skin</artifactId>
+  </skin>
   <body>
     <links>
       <item name="SF.net project page" href="http://sourceforge.net/unitils" />
