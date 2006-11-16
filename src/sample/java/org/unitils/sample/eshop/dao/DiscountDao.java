@@ -22,9 +22,9 @@ import org.unitils.sample.eshop.model.User;
  */
 public class DiscountDao extends HibernateDao {
 
-    public double calculateTotalPurchaseAmount(User user) {
-        return (Double) getSession().createQuery("select sum(purchaseItem.price) from PurchaseItem purchaseItem " +
-                "where purchaseItem.purchase.user = :user").setParameter("user", user).uniqueResult();
+    public long calculateTotalPurchaseAmount(User user) {
+        return (Long) getSession().createQuery("select sum(item.amount) from ShoppingBasket basket left join " +
+                "basket.items item where basket.user = :user").setParameter("user", user).uniqueResult();
     }
 
 }
