@@ -37,7 +37,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -76,12 +75,6 @@ public class DatabaseModule implements Module {
 
     /* Indicates if the DBMaintainer should be invoked to update the database */
     private boolean updateDatabaseSchemaEnabled;
-
-    /*
-    * Database connection holder: ensures that if the method getCurrentConnection is always used for getting
-    * a connection to the database, at most one database connection exists per thread
-    */
-    private ThreadLocal<Connection> connectionHolder = new ThreadLocal<Connection>();
 
     /* Set of annotations that identify a test as a DatabaseTest */
     private Set<Class<? extends Annotation>> databaseTestAnnotations = new HashSet<Class<? extends Annotation>>();
@@ -192,22 +185,6 @@ public class DatabaseModule implements Module {
      */
     public DataSource getDataSource() {
         return dataSource;
-    }
-
-    /**
-     * @return The database connection that is associated with the current thread.
-     */
-    public Connection getCurrentConnection() {
-        Connection currentConnection = connectionHolder.get();
-        if (currentConnection == null) {
-            try {
-                currentConnection = getDataSource().getConnection();
-            } catch (SQLException e) {
-                throw new UnitilsException("Error while establishing connection to the database", e);
-            }
-            connectionHolder.set(currentConnection);
-        }
-        return currentConnection;
     }
 
     /**

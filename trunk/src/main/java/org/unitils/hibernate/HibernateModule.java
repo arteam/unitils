@@ -18,6 +18,7 @@ package org.unitils.hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
@@ -32,7 +33,9 @@ import org.unitils.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Module providing support for unit tests for code that uses Hibernate. This involves unit tests for queries to the
@@ -69,8 +72,8 @@ public class HibernateModule implements Module {
     /* The Hibernate SessionFactory */
     private SessionFactory hibernateSessionFactory;
 
-    /* The Hibernate Session that is used in unit tests, one for each thread */
-    private ThreadLocal<Session> currentHibernateSessionHolder = new ThreadLocal<Session>();
+    /* The Hibernate Session that is used in unit tests */
+    private Session currentHibernateSession;
 
     /* Fully qualified class name of the Hibernate Configuration class that is used */
     private String configurationClassName;
@@ -121,15 +124,23 @@ public class HibernateModule implements Module {
     }
 
     /**
-     * Creates completely configured Hibernate <code>Configuration</code> object
+     * Creates completely configured Hibernate <code>Configuration</code> object. Loads all hibernate configuration files
+     * listed in the property {@link #PROPKEY_HIBERNATE_CONFIGFILES} of the Unitils configuration. Also executes all
+     * methods in the test class annotated with {@link HibernateConfiguration}.
+     * Unitils' own implementation of the Hibernate <code>ConnectionProvider</code>, {@link HibernateConnectionProvider},
+     * is set as connection provider. This object makes sure that Hibernate uses connections of Unitils' own
+     * <code>DataSource</code>.
      *
-     * @param test
+     * @param test The test object
      * @return the Hibernate configuration
      */
     private Configuration createHibernateConfiguration(Object test) {
 
         Configuration hbnConfiguration = createHibernateConfiguration();
         callHibernateConfigurationMethods(test, hbnConfiguration);
+        Properties connectionProviderProperty = new Properties();
+        connectionProviderProperty.setProperty(Environment.CONNECTION_PROVIDER, HibernateConnectionProvider.class.getName());
+        hbnConfiguration.addProperties(connectionProviderProperty);
         return hbnConfiguration;
     }
 
@@ -216,9 +227,12 @@ public class HibernateModule implements Module {
      */
     protected Connection getConnection() {
 
-        Unitils unitils = Unitils.getInstance();
-        DatabaseModule dbModule = unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
-        return dbModule.getCurrentConnection();
+        try {
+            DatabaseModule dbModule = getDatabaseModule();
+            return dbModule.getDataSource().getConnection();
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while getting Connection", e);
+        }
     }
 
     /**
@@ -237,23 +251,17 @@ public class HibernateModule implements Module {
 
     /**
      * Retrieves the current Hibernate <code>Session</code>. If there is no session yet, or if the current session is
-     * closed, a new one is created. If the current session is disconnected, it is reconnected with the current
-     * <code>Connection</code>.
+     * closed, a new one is created. If the current session is disconnected, it is reconnected with a
+     * <code>Connection</code> from the pool.
      *
      * @return An open and connected Hibernate <code>Session</code>
      */
     public Session getCurrentSession() {
 
-        Session currentSession = currentHibernateSessionHolder.get();
-        if (currentSession == null || !currentSession.isOpen()) {
-            currentSession = hibernateSessionFactory.openSession(getConnection());
-            currentHibernateSessionHolder.set(currentSession);
-        } else {
-            if (!currentSession.isConnected()) {
-                currentSession.reconnect(getConnection());
-            }
+        if (currentHibernateSession == null || !currentHibernateSession.isOpen()) {
+            currentHibernateSession = hibernateSessionFactory.openSession();
         }
-        return currentSession;
+        return currentHibernateSession;
     }
 
     /**
@@ -261,9 +269,8 @@ public class HibernateModule implements Module {
      */
     public void closeHibernateSession() {
 
-        Session currentSession = currentHibernateSessionHolder.get();
-        if (currentSession != null && currentSession.isOpen()) {
-            currentSession.close();
+        if (currentHibernateSession != null && currentHibernateSession.isOpen()) {
+            currentHibernateSession.close();
         }
     }
 
@@ -275,6 +282,17 @@ public class HibernateModule implements Module {
     public void flushDatabaseUpdates() {
 
         getCurrentSession().flush();
+    }
+
+    /**
+     * @return The {@link DatabaseModule} that provides a connection pooled <code>DataSource</code> to the
+     * HibernateModule.
+     */
+    private DatabaseModule getDatabaseModule() {
+
+        Unitils unitils = Unitils.getInstance();
+        DatabaseModule dbModule = unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
+        return dbModule;
     }
 
     /**
@@ -295,8 +313,7 @@ public class HibernateModule implements Module {
 
         @Override
         public void beforeAll() {
-            Unitils unitils = Unitils.getInstance();
-            DatabaseModule databaseModule = unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
+            DatabaseModule databaseModule = getDatabaseModule();
             databaseModule.registerDatabaseTestAnnotation(HibernateTest.class);
         }
 
