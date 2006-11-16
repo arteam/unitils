@@ -62,7 +62,7 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
     private DbUnitModule dbUnitModule;
 
     @LenientMock
-    private IDatabaseConnection mockDbUnitDatabaseConnection;
+    private DbUnitDatabaseConnection mockDbUnitDatabaseConnection;
 
     @LenientMock
     private ModulesRepository mockModulesRepository;
@@ -85,7 +85,7 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
         super.setUp();
 
         dbUnitModule = new DbUnitModule() {
-            protected IDatabaseConnection createDbUnitConnection() {
+            protected DbUnitDatabaseConnection createDbUnitConnection() {
                 return mockDbUnitDatabaseConnection;
             }
 

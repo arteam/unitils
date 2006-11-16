@@ -19,7 +19,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.Assertion;
 import org.dbunit.database.DatabaseConfig;
-import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.DefaultDataTypeFactory;
@@ -41,7 +40,6 @@ import org.unitils.dbunit.annotation.ExpectedDbUnitDataSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -84,9 +82,10 @@ public class DbUnitModule implements Module {
 
     /**
      * Object that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
-     * caching is time-consuming, this object is created only once and used througout the entire test run.
+     * caching is time-consuming, this object is created only once and used througout the entire test run. The
+     * underlying JDBC Connection however is 'closed' (returned to the pool) after every database operation.
      */
-    private IDatabaseConnection dbUnitDatabaseConnection;
+    private DbUnitDatabaseConnection dbUnitDatabaseConnection;
 
     /* Name of the database schema, needed to configure DBUnit */
     private String databaseSchemaName;
@@ -131,23 +130,14 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * @return The current JDBC database connection, as provided by the {@link DatabaseModule}
-     */
-    private Connection getCurrentConnection() {
-
-        DatabaseModule databaseModule = getDatabaseModule();
-        return databaseModule.getCurrentConnection();
-    }
-
-    /**
      * Creates a new instance of dbUnit's <code>IDatabaseConnection</code>
      *
      * @return a new instance of dbUnit's <code>IDatabaseConnection</code>
      */
-    protected IDatabaseConnection createDbUnitConnection() {
+    protected DbUnitDatabaseConnection createDbUnitConnection() {
 
         // Create connection
-        IDatabaseConnection connection = new DatabaseConnection(getCurrentConnection(), databaseSchemaName);
+        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(getDatabaseModule().getDataSource(), databaseSchemaName);
 
         // Set correct dialect
         if ("oracle".equals(databaseDialect)) {
@@ -172,23 +162,9 @@ public class DbUnitModule implements Module {
     /**
      * @return The DbUnit connection
      */
-    public IDatabaseConnection getDbUnitDatabaseConnection() {
+    public DbUnitDatabaseConnection getDbUnitDatabaseConnection() {
 
         return dbUnitDatabaseConnection;
-    }
-
-    /**
-     * Closes the DbUnit connection to the database
-     */
-    protected void closeDbUnitConnection() {
-
-        try {
-            if (dbUnitDatabaseConnection != null) {
-                dbUnitDatabaseConnection.close();
-            }
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while closing database connection");
-        }
     }
 
     /**
@@ -211,6 +187,8 @@ public class DbUnitModule implements Module {
             }
         } catch (Exception e) {
             throw new UnitilsException("Error while trying to insert test data from DbUnit xml file", e);
+        } finally {
+            closeJdbcConnection();
         }
     }
 
@@ -388,10 +366,8 @@ public class DbUnitModule implements Module {
     public void assertDBContentAsExpected(Object testObject, String expectedDataSetFileName) {
 
         try {
-            IDatabaseConnection databaseConnection = getDbUnitDatabaseConnection();
-
             IDataSet expectedDataSet = getDataSet(testObject.getClass(), expectedDataSetFileName);
-            IDataSet actualDataSet = databaseConnection.createDataSet(expectedDataSet.getTableNames());
+            IDataSet actualDataSet = getDbUnitDatabaseConnection().createDataSet(expectedDataSet.getTableNames());
             ITableIterator tables = expectedDataSet.iterator();
 
             while (tables.next()) {
@@ -405,6 +381,19 @@ public class DbUnitModule implements Module {
             }
         } catch (Exception e) {
             throw new UnitilsException("Error while verifying db contents", e);
+        } finally {
+            closeJdbcConnection();
+        }
+    }
+
+    /**
+     * Closes (i.e. return to the pool) the JDBC Connection that is currently in use by the DbUnitDatabaseConnection
+     */
+    private void closeJdbcConnection() {
+        try {
+            getDbUnitDatabaseConnection().closeJdbcConnection();
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while closing connection", e);
         }
     }
 
@@ -477,11 +466,6 @@ public class DbUnitModule implements Module {
             if (isDatabaseTest(testObject.getClass())) {
                 assertDbContentsAsExpectedIfAnnotated(testObject, testMethod);
             }
-        }
-
-        @Override
-        public void afterAll() {
-            closeDbUnitConnection();
         }
 
     }
