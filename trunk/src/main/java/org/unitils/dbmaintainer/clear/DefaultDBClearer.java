@@ -35,7 +35,7 @@ import java.util.HashSet;
 public class DefaultDBClearer extends DatabaseTask implements DBClearer {
 
     /* The key of the property that specifies which database items should not be deleted when clearing the database */
-    public static final String PROPKEY_ITEMSTOPRESERVE = "dbMaintainer.cleardb.itemsToPreserve";
+    public static final String PROPKEY_ITEMSTOPRESERVE = "dbMaintainer.clearDb.itemsToPreserve";
 
     /* Names of database items (tables, views, sequences or triggers) that should not be deleted when clearning the
         database */
