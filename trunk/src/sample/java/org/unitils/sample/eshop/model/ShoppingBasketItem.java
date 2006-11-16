@@ -43,8 +43,6 @@ public class ShoppingBasketItem {
 
     public ShoppingBasketItem() {}
 
-
-
     public int getAmount() {
         return amount;
     }
