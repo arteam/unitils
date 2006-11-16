@@ -109,27 +109,108 @@ Introduction
 
 * Database testing
 ~~~~~~~~~~~~~~~~~~
+    Unit tests for the database layer are extremely valuable in enterprise applications, but are often abandoned because of their complexity. 
+    Unitils greatly reduces this complexity, making database testing simple and maintainable. The following sections describe the database 
+    support by a number of simple examples. For an elaborate description of the guidelines, read the database testing guidelines.
  
 ** Managing test data with DbUnit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  * Use small sets of test data, containing as few data as possible.
+    Database tests should be run on a unit test database, having complete and fine grained control over the test data that is used. Unitils
+    builds further on DBUnit for providing support for test data sets. Following code section provides a simple example of a database unit test with Unitils' DbUnit support.
+    
+    Let's say we have UserDAO with a simple findByName method for retrieving a user based on it's first and last name. The unit test looks as follows:
+    
++-----+
+    @DatabaseTest
+    public void UserDAOTest extends UnitilsJUnit4 {
+    
+     	public void testFindByName {
+         User johnDoe = userDao.findByName("doe", "john");
+         assertEquals("jdoe", johnDoe.getUserName());
+    	}
+    	
+    	public void testFindByMinimalAge {
+    		List<User> min18 = userDao.findByMinimalAge(18);
+    		assertEquals(1, min18.size());
+    		assertEquals("jack", min18.get(0).getUserName());
+    	}
+    
+    }
++-----+
 
-  * Don't reuse data files too much. Make them test class or even test method specific.
+    The class level data file UserDAOTest.xml is located in the same package as the test class:
+    
++-----+
+    <?xml version='1.0' encoding='UTF-8'?>
+    <dataset>
+	     <user userName="jdoe" name="doe" firstname="john" />
+    </dataset>
++-----+
+
+    The method testFindByMinimalAge has a specific data file named UserDAOTest.testFindByMinimalAge.xml:
+    
++-----+
+    <?xml version='1.0' encoding='UTF-8'?>
+    <dataset>
+	     <user userName="jack" age="18" />
+	     <user userName="jim" age="17" />
+    </dataset>
++-----+
+
+    The annotation @DatabaseTest marks the test as being a database test, instructing Unitils to look for DBUnit datafiles to load. Unitils automatically looks
+    for a data file names <className>.xml. All existing data in the tables specified in the dataset is deleted, and the data 
+    in the datafile is inserted. DbUnit's FlatXMLDataSet is used as the file format.
+    
+    For methods needing very specific data, it may be a good idea to use a method level dataset. Unitils automatically looks for files named <className>.<methodName>.xml, such
+    as the file UserDAOTest.testFindByMinimalAge.xml in the example.
+    
+    The datasets to use can also be specified explicitly using the annotation @DbUnitDataSet, like in the following example:
+    
++-----+
+    @DatabaseTest
+    @DbUnitDataSet(fileName = "UserDAOTest_general.xml")
+    public void UserDAOTest extends UnitilsJUnit4 {
+    
+     	public void testFindByName {
+         User johnDoe = userDao.findByName("doe", "john");
+         assertEquals("jdoe", johnDoe.getUserName());
+    	}
+    	
+    	@DbUnitDataSet(fileName = "UserDAOTest_ages.xml")
+    	public void testFindByMinimalAge {
+    		List<User> min18 = userDao.findByMinimalAge(18);
+    		assertEquals(1, min18.size());
+    		assertEquals("jack", min18.get(0).getUserName());
+    	}
+    
+    }
++-----+ 
+
+    For checking the result of bulk update methods or stored procedures, Unitils offers support for result file checking. Suppose we have
+    a data access method that gives all employees a 10% payraise as follows:
+
+   Always keep in mind the following guidelines: 
+   
+   * Use small sets of test data, containing as few data as possible. In your data files, 
+   only specifiy columns that are used in join columns or the where clause of the tested query.
+
+   * Don't reuse data files too much. Make them test class and in some cases even test method specific. 
+   Changing the data becomes very difficult when multiple tests are using the same data files.
   
-  * Disable foreign key and not-null constraints
-
+   * Use a database schema per developer. This allows developers to insert test data and run tests without interfering each other.
+   
+   * Disable all foreign key and not null constraints on the test databases. This way, the data files need to contain no more
+   data than absolutely necessary.
+   
+   To provide support with these 2 last features, Unitils offers automatic test database schema maintenance:
 
 ** Unit test database maintenance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    A powerful DBMaintainer is provided to automatically update each developer's database schema individually. 
-
-  * Make use of unit test databases: each developer has his own unit test database (schema)
-  
-  * Automate the maintenance of unit test databases
-  
-  * Disable foreign key and not-null constraints
-  
+    A powerful DBMaintainer is provided to automatically update each developer's database schema individually. Unitils' DBMaintainer
+    will automatically check if database structure updates are available before running a database test, and apply them if necessary.
+    
+      
 
 ** Testing with Hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
