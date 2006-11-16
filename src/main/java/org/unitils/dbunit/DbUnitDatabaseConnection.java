@@ -38,8 +38,10 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     }
 
     public void closeJdbcConnection() throws SQLException {
-        currentlyUsedConnection.close();
-        currentlyUsedConnection = null;
+        if (currentlyUsedConnection != null) {
+            currentlyUsedConnection.close();
+            currentlyUsedConnection = null;
+        }
     }
 
 }
