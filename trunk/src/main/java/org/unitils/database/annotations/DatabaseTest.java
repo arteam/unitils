@@ -13,32 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.db.config;
+package org.unitils.database.annotations;
 
-import org.apache.commons.configuration.Configuration;
-
-import javax.sql.DataSource;
+import java.lang.annotation.*;
 
 /**
- * Interface for different sorts of Factories of a TestDataSource.
- * <p/>
- * todo javadoc
+ * Annotation that marks the annotated class as a database test.
  */
-public interface DataSourceFactory {
-
-    /**
-     * Initializes itself using the properties in the given <code>Configuration</code> object.
-     *
-     * @param configuration
-     */
-    public void init(Configuration configuration);
-
-
-    /**
-     * Creates a new <code>TestDataSource</code>
-     *
-     * @return the TestDataSource
-     */
-    public DataSource createDataSource();
-
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+public @interface DatabaseTest {
 }

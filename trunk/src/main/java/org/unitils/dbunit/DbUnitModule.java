@@ -19,22 +19,16 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.Assertion;
 import org.dbunit.database.DatabaseConfig;
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.*;
-import org.dbunit.dataset.datatype.DefaultDataTypeFactory;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.ext.db2.Db2DataTypeFactory;
-import org.dbunit.ext.mysql.MySqlDataTypeFactory;
-import org.dbunit.ext.oracle.OracleDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.db.DatabaseModule;
-import org.unitils.db.annotations.DatabaseTest;
+import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DbUnitDataSet;
 import org.unitils.dbunit.annotation.ExpectedDbUnitDataSet;
 import org.unitils.util.ConfigUtils;
@@ -257,7 +251,6 @@ public class DbUnitModule implements Module {
             return getDataSet(testClass, getClassLevelDefaultTestDataSetFileName(testClass));
         }
     }
-
 
 
     /**

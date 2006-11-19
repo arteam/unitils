@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.db;
+package org.unitils.database;
 
 import org.apache.commons.configuration.Configuration;
 import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.db.annotations.DatabaseTest;
-import org.unitils.db.annotations.TestDataSource;
+import org.unitils.database.annotations.DatabaseTest;
+import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.easymock.annotation.LenientMock;
 

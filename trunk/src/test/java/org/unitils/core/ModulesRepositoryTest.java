@@ -17,7 +17,7 @@ package org.unitils.core;
 
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
-import org.unitils.db.DatabaseModule;
+import org.unitils.database.DatabaseModule;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 import java.util.Arrays;

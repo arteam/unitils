@@ -19,13 +19,13 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.dbunit.annotation.DbUnitDataSet;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.db.annotations.DatabaseTest;
-import org.unitils.db.annotations.TestDataSource;
+import org.unitils.database.annotations.DatabaseTest;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
+import org.unitils.dbunit.annotation.DbUnitDataSet;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 
 import java.sql.Connection;
