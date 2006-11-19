@@ -48,9 +48,6 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
     @LenientMock
     private org.hibernate.classic.Session mockHibernateSession;
 
-    @LenientMock
-    private Connection mockConnection;
-
     /**
      * Fake unit test
      */
@@ -72,10 +69,6 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
                 return mockHibernateConfiguration;
             }
 
-            @Override
-            protected Connection getConnection() {
-                return mockConnection;
-            }
         };
 
         hbnTest = new HbnTest();
@@ -97,7 +90,8 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
     public void testConfigureHibernate() {
 
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
-        expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
+        expect(mockHibernateConfiguration.addProperties(null)).andStubReturn(mockHibernateConfiguration);
+        expect(mockHibernateSessionFactory.openSession()).andStubReturn(mockHibernateSession);
         replay();
 
         hibernateModule.configureHibernate(hbnTest);
@@ -112,8 +106,9 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
     public void testInjectHibernateSession() {
 
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
+        expect(mockHibernateConfiguration.addProperties(null)).andStubReturn(mockHibernateConfiguration);
         expect(mockHibernateSession.isOpen()).andReturn(false);
-        expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
+        expect(mockHibernateSessionFactory.openSession()).andStubReturn(mockHibernateSession);
         replay();
 
         hibernateModule.configureHibernate(hbnTest);
@@ -128,7 +123,8 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
      */
     public void testCloseSession() {
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
-        expect(mockHibernateSessionFactory.openSession(mockConnection)).andStubReturn(mockHibernateSession);
+        expect(mockHibernateConfiguration.addProperties(null)).andStubReturn(mockHibernateConfiguration);
+        expect(mockHibernateSessionFactory.openSession()).andStubReturn(mockHibernateSession);
         expect(mockHibernateSession.isOpen()).andReturn(true);
         expect(mockHibernateSession.close()).andReturn(null);
         replay();

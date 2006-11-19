@@ -15,9 +15,18 @@
  */
 package org.unitils.dbunit.annotation;
 
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
- * todo javadoc
+ * Indicates that after having executed the annotated test method, the contents of the unit test database should be
+ * equal to the contents of either the default result datafile (ClassName.methodName-result.xml), or a file with a
+ * custom specified name (fileName property).
  */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface ExpectedDbUnitDataSet {
 
     String fileName() default "";

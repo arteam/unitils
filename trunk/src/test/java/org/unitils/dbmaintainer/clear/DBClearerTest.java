@@ -25,9 +25,7 @@ import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.util.ConfigUtils;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -78,7 +76,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class,
                     configuration, dataSource, statementHandler);
 
-            dropTestView();
+            dropTestViews();
             dropTestTables();
             dropTestSequences();
             dropTestTriggers();
@@ -93,14 +91,10 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         if (isTestedDialectActivated()) {
             super.tearDown();
 
-            dropTestView();
+            dropTestViews();
             dropTestTables();
             dropTestSequences();
             dropTestTriggers();
-            createTestTables();
-            createTestView();
-            createTestSequences();
-            createTestTriggers();
         }
     }
 
@@ -220,7 +214,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     /**
      * Drops the test views
      */
-    private void dropTestView() {
+    private void dropTestViews() {
         try {
             dbSupport.dropView("testview");
         } catch (StatementHandlerException e) {

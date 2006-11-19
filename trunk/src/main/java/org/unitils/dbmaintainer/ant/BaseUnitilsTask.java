@@ -20,6 +20,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.unitils.core.Unitils;
 import org.unitils.db.config.DataSourceFactory;
+import org.unitils.db.DatabaseModule;
 import org.unitils.util.ReflectionUtils;
 
 import javax.sql.DataSource;
@@ -28,12 +29,6 @@ import javax.sql.DataSource;
  * Base ant task for Unitils database operations
  */
 public abstract class BaseUnitilsTask extends Task {
-
-    /* Property key of the implementation of the DbSupport interface */
-    public static final String PROPKEY_DBSUPPORT_CLASSNAME = "dbMaintainer.dbSupport.className";
-    
-    /* Property key of the datasource factory classname */
-    private static final String PROPKEY_DATASOURCEFACTORY_CLASSNAME = "dataSourceFactory.className";
 
     /* Property key of the database schema name */
     private static final String PROPKEY_DATABASE_SCHEMANAME = "dataSource.schemaName";
@@ -51,11 +46,10 @@ public abstract class BaseUnitilsTask extends Task {
      */
     public final void execute() throws BuildException {
 
-        //todo move implementation to module?
+        DatabaseModule databaseModule = getDatabaseModule();
+        dataSource = databaseModule.getDataSource();
+
         Configuration configuration = Unitils.getInstance().getConfiguration();
-        DataSourceFactory dataSourceFactory = ReflectionUtils.createInstanceOfType(configuration.getString(PROPKEY_DATASOURCEFACTORY_CLASSNAME));
-        dataSourceFactory.init(configuration);
-        dataSource = dataSourceFactory.createDataSource();
         schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
         doExecute();
     }
@@ -67,4 +61,8 @@ public abstract class BaseUnitilsTask extends Task {
      */
     protected abstract void doExecute() throws BuildException;
 
+
+    private DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
 }

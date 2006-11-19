@@ -24,9 +24,13 @@ import org.unitils.core.ModulesRepository;
 import org.unitils.db.DatabaseModule;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.easymock.EasyMockModule;
+import org.unitils.easymock.EasyMockUnitils;
 
 /**
  * Test class for the DbUnitModule
+ *
+ * todo write tests for dbunit file loading, annotations, expected data file
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class DbUnitModuleTest extends UnitilsJUnit3 {
@@ -104,6 +108,7 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
      */
     public void testIsDatabaseTest() throws Exception {
 
+        EasyMockUnitils.replay();
         assertTrue(dbUnitModule.isDatabaseTest(DbTest.class));
     }
 
@@ -111,18 +116,10 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
      * Tests that the DbUnitDatabaseConnection is correctly returned
      */
     public void testInitDbUnitConnection() {
-        dbUnitModule.initDbUnitConnection();
+
+        EasyMockUnitils.replay();
         assertSame(mockDbUnitDatabaseConnection, dbUnitModule.getDbUnitDatabaseConnection());
     }
-
-
-    //Todo implement
-    public void testInsertTestData_noDbUnitDataSetAnnotation() throws Exception {
-
-        dbUnitModule.insertTestData(DbTest.class, DbTest.class.getDeclaredMethod("testMethod"));
-
-    }
-
 
     @DatabaseTest
     public static class DbTest {

@@ -127,25 +127,6 @@ public class DatabaseModule implements Module {
     }
 
     /**
-     * Inializes the database setup. I.e., creates a <code>TestDataSource</code> and updates the database schema if needed
-     * using the {@link DBMaintainer}
-     *
-     * @param testObject the test instance, not null
-     */
-    protected void initDatabase(Object testObject) {
-        try {
-            if (dataSource == null) {
-                //create the singleton datasource
-                dataSource = createDataSource();
-                //check if the database must be updated using the DBMaintainer
-                updateDatabaseSchemaIfNeeded();
-            }
-        } catch (Exception e) {
-            throw new UnitilsException("Error while intializing database connection", e);
-        }
-    }
-
-    /**
      * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
      *
      * @return the datasource
@@ -184,6 +165,9 @@ public class DatabaseModule implements Module {
      * @return The <code>TestDataSource</code>
      */
     public DataSource getDataSource() {
+        if (dataSource == null) {
+            dataSource = createDataSource();
+        }
         return dataSource;
     }
 
@@ -197,7 +181,7 @@ public class DatabaseModule implements Module {
         List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         for (Field field : fields) {
             try {
-                ReflectionUtils.setFieldValue(testObject, field, dataSource);
+                ReflectionUtils.setFieldValue(testObject, field, getDataSource());
 
             } catch (UnitilsException e) {
 
@@ -210,7 +194,7 @@ public class DatabaseModule implements Module {
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         for (Method method : methods) {
             try {
-                ReflectionUtils.invokeMethod(testObject, method, dataSource);
+                ReflectionUtils.invokeMethod(testObject, method, getDataSource());
 
             } catch (UnitilsException e) {
 
@@ -226,11 +210,15 @@ public class DatabaseModule implements Module {
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link org.unitils.dbmaintainer.maintainer.DBMaintainer} for more information.
      */
-    protected void updateDatabaseSchemaIfNeeded() throws StatementHandlerException {
+    protected void updateDatabaseSchemaIfNeeded() {
 
         if (updateDatabaseSchemaEnabled) {
-            DBMaintainer dbMaintainer = createDbMaintainer(configuration);
-            dbMaintainer.updateDatabase();
+            try {
+                DBMaintainer dbMaintainer = createDbMaintainer(configuration);
+                dbMaintainer.updateDatabase();
+            } catch (StatementHandlerException e) {
+                throw new UnitilsException("Error while updating database", e);
+            }
         }
     }
 
@@ -241,7 +229,7 @@ public class DatabaseModule implements Module {
      * @return a new instance of the DBMaintainer
      */
     protected DBMaintainer createDbMaintainer(Configuration configuration) {
-        return new DBMaintainer(configuration, dataSource);
+        return new DBMaintainer(configuration, getDataSource());
     }
 
     /**
@@ -268,22 +256,23 @@ public class DatabaseModule implements Module {
      */
     private class DatabaseTestListener extends TestListener {
 
+        /* Boolean that is set to false after the first database test has been occured in the beforeTestClass method,
+           to make sure database update is only performed once */
+        private boolean firstDatabaseTest = true;
+
         @Override
         public void beforeTestClass(Class<?> testClass) {
 
-            if (isDatabaseTest(testClass)) {
-                initDatabase(testClass);
+            if (isDatabaseTest(testClass) && firstDatabaseTest) {
+                updateDatabaseSchemaIfNeeded();
+                firstDatabaseTest = false;
             }
         }
 
         @Override
         public void beforeTestSetUp(Object testObject) {
 
-            if (isDatabaseTest(testObject.getClass())) {
-                //call methods annotated with TestDataSource, if any
-                injectDataSource(testObject);
-            }
+            injectDataSource(testObject);
         }
-
     }
 }
