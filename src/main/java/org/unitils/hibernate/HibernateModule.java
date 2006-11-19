@@ -23,7 +23,7 @@ import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.db.DatabaseModule;
+import org.unitils.database.DatabaseModule;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateTest;
@@ -269,7 +269,7 @@ public class HibernateModule implements Module {
 
     /**
      * @return The {@link DatabaseModule} that provides a connection pooled <code>DataSource</code> to the
-     * HibernateModule.
+     *         HibernateModule.
      */
     private DatabaseModule getDatabaseModule() {
 

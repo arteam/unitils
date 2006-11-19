@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.db.config;
+package org.unitils.database.config;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -62,7 +62,7 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     }
 
     /**
-     * @see org.unitils.db.config.DataSourceFactory#createDataSource()
+     * @see DataSourceFactory#createDataSource()
      */
     public DataSource createDataSource() {
         BasicDataSource dataSource = getNewDataSource();

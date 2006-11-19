@@ -19,9 +19,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.unitils.core.Unitils;
-import org.unitils.db.config.DataSourceFactory;
-import org.unitils.db.DatabaseModule;
-import org.unitils.util.ReflectionUtils;
+import org.unitils.database.DatabaseModule;
 
 import javax.sql.DataSource;
 

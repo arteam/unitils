@@ -15,21 +15,19 @@
  */
 package org.unitils.dbunit;
 
-import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
 import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ModulesRepository;
-import org.unitils.db.DatabaseModule;
-import org.unitils.db.annotations.DatabaseTest;
-import org.unitils.easymock.annotation.LenientMock;
-import org.unitils.easymock.EasyMockModule;
+import org.unitils.database.DatabaseModule;
+import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.easymock.EasyMockUnitils;
+import org.unitils.easymock.annotation.LenientMock;
 
 /**
  * Test class for the DbUnitModule
- *
+ * <p/>
  * todo write tests for dbunit file loading, annotations, expected data file
  */
 @SuppressWarnings({"UnusedDeclaration"})

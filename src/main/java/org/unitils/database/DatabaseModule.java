@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.db;
+package org.unitils.database;
 
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.db.annotations.DatabaseTest;
-import org.unitils.db.annotations.TestDataSource;
-import org.unitils.db.config.DataSourceFactory;
+import org.unitils.database.annotations.DatabaseTest;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.config.DataSourceFactory;
 import org.unitils.dbmaintainer.constraints.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
@@ -36,7 +36,6 @@ import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.sql.Connection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -154,10 +153,8 @@ public class DatabaseModule implements Module {
      */
     protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
 
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
-                dataSource);
-        ConstraintsDisabler constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
-                configuration, dataSource, statementHandler);
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
+        ConstraintsDisabler constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
         return constraintsDisabler;
     }
 

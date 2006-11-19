@@ -1,14 +1,14 @@
 package org.unitils.hibernate;
 
-import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.HibernateException;
-import org.unitils.db.DatabaseModule;
+import org.hibernate.connection.ConnectionProvider;
 import org.unitils.core.Unitils;
+import org.unitils.database.DatabaseModule;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * Implementation of the Hibernate <code>ConnectionProvider</code> interface. Provides JDBC connections to Hibernate
@@ -46,6 +46,7 @@ public class HibernateConnectionProvider implements ConnectionProvider {
 
     /**
      * Closes the given connection, i.e. returns it to the connection pool.
+     *
      * @param conn
      * @throws SQLException
      */
@@ -55,14 +56,15 @@ public class HibernateConnectionProvider implements ConnectionProvider {
 
     /**
      * Method for releasing resources. Does nothing.
+     *
      * @throws HibernateException
      */
     public void close() throws HibernateException {
     }
 
     /**
-     * @see org.hibernate.connection.ConnectionProvider#supportsAggressiveRelease()
      * @return true
+     * @see org.hibernate.connection.ConnectionProvider#supportsAggressiveRelease()
      */
     public boolean supportsAggressiveRelease() {
         return true;

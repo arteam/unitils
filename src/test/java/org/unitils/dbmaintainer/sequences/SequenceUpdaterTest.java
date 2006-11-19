@@ -19,11 +19,11 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.db.annotations.DatabaseTest;
-import org.unitils.db.annotations.TestDataSource;
+import org.unitils.database.annotations.DatabaseTest;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -97,7 +97,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     /**
      * Inserts a test record
-     *
      */
     private void insertTestRecord() {
         Connection conn = null;
@@ -116,7 +115,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     /**
      * Creates a test table
-     *
      */
     private void createTestTable() {
         Connection conn = null;
@@ -135,7 +133,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     /**
      * Drops the test table
-     *
      */
     private void dropTestTable() {
         Connection conn = null;
@@ -154,7 +151,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     /**
      * Creates a test sequence
-     *
      */
     private void createTestSequence() {
         Connection conn = null;
@@ -173,7 +169,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     /**
      * Drops the test sequence
-     *
      */
     private void dropTestSequence() {
         Connection conn = null;
@@ -221,6 +216,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
     /**
      * Returns the next value for the test sequence
+     *
      * @return
      * @throws SQLException
      */

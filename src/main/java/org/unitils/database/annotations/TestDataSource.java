@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.db.annotations;
+package org.unitils.database.annotations;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Annotation that marks the annotated class as a database test.
+ * Annotation indicating that this field or method should be initialized with the <code>DataSource</code> that supplies
+ * a connection to the unit test database. If a field is annotated, it should be of type <code>DataSource</code>. If
+ * a method is annotated, the method should have following signature: void myMethod(DataSource dataSource)
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
-public @interface DatabaseTest {
+public @interface TestDataSource {
 }
