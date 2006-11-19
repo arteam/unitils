@@ -17,7 +17,9 @@ package org.unitils;
 
 
 /**
- * Empty JUnit 4 test class
+ * Empty JUnit 4 test class.  This test test-class is used in the {@link UnitilsInvocationTest} tests.
+ *
+ * @author Tim Ducheyne
  */
 public class UnitilsJUnit4Test_EmptyTestClass extends UnitilsJUnit4 {
 

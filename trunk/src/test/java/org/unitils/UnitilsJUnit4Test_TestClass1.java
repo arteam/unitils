@@ -19,13 +19,23 @@ import org.junit.*;
 import static org.unitils.TracingTestListener.*;
 
 /**
- * JUnit 4 test class containing 2 active and 1 ignored test method
+ * JUnit 4 test class containing 2 active and 1 ignored test method. This test test-class is used
+ * in the {@link UnitilsInvocationTest} and {@link UnitilsInvocationExceptionTest} tests.
+ *
+ * @author Tim Ducheyne
  */
 public class UnitilsJUnit4Test_TestClass1 extends UnitilsJUnit4 {
 
 
+    /* Test listener that will record all invocations */
     private static TracingTestListener tracingTestListener;
 
+
+    /**
+     * Sets the tracing test listener that will record all invocations.
+     *
+     * @param testListener the listener
+     */
     public static void setTracingTestListener(TracingTestListener testListener) {
         tracingTestListener = testListener;
     }
@@ -36,30 +46,36 @@ public class UnitilsJUnit4Test_TestClass1 extends UnitilsJUnit4 {
         addTestInvocation(TEST_BEFORE_CLASS, UnitilsJUnit4Test_TestClass1.class, null);
     }
 
+
     @AfterClass
     public static void afterClass() {
         addTestInvocation(TEST_AFTER_CLASS, UnitilsJUnit4Test_TestClass1.class, null);
     }
+
 
     @Before
     public void setUp() {
         addTestInvocation(TEST_SET_UP, this, null);
     }
 
+
     @After
     public void tearDown() {
         addTestInvocation(TEST_TEAR_DOWN, this, null);
     }
+
 
     @Test
     public void test1() {
         addTestInvocation(TEST_METHOD, this, "test1");
     }
 
+
     @Test
     public void test2() {
         addTestInvocation(TEST_METHOD, this, "test2");
     }
+
 
     @Ignore
     @Test
@@ -67,6 +83,14 @@ public class UnitilsJUnit4Test_TestClass1 extends UnitilsJUnit4 {
         addTestInvocation(TEST_METHOD, this, "test3");
     }
 
+
+    /**
+     * Records an invocation.
+     *
+     * @param invocation     the invocation type, not null
+     * @param test           the test instance or class, not null
+     * @param testMethodName the actual test name, null if not applicable
+     */
     private static void addTestInvocation(String invocation, Object test, String testMethodName) {
         if (tracingTestListener != null) {
             tracingTestListener.addTestInvocation(invocation, test, testMethodName);

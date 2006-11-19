@@ -23,53 +23,145 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 
 /**
- * todo javadoc
+ * Base test class that will Unitils-enable your test. This base class will make sure that the
+ * core unitils test listener methods are invoked in the expected order. See {@link TestListener} for
+ * more information on the listener invocation order.
+ *
+ * @author Tim Ducheyne
  */
 public abstract class UnitilsTestNG implements IHookable {
 
+    /* The main test listener, that hooks this test into unitils */
     private static TestListener testListener;
 
+    /* True if beforeTestClass was called */
+    private static boolean beforeTestClassCalled = false;
+
+    /* True if beforeTestSetUp was called */
+    private static boolean beforeTestSetUpCalled = false;
+
+
+    /**
+     * Called at the beginning of the test run. This will initialize unitils and the test listener
+     * and call {@link TestListener#beforeAll}.
+     */
     @BeforeSuite
     protected void unitilsBeforeSuite() {
-        testListener = getUnitils().createTestListener();
+
+        testListener = createUnitils().createTestListener();
         testListener.beforeAll();
     }
 
-    @AfterSuite
+
+    /**
+     * Called at the end of the test run. This is where {@link TestListener#afterAll} is called.
+     */
+    @AfterSuite(alwaysRun = true)
     protected void unitilsAfterSuite() {
         testListener.afterAll();
     }
 
+
+    /**
+     * Called before a test of a test class is run. This is where {@link TestListener#beforeTestClass} is called.
+     */
     @BeforeClass
     protected void unitilsBeforeClass() {
+        beforeTestClassCalled = true;
         testListener.beforeTestClass(getClass());
     }
 
-    @AfterClass
+
+    /**
+     * Called after all tests of a test class were run. This is where {@link TestListener#afterTestClass} is called.
+     * <p/>
+     * NOTE: alwaysRun is enabled to be sure that this method is called even when an exception occurs during
+     * {@link #unitilsBeforeClass}.
+     */
+    @AfterClass(alwaysRun = true)
     protected void unitilsAfterClass() {
-        testListener.afterTestClass(getClass());
+        // alwaysRun is enaled, extra test to ensure that unitilsBeforeClass was called
+        if (beforeTestClassCalled) {
+            beforeTestClassCalled = false;
+            testListener.afterTestClass(getClass());
+        }
     }
 
+
+    /**
+     * Called before all test setup. This is where {@link TestListener#beforeTestSetUp} is called.
+     */
     @BeforeMethod
     protected void unitilsBeforeTestSetUp() {
+        beforeTestSetUpCalled = true;
         testListener.beforeTestSetUp(this);
     }
 
-    @AfterMethod
+
+    /**
+     * Called after all test tear down. This is where {@link TestListener#afterTestTearDown} is called.
+     * <p/>
+     * NOTE: alwaysRun is enabled to be sure that this method is called even when an exception occurs during
+     * {@link #unitilsBeforeTestSetUp}.
+     */
+    @AfterMethod(alwaysRun = true)
     protected void unitilsAfterTestTearDown() {
-        testListener.afterTestTearDown(this);
+        // alwaysRun is enaled, extra test to ensure that unitilsBeforeTestSetUp was called
+        if (beforeTestSetUpCalled) {
+            beforeTestSetUpCalled = false;
+            testListener.afterTestTearDown(this);
+        }
     }
 
 
+    /**
+     * Implementation of the hookable interface to be able to call {@link TestListener#beforeTestMethod} and
+     * {@link TestListener#afterTestMethod}.
+     *
+     * @param callBack   the TestNG test callback, not null
+     * @param testResult the TestNG test result, not null
+     */
     public void run(IHookCallBack callBack, ITestResult testResult) {
 
-        testListener.beforeTestMethod(this, testResult.getMethod().getMethod());
-        callBack.runTestMethod(testResult);
-        testListener.afterTestMethod(this, testResult.getMethod().getMethod());
+        RuntimeException firstRuntimeException = null;
+        try {
+            testListener.beforeTestMethod(this, testResult.getMethod().getMethod());
+            callBack.runTestMethod(testResult);
+
+        } catch (RuntimeException e) {
+            // hold exception until later, first call afterTestMethod
+            firstRuntimeException = e;
+        }
+
+        try {
+            testListener.afterTestMethod(this, testResult.getMethod().getMethod());
+
+        } catch (RuntimeException e) {
+            // first exception is typically the most meaningful, so ignore second exception
+            if (firstRuntimeException == null) {
+                firstRuntimeException = e;
+            }
+        }
+
+        // if there were exceptions, throw the first one
+        if (firstRuntimeException != null) {
+            throw firstRuntimeException;
+        }
     }
 
 
-    protected Unitils getUnitils() {
+    /**
+     * Creates and initializes a unitils core instance.
+     * <p/>
+     * This will create and set the default singleton instance by calling {@link Unitils#initSingletonInstance}.
+     * <p/>
+     * You can override this method to let it create and set your own singleton instance. For example, you
+     * can let it create an instance of your own Unitils subclass and set it by using {@link Unitils#setInstance}.
+     *
+     * @return the unitils core instance, not null
+     */
+    protected Unitils createUnitils() {
+
         Unitils unitils = Unitils.getInstance();
         if (unitils == null) {
             Unitils.initSingletonInstance();

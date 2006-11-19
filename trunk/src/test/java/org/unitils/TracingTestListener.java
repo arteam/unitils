@@ -72,7 +72,7 @@ public class TracingTestListener extends TestListener {
 
     public void addTestInvocation(String invocation, Object test, String testMethodName) {
         callList.add(formatString(TEST, invocation, getClassName(test), testMethodName));
-        throwExceptionIfRequested(testMethodName);
+        throwExceptionIfRequested(invocation);
     }
 
 
