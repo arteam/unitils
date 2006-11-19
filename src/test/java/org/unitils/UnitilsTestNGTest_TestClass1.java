@@ -21,15 +21,23 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 
 /**
- * TestNG test class containing 2 active and 1 ignored test method
- * <p/>
- * Test class used in the {@link UnitilsInvocationTest} tests.
- * This is a public class because there is a bug in TestNG that does not allow tests on inner classes.
+ * TestNG test class containing 2 active and 1 ignored test method. This test test-class is used
+ * in the {@link UnitilsInvocationTest} and {@link UnitilsInvocationExceptionTest} tests.
+ *
+ * @author Tim Ducheyne
  */
 public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNG {
 
+
+    /* Test listener that will record all invocations */
     private static TracingTestListener tracingTestListener;
 
+
+    /**
+     * Sets the tracing test listener that will record all invocations.
+     *
+     * @param testListener the listener
+     */
     public static void setTracingTestListener(TracingTestListener testListener) {
         tracingTestListener = testListener;
     }
@@ -40,30 +48,36 @@ public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNG {
         addTestInvocation(TEST_BEFORE_CLASS, null);
     }
 
+
     @AfterClass
     public void afterClass() {
         addTestInvocation(TEST_AFTER_CLASS, null);
     }
+
 
     @BeforeMethod
     public void setUp() {
         addTestInvocation(TEST_SET_UP, null);
     }
 
+
     @AfterMethod
     public void tearDown() {
         addTestInvocation(TEST_TEAR_DOWN, null);
     }
+
 
     @Test
     public void test1() {
         addTestInvocation(TEST_METHOD, "test1");
     }
 
+
     @Test
     public void test2() {
         addTestInvocation(TEST_METHOD, "test2");
     }
+
 
     @Test(enabled = false)
     public void test3() {
@@ -71,6 +85,12 @@ public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNG {
     }
 
 
+    /**
+     * Records an invocation.
+     *
+     * @param invocation     the invocation type, not null
+     * @param testMethodName the actual test name, null if not applicable
+     */
     private void addTestInvocation(String invocation, String testMethodName) {
         if (tracingTestListener != null) {
             tracingTestListener.addTestInvocation(invocation, this, testMethodName);
@@ -78,8 +98,13 @@ public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNG {
     }
 
 
+    /**
+     * Overridden to install the tracing test listener.
+     *
+     * @return the unitils instance, not null
+     */
     @Override
-    protected Unitils getUnitils() {
+    protected Unitils createUnitils() {
         if (tracingTestListener != null) {
             return new Unitils() {
 
@@ -88,7 +113,7 @@ public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNG {
                 }
             };
         }
-        return super.getUnitils();
+        return super.createUnitils();
     }
 
 }

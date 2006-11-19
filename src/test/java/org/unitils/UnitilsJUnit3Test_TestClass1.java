@@ -21,12 +21,22 @@ import org.unitils.core.Unitils;
 
 
 /**
- * JUnit 3 test class containing 2 test methods
+ * JUnit 3 test class containing 2 test methods. This test test-class is used in the
+ * {@link UnitilsInvocationTest} and {@link UnitilsInvocationExceptionTest} tests.
+ *
+ * @author Tim Ducheyne
  */
 public class UnitilsJUnit3Test_TestClass1 extends UnitilsJUnit3 {
 
+    /* Test listener that will record all invocations */
     private static TracingTestListener tracingTestListener;
 
+
+    /**
+     * Sets the tracing test listener that will record all invocations.
+     *
+     * @param testListener the listener
+     */
     public static void setTracingTestListener(TracingTestListener testListener) {
         tracingTestListener = testListener;
     }
@@ -37,20 +47,29 @@ public class UnitilsJUnit3Test_TestClass1 extends UnitilsJUnit3 {
         addTestInvocation(TEST_SET_UP, null);
     }
 
+
     protected void tearDown() throws Exception {
         super.tearDown();
         addTestInvocation(TEST_TEAR_DOWN, null);
     }
 
+
     public void test1() {
         addTestInvocation(TEST_METHOD, "test1");
     }
+
 
     public void test2() {
         addTestInvocation(TEST_METHOD, "test2");
     }
 
 
+    /**
+     * Records an invocation.
+     *
+     * @param invocation     the invocation type, not null
+     * @param testMethodName the actual test name, null if not applicable
+     */
     private void addTestInvocation(String invocation, String testMethodName) {
         if (tracingTestListener != null) {
             tracingTestListener.addTestInvocation(invocation, this, testMethodName);
@@ -58,8 +77,13 @@ public class UnitilsJUnit3Test_TestClass1 extends UnitilsJUnit3 {
     }
 
 
+    /**
+     * Overridden to install the tracing test listener.
+     *
+     * @return the unitils instance, not null
+     */
     @Override
-    protected Unitils getUnitils() {
+    protected Unitils createUnitils() {
         if (tracingTestListener != null) {
             return new Unitils() {
 
@@ -68,6 +92,6 @@ public class UnitilsJUnit3Test_TestClass1 extends UnitilsJUnit3 {
                 }
             };
         }
-        return super.getUnitils();
+        return super.createUnitils();
     }
 }

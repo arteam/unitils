@@ -95,6 +95,7 @@ public class DatabaseModule implements Module {
     public void init(Configuration configuration) {
         this.configuration = configuration;
 
+        //todo add config utils that check on empty properties
         disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         updateDatabaseSchemaEnabled = configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED);
 

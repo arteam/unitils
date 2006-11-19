@@ -19,22 +19,34 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 
 /**
- * Empty TestNG test class
- * <p/>
- * Test class used in the {@link UnitilsInvocationTest} tests.
- * This is a public class because there is a bug in TestNG that does not allow tests on inner classes.
+ * Empty TestNG test class. This test test-class is used in the {@link UnitilsInvocationTest} tests.
+ *
+ * @author Tim Ducheyne
  */
 public class UnitilsTestNGTest_EmptyTestClass extends UnitilsTestNG {
 
 
+    /* Test listener that will record all invocations */
     private static TracingTestListener tracingTestListener;
 
+
+    /**
+     * Sets the tracing test listener that will record all invocations .
+     *
+     * @param testListener the listener
+     */
     public static void setTracingTestListener(TracingTestListener testListener) {
         tracingTestListener = testListener;
     }
 
+
+    /**
+     * Overridden to install the tracing test listener.
+     *
+     * @return the unitils instance, not null
+     */
     @Override
-    protected Unitils getUnitils() {
+    protected Unitils createUnitils() {
         if (tracingTestListener != null) {
             return new Unitils() {
 
@@ -43,7 +55,7 @@ public class UnitilsTestNGTest_EmptyTestClass extends UnitilsTestNG {
                 }
             };
         }
-        return super.getUnitils();
+        return super.createUnitils();
     }
 
 }

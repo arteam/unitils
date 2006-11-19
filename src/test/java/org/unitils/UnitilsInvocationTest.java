@@ -25,8 +25,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
-import org.junit.runner.notification.Failure;
-import org.junit.runner.notification.RunListener;
+import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
@@ -41,12 +40,13 @@ import java.util.Iterator;
  * Test for the main flow of the unitils test listeners for JUnit3 ({@link UnitilsJUnit3}),
  * JUnit4 (@link UnitilsJUnit4TestClassRunner}) and TestNG ({@link UnitilsTestNG}).
  * <p/>
- * Except for some minor differences (see {@link #assertInvocationOrder}, the flows for all these test frameworks
- * are expected to be the same.
+ * Except for some minor differences, the flows for all these test frameworks
+ * are expected to be the same (see {@link #assertInvocationOrder}.
  * <p/>
  * 3 tests are performed: TestClass1 and TestClass2 both with 2 test methods and EmptyTestClass
  * that does not contain any methods. TestClass1 also contains an ignored test (not for JUnit3).
  *
+ * @author Tim Ducheyne
  * @see UnitilsJUnit3Test_TestClass1
  * @see UnitilsJUnit3Test_TestClass2
  * @see UnitilsJUnit3Test_EmptyTestClass
@@ -151,9 +151,9 @@ public class UnitilsInvocationTest {
     @Test
     public void testUnitilsJUnit4() throws Exception {
 
-        FailureRunListener failureRunListener = new FailureRunListener();
+        Result result = new Result();
         RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
+        runNotifier.addListener(result.createListener());
 
         TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
         TestUnitilsJUnit4TestClassRunner testRunner2 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass2.class);
@@ -164,7 +164,9 @@ public class UnitilsInvocationTest {
 
         assertInvocationOrder("JUnit4", tracingTestListener);
         // EmptyTestClass has caused a failure
-        assertEquals(1, failureRunListener.getFailureCount());
+        assertEquals(5, result.getRunCount());
+        assertEquals(1, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
     }
 
 
@@ -275,7 +277,7 @@ public class UnitilsInvocationTest {
             super(testClass);
         }
 
-        protected Unitils getUnitils() {
+        protected Unitils createUnitils() {
 
             return new Unitils() {
 
@@ -283,24 +285,6 @@ public class UnitilsInvocationTest {
                     return tracingTestListener;
                 }
             };
-        }
-    }
-
-
-    /**
-     * JUnit 4 run listener for recording the nr of failures during the test.
-     */
-    private class FailureRunListener extends RunListener {
-
-        private int failureCount = 0;
-
-        public void testFailure(Failure failure) throws Exception {
-            super.testFailure(failure);
-            failureCount++;
-        }
-
-        public int getFailureCount() {
-            return failureCount;
         }
     }
 
@@ -318,7 +302,7 @@ public class UnitilsInvocationTest {
 
 
         @Override
-        protected Unitils getUnitils() {
+        protected Unitils createUnitils() {
             if (tracingTestListener != null) {
                 return new Unitils() {
 
@@ -327,7 +311,7 @@ public class UnitilsInvocationTest {
                     }
                 };
             }
-            return super.getUnitils();
+            return super.createUnitils();
         }
     }
 

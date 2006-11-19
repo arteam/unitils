@@ -25,8 +25,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
-import org.junit.runner.notification.Failure;
-import org.junit.runner.notification.RunListener;
+import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
@@ -39,9 +38,16 @@ import org.unitils.util.ReflectionUtils;
 import java.util.Iterator;
 
 /**
- * Test for {@link UnitilsJUnit3}.
+ * Test for the flows in case an exception occurs in one of the listener or test methods for JUnit3 ({@link UnitilsJUnit3}),
+ * JUnit4 (@link UnitilsJUnit4TestClassRunner}) and TestNG ({@link UnitilsTestNG}).
  * <p/>
- * todo afterTestClass + afterAll explain
+ * Except for some minor differences, the flows for all these test frameworks
+ * are expected to be the same (see assertInvocationOrder* methods).
+ *
+ * @author Tim Ducheyne
+ * @see UnitilsJUnit3Test_TestClass1
+ * @see UnitilsJUnit4Test_TestClass1
+ * @see UnitilsTestNGTest_TestClass1
  */
 public class UnitilsInvocationExceptionTest {
 
@@ -104,528 +110,1205 @@ public class UnitilsInvocationExceptionTest {
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeAll} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeAll
      */
     @Test
-    public void testUnitilsJUnit3BeforeAll_RuntimeException() {
+    public void testUnitilsJUnit3_beforeAll_RuntimeException() {
 
         tracingTestListener.setExceptionMethod(BEFORE_ALL, false);
-
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", BEFORE_ALL, tracingTestListener);
+        assertInvocationOrder_beforeAll("JUnit3", tracingTestListener);
         assertEquals(0, result.failureCount());
         assertEquals(2, result.errorCount());
     }
 
+
+    /**
+     * Test the flow when an assertion error is thrown during a {@link TestListener#beforeAll} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeAll
+     */
     @Test
-    public void testUnitilsJUnit3BeforeAll_AssertionFailedError() {
+    public void testUnitilsJUnit3_beforeAll_AssertionFailedError() {
 
         tracingTestListener.setExceptionMethod(BEFORE_ALL, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", BEFORE_ALL, tracingTestListener);
-        assertEquals(2, result.failureCount());
+        assertInvocationOrder_beforeAll("JUnit3", tracingTestListener);
+        assertEquals(2, result.failureCount());       // failures instead of errors
         assertEquals(0, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
-     * <p/>
-     * todo implement
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeAll} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeAll
      */
     @Test
-    public void testUnitilsJUnit4BeforeAll() throws Exception {
+    public void testUnitilsJUnit4_beforeAll() throws Exception {
 
         tracingTestListener.setExceptionMethod(BEFORE_ALL, false);
-        FailureRunListener failureRunListener = new FailureRunListener();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        testRunner1.run(runNotifier);
+        Result result = performJUnit4Test();
 
-        assertInvocationOrder("JUnit4", BEFORE_ALL, tracingTestListener);
-        assertEquals(2, failureRunListener.getFailureCount());
+        assertInvocationOrder_beforeAll("JUnit4", tracingTestListener);
+        assertEquals(0, result.getRunCount());
+        assertEquals(1, result.getFailureCount());
+        assertEquals(0, result.getIgnoreCount());
     }
 
 
     /**
-     * todo javadoc
-     * <p/>
-     * todo implement
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeAll} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeAll
      */
     @Test
-    public void testUnitilsTestNGBeforeAll() throws Exception {
+    public void testUnitilsTestNG_beforeAll() throws Exception {
 
         tracingTestListener.setExceptionMethod(BEFORE_ALL, false);
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class});
-        testng.addListener(testListenerAdapter);
-        testng.run();
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
 
-        assertInvocationOrder("TestNG", BEFORE_ALL, tracingTestListener);
-        assertEquals(2, testListenerAdapter.getFailedTests().size());
+        assertInvocationOrder_beforeAll("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestClass} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestClass
      */
     @Test
-    public void testUnitilsJUnit3BeforeTestClass_RuntimeException() {
+    public void testUnitilsJUnit3_beforeTestClass_RuntimeException() {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", BEFORE_TEST_CLASS, tracingTestListener);
+        assertInvocationOrder_beforeTestClass("JUnit3", tracingTestListener);
         assertEquals(0, result.failureCount());
         assertEquals(2, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when an assertion error is thrown during a {@link TestListener#beforeTestClass} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestClass
      */
     @Test
-    public void testUnitilsJUnit3BeforeTestClass_AssertionFailedError() {
+    public void testUnitilsJUnit3_beforeTestClass_AssertionFailedError() {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", BEFORE_TEST_CLASS, tracingTestListener);
-        assertEquals(2, result.failureCount());
+        assertInvocationOrder_beforeTestClass("JUnit3", tracingTestListener);
+        assertEquals(2, result.failureCount());   // failures instead of errors
         assertEquals(0, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestClass} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestClass
      */
     @Test
-    public void testUnitilsJUnit4BeforeTestClass() throws Exception {
+    public void testUnitilsJUnit4_beforeTestClass() throws Exception {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, false);
-        FailureRunListener failureRunListener = new FailureRunListener();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        testRunner1.run(runNotifier);
+        Result result = performJUnit4Test();
 
-        assertInvocationOrder("JUnit4", BEFORE_TEST_CLASS, tracingTestListener);
-        assertEquals(2, failureRunListener.getFailureCount());
+        assertInvocationOrder_beforeTestClass("JUnit4", tracingTestListener);
+        assertEquals(0, result.getRunCount());
+        assertEquals(1, result.getFailureCount());
+        assertEquals(0, result.getIgnoreCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestClass} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestClass
      */
     @Test
-    public void testUnitilsTestNGBeforeTestClass() throws Exception {
+    public void testUnitilsTestNG_beforeTestClass() throws Exception {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, false);
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class});
-        testng.addListener(testListenerAdapter);
-        testng.run();
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
 
-        assertInvocationOrder("TestNG", BEFORE_TEST_CLASS, tracingTestListener);
-        assertEquals(2, testListenerAdapter.getFailedTests().size());
+        assertInvocationOrder_beforeTestClass("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
     }
 
+    // no JUnit 3 versions of testBeforeClass (does not exist for JUnit3)
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link org.junit.BeforeClass} call of a test.
+     *
+     * @see #assertInvocationOrder_testBeforeClass
      */
     @Test
-    public void testUnitilsJUnit4TestBeforeClass() throws Exception {
+    public void testUnitilsJUnit4_testBeforeClass() throws Exception {
 
         tracingTestListener.setExceptionMethod(TEST_BEFORE_CLASS, false);
-        FailureRunListener failureRunListener = new FailureRunListener();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        testRunner1.run(runNotifier);
+        Result result = performJUnit4Test();
 
-        assertInvocationOrder("JUnit4", TEST_BEFORE_CLASS, tracingTestListener);
-        assertEquals(2, failureRunListener.getFailureCount());
+        assertInvocationOrder_testBeforeClass("JUnit4", tracingTestListener);
+        assertEquals(0, result.getRunCount());
+        assertEquals(1, result.getFailureCount());
+        assertEquals(0, result.getIgnoreCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link org.testng.annotations.BeforeClass} call of a test.
+     *
+     * @see #assertInvocationOrder_testBeforeClass
      */
     @Test
-    public void testUnitilsTestNGTestBeforeClass() throws Exception {
+    public void testUnitilsTestNG_testBeforeClass() throws Exception {
 
         tracingTestListener.setExceptionMethod(TEST_BEFORE_CLASS, false);
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class});
-        testng.addListener(testListenerAdapter);
-        testng.run();
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
 
-        assertInvocationOrder("TestNG", TEST_BEFORE_CLASS, tracingTestListener);
-        assertEquals(2, testListenerAdapter.getFailedTests().size());
+        assertInvocationOrder_testBeforeClass("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestSetUp} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestSetUp
      */
     @Test
-    public void testUnitilsJUnit3BeforeTestSetUp_RuntimeException() {
+    public void testUnitilsJUnit3_beforeTestSetUp_RuntimeException() {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", BEFORE_TEST_SET_UP, tracingTestListener);
+        assertInvocationOrder_beforeTestSetUp("JUnit3", tracingTestListener);
         assertEquals(0, result.failureCount());
         assertEquals(2, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when an assertion error is thrown during a {@link TestListener#beforeTestSetUp} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestSetUp
      */
     @Test
-    public void testUnitilsJUnit3BeforeTestSetUp_AssertionFailedError() {
+    public void testUnitilsJUnit3_beforeTestSetUp_AssertionFailedError() {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", BEFORE_TEST_SET_UP, tracingTestListener);
+        assertInvocationOrder_beforeTestSetUp("JUnit3", tracingTestListener);
         assertEquals(2, result.failureCount());
         assertEquals(0, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestSetUp} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestSetUp
      */
     @Test
-    public void testUnitilsJUnit4BeforeTestSetUp() throws Exception {
+    public void testUnitilsJUnit4_beforeTestSetUp() throws Exception {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, false);
-        FailureRunListener failureRunListener = new FailureRunListener();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        testRunner1.run(runNotifier);
+        Result result = performJUnit4Test();
 
-        assertInvocationOrder("JUnit4", BEFORE_TEST_SET_UP, tracingTestListener);
-        assertEquals(2, failureRunListener.getFailureCount());
+        assertInvocationOrder_beforeTestSetUp("JUnit4", tracingTestListener);
+        assertEquals(0, result.getRunCount());
+        assertEquals(2, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestSetUp} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestSetUp
      */
     @Test
-    public void testUnitilsTestNGBeforeTestSetUp() {
+    public void testUnitilsTestNG_beforeTestSetUp() {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, false);
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class});
-        testng.addListener(testListenerAdapter);
-        testng.run();
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
 
-        assertInvocationOrder("TestNG", BEFORE_TEST_SET_UP, tracingTestListener);
-        assertEquals(2, testListenerAdapter.getFailedTests().size());
+        assertInvocationOrder_beforeTestSetUp("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link junit.framework.TestCase#setUp} call of a test.
+     *
+     * @see #assertInvocationOrder_testSetUp
      */
     @Test
-    public void testUnitilsJUnit4TestSetUp() throws Exception {
+    public void testUnitilsJUnit3_testSetUp_RuntimeException() {
 
         tracingTestListener.setExceptionMethod(TEST_SET_UP, false);
-        FailureRunListener failureRunListener = new FailureRunListener();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        testRunner1.run(runNotifier);
-
-        assertInvocationOrder("JUnit4", TEST_SET_UP, tracingTestListener);
-        assertEquals(2, failureRunListener.getFailureCount());
-    }
-
-
-    /**
-     * todo javadoc
-     */
-    @Test
-    public void testUnitilsJUnit3BeforeTestMethod_RuntimeException() {
-
-        tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", BEFORE_TEST_METHOD, tracingTestListener);
+        assertInvocationOrder_testSetUp("JUnit3", tracingTestListener);
         assertEquals(0, result.failureCount());
         assertEquals(2, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when an assertion error is thrown during a {@link junit.framework.TestCase#setUp} call of a test.
+     *
+     * @see #assertInvocationOrder_testSetUp
      */
     @Test
-    public void testUnitilsJUnit3BeforeTestMethod_AssertionFailedError() {
+    public void testUnitilsJUnit3_testSetUp_AssertionFailedError() {
+
+        tracingTestListener.setExceptionMethod(TEST_SET_UP, true);
+        TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
+
+        assertInvocationOrder_testSetUp("JUnit3", tracingTestListener);
+        assertEquals(2, result.failureCount());
+        assertEquals(0, result.errorCount());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link org.junit.Before} call of a test.
+     *
+     * @see #assertInvocationOrder_testSetUp
+     */
+    @Test
+    public void testUnitilsJUnit4_testSetUp() throws Exception {
+
+        tracingTestListener.setExceptionMethod(TEST_SET_UP, false);
+        Result result = performJUnit4Test();
+
+        assertInvocationOrder_testSetUp("JUnit4", tracingTestListener);
+        assertEquals(2, result.getRunCount());
+        assertEquals(2, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link org.testng.annotations.BeforeMethod} call of a test.
+     *
+     * @see #assertInvocationOrder_testSetUp
+     */
+    @Test
+    public void testUnitilsTestNG_testSetUp() throws Exception {
+
+        tracingTestListener.setExceptionMethod(TEST_SET_UP, false);
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
+
+        assertInvocationOrder_testSetUp("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestMethod} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestMethod
+     */
+    @Test
+    public void testUnitilsJUnit3_beforeTestMethod_RuntimeException() {
+
+        tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, false);
+        TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
+
+        assertInvocationOrder_beforeTestMethod("JUnit3", tracingTestListener);
+        assertEquals(0, result.failureCount());
+        assertEquals(2, result.errorCount());
+    }
+
+
+    /**
+     * Test the flow when an assertion error is thrown during a {@link TestListener#beforeTestMethod} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestMethod
+     */
+    @Test
+    public void testUnitilsJUnit3_beforeTestMethod_AssertionFailedError() {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", BEFORE_TEST_METHOD, tracingTestListener);
-        assertEquals(2, result.failureCount());
+        assertInvocationOrder_beforeTestMethod("JUnit3", tracingTestListener);
+        assertEquals(2, result.failureCount());  // failures instead of errors
         assertEquals(0, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestMethod} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestMethod
      */
     @Test
-    public void testUnitilsJUnit4BeforeTestMethod() throws Exception {
+    public void testUnitilsJUnit4_beforeTestMethod() throws Exception {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, false);
-        FailureRunListener failureRunListener = new FailureRunListener();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        testRunner1.run(runNotifier);
+        Result result = performJUnit4Test();
 
-        assertInvocationOrder("JUnit4", BEFORE_TEST_METHOD, tracingTestListener);
-        assertEquals(2, failureRunListener.getFailureCount());
+        assertInvocationOrder_beforeTestMethod("JUnit4", tracingTestListener);
+        assertEquals(2, result.getRunCount());
+        assertEquals(2, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestMethod} call of a module.
+     *
+     * @see #assertInvocationOrder_beforeTestMethod
      */
     @Test
-    public void testUnitilsTestNGBeforeTestMethod() {
+    public void testUnitilsTestNG_beforeTestMethod() {
 
         tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, false);
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class});
-        testng.addListener(testListenerAdapter);
-        testng.run();
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
 
-        assertInvocationOrder("TestNG", BEFORE_TEST_METHOD, tracingTestListener);
+        assertInvocationOrder_beforeTestMethod("TestNG", tracingTestListener);
         assertEquals(2, testListenerAdapter.getFailedTests().size());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a test.
+     *
+     * @see #assertInvocationOrder
      */
     @Test
-    public void testUnitilsJUnit3AfterTestMethod_RuntimeException() {
+    public void testUnitilsJUnit3_testMethod_RuntimeException() {
 
-        tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, false);
+        tracingTestListener.setExceptionMethod(TEST_METHOD, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", AFTER_TEST_METHOD, tracingTestListener);
+        assertInvocationOrder("JUnit3", tracingTestListener);
         assertEquals(0, result.failureCount());
         assertEquals(2, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when an assertion error is thrown during a test.
+     *
+     * @see #assertInvocationOrder
      */
     @Test
-    public void testUnitilsJUnit3AfterTestMethod_AssertionFailedError() {
+    public void testUnitilsJUnit3_testMethod_AssertionFailedError() {
+
+        tracingTestListener.setExceptionMethod(TEST_METHOD, true);
+        TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
+
+        assertInvocationOrder("JUnit3", tracingTestListener);
+        assertEquals(2, result.failureCount());
+        assertEquals(0, result.errorCount());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a test.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsJUnit4_testMethod() throws Exception {
+
+        tracingTestListener.setExceptionMethod(TEST_METHOD, false);
+        Result result = performJUnit4Test();
+
+        assertInvocationOrder("JUnit4", tracingTestListener);
+        assertEquals(2, result.getRunCount());
+        assertEquals(2, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a test.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsTestNG_testMethod() {
+
+        tracingTestListener.setExceptionMethod(TEST_METHOD, false);
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
+
+        assertInvocationOrder("TestNG", tracingTestListener);
+        assertEquals(2, testListenerAdapter.getFailedTests().size());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterTestMethod} call of a module.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsJUnit3_afterTestMethod_RuntimeException() {
+
+        tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, false);
+        TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
+
+        assertInvocationOrder("JUnit3", tracingTestListener);
+        assertEquals(0, result.failureCount());
+        assertEquals(2, result.errorCount());
+    }
+
+
+    /**
+     * Test the flow when an assertion error is thrown during a {@link TestListener#afterTestMethod} call of a module.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsJUnit3_afterTestMethod_AssertionFailedError() {
 
         tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", AFTER_TEST_METHOD, tracingTestListener);
+        assertInvocationOrder("JUnit3", tracingTestListener);
         assertEquals(2, result.failureCount());
         assertEquals(0, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterTestMethod} call of a module.
+     *
+     * @see #assertInvocationOrder
      */
     @Test
-    public void testUnitilsJUnit4AfterTestMethod() throws Exception {
+    public void testUnitilsJUnit4_afterTestMethod() throws Exception {
 
         tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, false);
-        FailureRunListener failureRunListener = new FailureRunListener();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        testRunner1.run(runNotifier);
+        Result result = performJUnit4Test();
 
-        assertInvocationOrder("JUnit4", AFTER_TEST_METHOD, tracingTestListener);
-        assertEquals(2, failureRunListener.getFailureCount());
+        assertInvocationOrder("JUnit4", tracingTestListener);
+        assertEquals(2, result.getRunCount());
+        assertEquals(2, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterTestMethod} call of a module.
+     *
+     * @see #assertInvocationOrder
      */
     @Test
-    public void testUnitilsTestNGAfterTestMethod() {
+    public void testUnitilsTestNG_afterTestMethod() {
 
         tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, false);
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class});
-        testng.addListener(testListenerAdapter);
-        testng.run();
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
 
-        assertInvocationOrder("TestNG", AFTER_TEST_METHOD, tracingTestListener);
+        assertInvocationOrder("TestNG", tracingTestListener);
         assertEquals(2, testListenerAdapter.getFailedTests().size());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link junit.framework.TestCase#tearDown} call of a test.
+     *
+     * @see #assertInvocationOrder
      */
     @Test
-    public void testUnitilsJUnit3AfterTestTearDown_RuntimeException() {
+    public void testUnitilsJUnit3_testTearDown_RuntimeException() {
 
-        tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
-
+        tracingTestListener.setExceptionMethod(TEST_TEAR_DOWN, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", AFTER_TEST_TEAR_DOWN, tracingTestListener);
+        assertInvocationOrder_testTearDown("JUnit3", tracingTestListener);
         assertEquals(0, result.failureCount());
         assertEquals(2, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when an assertion error is thrown during a {@link junit.framework.TestCase#tearDown} call of a test.
+     *
+     * @see #assertInvocationOrder
      */
     @Test
-    public void testUnitilsJUnit3AfterTestTearDown_AssertionFailedError() {
+    public void testUnitilsJUnit3_testTearDown_AssertionFailedError() {
 
-        tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, true);
-
+        tracingTestListener.setExceptionMethod(TEST_TEAR_DOWN, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
-        assertInvocationOrder("JUnit3", AFTER_TEST_TEAR_DOWN, tracingTestListener);
+        assertInvocationOrder_testTearDown("JUnit3", tracingTestListener);
         assertEquals(2, result.failureCount());
         assertEquals(0, result.errorCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link org.junit.After} call of a test.
+     *
+     * @see #assertInvocationOrder
      */
     @Test
-    public void testUnitilsJUnit4AfterTestTearDown() throws Exception {
+    public void testUnitilsJUnit4_testTearDown() throws Exception {
 
-        tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
-        FailureRunListener failureRunListener = new FailureRunListener();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(failureRunListener);
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        testRunner1.run(runNotifier);
+        tracingTestListener.setExceptionMethod(TEST_TEAR_DOWN, false);
+        Result result = performJUnit4Test();
 
-        assertInvocationOrder("JUnit4", AFTER_TEST_TEAR_DOWN, tracingTestListener);
-        assertEquals(2, failureRunListener.getFailureCount());
+        assertInvocationOrder_testTearDown("JUnit4", tracingTestListener);
+        assertEquals(2, result.getRunCount());
+        assertEquals(2, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
     }
 
 
     /**
-     * todo javadoc
+     * Test the flow when a runtime exception is thrown during a {@link org.testng.annotations.AfterMethod} call of a test.
+     *
+     * @see #assertInvocationOrder
      */
     @Test
-    public void testUnitilsTestNGAfterTestTearDown() {
+    public void testUnitilsTestNG_testTearDown() throws Exception {
+
+        tracingTestListener.setExceptionMethod(TEST_TEAR_DOWN, false);
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
+
+        assertInvocationOrder_testTearDown("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterTestTearDown} call of a module.
+     *
+     * @see #assertInvocationOrder_afterTestTearDown
+     */
+    @Test
+    public void testUnitilsJUnit3_afterTestTearDown_RuntimeException() {
 
         tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
+        TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
+
+        assertInvocationOrder_afterTestTearDown("JUnit3", tracingTestListener);
+        assertEquals(0, result.failureCount());
+        assertEquals(2, result.errorCount());
+    }
+
+
+    /**
+     * Test the flow when an assertion error is thrown during a {@link TestListener#afterTestTearDown} call of a module.
+     *
+     * @see #assertInvocationOrder_afterTestTearDown
+     */
+    @Test
+    public void testUnitilsJUnit3_afterTestTearDown_AssertionFailedError() {
+
+        tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, true);
+        TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
+
+        assertInvocationOrder_afterTestTearDown("JUnit3", tracingTestListener);
+        assertEquals(2, result.failureCount());
+        assertEquals(0, result.errorCount());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterTestTearDown} call of a module.
+     *
+     * @see #assertInvocationOrder_afterTestTearDown
+     */
+    @Test
+    public void testUnitilsJUnit4_afterTestTearDown() throws Exception {
+
+        tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
+        Result result = performJUnit4Test();
+
+        assertInvocationOrder_afterTestTearDown("JUnit4", tracingTestListener);
+        assertEquals(2, result.getRunCount());
+        assertEquals(2, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterTestTearDown} call of a module.
+     *
+     * @see #assertInvocationOrder_afterTestTearDown
+     */
+    @Test
+    public void testUnitilsTestNG_afterTestTearDown() {
+
+        tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
+
+        assertInvocationOrder_afterTestTearDown("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
+    }
+
+    // no JUnit 3 versions of testAfterClass (does not exist for JUnit3)
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link org.junit.AfterClass} call of a test.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsJUnit4_testAfterClass() throws Exception {
+
+        tracingTestListener.setExceptionMethod(TEST_AFTER_CLASS, false);
+        Result result = performJUnit4Test();
+
+        assertInvocationOrder("JUnit4", tracingTestListener);
+        assertEquals(2, result.getRunCount());
+        assertEquals(1, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link org.testng.annotations.AfterClass} call of a test.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsTestNG_testAfterClass() throws Exception {
+
+        tracingTestListener.setExceptionMethod(TEST_AFTER_CLASS, false);
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
+
+        assertInvocationOrder("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterTestClass} call of a module.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsJUnit4_afterTestClass() throws Exception {
+
+        tracingTestListener.setExceptionMethod(AFTER_TEST_CLASS, false);
+        Result result = performJUnit4Test();
+
+        assertInvocationOrder("JUnit4", tracingTestListener);
+        assertEquals(2, result.getRunCount());
+        assertEquals(1, result.getFailureCount());
+        assertEquals(1, result.getIgnoreCount());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterTestClass} call of a module.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsTestNG_afterTestClass() {
+
+        tracingTestListener.setExceptionMethod(AFTER_TEST_CLASS, false);
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
+
+        assertInvocationOrder("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
+    }
+
+
+    /**
+     * Test the flow when a runtime exception is thrown during a {@link TestListener#afterAll} call of a module.
+     *
+     * @see #assertInvocationOrder
+     */
+    @Test
+    public void testUnitilsTestNG_afterAll() {
+
+        tracingTestListener.setExceptionMethod(AFTER_ALL, false);
+        TestListenerAdapter testListenerAdapter = performTestNGTest();
+
+        assertInvocationOrder("TestNG", tracingTestListener);
+        assertEquals(1, testListenerAdapter.getFailedTests().size());
+    }
+
+
+    /**
+     * Asserts the flow when an exception is thrown during a {@link TestListener#beforeAll} call of a module.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder_beforeAll(String type, TracingTestListener tracingTestListener) {
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+
+        if ("JUnit3".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeAll", iterator.next()); // 2 times, once for each test
+            // afterAll will be called when the runtime exits
+        }
+        if ("JUnit4".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            // afterAll will be called when the runtime exits
+        }
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Asserts the flow when an exception is thrown during a {@link TestListener#beforeTestClass} call of a module.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder_beforeTestClass(String type, TracingTestListener tracingTestListener) {
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+
+        if ("JUnit3".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());  // 2 times, once for each test
+            // The last afterTestClass will be called when the runtime exits
+            // afterAll will be called when the runtime exits
+        }
+        if ("JUnit4".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            // afterAll will be called when the runtime exits
+        }
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Asserts the flow when an exception is thrown during a before class call of a test.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder_testBeforeClass(String type, TracingTestListener tracingTestListener) {
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+
+        // does not exist for JUnit3
+        if ("JUnit4".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            // afterAll will be called when the runtime exits
+        }
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            // setup and teardown are still called even though tests are skipped
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());   // difference with JUnit
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());   // difference with JUnit
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());   // difference with JUnit
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());   // difference with JUnit
+            // testAfterClass is skipped                                                 // difference with JUnit
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Asserts the flow when an exception is thrown during a {@link TestListener#beforeTestSetUp} call of a module.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder_beforeTestSetUp(String type, TracingTestListener tracingTestListener) {
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+
+        if ("JUnit3".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            // testBeforeClass does not exist
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());   // still called
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());   // still called
+            // testAfterClass does not exist
+            // The last afterTestClass will be called when the runtime exits
+            // afterAll will be called when the runtime exits
+        }
+        if ("JUnit4".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());   // still called
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());   // still called
+            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            // afterAll will be called when the runtime exits
+        }
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());   // still called
+            // second beforeTestSetUp is skipped                                         // difference with JUnit
+            // second afterTestTearDown is skipped                                       // difference with JUnit
+            // testAfterClass is skipped                                                 // difference with JUnit
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Asserts the flow when an exception is thrown during a setUp call of a test.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder_testSetUp(String type, TracingTestListener tracingTestListener) {
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+
+        if ("JUnit3".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            // testBeforeClass does not exist
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            // testTearDown is skipped                                                  // difference with JUnit4
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            // testTearDown is skipped                                                  // difference with JUnit4
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            // testAfterClass does not exist
+            // The last afterTestClass will be called when the runtime exits
+            // afterAll will be called when the runtime exits
+        }
+        if ("JUnit4".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());   // still called
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());   // still called
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            // afterAll will be called when the runtime exits
+        }
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            // testTearDown is skipped                                                  // difference with JUnit4
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            // second testSetUp is skipped                                              // difference with JUnit
+            // testTearDown is skipped                                                  // difference with JUnit4
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            // testAfterClass is skipped                                                 // difference with JUnit
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Asserts the flow when an exception is thrown during a {@link TestListener#beforeTestMethod} call of a module.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder_beforeTestMethod(String type, TracingTestListener tracingTestListener) {
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+
+        if ("JUnit3".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            // testBeforeClass does not exist
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());  // still called
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());  // still called
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            // testAfterClass does not exist
+            // The last afterTestClass will be called when the runtime exits
+            // afterAll will be called when the runtime exits
+        }
+        if ("JUnit4".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());  // still called
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());  // still called
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            // afterAll will be called when the runtime exits
+        }
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());  // still called
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());  // still called
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Asserts the main flow of invocation calls.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+
+        if ("JUnit3".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            // testBeforeClass does not exist
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
+            assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            // testAfterClass does not exist
+            // The last afterTestClass will be called when the runtime exits
+            // afterAll will be called when the runtime exits
+        }
+        if ("JUnit4".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
+            assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            // afterAll will be called when the runtime exits
+        }
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
+            assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Asserts the flow when an exception is thrown during a tear down call of a test.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder_testTearDown(String type, TracingTestListener tracingTestListener) {
+
+        if ("JUnit3".equals(type) || "JUnit4".equals(type)) {
+            assertInvocationOrder(type, tracingTestListener);
+            return;
+        }
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());   // difference with JUnit
+            // second testSetUp is skipped                                               // difference with JUnit
+            // second beforeTestMethod is skipped                                        // difference with JUnit
+            // second testMethod 2 is skipped                                            // difference with JUnit
+            // second afterTestMethod is skipped                                         // difference with JUnit
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());   // difference with JUnit
+            // testAfterClass is skipped                                                 // difference with JUnit
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Asserts the flow when an exception is thrown during a {@link TestListener#afterTestTearDown} call of a module.
+     *
+     * @param type                JUnit3, JUnit4 or TestNG
+     * @param tracingTestListener the recorded invocations
+     */
+    private void assertInvocationOrder_afterTestTearDown(String type, TracingTestListener tracingTestListener) {
+
+        if ("JUnit3".equals(type) || "JUnit4".equals(type)) {
+            assertInvocationOrder(type, tracingTestListener);
+            return;
+        }
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+        if ("TestNG".equals(type)) {
+            assertEquals("[Unitils] beforeAll", iterator.next());
+            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
+            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
+            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
+            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
+            assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
+            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
+            // second beforeTestSetUp is skipped                                         // difference with JUnit
+            // second testSetUp is skipped                                               // difference with JUnit
+            // second beforeTestMethod is skipped                                        // difference with JUnit
+            // second testMethod 2 is skipped                                            // difference with JUnit
+            // second afterTestMethod is skipped                                         // difference with JUnit
+            // testAfterClass is skipped                                                 // difference with JUnit
+            assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
+            assertEquals("[Unitils] afterAll", iterator.next());
+        }
+        assertFalse(iterator.hasNext());
+    }
+
+
+    /**
+     * Runs the {@link UnitilsJUnit4Test_TestClass1} JUnit 4 test.
+     *
+     * @return the test result
+     */
+    private Result performJUnit4Test() throws Exception {
+
+        Result result = new Result();
+        RunNotifier runNotifier = new RunNotifier();
+        runNotifier.addListener(result.createListener());
+        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
+        testRunner1.run(runNotifier);
+        return result;
+    }
+
+
+    /**
+     * Runs the {@link UnitilsTestNGTest_TestClass1} TestNG test.
+     *
+     * @return the test result
+     */
+    private TestListenerAdapter performTestNGTest() {
+
         TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
         TestNG testng = new TestNG();
         testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class});
         testng.addListener(testListenerAdapter);
         testng.run();
-
-        assertInvocationOrder("TestNG", AFTER_TEST_TEAR_DOWN, tracingTestListener);
-        assertEquals(2, testListenerAdapter.getFailedTests().size());
-    }
-
-
-    /**
-     * todo javadoc
-     * <p/>
-     * Asserts that the given listener recorded the correct invocation sequence. Except for some minor difference, the
-     * sequence should be equal for  all test frameworks.
-     * <p/>
-     * Following difference are allowed:<ul>
-     * <li>beforeTestClass and afterTestClass no not exist in JUnit 3 (the Unitils versions will be called however)</li>
-     * </ul>
-     * For JUnit3 and JUnit4 afterAll will be called during the runtime exit and can therefore not be asserted here.
-     * The same is true for the last afterTestClass method of JUnit3 tests. This is because you cannot determine which test
-     * is going to be the last test in the class
-     *
-     * @param type                JUnit3, JUnit4 or TestNG
-     * @param exceptionMethod     the location of the exception, not null
-     * @param tracingTestListener the listener, not null
-     */
-    private void assertInvocationOrder(String type, String exceptionMethod, TracingTestListener tracingTestListener) {
-        Iterator iterator = tracingTestListener.getCallList().iterator();
-        assertEquals("[Unitils] beforeAll", iterator.next());
-
-        if (BEFORE_ALL.equals(exceptionMethod)) {
-            assertEquals("[Unitils] beforeAll", iterator.next()); // 2 times, once for each test
-            return;
-        }
-
-        assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
-        if (BEFORE_TEST_CLASS.equals(exceptionMethod)) {
-            assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());  // 2 times, once for each test
-            return;
-        }
-
-        if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
-        }
-
-        assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        if (!BEFORE_TEST_SET_UP.equals(exceptionMethod)) {
-            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
-            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
-            if (!BEFORE_TEST_METHOD.equals(exceptionMethod)) {
-                assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
-                assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
-            }
-            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
-            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
-        }
-
-        assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        if (!BEFORE_TEST_SET_UP.equals(exceptionMethod)) {
-            assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
-            assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
-            if (!BEFORE_TEST_METHOD.equals(exceptionMethod)) {
-                assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
-                assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
-            }
-            assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
-            assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
-        }
-
-        if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
-        }
-        assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
-
-        // For JUnit 3 and JUnit 4 afterAll will be called when the runtime exits
-        if ("TestNG".equals(type)) {
-            assertEquals("[Unitils] afterAll", iterator.next());
-        }
-        assertFalse(iterator.hasNext());
+        return testListenerAdapter;
     }
 
 
@@ -638,7 +1321,7 @@ public class UnitilsInvocationExceptionTest {
             super(testClass);
         }
 
-        protected Unitils getUnitils() {
+        protected Unitils createUnitils() {
 
             return new Unitils() {
 
@@ -646,23 +1329,6 @@ public class UnitilsInvocationExceptionTest {
                     return tracingTestListener;
                 }
             };
-        }
-    }
-
-    /**
-     * JUnit 4 run listener for recording the nr of failures during the test.
-     */
-    private class FailureRunListener extends RunListener {
-
-        private int failureCount = 0;
-
-        public void testFailure(Failure failure) throws Exception {
-            super.testFailure(failure);
-            failureCount++;
-        }
-
-        public int getFailureCount() {
-            return failureCount;
         }
     }
 

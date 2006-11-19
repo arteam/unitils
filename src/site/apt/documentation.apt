@@ -48,13 +48,72 @@ Introduction
     []
     
    
-    Unitils provides extensive support for testing a project's data access layer. Unitils' approach for database testing has grown 
-    from a number of database testing guidelines, which are based on real-life project experience of different persons. 
-    For an elaborate description see the Database testing guidelines.    
+    This tutorial will show you by example what unitils is about and how you can configure your project to make use of it's services.
+    It is only an introduction to unitils, more in-depth documentation can be found in the {{{javadoc.html}javadoc}} of the modules.
+    The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}.
 
 
-* Module system
-~~~~~~~~~~~~~~~
+* Getting started
+~~~~~~~~~~~~~~~~~    
+
+** Configuration
+~~~~~~~~~~~~~~~~
+    As with many projects, unitils needs some configuration of its services. By default, there are 3 levels 
+    of configuration, each level overriding the settings of the previous one: 
+
+    [[1]] <unitils-defaults.properties>: default configuration that is shipped within the distribution of unitils
+    
+    [[2]] <unitils.properties>: can contain project-wide configuration
+    
+    [[3]] <unitils-local.properties>: can contain user-specific configuration
+    
+    []
+
+    The first file, unitils-defaults.properties, contains default values and is packaged in the unitils jar. There is no need to make changes 
+    to this file, but it can be used as reference, since it contains all possible configuration settings for unitils.
+    
+    The second, unitils.properties, can override the defaults and is typically used to set values for configuration settings for all developers 
+    on a project. For example if your project uses an oracle database, you can create a unitils.properties file
+    that overrideds the driver class name and url properties as follows:
+    
++---------------------------------------------------------+
+dataSource.driverClassName=oracle.jdbc.driver.OracleDriver
+dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
++---------------------------------------------------------+
+    
+    The file is not required, but if you create one, it should be placed somewhere in the classpath of your project. 
+    You can find a sample file that contains most commonly used configuration settings in following unitils.properties template.
+    
+    The last file, unitils-local.properties, is also optional and can contain settings that override the project settings and 
+    define per user configuration. For example, if each user uses its own unit-test database schema, you can 
+    create a unitils-local.properties for each user that contains the corresponding schema, username and password:
+
++------------------------------------------+
+dataSource.schemaName=test_john
+dataSource.userName=john
+dataSource.password=secret
++------------------------------------------+
+
+    Each of these unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>). 
+
+
+    If you want to use unitils on multiple projects at the same time, thereby requiring different local config you can override the used name. 
+
+    Examples:
+    project
+
+    Link to typical config files.
+
+
+** Hooking into unitils
+~~~~~~~~~~~~~~~~~~~~~~~
+    TODO superclasses 
+    
+
+** Module system
+~~~~~~~~~~~~~~~~    
+    Before starting with the examples, let's first take a look at some of the concepts used in unitils and how it functions under the hood.
+
     Unitils is structured as an easily extensible system of modules. Modules are functional units that hook-up into the 
     execution of tests using test listeners, one for each module.
    
@@ -64,43 +123,18 @@ Introduction
    This allows us to add services in a very flexible way. An upcoming new feature will be support for JPA.
    Currently, following modules are available in Unitils:
    
-   * DatabaseModule: Unit test database maintenance and connection pooling
+   * <DatabaseModule>: Unit test database maintenance and connection pooling
    
-   * DbUnitModule: Test data management using DBUnit
+   * <DbUnitModule>: Test data management using DBUnit
    
-   * HibernateModule: Hibernate configuration support and automatic database mapping checking
+   * <HibernateModule>: Hibernate configuration support and automatic database mapping checking
    
-   * EasyMockModule: Support for creating mocks and lenient reflection argument matching
+   * <EasyMockModule>: Support for creating mocks and lenient reflection argument matching
    
-   * InjectModule: Support for injecting (mock) objects into other objects
+   * <InjectModule>: Support for injecting (mock) objects into other objects
 
+   
 
-
-* Configuration
-~~~~~~~~~~~~~~~
-    The default configuration mechanism in unitils depends on 3 properties files: 
-
-    [[1]] unitils-defaults.properties: default configuration that is shipped within the distribution of unitils
-    
-    [[2]] unitils.properties: can contain project-wide configuration
-    
-    [[3]] unitils-local.properties: can contain user-specific configuration
-    
-    []
-
-    These files provide 3 levels of configuration. Each level can override settings of a previous one.
-    
-    
-
-    unitils.propeties typically in classpath
-    unitils-local in java user.home folder
-
-    If you want to use unitils on multiple projects at the same time, thereby requiring different local config you can override the used name. 
-
-    Examples:
-    project
-
-    Link to typical config files.
 
 
 
