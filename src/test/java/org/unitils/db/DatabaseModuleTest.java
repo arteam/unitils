@@ -83,7 +83,6 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
     public void testInjectDataSource() throws Exception {
 
         DbTest dbTest = new DbTest();
-        databaseModule.initDatabase(dbTest);
         databaseModule.injectDataSource(dbTest);
         assertSame(mockDataSource, databaseModule.getDataSource());
         assertSame(mockDataSource, dbTest.getDataSourceFromMethod());

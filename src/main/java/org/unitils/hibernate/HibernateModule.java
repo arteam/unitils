@@ -32,8 +32,6 @@ import org.unitils.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
@@ -217,21 +215,6 @@ public class HibernateModule implements Module {
                         HibernateSession.class.getSimpleName() + ". Ensure that this method has following signature: " +
                         "void myMethod(" + Session.class.getName() + " session)", e);
             }
-        }
-    }
-
-    /**
-     * Retries the currently active <code>Connection</code> to the unit test database
-     *
-     * @return the connection to the database
-     */
-    protected Connection getConnection() {
-
-        try {
-            DatabaseModule dbModule = getDatabaseModule();
-            return dbModule.getDataSource().getConnection();
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while getting Connection", e);
         }
     }
 

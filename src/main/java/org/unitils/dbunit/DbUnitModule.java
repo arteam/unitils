@@ -22,6 +22,7 @@ import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.DefaultDataTypeFactory;
+import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.ext.db2.Db2DataTypeFactory;
@@ -36,6 +37,7 @@ import org.unitils.db.DatabaseModule;
 import org.unitils.db.annotations.DatabaseTest;
 import org.unitils.dbunit.annotation.DbUnitDataSet;
 import org.unitils.dbunit.annotation.ExpectedDbUnitDataSet;
+import org.unitils.util.ConfigUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +72,6 @@ import java.sql.SQLException;
  * the contents of a dataset. The expected dataset file should be located in the classpath in the same package as the
  * testclass, with the name 'classname without packagename'.'test method name'-result.xml.
  * <p/>
- * todo expected dataset annotation
  */
 public class DbUnitModule implements Module {
 
@@ -90,10 +91,8 @@ public class DbUnitModule implements Module {
     /* Name of the database schema, needed to configure DBUnit */
     private String databaseSchemaName;
 
-    /**
-     * The database dialect, needed to configure DBUnit
-     */
-    private String databaseDialect;
+    /* Instance of DbUnits IDataTypeFactory, that handles dbms specific data type issues */
+    IDataTypeFactory dataTypeFactory;
 
     /**
      * Initializes the DbUnitModule using the given Configuration
@@ -103,7 +102,9 @@ public class DbUnitModule implements Module {
     public void init(Configuration configuration) {
 
         databaseSchemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
-        databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+        dataTypeFactory = ConfigUtils.getConfiguredInstance(IDataTypeFactory.class, configuration,
+                databaseDialect);
     }
 
     /**
@@ -119,17 +120,6 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * If this is the first time that we encounter a test class annotated with {@link DatabaseTest}, a new instance
-     * of the dbUnit's {@link IDatabaseConnection} is created, that is used througout the whole test run.
-     */
-    protected void initDbUnitConnection() {
-
-        if (dbUnitDatabaseConnection == null) {
-            dbUnitDatabaseConnection = createDbUnitConnection();
-        }
-    }
-
-    /**
      * Creates a new instance of dbUnit's <code>IDatabaseConnection</code>
      *
      * @return a new instance of dbUnit's <code>IDatabaseConnection</code>
@@ -139,23 +129,9 @@ public class DbUnitModule implements Module {
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(getDatabaseModule().getDataSource(), databaseSchemaName);
 
-        // Set correct dialect
-        if ("oracle".equals(databaseDialect)) {
-            DatabaseConfig config = connection.getConfig();
-            config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new OracleDataTypeFactory());
-        }
-        if ("db2".equals(databaseDialect)) {
-            DatabaseConfig config = connection.getConfig();
-            config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new Db2DataTypeFactory());
-        }
-        if ("mysql".equals(databaseDialect)) {
-            DatabaseConfig config = connection.getConfig();
-            config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
-        }
-        if ("hsqldb".equals(databaseDialect)) {
-            DatabaseConfig config = connection.getConfig();
-            config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new DefaultDataTypeFactory());
-        }
+        // Make sure correct dbms specific data types are used
+        DatabaseConfig config = connection.getConfig();
+        config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         return connection;
     }
 
@@ -164,6 +140,9 @@ public class DbUnitModule implements Module {
      */
     public DbUnitDatabaseConnection getDbUnitDatabaseConnection() {
 
+        if (dbUnitDatabaseConnection == null) {
+            dbUnitDatabaseConnection = createDbUnitConnection();
+        }
         return dbUnitDatabaseConnection;
     }
 
@@ -444,13 +423,6 @@ public class DbUnitModule implements Module {
             if (getDatabaseModule() == null) {
                 throw new UnitilsException("Invalid configuration: When the DbUnitModule is enabled, the DatabaseModule " +
                         "should also be enabled and the DbUnitModule should be configured to run after the DatabaseModule");
-            }
-        }
-
-        @Override
-        public void beforeTestClass(Class<?> testClass) {
-            if (isDatabaseTest(testClass)) {
-                initDbUnitConnection();
             }
         }
 
