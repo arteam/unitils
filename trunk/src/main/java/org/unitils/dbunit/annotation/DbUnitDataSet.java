@@ -21,7 +21,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * If at class level, indicates that before the execution of each test method in this class, a DbUnit datafile must be
+ * loaded, either with the default fileName (ClassName.xml), or with a custom specified fileName (fileName property).
+ * If at method level, indicates that before running this method, a DbUnit datafile must be loaded, either with the
+ * default fileName (ClassName.xml), or with a custom specified fileName (fileName property).   
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
