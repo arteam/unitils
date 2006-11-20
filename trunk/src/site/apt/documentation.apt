@@ -17,13 +17,13 @@ Introduction
 
     Currently Unitils offers follwing features:
 
-    * General testing utilities
+    * <General testing utilities>
 
         * Equality assertion through reflection, with different options like ignoring Java default/null values and ignoring order of collections
 
     []
 
-    * Database testing utilities
+    * <Database testing utilities>
 
         * Automatic maintenance and constraints disabling of unit test databases
 
@@ -37,7 +37,7 @@ Introduction
 
     []
 
-    * Mock object utilities
+    * <Mock object utilities>
 
         * Simplify EasyMock mock object creation
 
@@ -48,8 +48,8 @@ Introduction
     []
     
    
-    This tutorial will show you by example what unitils is about and how you can configure your project to make use of it's services.
-    It is only an introduction to unitils, more in-depth documentation can be found in the {{{javadoc.html}javadoc}} of the modules.
+    This tutorial will show you by example what Unitils is about and how you can configure your project to make use of it's services.
+    It is only an introduction to Unitils, more in-depth documentation can be found in the {{{javadoc.html}javadoc}} of the modules.
     The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}.
 
 
@@ -58,22 +58,22 @@ Introduction
 
 ** Configuration
 ~~~~~~~~~~~~~~~~
-    As with many projects, unitils needs some configuration of its services. By default, there are 3 levels 
+    As with many projects, Unitils needs some configuration of its services. By default, there are 3 levels 
     of configuration, each level overriding the settings of the previous one: 
 
-    [[1]] <unitils-defaults.properties>: default configuration that is shipped within the distribution of unitils
+    [[1]] <Unitils-defaults.properties>: default configuration that is shipped within the distribution of Unitils
     
-    [[2]] <unitils.properties>: can contain project-wide configuration
+    [[2]] <Unitils.properties>: can contain project-wide configuration
     
-    [[3]] <unitils-local.properties>: can contain user-specific configuration
+    [[3]] <Unitils-local.properties>: can contain user-specific configuration
     
     []
 
-    The first file, unitils-defaults.properties, contains default values and is packaged in the unitils jar. There is no need to make changes 
-    to this file, but it can be used as reference, since it contains all possible configuration settings for unitils.
+    The first file, Unitils-defaults.properties, contains default values and is packaged in the Unitils jar. There is no need to make changes 
+    to this file, but it can be used as reference, since it contains all possible configuration settings for Unitils.
     
-    The second, unitils.properties, can override the defaults and is typically used to set values for configuration settings for all developers 
-    on a project. For example if your project uses an oracle database, you can create a unitils.properties file
+    The second, Unitils.properties, can override the defaults and is typically used to set values for configuration settings for all developers 
+    on a project. For example if your project uses an oracle database, you can create a Unitils.properties file
     that overrideds the driver class name and url properties as follows:
     
 +---------------------------------------------------------+
@@ -82,11 +82,11 @@ dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 +---------------------------------------------------------+
     
     The file is not required, but if you create one, it should be placed somewhere in the classpath of your project. 
-    You can find a sample file that contains most commonly used configuration settings in following unitils.properties template.
+    You can find a sample file that contains most commonly used configuration settings in following Unitils.properties template.
     
-    The last file, unitils-local.properties, is also optional and can contain settings that override the project settings and 
+    The last file, Unitils-local.properties, is also optional and can contain settings that override the project settings and 
     define per user configuration. For example, if each user uses its own unit-test database schema, you can 
-    create a unitils-local.properties for each user that contains the corresponding schema, username and password:
+    create a Unitils-local.properties for each user that contains the corresponding schema, username and password:
 
 +------------------------------------------+
 dataSource.schemaName=test_john
@@ -94,49 +94,81 @@ dataSource.userName=john
 dataSource.password=secret
 +------------------------------------------+
 
-    Each of these unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>). 
+    Each of these Unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>). 
 
+    The name of the local file, Unitils-local.properties, is also defined by a property. This makes it possible to use different names for each 
+    of the projects you are working on. For example, suppose you are working on a project named projectOne and want to start a new project 
+    named projectTwo. Adding following property to the Unitils.properties of projetTwo will let Unitils use projectTwo-local.properties 
+    as local properties file for the project:
+    
++--------------------------------------------------------------+
+Unitils.configuration.localFileName=projectTwo-local.properties
++--------------------------------------------------------------+    
+    
 
-    If you want to use unitils on multiple projects at the same time, thereby requiring different local config you can override the used name. 
+** Making your test Unitils-enabled
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Unitils offers services for test classes. To let your test make use of these services, you first have to Unitils-enable your test.
+    This can be done easily by (indirectly) extending from a Unitils base test-class. Currently there are base classes for the major test frameworks:
+    
+    * <<{{{http://www.junit.org/}JUnit3}}>>: org.unitils.UnitilsJUnit3
+    
+    * <<{{{http://www.junit.org/}JUnit4}}>>: org.unitils.UnitilsJUnit4
+    
+    * <<{{{http://testng.org/}TestNG}}>>: org.unitils.UnitilsTestNG
+    
+    []
+    
+    As an example, suppose you have a JUnit3 test that you want to Unitils-enable:
+    
++------------------------------------------+
+import org.unitils.UnitilsJUnit3;
 
-    Examples:
-    project
+public class MyTest extends UnitilsJUnit3 {
+}
++------------------------------------------+
 
-    Link to typical config files.
+    Typically you would create your own test base class containing some utility behavior common for all your tests, e.g. datasource injection, and 
+    then let this base class extend from one of the Unitils base classes.    
+    
+    For JUnit4 it is also possible to add a @RunWith annotation instead of extending from the base class:
+    
++------------------------------------------+
+import org.junit.runner.RunWith;
+import org.unitils.UnitilsJUnit4TestClassRunner;
 
-
-** Hooking into unitils
-~~~~~~~~~~~~~~~~~~~~~~~
-    TODO superclasses 
+@RunWith(UnitilsJUnit4TestClassRunner.class)
+public class MyTest {
+}
++------------------------------------------+
+    
     
 
 ** Module system
 ~~~~~~~~~~~~~~~~    
-    Before starting with the examples, let's first take a look at some of the concepts used in unitils and how it functions under the hood.
+    Before starting with the examples, let's first take a look at some of the concepts used in Unitils and how the framwork functions under the hood.
 
-    Unitils is structured as an easily extensible system of modules. Modules are functional units that hook-up into the 
-    execution of tests using test listeners, one for each module.
+    Unitils is structured as an easily extensible system of modules. Each of these modules offers some type of service to a test by listening to the 
+    execution of the test and invoking the correct service behavior when needed.
    
-[images/unitils-modules.png] Unitils modules
+[images/Unitils-modules.png] Unitils modules
    
-   This mechanism provides a uniform way for providing extra services to tests without having to change the superclass.
-   This allows us to add services in a very flexible way. An upcoming new feature will be support for JPA.
+   This mechanism provides a uniform way for providing extra services to your tests and offers a flexible way of adding services without having 
+   to change the superclass of the test. Adding new services is as easy as adding a new module and making some changes to the unitils configuration.
+   
    Currently, following modules are available in Unitils:
    
-   * <DatabaseModule>: Unit test database maintenance and connection pooling
+   * <DatabaseModule>: unit-test database maintenance and connection pooling
    
-   * <DbUnitModule>: Test data management using DBUnit
+   * <DbUnitModule>: test data management using DBUnit
    
    * <HibernateModule>: Hibernate configuration support and automatic database mapping checking
    
-   * <EasyMockModule>: Support for creating mocks and lenient reflection argument matching
+   * <EasyMockModule>: support for creating mocks and lenient reflection argument matching
    
-   * <InjectModule>: Support for injecting (mock) objects into other objects
+   * <InjectModule>: support for injecting (mock) objects into other objects
 
-   
-
-
-
+   * Planned: support for JPA. 
 
 
 
