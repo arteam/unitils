@@ -16,6 +16,7 @@
 package org.unitils.core;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.unitils.util.ReflectionUtils;
 
 import java.util.*;
@@ -38,11 +39,11 @@ import java.util.*;
  * order C, B, A.
  * <p/>
  * If a circular dependency is found in the runAfter configuration, a runtime exception will be thrown.
- * <p/>
- * todo only warning if configuration cannot be loaded
- * todo error when file found but could not be loaded
  */
 public class ModulesLoader {
+
+    /* The logger instance for this class */
+    private static final Logger logger = Logger.getLogger(ModulesLoader.class);
 
     /**
      * Property that contains the names of the modules that are to be loaded
@@ -82,15 +83,7 @@ public class ModulesLoader {
         Set<String> moduleNames = new TreeSet<String>(Arrays.asList(configuration.getStringArray(PROPKEY_MODULES)));
 
         // remove all disable modules
-        Iterator<String> moduleNameIterator = moduleNames.iterator();
-        while (moduleNameIterator.hasNext()) {
-
-            String moduleName = moduleNameIterator.next();
-            boolean enabled = configuration.getBoolean(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_ENABLED, true);
-            if (!enabled) {
-                moduleNameIterator.remove();
-            }
-        }
+        removeDisabledModules(moduleNames, configuration);
 
         // get all core dependencies
         Map<String, String[]> runAfters = new HashMap<String, String[]>();
@@ -118,13 +111,31 @@ public class ModulesLoader {
         }
 
         // Create core instances in the correct sequence
-        List<Module> modules = new ArrayList<Module>();
+        List<Module> result = new ArrayList<Module>();
         for (List<String> moduleNameList : runAfterCounts.values()) {
-            for (String moduleName : moduleNameList) {
+            List<Module> modules = createAndInitializeModules(moduleNameList, configuration);
+            result.addAll(modules);
+        }
+        return result;
+    }
 
-                // get core class name
-                String className = configuration.getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME);
 
+    /**
+     * Creates the modules with the given class names and calls initializes them with the given configuration.
+     *
+     * @param moduleNameList the module class names, not null
+     * @param configuration  the configuration, not null
+     * @return the modules, not null
+     */
+    protected List<Module> createAndInitializeModules(List<String> moduleNameList, Configuration configuration) {
+
+        List<Module> result = new ArrayList<Module>();
+        for (String moduleName : moduleNameList) {
+
+            // get core class name
+            String className = configuration.getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME);
+
+            try {
                 // create core instance
                 Object module = ReflectionUtils.createInstanceOfType(className);
                 if (!(module instanceof Module)) {
@@ -133,10 +144,22 @@ public class ModulesLoader {
                 }
                 // run initializer
                 ((Module) module).init(configuration);
-                modules.add((Module) module);
+                result.add((Module) module);
+
+            } catch (UnitilsException e) {
+                if (e.getCause() instanceof ClassNotFoundException) {
+
+                    // Class not found, maybe this is caused by a library that is not in the classpath
+                    // Log warning and ingore exception
+                    logger.warn("Unable to create module instance for module class: " + className + ". The module will " +
+                            "not be loaded. If this is caused by a library that is not used by your project and thus not " +
+                            "in the classpath the warning can be avoided by explicitly disabling the module.");
+                    continue;
+                }
+                throw e;
             }
         }
-        return modules;
+        return result;
     }
 
 
@@ -174,5 +197,25 @@ public class ModulesLoader {
 
         traversedModuleNames.remove(moduleName);
         return count;
+    }
+
+
+    /**
+     * Removes all modules that have a value false for the enabled property.
+     *
+     * @param moduleNames   the module names, not null
+     * @param configuration the configuration, not null
+     */
+    protected void removeDisabledModules(Set<String> moduleNames, Configuration configuration) {
+
+        Iterator<String> moduleNameIterator = moduleNames.iterator();
+        while (moduleNameIterator.hasNext()) {
+
+            String moduleName = moduleNameIterator.next();
+            boolean enabled = configuration.getBoolean(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_ENABLED, true);
+            if (!enabled) {
+                moduleNameIterator.remove();
+            }
+        }
     }
 }

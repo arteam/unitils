@@ -142,7 +142,7 @@ public class ModulesLoaderTest extends TestCase {
 
     /**
      * Tests the loading of a core that is configured with a class name for a class that is not a UnitilsModule.
-     * A runtime exception should have been thrown.
+     * A warning should have been logged and the other modules should have been loaded.
      */
     public void testLoadModules_wrongClassName() {
 
@@ -152,9 +152,27 @@ public class ModulesLoaderTest extends TestCase {
             modulesLoader.loadModules(configuration);
             fail();
 
-        } catch (RuntimeException e) {
+        } catch (UnitilsException e) {
             //expected
         }
+    }
+
+
+    /**
+     * Tests the loading of a core that is configured with a class name for a class that does not exist.
+     * A warning should have been logged and the other modules should have been loaded.
+     */
+    public void testLoadModules_classNotFound() {
+
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, "xxxxx");
+
+        List<Module> result = modulesLoader.loadModules(configuration);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertTrue(result.get(0) instanceof TestModuleD);
+        assertTrue(result.get(1) instanceof TestModuleB);
+        assertTrue(result.get(2) instanceof TestModuleC);
     }
 
 
@@ -170,7 +188,7 @@ public class ModulesLoaderTest extends TestCase {
             modulesLoader.loadModules(configuration);
             fail();
 
-        } catch (RuntimeException e) {
+        } catch (UnitilsException e) {
             //expected
         }
     }
@@ -188,7 +206,7 @@ public class ModulesLoaderTest extends TestCase {
             modulesLoader.loadModules(configuration);
             fail();
 
-        } catch (RuntimeException e) {
+        } catch (UnitilsException e) {
             //expected
         }
     }
