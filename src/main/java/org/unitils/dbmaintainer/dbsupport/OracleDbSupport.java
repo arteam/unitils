@@ -1,19 +1,17 @@
 package org.unitils.dbmaintainer.dbsupport;
 
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.apache.commons.dbutils.DbUtils;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
-import javax.sql.DataSource;
-import java.util.Set;
-import java.util.HashSet;
-import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * 
+ *
  */
 public class OracleDbSupport extends DbSupport {
 
@@ -111,7 +109,7 @@ public class OracleDbSupport extends DbSupport {
                 statementHandler.handle(sqlResetIncrement);
             }
         } finally {
-            DbUtils.closeQuietly(null, st, rs);
+            DbUtils.closeQuietly(conn, st, rs);
         }
     }
 
