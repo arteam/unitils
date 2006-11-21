@@ -29,8 +29,8 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
-import org.unitils.dbunit.annotation.DbUnitDataSet;
-import org.unitils.dbunit.annotation.ExpectedDbUnitDataSet;
+import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.util.ConfigUtils;
 
 import java.io.IOException;
@@ -53,11 +53,11 @@ import java.sql.SQLException;
  * file format, DbUnit's <code>FlatXmlDataSet</code> is used.
  * <p/>
  * For each database test method, the dataset file is found as follows:
- * <ol><li>If the test method is annotated with {@link DbUnitDataSet}, the file with the name specified by the fileName
+ * <ol><li>If the test method is annotated with {@link DataSet}, the file with the name specified by the fileName
  * property of this annotation is used</li>
  * <li>If a file can be found in the classpath in the same package as the testclass, with the name
  * 'classname without packagename'.'test method name'.xml, this file is used</li>
- * <li>If the test class is annotated with {@link DbUnitDataSet}, the file with the name specified by the fileName
+ * <li>If the test class is annotated with {@link DataSet}, the file with the name specified by the fileName
  * property of this annotation is used</li>
  * <li>If a file can be found in the classpath in the same package as the testclass, with the name
  * 'classname without packagename'.xml, this file is used</li>
@@ -97,8 +97,7 @@ public class DbUnitModule implements Module {
 
         databaseSchemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
-        dataTypeFactory = ConfigUtils.getConfiguredInstance(IDataTypeFactory.class, configuration,
-                databaseDialect);
+        dataTypeFactory = ConfigUtils.getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
     }
 
     /**
@@ -145,7 +144,7 @@ public class DbUnitModule implements Module {
      * If no such file exists, a class level defined dataset will be loaded.
      * If neither of these files exist, nothing is done.
      * The name of the test data file at both method level and class level can be overridden using the {@link
-     * DbUnitDataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
+     * DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
      * thrown.
      *
      * @param testClass
@@ -178,7 +177,7 @@ public class DbUnitModule implements Module {
      * If no such file exists, a class level defined dataset will be returned.
      * If neither of these files exist, null is returned.
      * The name of the test data file at both method level and class level can be overridden using the {@link
-     * DbUnitDataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
+     * DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
      * thrown.
      *
      * @param testClass
@@ -199,18 +198,18 @@ public class DbUnitModule implements Module {
     /**
      * Returns the DbUnit dataSet that has been defined at method level, if it exists. By default, this dataSet is the
      * file located in the same package as the test class, with as name className + '.' + methodName + '.xml'. This default
-     * name can be overridden using the {@link DbUnitDataSet} annotation at method level. If the dataSet filename is
+     * name can be overridden using the {@link DataSet} annotation at method level. If the dataSet filename is
      * explicitly set but not found, a {@link UnitilsException} is thrown.
      *
      * @param testClass
      * @return The class level DbUnit DataSet
      */
     private IDataSet getMethodLevelTestDataSet(Class testClass, Method method) {
-        DbUnitDataSet dbUnitDataSetAnnotation = method.getAnnotation(DbUnitDataSet.class);
-        if (dbUnitDataSetAnnotation != null) {
-            IDataSet dataSet = getDataSet(testClass, dbUnitDataSetAnnotation.fileName());
+        DataSet dataSetAnnotation = method.getAnnotation(DataSet.class);
+        if (dataSetAnnotation != null) {
+            IDataSet dataSet = getDataSet(testClass, dataSetAnnotation.fileName());
             if (dataSet == null) {
-                throw new UnitilsException("Could not find DbUnit dataset with name " + dbUnitDataSetAnnotation.fileName());
+                throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetAnnotation.fileName());
             }
             return dataSet;
         } else {
@@ -233,18 +232,18 @@ public class DbUnitModule implements Module {
     /**
      * Returns the DbUnit dataSet that has been defined at class level. By default, this dataSet is the file located
      * in the same package as the test class, with as name name of class + '.xml'. This default name can be
-     * overridden using the {@link DbUnitDataSet} annotation at class level. If the dataSet filename is explicitly set
+     * overridden using the {@link DataSet} annotation at class level. If the dataSet filename is explicitly set
      * but not found, a {@link UnitilsException} is thrown.
      *
      * @param testClass
      * @return The class level DbUnit DataSet
      */
     private IDataSet getClassLevelTestDataSet(Class testClass) {
-        DbUnitDataSet dbUnitDataSetAnnotation = (DbUnitDataSet) testClass.getAnnotation(DbUnitDataSet.class);
-        if (dbUnitDataSetAnnotation != null) {
-            IDataSet dataSet = getDataSet(testClass, dbUnitDataSetAnnotation.fileName());
+        DataSet dataSetAnnotation = (DataSet) testClass.getAnnotation(DataSet.class);
+        if (dataSetAnnotation != null) {
+            IDataSet dataSet = getDataSet(testClass, dataSetAnnotation.fileName());
             if (dataSet == null) {
-                throw new UnitilsException("Could not find DbUnit dataset with name " + dbUnitDataSetAnnotation.fileName());
+                throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetAnnotation.fileName());
             }
             return dataSet;
         } else {
@@ -322,9 +321,9 @@ public class DbUnitModule implements Module {
 
     private void assertDbContentsAsExpectedIfAnnotated(Object testObject, Method testMethod) {
 
-        ExpectedDbUnitDataSet expectedDbUnitDataSetAnnotation = testMethod.getAnnotation(ExpectedDbUnitDataSet.class);
-        if (expectedDbUnitDataSetAnnotation != null) {
-            String expectedDataSetFileName = expectedDbUnitDataSetAnnotation.fileName();
+        ExpectedDataSet expectedDataSetAnnotation = testMethod.getAnnotation(ExpectedDataSet.class);
+        if (expectedDataSetAnnotation != null) {
+            String expectedDataSetFileName = expectedDataSetAnnotation.fileName();
             if (StringUtils.isEmpty(expectedDataSetFileName)) {
                 expectedDataSetFileName = getDefaultExpectedDataSetFileName(testObject.getClass(), testMethod.getName());
             }
@@ -373,16 +372,16 @@ public class DbUnitModule implements Module {
     /**
      * Gets the name of the expected dataset file.
      * The default name of this file is constructed as follows: 'classname without packagename'.'testname'-result.xml.
-     * This default name can be overridden by annotating the test method with the {@link ExpectedDbUnitDataSet}
+     * This default name can be overridden by annotating the test method with the {@link ExpectedDataSet}
      * annotation.
      *
      * @return the expected dataset filename
      */
     protected static String getDefaultExpectedDataSetFileName(Class<?> testClass, String methodName) {
 
-        ExpectedDbUnitDataSet expectedDbUnitDataSetAnnotation = testClass.getAnnotation(ExpectedDbUnitDataSet.class);
-        if (expectedDbUnitDataSetAnnotation != null) {
-            return expectedDbUnitDataSetAnnotation.fileName();
+        ExpectedDataSet expectedDataSetAnnotation = testClass.getAnnotation(ExpectedDataSet.class);
+        if (expectedDataSetAnnotation != null) {
+            return expectedDataSetAnnotation.fileName();
         } else {
             String className = testClass.getName();
             return className.substring(className.lastIndexOf(".") + 1) + "." + methodName + "-result.xml";

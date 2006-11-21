@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * A class for loading unitils modules.
  * <p/>
- * The core names set by the {@link #PROPERTY_MODULES} property which modules will be loaded. These names can then
+ * The core names set by the {@link #PROPKEY_MODULES} property which modules will be loaded. These names can then
  * be used to construct properties that define the classnames and optionally the dependencies of these modules. E.g.
  * <pre><code>
  * unitils.modules= a, b, c, d
@@ -47,27 +47,27 @@ public class ModulesLoader {
     /**
      * Property that contains the names of the modules that are to be loaded
      */
-    public static final String PROPERTY_MODULES = "unitils.modules";
+    public static final String PROPKEY_MODULES = "unitils.modules";
 
     /**
      * First part of all core specific properties
      */
-    public static final String PROPERTY_MODULE_PREFIX = "unitils.module.";
+    public static final String PROPKEY_MODULE_PREFIX = "unitils.module.";
 
     /**
      * Last part of the core specific property that specifies whehter the core should be loaded
      */
-    public static final String PROPERTY_MODULE_SUFFIX_ENABLED = ".enabled";
+    public static final String PROPKEY_MODULE_SUFFIX_ENABLED = ".enabled";
 
     /**
      * Last part of the core specific property that specifies the classname of the core
      */
-    public static final String PROPERTY_MODULE_SUFFIX_CLASS_NAME = ".className";
+    public static final String PROPKEY_MODULE_SUFFIX_CLASS_NAME = ".className";
 
     /**
      * Last part of the core specific property that specifies the names of the modules that should be run before this core
      */
-    public static final String PROPERTY_MODULE_SUFFIX_RUN_AFTER = ".runAfter";
+    public static final String PROPKEY_MODULE_SUFFIX_RUN_AFTER = ".runAfter";
 
 
     /**
@@ -79,14 +79,14 @@ public class ModulesLoader {
     public List<Module> loadModules(Configuration configuration) {
 
         // get all declared modules (filter doubles)
-        Set<String> moduleNames = new TreeSet<String>(Arrays.asList(configuration.getStringArray(PROPERTY_MODULES)));
+        Set<String> moduleNames = new TreeSet<String>(Arrays.asList(configuration.getStringArray(PROPKEY_MODULES)));
 
         // remove all disable modules
         Iterator<String> moduleNameIterator = moduleNames.iterator();
         while (moduleNameIterator.hasNext()) {
 
             String moduleName = moduleNameIterator.next();
-            boolean enabled = configuration.getBoolean(PROPERTY_MODULE_PREFIX + moduleName + PROPERTY_MODULE_SUFFIX_ENABLED, true);
+            boolean enabled = configuration.getBoolean(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_ENABLED, true);
             if (!enabled) {
                 moduleNameIterator.remove();
             }
@@ -97,7 +97,7 @@ public class ModulesLoader {
         for (String moduleName : moduleNames) {
 
             // get dependencies for core
-            String[] runAfterModuleNames = configuration.getStringArray(PROPERTY_MODULE_PREFIX + moduleName + PROPERTY_MODULE_SUFFIX_RUN_AFTER);
+            String[] runAfterModuleNames = configuration.getStringArray(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_RUN_AFTER);
             runAfters.put(moduleName, runAfterModuleNames);
         }
 
@@ -123,7 +123,7 @@ public class ModulesLoader {
             for (String moduleName : moduleNameList) {
 
                 // get core class name
-                String className = configuration.getString(PROPERTY_MODULE_PREFIX + moduleName + PROPERTY_MODULE_SUFFIX_CLASS_NAME);
+                String className = configuration.getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME);
 
                 // create core instance
                 Object module = ReflectionUtils.createInstanceOfType(className);
