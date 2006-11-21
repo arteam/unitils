@@ -156,7 +156,7 @@ public class DbUnitModule implements Module {
         try {
             IDataSet dataSet = getTestDataSet(testClass, testMethod);
             if (dataSet != null) { // Dataset is null when there is no data xml file.
-                getInsertDatabaseOperation().execute(dbUnitDatabaseConnection, dataSet);
+                getInsertDatabaseOperation().execute(getDbUnitDatabaseConnection(), dataSet);
             }
         } catch (Exception e) {
             throw new UnitilsException("Error while trying to insert test data from DbUnit xml file", e);
@@ -313,7 +313,8 @@ public class DbUnitModule implements Module {
     protected IDataSet createDbUnitDataSet(InputStream in) {
 
         try {
-            return new FlatXmlDataSet(in);
+            return new FlatXmlDataSet(in, false);
+
         } catch (Exception e) {
             throw new UnitilsException("Error while reading DbUnit dataset", e);
         }
@@ -393,6 +394,7 @@ public class DbUnitModule implements Module {
      */
     protected DatabaseModule getDatabaseModule() {
 
+        //todo throw exception when module not found
         Unitils unitils = Unitils.getInstance();
         return unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
     }

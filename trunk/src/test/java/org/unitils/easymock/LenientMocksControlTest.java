@@ -122,7 +122,6 @@ public class LenientMocksControlTest extends TestCase {
             fail();
         } catch (AssertionError e) {
             //expected
-            e.printStackTrace();
         }
     }
 
@@ -141,7 +140,6 @@ public class LenientMocksControlTest extends TestCase {
             fail();
         } catch (AssertionError e) {
             //expected
-            e.printStackTrace();
         }
     }
 

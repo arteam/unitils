@@ -19,7 +19,6 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import static org.unitils.core.ModulesLoader.*;
-import org.unitils.inject.util.InjectionUtils;
 
 import java.util.List;
 
@@ -52,9 +51,7 @@ public class ModulesLoaderTest extends TestCase {
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "b" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "d");
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "c" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModuleC.class.getName());
         configuration.setProperty(PROPERTY_MODULE_PREFIX + "c" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "a");
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "d" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModuleD.class.getName());
-
-        InjectionUtils.injectStatic(configuration, Unitils.class, "unitils.configuration");
+        configuration.setProperty(PROPERTY_MODULE_PREFIX + "d" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModuleD.class.getName());       
     }
 
 

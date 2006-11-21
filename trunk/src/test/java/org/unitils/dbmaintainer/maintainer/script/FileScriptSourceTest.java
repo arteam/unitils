@@ -84,6 +84,7 @@ public class FileScriptSourceTest extends TestCase {
         File testDir = new File(DBCHANGE_FILE_DIRECTORY);
         FileUtils.deleteDirectory(testDir);
         testDir.mkdirs();
+        FileUtils.forceDeleteOnExit(testDir);
 
         // Copy test files
         File f1 = copyFile(DBCHANGE_FILE1, DBCHANGE_FILE1_FILESYSTEM);

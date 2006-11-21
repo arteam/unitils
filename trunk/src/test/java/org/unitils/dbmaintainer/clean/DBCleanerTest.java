@@ -37,14 +37,10 @@ import java.sql.Statement;
 @SuppressWarnings({"UnusedDeclaration"})
 public class DBCleanerTest extends UnitilsJUnit3 {
 
-    /**
-     * Tested object
-     */
+    /* Tested object */
     private DBCleaner dbCleaner;
 
-    /**
-     * DataSource for the test database, is injected
-     */
+    /* DataSource for the test database, is injected */
     @TestDataSource
     private DataSource dataSource;
 
@@ -61,11 +57,8 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Configuration configuration = configurationLoader.loadConfiguration();
         configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "tabletopreserve");
 
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
-                dataSource);
-
-        dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class,
-                configuration, dataSource, statementHandler);
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
+        dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
 
         dropTestTables();
         createTestTables();
