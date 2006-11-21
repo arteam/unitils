@@ -43,8 +43,6 @@ import org.apache.log4j.Logger;
  * A runtime exception is thrown when the default settings cannot be loaded.
  * A warning is logged when the custom propreties cannot be loaded.
  * A debug message is logged when the local configuration cannot be loaded.
- * <p/>
- * todo Make sure an error is given when a custom or local properties file has been found but could not be correctly loaded
  */
 public class ConfigurationLoader {
 
