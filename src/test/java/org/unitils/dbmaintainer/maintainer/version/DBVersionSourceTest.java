@@ -25,7 +25,7 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbunit.annotation.DbUnitDataSet;
+import org.unitils.dbunit.annotation.DataSet;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 
 import java.sql.Connection;
@@ -37,7 +37,7 @@ import java.sql.Statement;
  * a test database. The dbms that is used depends on the database configuration in test/resources/unitils.properties
  */
 @DatabaseTest
-@DbUnitDataSet(fileName = "DBVersionSourceTest.versionTableEmpty.xml")
+@DataSet(fileName = "DBVersionSourceTest.versionTableEmpty.xml")
 public class DBVersionSourceTest extends UnitilsJUnit3 {
 
     /* The tested instance */
@@ -134,7 +134,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      *
      * @throws Exception
      */
-    @DbUnitDataSet(fileName = "DBVersionSourceTest.versionTableFilled.xml")
+    @DataSet(fileName = "DBVersionSourceTest.versionTableFilled.xml")
     public void testGetDBVersion() throws Exception {
         Version expectedVersion = new Version(3L, DateUtils.parseDate("2006-10-08 12:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
         assertRefEquals(expectedVersion, dbVersionSource.getDbVersion());

@@ -35,9 +35,9 @@ import org.apache.log4j.Logger;
  * configuration. Eg the database schema specific to the local user could be defined here. Settings in this file
  * will override the unitil default and custom settings.</li>
  * </ul>
- * The name of the custom settings file (unitils.properties) is defined by the {@link #PROPERTY_CUSTOM_CONFIGURATION}
+ * The name of the custom settings file (unitils.properties) is defined by the {@link #PROPKEY_CUSTOM_CONFIGURATION}
  * property in the default settings. The name of the local settings file (unitils-local.propeties) is defined
- * by the {@link #PROPERTY_LOCAL_CONFIGURATION} in the custom or default settings. If these properties are set to
+ * by the {@link #PROPKEY_LOCAL_CONFIGURATION} in the custom or default settings. If these properties are set to
  * null or empty, the corresponding property file will not be loaded.
  * <p/>
  * A runtime exception is thrown when the default settings cannot be loaded.
@@ -56,13 +56,13 @@ public class ConfigurationLoader {
     /**
      * Property in the defaults configuration file that contains the name of the custom configuration file
      */
-    public static final String PROPERTY_CUSTOM_CONFIGURATION = "unitils.configuration.customFileName";
+    public static final String PROPKEY_CUSTOM_CONFIGURATION = "unitils.configuration.customFileName";
 
     /**
      * Property in the defaults and/or custom configuration file that contains the name of
      * the user local configuration file
      */
-    public static final String PROPERTY_LOCAL_CONFIGURATION = "unitils.configuration.localFileName";
+    public static final String PROPKEY_LOCAL_CONFIGURATION = "unitils.configuration.localFileName";
 
 
     /* The logger instance for this class */
@@ -113,14 +113,14 @@ public class ConfigurationLoader {
 
     /**
      * Creates and loads the custom configuration settings. The name of the settings file is defined by the
-     * {@link #PROPERTY_CUSTOM_CONFIGURATION} property in the given default configuration.
+     * {@link #PROPKEY_CUSTOM_CONFIGURATION} property in the given default configuration.
      *
      * @param defaultConfiguration the default settings, not null
      * @return the custom settings, null if not found or not loaded
      */
     private static Configuration createCustomConfiguration(Configuration defaultConfiguration) {
 
-        String customConfigurationFileName = defaultConfiguration.getString(PROPERTY_CUSTOM_CONFIGURATION);
+        String customConfigurationFileName = defaultConfiguration.getString(PROPKEY_CUSTOM_CONFIGURATION);
         if (StringUtils.isEmpty(customConfigurationFileName)) {
             // loading of local settings disabled
             return null;
@@ -138,7 +138,7 @@ public class ConfigurationLoader {
 
     /**
      * Creates and loads the local configuration settings. The name of the settings file is defined by the
-     * {@link #PROPERTY_LOCAL_CONFIGURATION} property in the given custom or default configuration.
+     * {@link #PROPKEY_LOCAL_CONFIGURATION} property in the given custom or default configuration.
      *
      * @param defaultConfiguration the default settings, not null
      * @param customConfiguration  the custom settings, can be null
@@ -149,11 +149,11 @@ public class ConfigurationLoader {
         String localConfigurationFileName = null;
         if (customConfiguration != null) {
             // try custom settings
-            localConfigurationFileName = customConfiguration.getString(PROPERTY_LOCAL_CONFIGURATION);
+            localConfigurationFileName = customConfiguration.getString(PROPKEY_LOCAL_CONFIGURATION);
         }
         if (StringUtils.isEmpty(localConfigurationFileName)) {
             // not found in custom settings, try defaults
-            localConfigurationFileName = defaultConfiguration.getString(PROPERTY_LOCAL_CONFIGURATION);
+            localConfigurationFileName = defaultConfiguration.getString(PROPKEY_LOCAL_CONFIGURATION);
         }
         if (StringUtils.isEmpty(localConfigurationFileName)) {
             // loading of local settings disabled

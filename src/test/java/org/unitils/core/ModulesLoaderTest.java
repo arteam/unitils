@@ -44,14 +44,14 @@ public class ModulesLoaderTest extends TestCase {
         modulesLoader = new ModulesLoader();
 
         configuration = new PropertiesConfiguration();
-        configuration.setProperty(PROPERTY_MODULES, "a, b, c, d");
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModuleA.class.getName());
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "b, d");
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "b" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModuleB.class.getName());
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "b" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "d");
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "c" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModuleC.class.getName());
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "c" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "a");
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "d" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModuleD.class.getName());       
+        configuration.setProperty(PROPKEY_MODULES, "a, b, c, d");
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, TestModuleA.class.getName());
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_RUN_AFTER, "b, d");
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "b" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, TestModuleB.class.getName());
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "b" + PROPKEY_MODULE_SUFFIX_RUN_AFTER, "d");
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "c" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, TestModuleC.class.getName());
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "c" + PROPKEY_MODULE_SUFFIX_RUN_AFTER, "a");
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "d" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, TestModuleD.class.getName());
     }
 
 
@@ -77,7 +77,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public void testLoadModules_notActive() {
 
-        configuration.setProperty(PROPERTY_MODULES, "a, b, d");
+        configuration.setProperty(PROPKEY_MODULES, "a, b, d");
 
         List<Module> result = modulesLoader.loadModules(configuration);
 
@@ -94,7 +94,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public void testLoadModules_notEnabled() {
 
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "d" + PROPERTY_MODULE_SUFFIX_ENABLED, "false");
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "d" + PROPKEY_MODULE_SUFFIX_ENABLED, "false");
 
         List<Module> result = modulesLoader.loadModules(configuration);
 
@@ -112,8 +112,8 @@ public class ModulesLoaderTest extends TestCase {
      */
     public void testLoadModules_notDoubles() {
 
-        configuration.setProperty(PROPERTY_MODULES, "a, b, c, d, a, b");
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "b, b, d, b, d");
+        configuration.setProperty(PROPKEY_MODULES, "a, b, c, d, a, b");
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_RUN_AFTER, "b, b, d, b, d");
 
         List<Module> result = modulesLoader.loadModules(configuration);
 
@@ -146,7 +146,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public void testLoadModules_wrongClassName() {
 
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, "java.lang.String");
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, "java.lang.String");
 
         try {
             modulesLoader.loadModules(configuration);
@@ -164,7 +164,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public void testLoadModules_circular() {
 
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "b" + PROPERTY_MODULE_SUFFIX_RUN_AFTER, "c");
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "b" + PROPKEY_MODULE_SUFFIX_RUN_AFTER, "c");
 
         try {
             modulesLoader.loadModules(configuration);
@@ -182,7 +182,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public void testLoadModules_privateConstructor() {
 
-        configuration.setProperty(PROPERTY_MODULE_PREFIX + "a" + PROPERTY_MODULE_SUFFIX_CLASS_NAME, TestModulePrivate.class.getName());
+        configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, TestModulePrivate.class.getName());
 
         try {
             modulesLoader.loadModules(configuration);

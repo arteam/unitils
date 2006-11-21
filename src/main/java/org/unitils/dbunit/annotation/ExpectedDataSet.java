@@ -27,7 +27,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ExpectedDbUnitDataSet {
+public @interface ExpectedDataSet {
 
     String fileName() default "";
 
