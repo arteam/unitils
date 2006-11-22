@@ -3,7 +3,7 @@
  -----
  -----
 
-Introduction
+Unitils documentation
 ~~~~~~~~~~~~
 
 * Overview
@@ -46,47 +46,47 @@ Introduction
         * EasyMock argument matching using reflection equality
 
     []
-    
-   
+
+
     This tutorial will show you by example what Unitils is about and how you can configure your project to make use of it's services.
     It is only an introduction to Unitils, more in-depth documentation can be found in the {{{javadoc.html}javadoc}} of the modules.
     The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}.
 
 
 * Getting started
-~~~~~~~~~~~~~~~~~    
+~~~~~~~~~~~~~~~~~
 
 ** Configuration
 ~~~~~~~~~~~~~~~~
-    As with many projects, Unitils needs some configuration of its services. By default, there are 3 levels 
-    of configuration, each level overriding the settings of the previous one: 
+    As with many projects, Unitils needs some configuration of its services. By default, there are 3 levels
+    of configuration, each level overriding the settings of the previous one:
 
-    [[1]] <Unitils-defaults.properties>: default configuration that is shipped within the distribution of Unitils
-    
-    [[2]] <Unitils.properties>: can contain project-wide configuration
-    
-    [[3]] <Unitils-local.properties>: can contain user-specific configuration
-    
+    [[1]] <unitils-defaults.properties>: default configuration that is shipped within the distribution of Unitils
+
+    [[2]] <unitils.properties>: can contain project-wide configuration
+
+    [[3]] <unitils-local.properties>: can contain user-specific configuration
+
     []
 
-    The first file, Unitils-defaults.properties, contains default values and is packaged in the Unitils jar. There is no need to make changes 
+    The first file, unitils-defaults.properties, contains default values and is packaged in the Unitils jar. There is no need to make changes
     to this file, but it can be used as reference, since it contains all possible configuration settings for Unitils.
-    
-    The second, Unitils.properties, can override the defaults and is typically used to set values for configuration settings for all developers 
-    on a project. For example if your project uses an oracle database, you can create a Unitils.properties file
+
+    The second, unitils.properties, can override the defaults and is typically used to set values for configuration settings for all developers
+    on a project. For example if your project uses an oracle database, you can create a unitils.properties file
     that overrideds the driver class name and url properties as follows:
-    
+
 +---------------------------------------------------------+
 dataSource.driverClassName=oracle.jdbc.driver.OracleDriver
 dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 +---------------------------------------------------------+
-    
-    The file is not required, but if you create one, it should be placed somewhere in the classpath of your project. 
-    You can find a sample file that contains most commonly used configuration settings in following Unitils.properties template.
-    
-    The last file, Unitils-local.properties, is also optional and can contain settings that override the project settings and 
-    define per user configuration. For example, if each user uses its own unit-test database schema, you can 
-    create a Unitils-local.properties for each user that contains the corresponding schema, username and password:
+
+    The file is not required, but if you create one, it should be placed somewhere in the classpath of your project.
+    You can find a sample file that contains most commonly used configuration settings in following unitils.properties template.
+
+    The last file, unitils-local.properties, is also optional and can contain settings that override the project settings and
+    define per user configuration. For example, if each user uses its own unit-test database schema, you can
+    create a unitils-local.properties for each user that contains the corresponding schema, username and password:
 
 +------------------------------------------+
 dataSource.schemaName=test_john
@@ -94,33 +94,33 @@ dataSource.userName=john
 dataSource.password=secret
 +------------------------------------------+
 
-    Each of these Unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>). 
+    Each of these unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>).
 
-    The name of the local file, Unitils-local.properties, is also defined by a property. This makes it possible to use different names for each 
-    of the projects you are working on. For example, suppose you are working on a project named projectOne and want to start a new project 
-    named projectTwo. Adding following property to the Unitils.properties of projetTwo will let Unitils use projectTwo-local.properties 
+    The name of the local file, unitils-local.properties, is also defined by a property. This makes it possible to use different names for each
+    of the projects you are working on. For example, suppose you are working on a project named projectOne and want to start a new project
+    named projectTwo. Adding following property to the unitils.properties of projetTwo will let Unitils use projectTwo-local.properties
     as local properties file for the project:
-    
+
 +--------------------------------------------------------------+
-Unitils.configuration.localFileName=projectTwo-local.properties
-+--------------------------------------------------------------+    
-    
+unitils.configuration.localFileName=projectTwo-local.properties
++--------------------------------------------------------------+
+
 
 ** Making your test Unitils-enabled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unitils offers services for test classes. To let your test make use of these services, you first have to Unitils-enable your test.
     This can be done easily by (indirectly) extending from a Unitils base test-class. Currently there are base classes for the major test frameworks:
-    
+
     * <<{{{http://www.junit.org/}JUnit3}}>>: org.unitils.UnitilsJUnit3
-    
+
     * <<{{{http://www.junit.org/}JUnit4}}>>: org.unitils.UnitilsJUnit4
-    
+
     * <<{{{http://testng.org/}TestNG}}>>: org.unitils.UnitilsTestNG
-    
+
     []
-    
+
     As an example, suppose you have a JUnit3 test that you want to Unitils-enable:
-    
+
 +------------------------------------------+
 import org.unitils.UnitilsJUnit3;
 
@@ -128,11 +128,11 @@ public class MyTest extends UnitilsJUnit3 {
 }
 +------------------------------------------+
 
-    Typically you would create your own test base class containing some utility behavior common for all your tests, e.g. datasource injection, and 
-    then let this base class extend from one of the Unitils base classes.    
-    
+    Typically you would create your own test base class containing some utility behavior common for all your tests, e.g. datasource injection, and
+    then let this base class extend from one of the Unitils base classes.
+
     For JUnit4 it is also possible to add a @RunWith annotation instead of extending from the base class:
-    
+
 +------------------------------------------+
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
@@ -141,151 +141,321 @@ import org.unitils.UnitilsJUnit4TestClassRunner;
 public class MyTest {
 }
 +------------------------------------------+
-    
-    
+
+
 
 ** Module system
-~~~~~~~~~~~~~~~~    
+~~~~~~~~~~~~~~~~
     Before starting with the examples, let's first take a look at some of the concepts used in Unitils and how the framwork functions under the hood.
 
-    Unitils is structured as an easily extensible system of modules. Each of these modules offers some type of service to a test by listening to the 
+    Unitils is structured as an easily extensible system of modules. Each of these modules offers some type of service to a test by listening to the
     execution of the test and invoking the correct service behavior when needed.
-   
-[images/Unitils-modules.png] Unitils modules
-   
-   This mechanism provides a uniform way for providing extra services to your tests and offers a flexible way of adding services without having 
+
+[images/unitils-modules.png] Unitils modules
+
+   This mechanism provides a uniform way for providing extra services to your tests and offers a flexible way of adding services without having
    to change the superclass of the test. Adding new services is as easy as adding a new module and making some changes to the unitils configuration.
-   
+
    Currently, following modules are available in Unitils:
-   
+
    * <DatabaseModule>: unit-test database maintenance and connection pooling
-   
+
    * <DbUnitModule>: test data management using DBUnit
-   
+
    * <HibernateModule>: Hibernate configuration support and automatic database mapping checking
-   
+
    * <EasyMockModule>: support for creating mocks and lenient reflection argument matching
-   
+
    * <InjectModule>: support for injecting (mock) objects into other objects
 
-   * Planned: support for JPA. 
+   * Planned: support for JPA.
 
 
 
 
 * Database testing
 ~~~~~~~~~~~~~~~~~~
-    Unit tests for the database layer are extremely valuable in enterprise applications, but are often abandoned because of their complexity. 
-    Unitils greatly reduces this complexity, making database testing simple and maintainable. The following sections describe the database 
+    Unit tests for the database layer are extremely valuable in enterprise applications, but are often abandoned because of their complexity.
+    Unitils greatly reduces this complexity, making database testing simple and maintainable. The following sections describe the database
     support by a number of simple examples. For an elaborate description of the guidelines, read the database testing guidelines.
- 
+
 ** Managing test data with DbUnit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Database tests should be run on a unit test database, having complete and fine grained control over the test data that is used. Unitils
     builds further on DBUnit for providing support for test data sets. Following code section provides a simple example of a database unit test with Unitils' DbUnit support.
-    
+
     Let's say we have UserDAO with a simple findByName method for retrieving a user based on it's first and last name. The unit test looks as follows:
-    
+
 +-----+
     @DatabaseTest
     public void UserDAOTest extends UnitilsJUnit4 {
-    
-     	public void testFindByName {
+
+      @Test
+      public void testFindByName {
          User johnDoe = userDao.findByName("doe", "john");
          assertEquals("jdoe", johnDoe.getUserName());
-    	}
-    	
-    	public void testFindByMinimalAge {
-    		List<User> min18 = userDao.findByMinimalAge(18);
-    		assertEquals(1, min18.size());
-    		assertEquals("jack", min18.get(0).getUserName());
-    	}
-    
+      }
+
+      @Test
+      public void testFindByMinimalAge {
+        List<User> min18 = userDao.findByMinimalAge(18);
+        assertEquals(1, min18.size());
+        assertEquals("jack", min18.get(0).getUserName());
+      }
+
     }
 +-----+
 
     The class level data file UserDAOTest.xml is located in the same package as the test class:
-    
+
 +-----+
     <?xml version='1.0' encoding='UTF-8'?>
     <dataset>
-	     <user userName="jdoe" name="doe" firstname="john" />
+       <user userName="jdoe" name="doe" firstname="john" />
     </dataset>
 +-----+
 
     The method testFindByMinimalAge has a specific data file named UserDAOTest.testFindByMinimalAge.xml:
-    
+
 +-----+
     <?xml version='1.0' encoding='UTF-8'?>
     <dataset>
-	     <user userName="jack" age="18" />
-	     <user userName="jim" age="17" />
+       <user userName="jack" age="18" />
+       <user userName="jim" age="17" />
     </dataset>
 +-----+
 
     The annotation @DatabaseTest marks the test as being a database test, instructing Unitils to look for DBUnit datafiles to load. Unitils automatically looks
-    for a data file names <className>.xml. All existing data in the tables specified in the dataset is deleted, and the data 
+    for a data file names <className>.xml. All existing data in the tables specified in the dataset is deleted, and the data
     in the datafile is inserted. DbUnit's FlatXMLDataSet is used as the file format.
-    
+
     For methods needing very specific data, it may be a good idea to use a method level dataset. Unitils automatically looks for files named <className>.<methodName>.xml, such
     as the file UserDAOTest.testFindByMinimalAge.xml in the example.
-    
-    The datasets to use can also be specified explicitly using the annotation @DbUnitDataSet, like in the following example:
-    
+
+    The datasets to use can also be specified explicitly using the annotation @DataSet, as in the following example:
+
 +-----+
     @DatabaseTest
-    @DbUnitDataSet(fileName = "UserDAOTest_general.xml")
+    @DataSet(fileName = "UserDAOTest_general.xml")
     public void UserDAOTest extends UnitilsJUnit4 {
-    
-     	public void testFindByName {
+
+      @Test
+      public void testFindByName {
          User johnDoe = userDao.findByName("doe", "john");
          assertEquals("jdoe", johnDoe.getUserName());
-    	}
-    	
-    	@DbUnitDataSet(fileName = "UserDAOTest_ages.xml")
-    	public void testFindByMinimalAge {
-    		List<User> min18 = userDao.findByMinimalAge(18);
-    		assertEquals(1, min18.size());
-    		assertEquals("jack", min18.get(0).getUserName());
-    	}
-    
+      }
+
+      @DataSet(fileName = "UserDAOTest_ages.xml")
+      public void testFindByMinimalAge {
+        List<User> min18 = userDao.findByMinimalAge(18);
+        assertEquals(1, min18.size());
+        assertEquals("jack", min18.get(0).getUserName());
+      }
+
     }
-+-----+ 
++-----+
 
-    For checking the result of bulk update methods or stored procedures, Unitils offers support for result file checking. Suppose we have
-    a data access method that gives all employees a 10% payraise as follows:
+   For checking the result of bulk update methods or stored procedures, that are difficult to check in Java code,
+   Unitils offers support for result file checking.
 
-   Always keep in mind the following guidelines: 
-   
-   * Use small sets of test data, containing as few data as possible. In your data files, 
+   Following example tests a method that disables all user accounts that haven't been used for a whole year:
+
++-----+
+    @DatabaseTest
+    public void UserDAOTest extends UnitilsJUnit4 {
+
+      @Test
+      @ExpectedDataSet
+      public void testDisableInactiveAccounts {
+         userDao.disableInactiveAccounts();
+      }
+
+    }
++-----+
+
+    After having executed the method annotated with @ExpectedDataSet, the contents of the database are compared with
+    the data file UserDAOTest.testDisableInactiveAccounts-result.xml (<className>.<methodName>-result.xml):
+
++-----+
+    <?xml version='1.0' encoding='UTF-8'?>
+    <dataset>
+       <user userName="jack" active="true" />
+       <user userName="jim" active="false" />
+    </dataset>
++-----+
+
+   When writing database tests, keep in mind following guidelines:
+
+   * Use small sets of test data, containing as few data as possible. In your data files,
    only specifiy columns that are used in join columns or the where clause of the tested query.
 
-   * Don't reuse data files too much. Make them test class and in some cases even test method specific. 
+   * Don't reuse data files too much. Make them test class and in some cases even test method specific.
    Changing the data becomes very difficult when multiple tests are using the same data files.
-  
-   * Use a database schema per developer. This allows developers to insert test data and run tests without interfering each other.
-   
+
+   * Limit the use of result data files. If you do use them, only specify include the tables and columns that are
+   important and leave out the rest.
+
+   * Use a database schema per developer. This allows developers to insert test data and run tests without interfering with each other.
+
    * Disable all foreign key and not null constraints on the test databases. This way, the data files need to contain no more
    data than absolutely necessary.
-   
+
    To provide support with these 2 last features, Unitils offers automatic test database schema maintenance:
 
 ** Unit test database maintenance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     A powerful DBMaintainer is provided to automatically update each developer's database schema individually. Unitils' DBMaintainer
     will automatically check if database structure updates are available before running a database test, and apply them if necessary.
+
+    The test script folder contains scripts that start with a version number and end on .sql, as in following example:
+
++-----+
+    dbscripts/
+              001_initial.sql
+              002_tracking_updates.sql
+              003_auditing_updates.sql
++-----+
+
+    The leading zeroes are only added to make sure the scripts are shown in proper sequence in a file explorer window, they are not required.
+
+    If a script is added with version number 4, the database will execute this script, bringing the database to version 4. When an
+    existing script is changed, e.g. 001_initial.sql is replaced with a new version, the database is cleared and recreated from scratch.
+    Before doing an update, all data in the database is deleted, to avoid errors when adding not-null columns or adding foreign keys in update scripts.
+    It is possible to specify a number of tables for which the data is preserved. You can also configure a number of database items
+    (tables, views, sequences, ...) that are preserved. Look at the configuration section for more information.
+
+    It is a good practice to add new update files for small database updates. This makes sure updates are executed very quickly. Once in a while,
+    you can clean up the small update scripts and replace them with one large DDL script.
+
+    After each update, the DBMaintainer performs following actions:
+
+    * <Disable foreign key and not-null constraints>: To be able to work with the smallest possible test data sets, all foreign key and not null
+    constraints on the test database are disabled.
+
+    * <Update sequences>: All sequences and identity columns are updated to a sufficiently high initial value (1000 by default). This way, you can
+    use fixed primary key values when inserting test data.
+
+    * <Create a DTD>: A DTD that describes the structure of DbUnit's FlatXMLDataSet is created. This enables validness checking and auto-completion
+    when writing test data files.
+
+    The DBMaintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates, ... Look at
+    the configuration for more information!
     
-      
+*** Configuration
+~~~~~~~~~~~~~~~~~
+
+    TODO
+
 
 ** Testing with Hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Unit tests remain valuable, for ensuring the
+    mapping of the Hibernate mapped classes is always in sync with the database, and for easy and quick testing of HQL queries.
+
+    Unitils provides out-of-the box configuration support for Hibernate. When properly configured, Unitils' database and DbUnit support can be used like
+    described in database testing. 
+    
+    A HQL test can be tested exacltly the same way as described in managing test data with DbUnit. The only difference is that you extend a superclass
+    that is configured as being a Hibernate test superclass (see configuration). 
+    
+    The @ExpectedDataSet annotation can also be used for result checking with a data file. Unitils will make sure the Hibernate Session is flushed before
+    performing the check, to make sure all database updates performed during the test are actually executed on the database.
+
 *** Configuration
 ~~~~~~~~~~~~~~~~~
 
+    Unitils provides out-of-the box configuration support for Hibernate. Make sure you properly configure Unitils' database support first, and then correctly
+    override the property HibernateModule.hibernate.configfiles in unitils.properties. E.g.
+
++-----+
+    HibernateModule.hibernate.configfiles=hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
++-----+
+
+    It is a good practice to split your Hibernate configuration in two parts: One config files containing shared configuration, such as the database dialect
+    and the mapped classes. A second one contains configuration that is specifically for unit testing. TODO example files.
+
+    We advise you to write a superclass that is used as base class for all Hibernate tests. This superclass looks like the following:
+
++-----+
+    @HibernateTest
+    public abstract class BaseHibernateTest extends UnitilsJUnit3 {
+
+        @HibernateConfiguration
+        public void configureHibernate(Configuration config) {
+            HibernateConfigHelper.addMappedClasses(config);
+        }
+
+        @HibernateSession
+        public void injectHibernateSession(Session session) {
+            HibernateSessionManager.injectSession(session);
+        }
+    }
++-----+
+
+    The method annotated with @HibernateConfiguration allows performing some extra, programmatic Hibernate configuration, like e.g. registering mapped
+    classes with Hibernate. This method can be abandoned if all configuration is performed in the Hibernate config files.
+
+    The method annotated with @HibernateSession will be invoked before each test, with a Hibernate Session object as parameter. This method should make
+    sure that the tested data access code uses the Hibernate Session that is supplied by Unitils. The HibernateSessionManager that is invoked in this method
+    is also project specific code. The one in the example looks like the following:
+
++-----+
+    public class HibernateSessionManager {
+
+		    private static Session externallyProvidedSession;
+		
+		    private static SessionFactory sessionFactory;
+		
+		    public static Session getSession() {
+		        if (externallyProvidedSession != null) {
+		            return externallyProvidedSession;
+		        } else {
+		            return doGetSession();
+		        }
+		    }
+		
+		    private static Session doGetSession() {
+		        if (sessionFactory == null) {
+		            initSessionFactory();
+		        }
+		        return sessionFactory.openSession();
+		    }
+		
+		    private static void initSessionFactory() {
+		        Configuration configuration = new AnnotationConfiguration();
+		        configuration.addFile("hibernate.cfg.xml");
+		        configuration.addFile("hibernate-mappedClasses.cfg.xml");
+		        configuration.configure();
+		        sessionFactory = configuration.buildSessionFactory();
+		    }
+		
+		    public static void injectSession(Session session) {
+		        externallyProvidedSession = session;
+		    }
+		}
++-----+
+
 *** Testing the mapping
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+    Unitils is shipped with a ready-to-use unit test that verifies if the mapping of all your mapped classes is consistent with the database. This
+    test is not automatically executed; you should write a unit test that looks like the following:
+
++-----+
+    public class HibernateMappingTest extends BaseHibernateTest {
+
+    public void testMappingToDatabase() {
+        HibernateAssert.assertMappingToDatabase();
+    }
+}
++-----+
+
+    The method HibernateAssert.assertMappingToDatabase() checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
+    the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
+    
+    TODO example error message
 
 * Using reflection for assertion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
