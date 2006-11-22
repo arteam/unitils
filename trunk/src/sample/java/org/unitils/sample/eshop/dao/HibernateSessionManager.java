@@ -25,25 +25,34 @@ import org.hibernate.cfg.AnnotationConfiguration;
  */
 public class HibernateSessionManager {
 
-    private static Session session;
+    private static Session externallyProvidedSession;
+
+    private static SessionFactory sessionFactory;
 
     public static Session getSession() {
-        if (session == null) {
-            initSession();
+        if (externallyProvidedSession != null) {
+            return externallyProvidedSession;
+        } else {
+            return doGetSession();
         }
-        return session;
     }
 
-    private static void initSession() {
+    private static Session doGetSession() {
+        if (sessionFactory == null) {
+            initSessionFactory();
+        }
+        return sessionFactory.openSession();
+    }
+
+    private static void initSessionFactory() {
         Configuration configuration = new AnnotationConfiguration();
         configuration.addFile("hibernate.cfg.xml");
         configuration.addFile("hibernate-mappedClasses.cfg.xml");
         configuration.configure();
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        session = sessionFactory.openSession();
+        sessionFactory = configuration.buildSessionFactory();
     }
 
     public static void injectSession(Session session) {
-        HibernateSessionManager.session = session;
+        externallyProvidedSession = session;
     }
 }
