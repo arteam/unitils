@@ -15,11 +15,7 @@
  */
 package org.unitils.dbmaintainer.sequences;
 
-import org.apache.commons.configuration.Configuration;
-import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
-
-import javax.sql.DataSource;
 
 /**
  * Defines the contract for implementation classes that update the sequence of a unit testing database to a sufficiently

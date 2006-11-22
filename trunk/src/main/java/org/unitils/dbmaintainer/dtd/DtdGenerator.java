@@ -15,10 +15,6 @@
  */
 package org.unitils.dbmaintainer.dtd;
 
-import org.apache.commons.configuration.Configuration;
-
-import javax.sql.DataSource;
-
 /**
  * Defines the contract for implementations that create a DTD that describes a database. This DTD can
  * be used in XML files containing test data for a unit test database

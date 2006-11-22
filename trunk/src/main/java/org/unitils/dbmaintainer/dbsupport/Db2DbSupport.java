@@ -1,16 +1,14 @@
 package org.unitils.dbmaintainer.dbsupport;
 
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.apache.commons.dbutils.DbUtils;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
-import javax.sql.DataSource;
-import java.util.Set;
-import java.util.HashSet;
-import java.sql.SQLException;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 
@@ -52,6 +50,14 @@ public class Db2DbSupport extends DbSupport {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public boolean supportsSequences() {
+        return false;
+    }
+
+    public boolean supportsTriggers() {
+        return true;
+    }
+
     public boolean supportsIdentityColumns() {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -87,7 +93,7 @@ public class Db2DbSupport extends DbSupport {
     }
 
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
-        statementHandler.handle("alter table " + tableName + " disable constraint " + constraintName) ;
+        statementHandler.handle("alter table " + tableName + " disable constraint " + constraintName);
     }
 
     public String getLongDataType() {

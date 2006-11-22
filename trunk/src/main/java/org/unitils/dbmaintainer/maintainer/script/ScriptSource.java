@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.maintainer.script;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
 

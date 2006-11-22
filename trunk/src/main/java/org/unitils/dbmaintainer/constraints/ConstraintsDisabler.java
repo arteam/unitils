@@ -15,11 +15,9 @@
  */
 package org.unitils.dbmaintainer.constraints;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**

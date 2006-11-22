@@ -15,12 +15,7 @@
  */
 package org.unitils.dbmaintainer.clear;
 
-import org.apache.commons.configuration.Configuration;
-import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
-
-import javax.sql.DataSource;
 
 /**
  * Defines the contract for implementations that clear a database schema. This means, all the tables, views, constraints,

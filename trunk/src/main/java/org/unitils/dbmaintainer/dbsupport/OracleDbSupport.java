@@ -26,44 +26,6 @@ public class OracleDbSupport extends DbSupport {
         return getDbItemsOfType("TRIGGER_NAME", "USER_TRIGGERS");
     }
 
-    public boolean triggerExists(String triggerName) throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            rs = st.executeQuery("select TRIGGER_NAME from USER_TRIGGERS");
-            while (rs.next()) {
-                if (triggerName.equalsIgnoreCase(rs.getString("TRIGGER_NAME"))) {
-                    return true;
-                }
-            }
-            return false;
-        } finally {
-            DbUtils.closeQuietly(conn, st, rs);
-        }
-    }
-
-    public boolean sequenceExists(String sequenceName) throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            rs = st.executeQuery("select SEQUENCE_NAME from USER_SEQUENCES");
-            while (rs.next()) {
-                if (sequenceName.equalsIgnoreCase(rs.getString("SEQUENCE_NAME"))) {
-                    return true;
-                }
-            }
-            return false;
-        } finally {
-            DbUtils.closeQuietly(conn, st, rs);
-        }
-    }
-
     public void dropView(String viewName) throws StatementHandlerException {
         String dropTableSQL = "drop view " + viewName + " cascade constraints";
         statementHandler.handle(dropTableSQL);
@@ -113,6 +75,14 @@ public class OracleDbSupport extends DbSupport {
         }
     }
 
+    public boolean supportsSequences() {
+        return true;
+    }
+
+    public boolean supportsTriggers() {
+        return true;
+    }
+
     public boolean supportsIdentityColumns() {
         return false;
     }
@@ -127,24 +97,6 @@ public class OracleDbSupport extends DbSupport {
 
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         throw new UnsupportedOperationException("Removal of not null constraints is not supported for Oracle");
-    }
-
-    private Set<String> getDbItemsOfType(String dbItemName, String systemMetadataTableName) throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            rs = st.executeQuery("select " + dbItemName + " from " + systemMetadataTableName);
-            Set<String> sequenceNames = new HashSet<String>();
-            while (rs.next()) {
-                sequenceNames.add(rs.getString(dbItemName));
-            }
-            return sequenceNames;
-        } finally {
-            DbUtils.closeQuietly(conn, st, rs);
-        }
     }
 
     public Set<String> getTableConstraintNames(String tableName) throws SQLException {
@@ -173,4 +125,23 @@ public class OracleDbSupport extends DbSupport {
     public String getLongDataType() {
         return "INTEGER";
     }
+
+    private Set<String> getDbItemsOfType(String dbItemName, String systemMetadataTableName) throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rs = st.executeQuery("select " + dbItemName + " from " + systemMetadataTableName);
+            Set<String> names = new HashSet<String>();
+            while (rs.next()) {
+                names.add(rs.getString(dbItemName).toUpperCase());
+            }
+            return names;
+        } finally {
+            DbUtils.closeQuietly(conn, st, rs);
+        }
+    }
+
 }

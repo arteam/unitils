@@ -30,35 +30,14 @@ import java.sql.Statement;
  */
 public class HsqldbDBClearerTest extends DBClearerTest {
 
-    protected void createTestTrigger(String triggerName) throws SQLException {
+    protected void createTestTrigger(String tableName, String triggerName) throws SQLException {
         Connection conn = null;
         Statement st = null;
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("create trigger " + triggerName + " before insert on testtablepreserve call "
+            st.execute("create trigger " + triggerName + " before insert on " + tableName + " call "
                     + "\"org.unitils.dbmaintainer.clear.HsqldbTestTrigger\"");
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
-    /**
-     * Drops the test trigger
-     *
-     * @throws SQLException
-     */
-    protected void dropTestTrigger(String triggerName) throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            try {
-                st.execute("drop trigger " + triggerName);
-            } catch (SQLException e) {
-                // Ignored
-            }
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }

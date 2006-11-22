@@ -21,9 +21,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.maintainer.VersionScriptPair;
 import org.unitils.dbmaintainer.maintainer.version.Version;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 
 import java.io.File;
 import java.io.FilenameFilter;
