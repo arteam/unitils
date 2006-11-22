@@ -72,6 +72,31 @@ abstract public class DbSupport {
     }
 
     /**
+     * Returns the names of the tables with the given types
+     *
+     * @param types The type of the tables as an array of Strings, e.g. "TABLE" or "VIEW"
+     * @return
+     * @throws SQLException
+     */
+    private Set<String> getTableNames(String[] types) throws SQLException {
+        Connection conn = null;
+        ResultSet rset = null;
+        try {
+            conn = dataSource.getConnection();
+            Set<String> tableNames = new HashSet<String>();
+            DatabaseMetaData databaseMetadata = conn.getMetaData();
+            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, types);
+            while (rset.next()) {
+                String tableName = rset.getString("TABLE_NAME");
+                tableNames.add(tableName.toUpperCase());
+            }
+            return tableNames;
+        } finally {
+            DbUtils.closeQuietly(conn, null, rset);
+        }
+    }
+
+    /**
      * Retrieves the names of all the sequences in the database schema.
      *
      * @return The names of all sequences in the database (in uppercase)
@@ -323,23 +348,5 @@ abstract public class DbSupport {
      * @return Column type suitable to store values of the Java <code>java.lang.Long</code> type
      */
     abstract public String getLongDataType();
-
-    protected Set<String> getTableNames(String[] types) throws SQLException {
-        Connection conn = null;
-        ResultSet rset = null;
-        try {
-            conn = dataSource.getConnection();
-            Set<String> tableNames = new HashSet<String>();
-            DatabaseMetaData databaseMetadata = conn.getMetaData();
-            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, types);
-            while (rset.next()) {
-                String tableName = rset.getString("TABLE_NAME");
-                tableNames.add(tableName.toUpperCase());
-            }
-            return tableNames;
-        } finally {
-            DbUtils.closeQuietly(conn, null, rset);
-        }
-    }
 
 }

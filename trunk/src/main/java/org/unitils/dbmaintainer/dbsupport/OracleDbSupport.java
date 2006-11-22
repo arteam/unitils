@@ -106,8 +106,8 @@ public class OracleDbSupport extends DbSupport {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = " +
-                    tableName + " and CONSTRAINT_TYPE <> 'P'");
+            rs = st.executeQuery("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" +
+                    tableName + "' and CONSTRAINT_TYPE <> 'P'");
             Set<String> constraintNames = new HashSet<String>();
             while (rs.next()) {
                 constraintNames.add(rs.getString("CONSTRAINT_NAME"));
