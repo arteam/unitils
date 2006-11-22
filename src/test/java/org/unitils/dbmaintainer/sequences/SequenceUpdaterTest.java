@@ -68,19 +68,20 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
-
         StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
                 dataSource);
-        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
         sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class,
                 configuration, dataSource, statementHandler);
+        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
-        dropTestSequence();
-        dropTestTable();
+        if (dbSupport.supportsSequences()) {
+            dropTestSequence();
+            dropTestTable();
 
-        createTestTable();
-        insertTestRecord();
-        createTestSequence();
+            createTestTable();
+            insertTestRecord();
+            createTestSequence();
+        }
     }
 
     /**
@@ -91,8 +92,10 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
     protected void tearDown() throws Exception {
         super.tearDown();
 
-        dropTestSequence();
-        dropTestTable();
+        if (dbSupport.supportsSequences()) {
+            dropTestSequence();
+            dropTestTable();
+        }
     }
 
     /**
@@ -191,9 +194,11 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testUpdateSequences() throws Exception {
-        assertTrue(getNextTestSequenceValue() < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
-        sequenceUpdater.updateSequences();
-        assertTrue(getNextTestSequenceValue() >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+        if (dbSupport.supportsSequences()) {
+            assertTrue(getNextTestSequenceValue() < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+            sequenceUpdater.updateSequences();
+            assertTrue(getNextTestSequenceValue() >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+        }
     }
 
     /**
@@ -202,15 +207,17 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testUpdateSequences_valueAlreadyHighEnough() throws Exception {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            sequenceUpdater.updateSequences();
-            long updatedSequenceValue = getNextTestSequenceValue();
-            sequenceUpdater.updateSequences();
-            assertFalse(getNextTestSequenceValue() <= updatedSequenceValue);
-        } finally {
-            DbUtils.closeQuietly(conn);
+        if (dbSupport.supportsSequences()) {
+            Connection conn = null;
+            try {
+                conn = dataSource.getConnection();
+                sequenceUpdater.updateSequences();
+                long updatedSequenceValue = getNextTestSequenceValue();
+                sequenceUpdater.updateSequences();
+                assertFalse(getNextTestSequenceValue() <= updatedSequenceValue);
+            } finally {
+                DbUtils.closeQuietly(conn);
+            }
         }
     }
 

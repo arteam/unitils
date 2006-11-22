@@ -15,19 +15,14 @@
  */
 package org.unitils.dbmaintainer.constraints;
 
-import java.util.Set;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
-import javax.sql.DataSource;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * Implementation of {@link ConstraintsDisabler} for a hsqldb database.

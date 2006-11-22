@@ -1,19 +1,12 @@
 package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.log4j.Logger;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
+import java.sql.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,11 +15,6 @@ import java.util.Set;
  * specific are abstract, and their implementation is left to DBMS specific subclasses.
  */
 abstract public class DbSupport {
-
-    /**
-     * Logger instance
-     */
-    private static Logger logger = Logger.getLogger(DbSupport.class);
 
     /**
      * The name of the database schema
@@ -52,6 +40,7 @@ abstract public class DbSupport {
 
     /**
      * Initializes this DbSupport object with the given schemaName, statementHandler and dataSource
+     *
      * @param dataSource
      * @param schemaName
      * @param statementHandler
@@ -65,111 +54,101 @@ abstract public class DbSupport {
     /**
      * Returns the names of all tables in the database.
      *
-     * @return the names of all tables in the database.
+     * @return the names of all tables in the database (in uppercase)
      * @throws java.sql.SQLException
      */
     public Set<String> getTableNames() throws SQLException {
-        Connection conn = null;
-        ResultSet rset = null;
-        try {
-            conn = dataSource.getConnection();
-            Set<String> tableNames = new HashSet<String>();
-            DatabaseMetaData databaseMetadata = conn.getMetaData();
-            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, null);
-            while (rset.next()) {
-                String tableName = rset.getString("TABLE_NAME");
-                tableNames.add(tableName.toUpperCase());
-            }
-            return tableNames;
-        } finally {
-            DbUtils.closeQuietly(conn, null, rset);
-        }
+        return getTableNames(new String[]{"TABLE"});
     }
 
     /**
      * Retrieves the names of all the views in the database schema.
      *
-     * @return the names of all views
+     * @return the names of all views in the database (in uppercase)
      * @throws SQLException
      */
     public Set<String> getViewNames() throws SQLException {
-        Connection conn = null;
-        ResultSet rset = null;
-        try {
-            conn = dataSource.getConnection();
-            Set<String> tableNames = new HashSet<String>();
-            DatabaseMetaData databaseMetadata = conn.getMetaData();
-            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null,
-                    new String[]{"VIEW"});
-            while (rset.next()) {
-                String tableName = rset.getString("TABLE_NAME");
-                tableNames.add(tableName);
-            }
-            return tableNames;
-        } finally {
-            DbUtils.closeQuietly(conn, null, rset);
-        }
+        return getTableNames(new String[]{"VIEW"});
     }
 
     /**
-     * @return The names of all sequences in the database
+     * Retrieves the names of all the sequences in the database schema.
+     *
+     * @return The names of all sequences in the database (in uppercase)
      * @throws SQLException
      */
     abstract public Set<String> getSequenceNames() throws SQLException;
 
     /**
-     * @return The names of all triggers in the database
+     * Retrieves the names of all the triggers in the database schema.
      *
+     * @return The names of all triggers in the database (in uppercase)
      * @throws SQLException
      */
     abstract public Set<String> getTriggerNames() throws SQLException;
 
     /**
-     * Checks whether the table or view with the given name exists
+     * Checks whether the table with the given name exists
      *
-     * @param tableName
-     * @return
+     * @param tableName the name of the table
+     * @return true if the table with the given name exists, false otherwise
      * @throws SQLException
      */
     public boolean tableExists(String tableName) throws SQLException {
-        Connection conn = null;
-        ResultSet rs = null;
-        try {
-            conn = dataSource.getConnection();
-            DatabaseMetaData metaData = conn.getMetaData();
-            rs = metaData.getTables(null, schemaName, tableName.toUpperCase(), null);
-            while (rs.next()) {
-                if (tableName.equalsIgnoreCase(rs.getString("TABLE_NAME"))) {
-                    return true;
-                }
-            }
+        if (tableName == null) {
             return false;
-        } finally {
-            DbUtils.closeQuietly(conn, null, rs);
         }
+        return getTableNames().contains(tableName.toUpperCase());
+    }
+
+    /**
+     * Checks whether the table with the given name exists
+     *
+     * @param viewName the name of the view
+     * @return true if the view with the given name exists, false otherwise
+     * @throws SQLException
+     */
+    public boolean viewExists(String viewName) throws SQLException {
+        if (viewName == null) {
+            return false;
+        }
+        return getViewNames().contains(viewName.toUpperCase());
     }
 
     /**
      * Checks whether the trigger with the given name exists
      *
-     * @param triggerName
+     * @param triggerName the name of the trigger
      * @return true if the trigger with the given name exists, false otherwise
      * @throws SQLException
      */
-    abstract public boolean triggerExists(String triggerName) throws SQLException;
+    public boolean triggerExists(String triggerName) throws SQLException {
+        if (triggerName == null) {
+            return false;
+        }
+        return getTriggerNames().contains(triggerName.toUpperCase());
+    }
 
     /**
      * Checks whether the sequence with the given name exists
-     * @param sequenceName
-     * @return true if the sequence with the given name exists
+     *
+     * @param sequenceName the name of the sequence
+     * @return true if the sequence with the given name exists, false otherwise
+     * @throws SQLException
      */
-    abstract public boolean sequenceExists(String sequenceName) throws SQLException;
+    public boolean sequenceExists(String sequenceName) throws SQLException {
+        if (sequenceName == null || !supportsSequences()) {
+            return false;
+        }
+        return getSequenceNames().contains(sequenceName.toUpperCase());
+    }
 
     /**
      * Removes the view with the given name from the database
      *
      * @param viewName
      * @throws org.unitils.dbmaintainer.handler.StatementHandlerException
+     *
      */
     abstract public void dropView(String viewName) throws StatementHandlerException;
 
@@ -188,7 +167,9 @@ abstract public class DbSupport {
      * @throws StatementHandlerException
      */
     public void dropSequence(String sequenceName) throws StatementHandlerException {
-        statementHandler.handle("drop sequence " + sequenceName);
+        if (supportsSequences()) {
+            statementHandler.handle("drop sequence " + sequenceName);
+        }
     }
 
     /**
@@ -198,7 +179,9 @@ abstract public class DbSupport {
      * @throws StatementHandlerException
      */
     public void dropTrigger(String triggerName) throws StatementHandlerException {
-        statementHandler.handle("drop trigger " + triggerName);
+        if (supportsTriggers()) {
+            statementHandler.handle("drop trigger " + triggerName);
+        }
     }
 
     /**
@@ -217,6 +200,20 @@ abstract public class DbSupport {
      * @throws StatementHandlerException
      */
     abstract public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException, SQLException;
+
+    /**
+     * Indicates whether the underlying DBMS supports sequences
+     *
+     * @return true if sequences are supported, false otherwise
+     */
+    abstract public boolean supportsSequences();
+
+    /**
+     * Indicates whether the underlying DBMS supports triggers
+     *
+     * @return true if triggers are supported, false otherwise
+     */
+    abstract public boolean supportsTriggers();
 
     /**
      * Indicates whether the underlying DBMS supports identity columns
@@ -260,12 +257,14 @@ abstract public class DbSupport {
 
     /**
      * Disables foreign key checking on all subsequent operations that are performed on the given connection object
+     *
      * @param conn
      */
     abstract public void disableForeignKeyConstraintsCheckingOnConnection(Connection conn);
 
     /**
      * Removes the not-null constraint on the specified column and table
+     *
      * @param tableName
      * @param columnName
      * @throws StatementHandlerException
@@ -324,5 +323,23 @@ abstract public class DbSupport {
      * @return Column type suitable to store values of the Java <code>java.lang.Long</code> type
      */
     abstract public String getLongDataType();
+
+    protected Set<String> getTableNames(String[] types) throws SQLException {
+        Connection conn = null;
+        ResultSet rset = null;
+        try {
+            conn = dataSource.getConnection();
+            Set<String> tableNames = new HashSet<String>();
+            DatabaseMetaData databaseMetadata = conn.getMetaData();
+            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, types);
+            while (rset.next()) {
+                String tableName = rset.getString("TABLE_NAME");
+                tableNames.add(tableName.toUpperCase());
+            }
+            return tableNames;
+        } finally {
+            DbUtils.closeQuietly(conn, null, rset);
+        }
+    }
 
 }

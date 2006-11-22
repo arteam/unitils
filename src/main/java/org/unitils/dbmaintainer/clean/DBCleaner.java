@@ -15,11 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.configuration.Configuration;
-import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
-
-import javax.sql.DataSource;
 
 /**
  * TODO use this class

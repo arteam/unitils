@@ -55,7 +55,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     protected Configuration configuration;
 
     /* The DbSupport object */
-    private DbSupport dbSupport;
+    protected DbSupport dbSupport;
 
     /**
      * Configures the tested object. Creates a test table, index, view and sequence
@@ -120,11 +120,11 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_views() throws Exception {
         if (isTestedDialectActivated()) {
-            assertTrue(dbSupport.tableExists("testview"));
-            assertTrue(dbSupport.tableExists("testviewpreserve"));
+            assertTrue(dbSupport.viewExists("testview"));
+            assertTrue(dbSupport.viewExists("testviewpreserve"));
             dbClearer.clearDatabase();
-            assertFalse(dbSupport.tableExists("testview"));
-            assertTrue(dbSupport.tableExists("testviewpreserve"));
+            assertFalse(dbSupport.viewExists("testview"));
+            assertTrue(dbSupport.viewExists("testviewpreserve"));
         }
     }
 
@@ -134,7 +134,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testClearDatabase_sequences() throws Exception {
-        if (isTestedDialectActivated()) {
+        if (isTestedDialectActivated() && dbSupport.supportsSequences()) {
             assertTrue(dbSupport.sequenceExists("testsequence"));
             assertTrue(dbSupport.sequenceExists("testsequencepreserve"));
             dbClearer.clearDatabase();
@@ -149,7 +149,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * @throws Exception
      */
     public void testClearDatabase_triggers() throws Exception {
-        if (isTestedDialectActivated()) {
+        if (isTestedDialectActivated() && dbSupport.supportsTriggers()) {
             assertTrue(dbSupport.triggerExists("testtrigger"));
             assertTrue(dbSupport.triggerExists("testtriggerpreserve"));
             dbClearer.clearDatabase();
@@ -231,18 +231,20 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * Creates the test sequences
      */
     private void createTestSequences() {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            // Make sure previous setup is cleaned up
-            st.execute("create sequence testsequence");
-            st.execute("create sequence testsequencepreserve");
-        } catch (SQLException e) {
-            // No action is taken
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
+        if (dbSupport.supportsSequences()) {
+            Connection conn = null;
+            Statement st = null;
+            try {
+                conn = dataSource.getConnection();
+                st = conn.createStatement();
+                // Make sure previous setup is cleaned up
+                st.execute("create sequence testsequence");
+                st.execute("create sequence testsequencepreserve");
+            } catch (SQLException e) {
+                // No action is taken
+            } finally {
+                DbUtils.closeQuietly(conn, st, null);
+            }
         }
     }
 
@@ -250,39 +252,43 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * Drops the test sequence
      */
     private void dropTestSequences() {
-        try {
-            dbSupport.dropSequence("testsequence");
-        } catch (StatementHandlerException e) {
-            // Ignored
-        }
-        try {
-            dbSupport.dropSequence("testsequencepreserve");
-        } catch (StatementHandlerException e) {
-            // Ignored
+        if (dbSupport.supportsSequences()) {
+            try {
+                dbSupport.dropSequence("testsequence");
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
+            try {
+                dbSupport.dropSequence("testsequencepreserve");
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
         }
     }
 
     private void createTestTriggers() throws SQLException {
-        createTestTrigger("testtrigger");
-        createTestTrigger("testtriggerpreserve");
+        if (dbSupport.supportsTriggers()) {
+            createTestTrigger("testtable", "testtrigger");
+            createTestTrigger("testtablepreserve", "testtriggerpreserve");
+        }
     }
-
-    abstract protected void createTestTrigger(String triggerName) throws SQLException;
 
     private void dropTestTriggers() {
-        try {
-            dropTestTrigger("testtrigger");
-        } catch (SQLException e) {
-            // Ignored
-        }
-        try {
-            dropTestTrigger("testtriggerpreserve");
-        } catch (SQLException e) {
-            // Ignored
+        if (dbSupport.supportsTriggers()) {
+            try {
+                dbSupport.dropTrigger("testtrigger");
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
+            try {
+                dbSupport.dropTrigger("testtriggerpreserve");
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
         }
     }
 
-    abstract protected void dropTestTrigger(String triggerName) throws SQLException;
+    abstract protected void createTestTrigger(String tableName, String triggerName) throws SQLException;
 
     /**
      * Checks whether the database dialect that is tested in the current implementation is the currenlty configured

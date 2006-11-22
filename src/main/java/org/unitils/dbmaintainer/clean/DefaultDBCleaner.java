@@ -17,19 +17,16 @@ package org.unitils.dbmaintainer.clean;
 
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.*;
 
 /**
  * Implementation of {@link DBCleaner}. This implementation doesn't use any DBMS specific features, so it should work
  * for every database.
- *
+ * <p/>
  * // todo don't clear dbclearer itemstopreserve
  */
 public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {

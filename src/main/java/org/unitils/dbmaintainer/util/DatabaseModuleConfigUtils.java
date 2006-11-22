@@ -1,10 +1,10 @@
 package org.unitils.dbmaintainer.util;
 
 import org.apache.commons.configuration.Configuration;
-import org.unitils.util.ConfigUtils;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.util.ConfigUtils;
 
 import javax.sql.DataSource;
 
@@ -21,7 +21,7 @@ public class DatabaseModuleConfigUtils {
 
     /* Property key of the implementation of the DbSupport interface */
     public static final String PROPKEY_DBSUPPORT_CLASSNAME = "dbMaintainer.dbSupport.className";
-    
+
     /**
      * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
      * The concrete instance must extend the class {@link DatabaseTask}.
@@ -31,7 +31,7 @@ public class DatabaseModuleConfigUtils {
      * @return The configured instance
      */
     public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType,
-                  Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
+                                                          Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
 
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         DatabaseTask instance = ConfigUtils.getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
@@ -51,13 +51,14 @@ public class DatabaseModuleConfigUtils {
     public static DbSupport getConfiguredDbSupportInstance(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         DbSupport dbSupport = ConfigUtils.getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
-        String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
+        String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
         dbSupport.init(dataSource, schemaName, statementHandler);
         return dbSupport;
     }
 
     /**
      * Returns the configured instance of {@link StatementHandler} which is configured by the given <code>Configuration</code>.
+     *
      * @param configuration
      * @param dataSource
      * @return Returns the configured instance of {@link StatementHandler}

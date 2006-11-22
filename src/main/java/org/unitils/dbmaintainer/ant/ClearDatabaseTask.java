@@ -61,8 +61,7 @@ public class ClearDatabaseTask extends BaseUnitilsTask {
 
         StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
                 dataSource);
-        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration,
+        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration,
                 dataSource, statementHandler);
-        return dbClearer;
     }
 }

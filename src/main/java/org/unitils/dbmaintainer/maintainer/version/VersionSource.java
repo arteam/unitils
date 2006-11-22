@@ -15,11 +15,7 @@
  */
 package org.unitils.dbmaintainer.maintainer.version;
 
-import org.apache.commons.configuration.Configuration;
-import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
-
-import javax.sql.DataSource;
 
 /**
  * Interface that gives access to the version of a database, and a means to increment this version

@@ -17,16 +17,12 @@ package org.unitils.dbmaintainer.clear;
 
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Base implementation of {@link DBClearer}. This implementation uses plain JDBC and standard SQL
@@ -101,12 +97,13 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      * @throws StatementHandlerException
      * @throws SQLException
      */
-    private void dropSequences() throws StatementHandlerException,
-            SQLException {
-        Set<String> sequenceNames = dbSupport.getSequenceNames();
-        sequenceNames.removeAll(itemsToPreserve);
-        for (String sequenceName : sequenceNames) {
-            dbSupport.dropSequence(sequenceName);
+    private void dropSequences() throws StatementHandlerException, SQLException {
+        if (dbSupport.supportsSequences()) {
+            Set<String> sequenceNames = dbSupport.getSequenceNames();
+            sequenceNames.removeAll(itemsToPreserve);
+            for (String sequenceName : sequenceNames) {
+                dbSupport.dropSequence(sequenceName);
+            }
         }
     }
 
@@ -116,12 +113,13 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      * @throws StatementHandlerException
      * @throws SQLException
      */
-    private void dropTriggers() throws StatementHandlerException,
-            SQLException {
-        Set<String> triggerNames = dbSupport.getTriggerNames();
-        triggerNames.removeAll(itemsToPreserve);
-        for (String triggerName : triggerNames) {
-            dbSupport.dropTrigger(triggerName);
+    private void dropTriggers() throws StatementHandlerException, SQLException {
+        if (dbSupport.supportsTriggers()) {
+            Set<String> triggerNames = dbSupport.getTriggerNames();
+            triggerNames.removeAll(itemsToPreserve);
+            for (String triggerName : triggerNames) {
+                dbSupport.dropTrigger(triggerName);
+            }
         }
     }
 

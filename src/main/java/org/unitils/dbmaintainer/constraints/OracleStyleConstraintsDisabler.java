@@ -16,20 +16,13 @@
 package org.unitils.dbmaintainer.constraints;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * TODO test me

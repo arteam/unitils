@@ -70,7 +70,7 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
      */
     public void testGenerateDtd() throws Exception {
 
-        String expectedContent = "<!ELEMENT dataset ( (TABLEONE | TABLETWO)*)> " +
+        String expectedContent = "<!ELEMENT DATASET ( (TABLEONE | TABLETWO)*)> " +
                 "<!ELEMENT TABLEONE EMPTY>" +
                 "<!ATTLIST TABLEONE" +
                 "   COLUMNA CDATA #IMPLIED" +
@@ -84,7 +84,7 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
         dtdGenerator.generateDtd();
 
         assertTrue(dtdFile.exists());
-        String content = IOUtils.toString(new FileReader(dtdFile));
+        String content = IOUtils.toString(new FileReader(dtdFile)).toUpperCase();
         assertEquals(StringUtils.deleteWhitespace(expectedContent), StringUtils.deleteWhitespace(content));
     }
 

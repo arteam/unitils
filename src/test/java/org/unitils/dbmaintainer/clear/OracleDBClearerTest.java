@@ -30,26 +30,14 @@ import java.sql.Statement;
  */
 public class OracleDBClearerTest extends DBClearerTest {
 
-    protected void createTestTrigger(String triggerName) throws SQLException {
+    protected void createTestTrigger(String tableName, String triggerName) throws SQLException {
         Connection conn = null;
         Statement st = null;
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("create or replace trigger " + triggerName + " + before insert on testtablepreserve begin " +
+            st.execute("create or replace trigger " + triggerName + " + before insert on " + tableName + " begin " +
                     "select 1 from dual end " + triggerName);
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
-    protected void dropTestTrigger(String triggerName) throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("drop trigger " + triggerName);
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }
