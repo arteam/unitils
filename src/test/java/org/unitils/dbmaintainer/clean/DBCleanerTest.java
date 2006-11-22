@@ -77,6 +77,46 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     }
 
     /**
+     * Creates the test tables
+     *
+     * @throws SQLException
+     */
+    private void createTestTables() throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            st.execute("create table tabletoclean(testcolumn varchar(10))");
+            st.execute("create table db_version(testcolumn varchar(10))");
+            st.execute("create table tabletopreserve(testcolumn varchar(10))");
+            // Also create a view, to see if the DBCleaner doesn't crash on views
+            st.execute("create view testview as (select * from tabletopreserve)");
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+    /**
+     * Inserts a test record in each test table
+     *
+     * @throws SQLException
+     */
+    private void insertTestData() throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            st.execute("insert into tabletoclean values('test')");
+            st.execute("insert into db_version values('test')");
+            st.execute("insert into tabletopreserve values('test')");
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+    /**
      * Removes the test database tables
      *
      * @throws SQLException
@@ -87,6 +127,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
+            try {
+                st.executeUpdate("drop view testview");
+            } catch (SQLException e) {
+                // Ignored
+            }
             try {
                 st.executeUpdate("drop table tabletoclean");
             } catch (SQLException e) {
@@ -155,44 +200,6 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             assertFalse(isEmpty("tabletopreserve"));
         } finally {
             DbUtils.closeQuietly(conn);
-        }
-    }
-
-    /**
-     * Creates the test tables
-     *
-     * @throws SQLException
-     */
-    private void createTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create table tabletoclean(testcolumn varchar(10))");
-            st.execute("create table db_version(testcolumn varchar(10))");
-            st.execute("create table tabletopreserve(testcolumn varchar(10))");
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
-    /**
-     * Inserts a test record in each test table
-     *
-     * @throws SQLException
-     */
-    private void insertTestData() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("insert into tabletoclean values('test')");
-            st.execute("insert into db_version values('test')");
-            st.execute("insert into tabletopreserve values('test')");
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
