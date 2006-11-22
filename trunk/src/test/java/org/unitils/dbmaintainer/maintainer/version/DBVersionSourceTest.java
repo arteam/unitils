@@ -180,21 +180,4 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         assertFalse(dbVersionSource.lastUpdateSucceeded());
     }
 
-    /**
-     * Deletes all records from the db_version table
-     *
-     * @throws SQLException
-     */
-    private void clearDBVersionTable() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("delete from db_version");
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
 }

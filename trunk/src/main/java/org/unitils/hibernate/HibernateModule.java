@@ -59,10 +59,10 @@ import java.util.Properties;
 public class HibernateModule implements Module {
 
     /* Property key for a comma seperated list of Hibernate configuration files, that can be found in the classpath */
-    public static final String PROPKEY_HIBERNATE_CONFIGFILES = "hibernatetestcase.hibernate.cfg.configfiles";
+    public static final String PROPKEY_HIBERNATE_CONFIGFILES = "HibernateModule.hibernate.configfiles";
 
     /* Property key for the Hibernate configuration class that is used */
-    public static final String PROPKEY_HIBERNATE_CONFIGURATION_CLASS = "hibernatetestcase.hibernate.cfg.configurationclass";
+    public static final String PROPKEY_HIBERNATE_CONFIGURATION_CLASS = "HibernateModule.hibernate.configurationclass";
 
     /* The Hibernate configuration */
     private Configuration hibernateConfiguration;

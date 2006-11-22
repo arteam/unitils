@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Test class for the DBCleaner
+ * Test class for the FlatXmlDataSetDtdGenerator
  *
  * @author Tim Ducheyne
  */
