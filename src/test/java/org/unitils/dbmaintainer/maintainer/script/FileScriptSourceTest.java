@@ -35,59 +35,44 @@ import java.util.List;
  */
 public class FileScriptSourceTest extends TestCase {
 
-    /**
-     * Temp dir where test script files are put during the tests
-     */
+    /* Temp dir where test script files are put during the tests */
     private static final String DBCHANGE_FILE_DIRECTORY = System.getProperty("java.io.tmpdir") + "/FileScriptSourceTest/";
 
-    /**
-     * First test script file
-     */
+    /* First test script file */
     private static final String DBCHANGE_FILE1 = "001_script.sql";
 
-    /**
-     * Second test script file
-     */
+    /* Second test script file */
     private static final String DBCHANGE_FILE2 = "002_script.sql";
 
-    /**
-     * Path of first test script file on the file system
-     */
+    /* Path of first test script file on the file system */
     private static final String DBCHANGE_FILE1_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE1;
 
-    /**
-     * Path of second test script file on the file system
-     */
+    /* Path of second test script file on the file system */
     private static final String DBCHANGE_FILE2_FILESYSTEM = DBCHANGE_FILE_DIRECTORY + DBCHANGE_FILE2;
 
-    /**
-     * Version objects: represent the different versions of the scripts and the database
-     */
+    /* Version objects: represent the different versions of the scripts and the database */
     private Version versionIndex0, versionIndex1, versionIndex2, versionTimestampOld;
 
-    /**
-     * Tested object
-     */
+    /* Tested object */
     private FileScriptSource fileScriptSource;
 
+    /* The timestamp of the DBCHANGE_FILE2 file. */
     private long file2Timestamp;
+
 
     /**
      * Cleans test directory and copies test files to it. Initializes test objects
-     *
-     * @throws Exception
      */
     protected void setUp() throws Exception {
         super.setUp();
 
-        // Clean up test directory
+        // Create test directory
         File testDir = new File(DBCHANGE_FILE_DIRECTORY);
-        FileUtils.deleteDirectory(testDir);
         testDir.mkdirs();
         FileUtils.forceDeleteOnExit(testDir);
 
         // Copy test files
-        File f1 = copyFile(DBCHANGE_FILE1, DBCHANGE_FILE1_FILESYSTEM);
+        copyFile(DBCHANGE_FILE1, DBCHANGE_FILE1_FILESYSTEM);
         File f2 = copyFile(DBCHANGE_FILE2, DBCHANGE_FILE2_FILESYSTEM);
         file2Timestamp = f2.lastModified();
 
@@ -109,10 +94,9 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Copies file from classpath to the given system path
      *
-     * @param fileInClassPath
-     * @param systemPath
-     * @return
-     * @throws Exception
+     * @param fileInClassPath the from file name, not null
+     * @param systemPath      the to file, not null
+     * @return the to file, not null
      */
     private File copyFile(String fileInClassPath, String systemPath) throws Exception {
         InputStream is = getClass().getResourceAsStream(fileInClassPath);
@@ -178,7 +162,7 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Checks if script 1 is returned with the correct version
      *
-     * @param versionScriptPair
+     * @param versionScriptPair the version and script to check, not null
      */
     private void checkScript1(VersionScriptPair versionScriptPair) {
         assertRefEquals(new VersionScriptPair(new Version(1L, file2Timestamp), "Contents of script 1"), versionScriptPair);
@@ -187,7 +171,7 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Checks if script 1 is returned with the correct version
      *
-     * @param versionScriptPair
+     * @param versionScriptPair the version and script to check, not null
      */
     private void checkScript2(VersionScriptPair versionScriptPair) {
         assertRefEquals(new VersionScriptPair(new Version(2L, file2Timestamp), "Contents of script 2"), versionScriptPair);

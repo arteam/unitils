@@ -22,7 +22,6 @@ import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.operation.DatabaseOperation;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
@@ -86,12 +85,12 @@ public class DbUnitModule implements Module {
     private String databaseSchemaName;
 
     /* Instance of DbUnits IDataTypeFactory, that handles dbms specific data type issues */
-    IDataTypeFactory dataTypeFactory;
+    private IDataTypeFactory dataTypeFactory;
 
     /**
      * Initializes the DbUnitModule using the given Configuration
      *
-     * @param configuration
+     * @param configuration the config, not null
      */
     public void init(Configuration configuration) {
 
@@ -147,8 +146,8 @@ public class DbUnitModule implements Module {
      * DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
      * thrown.
      *
-     * @param testClass
-     * @param testMethod
+     * @param testClass  the test class, not null
+     * @param testMethod the method, not null
      */
     protected void insertTestData(Class testClass, Method testMethod) {
 
@@ -180,11 +179,11 @@ public class DbUnitModule implements Module {
      * DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
      * thrown.
      *
-     * @param testClass
-     * @param method
+     * @param testClass the test class, not null
+     * @param method    the test method, not null
      * @return the dataset, can be null if the files were not found
      */
-    private IDataSet getTestDataSet(Class testClass, Method method) {
+    protected IDataSet getTestDataSet(Class testClass, Method method) {
 
         //load the test specific dataset
         IDataSet dataSet = getMethodLevelTestDataSet(testClass, method);
@@ -201,10 +200,11 @@ public class DbUnitModule implements Module {
      * name can be overridden using the {@link DataSet} annotation at method level. If the dataSet filename is
      * explicitly set but not found, a {@link UnitilsException} is thrown.
      *
-     * @param testClass
+     * @param testClass the test class, not null
+     * @param method    the test method, not null
      * @return The class level DbUnit DataSet
      */
-    private IDataSet getMethodLevelTestDataSet(Class testClass, Method method) {
+    protected IDataSet getMethodLevelTestDataSet(Class testClass, Method method) {
         DataSet dataSetAnnotation = method.getAnnotation(DataSet.class);
         if (dataSetAnnotation != null) {
             IDataSet dataSet = getDataSet(testClass, dataSetAnnotation.fileName());
@@ -221,10 +221,11 @@ public class DbUnitModule implements Module {
      * Gets the name of the default testdata file at method level
      * The default name is constructed as follows: classname + '.' + methodName + '.xml'
      *
-     * @param testClass
+     * @param testClass the test class, not null
+     * @param method    the test method, not null
      * @return the default filename
      */
-    private String getMethodLevelDefaultTestDataSetFileName(Class<?> testClass, Method method) {
+    protected String getMethodLevelDefaultTestDataSetFileName(Class<?> testClass, Method method) {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + ".xml";
     }
@@ -235,11 +236,11 @@ public class DbUnitModule implements Module {
      * overridden using the {@link DataSet} annotation at class level. If the dataSet filename is explicitly set
      * but not found, a {@link UnitilsException} is thrown.
      *
-     * @param testClass
+     * @param testClass the test class, not null
      * @return The class level DbUnit DataSet
      */
-    private IDataSet getClassLevelTestDataSet(Class testClass) {
-        DataSet dataSetAnnotation = (DataSet) testClass.getAnnotation(DataSet.class);
+    protected IDataSet getClassLevelTestDataSet(Class<?> testClass) {
+        DataSet dataSetAnnotation = testClass.getAnnotation(DataSet.class);
         if (dataSetAnnotation != null) {
             IDataSet dataSet = getDataSet(testClass, dataSetAnnotation.fileName());
             if (dataSet == null) {
@@ -256,7 +257,7 @@ public class DbUnitModule implements Module {
      * Gets the name of the default testdata file at class level
      * The default name is constructed as follows: 'classname without packagename'.xml
      *
-     * @param testClass
+     * @param testClass the test class, not null
      * @return the default filename
      */
     protected String getClassLevelDefaultTestDataSetFileName(Class<?> testClass) {
@@ -270,10 +271,11 @@ public class DbUnitModule implements Module {
      * Filenames that start with '/' are treated absolute. Filenames that do not start with '/', are relative
      * to the current class.
      *
+     * @param testClass       the test class, not null
      * @param dataSetFilename the name, (start with '/' for absolute names)
      * @return the data set, or null if the file did not exist
      */
-    private IDataSet getDataSet(Class testClass, String dataSetFilename) {
+    protected IDataSet getDataSet(Class testClass, String dataSetFilename) {
 
         try {
             if (dataSetFilename == null) {
@@ -306,20 +308,22 @@ public class DbUnitModule implements Module {
     /**
      * Constructs a DbUnit DataSet object from the given InputStream
      *
-     * @param in
+     * @param in the xml content stream, not null
      * @return a DbUnit DataSet object
      */
     protected IDataSet createDbUnitDataSet(InputStream in) {
 
         try {
-            return new FlatXmlDataSet(in, false);
+            return new TablePerRowXmlDataSet(in);
 
         } catch (Exception e) {
             throw new UnitilsException("Error while reading DbUnit dataset", e);
         }
     }
 
-    private void assertDbContentsAsExpectedIfAnnotated(Object testObject, Method testMethod) {
+
+    //todo javadoc
+    protected void assertDbContentsAsExpectedIfAnnotated(Object testObject, Method testMethod) {
 
         ExpectedDataSet expectedDataSetAnnotation = testMethod.getAnnotation(ExpectedDataSet.class);
         if (expectedDataSetAnnotation != null) {
@@ -334,6 +338,9 @@ public class DbUnitModule implements Module {
     /**
      * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
      * that occur in the expected DbUnitDataSet are compared with the database contents.
+     *
+     * @param testObject              the test instance, not null
+     * @param expectedDataSetFileName the file name, not null
      */
     public void assertDBContentAsExpected(Object testObject, String expectedDataSetFileName) {
 
@@ -361,9 +368,10 @@ public class DbUnitModule implements Module {
     /**
      * Closes (i.e. return to the pool) the JDBC Connection that is currently in use by the DbUnitDatabaseConnection
      */
-    private void closeJdbcConnection() {
+    protected void closeJdbcConnection() {
         try {
             getDbUnitDatabaseConnection().closeJdbcConnection();
+
         } catch (SQLException e) {
             throw new UnitilsException("Error while closing connection", e);
         }
@@ -374,7 +382,11 @@ public class DbUnitModule implements Module {
      * The default name of this file is constructed as follows: 'classname without packagename'.'testname'-result.xml.
      * This default name can be overridden by annotating the test method with the {@link ExpectedDataSet}
      * annotation.
+     * <p/>
+     * todo method name or Method object?
      *
+     * @param testClass  the test class, not null
+     * @param methodName the test method name, not null
      * @return the expected dataset filename
      */
     protected static String getDefaultExpectedDataSetFileName(Class<?> testClass, String methodName) {
@@ -406,6 +418,7 @@ public class DbUnitModule implements Module {
 
         return new DbUnitListener();
     }
+
 
     /**
      * Test listener that is called while the test framework is running tests
