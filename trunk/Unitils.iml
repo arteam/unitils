@@ -307,7 +307,9 @@
           <root url="jar://$MODULE_DIR$/lib/dbunit-2.1.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../_apps/java/dbunit-2.1/src/java" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">

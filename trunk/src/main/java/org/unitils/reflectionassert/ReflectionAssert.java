@@ -323,6 +323,8 @@ public class ReflectionAssert {
      * @param suppliedMessage the user supplied message
      * @param difference      the difference
      * @return the formatted message
+     *
+     * todo better output when left and right value are string arrays (now something like <[Ljava.lang.String;@1595f51>)
      */
     private static String formatMessage(String suppliedMessage, Difference difference) {
 
