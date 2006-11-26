@@ -160,23 +160,22 @@ public class ReflectionComparator {
         traversedInstanceMap.put(left, left);
 
         // check collections
-        if (left instanceof Collection) {
-            return compareCollections((Collection<Object>) left, (Collection<Object>) right, fieldStack, traversedInstanceMap);
+        if (left instanceof Collection && right instanceof Collection) {
+            return compareCollections((Collection<?>) left, (Collection<?>) right, fieldStack, traversedInstanceMap);
         }
 
         // check maps
-        if (left instanceof Map) {
-            return compareMaps((Map<Object, Object>) left, (Map<Object, Object>) right, fieldStack, traversedInstanceMap);
+        if (left instanceof Map && right instanceof Map) {
+            return compareMaps((Map<?, ?>) left, (Map<?, ?>) right, fieldStack, traversedInstanceMap);
         }
 
         // check primitive and object arrays
-        Class clazz = left.getClass();
-        if (clazz.isArray()) {
+        if (left.getClass().isArray() && right.getClass().isArray()) {
             return compareArrays(left, right, fieldStack, traversedInstanceMap);
         }
 
         // check objects
-        return compareObjects(left, right, clazz, fieldStack, traversedInstanceMap);
+        return compareObjects(left, right, fieldStack, traversedInstanceMap);
     }
 
 
@@ -227,43 +226,8 @@ public class ReflectionComparator {
     private Difference compareArrays(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         // If needed convert primitive array to object array
-        Object[] leftObjectArray;
-        Object[] rightObjectArray;
-        if (left instanceof byte[]) {
-            leftObjectArray = ArrayUtils.toObject((byte[]) left);
-            rightObjectArray = ArrayUtils.toObject((byte[]) right);
-
-        } else if (left instanceof short[]) {
-            leftObjectArray = ArrayUtils.toObject((short[]) left);
-            rightObjectArray = ArrayUtils.toObject((short[]) right);
-
-        } else if (left instanceof int[]) {
-            leftObjectArray = ArrayUtils.toObject((int[]) left);
-            rightObjectArray = ArrayUtils.toObject((int[]) right);
-
-        } else if (left instanceof long[]) {
-            leftObjectArray = ArrayUtils.toObject((long[]) left);
-            rightObjectArray = ArrayUtils.toObject((long[]) right);
-
-        } else if (left instanceof char[]) {
-            leftObjectArray = ArrayUtils.toObject((char[]) left);
-            rightObjectArray = ArrayUtils.toObject((char[]) right);
-
-        } else if (left instanceof float[]) {
-            leftObjectArray = ArrayUtils.toObject((float[]) left);
-            rightObjectArray = ArrayUtils.toObject((float[]) right);
-
-        } else if (left instanceof double[]) {
-            leftObjectArray = ArrayUtils.toObject((double[]) left);
-            rightObjectArray = ArrayUtils.toObject((double[]) right);
-
-        } else if (left instanceof boolean[]) {
-            leftObjectArray = ArrayUtils.toObject((boolean[]) left);
-            rightObjectArray = ArrayUtils.toObject((boolean[]) right);
-        } else {
-            leftObjectArray = (Object[]) left;
-            rightObjectArray = (Object[]) right;
-        }
+        Object[] leftObjectArray = convertToObjectArray(left);
+        Object[] rightObjectArray = convertToObjectArray(right);
 
         if (leftObjectArray.length != rightObjectArray.length) {
             return new Difference("Different array lengths. Left length: " + leftObjectArray.length + ", right size: " + rightObjectArray.length, left, right, fieldStack);
@@ -286,6 +250,7 @@ public class ReflectionComparator {
         }
         return difference;
     }
+
 
     /**
      * Checks equality of two collections.
@@ -386,13 +351,13 @@ public class ReflectionComparator {
      * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
      * @return the difference, null if there is no difference
      */
-    private Difference compareMaps(Map<Object, Object> left, Map<Object, Object> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
+    private Difference compareMaps(Map<?, ?> left, Map<?, ?> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         if (left.size() != right.size()) {
             return new Difference("Different map sizes.", left, right, fieldStack);
         }
 
-        for (Map.Entry<Object, Object> lhsEntry : left.entrySet()) {
+        for (Map.Entry<?, ?> lhsEntry : left.entrySet()) {
             Object lhsKey = lhsEntry.getKey();
 
             fieldStack.push("" + lhsKey);
@@ -417,9 +382,19 @@ public class ReflectionComparator {
      * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
      * @return the difference, null if there is no difference
      */
-    private Difference compareObjects(Object left, Object right, Class clazz, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
+    private Difference compareObjects(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
+
+        // check same primitive values
+        if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
+
+            if (getDoubleValue(left) == getDoubleValue(right)) {
+                return null;
+            }
+            return new Difference("Different primitive values.", left, right, fieldStack);
+        }
 
         // check different class type
+        Class clazz = left.getClass();
         if (!clazz.equals(right.getClass())) {
             return new Difference("Different class types. Left: " + clazz + ", right: " + right.getClass(), left, right, fieldStack);
         }
@@ -513,12 +488,60 @@ public class ReflectionComparator {
         // primitive types
         return (value instanceof Boolean && !(Boolean) value) ||
                 (value instanceof Character && (Character) value == 0) ||
-                (value instanceof Byte && (Byte) value == 0) ||
-                (value instanceof Short && (Short) value == 0) ||
-                (value instanceof Integer && (Integer) value == 0) ||
-                (value instanceof Long && (Long) value == 0) ||
-                (value instanceof Float && (Float) value == 0) ||
-                (value instanceof Double && (Double) value == 0);
+                (value instanceof Number && ((Number) value).doubleValue() == 0);
+    }
+
+
+    /**
+     * Gets the double value for the given left Character or Number instance.
+     *
+     * @param object the Character or Number, not null
+     * @return the value as a double
+     */
+    private double getDoubleValue(Object object) {
+
+        if (object instanceof Number) {
+            return ((Number) object).doubleValue();
+        }
+        return (double) ((Character) object).charValue();
+    }
+
+
+    /**
+     * Converts the given array object (possibly primitive array) to type Object[]
+     *
+     * @param object the array
+     * @return the object array
+     */
+    private Object[] convertToObjectArray(Object object) {
+
+        if (object instanceof byte[]) {
+            return ArrayUtils.toObject((byte[]) object);
+
+        } else if (object instanceof short[]) {
+            return ArrayUtils.toObject((short[]) object);
+
+        } else if (object instanceof int[]) {
+            return ArrayUtils.toObject((int[]) object);
+
+        } else if (object instanceof long[]) {
+            return ArrayUtils.toObject((long[]) object);
+
+        } else if (object instanceof char[]) {
+            return ArrayUtils.toObject((char[]) object);
+
+        } else if (object instanceof float[]) {
+            return ArrayUtils.toObject((float[]) object);
+
+        } else if (object instanceof double[]) {
+            return ArrayUtils.toObject((double[]) object);
+
+        } else if (object instanceof boolean[]) {
+            return ArrayUtils.toObject((boolean[]) object);
+
+        } else {
+            return (Object[]) object;
+        }
     }
 
 

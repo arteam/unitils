@@ -101,6 +101,16 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         assertNull(result);
     }
 
+    /**
+     * Test for two equal primitives but of different type (int vs long).
+     */
+    public void testCheckEquals_differentTypes() {
+
+        Difference result = reflectionComparator.getDifference(5L, 5);
+        
+        assertNull(result);
+    }
+
 
     /**
      * Test for two primitives that contain different values.

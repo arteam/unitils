@@ -41,6 +41,9 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
     /* Same as A and B but no 3rd element */
     private int[] arrayDifferentSize;
 
+    /* Same as A and B but of type long */
+    private long[] arrayDifferentType;
+
     /* Test element with inner array for element 2 */
     private Element arrayInnerA;
 
@@ -70,6 +73,7 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
         arrayDifferentOrder = new int[]{3, 1, 2};
         arrayDifferentValue = new int[]{1, 9999, 3};
         arrayDifferentSize = new int[]{1, 2};
+        arrayDifferentType = new long[]{1, 2, 3};
 
         arrayInnerA = new Element(arrayA);
         arrayInnerB = new Element(arrayB);
@@ -122,6 +126,17 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
     public void testCheckEquals_equalsLenientOrder() {
 
         Difference result = reflectionComparatorLenientOrder.getDifference(arrayA, arrayDifferentOrder);
+
+        assertNull(result);
+    }
+
+
+    /**
+     * Test for two equal primitives arrays but of different type (int vs long).
+     */
+    public void testCheckEquals_differentTypes() {
+
+        Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentType);
 
         assertNull(result);
     }
