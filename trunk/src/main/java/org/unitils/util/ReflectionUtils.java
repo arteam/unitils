@@ -50,6 +50,9 @@ public class ReflectionUtils {
             //noinspection unchecked
             return (T) constructor.newInstance();
 
+        } catch (NoClassDefFoundError e) {
+            throw new UnitilsException("Unable to load class " + className, e);
+
         } catch (ClassNotFoundException e) {
             throw new UnitilsException("Class " + className + " not found", e);
 
