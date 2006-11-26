@@ -147,13 +147,14 @@ public class ModulesLoader {
                 result.add((Module) module);
 
             } catch (UnitilsException e) {
-                if (e.getCause() instanceof ClassNotFoundException) {
 
+                if (e.getCause() instanceof ClassNotFoundException || e.getCause() instanceof NoClassDefFoundError) {
                     // Class not found, maybe this is caused by a library that is not in the classpath
                     // Log warning and ingore exception
                     logger.warn("Unable to create module instance for module class: " + className + ". The module will " +
                             "not be loaded. If this is caused by a library that is not used by your project and thus not " +
                             "in the classpath the warning can be avoided by explicitly disabling the module.");
+                    logger.debug("Ignored exception during module initialisation. ", e);
                     continue;
                 }
                 throw e;
