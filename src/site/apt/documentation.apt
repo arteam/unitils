@@ -3,7 +3,7 @@
  -----
  -----
 
-Unitils documentation
+Documentation
 ~~~~~~~~~~~~
 
 * Overview
@@ -74,25 +74,25 @@ Unitils documentation
 
     The second, unitils.properties, can override the defaults and is typically used to set values for configuration settings for all developers
     on a project. For example if your project uses an oracle database, you can create a unitils.properties file
-    that overrideds the driver class name and url properties as follows:
+    that overrides the driver class name and url properties as follows:
 
-+---------------------------------------------------------+
++-----+
 dataSource.driverClassName=oracle.jdbc.driver.OracleDriver
 dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
-+---------------------------------------------------------+
++-----+
 
-    The file is not required, but if you create one, it should be placed somewhere in the classpath of your project.
-    You can find a sample file that contains most commonly used configuration settings in following unitils.properties template.
+    The file is not required, but if you create one, it should be placed somewhere in the classpath of your project. To get you started, 
+    you can find a sample file that contains most commonly used configuration settings in following unitils.properties template.
 
-    The last file, unitils-local.properties, is also optional and can contain settings that override the project settings and
-    define per user configuration. For example, if each user uses its own unit-test database schema, you can
+    The last file, unitils-local.properties, is also optional and can contain settings that override the project settings and is used for
+    defining per-user settings. For example, if each user uses its own unit-test database schema, you can
     create a unitils-local.properties for each user that contains the corresponding schema, username and password:
 
-+------------------------------------------+
++-----+
 dataSource.schemaName=test_john
 dataSource.userName=john
 dataSource.password=secret
-+------------------------------------------+
++-----+
 
     Each of these unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>).
 
@@ -101,9 +101,9 @@ dataSource.password=secret
     named projectTwo. Adding following property to the unitils.properties of projetTwo will let Unitils use projectTwo-local.properties
     as local properties file for the project:
 
-+--------------------------------------------------------------+
++-----+
 unitils.configuration.localFileName=projectTwo-local.properties
-+--------------------------------------------------------------+
++-----+
 
 
 ** Making your test Unitils-enabled
@@ -121,26 +121,26 @@ unitils.configuration.localFileName=projectTwo-local.properties
 
     As an example, suppose you have a JUnit3 test that you want to Unitils-enable:
 
-+------------------------------------------+
++-----+
 import org.unitils.UnitilsJUnit3;
 
 public class MyTest extends UnitilsJUnit3 {
 }
-+------------------------------------------+
++-----+
 
     Typically you would create your own test base class containing some utility behavior common for all your tests, e.g. datasource injection, and
     then let this base class extend from one of the Unitils base classes.
 
     For JUnit4 it is also possible to add a @RunWith annotation instead of extending from the base class:
 
-+------------------------------------------+
++-----+
 import org.junit.runner.RunWith;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 
 @RunWith(UnitilsJUnit4TestClassRunner.class)
 public class MyTest {
 }
-+------------------------------------------+
++-----+
 
 
 
@@ -173,11 +173,15 @@ public class MyTest {
 
 
 
+
+
 * Database testing
 ~~~~~~~~~~~~~~~~~~
     Unit tests for the database layer are extremely valuable in enterprise applications, but are often abandoned because of their complexity.
     Unitils greatly reduces this complexity, making database testing simple and maintainable. The following sections describe the database
     support by a number of simple examples. For an elaborate description of the guidelines, read the database testing guidelines.
+
+
 
 ** Managing test data with DbUnit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -303,8 +307,12 @@ public class MyTest {
 
    To provide support with these 2 last features, Unitils offers automatic test database schema maintenance:
 
+
+
+
+
 ** Unit test database maintenance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     A powerful DBMaintainer is provided to automatically update each developer's database schema individually. Unitils' DBMaintainer
     will automatically check if database structure updates are available before running a database test, and apply them if necessary.
 
@@ -341,11 +349,19 @@ public class MyTest {
 
     The DBMaintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates, ... Look at
     the configuration for more information!
-    
+
+
+
+
 *** Configuration
 ~~~~~~~~~~~~~~~~~
 
     TODO
+
+
+
+
+
 
 
 ** Testing with Hibernate
@@ -362,6 +378,9 @@ public class MyTest {
     
     The @ExpectedDataSet annotation can also be used for result checking with a data file. Unitils will make sure the Hibernate Session is flushed before
     performing the check, to make sure all database updates performed during the test are actually executed on the database.
+
+
+
 
 *** Configuration
 ~~~~~~~~~~~~~~~~~
@@ -437,6 +456,9 @@ public class MyTest {
 		}
 +-----+
 
+
+
+
 *** Testing the mapping
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -457,8 +479,88 @@ public class MyTest {
     
     TODO example error message
 
+
+
+
+
+
 * Using reflection for assertion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** Reflection versus equals()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    A typical unit test contains a part in which it will compare test result values with expected values. Unitils offers some
+    assertion utilities to help you with this. 
+    
+    Let's start with an example of comparing 2 User instances having an id, a first and a last name:
+
++-----+    
+    public class User {
+    
+        private long id;
+        private String first;
+        private String last;
+
+
+        public User(long id, String first, String last) {
+            this.id = id;
+            this.first = first;
+            this.last = last;
+        }
+    }
+
+    User user1 = new User(1, "John", "Doe");
+    User user2 = new User(1, "John", "Doe");
+    assertEquals(user1, user2);
++-----+
+
+    You would expect that this assertion would be successful since both instances contain the same values. This is not
+    the case however. User does not override the equals() method. Checking equals of 2 User instances is therefore the same
+    as checking whether both instances are the same. In other words, the assertEquals actually results in user1 == user2 
+    being tested which causes the assertion to fail.
+    
+    Suppose you would implement the equals method as follows:
+    
++-----+    
+    public boolean equals(Object object) {
+        if (object instanceof User) {
+            return id == ((User) object).id;
+        }
+        return false;
+    }
++-----+    
+
+    This is a totally reasonable implementation for your application logic, stating that 2 user instances are referring to 
+    the same user when they have the same id. It does not help you however with your unit testing. Testing whether 2 objects
+    are equal is now reduced to the test whether they have the same id:
+    
++-----+        
+    User user1 = new User(1, "John", "Doe");
+    User user2 = new User(1, "Jane", "Smith");
+    assertEquals(user1, user2);
++-----+
+
+    This assertion will be successful, which is probably not what you want. Best is just to avoid using equals() altogether 
+    when comparing object values since it can always contain business logic. One approach can be to do the comparisson of each
+    of the values one by one:    
+    
++-----+        
+    User user1 = new User(1, "John", "Doe");
+    User user2 = new User(1, "John", "Doe");
+    assertEquals(user1.getId(), user2.getId());
+    assertEquals(user1.getFirst(), user2.getFirst());
+    assertEquals(user1.getLast(), user2.getLast());
++-----+
+    
+    Unitils offers utilities that help you perform these checks more easily, through reflection. Using <ReflectionAssert.assertRefEquals>
+    the above example could be re-written as follows:
+    
++-----+        
+    User user1 = new User(1, "John", "Doe");
+    User user2 = new User(1, "John", "Doe");
+    assertRefEquals(user1, user2);    
++-----+
+    
 
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
