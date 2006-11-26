@@ -203,6 +203,20 @@ public class ReflectionComparatorArrayTest extends TestCase {
 
 
     /**
+     * Tests for arrays but right value is not an array.
+     */
+    public void testCheckEquals_notEqualsRightNotArray() {
+
+        Difference result = reflectionComparator.getDifference(arrayA, "Test string");
+
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().empty());
+        assertSame(arrayA, result.getLeftValue());
+        assertEquals("Test string", result.getRightValue());
+    }
+
+
+    /**
      * Creates an array.
      *
      * @param stringValueElement2 the value for the 2nd element in the array

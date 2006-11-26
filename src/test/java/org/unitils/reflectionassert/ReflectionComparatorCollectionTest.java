@@ -168,6 +168,20 @@ public class ReflectionComparatorCollectionTest extends TestCase {
 
 
     /**
+     * Tests for collections but right value is not a collection.
+     */
+    public void testCheckEquals_notEqualsRightNotCollection() {
+
+        Difference result = reflectionComparator.getDifference(collectionA, "Test string");
+
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().empty());
+        assertSame(collectionA, result.getLeftValue());
+        assertEquals("Test string", result.getRightValue());
+    }
+
+
+    /**
      * Creates a collection.
      *
      * @param stringValueElement2 the value for the 2nd element in the collection

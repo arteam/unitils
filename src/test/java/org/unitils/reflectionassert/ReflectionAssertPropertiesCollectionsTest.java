@@ -54,6 +54,15 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
 
 
     /**
+     * Test for equal property values but of different types (int versus long).
+     */
+    public void testAssertPropertyRefEquals_differentTypes() {
+
+        ReflectionAssert.assertPropertyRefEquals("primitiveProperty", Arrays.asList(1, 2), list);
+    }
+
+
+    /**
      * Test for different property values.
      */
     public void testAssertPropertyRefEquals_notEqualsDifferentValues() {

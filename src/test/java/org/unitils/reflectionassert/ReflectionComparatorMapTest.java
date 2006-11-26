@@ -172,6 +172,20 @@ public class ReflectionComparatorMapTest extends TestCase {
 
 
     /**
+     * Tests for maps but right value is not a map.
+     */
+    public void testCheckEquals_notEqualsRightNotMap() {
+
+        Difference result = reflectionComparator.getDifference(mapA, "Test string");
+
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().empty());
+        assertSame(mapA, result.getLeftValue());
+        assertEquals("Test string", result.getRightValue());
+    }
+
+
+    /**
      * Creates a map.
      *
      * @param keyElement2         the key for the 2nd element in the collection
