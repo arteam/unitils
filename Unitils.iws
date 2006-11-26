@@ -18,13 +18,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorArrayTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorArrayTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorCollectionTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorCollectionTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertPropertiesCollectionsTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertPropertiesCollectionsTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorMapTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorMapTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesArrayTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesArrayTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
@@ -186,7 +180,17 @@
     <option name="myCurrentFavoritesList" value="Unitils" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="ReflectionUtils.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="52" column="37" selection-start="1695" selection-end="1715" vertical-scroll-proportion="0.73879886">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -1484,13 +1488,6 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorMapTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="195" column="77" selection-start="6015" selection-end="6015" vertical-scroll-proportion="0.300286">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/commons-lang-2.2.jar!/org/apache/commons/lang/math/NumberUtils.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="120" column="13" selection-start="5088" selection-end="5088" vertical-scroll-proportion="0.90276456">
@@ -1585,6 +1582,13 @@
     <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Class.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="404" column="0" selection-start="17001" selection-end="17001" vertical-scroll-proportion="0.34626576">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="52" column="37" selection-start="1695" selection-end="1715" vertical-scroll-proportion="0.73879886">
           <folding />
         </state>
       </provider>
