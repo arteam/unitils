@@ -3,11 +3,9 @@
  -----
  -----
 
-Documentation
-~~~~~~~~~~~~
+Tutorial
+~~~~~~~~
 
-* Overview
-~~~~~~~~~~
     Unit testing should be easy and intuitively... at least in theory. Real-life projects
     typically span multiple layers, are data-driven and use middleware technologies such as EJBs and Hibernate.
 
