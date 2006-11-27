@@ -1,11 +1,11 @@
 a:link {
-  color:#47a;
+  	color:#47a;
 }
 a:visited  {
-  color:#47a;
+  	color:#47a;
 }
 #bodyColumn a, #bodyColumn a:visited, #bodyColumn a:link, #bodyColumn a:active, #bodyColumn a:hover {
-  font-weight:bold;
+  	font-weight:bold;
 }
 
 
@@ -15,11 +15,11 @@ a:visited  {
 }
 
 #poweredBy img {
-  display:block;
-  margin: 5px 0 5px 17px;
-  border: none;
-  width: none;
-  height: none;
+  	display:block;
+  	margin: 5px 0 5px 17px;
+  	border: none;
+  	width: none;
+  	height: none;
 }
 
 #navcolumn ul {
@@ -28,4 +28,8 @@ a:visited  {
 
 #leftColumn {
 	padding-bottom: 5px;
+}
+
+.section h3 {
+  	color: #000;
 }
