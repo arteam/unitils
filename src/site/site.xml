@@ -1,31 +1,37 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="Unitils">
-  <bannerLeft>
-    <name>Unitils</name>
-    <!--<src>http://maven.apache.org/images/apache-maven-project.png</src>-->
-    <!--<href>http://maven.apache.org/</href>-->
-  </bannerLeft>
-  <!--<bannerRight>
-    <src>http://maven.apache.org/images/maven-small.gif</src>
-  </bannerRight>-->
-  <skin>
-     <groupId>org.apache.maven.skins</groupId>
-     <artifactId>maven-stylus-skin</artifactId>
-  </skin>
-  <body>
-    <links>
-      <item name="SF.net project page" href="http://sourceforge.net/unitils" />
-      <item name="Ordina" href="http://www.ordina.be/"/>
-    </links>
+    <bannerLeft>
+        <name>Unitils</name>
+        <src>./images/logos/unitils.gif</src>        
+    </bannerLeft>
+    
+    <poweredBy>    
+        <logo img="http://sflogo.sourceforge.net/sflogo.php?group_id=167201&amp;type=1" name="SourceForge.net" href="http://sourceforge.net/" />        
+        <logo img="./images/logos/maven-feather-border.png" name="Built by Maven" href="http://maven.apache.org/" />     
+    </poweredBy>  
+    
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-stylus-skin</artifactId>
+    </skin>
+  
+    <body>
+        <links>
+            <item name="SF.net project page" href="http://sourceforge.net/unitils" />
+            <item name="Ordina" href="http://www.ordina.be/"/>        
+        </links>
 
-    <menu name="Unitils">
-      <item name="Summary" href="index.html"/>
-      <item name="Downloads" href="http://sourceforge.net/project/showfiles.php?group_id=167201"/>
-      <item name="Documentation" href="documentation.html"/> 
-      <item name="Guidelines" href="guidelines.html"/>     
-      <item name="API Javadoc" href="javadoc.html"/>      
-      <item name="Forum" href="forum.html"/>
-      <item name="Format" href="format.html"/>
-    </menu>
-  </body>
+        <menu name="Unitils">
+            <item name="Summary" href="index.html"/>
+            <item name="Downloads" href="http://sourceforge.net/project/showfiles.php?group_id=167201"/>
+            <item name="Documentation" href="documentation.html"/> 
+            <item name="Guidelines" href="guidelines.html"/>     
+            <item name="API Javadoc" href="javadoc.html"/>      
+            <item name="Forum" href="forum.html"/>
+            <item name="Format" href="format.html"/>
+        </menu>
+    
+        <menu ref="reports" />        
+        
+    </body>
 </project>
