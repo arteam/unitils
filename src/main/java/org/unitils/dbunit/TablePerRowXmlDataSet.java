@@ -71,7 +71,7 @@ public class TablePerRowXmlDataSet extends CachedDataSet {
          * @param in the xml content stream, not null
          */
         public TablePerRowXmlProducer(InputStream in) {
-            super(new InputSource(in));
+            super(new InputSource(in), false);
         }
 
 
