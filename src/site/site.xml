@@ -17,12 +17,12 @@
   
     <body>
         <links>
-            <item name="SF.net project page" href="http://sourceforge.net/unitils" />
+            <item name="SF.net project page" href="http://sourceforge.net/projects/unitils/" />
             <item name="Ordina" href="http://www.ordina.be/"/>        
         </links>
 
         <menu name="Unitils">
-            <item name="Summary" href="index.html"/>
+            <item name="Summary" href="summary.html"/>
             <item name="Downloads" href="http://sourceforge.net/project/showfiles.php?group_id=167201"/>
             <item name="Documentation" href="documentation.html"/> 
             <item name="Guidelines" href="guidelines.html"/>     
@@ -30,8 +30,6 @@
             <item name="Forum" href="forum.html"/>
             <item name="Format" href="format.html"/>
         </menu>
-    
-        <menu ref="reports" />        
         
     </body>
 </project>
