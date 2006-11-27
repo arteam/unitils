@@ -1,9 +1,9 @@
  -----
- The Unitils website
+ Summary
  -----
  -----
 
-Unitils
+Summary
 
  Unitils provides utilities to further simplify unit-testing with JUnit, DBUnit and EasyMock. The goal is to make unit-testing easy and maintainable by offering utilities such as automatic DB-schema maintainance and equality assertion through reflection.
 

@@ -21,3 +21,11 @@ a:visited  {
   width: none;
   height: none;
 }
+
+#navcolumn ul {
+	margin: 5px 0 25px -0em;
+}
+
+#leftColumn {
+	padding-bottom: 5px;
+}
