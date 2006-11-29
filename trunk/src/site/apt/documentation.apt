@@ -190,42 +190,41 @@ public class MyTest {
     Let's say we have UserDAO with a simple findByName method for retrieving a user based on it's first and last name. The unit test looks as follows:
 
 +-----+
-    @DatabaseTest
-    public void UserDAOTest extends UnitilsJUnit4 {
+@DatabaseTest
+public void UserDAOTest extends UnitilsJUnit4 {
 
-      @Test
-      public void testFindByName {
-         User johnDoe = userDao.findByName("doe", "john");
-         assertEquals("jdoe", johnDoe.getUserName());
-      }
+    @Test
+    public void testFindByName {
+        User johnDoe = userDao.findByName("doe", "john");
+        assertEquals("jdoe", johnDoe.getUserName());
+    }
 
-      @Test
-      public void testFindByMinimalAge {
+    @Test
+    public void testFindByMinimalAge {
         List<User> min18 = userDao.findByMinimalAge(18);
         assertEquals(1, min18.size());
         assertEquals("jack", min18.get(0).getUserName());
-      }
-
     }
+}
 +-----+
 
     The class level data file UserDAOTest.xml is located in the same package as the test class:
 
 +-----+
-    <?xml version='1.0' encoding='UTF-8'?>
-    <dataset>
-       <user userName="jdoe" name="doe" firstname="john" />
-    </dataset>
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <user userName="jdoe" name="doe" firstname="john" />
+</dataset>
 +-----+
 
     The method testFindByMinimalAge has a specific data file named UserDAOTest.testFindByMinimalAge.xml:
 
 +-----+
-    <?xml version='1.0' encoding='UTF-8'?>
-    <dataset>
-       <user userName="jack" age="18" />
-       <user userName="jim" age="17" />
-    </dataset>
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <user userName="jack" age="18" />
+    <user userName="jim" age="17" />
+</dataset>
 +-----+
 
     The annotation @DatabaseTest marks the test as being a database test, instructing Unitils to look for DBUnit datafiles to load. Unitils automatically looks
@@ -238,24 +237,23 @@ public class MyTest {
     The datasets to use can also be specified explicitly using the annotation @DataSet, as in the following example:
 
 +-----+
-    @DatabaseTest
-    @DataSet(fileName = "UserDAOTest_general.xml")
-    public void UserDAOTest extends UnitilsJUnit4 {
+@DatabaseTest
+@DataSet(fileName = "UserDAOTest_general.xml")
+public void UserDAOTest extends UnitilsJUnit4 {
 
-      @Test
-      public void testFindByName {
-         User johnDoe = userDao.findByName("doe", "john");
-         assertEquals("jdoe", johnDoe.getUserName());
-      }
+    @Test
+    public void testFindByName {
+        User johnDoe = userDao.findByName("doe", "john");
+        assertEquals("jdoe", johnDoe.getUserName());
+    }
 
-      @DataSet(fileName = "UserDAOTest_ages.xml")
-      public void testFindByMinimalAge {
+    @DataSet(fileName = "UserDAOTest_ages.xml")
+    public void testFindByMinimalAge {
         List<User> min18 = userDao.findByMinimalAge(18);
         assertEquals(1, min18.size());
         assertEquals("jack", min18.get(0).getUserName());
-      }
-
     }
+}
 +-----+
 
    For checking the result of bulk update methods or stored procedures, that are difficult to check in Java code,
@@ -264,27 +262,26 @@ public class MyTest {
    Following example tests a method that disables all user accounts that haven't been used for a whole year:
 
 +-----+
-    @DatabaseTest
-    public void UserDAOTest extends UnitilsJUnit4 {
+@DatabaseTest
+public void UserDAOTest extends UnitilsJUnit4 {
 
-      @Test
-      @ExpectedDataSet
-      public void testDisableInactiveAccounts {
-         userDao.disableInactiveAccounts();
-      }
-
+    @Test
+    @ExpectedDataSet
+    public void testDisableInactiveAccounts {
+        userDao.disableInactiveAccounts();
     }
+}
 +-----+
 
     After having executed the method annotated with @ExpectedDataSet, the contents of the database are compared with
     the data file UserDAOTest.testDisableInactiveAccounts-result.xml (<className>.<methodName>-result.xml):
 
 +-----+
-    <?xml version='1.0' encoding='UTF-8'?>
-    <dataset>
-       <user userName="jack" active="true" />
-       <user userName="jim" active="false" />
-    </dataset>
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <user userName="jack" active="true" />
+    <user userName="jim" active="false" />
+</dataset>
 +-----+
 
    When writing database tests, keep in mind following guidelines:
@@ -317,10 +314,9 @@ public class MyTest {
     The test script folder contains scripts that start with a version number and end on .sql, as in following example:
 
 +-----+
-    dbscripts/
-              001_initial.sql
-              002_tracking_updates.sql
-              003_auditing_updates.sql
+dbscripts/ 001_initial.sql
+           002_tracking_updates.sql
+           003_auditing_updates.sql
 +-----+
 
     The leading zeroes are only added to make sure the scripts are shown in proper sequence in a file explorer window, they are not required.
@@ -387,7 +383,7 @@ public class MyTest {
     override the property HibernateModule.hibernate.configfiles in unitils.properties. E.g.
 
 +-----+
-    HibernateModule.hibernate.configfiles=hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
+HibernateModule.hibernate.configfiles=hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
 +-----+
 
     It is a good practice to split your Hibernate configuration in two parts: One config files containing shared configuration, such as the database dialect
@@ -396,19 +392,19 @@ public class MyTest {
     We advise you to write a superclass that is used as base class for all Hibernate tests. This superclass looks like the following:
 
 +-----+
-    @HibernateTest
-    public abstract class BaseHibernateTest extends UnitilsJUnit3 {
+@HibernateTest
+public abstract class BaseHibernateTest extends UnitilsJUnit3 {
 
-        @HibernateConfiguration
-        public void configureHibernate(Configuration config) {
-            HibernateConfigHelper.addMappedClasses(config);
-        }
-
-        @HibernateSession
-        public void injectHibernateSession(Session session) {
-            HibernateSessionManager.injectSession(session);
-        }
+    @HibernateConfiguration
+    public void configureHibernate(Configuration config) {
+        HibernateConfigHelper.addMappedClasses(config);
     }
+
+    @HibernateSession
+    public void injectHibernateSession(Session session) {
+        HibernateSessionManager.injectSession(session);
+    }
+}
 +-----+
 
     The method annotated with @HibernateConfiguration allows performing some extra, programmatic Hibernate configuration, like e.g. registering mapped
@@ -419,39 +415,39 @@ public class MyTest {
     is also project specific code. The one in the example looks like the following:
 
 +-----+
-    public class HibernateSessionManager {
+public class HibernateSessionManager {
 
-		    private static Session externallyProvidedSession;
-		
-		    private static SessionFactory sessionFactory;
-		
-		    public static Session getSession() {
-		        if (externallyProvidedSession != null) {
-		            return externallyProvidedSession;
-		        } else {
-		            return doGetSession();
-		        }
-		    }
-		
-		    private static Session doGetSession() {
-		        if (sessionFactory == null) {
-		            initSessionFactory();
-		        }
-		        return sessionFactory.openSession();
-		    }
-		
-		    private static void initSessionFactory() {
-		        Configuration configuration = new AnnotationConfiguration();
-		        configuration.addFile("hibernate.cfg.xml");
-		        configuration.addFile("hibernate-mappedClasses.cfg.xml");
-		        configuration.configure();
-		        sessionFactory = configuration.buildSessionFactory();
-		    }
-		
-		    public static void injectSession(Session session) {
-		        externallyProvidedSession = session;
-		    }
-		}
+    private static Session externallyProvidedSession;
+
+    private static SessionFactory sessionFactory;
+
+    public static Session getSession() {
+        if (externallyProvidedSession != null) {
+            return externallyProvidedSession;
+        } else {
+            return doGetSession();
+        }
+    }
+
+    private static Session doGetSession() {
+        if (sessionFactory == null) {
+            initSessionFactory();
+        }
+        return sessionFactory.openSession();
+    }
+
+    private static void initSessionFactory() {
+        Configuration configuration = new AnnotationConfiguration();
+        configuration.addFile("hibernate.cfg.xml");
+        configuration.addFile("hibernate-mappedClasses.cfg.xml");
+        configuration.configure();
+        sessionFactory = configuration.buildSessionFactory();
+    }
+
+    public static void injectSession(Session session) {
+        externallyProvidedSession = session;
+    }
+}
 +-----+
 
 
@@ -464,7 +460,7 @@ public class MyTest {
     test is not automatically executed; you should write a unit test that looks like the following:
 
 +-----+
-    public class HibernateMappingTest extends BaseHibernateTest {
+public class HibernateMappingTest extends BaseHibernateTest {
 
     public void testMappingToDatabase() {
         HibernateAssert.assertMappingToDatabase();
@@ -493,23 +489,23 @@ public class MyTest {
     Let's start with an example of comparing 2 User instances having an id, a first and a last name:
 
 +-----+    
-    public class User {
-    
-        private long id;
-        private String first;
-        private String last;
+public class User {
+
+    private long id;
+    private String first;
+    private String last;
 
 
-        public User(long id, String first, String last) {
-            this.id = id;
-            this.first = first;
-            this.last = last;
-        }
+    public User(long id, String first, String last) {
+        this.id = id;
+        this.first = first;
+        this.last = last;
     }
+}
 
-    User user1 = new User(1, "John", "Doe");
-    User user2 = new User(1, "John", "Doe");
-    assertEquals(user1, user2);
+User user1 = new User(1, "John", "Doe");
+User user2 = new User(1, "John", "Doe");
+assertEquals(user1, user2);
 +-----+
 
     You would expect that this assertion would be successful since both instances contain the same values. This is not
@@ -520,12 +516,12 @@ public class MyTest {
     Suppose you would implement the equals method as follows:
     
 +-----+    
-    public boolean equals(Object object) {
-        if (object instanceof User) {
-            return id == ((User) object).id;
-        }
-        return false;
+public boolean equals(Object object) {
+    if (object instanceof User) {
+        return id == ((User) object).id;
     }
+    return false;
+}
 +-----+    
 
     This is a totally reasonable implementation for your application logic, stating that 2 user instances are referring to 
@@ -533,9 +529,9 @@ public class MyTest {
     are equal is now reduced to the test whether they have the same id:
     
 +-----+        
-    User user1 = new User(1, "John", "Doe");
-    User user2 = new User(1, "Jane", "Smith");
-    assertEquals(user1, user2);
+User user1 = new User(1, "John", "Doe");
+User user2 = new User(1, "Jane", "Smith");
+assertEquals(user1, user2);
 +-----+
 
     This assertion will be successful, which is probably not what you want. Best is just to avoid using equals() altogether 
@@ -543,20 +539,20 @@ public class MyTest {
     of the values one by one:    
     
 +-----+        
-    User user1 = new User(1, "John", "Doe");
-    User user2 = new User(1, "John", "Doe");
-    assertEquals(user1.getId(), user2.getId());
-    assertEquals(user1.getFirst(), user2.getFirst());
-    assertEquals(user1.getLast(), user2.getLast());
+User user1 = new User(1, "John", "Doe");
+User user2 = new User(1, "John", "Doe");
+assertEquals(user1.getId(), user2.getId());
+assertEquals(user1.getFirst(), user2.getFirst());
+assertEquals(user1.getLast(), user2.getLast());
 +-----+
     
     Unitils offers utilities that help you perform these checks more easily, through reflection. Using <ReflectionAssert.assertRefEquals>
     the above example could be re-written as follows:
     
 +-----+        
-    User user1 = new User(1, "John", "Doe");
-    User user2 = new User(1, "John", "Doe");
-    assertRefEquals(user1, user2);    
+User user1 = new User(1, "John", "Doe");
+User user2 = new User(1, "John", "Doe");
+assertRefEquals(user1, user2);    
 +-----+
     
 
