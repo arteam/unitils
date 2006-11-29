@@ -51,7 +51,7 @@ public class HibernateAssert {
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method does the
      * same as {@link #assertMappingToDatabase} without parameters, but can also be used without the using the
-     * {@link HibernateModule} or the {@link org.unitils.db.DatabaseModule} (this means it can be used separately without
+     * {@link HibernateModule} or the {@link org.unitils.database.DatabaseModule} (this means it can be used separately without
      * using any other feature of Unitils).
      *
      * @param configuration
@@ -98,12 +98,12 @@ public class HibernateAssert {
     private static Dialect getDatabaseDialect(Configuration configuration) {
         String dialectClassName = configuration.getProperty("hibernate.dialect");
         if (StringUtils.isEmpty(dialectClassName)) {
-            throw new IllegalArgumentException("Property hibernate.dialect not specified");
+            throw new UnitilsException("Property hibernate.dialect not specified");
         }
         try {
             return (Dialect) Class.forName(dialectClassName).newInstance();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not instantiate dialect class " + dialectClassName, e);
+            throw new UnitilsException("Could not instantiate dialect class " + dialectClassName, e);
         }
     }
 

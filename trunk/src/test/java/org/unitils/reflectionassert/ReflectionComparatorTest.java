@@ -83,7 +83,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test for two equal objects.
      */
-    public void testCheckEquals_equals() {
+    public void testGetDifference_equals() {
 
         Difference result = reflectionComparator.getDifference(objectsA, objectsB);
 
@@ -94,7 +94,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * * Test for two equal objects as an inner field of an object.
      */
-    public void testCheckEquals_equalsInner() {
+    public void testGetDifference_equalsInner() {
 
         Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerB);
 
@@ -106,7 +106,7 @@ public class ReflectionComparatorTest extends TestCase {
      * Test case for 2 equal objects that contain a circular reference.
      * This may not cause an infinite loop.
      */
-    public void testCheckEquals_equalsCircularDependency() {
+    public void testGetDifference_equalsCircularDependency() {
 
         Difference result = reflectionComparator.getDifference(objectsCircularDependencyA, objectsCircularDependencyB);
 
@@ -117,7 +117,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test for two objects that contain different values.
      */
-    public void testCheckEquals_notEqualsDifferentValues() {
+    public void testGetDifference_notEqualsDifferentValues() {
 
         Difference result = reflectionComparator.getDifference(objectsA, objectsDifferentValue);
 
@@ -131,7 +131,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for 2 objects with a right value null.
      */
-    public void testCheckEquals_notEqualsRightNull() {
+    public void testGetDifference_notEqualsRightNull() {
 
         Difference result = reflectionComparator.getDifference(objectsA, objectsNullValue);
 
@@ -145,7 +145,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for 2 objects with a left value null.
      */
-    public void testCheckEquals_notEqualsLeftNull() {
+    public void testGetDifference_notEqualsLeftNull() {
 
         Difference result = reflectionComparator.getDifference(objectsNullValue, objectsA);
 
@@ -159,7 +159,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test for objects with inner objects that contain different values.
      */
-    public void testCheckEquals_notEqualsInnerDifferentValues() {
+    public void testGetDifference_notEqualsInnerDifferentValues() {
 
         Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerDifferentValue);
 
@@ -174,7 +174,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for a null left-argument.
      */
-    public void testCheckEquals_leftNull() {
+    public void testGetDifference_leftNull() {
 
         Difference result = reflectionComparator.getDifference(null, objectsA);
 
@@ -188,7 +188,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for a null right-argument.
      */
-    public void testCheckEquals_rightNull() {
+    public void testGetDifference_rightNull() {
 
         Difference result = reflectionComparator.getDifference(objectsA, null);
 
@@ -202,11 +202,22 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for both null arguments.
      */
-    public void testCheckEquals_null() {
+    public void testGetDifference_null() {
 
         Difference result = reflectionComparator.getDifference(null, null);
 
         assertNull(result);
+    }
+
+
+    /**
+     * Test for two equal objects.
+     */
+    public void testIsEquals() {
+
+        boolean result = reflectionComparator.isEqual(objectsA, objectsB);
+
+        assertTrue(result);
     }
 
 

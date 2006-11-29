@@ -18,6 +18,7 @@ package org.unitils.database.config;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
 
@@ -44,9 +45,9 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
      * <p/>
      * Initializes itself using the properties in the given <code>Properties</code> object.
      *
-     * @throws IllegalArgumentException When the given <code>Properties</code> misses one or more required properties.
+     * @throws UnitilsException when the given <code>Properties</code> misses one or more required properties.
      */
-    public void init(Configuration configuration) throws IllegalArgumentException {
+    public void init(Configuration configuration) {
 
         driverClassName = configuration.getString("dataSource.driverClassName");
         databaseUrl = configuration.getString("dataSource.url");
@@ -54,10 +55,10 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
         password = configuration.getString("dataSource.password");
 
         if (StringUtils.isEmpty(driverClassName)) {
-            throw new IllegalArgumentException("Could not determine driver class name. Missing property dataSource.driverClassName");
+            throw new UnitilsException("Could not determine driver class name. Missing property dataSource.driverClassName");
         }
         if (StringUtils.isEmpty(databaseUrl)) {
-            throw new IllegalArgumentException("Could not determine database url. Missing property dataSource.databaseUrl");
+            throw new UnitilsException("Could not determine database url. Missing property dataSource.databaseUrl");
         }
     }
 

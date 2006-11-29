@@ -71,7 +71,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two equal primitives.
      */
-    public void testCheckEquals_equals() {
+    public void testGetDifference_equals() {
 
         Difference result = reflectionComparator.getDifference(primitivesA, primitivesB);
 
@@ -82,7 +82,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      * Test for two equal autoboxing.
      * An autoboxed primitive should be considered equals to the object version.
      */
-    public void testCheckEquals_equalsAutoboxing() {
+    public void testGetDifference_equalsAutoboxing() {
 
         //noinspection UnnecessaryBoxing
         Difference result = reflectionComparator.getDifference(5L, new Long(5));
@@ -94,7 +94,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two equal primitives as an inner field of an object.
      */
-    public void testCheckEquals_equalsInner() {
+    public void testGetDifference_equalsInner() {
 
         Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerB);
 
@@ -104,7 +104,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two equal primitives but of different type (int vs long).
      */
-    public void testCheckEquals_differentTypes() {
+    public void testGetDifference_differentTypes() {
 
         Difference result = reflectionComparator.getDifference(5L, 5);
         
@@ -115,7 +115,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two primitives that contain different values.
      */
-    public void testCheckEquals_notEqualsDifferentValues() {
+    public void testGetDifference_notEqualsDifferentValues() {
 
         Difference result = reflectionComparator.getDifference(primitivesA, primitiveDifferentValue);
 
@@ -129,7 +129,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two primitives with right value 0.
      */
-    public void testCheckEquals_notEqualsRight0() {
+    public void testGetDifference_notEqualsRight0() {
 
         Difference result = reflectionComparator.getDifference(primitivesA, primitives0Value);
 
@@ -143,7 +143,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for two primitives with left value 0.
      */
-    public void testCheckEquals_notEqualsLeft0() {
+    public void testGetDifference_notEqualsLeft0() {
 
         Difference result = reflectionComparator.getDifference(primitives0Value, primitivesA);
 
@@ -157,7 +157,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test for objects with inner primitives that contain different values.
      */
-    public void testCheckEquals_notEqualsInnerDifferentValues() {
+    public void testGetDifference_notEqualsInnerDifferentValues() {
 
         Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerDifferentValue);
 

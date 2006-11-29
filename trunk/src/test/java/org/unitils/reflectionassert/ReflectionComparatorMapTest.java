@@ -30,25 +30,25 @@ import java.util.Map;
 public class ReflectionComparatorMapTest extends TestCase {
 
     /* Test map */
-    private Map mapA;
+    private Map<String, Element> mapA;
 
     /* Same as A but different instance */
-    private Map mapB;
+    private Map<String, Element> mapB;
 
     /* Same as A and B but different string value for element 2 */
-    private Map mapDifferentValue;
+    private Map<String, Element> mapDifferentValue;
 
     /* Same as A and B but different key value for element 2 */
-    private Map mapDifferentKey;
+    private Map<String, Element> mapDifferentKey;
 
     /* Test collection with inner map for element 2 */
-    private Map mapInnerA;
+    private Map<String, Element> mapInnerA;
 
     /* Same as innerA but different instance  */
-    private Map mapInnerB;
+    private Map<String, Element> mapInnerB;
 
     /* Same as innerA and innerB but different string value for inner element 2 */
-    private Map mapInnerDifferentValue;
+    private Map<String, Element> mapInnerDifferentValue;
 
     /* Class under test */
     private ReflectionComparator reflectionComparator;
@@ -75,7 +75,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /**
      * Test for two equal maps.
      */
-    public void testCheckEquals_equals() {
+    public void testGetDifference_equals() {
 
         Difference result = reflectionComparator.getDifference(mapA, mapB);
 
@@ -86,7 +86,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /**
      * Test for two equal maps as an inner field of an object.
      */
-    public void testCheckEquals_equalsInner() {
+    public void testGetDifference_equalsInner() {
 
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerB);
 
@@ -97,7 +97,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /**
      * Test for two maps that contain different values.
      */
-    public void testCheckEquals_notEqualsDifferentValues() {
+    public void testGetDifference_notEqualsDifferentValues() {
 
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentValue);
 
@@ -111,7 +111,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /**
      * Test for two maps that have a different size.
      */
-    public void testCheckEquals_notEqualsDifferentSize() {
+    public void testGetDifference_notEqualsDifferentSize() {
         Iterator iterator = mapB.entrySet().iterator();
         iterator.next();
         iterator.remove();
@@ -128,7 +128,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /**
      * Test for objects with inner maps that contain different values.
      */
-    public void testCheckEquals_notEqualsInnerDifferentValues() {
+    public void testGetDifference_notEqualsInnerDifferentValues() {
 
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerDifferentValue);
 
@@ -143,7 +143,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /**
      * Test for objects with inner maps that contain different keys.
      */
-    public void testCheckEquals_notEqualsDifferentKeys() {
+    public void testGetDifference_notEqualsDifferentKeys() {
 
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentKey);
 
@@ -157,7 +157,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /**
      * Tests for objects with inner maps that have a different size.
      */
-    public void testCheckEquals_notEqualsInnerDifferentSize() {
+    public void testGetDifference_notEqualsInnerDifferentSize() {
         Iterator iterator = mapB.entrySet().iterator();
         iterator.next();
         iterator.remove();
@@ -174,7 +174,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /**
      * Tests for maps but right value is not a map.
      */
-    public void testCheckEquals_notEqualsRightNotMap() {
+    public void testGetDifference_notEqualsRightNotMap() {
 
         Difference result = reflectionComparator.getDifference(mapA, "Test string");
 
@@ -193,8 +193,8 @@ public class ReflectionComparatorMapTest extends TestCase {
      * @param innerElement2       the value for the inner array of the 2nd element in the collection
      * @return the test collection
      */
-    private Map createMap(String keyElement2, String stringValueElement2, Map innerElement2) {
-        Map map = new HashMap();
+    private Map<String, Element> createMap(String keyElement2, String stringValueElement2, Map innerElement2) {
+        Map<String, Element> map = new HashMap<String, Element>();
         map.put("key 1", new Element("test 1", null));
         map.put(keyElement2, new Element(stringValueElement2, innerElement2));
         map.put("key 3", new Element("test 3", null));

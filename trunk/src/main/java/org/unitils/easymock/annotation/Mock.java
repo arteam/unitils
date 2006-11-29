@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that a mock object should be created and set in the annotated field.
+ *
+ * todo rename to EasyMock and test whether there are static import conflicts
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
