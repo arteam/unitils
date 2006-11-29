@@ -154,7 +154,7 @@ public class ModulesLoader {
                     logger.warn("Unable to create module instance for module class: " + className + ". The module will " +
                             "not be loaded. If this is caused by a library that is not used by your project and thus not " +
                             "in the classpath the warning can be avoided by explicitly disabling the module.");
-                    logger.debug("Ignored exception during module initialisation.", e);
+                    logger.debug("Ignored exception during module initialisation.re", e);
                     continue;
                 }
                 throw e;

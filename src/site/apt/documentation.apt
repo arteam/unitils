@@ -47,7 +47,7 @@ Tutorial
 
 
     This tutorial will show you by example what Unitils is about and how you can configure your project to make use of it's services.
-    It is only an introduction to Unitils, more in-depth documentation can be found in the {{{javadoc.html}javadoc}} of the modules.
+    It is only an introduction to Unitils, more in-depth documentation can be found in the {{{apidocs/index.html}javadoc}} of the modules.
     The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}.
 
 
@@ -535,8 +535,7 @@ assertEquals(user1, user2);
 +-----+
 
     This assertion will be successful, which is probably not what you want. Best is just to avoid using equals() altogether 
-    when comparing object values since it can always contain business logic. One approach can be to do the comparisson of each
-    of the values one by one:    
+    when comparing object values. One approach can be to do the comparisson of each of the values one by one:    
     
 +-----+        
 User user1 = new User(1, "John", "Doe");
@@ -549,12 +548,58 @@ assertEquals(user1.getLast(), user2.getLast());
     Unitils offers utilities that help you perform these checks more easily, through reflection. Using <ReflectionAssert.assertRefEquals>
     the above example could be re-written as follows:
     
-+-----+        
++-----+
 User user1 = new User(1, "John", "Doe");
 User user2 = new User(1, "John", "Doe");
 assertRefEquals(user1, user2);    
 +-----+
+
+    This assertion will loop over all fields in both objects and compare their values using reflection. For the above example, it will
+    first compare both <id> field values, next both <first> field values and finally both <last> fields values. 
     
+    If a field value itself is also an object, it will recursively be compared field by field using reflection. The same is true for 
+    collections, maps and arrays. Their elements will be traversed and recusively be compared using reflection. 
+
+    If a value is of a primitive type (int, long, ...) or one of the primitive wrapper types (Integer, Long, ...) it will be 
+    compared by value (using ==). Following assertions, for example, will be successful:
+
++-----+
+assertRefEquals(1, 1L); 
+
+List<Double> myList = new ArrayList<Double>();
+myList.add(1.0);
+myList.add(2.0);
+assertRefEquals(Arrays.asList(1, 2), myList); 
++-----+
+
+
+
+
+** Lenient assertions
+~~~~~~~~~~~~~~~~~~~~~
+    
+    
+    
+    * <Ignoring the order in collections>
+    
+    * <Ignoring default values>
+    
+    * <Lenient date values>
+
+    []
+
+
+*** Lenient order
+~~~~~~~~~~~~~~~~~
+
+*** Ignoring defaults
+~~~~~~~~~~~~~~~~~~~~~
+
+*** Lenient dates
+~~~~~~~~~~~~~~~~~~~~~
+
+
+
 
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

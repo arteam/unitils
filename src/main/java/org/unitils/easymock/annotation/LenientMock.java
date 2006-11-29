@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
 /**
  * Annotation indicating that a lenient mock object (see {@link org.unitils.easymock.LenientMocksControl} should be created
  * and set intp the annotated field.
+ *
+ * todo rename to Mock
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
