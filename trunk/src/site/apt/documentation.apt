@@ -347,16 +347,6 @@ dbscripts/ 001_initial.sql
 
 
 
-*** Configuration
-~~~~~~~~~~~~~~~~~
-
-    TODO
-
-
-
-
-
-
 
 ** Testing with Hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -383,7 +373,8 @@ dbscripts/ 001_initial.sql
     override the property HibernateModule.hibernate.configfiles in unitils.properties. E.g.
 
 +-----+
-HibernateModule.hibernate.configfiles=hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
+HibernateModule.hibernate.configfiles=
+              hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
 +-----+
 
     It is a good practice to split your Hibernate configuration in two parts: One config files containing shared configuration, such as the database dialect
@@ -604,8 +595,14 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-** EasyMock mock creation
-~~~~~~~~~~~~~~~~~~~~~~~~~
+    Unit tests should test code in isolation. Mock objects allow testing a component without having to care about other components or services that it depends on. 
+    Unitils builds further on EasyMock for its mock object testing support. Unitils provides convenience functionality that greatly reduces the plumbing code that needs to be written when working with mocks. 
+    This involves simplification of mock creation, argument matching and injection of mocks.
+
+** Mock creation
+~~~~~~~~~~~~~~~~
+
+    
 
 ** Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -613,9 +610,7 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
 
-*** Using a Service Locator
+*** Mock injection when using a Service Locator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*** Using IOC
-~~~~~~~~~~~~~
 
