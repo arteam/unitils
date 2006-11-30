@@ -26,6 +26,8 @@ import java.io.PrintWriter;
  * Implementation of {@link StatementHandler} that writes each statement to a file. The fileName is specified
  * on invocation of the {@link #init} method with a <code>Configuration</code> object that contains the property
  * with the key {@link #PROPKEY_FILENAME}.
+ *
+ * @author Filip Neven
  */
 public class FileStatementHandler implements StatementHandler {
 

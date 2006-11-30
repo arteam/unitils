@@ -11,7 +11,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Implementation of {@link DbSupport} for an Oracle database
  *
+ * @author Filip Neven
  */
 public class OracleDbSupport extends DbSupport {
 

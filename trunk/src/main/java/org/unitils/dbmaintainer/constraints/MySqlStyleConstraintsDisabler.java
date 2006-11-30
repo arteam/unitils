@@ -16,6 +16,7 @@
 package org.unitils.dbmaintainer.constraints;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -25,9 +26,19 @@ import java.sql.SQLException;
 import java.util.Set;
 
 /**
- * Implementation of {@link ConstraintsDisabler} for a hsqldb database.
+ * Implementation of {@link ConstraintsDisabler} for a DBMS that has following properties:
+ * <ul>
+ * <li>Constraints cannot be disabled individually</li>
+ * <li>Foreign key checking can be switched off on a JDBC <code>Connection</code></li>
+ * </ul>
+ * Examples of such a DBMS are MySql and hsqldb
+ *
+ * @author Filip Neven
+ * @author Bart Vermeiren
  */
 public class MySqlStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
+
+    private static final Logger logger = Logger.getLogger(MySqlStyleConstraintsDisabler.class);
 
     protected void doInit(Configuration configuration) {
     }
@@ -38,6 +49,7 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
      */
     public void disableConstraints() throws StatementHandlerException {
         try {
+            logger.info("Disabling contraints");
             removeNotNullConstraints();
         } catch (SQLException e) {
             throw new UnitilsException("Error while disabling constraints", e);

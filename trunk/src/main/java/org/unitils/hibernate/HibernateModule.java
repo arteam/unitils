@@ -29,6 +29,7 @@ import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateTest;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -55,6 +56,8 @@ import java.util.Properties;
  * It is highly recommended to write a unit test that invokes {@link org.unitils.hibernate.HibernateAssert#assertMappingToDatabase()},
  * This is a very powerful test that verifies if the mapping of all your Hibernate mapped objects with the database is
  * correct.
+ *
+ * @author Filip Neven
  */
 public class HibernateModule implements Module {
 
@@ -77,7 +80,7 @@ public class HibernateModule implements Module {
     private String configurationClassName;
 
     /* List of Hibernate configuration files */
-    private List<String> configFiles;
+    private List<String> configFileNames;
 
     /**
      * Initializes the module. The given <code>Configuration</code> object should contain values for the properties
@@ -87,7 +90,7 @@ public class HibernateModule implements Module {
      */
     public void init(org.apache.commons.configuration.Configuration configuration) {
 
-        configFiles = configuration.getList(PROPKEY_HIBERNATE_CONFIGFILES);
+        configFileNames = configuration.getList(PROPKEY_HIBERNATE_CONFIGFILES);
         configurationClassName = configuration.getString(PROPKEY_HIBERNATE_CONFIGURATION_CLASS);
     }
 
@@ -159,8 +162,10 @@ public class HibernateModule implements Module {
         } catch (InstantiationException e) {
             throw new UnitilsException("Exception while instantiating instance of class " + configurationClassName, e);
         }
-        for (String configFile : configFiles) {
-            hbnConfiguration.configure(configFile);
+        for (String configFileName : configFileNames) {
+            if (!StringUtils.isEmpty(configFileName)) {
+                hbnConfiguration.configure(configFileName);
+            }
         }
         return hbnConfiguration;
     }

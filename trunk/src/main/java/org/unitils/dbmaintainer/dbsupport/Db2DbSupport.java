@@ -11,7 +11,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 
+ * Implementation of {@link DbSupport} for an IBM DB2 database
+ *
+ * @author Filip Neven
  */
 public class Db2DbSupport extends DbSupport {
 

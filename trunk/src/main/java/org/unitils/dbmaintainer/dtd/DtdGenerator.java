@@ -18,6 +18,8 @@ package org.unitils.dbmaintainer.dtd;
 /**
  * Defines the contract for implementations that create a DTD that describes a database. This DTD can
  * be used in XML files containing test data for a unit test database
+ *
+ * @author Filip Neven
  */
 public interface DtdGenerator {
 

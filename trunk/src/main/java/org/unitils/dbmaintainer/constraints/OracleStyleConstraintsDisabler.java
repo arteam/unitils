@@ -16,6 +16,7 @@
 package org.unitils.dbmaintainer.constraints;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -25,23 +26,29 @@ import java.sql.SQLException;
 import java.util.Set;
 
 /**
- * TODO test me
- * TODO javadoc me
- * <p/>
- * Implementation of {@link ConstraintsDisabler} for an DB2 database.
+ * Implementation of {@link ConstraintsDisabler} for a DBMS with following properties:
+ * <ul>
+ * <li>Constraints can be disabled permanently and individually</li>
+ * <li>Foreign key constraints checking cannot be disabled on a JDBC connection<li>
+ * </ul>
+ * Examples of such a DBMS are Oracle and DB2.
  *
- * @author BaVe
+ * @author Filip Neven
+ * @author Bart Vermeiren
  */
 public class OracleStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
+
+    private static final Logger logger = Logger.getLogger(OracleStyleConstraintsDisabler.class);
 
     protected void doInit(Configuration configuration) {
     }
 
     /**
-     * @see org.unitils.dbmaintainer.constraints.ConstraintsDisabler#disableConstraints()
+     * Permanently disable every foreign key or not-null constraint
      */
     public void disableConstraints() throws StatementHandlerException {
         try {
+            logger.info("Disabling constraints");
             Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {
                 Set<String> constraintNames = dbSupport.getTableConstraintNames(tableName);

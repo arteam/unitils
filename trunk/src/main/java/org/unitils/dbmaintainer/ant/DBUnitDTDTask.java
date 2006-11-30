@@ -25,6 +25,8 @@ import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 /**
  * Ant task that generates a DTD from the unit test database. Invokes the implementation of {@link DtdGenerator}
  * that is configured in the Unitils configuration.
+ *
+ * @author Filip Neven
  */
 public class DBUnitDTDTask extends BaseUnitilsTask {
 

@@ -1,12 +1,17 @@
 package org.unitils.util;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.unitils.core.UnitilsException;
 
 /**
  * Class containing configuration related utilities
+ *
+ * @author Filip Neven
  */
 public class ConfigUtils {
+
+    private static final Logger logger = Logger.getLogger(ConfigUtils.class);
 
     /**
      * @param type The type of the instance
@@ -16,7 +21,9 @@ public class ConfigUtils {
      * '.impl.className', and as value the fully qualified classname of the implementation type.
      */
     public static <T> T getConfiguredInstance(Class type, Configuration configuration) {
+
         String propKey = type.getName() + ".implClassName";
+        logger.debug("Creating instance of " + type + ". Concrete implementation class is defined by the property " + propKey);
         return (T) ReflectionUtils.createInstanceOfType(configuration.getString(propKey));
     }
 
@@ -33,14 +40,21 @@ public class ConfigUtils {
      * @return The configured instance
      */
     public static <T> T getConfiguredInstance(Class type, Configuration configuration, String implementationDiscriminatorValue) {
+
         String propKey = type.getName() + ".implClassName";
         String implementationSpecificPropKey = propKey + "." + implementationDiscriminatorValue;
+        logger.debug("Creating instance of " + type + ". Trying to retrieve concrete implementation class from the property "
+                + implementationSpecificPropKey);
         if (configuration.containsKey(implementationSpecificPropKey)) {
             return (T) ReflectionUtils.createInstanceOfType(configuration.getString(implementationSpecificPropKey));
-        } else if (configuration.containsKey(propKey)) {
-            return (T) ReflectionUtils.createInstanceOfType(configuration.getString(propKey));
         } else {
-            throw new UnitilsException("Missing configuration for " + propKey);
+            logger.debug("Property " + implementationSpecificPropKey + " not specified. Trying to retrieve concrete " +
+                    "implementation class from the property " + propKey);
+            if (configuration.containsKey(propKey)) {
+                return (T) ReflectionUtils.createInstanceOfType(configuration.getString(propKey));
+            } else {
+                throw new UnitilsException("Missing configuration for " + propKey);
+            }
         }
     }
 }

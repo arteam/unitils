@@ -18,14 +18,15 @@ package org.unitils.dbmaintainer.clear;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
- * Defines the contract for implementations that clear a database schema. This means, all the tables, views, constraints,
- * triggers and sequences are dropped, so that the database schema is empty.
+ * Defines the contract for implementations that clear a database schema, so that it can be recreated from scratch by
+ * the {@link org.unitils.dbmaintainer.maintainer.DBMaintainer}
+ *
+ * @author Filip Neven
  */
 public interface DBClearer {
 
     /**
-     * Clears the database schema. This means, all the tables, views, constraints, triggers and sequences are
-     * dropped, so that the database schema is empty.
+     * Clears the database schema.
      *
      * @throws StatementHandlerException
      */

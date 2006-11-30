@@ -23,14 +23,26 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
+ * the annotated field to a static property of the class defined by the target attribute.
+ * <p/>
+ * Automatic injection by type is used, which means that a the object is injected to the most specific static property
+ * with an assignable type.
+ *
+ * @author Filip Neven
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AutoInjectStatic {
 
+    /**
+     * The target class to which the object referenced by the annotated field is injected
+     */
     Class target();
 
+    /**
+     * The property access type that is used for injection
+     */
     PropertyAccessType propertyAccessType() default PropertyAccessType.DEFAULT;
 
 }

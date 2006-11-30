@@ -13,6 +13,8 @@ import java.util.Properties;
 /**
  * Implementation of the Hibernate <code>ConnectionProvider</code> interface. Provides JDBC connections to Hibernate
  * using the <code>DataSource</code> from the {@link DatabaseModule}.
+ *
+ * @author Filip Neven
  */
 public class HibernateConnectionProvider implements ConnectionProvider {
 
@@ -28,8 +30,7 @@ public class HibernateConnectionProvider implements ConnectionProvider {
 
     /**
      * Possibility to do something with the Hibernate properties. Nothing is done with it at the moment.
-     * TODO check if this is reasonable in all cases.
-     *
+     * 
      * @param props
      * @throws HibernateException
      */

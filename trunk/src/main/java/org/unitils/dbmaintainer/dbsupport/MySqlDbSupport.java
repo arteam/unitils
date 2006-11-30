@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 
+ * Implementation of {@link DbSupport} for a MySql database
+ *
+ * @author Frederick Beernaert
  */
 public class MySqlDbSupport extends DbSupport {
 
@@ -68,8 +70,8 @@ public class MySqlDbSupport extends DbSupport {
     }
 
     public void dropView(String viewName) throws StatementHandlerException {
-        String dropTableSQL = "drop view " + viewName + " cascade";
-        statementHandler.handle(dropTableSQL);
+        String dropViewSQL = "drop view " + viewName + " cascade";
+        statementHandler.handle(dropViewSQL);
     }
 
     public void dropTable(String tableName) throws StatementHandlerException {

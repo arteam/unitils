@@ -16,7 +16,9 @@
 package org.unitils.dbmaintainer.handler;
 
 /**
- * This Exception is thrown when a problem occurs handling a statement
+ * This Exception is thrown when a problem occurs handling a statement.
+ *
+ * @author Filip Neven
  */
 public class StatementHandlerException extends Exception {
 

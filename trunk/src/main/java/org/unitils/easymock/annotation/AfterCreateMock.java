@@ -21,13 +21,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
- * <p/>
- * Annotation indicating that a mock object should be injected into the annotated field.
+ * Annotation that is called after a mock object has been created by the {@link org.unitils.easymock.EasyMockModule}
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AfterCreateMock {
-
-
 }

@@ -27,6 +27,8 @@ import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 /**
  * Ant task that drops all database tables in the current database. Invokes the implementation of {@link DBClearer}
  * that is configured in the Unitils configuration.
+ *
+ * @author Filip Neven
  */
 public class ClearDatabaseTask extends BaseUnitilsTask {
 

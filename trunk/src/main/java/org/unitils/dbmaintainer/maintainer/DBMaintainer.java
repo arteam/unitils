@@ -38,28 +38,30 @@ import java.util.List;
 /**
  * A class for performing automatic maintenance of a database.<br>
  * This class must be configured with implementations of a {@link VersionSource}, {@link ScriptSource}, a
- * {@link ScriptRunner}, {@link DBClearer}, {@link ConstraintsDisabler}, {@link SequenceUpdater} and a
- * {@link DtdGenerator}
+ * {@link ScriptRunner}, {@link DBClearer}, {@link DBCleaner}, {@link ConstraintsDisabler}, {@link SequenceUpdater} and
+ * a {@link DtdGenerator}
  * <p/>
- * The {@link #updateDatabase()} method will use the {@link VersionSource} to check what is
- * the current version of the database. The {@link ScriptSource} is used to check if existing scripts have
- * been modified. If yes, the database is cleared by invoking the {@link DBClearer} and all database scripts,
- * obtained from the {@link ScriptSource} are executed on the database. If no existing scripts have been
- * modified, but new scripts have been added, only the new scripts are executed.
+ * The {@link #updateDatabase()} method check what is the current version of the database, and see if existing scripts
+ * have been modified. If yes, the database is cleared and all available database scripts, are executed on the database.
+ * If no existing scripts have been modified, but new scripts were added, only the new scripts are executed.
+ * Before executing an update, data from the database is removed, to avoid problems when e.g. adding a not null column.
+ * <p/>
+ * If a database update causes an error, a {@link StatementHandlerException} is thrown. After a failing update, the
+ * database is always completely recreated from scratch.
  * <p/>
  * After updating the database, following steps are optionally executed on the database (depending on the configuration):
  * <ul>
- * <li>Foreign key and not null constraints are disabled</li>
- * <li>Sequences that have a value lower than a configured treshold, are updated to a value equal to or largen than this
- * treshold</li>
+ * <li>Foreign key and not null constraints are disabled.</li>
+ * <li>Sequences and identity columns that have a value lower than a configured treshold, are updated to a value equal
+ * to or largen than this treshold</li>
  * <li>A DTD is generated that describes the database's table structure, to use in test data XML files</li>
  * </ul>
  * <p/>
  * To obtain a properly configured <code>DBMaintainer</code>, invoke the contructor
  * {@link #DBMaintainer(Configuration,DataSource)} with a <code>TestDataSource</code> providing access
  * to the database and a <code>Configuration</code> object containing all necessary properties.
- * <p/>
- * todo clear database before updating
+ *
+ * @author Filip Neven
  */
 public class DBMaintainer {
 
@@ -120,10 +122,8 @@ public class DBMaintainer {
     }
 
     /**
-     * Create a new instance of <code>DBMaintainer</code>, The concrete implementations of {@link VersionSource},
-     * {@link ScriptSource} and {@link StatementHandler} are derived from the given <code>Configuration</code> object.
-     * These objects are initialized using their init method and the given <code>Configuration</code> and
-     * <code>TestDataSource</code> object.
+     * Create a new instance of <code>DBMaintainer</code>, The concrete implementations of all helper classes are
+     * derived from the given <code>Configuration</code> object.
      *
      * @param configuration
      * @param dataSource
@@ -183,22 +183,14 @@ public class DBMaintainer {
     public void updateDatabase() throws StatementHandlerException {
         Version currentVersion = versionSource.getDbVersion();
         boolean rebuildDatabaseFromScratch = false;
-        if (!versionSource.lastUpdateSucceeded()) {
+        if (scriptSource.existingScriptsModified(currentVersion)) {
             if (fromScratchEnabled) {
-                logger.info("Last update didn't succeed. Database will be cleared and rebuilt from scratch");
+                logger.info("One or more existing database update scripts have been modified. Database will be " +
+                        "cleared and rebuilt from scratch");
                 rebuildDatabaseFromScratch = true;
             } else {
-                logger.warn("Last update didn't succeed, but updating the database from scratch is not enabled. Trying" +
-                        " incremental update anyway");
-            }
-        } else {
-            if (scriptSource.existingScriptsModified(currentVersion)) {
-                if (fromScratchEnabled) {
-                    rebuildDatabaseFromScratch = true;
-                } else {
-                    throw new UnitilsException("Existing database update scripts have been modified, but updating " +
-                            "from scratch is disabled");
-                }
+                logger.warn("Existing database update scripts have been modified, but updating " +
+                        "from scratch is disabled. The updated scripts are not executed again!!");
             }
         }
 
@@ -211,6 +203,9 @@ public class DBMaintainer {
         }
 
         if (versionScriptPairs.size() > 0) {
+            logger.info("Database update scripts have been found and will be executed on the database");
+            // Remove data from the database, that could cause errors when executing scripts. Such as for example
+            // when added a not null column.
             if (dbCleaner != null) {
                 dbCleaner.cleanDatabase();
             }
@@ -218,21 +213,37 @@ public class DBMaintainer {
                 try {
                     scriptRunner.execute(versionScriptPair.getScript());
                 } catch (StatementHandlerException e) {
-                    logger.error("Error while executing script: " + versionScriptPair.getScript() + "\nDatabase version not incremented", e);
+                    logger.error("Error while executing script with version number " + versionScriptPair.getVersion() +
+                            ": " + versionScriptPair.getScript(), e);
+                    if (fromScratchEnabled) {
+                        // If rebuilding from scratch is disabled, the version is not incremented, to give the chance
+                        // of fixing the erroneous script.
+                        // If rebuilding from scratch is enabled, the version is set to the version of the erroneous
+                        // script anyway, so that the database is rebuilt from scratch when the erroneous script is
+                        // fixed.
+                        versionSource.setDbVersion(versionScriptPair.getVersion());
+                        logger.info("Database version incremented to " + versionScriptPair.getVersion());
+                    }
                     logger.error("Current database version is " + versionSource.getDbVersion());
+                    // The fact that the update didn't succeed, is only stored for information purposes
                     versionSource.registerUpdateSucceeded(false);
                     throw e;
                 }
                 versionSource.setDbVersion(versionScriptPair.getVersion());
-                logger.info("Database version incremented to " + versionScriptPair.getVersion());
+                logger.info("Database version successfully incremented to " + versionScriptPair.getVersion());
+                // The fact that the update didn't succeed, is only stored for information purposes
+                versionSource.registerUpdateSucceeded(true);
             }
-            versionSource.registerUpdateSucceeded(true);
+
+            // Disable FK and not null constraints, if enabled
             if (constraintsDisabler != null) {
                 constraintsDisabler.disableConstraints();
             }
+            // Update sequences to a sufficiently high value, if enabled
             if (sequenceUpdater != null) {
                 sequenceUpdater.updateSequences();
             }
+            // Generate a DTD to enable validation and completion in data xml files, if enabled
             if (dtdGenerator != null) {
                 dtdGenerator.generateDtd();
             }
@@ -240,7 +251,7 @@ public class DBMaintainer {
     }
 
     /**
-     * Allows setting fromScratchEnabled property programmatically
+     * Sets the fromScratchEnabled property
      *
      * @param fromScratchEnabled
      */

@@ -21,9 +21,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Wrapper or decorator for a <code>TestDataSource</code> that makes sure that the constraints are disabled on all
- * <code>Connection</code>s retrieved, provided that the {@link ConstraintsDisabler} is correctly used (see
- * Javadoc of {@link ConstraintsDisabler}
+ * Wrapper or decorator for a <code>TestDataSource</code> that makes sure that for every
+ * <code>Connection</code>s that is returned, the method {@link ConstraintsDisabler#disableConstraintsOnConnection(java.sql.Connection)}
+ * is called.
+ *
+ * @author Filip Neven
  */
 public class ConstraintsCheckDisablingDataSource implements DataSource {
 
@@ -34,7 +36,7 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
     private ConstraintsDisabler constraintsDisabler;
 
     /**
-     * Creates a new instance.
+     * Creates a new instance that wraps the given <code>DataSource</code>
      *
      * @param wrappedDataSource
      * @param constraintsDisabler
@@ -45,7 +47,8 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
     }
 
     /**
-     * Returns a new connection to the database, on which constraints checking has been disabled.
+     * Returns a new connection to the database, on which the method
+     * {@link ConstraintsDisabler#disableConstraintsOnConnection(java.sql.Connection)} has been called.
      *
      * @see javax.sql.DataSource#getConnection()
      */
@@ -56,7 +59,8 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
     }
 
     /**
-     * Returns a new connection to the database, on which constraints checking has been disabled.
+     * Returns a new connection to the database, on which the method
+     * {@link ConstraintsDisabler#disableConstraintsOnConnection(java.sql.Connection)} has been called.
      *
      * @see javax.sql.DataSource#getConnection(java.lang.String,java.lang.String)
      */

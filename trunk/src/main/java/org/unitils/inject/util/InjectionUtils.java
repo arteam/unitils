@@ -28,7 +28,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * General utility class that implements explicit injection using OGNL expressions, or auto-injection by type.
+ * Class containing static methods that implement explicit injection using OGNL expressions, and auto-injection by type.
+ *
+ * @author Filip Neven
  */
 public class InjectionUtils {
 

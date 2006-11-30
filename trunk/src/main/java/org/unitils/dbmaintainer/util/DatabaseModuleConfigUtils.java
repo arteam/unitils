@@ -9,7 +9,10 @@ import org.unitils.util.ConfigUtils;
 import javax.sql.DataSource;
 
 /**
- * Class containing configuration utility methods secifically for the DatabaseModule and related modules
+ * Class containing configuration utility methods specifically for the {@link org.unitils.database.DatabaseModule} and
+ * related modules
+ *
+ * @author Filip Neven
  */
 public class DatabaseModuleConfigUtils {
 
@@ -49,9 +52,10 @@ public class DatabaseModuleConfigUtils {
      * @return The dbms specific instance of {@link DbSupport}
      */
     public static DbSupport getConfiguredDbSupportInstance(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
+
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         DbSupport dbSupport = ConfigUtils.getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
-        String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME);
+        String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
         dbSupport.init(dataSource, schemaName, statementHandler);
         return dbSupport;
     }
@@ -64,6 +68,7 @@ public class DatabaseModuleConfigUtils {
      * @return Returns the configured instance of {@link StatementHandler}
      */
     public static StatementHandler getConfiguredStatementHandlerInstance(Configuration configuration, DataSource dataSource) {
+
         StatementHandler st = ConfigUtils.getConfiguredInstance(StatementHandler.class, configuration);
         st.init(configuration, dataSource);
         return st;

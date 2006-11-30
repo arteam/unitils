@@ -19,6 +19,8 @@ import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
  * Defines the contract for an executer of a database update script.
+ *
+ * @author Filip Neven
  */
 public interface ScriptRunner {
 

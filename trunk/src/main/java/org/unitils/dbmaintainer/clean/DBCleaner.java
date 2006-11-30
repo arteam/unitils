@@ -18,16 +18,15 @@ package org.unitils.dbmaintainer.clean;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
- * TODO use this class
- * <p/>
- * Defines the contract for implementations that delete all data from the database, except for the tables that have been
- * configured as <i>tablesToPreserve</i>, and the table in which the database version is stored.
+ * Defines the contract for implementations that delete data from the database, that could cause problems when performing
+ * updates to the database, such as adding not null columns or foreign key constraints.
+ *
+ * @author Filip Neven
  */
 public interface DBCleaner {
 
     /**
-     * Deletes all data from the database, except for the tables that have been
-     * configured as <i>tablesToPreserve</i>, and the table in which the database version is stored
+     * Delete data from the database, that could cause problems when performing updates.
      *
      * @throws StatementHandlerException
      */

@@ -16,6 +16,7 @@
 package org.unitils.database;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
@@ -56,6 +57,8 @@ import java.util.Set;
  * database and prepare it for unit testing (see {@link DBMaintainer} Javadoc)</li>
  */
 public class DatabaseModule implements Module {
+
+    private static final Logger logger = Logger.getLogger(DatabaseModule.class);
 
     /* Property keys indicating if the database schema should be updated before performing the tests */
     static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
@@ -132,6 +135,8 @@ public class DatabaseModule implements Module {
      * @return the datasource
      */
     protected DataSource createDataSource() {
+
+        logger.info("Creating DataSource");
         DataSourceFactory dataSourceFactory = createDataSourceFactory();
         dataSourceFactory.init(configuration);
         DataSource dataSource = dataSourceFactory.createDataSource();

@@ -21,14 +21,28 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
+ * the annotated field to the object defined by the target attribute (or the object(s) assigned to the field annotated
+ * with {@link TestedObject}.
+ * <p/>
+ * Explicit injection is used, which means that the object is injected to the property indicated by the {@link #property()}
+ * attribute.
+ *
+ * @author Filip Neven
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Inject {
 
+    /**
+     * The name of the field that references the object to which the object in the annotated field should be injected.
+     * If not specified, the target is defined by the field annotated with {@link TestedObject}
+     */
     String target() default "";
 
+    /**
+     * OGNL expression that defines the property to which the object referenced by the annotated field is injected
+     */
     String property();
 
 }

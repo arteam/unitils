@@ -104,7 +104,7 @@ public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGener
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            IDatabaseConnection dbUnitConn = new DatabaseConnection(conn, schemaName.toUpperCase());
+            IDatabaseConnection dbUnitConn = new DatabaseConnection(conn, schemaName);
 
             StringWriter stringWriter = new StringWriter();
 

@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
  * has been created, but before the Hibernate <code>SessionFactory</code> is instantiated. Annotated methods can perform
  * programmatic Hibernate configuration, such as registering mapped classes. Annotated methods should have following
  * signature: void myMethod(org.hibernate.cfg.Configuration configuration)
+ *
+ * @author Filip Neven
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

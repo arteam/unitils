@@ -16,6 +16,7 @@
 package org.unitils.dbmaintainer.clear;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -25,10 +26,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Base implementation of {@link DBClearer}. This implementation uses plain JDBC and standard SQL
- * for most of the work, and defers DBMS specific work to its subclasses.
+ * Implementation of {@link DBClearer}. This implementation individually drops every table, view, constraint,
+ * trigger and sequence in the database. A list of tables, views, ... that should be preserverd can be specified
+ * using the property {@link #PROPKEY_ITEMSTOPRESERVE}.
+ *
+ * @author Filip Neven
  */
 public class DefaultDBClearer extends DatabaseTask implements DBClearer {
+
+    private static final Logger logger = Logger.getLogger(DefaultDBClearer.class);
 
     /* The key of the property that specifies which database items should not be deleted when clearing the database */
     public static final String PROPKEY_ITEMSTOPRESERVE = "dbMaintainer.clearDb.itemsToPreserve";
@@ -38,6 +44,9 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     private Set<String> itemsToPreserve = new HashSet<String>();
 
     /**
+     * Initializes the the DBClearer. The list of database items that should be preserved is retrieved from the given
+     * <code>Configuration</code> object.
+     *
      * @param configuration
      */
     protected void doInit(Configuration configuration) {
@@ -48,12 +57,15 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     }
 
     /**
-     * Clears the database schema.
+     * Clears the database schema. This means, all the tables, views, constraints, triggers and sequences are
+     * dropped, so that the database schema is empty. The database items that are configured as items to preserve, are
+     * left untouched.
      *
      * @throws StatementHandlerException
      */
     public void clearDatabase() throws StatementHandlerException {
         try {
+            logger.info("Clearing (dropping) the unit test database");
             dropViews();
             dropTables();
             dropSequences();
@@ -92,7 +104,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     }
 
     /**
-     * Drops all sequences in the database
+     * Drops all sequences
      *
      * @throws StatementHandlerException
      * @throws SQLException
@@ -108,7 +120,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     }
 
     /**
-     * Drops all database triggers
+     * Drops all triggers
      *
      * @throws StatementHandlerException
      * @throws SQLException
