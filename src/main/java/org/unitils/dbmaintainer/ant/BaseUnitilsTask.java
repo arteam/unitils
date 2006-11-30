@@ -25,6 +25,8 @@ import javax.sql.DataSource;
 
 /**
  * Base ant task for Unitils database operations
+ *
+ * @author Filip Neven
  */
 public abstract class BaseUnitilsTask extends Task {
 

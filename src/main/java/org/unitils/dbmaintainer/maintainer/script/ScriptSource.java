@@ -22,8 +22,10 @@ import java.util.List;
 
 /**
  * Defines the contract for a source that provides scripts for updating the database to a given state.<br>
- * Scripts are provides a {@link org.unitils.dbmaintainer.maintainer.VersionScriptPair} objects, which indicate
- * which scripts should be executed, to update the database to which state.<br>
+ * Scripts are provided as {@link VersionScriptPair} objects, which indicate which scripts should be executed, to
+ * update the database to a given state.
+ *
+ * @author Filip Neven
  */
 public interface ScriptSource {
 
@@ -38,21 +40,15 @@ public interface ScriptSource {
     public boolean existingScriptsModified(Version currentVersion);
 
     /**
-     * Returns a <code>List<VersionScriptPair></code> containing the statements that will update the database from the
-     * given version to the latest one.
-     *
      * @param currentVersion The current database version
      * @return A List<VersionScriptPair> containing the scripts that need to be executed to update the database
-     *         version to the latest one.
+     *         from the given version to the latest one.
      */
     List<VersionScriptPair> getNewScripts(Version currentVersion);
 
     /**
-     * Returns a <code>List<VersionScriptPair></code> containing all statements that complete create the database
-     * from scratch.
-     *
-     * @return a <code>List<VersionScriptPair></code> containing all statements that complete create the database
-     *         from scratch.
+     * @return a <code>List<VersionScriptPair></code> containing all available database update scripts. These scripts
+     * can be used to completely recreate the database from scratch.
      */
     List<VersionScriptPair> getAllScripts();
 

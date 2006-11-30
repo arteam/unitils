@@ -20,8 +20,10 @@ import java.lang.annotation.*;
 /**
  * Annotation indicating that the annotated test class tests methods using Hibernate to go to a database, so that the
  * {@link org.unitils.hibernate.HibernateModule} will provide it's services to it. Annotated classes are regarded as
- * database tests by the {@link org.unitils.db.DatabaseModule} and {@link org.unitils.dbunit.DbUnitModule}, so there is
- * no need for an extra {@link org.unitils.db.annotations.DatabaseTest} annotation.
+ * database tests by the {@link org.unitils.database.DatabaseModule} and {@link org.unitils.dbunit.DbUnitModule}, so there is
+ * no need for an extra {@link org.unitils.database.annotations.DatabaseTest} annotation.
+ *
+ * @author Filip Neven
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

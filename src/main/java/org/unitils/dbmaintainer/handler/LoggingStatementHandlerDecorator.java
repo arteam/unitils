@@ -23,6 +23,8 @@ import javax.sql.DataSource;
 /**
  * Decorator for another implementation of {@link StatementHandler}. Statements are written to log4j log, and
  * passed on to the {@link StatementHandler} that is decorated.
+ *
+ * @author Filip Neven
  */
 public class LoggingStatementHandlerDecorator implements StatementHandler {
 

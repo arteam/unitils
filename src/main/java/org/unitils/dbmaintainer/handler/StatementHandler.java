@@ -22,6 +22,8 @@ import javax.sql.DataSource;
 /**
  * Defines the contract for classes that handle SQL statements. E.g. by logging these statements or by executing them
  * on a database.
+ *
+ * @author Filip Neven
  */
 public interface StatementHandler {
 

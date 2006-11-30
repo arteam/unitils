@@ -21,7 +21,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
+ * the annotated field to a static property of the class defined by the target attribute.
+ * <p/>
+ * Explicit injection is used, which means that the object is injected to the property indicated by the {@link #property()}
+ * attribute.
  *
  * @author Filip Neven
  */
@@ -29,8 +33,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InjectStatic {
 
+    /**
+     * The target class to which the object referenced by the annotated field is injected
+     */
     Class target();
 
+    /**
+     * OGNL expression that defines the property to which the object referenced by the annotated fiel is injected
+     */
     String property();
 
 }

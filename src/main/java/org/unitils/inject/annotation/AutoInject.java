@@ -23,7 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
+ * the annotated field to the object defined by the target attribute (or the object(s) assigned to the field annotated
+ * with {@link TestedObject}.
+ * <p/>
+ * Automatic injection by type is used, which means that the object is injected to the most specific property with an
+ * assignable type.
  *
  * @author Filip Neven
  */
@@ -31,8 +36,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AutoInject {
 
+    /**
+     * The name of the field that references the object to which the object in the annotated field should be injected.
+     * If not specified, the target is defined by the field annotated with {@link TestedObject}
+     */
     String target() default "";
 
+    /**
+     * The property access type that should be used for injection.
+     */
     PropertyAccessType propertyAccessType() default PropertyAccessType.DEFAULT;
 
 }

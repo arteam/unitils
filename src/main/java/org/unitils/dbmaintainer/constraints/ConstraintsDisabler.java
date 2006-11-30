@@ -25,6 +25,9 @@ import java.sql.Connection;
  * The implementation guarantees that, when the method disableConstraints() is is called once after each database update,
  * and when the method enableConstraintsOnConnection is called on the <code>Connection</code> object, all foreign key
  * and not-null constraints are disabled for this <code>Connection</code>.
+ *
+ * @author Filip Neven
+ * @author Bart Vermeiren
  */
 public interface ConstraintsDisabler {
 

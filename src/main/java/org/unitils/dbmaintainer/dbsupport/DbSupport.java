@@ -13,6 +13,9 @@ import java.util.Set;
  * Helper class that implements a number of common operations on a database schema. Operations that can be implemented
  * using general JDBC or ANSI SQL constructs, are impelemented in this base abstract class. Operations that are DBMS
  * specific are abstract, and their implementation is left to DBMS specific subclasses.
+ *
+ * @author Filip Neven
+ * @author Frederick Beernaert
  */
 abstract public class DbSupport {
 
@@ -85,10 +88,10 @@ abstract public class DbSupport {
             conn = dataSource.getConnection();
             Set<String> tableNames = new HashSet<String>();
             DatabaseMetaData databaseMetadata = conn.getMetaData();
-            rset = databaseMetadata.getTables(null, schemaName.toUpperCase(), null, types);
+            rset = databaseMetadata.getTables(null, schemaName, null, types);
             while (rset.next()) {
                 String tableName = rset.getString("TABLE_NAME");
-                tableNames.add(tableName.toUpperCase());
+                tableNames.add(tableName);
             }
             return tableNames;
         } finally {
@@ -349,4 +352,22 @@ abstract public class DbSupport {
      */
     abstract public String getLongDataType();
 
+    /**
+     * @param tableName
+     * @return The number of records in the table with the given name
+     */
+    public long getRecordCount(String tableName) throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rs = st.executeQuery("select count(*) from " + tableName);
+            rs.next();
+            return rs.getLong(1);
+        } finally {
+            DbUtils.closeQuietly(conn, st, rs);
+        }
+    }
 }

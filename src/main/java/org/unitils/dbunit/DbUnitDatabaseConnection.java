@@ -7,29 +7,57 @@ import java.sql.SQLException;
 import java.sql.Connection;
 
 /**
- * 
+ * Implementation of DBUnits <code>IDatabaseConnection</code> interface. This implementation returns connections from
+ * an underlying <code>DataSource</code>.
+ *
+ * @author Filip Neven
  */
 public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
 
+    /* DataSource that provides access to JDBC connections */
     private DataSource dataSource;
 
+    /* Name of the database schema */
     private String schemaName;
 
+    /* Connection that is currently in use by DBUnit. Is stored to enable returning it to the connection pool after
+     the DBUnit operation finished */
     private Connection currentlyUsedConnection;
 
+    /**
+     * Creates a new instance that wraps the given <code>DataSource</code>
+     * @param dataSource
+     * @param schemaName
+     */
     public DbUnitDatabaseConnection(DataSource dataSource, String schemaName) {
         this.dataSource = dataSource;
         this.schemaName = schemaName;
     }
 
+    /**
+     * Method that is invoked by DBUnit when the connection is no longer needed. This method is not implemented,
+     * connections are 'closed' (returned to the connection pool) after every DBUnit operation
+     * @throws SQLException
+     */
     public void close() throws SQLException {
         // Nothing to be done. Connections are closed (i.e. returned to the pool) after every dbUnit operation
     }
 
+    /**
+     * @return The database schema name
+     */
     public String getSchema() {
         return schemaName;
     }
 
+    /**
+     * Returns a <code>Connection</code> that can be used by DBUnit. A reference to the connection is kept, to be able
+     * to 'close' it (return it to the connection pool) after the DBUnit operation finished. If an open connection
+     * is already in use by DBUnit, this connection is returned
+     *
+     * @return A JDBC connection
+     * @throws SQLException
+     */
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
             currentlyUsedConnection = dataSource.getConnection();
@@ -37,6 +65,11 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
         return currentlyUsedConnection;
     }
 
+    /**
+     * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
+     *
+     * @throws SQLException
+     */
     public void closeJdbcConnection() throws SQLException {
         if (currentlyUsedConnection != null) {
             currentlyUsedConnection.close();

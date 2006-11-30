@@ -33,6 +33,8 @@ import java.util.List;
 /**
  * Implementation of {@link ScriptRunner} that runs an SQL script. All statements are passed on to
  * a {@link StatementHandler}
+ *
+ * @author Tim Ducheyne
  */
 public class SQLScriptRunner extends DatabaseTask implements ScriptRunner {
 

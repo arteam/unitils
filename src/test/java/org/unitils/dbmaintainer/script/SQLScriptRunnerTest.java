@@ -15,17 +15,21 @@
  */
 package org.unitils.dbmaintainer.script;
 
+import org.apache.commons.configuration.Configuration;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.easymock.EasyMockTestCase;
+import static org.unitils.easymock.EasyMockUnitils.replay;
+import static org.unitils.easymock.EasyMockUnitils.verify;
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.core.ConfigurationLoader;
-import org.apache.commons.configuration.Configuration;
 
 /**
  * Tests the SQL script runner
+ *
+ * @author Filip Neven
  */
-public class SQLScriptRunnerTest extends EasyMockTestCase {
+public class SQLScriptRunnerTest extends UnitilsJUnit3 {
 
     @Mock
     private StatementHandler mockStatementHandler = null;

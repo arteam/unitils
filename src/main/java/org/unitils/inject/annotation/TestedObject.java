@@ -21,7 +21,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * Annotation indicating the object under test. The object(s) referenced by the annotated field(s) is (are) used as
+ * default target for injection.
  *
  * @author Filip Neven
  */

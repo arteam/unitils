@@ -13,14 +13,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 
+ * Implementation of {@link DbSupport} for a hsqldb database
+ *
+ * @author Filip Neven
  */
 public class HsqldbDbSupport extends DbSupport {
 
     /**
      * Logger for this class
      */
-    Logger logger = Logger.getLogger(HsqldbDbSupport.class);
+    private static final Logger logger = Logger.getLogger(HsqldbDbSupport.class);
 
     public HsqldbDbSupport() {
     }

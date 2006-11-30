@@ -30,6 +30,9 @@ import java.util.List;
 
 /**
  * Assert class that offers assert methods for testing things that are specific to Hibernate.
+ *
+ * @author Timmy Maris
+ * @author Filip Neven
  */
 public class HibernateAssert {
 

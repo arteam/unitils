@@ -24,6 +24,8 @@ import java.lang.annotation.RetentionPolicy;
  * Indicates that after having executed the annotated test method, the contents of the unit test database should be
  * equal to the contents of either the default result datafile (ClassName.methodName-result.xml), or a file with a
  * custom specified name (fileName property).
+ *
+ * @author Filip Neven
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -26,6 +26,8 @@ import java.sql.Statement;
 /**
  * Implementation of {@link StatementHandler} that will execute the SQL statements on a database using JDBC.
  * A <code>TestDataSource</code> is provided on creation to provide the connection to the database.
+ *
+ * @author Filip Neven
  */
 public class JDBCStatementHandler implements StatementHandler {
 

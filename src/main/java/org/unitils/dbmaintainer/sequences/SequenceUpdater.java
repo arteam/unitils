@@ -18,13 +18,14 @@ package org.unitils.dbmaintainer.sequences;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
- * Defines the contract for implementation classes that update the sequence of a unit testing database to a sufficiently
- * high value, so that test data be inserted easily.
+ * Defines the contract for implementation classes that update all sequences and identity columns of a database to
+ * a sufficiently high value, so that test data be inserted easily.
  */
 public interface SequenceUpdater {
 
     /**
-     * Updates the database sequences
+     * Updates all database sequences and identity columns to a sufficiently high value, so that test data be inserted
+     * easily.
      *
      * @throws StatementHandlerException
      */

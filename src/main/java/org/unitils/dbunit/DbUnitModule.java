@@ -64,7 +64,9 @@ import java.sql.SQLException;
  * Using the method {@link #assertDBContentAsExpected(Object,String)}, the contents of the database can be compared with
  * the contents of a dataset. The expected dataset file should be located in the classpath in the same package as the
  * testclass, with the name 'classname without packagename'.'test method name'-result.xml.
- * <p/>
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class DbUnitModule implements Module {
 
@@ -82,7 +84,7 @@ public class DbUnitModule implements Module {
     private DbUnitDatabaseConnection dbUnitDatabaseConnection;
 
     /* Name of the database schema, needed to configure DBUnit */
-    private String databaseSchemaName;
+    private String schemaName;
 
     /* Instance of DbUnits IDataTypeFactory, that handles dbms specific data type issues */
     private IDataTypeFactory dataTypeFactory;
@@ -94,7 +96,7 @@ public class DbUnitModule implements Module {
      */
     public void init(Configuration configuration) {
 
-        databaseSchemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
+        schemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         dataTypeFactory = ConfigUtils.getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
     }
@@ -119,7 +121,7 @@ public class DbUnitModule implements Module {
     protected DbUnitDatabaseConnection createDbUnitConnection() {
 
         // Create connection
-        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(getDatabaseModule().getDataSource(), databaseSchemaName);
+        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(getDatabaseModule().getDataSource(), schemaName);
 
         // Make sure correct dbms specific data types are used
         DatabaseConfig config = connection.getConfig();

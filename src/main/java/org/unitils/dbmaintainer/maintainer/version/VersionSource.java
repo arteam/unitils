@@ -18,14 +18,16 @@ package org.unitils.dbmaintainer.maintainer.version;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 
 /**
- * Interface that gives access to the version of a database, and a means to increment this version
+ * Interface that gives access to the version of a database, and a means to increment this version. The version of
+ * a database is represented by a {@link Version} object. This interface can also be used to register / retrieve whether
+ * the lastest database update succeeded.
+ *
+ * @author Filip Neven
  */
 public interface VersionSource {
 
     /**
-     * Returns the current version of the underlying database
-     *
-     * @return The current version of the underlying database
+     * @return The current version of the database
      */
     Version getDbVersion() throws StatementHandlerException;
 
@@ -44,8 +46,7 @@ public interface VersionSource {
     boolean lastUpdateSucceeded();
 
     /**
-     * Notifies the VersionSource of the fact that the lastest version update has succeeded (succeeded == true) or
-     * failed (succeeded = false)
+     * Notifies the VersionSource of the fact that the lastest version update has succeeded or not
      */
     void registerUpdateSucceeded(boolean succeeded) throws StatementHandlerException;
 }

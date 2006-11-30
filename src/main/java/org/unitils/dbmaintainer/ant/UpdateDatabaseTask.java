@@ -25,6 +25,8 @@ import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 /**
  * Ant task that updates the database to the latest version. Invokes the {@link DBMaintainer} as it is configured in the
  * Unitils configuration.
+ *
+ * @author Filip Neven
  */
 public class UpdateDatabaseTask extends BaseUnitilsTask {
 

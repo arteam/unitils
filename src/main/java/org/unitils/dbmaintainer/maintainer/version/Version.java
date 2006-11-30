@@ -16,8 +16,9 @@
 package org.unitils.dbmaintainer.maintainer.version;
 
 /**
- * Class representing the version of a database, or the version of a number of DDL scripts. Objects of this class
- * have value semantics, and are by consequence immutable.
+ * Class representing the version of a database, or the version of a number of DDL scripts.
+ *
+ * @author Filip Neven
  */
 public class Version {
 

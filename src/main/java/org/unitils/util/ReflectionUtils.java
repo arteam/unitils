@@ -23,7 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility methods that use reflection in some way.
+ * Utility methods that use reflection for instance creation or class inspection.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class ReflectionUtils {
 

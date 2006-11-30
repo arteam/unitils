@@ -49,6 +49,8 @@ import java.util.Map;
  * AutoInjectStatic} annotations.
  * <p/>
  * The target object can either be specified explicitly, or implicitly by annotating an object with {@link TestedObject}
+ *
+ * @author Filip Neven
  */
 public class InjectModule implements Module {
 

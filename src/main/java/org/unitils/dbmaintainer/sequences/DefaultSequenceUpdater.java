@@ -24,7 +24,10 @@ import java.sql.SQLException;
 import java.util.Set;
 
 /**
- * Base convenience implementation of {@link SequenceUpdater}
+ * Implementation of {@link SequenceUpdater}. All sequences and identity columns that have a value lower than the value
+ * defined by {@link #PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE} are set to this value.
+ *
+ * @author Filip Neven
  */
 public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpdater {
 
@@ -34,13 +37,26 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
     /* The lowest acceptable sequence value */
     protected long lowestAcceptableSequenceValue;
 
+    /**
+     * Initializes the lowest acceptable sequence value using the given configuration object
+     *
+     * @param configuration
+     */
     protected void doInit(Configuration configuration) {
         lowestAcceptableSequenceValue = configuration.getLong(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE);
     }
 
+    /**
+     * Updates all database sequences and identity columns to a sufficiently high value, so that test data be inserted
+     * easily.
+     *
+     * @throws StatementHandlerException
+     */
     public void updateSequences() throws StatementHandlerException {
         try {
-            incrementSequencesWithLowValue();
+            if (dbSupport.supportsSequences()) {
+                incrementSequencesWithLowValue();
+            }
             if (dbSupport.supportsIdentityColumns()) {
                 incrementIdentityColumnsWithLowValue();
             }
@@ -49,6 +65,12 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
         }
     }
 
+    /**
+     * Increments all sequences whose value is too low.
+     *
+     * @throws SQLException
+     * @throws StatementHandlerException
+     */
     private void incrementSequencesWithLowValue() throws SQLException, StatementHandlerException {
         Set<String> sequenceNames = dbSupport.getSequenceNames();
         for (String sequenceName : sequenceNames) {
@@ -58,6 +80,11 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
         }
     }
 
+    /**
+     * Increments the next value for identity columns whose next value is too low
+     * 
+     * @throws SQLException
+     */
     private void incrementIdentityColumnsWithLowValue() throws SQLException {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
