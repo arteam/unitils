@@ -5,5 +5,12 @@
 
 Summary
 
- Unitils provides utilities to further simplify unit-testing with JUnit, DBUnit and EasyMock. The goal is to make unit-testing easy and maintainable by offering utilities such as automatic DB-schema maintainance and equality assertion through reflection.
+ Unitils is an open source library aimed at making unit testing easy and maintainable. Unitils builds further on existing libraries like DBUnit and EasyMock, and integrates with JUnit and TestNG.
+ 
+ Unitils provides support for database testing, testing with mock objects, and some general assertion utilities. 
+ It has been designed in a very configurable and loosely coupled way, to make sure features can easily be changed or added.
+ 
+ 
+ The project started begin 2006 from a JTechnologies discussion group on unit testing. The result was a list of guidelines, and Unitils emerged in an attempt to write code to support these guidelines. 
+ 
 
