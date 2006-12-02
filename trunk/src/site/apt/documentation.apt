@@ -459,6 +459,7 @@ public class HibernateMappingTest extends BaseHibernateTest {
 }
 +-----+
 
+    In this example, BaseHibernateTest is a custom project base class, that handles all Unitils-Hibernate configuration. See the cookbook for more information.
     The method HibernateAssert.assertMappingToDatabase() checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
     the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
     
@@ -602,13 +603,75 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 ** Mock creation
 ~~~~~~~~~~~~~~~~
 
+    Unitils makes sure that mock objects are injected into a unit test class before the execution of each test. Following example shows a unit test for a method on a UserService that disables all inactive user accounts.
+    All data access is delegated to a UserDao service, which is replaced by a mock object.
     
++-----+
+public void UserServiceTest extends UnitilsJUnit4 { 
+
+	@Mock
+	private UserDao mockUserDao;
+
+	private UserService userService;
+
+	@Test testDisableInActiveAccounts() {
+    
+    expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
+		mockUserDao.disableAccount(accounts.get(0));
+		mockUserDao.disableAccount(accounts.get(1));
+		replay();
+
+		userService.disableInActiveAccounts();	
+	}
+} 
++-----+
+
+   Mock creation and assignment to the test object's fields is performed before the test fixture.
+   
+   An @AfterCreateMock annotation is foreseen, that allows intercepting a mock immediately after creation. This can be used e.g. to inject the mock into a ServiceFactory (see below).
 
 ** Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
+
+   Unitils provides services that simplify mock injection in various ways. Unitils' injection support is in the first place intended for projects that use an IOC framework like Spring to wire up objects. E.g.
+
++-----+
+  @Mock @Inject(property = "userDao")
+  private UserDao mockUserDao;
+
+  @TestedObject
+  private UserService userService;
++-----+
+
+  Before executing a test method in the above example, but after the test fixture, the mockUserDao will be injected into the userDao property of the userService.
+  The value for the attribute property of @Inject can be an arbitrary OGNL expression. Getter / setter and field access may be mixed and private access is also supported.
+  
+  The target object for injection is by default the field that is annotated as TestedObject. Multiple fields may be annotated as TestedObject, in this case the object
+  will be injected into every annotated field. If injection is not possible (e.g. a property in the OGNL expression doens't exist), the test fails.
+  
+  The target object can also specified explicitly, using the target attribute on the Inject annotation:
+  
++-----+
+  @Mock @Inject(target = "userService", property = "userDao")
+  private UserDao mockUserDao;
+
+  private UserService userService;
++-----+
+  
+  The injection module also supports automatically injecting objects into an arbitrary property of the target by type. E.g.
+  
++-----+
+  @Mock @AutoInject
+  private UserDao mockUserDao;
+
+  @TestedObject
+  private UserService userService;
++-----+
+
+  
 
 *** Mock injection when using a Service Locator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
