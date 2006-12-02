@@ -33,3 +33,8 @@ a:visited  {
 .section h3 {
   	color: #000;
 }
+
+.externalLink {
+  background: url(../images/external.png) right top no-repeat;
+  padding-right: 18px;
+}
