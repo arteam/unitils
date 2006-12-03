@@ -628,9 +628,8 @@ public void UserServiceTest extends UnitilsJUnit4 {
 
    Mock creation and assignment to the test object's fields is performed before the test fixture.
    
-   An @AfterCreateMock annotation is foreseen, that allows intercepting a mock immediately after creation. This can be used e.g. to inject the mock into a ServiceFactory (see below).
-
-** Reflection lenient argument matching
+   
+**   Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ** Mock injection
@@ -661,7 +660,7 @@ public void UserServiceTest extends UnitilsJUnit4 {
   private UserService userService;
 +-----+
   
-  The injection module also supports automatically injecting objects into an arbitrary property of the target by type. E.g.
+  The injection module also supports automatically injecting objects into the target by type. E.g.
   
 +-----+
   @Mock @AutoInject
@@ -671,9 +670,28 @@ public void UserServiceTest extends UnitilsJUnit4 {
   private UserService userService;
 +-----+
 
+  The mockUserDao will be injected into a property of userService with the type UserDao or a superclass or interface of UserDao. If more than one candidate target property exists, the most specific one
+  is chosen. If no single most specific target property can be found, a UnitilsException is thrown and the test fails.
   
+  The variant of the Inject and AutoInject annotation are foreseen, for injection into a static field or setter method. These are called InjectStatic and AutoInjectStatic, respectively.
+  A common use of these annotations is to inject a mock into a singleton class.
 
 *** Mock injection when using a Service Locator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  An AfterCreateMock annotation is foreseen, that allows intercepting a mock immediately after creation. The annotated method takes as parameters an Object (the mock), a String (the name of the field
+  to which the mock is assigned) and a Class (the type of the mock object). This method could be implemented as follows:
+  
++-----+
+
+  @AfterCreateMock
+  @AfterCreateMock
+  protected final void injectMock(Object mock, String name, Class type) {
+     ServiceLocator.injectService(type, mock);
+  }
+  
++----+
+
+  The method ServiceLocator.injectService make sure that when the ServiceLocator is requested for an implementation of UserDao, the mock is returned. This allows for a very simple way 
+  of using mock object in combination with a ServiceLocator.
 
