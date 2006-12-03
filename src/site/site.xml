@@ -26,6 +26,7 @@
             <item name="Summary" href="summary.html"/>
             <item name="&lt;span class=&quot;externalLink&quot;&gt;Downloads&lt;/span&gt;" href="http://sourceforge.net/project/showfiles.php?group_id=167201"/>
             <item name="Documentation" href="documentation.html"/> 
+            <item name="Cookbook" href="cookbook.html"/>
             <item name="Guidelines" href="guidelines.html"/>     
             <item name="&lt;span class=&quot;externalLink&quot;&gt;API Javadoc&lt;/span&gt;" href="apidocs/index.html"/>      
             <item name="&lt;span class=&quot;externalLink&quot;&gt;Forum&lt;/span&gt;" href="http://sourceforge.net/forum/?group_id=167201"/>            

@@ -7,13 +7,13 @@ Tutorial
 ~~~~~~~~
 
     Unit testing should be easy and intuitively... at least in theory. Real-life projects
-    typically span multiple layers, are data-driven and use middleware technologies such as EJBs and Hibernate.
+    typically span multiple layers, are data-driven and use middleware technologies such as EJB and Hibernate.
 
     Unitils originated out of an attempt to get a more pragmatic view on unit testing that involves some
     typical unit testing frameworks such as DbUnit and EasyMock. It started as a set of guidelines and
     eventually resulted in an open source library containing utilities that facilitate the application of these guidelines.
 
-    Currently Unitils offers follwing features:
+    Currently Unitils offers following features:
 
     * <General testing utilities>
 
@@ -46,8 +46,8 @@ Tutorial
     []
 
 
-    This tutorial will show you by example what Unitils is about and how you can configure your project to make use of it's services.
-    It is only an introduction to Unitils, more in-depth documentation can be found in the {{{apidocs/index.html}javadoc}} of the modules.
+    This tutorial will show you what Unitils can do for your projects, using examples.
+    It is merely an introduction to Unitils, more in-depth documentation can be found in the {{{apidocs/index.html}javadoc}} of the modules.
     The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}.
 
 
@@ -56,6 +56,8 @@ Tutorial
 
 ** Configuration
 ~~~~~~~~~~~~~~~~
+    This section explains how the configuration of Unitils works. If you want to learn how you can setup Unitils to get started quickly, read the {{{cookbook.html}cookbook}}.
+    
     As with many projects, Unitils needs some configuration of its services. By default, there are 3 levels
     of configuration, each level overriding the settings of the previous one:
 
@@ -106,7 +108,7 @@ unitils.configuration.localFileName=projectTwo-local.properties
 
 ** Making your test Unitils-enabled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unitils offers services for test classes. To let your test make use of these services, you first have to Unitils-enable your test.
+    Unitils offers services to test classes through a test listener system. To enable Unitils to provide services to your tests, you first have to Unitils-enable them.
     This can be done easily by (indirectly) extending from a Unitils base test-class. Currently there are base classes for the major test frameworks:
 
     * <<{{{http://www.junit.org/}JUnit3}}>>: org.unitils.UnitilsJUnit3
@@ -126,7 +128,7 @@ public class MyTest extends UnitilsJUnit3 {
 }
 +-----+
 
-    Typically you would create your own test base class containing some utility behavior common for all your tests, e.g. datasource injection, and
+    Typically you would create your own base test class containing some utility behavior common for all your tests, e.g. datasource injection, and
     then let this base class extend from one of the Unitils base classes.
 
     For JUnit4 it is also possible to add a @RunWith annotation instead of extending from the base class:
@@ -140,19 +142,23 @@ public class MyTest {
 }
 +-----+
 
-
+    It is possible to Unitils-enable an existing test superclass. You might for example want to use {{{http://www.springframework.org}Spring}}'s AbstractDependencyInjectionSpringContextTests,
+    which is a subclass of JUnit 3's TestCase, as superclass for a range of tests. You also want to make use of Unitils' services in some way. In this case, you can create a custom Unitils-enabled
+    superclass by copying the source code of Unitils' provided superclass for the test framework that you like to use (in this case, this is UnitilsJUnit3), and by letting it extend 
+    AbstractDependencyInjectionSpringContextTests instead of TestCase.
 
 ** Module system
 ~~~~~~~~~~~~~~~~
-    Before starting with the examples, let's first take a look at some of the concepts used in Unitils and how the framwork functions under the hood.
+    Before starting with the examples, let's first take a look at some of the concepts used in Unitils and how it functions under the hood.
 
-    Unitils is structured as an easily extensible system of modules. Each of these modules offers some type of service to a test by listening to the
-    execution of the test and invoking the correct service behavior when needed.
+    Unitils is structured as an easy extensible system of modules. Each of these modules offers some type of service to a test by listening to the
+    execution of the test and invoking the correct service behavior when needed. Each module provides an implementation of TestListener. The base classes 
+    that Unitils provides (UnitilsJUnit3, UnitilsJUnit4, UnitilsTestNG), implement this listener functionality for the test framework that is used.
 
 [images/unitils-modules.png] Unitils modules
 
-   This mechanism provides a uniform way for providing extra services to your tests and offers a flexible way of adding services without having
-   to change the superclass of the test. Adding new services is as easy as adding a new module and making some changes to the unitils configuration.
+   This mechanism offers a uniform way for providing extra services to your tests and a flexible way of adding services without having
+   to change the superclass of the test. Adding new services is as easy as adding a new module and registering this module in one of Unitils' configuration files.
 
    Currently, following modules are available in Unitils:
 
@@ -167,8 +173,6 @@ public class MyTest {
    * <InjectModule>: support for injecting (mock) objects into other objects
 
    * Planned: support for JPA.
-
-
 
 
 
@@ -190,8 +194,7 @@ public class MyTest {
     Let's say we have UserDAO with a simple findByName method for retrieving a user based on it's first and last name. The unit test looks as follows:
 
 +-----+
-@DatabaseTest
-public void UserDAOTest extends UnitilsJUnit4 {
+public void UserDAOTest extends BaseDatabaseTest {
 
     @Test
     public void testFindByName {
@@ -227,14 +230,15 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    The annotation @DatabaseTest marks the test as being a database test, instructing Unitils to look for DBUnit datafiles to load. Unitils automatically looks
-    for a data file names <className>.xml. All existing data in the tables specified in the dataset is deleted, and the data
+    The class BaseDatabaseTest is a custom project base class, that is implemented as a database test superclass. For an example of such a base class, we refer to the {{{cookbook.html}cookbook}.
+    The DatabaseTest annotation in the test superclass marks the test as being a database test, instructing Unitils to look for DBUnit datafiles to load. Unitils automatically looks
+    for a data file named <className>.xml. All existing data in the tables specified in the dataset is deleted, and the data
     in the datafile is inserted. DbUnit's FlatXMLDataSet is used as the file format.
 
     For methods needing very specific data, it may be a good idea to use a method level dataset. Unitils automatically looks for files named <className>.<methodName>.xml, such
     as the file UserDAOTest.testFindByMinimalAge.xml in the example.
 
-    The datasets to use can also be specified explicitly using the annotation @DataSet, as in the following example:
+    The dataset to use can also be specified explicitly using the annotation @DataSet, as in the following example:
 
 +-----+
 @DatabaseTest
@@ -362,87 +366,6 @@ dbscripts/ 001_initial.sql
     
     The @ExpectedDataSet annotation can also be used for result checking with a data file. Unitils will make sure the Hibernate Session is flushed before
     performing the check, to make sure all database updates performed during the test are actually executed on the database.
-
-
-
-
-*** Configuration
-~~~~~~~~~~~~~~~~~
-
-    Unitils provides out-of-the box configuration support for Hibernate. Make sure you properly configure Unitils' database support first, and then correctly
-    override the property HibernateModule.hibernate.configfiles in unitils.properties. E.g.
-
-+-----+
-HibernateModule.hibernate.configfiles=
-              hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
-+-----+
-
-    It is a good practice to split your Hibernate configuration in two parts: One config files containing shared configuration, such as the database dialect
-    and the mapped classes. A second one contains configuration that is specifically for unit testing. TODO example files.
-
-    We advise you to write a superclass that is used as base class for all Hibernate tests. This superclass looks like the following:
-
-+-----+
-@HibernateTest
-public abstract class BaseHibernateTest extends UnitilsJUnit3 {
-
-    @HibernateConfiguration
-    public void configureHibernate(Configuration config) {
-        HibernateConfigHelper.addMappedClasses(config);
-    }
-
-    @HibernateSession
-    public void injectHibernateSession(Session session) {
-        HibernateSessionManager.injectSession(session);
-    }
-}
-+-----+
-
-    The method annotated with @HibernateConfiguration allows performing some extra, programmatic Hibernate configuration, like e.g. registering mapped
-    classes with Hibernate. This method can be abandoned if all configuration is performed in the Hibernate config files.
-
-    The method annotated with @HibernateSession will be invoked before each test, with a Hibernate Session object as parameter. This method should make
-    sure that the tested data access code uses the Hibernate Session that is supplied by Unitils. The HibernateSessionManager that is invoked in this method
-    is also project specific code. The one in the example looks like the following:
-
-+-----+
-public class HibernateSessionManager {
-
-    private static Session externallyProvidedSession;
-
-    private static SessionFactory sessionFactory;
-
-    public static Session getSession() {
-        if (externallyProvidedSession != null) {
-            return externallyProvidedSession;
-        } else {
-            return doGetSession();
-        }
-    }
-
-    private static Session doGetSession() {
-        if (sessionFactory == null) {
-            initSessionFactory();
-        }
-        return sessionFactory.openSession();
-    }
-
-    private static void initSessionFactory() {
-        Configuration configuration = new AnnotationConfiguration();
-        configuration.addFile("hibernate.cfg.xml");
-        configuration.addFile("hibernate-mappedClasses.cfg.xml");
-        configuration.configure();
-        sessionFactory = configuration.buildSessionFactory();
-    }
-
-    public static void injectSession(Session session) {
-        externallyProvidedSession = session;
-    }
-}
-+-----+
-
-
-
 
 *** Testing the mapping
 ~~~~~~~~~~~~~~~~~~~~~~~
