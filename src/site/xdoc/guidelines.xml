@@ -42,7 +42,7 @@ methodology, and it should be discussed in advance, in cooperation with the
 customer. The customer must be aware of and agree with the fact that you choose
 the unit testing approach. He has to be aware of the fact that daily coding
 will take some more time, but that the eventual stable product will be
-delivered sooner. </p>
+delivered sooner.</p>
 
 <p>Each of the unit-tests tests only a small part of the code
 and therefore there should also be other kinds of tests on the project that
@@ -56,7 +56,7 @@ and performance tests.</p>
 <p>There are many possible levels of doing unit-testing. Some
 people want to reach 100% code coverage, that is, every line of code is used in
 at least one test. Of course this requires you to write lots and lots of tests,
-probably spending more time writing and maintaining tests than writing code.  </p>
+probably spending more time writing and maintaining tests than writing code.</p>
 
 <p>The other extreme is writing no tests at all. We think the
 ideal lies somewhere in the middle. Adding a few unit tests for some piece of
@@ -64,7 +64,6 @@ code already catches most of the bugs in that code while staying maintainable
 and keeping focus on the project code.</p>
 
 <p>A possible set of unit tests per piece of code can include:</p>
-
 <ul>
     <li>a test for the main flow (the happy path)</li>
     <li>tests for the main alternative flows</li>
@@ -88,32 +87,33 @@ project, but typically you would at least test the business and database layers.
 unit tests:</p>
 
 <ul>
-    <li><i>JUnit</i> - base test library        <a href="http://www.junit.org/">http://www.junit.org/</a></li>
-    <li><i>DbUnit</i> - tests using a database  <a href="http://dbunit.sourceforge.net/">http://dbunit.sourceforge.net/</a></li>
-    <li><i>JUnit Addons</i> - testing utilities <a href="http://sourceforge.net/projects/junit-addons">http://sourceforge.net/projects/junit-addons</a></li>
-    <li><i>EasyMock</i> - simulating behavior   <a href="http://www.easymock.org/">http://www.easymock.org/</a></li>
+    <li><a href="http://www.junit.org/">JUnit</a> - base test library</li>
+    <li><a href="http://dbunit.sourceforge.net/">DbUnit</a> - tests using a database</li>
+    <li><a href="http://sourceforge.net/projects/junit-addons">JUnit Addons</a> - testing utilities</li>
+    <li><a href="http://www.easymock.org/">EasyMock</a> - simulating behavior</li>
 </ul>
 
 <p>Aside from these libraries there is also a library that we
 created our own, that already implements or helps implementing many of the functionality
-described by the guidelines.</p>
-
-<p><b>Unitils</b> <a href="https://sourceforge.net/projects/unitils">https://sourceforge.net/projects/unitils</a></p>
+described by the guidelines: <b>Unitils</b></p>
 
 
 
 
+
+
+<br />
+<br />
 <h2>2 General Guidelines</h2>
 
 
 
+<div class="section"><h3><a name="_Naming_Conventions"></a>2.1 Structure of a unit test</h3>
 
-<h3><a name="_Naming_Conventions"></a>2.1 Structure of a unit test</h3>
 
 <h4>Short Description</h4>
 
 <p>A unit test generally consists of following parts:</p>
-
 <ul>
     <li>Class under test instance</li>
     <li>Test data instances (also called test fixture)</li>
@@ -123,29 +123,28 @@ described by the guidelines.</p>
 </ul>
 
 <p><i>For each test method:</i></p>
-<p>
 <ul>
     <li>(Optional) Test specific setup</li>
     <li>Execution of the method under test</li>
     <li>Verification of the results, using assert statements</li>
 </ul>
-</p>
+
 
 
 <h4>Description</h4>
 
 <p>Test classes typically contain a data setup part and a test
 part. The setup part is performed in the setUp() method and contains the
-instantiation of all objects that will be used as data during the test (See <a
-href="#_Create_test_data">Create test data during setup</a>). </p>
+instantiation of all objects that will be used as data during the test (See 
+<a href="#_Create_test_data">Create test data during setup</a>).</p>
 
 <p>The class under test instance is the object on which methods
 will be called to perform the actual tests. There should only be one such instance
 per test class and it should be created in the setUp() method.</p>
 
 <p>Verification of results is performed by using JUnit’s assert
-statements. You should only add asserts if they are of value for the test (See <a
-href="#_Keep_test_methods">Keep test methods small</a>). If objects need to be
+statements. You should only add asserts if they are of value for the test (See 
+<a href="#_Keep_test_methods">Keep test methods small</a>). If objects need to be
 compared, use Unitils’ ReflectionAssert instead of a regular assertEquals()
 (See <a href="#_Use_reflection_for">Use reflection for equality checking</a>).</p>
 
@@ -167,8 +166,7 @@ react to these smells as you would with normal code: refactor the code.</p>
 
 <h4>Examples</h4>
 
-<p>
-<code><pre>
+<div class="source"><pre>
 package be.ordina.util;
 
 import junit.framework.TestCase;
@@ -214,13 +212,17 @@ public class UserAdminTest extends TestCase {
         assertEquals(“Doe”, result.getLastName());
     }
 }
-</pre></code>
-</p>
+</pre></div>
+
+</div>
 
 
 
 
-<h3>2.2 Naming Conventions</h3>
+
+
+
+<div class="section"><h3>2.2 Naming Conventions</h3>
 
 
 <h4>Short Description</h4>
@@ -261,8 +263,7 @@ should give an indication of the subject of the test.</p>
 
 
 <h4>Examples</h4>
-
-<table>
+<p><table>
     <tr>
         <td></td>
         <td><b><i>Class/method under test</i></b></td>
@@ -291,12 +292,15 @@ should give an indication of the subject of the test.</p>
         <td><b>test</b>Add<b>_nullElement</b>()
             <b>test</b>Add<b>_negativeIndex</b>()</td>
     </tr>
-</table>
+</table></p>
+
+</div>
 
 
 
 
-<h3>2.3 Put unit tests in same package but separate source folder</h3>
+<div class="section"><h3>2.3 Put unit tests in same package but separate source folder</h3>
+
 
 <h4>Short Description</h4>
 
@@ -321,15 +325,17 @@ do not include any of the test classes.</p>
 
 <h4>Examples</h4>
 
-<p style='text-indent:28.8pt'><b>src/java</b>/be/ordina/util/StringUtils.java</p>
+<p><code><pre>
+    <b>src/java</b>/be/ordina/util/StringUtils.java
+    <b>src/test</b>/be/ordina/util/StringUtilsTest.java
+</pre></code></p>
+</div>
 
-<p style='text-indent:28.8pt'><b>src/test</b>/be/ordina/util/StringUtilsTest.java</p>
 
 
 
+<div class="section"><h3><a name="_Create_test_data">2.4 Create test data during setup</a></h3>
 
-
-<h3><a name="_Create_test_data">2.4 Create test data during setup</a></h3>
 
 <h4>Short Description</h4>
 
@@ -341,6 +347,7 @@ do not include any of the test classes.</p>
     <li>should use objects that were created during the setup of the test class</li>
     <li>may perform additional configuration (not creation) of test data during its own setup</li>
 </ul>
+
 
 <h4>Description</h4>
 
@@ -375,9 +382,10 @@ before each test method, Unitils provides a setup method that will be executed
 only once during the execution of all tests. This can for example be used for
 creating files that are used (but not changed) during the tests.</p>
 
+
 <h4>Examples</h4>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserAdminTest extends TestCase {
 
     /* Class under test */
@@ -413,17 +421,23 @@ public class UserAdminTest extends TestCase {
         assertEquals(“Doe”, result.getLastName()); 
     }
 }
-</pre></code></p>
+</pre></div>
+
+</div>
 
 
-<h3><a name="_Keep_your_test_fixture simple">2.5 Keep your test fixture simple</a></h3>
+
+
+<div class="section"><h3><a name="_Keep_your_test_fixture simple">2.5 Keep your test fixture simple</a></h3>
+
 
 <h4>Short Description</h4>
 
-<p align="left" style='text-align:left'>If the test fixture
+<p>If the test fixture
 becomes too large and incoherent, split the test into multiple smaller tests.  As
 names for these extra test classes, use &lt;class name&gt; + &lt;description of
 tested behavior&gt; + <i>‘Test’.</i></p>
+
 
 <h4>Description</h4>
 
@@ -437,17 +451,17 @@ href="#_Create_test_data_during setup">Create test data during setup</a>) you
 can easily spot incoherent test classes: they contain lots of instance
 variables that are only used by some of the test methods.</p>
 
-<p align="left" style='text-align:left'>Try to find a logical
-group of test methods and move them to a new test class. Name this new test
-class as follows: the original test class name, followed by some word that says
-something about the new group followed by ‘Test’.</p>
+<p>Try to find a logical group of test methods and move them to a new test class. 
+Name this new test class as follows: the original test class name, followed by 
+some word that says something about the new group followed by ‘Test’.</p>
+
 
 <h4>Examples</h4>
 
 <p>Suppose you have a test class for a class named UserAdmin
 that contains code for maintaining users and their roles.</p>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserAdminTest extends TestCase {
 
     /* A simple test user 1 */
@@ -481,7 +495,7 @@ public class UserAdminTest extends TestCase {
 
     ...
 }
-</pre></code></p>
+</pre></div>
 
 <p>This class clearly contains a fixture that is too large: 20
 instance variables for test data, so we should split the test class into
@@ -491,7 +505,7 @@ multiple test classes.</p>
 and move all roles related tests and test data out of the UserAdminTest class
 to this new class.</p>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserAdminTest extends TestCase {
 
     /* A simple test user 1 */
@@ -531,11 +545,15 @@ public class UserAdminRolesTest extends TestCase {
 
     ...
 }
-</pre></code></p>
+</pre></div>
+
+</div>
 
 
 
-<h3>2.6 Test boundary conditions</h3>
+
+<div class="section"><h3>2.6 Test boundary conditions</h3>
+
 
 <h4>Short Description</h4>
 
@@ -557,69 +575,46 @@ Only boundary conditions that a method can handle according to its interface
 interface (javadoc and arguments) does not prohibit a boundary value such as null,
 the method should be able to handle it.</p>
 
-
 <p>If the method shouldn’t be called with some boundary value:
 change the signature. That is, put the constraint as precondition in the
 javadoc of the method. This could be as easy as adding <i>not null</i> to the
 parameter declaration in the javadoc.</p>
 
-
 <p>If the method allows boundary values: create test cases for
 these values. Following table shows the typical boundary values for which you
 should write a test.</p>
 
-
-<table border="1" cellspacing="0" cellpadding="0" width="100%" style="width:100.0%;border-collapse:collapse;border:none">
-    <tr style='page-break-inside:avoid;height:18.1pt'>
-        <td width="26%" style="width:26.82%;border-top:solid navy 2.25pt;border-left:none;border-bottom:solid navy 2.25pt;border-right:none;padding:2.85pt 5.4pt 2.85pt 5.4pt; height:18.1pt">
-            <p align="left" style='text-align:left'><b><i>Argument</i></b></p>
-        </td>
-        <td width="73%" style="width:73.18%;border-top:solid navy 2.25pt;border-left:none;border-bottom:solid navy 2.25pt;border-right:none;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:18.1pt">
-            <p align="left" style='text-align:left'><b><i>Boundary conditions</i></b></p>
-        </td>
+<table>
+    <tr>
+        <td><b><i>Argument</i></b></td>
+        <td><b><i>Boundary conditions</i></b></td>
     </tr>
-    <tr style='page-break-inside:avoid;height:20.25pt'>
-        <td width="26%" style='width:26.82%;border:none;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:20.25pt'>
-            <p align="left" style='text-align:left'>Object</p>
-        </td>
-        <td width="73%" style='width:73.18%;border:none;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:20.25pt'>
-            <p align="left" style='text-align:left'><b>Null</b></p>
-            <p align="left" style='text-align:left'><b>boundary conditions of instance variables</b></p>
-        </td>
+    <tr>
+        <td>Object</td>
+        <td><b>Null</b>
+            <b>boundary conditions of instance variables</b></td>
     </tr>
-    <tr style='page-break-inside:avoid;height:44.45pt'>
-        <td width="26%" style='width:26.82%;border:none;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:44.45pt'>
-            <p align="left" style='text-align:left'>Numeric value</p>
-        </td>
-        <td width="73%" style='width:73.18%;border:none;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:44.45pt'>
-            <p align="left" style='text-align:left'><i>0</i></p>
-            <p align="left" style='text-align:left'><i>negative value (optional)</i></p>
-            <p align="left" style='text-align:left'><i>minimum and maximum(optional)</i></p>
-        </td>
+    <tr>
+        <td>Numeric value</td>
+        <td>
+            <i>0</i>
+            <i>negative value (optional)</i>
+            <i>minimum and maximum(optional)</i></td>
     </tr>
-    <tr style='page-break-inside:avoid;height:54.25pt'>
-        <td width="26%" style='width:26.82%;border:none;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:54.25pt'>
-            <p align="left" style='text-align:left'>String</p>
-        </td>
-        <td width="73%" style='width:73.18%;border:none;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:54.25pt'>
-            <p align="left" style='text-align:left'><b>Null</b></p>
-            <p align="left" style='text-align:left'><i>empty string (optional)</i></p>
-            <p align="left" style='text-align:left'><i>length equal to maximum length (if maximum defined)</i></p>
-            <p align="left" style='text-align:left'><i>length greater than maximum length (if maximum defined)</i></p>
-        </td>
+    <tr>
+        <td>String</td>
+        <td><b>Null</b>
+            <i>empty string (optional)</i>
+            <i>length equal to maximum length (if maximum defined)</i>
+            <i>length greater than maximum length (if maximum defined)</i></td>
     </tr>
-    <tr style='page-break-inside:avoid;height:42.0pt'>
-        <td width="26%" style='width:26.82%;border:none;border-bottom:solid navy 2.25pt;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:42.0pt'>
-            <p align="left" style='text-align:left'>Collections</p>
-        </td>
-        <td width="73%" style='width:73.18%;border:none;border-bottom:solid navy 2.25pt;padding:2.85pt 5.4pt 2.85pt 5.4pt;height:42.0pt'>
-            <p align="left" style='text-align:left'><b>Null</b></p>
-            <p align="left" style='text-align:left'><i>empty collection (optional)</i></p>
-            <p align="left" style='text-align:left'><i>collection with duplicate elements (optional)</i></p>
-        </td>
+    <tr>
+        <td>Collections</td>
+        <td><b>Null</b>
+            <i>empty collection (optional)</i>
+            <i>collection with duplicate elements (optional)</i></td>
     </tr>  
 </table>
-
 
 <p>The bold conditions are the minimal conditions for which a
 test needs to be written. Add extra boundary condition tests when necessary.
@@ -627,11 +622,9 @@ For example, you should create tests for the length of a string argument when
 the method implementation has some kind of restriction on the length of a
 string.</p>
 
-
 <p>Exception boundary conditions should also be tested. How to
 test such conditions is described in <a href="#_Test_declared_exceptions">Test
 declared exceptions</a>.</p>
-
 
 
 <h4>Examples</h4>
@@ -639,8 +632,7 @@ declared exceptions</a>.</p>
 <p>Suppose you have a class named UserAdmin that defines a
 method for adding a user. This method takes two arguments a user and a role.</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 public class UserAdmin
 {
 
@@ -655,7 +647,7 @@ public class UserAdmin
         roles.put(role.getName(), user)
     }
 }
-</pre></code></p>
+</pre></div>
 
 <p>After writing the tests for the typical behavior of this
 method, we should also add test for the boundary conditions of the arguments. Note
@@ -664,7 +656,7 @@ null arguments.</p>
 
 <p>You should now either, add the proper preconditions to the javadoc…</p>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserAdmin
 {
 
@@ -679,11 +671,11 @@ public class UserAdmin
         roles.put(role.getName(), user)
      }
 }
-</pre></code></p>
+</pre></div>
 
 <p>…or write a proper boundary condition test.</p>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserAdminTest extends TestCase {
 
     /**
@@ -697,30 +689,32 @@ public class UserAdminTest extends TestCase {
     }
 }
 
-</pre></code></p>
+</pre></div>
 
 <p>If you look at the implementation of the method, you see
 that this test will fail initially. You should fix the bug by implementing the
 proper null handling in the method and then rerun the test until it is
 successful.</p>
 
+</div>
 
-<h3>2.7 Test public interface, not internals</h3>
+
+
+
+<div class="section"><h3>2.7 Test public interface, not internals</h3>
+
 
 <h4>Short Description</h4>
 
 <p>Only test the behavior as is described in the public
 interface and javadoc. The internal implementation should not be tested. </p>
 
-
-
 <p>Do not test trivial methods such as getters and setters.
 Only methods that contain logic should be tested.</p>
 
-
-
 <p>Only test protected methods if they are meant to be called
 directly by subclasses, for example utility methods in abstract base classes.</p>
+
 
 <h4>Description</h4>
 
@@ -728,18 +722,15 @@ directly by subclasses, for example utility methods in abstract base classes.</p
 class. How a certain behavior is implemented is not important. Your tests
 should therefore not depend on how a class is implemented.</p>
 
-
-
 <p>Only testing the interface will make your tests less sensitive
 to change and refactorings. It will minimize the changes needed to your tests
 when changes to the implementation are made. </p>
-
-
 
 <p>Tests should be written for all methods that contain some
 non-trivial logic. Trivial methods that contain no logic, such as simple getters
 and setters, should not be tested. These tests would give no added-value and would
 only increase the effort needed to maintain all tests. </p>
+
 
 <h4>Examples</h4>
 
@@ -747,9 +738,7 @@ only increase the effort needed to maintain all tests. </p>
 public method, a non trivial getter, a trivial setter and an internal implementation
 method.</p>
 
-
-
-<p><code><pre>
+<div class="source"><pre>
 public class User {
       
     /**
@@ -794,15 +783,11 @@ public class User {
         return new Role(roleName);
     }
 }
-</pre></code></p>
-
-
+</pre></div>
 
 <p>In this example you should only write tests for the addRole()
 and getAge() method since these contain real logic. Testing the trivial
 setBirthDate() method would have no added-value. </p>
-
-
 
 <p>The createRole() method is used for the internal
 implementation and should therefore not be tested on its own. It will be tested
@@ -811,7 +796,7 @@ during the addUser() test. </p>
 <p>Following code snippets show an example of why you shouldn’t
 test the internals of a class. </p>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserAdmin
 {      
       private Map userMap = new HashMap();
@@ -836,15 +821,13 @@ public class UserAdmin
         return userMap;
     }
 }
-</pre></code></p>
-
+</pre></div>
 
 <p>UserAdmin is an example of a badly encapsulated class. It exposes
 its internal storage implementation. Suppose you would create a test for
 addUser() as follows:</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 public class UserAdminTest extends TestCase {
 
     /**
@@ -859,15 +842,20 @@ public class UserAdminTest extends TestCase {
         ReflectionAssert.assertLenEquals(user, result);
     }
 }
-</pre></code></p>
-
+</pre></div>
 
 <p>You should avoid writing tests that depend on the
 implementation details of the class. In the example above, suppose you would
 want to change to use the username as key in the map instead of the SSN, you
 would need to change al your tests.</p>
 
-<h3><a name="_Keep_test_methods">2.8 Keep test methods small</a></h3>
+</div>
+
+
+
+
+<div class="section"><h3><a name="_Keep_test_methods">2.8 Keep test methods small</a></h3>
+
 
 <h4>Short Description</h4>
 
@@ -878,6 +866,7 @@ would need to change al your tests.</p>
     <li>the actual test call</li>
     <li>a <i>limited </i>number of assertions</li>
 </ul>
+
 
 <h4>Description</h4>
 
@@ -895,9 +884,10 @@ equality checking</a>). It can however also be configured to perform a more
 lenient comparison: for example, it can ignore fields that contain default
 values are can ignore ordering in collections. </p>
 
+
 <h4>Examples</h4>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserTest extends TestCase {
 
     /**
@@ -911,8 +901,7 @@ public class UserTest extends TestCase {
         assertEquals(“john”, user.getName());
     }
 }
-</pre></code></p>
-
+</pre></div>
 
 <p>There is no reason for testing the name functionality in
 this test for the setting of the age. The code in this test should be limited
@@ -923,8 +912,7 @@ functionality will not cause changes in this test.</p>
 <p>Following is an example of how ReflectionAssert can help in
 comparing objects:</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 public class UserTest extends TestCase {
 
     /**
@@ -939,8 +927,7 @@ public class UserTest extends TestCase {
         ReflectionAssert.assertLenEquals(expected, user);
     }
 }
-</pre></code></p>
-
+</pre></div>
 
 <p>In this last assertion, only the age value will be compared,
 because all other values in the expected instance are set to their default
@@ -948,7 +935,14 @@ values (e.g. null, 0). This means that the user object can for example have
 values for its first and last name fields, but this is ignored by the assert
 (as it should, because it is not of value for testing of the age setting).</p>
 
-<h3>2.9 Create independent unit tests</h3>
+</div>
+
+
+
+
+
+<div class="section"><h3>2.9 Create independent unit tests</h3>
+
 
 <h4>Short Description</h4>
 
@@ -956,15 +950,17 @@ values for its first and last name fields, but this is ignored by the assert
 test. All tests should be independent of each other. One should be able to run
 each of the tests on its own.</p>
 
+
 <h4>Description</h4>
 
 <p>JUnit does not guarantee a particular sequence in which the
 test methods will be called. The tests should therefore never rely on any execution
 sequence and should contain all setup that is needed to perform the test.</p>
 
+
 <h4>Examples</h4>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserTest extends TestCase {
     
     /**
@@ -989,19 +985,25 @@ public class UserTest extends TestCase {
         assertNull(userAdmin.getUser(“user”));
     }
 }
-</pre></code></p>
+</pre></div>
 
 <p>The remove user test should not depend on the add user test
 to get the database in a certain state but should include its own set up.</p>
 
+</div>
 
 
-<h3>2.10 Write tests while writing code</h3>
+
+
+
+<div class="section"><h3>2.10 Write tests while writing code</h3>
+
 
 <h4>Short Description</h4>
 
 <p>Writing tests should be done while you are writing your code,
 not afterwards. </p>
+
 
 <h4>Description</h4>
 
@@ -1028,15 +1030,21 @@ boundary condition and alternative flow tests.</p>
 writing unit tests should become very simple. There is no reason in not doing
 unit testing.</p>
 
+</div>
 
 
-<h3><a name="_Use_reflection_for">2.11 Use reflection for equality checking</a></h3>
+
+
+
+<div class="section"><h3><a name="_Use_reflection_for">2.11 Use reflection for equality checking</a></h3>
+
 
 <h4>Short Description</h4>
 
 <p>Use reflection to check equality instead of equals() method.
 As a consequence, you should avoid using the assertEquals() and assertSame()
 methods for object types other that basic types such as String, Integer etc.</p>
+
 
 <h4>Description</h4>
 
@@ -1071,9 +1079,10 @@ contains some values but not necessarily in the same order. This makes it
 possible to only compare what is really important for the test (See <a
 href="#_Keep_test_methods">Keep test methods small</a>).</p>
 
+
 <h4>Examples</h4>
 
-<p><code><pre>
+<div class="source"><pre>
 public class User {
 
     /* The social security number */
@@ -1109,17 +1118,22 @@ user2.name = Tom
 
 assertEquals(user1, user2)                      <b>true</b>
 ReflectionAssert.assertEquals(user1, user2)     <b>false</b>
-</pre></code></p>
+</pre></div>
+
+</div>
 
 
 
 
-<h3>2.12 Everyone tests or no one tests</h3>
+
+<div class="section"><h3>2.12 Everyone tests or no one tests</h3>
+
 
 <h4>Short Description</h4>
 
 <p>Whether or not to perform unit-testing should be decided on a
 project level. </p>
+
 
 <h4>Description</h4>
 
@@ -1139,10 +1153,14 @@ writing unit tests.</p>
 convince the project manager of the necessity of such tests and let him impose
 the writing of the tests on a project level. </p>
 
+</div>
 
 
 
-<h3><a name="_Fix_broken_tests">2.13 Fix broken tests immediately</a></h3>
+
+
+<div class="section"><h3><a name="_Fix_broken_tests">2.13 Fix broken tests immediately</a></h3>
+
 
 <h4>Short Description</h4>
 
@@ -1161,7 +1179,13 @@ disable the test. You can do this by commenting the test implementation and
 putting some logging statements in place to make sure you won’t forget to
 re-enable it when it becomes possible.</p>
 
-<h3>2.14 Use continuous integration</h3>
+</div>
+
+
+
+
+
+<div class="section"><h3>2.14 Use continuous integration</h3>
 
 <h4>Short Description</h4>
 
@@ -1185,9 +1209,13 @@ unit-tests after code change and immediately give feedback when somebody broke
 a test. Impose your developers to immediately try to fix the build when it is
 broken. (See <a href="#_Fix_broken_tests">Fix broken tests immediately</a>)</p>
 
+</div>
 
 
-<h3>2.15 Use build tool or IDE to run suites of tests</h3>
+
+
+<div class="section"><h3>2.15 Use build tool or IDE to run suites of tests</h3>
+
 
 <h4>Short Description</h4>
 
@@ -1210,11 +1238,12 @@ performed when the suite is run.</p>
 automatically create test suites for you, so that you are sure that every test
 is being performed.</p>
 
+
 <h4>Examples</h4>
 
 <p>Ant build-script for running all your tests in your test source folder:</p>
 
-<p><code><pre>
+<div class="source"><pre>
 &lt;junit printsummary=&quot;yes&quot; haltonfailure=&quot;true&quot;&gt;
 
     &lt;classpath&gt;
@@ -1229,16 +1258,21 @@ is being performed.</p>
     &lt;/batchtest&gt;
 
 &lt;/junit&gt;
-</pre></code></p>
+</pre></div>
+
+</div>
 
 
 
 
-<h3>2.16 Write test when fixing a bug</h3>
+
+<div class="section"><h3>2.16 Write test when fixing a bug</h3>
+
 
 <h4>Short Description</h4>
 
 <p>If you fix a bug, also write a test for the fix. </p>
+
 
 <h4>Description</h4>
 
@@ -1252,15 +1286,20 @@ write a unit test for this fix. You have to test it anyway, so why not writing
 a unit test. Furthermore this will make sure that the bug will not be
 re-introduced in the code at a later time (regression test).</p>
 
+</div>
 
 
 
-<h3><a name="_Test_new_project">2.17 Test new project code, not library code</a></h3>
+
+
+<div class="section"><h3><a name="_Test_new_project">2.17 Test new project code, not library code</a></h3>
+
 
 <h4>Short Description</h4>
 
 <p>Only test code that is being written or changed. Do not
 write tests for libraries or non-project code.</p>
+
 
 <h4>Description</h4>
 
@@ -1272,16 +1311,20 @@ their own test suite. </p>
 write a separate test specifically for this library. Do not test the
 functionality from your projects unit tests.</p>
 
+</div>
 
 
 
 
-<h3><a name="_Test_declared_exceptions">2.18 Test declared exceptions</a></h3>
+
+<div class="section"><h3><a name="_Test_declared_exceptions">2.18 Test declared exceptions</a></h3>
+
 
 <h4>Short Description</h4>
 
 <p>Write tests for exceptional conditions that are declared in
 the interface.</p>
+
 
 <h4>-Description</h4>
 
@@ -1300,10 +1343,9 @@ IOException, should not be handled in the unit test. Let JUnit handle these
 exceptions.</p>
 
 
-
 <h4>Examples</h4>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserTest extends TestCase {
 
     /**
@@ -1331,11 +1373,18 @@ public class UserTest extends TestCase {
         assertEquals(20, user.getAge());
     }
 }
-</pre></code></p>
+</pre></div>
+
+</div>
 
 
 
 
+
+
+
+<br />
+<br />
 <h2>3 EIS tier testing guidelines</h2>
 
 <p>The database layer is a very important though brittle layer.
@@ -1356,7 +1405,10 @@ documentation of this project we refer to the documentation on the website.</p>
 
 
 
-<h3>3.1 Test with unit test databases</h3>
+
+
+<div class="section"><h3>3.1 Test with unit test databases</h3>
+
 
 <h4>Short Description</h4>
 
@@ -1407,8 +1459,14 @@ UNIT_CRCO schema.</p>
 <p>All the test databases are extra schemas that have been
 added to the development database.</p>
 
+</div>
 
-<h3><a name="_Automate_the_maintenance">3.2 Automate the maintenance of the test databases</a></h3>
+
+
+
+
+<div class="section"><h3><a name="_Automate_the_maintenance">3.2 Automate the maintenance of the test databases</a></h3>
+
 
 <h4>Short Description</h4>
 
@@ -1422,6 +1480,7 @@ unit test database after each database change.</p>
 
 <p>Maintain a full DDL script, and re-create the unit test schemas
 from scratch after every database change.</p>
+
 
 <h4>Description</h4>
 
@@ -1472,10 +1531,14 @@ that when the database size grows, maintaining a full DDL script will become
 much more difficult and performing a clean database setup will take a
 considerable amount of time.</p>
 
+</div>
 
 
 
-<h3>3.3 Disable foreign key and not null constraints</h3>
+
+
+<div class="section"><h3>3.3 Disable foreign key and not null constraints</h3>
+
 
 <h4>Short Description</h4>
 
@@ -1512,8 +1575,7 @@ email addresses per user, so we add an EMAIL table:</p>
 retrieving a user from the database, the email addresses are also correctly
 fetched: The test data file, UserDAOTest.xml, looks like the following:</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 
 &lt;dataset&gt;
@@ -1523,8 +1585,7 @@ fetched: The test data file, UserDAOTest.xml, looks like the following:</p>
     &lt;email userid=&quot;1&quot; emailaddress=&quot;jdoe@post.be&quot; /&gt;
 
 &lt;/dataset&gt;
-</pre></code></p>
-
+</pre></div>
 
 <p>This data file contains all the data we need to make our
 unit test pass! </p>
@@ -1533,7 +1594,7 @@ unit test pass! </p>
 database with all constraints enabled. The data file would have to be extended
 to something like this:</p>
 
-<p><code><pre>
+<div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 
 &lt;dataset&gt;
@@ -1546,7 +1607,7 @@ to something like this:</p>
     &lt;email userid=&quot;1&quot; emailaddress=&quot;jdoe@post.be&quot; /&gt;
 
 &lt;/dataset&gt;
-</pre></code></p>
+</pre></div>
 
 <p>The presence of constraints not only makes us spend a lot
 more time writing data, but also the maintenance cost increases dramatically.
@@ -1555,9 +1616,14 @@ file must be changed. If we rename one of the columns in the COMPANY table, the
 data file must be changed. All these changes have no effect at all on the logic
 of the tested method, so they should also not affect the test.</p>
 
+</div>
 
 
-<h3>3.4 Testing simple CRUD methods</h3>
+
+
+
+<div class="section"><h3>3.4 Testing simple CRUD methods</h3>
+
 
 <h4>Short Description</h4>
 
@@ -1585,8 +1651,7 @@ in a simple way.</p>
 interface of the DAO. Here are for example the unit tests for the findById,
 create, update and delete methods of the UserDAO class:</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 protected void setUp() throws Exception {
 
       existingUser = new User(“1”);
@@ -1619,13 +1684,11 @@ public void testDelete() {
 
       assertNull(toVerify);
 }
-</pre></code></p>
-
+</pre></div>
 
 <p>We have used following data file:</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 
 &lt;dataset&gt;
@@ -1633,8 +1696,7 @@ public void testDelete() {
     &lt;user id=&quot;1&quot; role=”admin” /&gt;
 
 &lt;/dataset&gt;
-</pre></code></p>
-
+</pre></div>
 
 <p>We didn’t include test data for the other properties of
 User, like userName, firstName, lastName and email. We did this on purpose to
@@ -1645,10 +1707,14 @@ also assigned to the objects and vice versa.</p>
 <p>A separate test for findById() is not included. The correct
 behavior of this method is implicitly tested by the other test methods.</p>
 
+</div>
 
 
 
-<h3><a name="_Testing_queries">3.5 Testing queries</a></h3>
+
+
+<div class="section"><h3><a name="_Testing_queries">3.5 Testing queries</a></h3>
+
 
 <h4>Short Description</h4>
 
@@ -1656,6 +1722,7 @@ behavior of this method is implicitly tested by the other test methods.</p>
 Writing unit tests for these queries is therefore very important, especially
 for complex queries. Following the rules in the description helps you in
 writing simple but effective tests for these queries.</p>
+
 
 <h4>Description</h4>
 
@@ -1686,6 +1753,7 @@ most effective way for guaranteeing the correctness.</p>
      returned.</li>
 </ul>
 
+
 <h4>Examples</h4>
 
 <p>The following example shows a unit test for a somewhat more
@@ -1700,8 +1768,7 @@ partnerships with other companies.</p>
 to a company that have some kind of partnership with the given company (for
 example, to send them some kind of commercial mail).</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 public List findPartnershipUsers(Company comp) {
 
     String query = &quot;select u.id, u.username, u.name, u.fname,u.roleid, &quot; +
@@ -1714,11 +1781,11 @@ public List findPartnershipUsers(Company comp) {
     
     // Code that executes query and returns result
 }
-</pre></code></p>
+</pre></div>
 
 <p>And we’ve written following unit test:</p>
 
-<p><code><pre>
+<div class="source"><pre>
     protected void setUp()
     {
         company1 = new Company(1, &quot;Ordina&quot;);
@@ -1729,13 +1796,11 @@ public List findPartnershipUsers(Company comp) {
         List foundUsers = userDao.findPartnershipUsers(company1);
         CollectionAssert.assertMatches(new String[] {“2”}, foundUsers, “id”);      
     }
-</pre></code></p>
-
+</pre></div>
 
 <p>With this data file:</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 
 &lt;dataset&gt;
@@ -1752,8 +1817,7 @@ public List findPartnershipUsers(Company comp) {
       &lt;partnership company1id=&quot;2&quot; company2id=&quot;3&quot; /&gt;
 
 &lt;/dataset&gt;
-</pre></code></p>
-
+</pre></div>
 
 <p>The data file defines 3 users, the first one being member of
 Ordina, the second is member of a second company, which is involved in a
@@ -1761,15 +1825,20 @@ partnership with Ordina. The third user is member of company 3, which is a
 partner of company 2, but not a partner of Ordina. The second user is the only
 one that should be returned by the tested method.</p>
 
+</div>
 
 
-<h3><a name="_Testing_bulk_data">3.6 Testing bulk data manipulation methods</a></h3>
+
+
+<div class="section"><h3><a name="_Testing_bulk_data">3.6 Testing bulk data manipulation methods</a></h3>
+
 
 <h4>Short Description</h4>
 
 <p>For testing bulk insert, update or delete methods, which are
 cumbersome to test through the API of your DAOs, check the updated DB contents
 with a DBUnit result data file.</p>
+
 
 <h4>Description</h4>
 
@@ -1820,19 +1889,17 @@ the correct behavior of this stored procedure.</p>
 
 <p>Our unit test looks like the following (OrderDAOTest.java):</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 public void testArchiveOrders()
 {
     orderDao.archiveOrdersOlderThan(DateUtils.parseDate(&quot;21-05-2005&quot;);
     assertMatchesResultDataset(); 
 }
-</pre></code></p>
+</pre></div>
 
 <p>And we have following data file (OrderDAOTest.xml):</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 
 &lt;dataset&gt;
@@ -1847,14 +1914,12 @@ public void testArchiveOrders()
     &lt;orderline id=&quot;22&quot; orderid=&quot;2&quot; /&gt;
 
 &lt;/dataset&gt;
-</pre></code></p>
-
+</pre></div>
 
 <p>And use this file for verification
 (OrderDAOTest.testArchiveOrders-result.xml):</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 
 &lt;dataset&gt;
@@ -1869,12 +1934,16 @@ public void testArchiveOrders()
     &lt;arch_orderline id=&quot;12&quot; arch_orderid=&quot;1&quot; /&gt;
 
 &lt;/dataset&gt;
-</pre></code></p>
+</pre></div>
+
+</div>
 
 
 
 
-<h3><a name="_Keep_your_test">3.7 Keep your test data files simple</a></h3>
+
+<div class="section"><h3><a name="_Keep_your_test">3.7 Keep your test data files simple</a></h3>
+
 
 <h4>Short Description</h4>
 
@@ -1924,9 +1993,13 @@ simplify them.</p>
 good example of how the rules described in this guideline are used to create a
 data file with the minimum required data.</p>
 
+</div>
 
 
-<h3>3.8 Use a DTD in your test data files</h3>
+
+
+<div class="section"><h3>3.8 Use a DTD in your test data files</h3>
+
 
 <h4>Short Description</h4>
 
@@ -1953,8 +2026,7 @@ changes the database structure he also updates this DTD.</p>
 <p>The test data file below shows how to use a DTD on the local
 file system.</p>
 
-
-<p><code><pre>
+<div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 &lt;!DOCTYPE dataset SYSTEM &quot;C:/Projects/Unitils/db/dtd/database.dtd&quot;&gt;
 
@@ -1965,17 +2037,22 @@ file system.</p>
     &lt;email userid=&quot;1&quot; emailaddress=&quot;jdoe@post.be&quot; /&gt;
 
 &lt;/dataset&gt;
-</pre></code></p>
+</pre></div>
+
+</div>
 
 
 
 
-<h3>3.9 Do not test auto-generated fields</h3>
+
+<div class="section"><h3>3.9 Do not test auto-generated fields</h3>
+
 
 <h4>Short Description</h4>
 
 <p>Don’t test fields that are automatically filled up by the
 underlying framework or database, like generated keys or timestamps.</p>
+
 
 <h4>Description</h4>
 
@@ -1989,17 +2066,21 @@ be handled application-wide, by the persistence mechanism and/or by DAO
 superclass methods. It is therefore not necessary to test it over and over again
 for every DAO method.</p>
 
+</div>
 
 
 
 
-<h3>3.10 Modify database sequences</h3>
+
+<div class="section"><h3>3.10 Modify database sequences</h3>
+
 
 <h4>Short Description</h4>
 
 <p>When using identity or auto-increment columns and sequences,
 make sure they have a high enough value for running the tests. This way they
 don’t interfere with the test data.</p>
+
 
 <h4>Description</h4>
 
@@ -2012,16 +2093,19 @@ overwritten with client values. Other databases, like Oracle, don’t support
 direct setting of these values but can use Unitils to make sure that the value
 of such a sequence contains a high enough value.</p>
 
+</div>
 
 
 
 
 
-<h3>3.11 Don’t use transactions</h3>
+<div class="section"><h3>3.11 Don’t use transactions</h3>
+
 
 <h4>Short Description</h4>
 
 <p>Don’t run unit tests in a transaction, instead use auto-commit.</p>
+
 
 <h4>Description</h4>
 
@@ -2037,10 +2121,13 @@ transaction, so that the tests closely resemble the real situation.</p>
     <li>Extra baseline code is required to enable transactions in unit tests.</li>
 </ul>
 
+</div>
 
 
 
-<h3>3.12 Reuse the connection</h3>
+
+
+<div class="section"><h3>3.12 Reuse the connection</h3>
 
 <h4>Short Description</h4>
 
@@ -2058,18 +2145,28 @@ throughout the test suite.</p>
 <p>Unitils’ BaseDatabaseTestCase makes sure all its subclasses
 use the same DbUnit connection throughout a complete test run.</p>
 
+</div>
 
 
 
 
+
+
+
+<br />
+<br />
 <h2>4 Hibernate testing guidelines</h2>
 
-<h3>4.1 Test Hibernate mapping file</h3>
+
+
+<div class="section"><h3>4.1 Test Hibernate mapping file</h3>
+
 
 <h4>Short Description</h4>
 
 <p>Add a test for checking consistency between hibernate
 mapping and database.</p>
+
 
 <h4>Description</h4>
 
@@ -2081,7 +2178,7 @@ is thereby essential to highlight the mapping mismatch as soon as possible.</p>
 
 <p>Typical mapping problems that can arise:</p>
 
-<ul style='margin-top:0cm' type="square">
+<ul>
     <li>Property isn’t mapped to a database column</li>
     <li>Name mismatch between object property and mapping specification</li>
     <li>Property of a class is mapped to a database column with a different name</li>
@@ -2089,13 +2186,16 @@ is thereby essential to highlight the mapping mismatch as soon as possible.</p>
 </ul>
 
 <p>The Unitils project provides a set of test methods that
-helps in finding these mapping mismatch problems at an early stage. </p>
+helps in finding these mapping mismatch problems at an early stage.</p>
+
+</div>
 
 
 
 
 
-<h3>4.1 Test non-trivial queries</h3>
+<div class="section"><h3>4.1 Test non-trivial queries</h3>
+
 
 <h4>Short Description</h4>
 
@@ -2119,7 +2219,7 @@ guidelines apply for the tests.</p>
 
 <h4>Examples</h4>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserDAOTest extends BaseDAOTestCase {
 
     public void testRetrieveUserAdmin() throws Exception {
@@ -2129,12 +2229,17 @@ public class UserDAOTest extends BaseDAOTestCase {
         // assert list with specified data.
     }
 }
-</pre></code></p>
+</pre></div>
+
+</div>
 
 
 
 
-<h3>4.2 Don’t test Hibernate</h3>
+
+
+<div class="section"><h3>4.2 Don’t test Hibernate</h3>
+
 
 <h4>Short Description</h4>
 
@@ -2150,11 +2255,15 @@ suite and should therefore not be tested during your project code unit tests. If
 you doubt whether a certain feature of Hibernate functions correctly, write a
 separate test specifically for this feature.</p>
 
+</div>
 
 
 
 
-<h3>4.3 Flush session when updating</h3>
+
+
+<div class="section"><h3>4.3 Flush session when updating</h3>
+
 
 <h4>Short Description</h4>
 
@@ -2171,9 +2280,10 @@ If you want to be sure you are not working on in-memory cached objects, you
 will need to flush the session. Unitils provides a utility method to do this
 (see example below).</p>
 
+
 <h4>Examples</h4>
 
-<p><code><pre>
+<div class="source"><pre>
 public class UserDAOTestCase extends HibernateDAOTestCase {
      
     /**
@@ -2192,7 +2302,13 @@ public class UserDAOTestCase extends HibernateDAOTestCase {
         assertNotNull(result);
     }
 }
-</pre></code></p>
+</pre></div>
+
+</div>
+
+<br />
+<br />
+
 
 
         

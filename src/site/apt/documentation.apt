@@ -230,7 +230,7 @@ public void UserDAOTest extends BaseDatabaseTest {
 </dataset>
 +-----+
 
-    The class BaseDatabaseTest is a custom project base class, that is implemented as a database test superclass. For an example of such a base class, we refer to the {{{cookbook.html}cookbook}.
+    The class BaseDatabaseTest is a custom project base class, that is implemented as a database test superclass. For an example of such a base class, we refer to the {{{cookbook.html}cookbook}}.
     The DatabaseTest annotation in the test superclass marks the test as being a database test, instructing Unitils to look for DBUnit datafiles to load. Unitils automatically looks
     for a data file named <className>.xml. All existing data in the tables specified in the dataset is deleted, and the data
     in the datafile is inserted. DbUnit's FlatXMLDataSet is used as the file format.

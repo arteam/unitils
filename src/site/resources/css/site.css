@@ -10,7 +10,7 @@ a:visited  {
 
 
 #banner {
-    height: 60px;
+    height: 75px;
     background: none;
 }
 
@@ -28,6 +28,10 @@ a:visited  {
 
 #leftColumn {
     padding-bottom: 5px;
+}
+
+.section h2 {
+    font-size: 22px;
 }
 
 .section h3 {
