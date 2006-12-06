@@ -22,7 +22,7 @@ import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import static org.unitils.easymock.EasyMockUnitils.verify;
-import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.annotation.RegularMock;
 
 /**
  * Tests the SQL script runner
@@ -31,7 +31,7 @@ import org.unitils.easymock.annotation.Mock;
  */
 public class SQLScriptRunnerTest extends UnitilsJUnit3 {
 
-    @Mock
+    @RegularMock
     private StatementHandler mockStatementHandler = null;
 
     /* Tested instance  */

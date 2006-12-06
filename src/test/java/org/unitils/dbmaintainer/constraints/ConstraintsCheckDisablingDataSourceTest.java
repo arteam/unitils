@@ -24,14 +24,12 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
- * Test for the ConstraintsCheckDisablingDataSource
+ * Test for the {@link ConstraintsCheckDisablingDataSource}.
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class ConstraintsCheckDisablingDataSourceTest extends UnitilsJUnit3 {
 
-    /**
-     * Tested object
-     */
+    /* Tested object */
     private ConstraintsCheckDisablingDataSource constraintsCheckDisablingDataSource;
 
     @LenientMock
@@ -46,8 +44,6 @@ public class ConstraintsCheckDisablingDataSourceTest extends UnitilsJUnit3 {
     /**
      * Test fixture. Sets up the ConstraintsCheckDisablingDataSource with mocks for the decorated DataSource and
      * ConstraintsDisabler
-     *
-     * @throws Exception
      */
     @Override
     protected void setUp() throws Exception {
@@ -59,8 +55,6 @@ public class ConstraintsCheckDisablingDataSourceTest extends UnitilsJUnit3 {
     /**
      * Wether a connection is correctly retrieved from the decorated DataSource and that constraints checking is
      * disabled on the connection.
-     *
-     * @throws Exception
      */
     public void testGetConnection() throws Exception {
         expect(mockDataSource.getConnection()).andReturn(mockConnection);
@@ -73,8 +67,6 @@ public class ConstraintsCheckDisablingDataSourceTest extends UnitilsJUnit3 {
     /**
      * Wether a connection is correctly retrieved from the decorated DataSource and that constraints checking is
      * disabled on the connection, in case a custom username and password are passed.
-     *
-     * @throws Exception
      */
     public void testGetConnectionWithUserNameAndPassword() throws Exception {
         expect(mockDataSource.getConnection(null, null)).andReturn(mockConnection);
