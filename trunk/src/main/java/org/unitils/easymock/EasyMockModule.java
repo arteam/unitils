@@ -26,7 +26,7 @@ import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.LenientMock;
-import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.annotation.RegularMock;
 import org.unitils.easymock.util.*;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
@@ -76,7 +76,7 @@ public class EasyMockModule implements Module {
     public void init(Configuration configuration) {
 
         this.mocksControls = new ArrayList<MocksControl>();
-        defaultEnumValues = getAnnotationEnumDefaults(EasyMockModule.class, configuration, Mock.class, LenientMock.class);
+        defaultEnumValues = getAnnotationEnumDefaults(EasyMockModule.class, configuration, RegularMock.class, LenientMock.class);
     }
 
 
@@ -105,8 +105,8 @@ public class EasyMockModule implements Module {
     public <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns) {
 
         // Get anotation arguments and replace default values if needed
-        invocationOrder = getValueReplaceDefault(Mock.class, invocationOrder, defaultEnumValues);
-        returns = getValueReplaceDefault(Mock.class, returns, defaultEnumValues);
+        invocationOrder = getValueReplaceDefault(RegularMock.class, invocationOrder, defaultEnumValues);
+        returns = getValueReplaceDefault(RegularMock.class, returns, defaultEnumValues);
 
         MocksControl mocksControl;
         if (Returns.NICE == returns) {
@@ -221,13 +221,13 @@ public class EasyMockModule implements Module {
      */
     protected void createAndInjectMocksIntoTest(Object testObject) {
 
-        List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
+        List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), RegularMock.class);
         for (Field mockField : mockFields) {
 
             Class<?> mockType = mockField.getType();
 
-            Mock mockAnnotation = mockField.getAnnotation(Mock.class);
-            Object mockObject = createMock(mockType, mockAnnotation.invocationOrder(), mockAnnotation.returns());
+            RegularMock regularMockAnnotation = mockField.getAnnotation(RegularMock.class);
+            Object mockObject = createMock(mockType, regularMockAnnotation.invocationOrder(), regularMockAnnotation.returns());
             setFieldValue(testObject, mockField, mockObject);
 
             callAfterCreateMockMethods(testObject, mockObject, mockField.getName(), mockType);

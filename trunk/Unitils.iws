@@ -18,12 +18,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/css/site.css" afterPath="$PROJECT_DIR$/src/site/resources/css/site.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE.txt" afterPath="$PROJECT_DIR$/LICENSE.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/constraints/ConstraintsCheckDisablingDataSourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/constraints/ConstraintsCheckDisablingDataSourceTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/documentation.apt" afterPath="$PROJECT_DIR$/src/site/apt/documentation.apt" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/annotation/Mock.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/xdoc/guidelines.xml" afterPath="$PROJECT_DIR$/src/site/xdoc/guidelines.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/images/logos/unitils.gif" afterPath="$PROJECT_DIR$/src/site/resources/images/logos/unitils.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/annotation/RegularMock.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -185,37 +186,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ReflectionArgumentMatcher.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/ReflectionArgumentMatcher.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="35" column="13" selection-start="1454" selection-end="1454" vertical-scroll-proportion="0.29361296">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LenientMocksControl.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/LenientMocksControl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="73" column="17" selection-start="3214" selection-end="3214" vertical-scroll-proportion="0.01620591">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DataSourceFactory.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/DataSourceFactory.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="5" column="73" selection-start="233" selection-end="233" vertical-scroll-proportion="0.08102955">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="PropertiesDataSourceFactory.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/PropertiesDataSourceFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="7" selection-start="1352" selection-end="1352" vertical-scroll-proportion="0.16396569">
+            <state line="42" column="7" selection-start="1352" selection-end="1352" vertical-scroll-proportion="0.16682832">
               <folding />
             </state>
           </provider>
@@ -224,7 +198,7 @@
       <file leaf-file-name="unitils-default.properties" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="185" column="1" selection-start="12464" selection-end="12464" vertical-scroll-proportion="0.65014297">
+            <state line="185" column="1" selection-start="12464" selection-end="12464" vertical-scroll-proportion="0.6614937">
               <folding />
             </state>
           </provider>
@@ -233,7 +207,7 @@
       <file leaf-file-name="EasyMockUnitils.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockUnitils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="45" selection-start="1481" selection-end="1481" vertical-scroll-proportion="0.01620591">
+            <state line="39" column="45" selection-start="1481" selection-end="1481" vertical-scroll-proportion="0.016488846">
               <folding />
             </state>
           </provider>
@@ -242,17 +216,64 @@
       <file leaf-file-name="ReflectionAssert.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionAssert.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="326" column="7" selection-start="16340" selection-end="16340" vertical-scroll-proportion="0.39651838">
+            <state line="326" column="7" selection-start="16340" selection-end="16340" vertical-scroll-proportion="0.4035433">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ReflectionComparatorTest.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ReflectionComparatorTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="198" column="78" selection-start="6371" selection-end="6371" vertical-scroll-proportion="0.01620591">
+            <state line="198" column="78" selection-start="6371" selection-end="6371" vertical-scroll-proportion="0.016488846">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ReflectionComparatorMode.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparatorMode.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="29" column="36" selection-start="1264" selection-end="1288" vertical-scroll-proportion="0.47817653">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LenientMock.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/annotation/LenientMock.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="32" column="18" selection-start="1132" selection-end="1132" vertical-scroll-proportion="0.33268672">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RegularMock.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/annotation/RegularMock.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="30" column="24" selection-start="1118" selection-end="1118" vertical-scroll-proportion="0.3957323">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EasyMockModule.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="207" column="17" selection-start="7977" selection-end="7977" vertical-scroll-proportion="0.016488846">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConstraintsCheckDisablingDataSourceTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/constraints/ConstraintsCheckDisablingDataSourceTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="34" column="16" selection-start="1224" selection-end="1224" vertical-scroll-proportion="0.5606208">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1292,7 +1313,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure ProjectPane="false" PackagesPane="false" Scope="false" Favorites="false" />
+      <showStructure Scope="false" ProjectPane="false" PackagesPane="false" Favorites="false" />
       <autoscrollToSource ProjectPane="false" />
       <autoscrollFromSource ProjectPane="false" />
       <sortByType />
@@ -1360,6 +1381,29 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <option name="PROPERTIES_FILE" />
+      <properties />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" />
       <option name="VM_PARAMETERS" />
@@ -1369,25 +1413,6 @@
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
       <module name="" />
-    </configuration>
-    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <method>
-        <option name="Make" value="true" />
-      </method>
     </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
@@ -1408,15 +1433,13 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
     </configuration>
-    <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
+    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="SUITE_NAME" />
       <option name="PACKAGE_NAME" />
       <option name="MAIN_CLASS_NAME" />
       <option name="METHOD_NAME" />
-      <option name="GROUP_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
@@ -1425,8 +1448,6 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
-      <option name="PROPERTIES_FILE" />
-      <properties />
       <method>
         <option name="Make" value="true" />
       </method>
@@ -1698,41 +1719,6 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/IllegalArgumentException.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="100" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorLenientTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="396" column="0" selection-start="11862" selection-end="11862" vertical-scroll-proportion="0.9010669">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorCollectionTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="74" selection-start="875" selection-end="875" vertical-scroll-proportion="0.06013579">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorArrayTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="93" column="0" selection-start="3119" selection-end="3119" vertical-scroll-proportion="0.7130601">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorMapTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.8095238">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesArrayTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="63" column="0" selection-start="2097" selection-end="2097" vertical-scroll-proportion="0.01620591">
@@ -1749,56 +1735,93 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/ReflectionArgumentMatcher.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="13" selection-start="1454" selection-end="1454" vertical-scroll-proportion="0.29361296">
+        <state line="35" column="13" selection-start="1454" selection-end="1454" vertical-scroll-proportion="0.29873908">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/LenientMocksControl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="73" column="17" selection-start="3214" selection-end="3214" vertical-scroll-proportion="0.01620591">
+        <state line="73" column="17" selection-start="3214" selection-end="3214" vertical-scroll-proportion="0.016488846">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/DataSourceFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="73" selection-start="233" selection-end="233" vertical-scroll-proportion="0.08102955">
+        <state line="5" column="73" selection-start="233" selection-end="233" vertical-scroll-proportion="0.08244423">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/PropertiesDataSourceFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="7" selection-start="1352" selection-end="1352" vertical-scroll-proportion="0.16396569">
+        <state line="42" column="7" selection-start="1352" selection-end="1352" vertical-scroll-proportion="0.16682832">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="185" column="1" selection-start="12464" selection-end="12464" vertical-scroll-proportion="0.65014297">
+        <state line="185" column="1" selection-start="12464" selection-end="12464" vertical-scroll-proportion="0.6614937">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockUnitils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="45" selection-start="1481" selection-end="1481" vertical-scroll-proportion="0.01620591">
+        <state line="39" column="45" selection-start="1481" selection-end="1481" vertical-scroll-proportion="0.016488846">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionAssert.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="326" column="7" selection-start="16340" selection-end="16340" vertical-scroll-proportion="0.39651838">
+        <state line="326" column="7" selection-start="16340" selection-end="16340" vertical-scroll-proportion="0.4035433">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="198" column="78" selection-start="6371" selection-end="6371" vertical-scroll-proportion="0.01620591">
+        <state line="198" column="78" selection-start="6371" selection-end="6371" vertical-scroll-proportion="0.016488846">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/constraints/ConstraintsCheckDisablingDataSourceTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="16" selection-start="1224" selection-end="1224" vertical-scroll-proportion="0.5606208">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparatorMode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="36" selection-start="1264" selection-end="1288" vertical-scroll-proportion="0.47817653">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="207" column="17" selection-start="7977" selection-end="7977" vertical-scroll-proportion="0.016488846">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/annotation/RegularMock.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="24" selection-start="1118" selection-end="1118" vertical-scroll-proportion="0.3957323">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/annotation/LenientMock.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="18" selection-start="1132" selection-end="1132" vertical-scroll-proportion="0.33268672">
           <folding />
         </state>
       </provider>
