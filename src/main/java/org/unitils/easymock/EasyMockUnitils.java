@@ -62,7 +62,7 @@ public class EasyMockUnitils {
 
 
     /**
-     * Creates an EasyMock mock object of the given type.
+     * Creates an regular EasyMock mock object of the given type.
      * <p/>
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()} is called.
@@ -72,16 +72,16 @@ public class EasyMockUnitils {
      * @param returns  the returns setting, not null
      * @return a mock for the given class or interface, not null
      */
-    public static <T> T createMock(Class<T> mockType, InvocationOrder order, Returns returns) {
+    public static <T> T createRegularMock(Class<T> mockType, InvocationOrder order, Returns returns) {
 
-        return getEasyMockModule().createMock(mockType, order, returns);
+        return getEasyMockModule().createRegularMock(mockType, order, returns);
     }
 
 
     //todo javadoc
-    public static <T> T createLenientMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns, Order order, Dates dates, Defaults defaults) {
+    public static <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns, Order order, Dates dates, Defaults defaults) {
 
-        return getEasyMockModule().createLenientMock(mockType, invocationOrder, returns, order, dates, defaults);
+        return getEasyMockModule().createMock(mockType, invocationOrder, returns, order, dates, defaults);
     }
 
     /**
@@ -89,8 +89,8 @@ public class EasyMockUnitils {
      * <p/>
      * This method will make sure EasyMock's replay method is called on every mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createMock(Class,InvocationOrder,Returns)} and
-     * {@link #createLenientMock(Class,InvocationOrder,Returns,Order,Dates,Defaults)} methods.
+     * {@link #createRegularMock(Class,InvocationOrder,Returns)} and
+     * {@link #createMock(Class,InvocationOrder,Returns,Order,Dates,Defaults)} methods.
      * <p/>
      * After each test, the expected behavior will be verified automatically. Verification can also be performed
      * explicitly by calling the {@link #verify()} method.
@@ -107,8 +107,8 @@ public class EasyMockUnitils {
      * <p/>
      * This method will make sure EasyMock's verify method is called on every mock mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createMock(Class,InvocationOrder,Returns)} and
-     * {@link #createLenientMock(Class,InvocationOrder,Returns,Order,Dates,Defaults)} methods.
+     * {@link #createRegularMock(Class,InvocationOrder,Returns)} and
+     * {@link #createMock(Class,InvocationOrder,Returns,Order,Dates,Defaults)} methods.
      * <p/>
      * After each test, the expected behavior will be verified automatically. Verification can also be performed
      * explicitly by calling this method.

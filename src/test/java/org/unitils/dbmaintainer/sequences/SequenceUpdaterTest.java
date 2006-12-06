@@ -41,6 +41,9 @@ import java.sql.Statement;
 @DatabaseTest
 public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
+    /**
+     * DataSource for the test database, is injected
+     */
     @TestDataSource
     protected DataSource dataSource;
 
@@ -57,21 +60,19 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      */
     protected static final int LOWEST_ACCEPTACLE_SEQUENCE_VALUE = 1000;
 
+
     /**
      * Test fixture. Configures the implementation of the SequenceUpdater that matches the currenlty configured dialect.
      * Creates a test table and test sequence.
-     *
-     * @throws Exception
      */
     protected void setUp() throws Exception {
         super.setUp();
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
-                dataSource);
-        sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class,
-                configuration, dataSource, statementHandler);
+
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
+        sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
         dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         if (dbSupport.supportsSequences()) {
@@ -84,10 +85,9 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Clears the database, to avoid interference with other tests
-     *
-     * @throws Exception
      */
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -97,6 +97,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             dropTestTable();
         }
     }
+
 
     /**
      * Inserts a test record
@@ -116,6 +117,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Creates a test table
      */
@@ -133,6 +135,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     /**
      * Drops the test table
@@ -152,6 +155,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Creates a test sequence
      */
@@ -169,6 +173,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     /**
      * Drops the test sequence
@@ -188,10 +193,9 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Tests the update sequences behavior
-     *
-     * @throws Exception
      */
     public void testUpdateSequences() throws Exception {
         if (dbSupport.supportsSequences()) {
@@ -201,10 +205,9 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Verifies that if a sequence has a value already high enough, the value is not being set to a lower value
-     *
-     * @throws Exception
      */
     public void testUpdateSequences_valueAlreadyHighEnough() throws Exception {
         if (dbSupport.supportsSequences()) {
@@ -221,11 +224,11 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Returns the next value for the test sequence
      *
-     * @return
-     * @throws SQLException
+     * @return the sequence
      */
     private long getNextTestSequenceValue() throws SQLException {
         return dbSupport.getNextValueOfSequence("testsequence");

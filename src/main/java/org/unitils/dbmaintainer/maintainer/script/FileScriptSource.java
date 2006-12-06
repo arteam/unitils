@@ -32,7 +32,7 @@ import java.util.*;
 
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem.
- * <p>
+ * <p/>
  * Script files should be located in the directory configured by {@link #PROPKEY_SCRIPTFILES_DIR}. Valid script files
  * start with a version number followed by an underscore, and end with the extension configured by
  * {@link #PROPKEY_SCRIPTFILES_FILEEXTENSION}.
@@ -70,8 +70,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         }
         fileExtension = configuration.getString(PROPKEY_SCRIPTFILES_FILEEXTENSION);
         if (fileExtension.startsWith(".")) {
-            throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSION +
-                    " should not start with a '.'");
+            throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSION + " should not start with a '.'");
         }
     }
 

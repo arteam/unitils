@@ -21,12 +21,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.unitils.UnitilsJUnit3;
 import static org.unitils.easymock.EasyMockUnitils.replay;
-import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.easymock.annotation.Mock;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateTest;
-
-import java.sql.Connection;
 
 /**
  * Test class for the HibernateModule
@@ -39,13 +37,13 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
      */
     private HibernateModule hibernateModule;
 
-    @LenientMock
+    @Mock
     private Configuration mockHibernateConfiguration;
 
-    @LenientMock
+    @Mock
     private SessionFactory mockHibernateSessionFactory;
 
-    @LenientMock
+    @Mock
     private org.hibernate.classic.Session mockHibernateSession;
 
     /**

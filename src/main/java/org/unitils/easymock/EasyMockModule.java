@@ -25,7 +25,7 @@ import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.AfterCreateMock;
-import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.annotation.RegularMock;
 import org.unitils.easymock.util.*;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
@@ -76,7 +76,7 @@ public class EasyMockModule implements Module {
     public void init(Configuration configuration) {
 
         this.mocksControls = new ArrayList<MocksControl>();
-        defaultEnumValues = getAnnotationEnumDefaults(EasyMockModule.class, configuration, RegularMock.class, LenientMock.class);
+        defaultEnumValues = getAnnotationEnumDefaults(EasyMockModule.class, configuration, RegularMock.class, Mock.class);
     }
 
 
@@ -102,7 +102,7 @@ public class EasyMockModule implements Module {
      * @param returns         the returns setting, not null
      * @return a mock for the given class or interface, not null
      */
-    public <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns) {
+    public <T> T createRegularMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns) {
 
         // Get anotation arguments and replace default values if needed
         invocationOrder = getValueReplaceDefault(RegularMock.class, invocationOrder, defaultEnumValues);
@@ -144,14 +144,14 @@ public class EasyMockModule implements Module {
      * @param defaults        todo
      * @return a mockcontrol for the given class or interface, not null
      */
-    public <T> T createLenientMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns, Order order, Dates dates, Defaults defaults) {
+    public <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns, Order order, Dates dates, Defaults defaults) {
 
         // Get anotation arguments and replace default values if needed
-        invocationOrder = getValueReplaceDefault(LenientMock.class, invocationOrder, defaultEnumValues);
-        returns = getValueReplaceDefault(LenientMock.class, returns, defaultEnumValues);
-        order = getValueReplaceDefault(LenientMock.class, order, defaultEnumValues);
-        dates = getValueReplaceDefault(LenientMock.class, dates, defaultEnumValues);
-        defaults = getValueReplaceDefault(LenientMock.class, defaults, defaultEnumValues);
+        invocationOrder = getValueReplaceDefault(Mock.class, invocationOrder, defaultEnumValues);
+        returns = getValueReplaceDefault(Mock.class, returns, defaultEnumValues);
+        order = getValueReplaceDefault(Mock.class, order, defaultEnumValues);
+        dates = getValueReplaceDefault(Mock.class, dates, defaultEnumValues);
+        defaults = getValueReplaceDefault(Mock.class, defaults, defaultEnumValues);
 
         List<ReflectionComparatorMode> comparatorModes = new ArrayList<ReflectionComparatorMode>();
         if (Order.LENIENT == order) {
@@ -211,7 +211,7 @@ public class EasyMockModule implements Module {
 
 
     /**
-     * Creates and sets a mock for all {@link @Mock} and {@link @LenientMock} annotated fields.
+     * Creates and sets a mock for all {@link @RegularMock} annotated fields.
      * <p/>
      * The
      * todo javadoc
@@ -219,7 +219,7 @@ public class EasyMockModule implements Module {
      *
      * @param testObject the test, not null
      */
-    protected void createAndInjectMocksIntoTest(Object testObject) {
+    protected void createAndInjectRegularMocksIntoTest(Object testObject) {
 
         List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), RegularMock.class);
         for (Field mockField : mockFields) {
@@ -227,7 +227,7 @@ public class EasyMockModule implements Module {
             Class<?> mockType = mockField.getType();
 
             RegularMock regularMockAnnotation = mockField.getAnnotation(RegularMock.class);
-            Object mockObject = createMock(mockType, regularMockAnnotation.invocationOrder(), regularMockAnnotation.returns());
+            Object mockObject = createRegularMock(mockType, regularMockAnnotation.invocationOrder(), regularMockAnnotation.returns());
             setFieldValue(testObject, mockField, mockObject);
 
             callAfterCreateMockMethods(testObject, mockObject, mockField.getName(), mockType);
@@ -236,15 +236,15 @@ public class EasyMockModule implements Module {
 
 
     //todo javadoc
-    protected void createAndInjectLenientMocksIntoTest(Object testObject) {
+    protected void createAndInjectMocksIntoTest(Object testObject) {
 
-        List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), LenientMock.class);
+        List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
         for (Field mockField : mockFields) {
 
             Class<?> mockType = mockField.getType();
 
-            LenientMock mockAnnotation = mockField.getAnnotation(LenientMock.class);
-            Object mockObject = createLenientMock(mockType, mockAnnotation.invocationOrder(), mockAnnotation.returns(), mockAnnotation.order(), mockAnnotation.dates(), mockAnnotation.defaults());
+            Mock mockAnnotation = mockField.getAnnotation(Mock.class);
+            Object mockObject = createMock(mockType, mockAnnotation.invocationOrder(), mockAnnotation.returns(), mockAnnotation.order(), mockAnnotation.dates(), mockAnnotation.defaults());
             setFieldValue(testObject, mockField, mockObject);
 
             callAfterCreateMockMethods(testObject, mockObject, mockField.getName(), mockType);
@@ -281,7 +281,7 @@ public class EasyMockModule implements Module {
     private class EasyMockTestListener extends TestListener {
 
         /**
-         * Before the test is executed this calls {@link EasyMockModule#createAndInjectMocksIntoTest(Object)} to
+         * Before the test is executed this calls {@link EasyMockModule#createAndInjectRegularMocksIntoTest(Object)} to
          * create and inject all mocks on the class.
          */
         @Override
@@ -290,8 +290,8 @@ public class EasyMockModule implements Module {
             // Clear all previously created mocks controls
             mocksControls.clear();
 
+            createAndInjectRegularMocksIntoTest(testObject);
             createAndInjectMocksIntoTest(testObject);
-            createAndInjectLenientMocksIntoTest(testObject);
         }
 
         /**

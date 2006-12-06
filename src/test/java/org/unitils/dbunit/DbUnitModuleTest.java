@@ -23,7 +23,7 @@ import org.unitils.core.ModulesRepository;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.easymock.EasyMockUnitils;
-import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.easymock.annotation.Mock;
 
 /**
  * Test class for the DbUnitModule
@@ -63,19 +63,19 @@ public class DbUnitModuleTest extends UnitilsJUnit3 {
      */
     private DbUnitModule dbUnitModule;
 
-    @LenientMock
+    @Mock
     private DbUnitDatabaseConnection mockDbUnitDatabaseConnection;
 
-    @LenientMock
+    @Mock
     private ModulesRepository mockModulesRepository;
 
-    @LenientMock
+    @Mock
     private DatabaseModule mockDatabaseModule;
 
-    @LenientMock
+    @Mock
     private DatabaseOperation mockInsertDatabaseOperation;
 
-    @LenientMock
+    @Mock
     private IDataSet mockDbUnitDataSet;
 
     /**

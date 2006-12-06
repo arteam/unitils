@@ -18,7 +18,7 @@ package org.unitils.dbmaintainer.constraints;
 import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
 import static org.unitils.easymock.EasyMockUnitils.replay;
-import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.easymock.annotation.Mock;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -32,13 +32,13 @@ public class ConstraintsCheckDisablingDataSourceTest extends UnitilsJUnit3 {
     /* Tested object */
     private ConstraintsCheckDisablingDataSource constraintsCheckDisablingDataSource;
 
-    @LenientMock
+    @Mock
     private DataSource mockDataSource;
 
-    @LenientMock
+    @Mock
     private ConstraintsDisabler mockConstraintsDisabler;
 
-    @LenientMock
+    @Mock
     private Connection mockConnection;
 
     /**
