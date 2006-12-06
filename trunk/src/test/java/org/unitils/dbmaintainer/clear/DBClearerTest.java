@@ -26,6 +26,7 @@ import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -41,20 +42,30 @@ import java.sql.Statement;
 @DatabaseTest
 abstract public class DBClearerTest extends UnitilsJUnit3 {
 
-    /* DataSource for the test database, is injected */
+    /**
+     * DataSource for the test database, is injected
+     */
     @TestDataSource
-    protected javax.sql.DataSource dataSource;
+    protected DataSource dataSource;
 
-    /* Tested object */
+    /**
+     * Tested object
+     */
     protected DBClearer dbClearer;
 
-    /* Test database schema name */
+    /**
+     * Test database schema name
+     */
     protected String schemaName;
 
-    /* The Configuration object */
+    /**
+     * The Configuration object
+     */
     protected Configuration configuration;
 
-    /* The DbSupport object */
+    /**
+     * The DbSupport object
+     */
     protected DbSupport dbSupport;
 
     /**
@@ -68,13 +79,11 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             super.setUp();
 
             configuration = new ConfigurationLoader().loadConfiguration();
-            configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, "testtablepreserve,testviewpreserve," +
-                    "testsequencepreserve,testtriggerpreserve");
+            configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, "testtablepreserve,testviewpreserve,testsequencepreserve,testtriggerpreserve");
 
             StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
             dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
-            dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class,
-                    configuration, dataSource, statementHandler);
+            dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
 
             dropTestViews();
             dropTestTables();
@@ -98,10 +107,9 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Checks if the tables are correctly dropped.
-     *
-     * @throws Exception
      */
     public void testClearDatabase_tables() throws Exception {
         if (isTestedDialectActivated()) {
@@ -113,10 +121,9 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Checks if the views are correctly dropped
-     *
-     * @throws Exception
      */
     public void testClearDatabase_views() throws Exception {
         if (isTestedDialectActivated()) {
@@ -128,10 +135,9 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Tests if the triggers are correctly dropped
-     *
-     * @throws Exception
      */
     public void testClearDatabase_sequences() throws Exception {
         if (isTestedDialectActivated() && dbSupport.supportsSequences()) {
@@ -143,10 +149,9 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Tests if the triggers are correctly dropped
-     *
-     * @throws Exception
      */
     public void testClearDatabase_triggers() throws Exception {
         if (isTestedDialectActivated() && dbSupport.supportsTriggers()) {
@@ -158,10 +163,9 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Creates the test tables
-     *
-     * @throws SQLException
      */
     private void createTestTables() throws SQLException {
         Connection conn = null;
@@ -175,6 +179,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     /**
      * Drops the test tables
@@ -192,10 +197,9 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Creates the test views
-     *
-     * @throws SQLException
      */
     private void createTestView() throws SQLException {
         Connection conn = null;
@@ -210,6 +214,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     /**
      * Drops the test views
@@ -226,6 +231,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             // Ignored
         }
     }
+
 
     /**
      * Creates the test sequences
@@ -248,6 +254,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Drops the test sequence
      */
@@ -266,12 +273,14 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     private void createTestTriggers() throws SQLException {
         if (dbSupport.supportsTriggers()) {
             createTestTrigger("testtable", "testtrigger");
             createTestTrigger("testtablepreserve", "testtriggerpreserve");
         }
     }
+
 
     private void dropTestTriggers() {
         if (dbSupport.supportsTriggers()) {
@@ -288,7 +297,9 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
     }
 
+
     abstract protected void createTestTrigger(String tableName, String triggerName) throws SQLException;
+
 
     /**
      * Checks whether the database dialect that is tested in the current implementation is the currenlty configured

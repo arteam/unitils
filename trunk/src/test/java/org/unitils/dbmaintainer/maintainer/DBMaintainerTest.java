@@ -28,7 +28,7 @@ import org.unitils.dbmaintainer.maintainer.version.VersionSource;
 import org.unitils.dbmaintainer.script.SQLScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
 import static org.unitils.easymock.EasyMockUnitils.replay;
-import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.easymock.annotation.Mock;
 import org.unitils.inject.annotation.AutoInject;
 import org.unitils.inject.annotation.TestedObject;
 
@@ -41,31 +41,31 @@ import java.util.List;
 @SuppressWarnings({"UnusedDeclaration"})
 public class DBMaintainerTest extends UnitilsJUnit3 {
 
-    @LenientMock
+    @Mock
     @AutoInject
     private VersionSource mockVersionSource;
 
-    @LenientMock
+    @Mock
     @AutoInject
     private ScriptSource mockScriptSource;
 
-    @LenientMock
+    @Mock
     @AutoInject
     private SQLScriptRunner mockScriptRunner;
 
-    @LenientMock
+    @Mock
     @AutoInject
     private DBClearer mockDbClearer;
 
-    @LenientMock
+    @Mock
     @AutoInject
     private ConstraintsDisabler mockConstraintsDisabler;
 
-    @LenientMock
+    @Mock
     @AutoInject
     private SequenceUpdater mockSequenceUpdater;
 
-    @LenientMock
+    @Mock
     @AutoInject
     private DtdGenerator mockDtdGenerator;
 

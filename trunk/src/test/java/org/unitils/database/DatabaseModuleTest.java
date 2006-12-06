@@ -21,7 +21,7 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.easymock.annotation.LenientMock;
+import org.unitils.easymock.annotation.Mock;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -37,13 +37,13 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
      */
     private DatabaseModule databaseModule;
 
-    @LenientMock
+    @Mock
     private DataSource mockDataSource = null;
 
-    @LenientMock
+    @Mock
     private Connection mockConnection = null;
 
-    @LenientMock
+    @Mock
     private DBMaintainer mockDbMaintainer = null;
 
     public void setUp() throws Exception {
@@ -109,7 +109,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
         /**
          * Method on which a DataSource should be injected
          *
-         * @param dataSource
+         * @param dataSource not null
          */
         @TestDataSource
         public void setDataSource(javax.sql.DataSource dataSource) {
