@@ -65,9 +65,9 @@ and keeping focus on the project code.</p>
 
 <p>A possible set of unit tests per piece of code can include:</p>
 <ul>
-    <li>a test for the main flow (the happy path)</li>
-    <li>tests for the main alternative flows</li>
-    <li>tests for boundary conditions (such as null arguments)</li>
+    <li><p>a test for the main flow (the happy path)</p></li>
+    <li><p>tests for the main alternative flows</p></li>
+    <li><p>tests for boundary conditions (such as null arguments)</p></li>
 </ul>
 
 <p>The main focus of the guidelines is to make unit-testing
@@ -87,10 +87,10 @@ project, but typically you would at least test the business and database layers.
 unit tests:</p>
 
 <ul>
-    <li><a href="http://www.junit.org/">JUnit</a> - base test library</li>
-    <li><a href="http://dbunit.sourceforge.net/">DbUnit</a> - tests using a database</li>
-    <li><a href="http://sourceforge.net/projects/junit-addons">JUnit Addons</a> - testing utilities</li>
-    <li><a href="http://www.easymock.org/">EasyMock</a> - simulating behavior</li>
+    <li><p><a href="http://www.junit.org/">JUnit</a> - base test library</p></li>
+    <li><p><a href="http://dbunit.sourceforge.net/">DbUnit</a> - tests using a database</p></li>
+    <li><p><a href="http://sourceforge.net/projects/junit-addons">JUnit Addons</a> - testing utilities</p></li>
+    <li><p><a href="http://www.easymock.org/">EasyMock</a> - simulating behavior</p></li>
 </ul>
 
 <p>Aside from these libraries there is also a library that we
@@ -115,18 +115,18 @@ described by the guidelines: <b>Unitils</b></p>
 
 <p>A unit test generally consists of following parts:</p>
 <ul>
-    <li>Class under test instance</li>
-    <li>Test data instances (also called test fixture)</li>
-    <li>Setup of test data</li>
-    <li>Test methods</li>
-    <li>Utility methods</li>
+    <li><p>Class under test instance</p></li>
+    <li><p>Test data instances (also called test fixture)</p></li>
+    <li><p>Setup of test data</p></li>
+    <li><p>Test methods</p></li>
+    <li><p>Utility methods</p></li>
 </ul>
 
 <p><i>For each test method:</i></p>
 <ul>
-    <li>(Optional) Test specific setup</li>
-    <li>Execution of the method under test</li>
-    <li>Verification of the results, using assert statements</li>
+    <li><p>(Optional) Test specific setup</p></li>
+    <li><p>Execution of the method under test</p></li>
+    <li><p>Verification of the results, using assert statements</p></li>
 </ul>
 
 
@@ -229,15 +229,15 @@ public class UserAdminTest extends TestCase {
 
 <p><i>For the test classes:</i></p>
 <ul>
-    <li>&lt;class name&gt; + <i>‘Test’</i></li>
-    <li>If there are multiple test classes for one class: <br />
-        &lt;class name&gt; + &lt;description of tested behavior&gt; + <i>‘Test’</i></li>
+    <li><p>&lt;class name&gt; + <i>‘Test’</i></p></li>
+    <li><p>If there are multiple test classes for one class: <br />
+        &lt;class name&gt; + &lt;description of tested behavior&gt; + <i>‘Test’</i></p></li>
 </ul>
 
 <p><i>For the test methods: </i></p>
 <ul>
-    <li>For the ‘happy path’:  ‘test’ + &lt;method name&gt;</li>
-    <li>For all special cases: ‘test’ + &lt;method name&gt; + ‘_’ + &lt;description of special case&gt;</li>
+    <li><p>For the ‘happy path’:  ‘test’ + &lt;method name&gt;</p></li>
+    <li><p>For all special cases: ‘test’ + &lt;method name&gt; + ‘_’ + &lt;description of special case&gt;</p></li>
 </ul>
 
 
@@ -344,8 +344,8 @@ do not include any of the test classes.</p>
 <p><i>Test methods </i></p>
 
 <ul>
-    <li>should use objects that were created during the setup of the test class</li>
-    <li>may perform additional configuration (not creation) of test data during its own setup</li>
+    <li><p>should use objects that were created during the setup of the test class</p></li>
+    <li><p>may perform additional configuration (not creation) of test data during its own setup</p></li>
 </ul>
 
 
@@ -564,8 +564,8 @@ Only boundary conditions that a method can handle according to its interface
 <p><i>For every boundary condition do the following:</i></p>
 
 <ul>
-    <li>write a unit test for this boundary condition or</li>
-    <li>add a preconditions to the javadoc that excludes this condition from the method’s contract.</li> 
+    <li><p>write a unit test for this boundary condition or</p></li>
+    <li><p>add a preconditions to the javadoc that excludes this condition from the method’s contract.</p></li> 
 </ul>
 
 
@@ -862,9 +862,9 @@ would need to change al your tests.</p>
 <p>Keep your test code as simple as possible. It should only contain:</p>
 
 <ul>
-    <li>an optional <i>small</i> setup of test data</li>
-    <li>the actual test call</li>
-    <li>a <i>limited </i>number of assertions</li>
+    <li><p>an optional <i>small</i> setup of test data</p></li>
+    <li><p>the actual test call</p></li>
+    <li><p>a <i>limited </i>number of assertions</p></li>
 </ul>
 
 
@@ -1735,22 +1735,22 @@ most effective way for guaranteeing the correctness.</p>
 <p>Make sure you to the following for testing a complex query:</p>
 
 <ul>
- <li>Create a test data file, with one or a few records that
+ <li><p>Create a test data file, with one or a few records that
      should be included in the result of the query. Each of these records
      should be returned because of a different condition or combination of
-     conditions.</li>
+     conditions.</p></li>
 </ul>
 
 <ul>
- <li>Add one or a few records to these file that should not be
+ <li><p>Add one or a few records to these file that should not be
      included in the result of the query. Each of these records should not be
-     included because of a different condition or combination of conditions.</li>
- <li>For each of the above mentioned records, only add the ID
-     columns and the columns involved in join conditions or the where clause.</li>
- <li>Write a test that invokes the query. Use
+     included because of a different condition or combination of conditions.</p></li>
+ <li><p>For each of the above mentioned records, only add the ID
+     columns and the columns involved in join conditions or the where clause.</p></li>
+ <li><p>Write a test that invokes the query. Use
      CollectionAssert.assertMatches for comparing the ID fields of the result
      with an array containing the IDs of the records that you expect to be
-     returned.</li>
+     returned.</p></li>
 </ul>
 
 
@@ -1948,10 +1948,10 @@ public void testArchiveOrders()
 <h4>Short Description</h4>
 
 <ul>
-    <li>Use DBUnit’s FlatXMLDataSet format for your data files</li>
-    <li>Add no more data than necessary. Only fill ID columns, join condition columns and where condition columns.</li>
-    <li>When data files grow too large, split your class in multiple test classes or create method-specific data files.</li>
-    <li>Don’t use DBUnit’s data file creation features, it will result in overly large data files.</li>
+    <li><p>Use DBUnit’s FlatXMLDataSet format for your data files</p></li>
+    <li><p>Add no more data than necessary. Only fill ID columns, join condition columns and where condition columns.</p></li>
+    <li><p>When data files grow too large, split your class in multiple test classes or create method-specific data files.</p></li>
+    <li><p>Don’t use DBUnit’s data file creation features, it will result in overly large data files.</p></li>
 </ul>
 
 
@@ -1967,9 +1967,9 @@ few test data as possible, just enough to perform the test.</p>
 kind of logic. This means filling up only the following columns:</p>
 
 <ul>
-    <li>ID columns</li>
-    <li>Columns used in join conditions</li>
-    <li>Columns used in the where clause of the query</li>
+    <li><p>ID columns</p></li>
+    <li><p>Columns used in join conditions</p></li>
+    <li><p>Columns used in the where clause of the query</p></li>
 </ul>
 
 <p>The columns specified above are part of a query’s logic.
@@ -1981,9 +1981,9 @@ test, but it greatly increases its maintenance cost.</p>
 simplify them.</p>
 
 <ul>
-    <li>Refactor different tests in a test class to make them make use of the same data (if possible)</li>
-    <li>If one or more methods need very specific test data, create a specific data file for these methods (check the Unitils documentation)</li>
-    <li>If a group of related tests can be identified, split them up into a separate test class.</li>
+    <li><p>Refactor different tests in a test class to make them make use of the same data (if possible)</p></li>
+    <li><p>If one or more methods need very specific test data, create a specific data file for these methods (check the Unitils documentation)</p></li>
+    <li><p>If a group of related tests can be identified, split them up into a separate test class.</p></li>
 </ul>
 
 
@@ -2116,9 +2116,9 @@ transaction, so that the tests closely resemble the real situation.</p>
 <p>But, running them in a transaction also has following disadvantages:</p>
 
 <ul>
-    <li>When debugging tests using the IDE’s debugger, the data updates executed so far are not visible in a database query console like Toad or SqlPlus.</li>
-    <li>Failing tests are difficult to debug afterwards if the transaction rolled back all changes to the database.</li>
-    <li>Extra baseline code is required to enable transactions in unit tests.</li>
+    <li><p>When debugging tests using the IDE’s debugger, the data updates executed so far are not visible in a database query console like Toad or SqlPlus.</p></li>
+    <li><p>Failing tests are difficult to debug afterwards if the transaction rolled back all changes to the database.</p></li>
+    <li><p>Extra baseline code is required to enable transactions in unit tests.</p></li>
 </ul>
 
 </div>
@@ -2179,10 +2179,10 @@ is thereby essential to highlight the mapping mismatch as soon as possible.</p>
 <p>Typical mapping problems that can arise:</p>
 
 <ul>
-    <li>Property isn’t mapped to a database column</li>
-    <li>Name mismatch between object property and mapping specification</li>
-    <li>Property of a class is mapped to a database column with a different name</li>
-    <li>Introduction of a new table or column that isn’t reflected to the Java property</li>
+    <li><p>Property isn’t mapped to a database column</p></li>
+    <li><p>Name mismatch between object property and mapping specification</p></li>
+    <li><p>Property of a class is mapped to a database column with a different name</p></li>
+    <li><p>Introduction of a new table or column that isn’t reflected to the Java property</p></li>
 </ul>
 
 <p>The Unitils project provides a set of test methods that
