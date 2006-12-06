@@ -352,6 +352,8 @@ dbscripts/ 001_initial.sql
 
 
 
+
+
 ** Testing with Hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -387,6 +389,8 @@ public class HibernateMappingTest extends BaseHibernateTest {
     the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
     
     TODO example error message
+
+
 
 
 
@@ -492,23 +496,49 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 
 ** Lenient assertions
 ~~~~~~~~~~~~~~~~~~~~~
+        
+    If you want to create unit tests that is maintainable care must be taken to only add assertions to your test that 
+    are of value for the test. Let me clarify this with an example: suppose you have a test for a calulation of an account balance. 
+    There is no need to add any assertions to this test that will check whether the name of the bank-customer is still correct.
+    This will only add complexity to your test making it more difficult to understand and, more importantly, more brittle against changes 
+    in the code. If you want your code to more easyly survive refactorings and other code changes, make sure you limit your assertions and 
+    test data setup to the scope of the test.
     
-    
-    
-    * <Ignoring the order in collections>
-    
-    * <Ignoring default values>
-    
-    * <Lenient date values>
-
-    []
+    To help you in writing assertions that only test what is important, we added some levels of leniency to the ReflectionAssert checks, which 
+    we will cover more in-depth in the sections that follow.
 
 
 *** Lenient order
 ~~~~~~~~~~~~~~~~~
+    A first type of leniency you can specify is ignoring the order of elements in a collection or an array. It is often the case that when working with 
+    lists, one is not interested in the actual real order of the elements, only that they comply to certain criteria. For example, code for retrieving 
+    all bankaccounts with a negative balance will typically return these in a list in a certain order that is unimportant for further processing.
+    
+    To implement this behavior, the <ReflectionAssert.assertRefEquals> method can be configured to ignore ordering by 
+    supplying it with the <ReflectionComparatorMode.LENIENT_ORDER> comparator mode:
+
++-----+
+List<Integer> myList = Arrays.asList(3, 2, 1);
+assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER); 
++-----+
+
+    The <ReflectionAssert> class also offers an assertion for which some leniency levels, namely lenient order and 
+    ignore defaults (see below) are pre-set: <ReflectionAssert.assertLenEquals>. The above example can therefore be re-written as follows:
+    
++-----+
+List<Integer> myList = Arrays.asList(3, 2, 1);
+assertLenEquals(Arrays.asList(1, 2, 3), myList); 
++-----+
+    
+    This len/ref thing is a general naming convention: assert<<Ref>>... is the version that is strict by default and for which you can 
+    manually set the leniency levels, assert<<Len>>... is the version for which the lenient order and ignore defaults are pre-set. 
+    
+
 
 *** Ignoring defaults
 ~~~~~~~~~~~~~~~~~~~~~
+    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode and is used 
+    
 
 *** Lenient dates
 ~~~~~~~~~~~~~~~~~~~~~
@@ -516,18 +546,23 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 
 
 
+
+
+
+
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Unit tests should test code in isolation. Mock objects allow testing a component without having to care about other components or services that it depends on. 
-    Unitils builds further on EasyMock for its mock object testing support. Unitils provides convenience functionality that greatly reduces the plumbing code that needs to be written when working with mocks. 
+    Unit tests should test code in isolation. Mock objects allow testing a component without having to care about other 
+    components or services that it depends on. Unitils builds further on EasyMock for its mock object testing support. Unitils 
+    provides convenience functionality that greatly reduces the plumbing code that needs to be written when working with mocks. 
     This involves simplification of mock creation, argument matching and injection of mocks.
+
 
 ** Mock creation
 ~~~~~~~~~~~~~~~~
-
-    Unitils makes sure that mock objects are injected into a unit test class before the execution of each test. Following example shows a unit test for a method on a UserService that disables all inactive user accounts.
-    All data access is delegated to a UserDao service, which is replaced by a mock object.
+    Unitils makes sure that mock objects are injected into a unit test class before the execution of each test. Following example 
+    shows a unit test for a method on a UserService that disables all inactive user accounts. All data access is delegated to a 
+    UserDao service, which is replaced by a mock object.
     
 +-----+
 public void UserServiceTest extends UnitilsJUnit4 { 
@@ -552,13 +587,14 @@ public void UserServiceTest extends UnitilsJUnit4 {
    Mock creation and assignment to the test object's fields is performed before the test fixture.
    
    
+   
 **   Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
-
-   Unitils provides services that simplify mock injection in various ways. Unitils' injection support is in the first place intended for projects that use an IOC framework like Spring to wire up objects. E.g.
+   Unitils provides services that simplify mock injection in various ways. Unitils' injection support is in the first place intended for 
+   projects that use an IOC framework like Spring to wire up objects. E.g.
 
 +-----+
   @Mock @Inject(property = "userDao")

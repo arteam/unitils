@@ -52,3 +52,10 @@ a:visited  {
     background: url(../images/external.png) right top no-repeat;
     padding-right: 18px;
 }
+
+.image-center {
+	text-align: center;
+}
+
+.image-left {
+}

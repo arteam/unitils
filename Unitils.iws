@@ -18,22 +18,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/constraints/ConstraintsCheckDisablingDataSourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/constraints/ConstraintsCheckDisablingDataSourceTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clear/DBClearerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clear/DBClearerTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/database/config/PropertiesDataSourceFactoryTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/database/config/PropertiesDataSourceFactoryTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockUnitils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockUnitils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleTest.java" />
-      <change type="DELETED" beforePath="D:\_tim\Ordina\Testing\trunk\src\main\java\org\unitils\easymock\annotation\LenientMock.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/documentation.apt" afterPath="$PROJECT_DIR$/src/site/apt/documentation.apt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/sequences/SequenceUpdaterTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/sequences/SequenceUpdaterTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/annotation/Mock.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/DBMaintainerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/DBMaintainerTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/FileScriptSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/FileScriptSource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/xdoc/guidelines.xml" afterPath="$PROJECT_DIR$/src/site/xdoc/guidelines.xml" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -194,62 +182,7 @@
     <option name="myCurrentFavoritesList" value="Unitils" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="EasyMockModule.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="213" column="54" selection-start="8026" selection-end="8026" vertical-scroll-proportion="0.3269781">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="unitils-default.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="196" column="15" selection-start="13113" selection-end="13113" vertical-scroll-proportion="0.80838895">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FileScriptSource.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/FileScriptSource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="66" column="0" selection-start="2471" selection-end="2471" vertical-scroll-proportion="0.21163012">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DBClearerTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clear/DBClearerTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="197" column="0" selection-start="6694" selection-end="6694" vertical-scroll-proportion="0.01620591">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SequenceUpdaterTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/sequences/SequenceUpdaterTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="71" column="133" selection-start="2728" selection-end="2728" vertical-scroll-proportion="0.6758818">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DBCleanerTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="57" column="22" selection-start="2009" selection-end="2009" vertical-scroll-proportion="0.21830314">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -1400,30 +1333,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="57" column="22" selection-start="2009" selection-end="2009" vertical-scroll-proportion="0.21830314">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/sequences/SequenceUpdaterTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="71" column="133" selection-start="2728" selection-end="2728" vertical-scroll-proportion="0.6758818">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clear/DBClearerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="197" column="0" selection-start="6694" selection-end="6694" vertical-scroll-proportion="0.01620591">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/FileScriptSource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="0" selection-start="2471" selection-end="2471" vertical-scroll-proportion="0.21163012">
+        <state line="69" column="13" selection-start="2478" selection-end="2711" vertical-scroll-proportion="0.26024786">
           <folding />
         </state>
       </provider>
@@ -1438,6 +1350,27 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="213" column="54" selection-start="8026" selection-end="8026" vertical-scroll-proportion="0.3269781">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clear/DBClearerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="197" column="0" selection-start="6694" selection-end="6694" vertical-scroll-proportion="0.01620591">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/sequences/SequenceUpdaterTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="71" column="133" selection-start="2728" selection-end="2728" vertical-scroll-proportion="0.6758818">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="57" column="22" selection-start="2009" selection-end="2009" vertical-scroll-proportion="0.21830314">
           <folding />
         </state>
       </provider>
