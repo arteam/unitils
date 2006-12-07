@@ -152,25 +152,25 @@ import junit.framework.TestCase;
 public class UserAdminTest extends TestCase {
 
     /* Class under test */
-    private UserAdmin userAdmin;  
+    private UserAdmin userAdmin;                            <span class="code-comment">// Class under Test</span>
 
-    /* A simple test user */
-    private User user;
-
-    /* An administrator role */
-    private Role adminRole;
+    /* A simple test user */                                <span class="code-comment">//</span>
+    private User user;                                      <span class="code-comment">// Test Data (Fixture)</span>
+                                                            <span class="code-comment">//</span>
+    /* An administrator role */                             <span class="code-comment">//</span>
+    private Role adminRole;                                 <span class="code-comment">//</span>
 
 
     /**
      * Initializes the test fixture.
      */
     protected void setUp() throws Exception {
-        super.setUp();
+        super.setUp();                                      <span class="code-comment">// Superclass Setup</span>
 
-        userAdmin = new UserAdmin();
+        userAdmin = new UserAdmin();                        <span class="code-comment">// Create Class under Test</span>
 
-        user = new User(“John”, “Doe”);
-        adminRole = new Role(“Administrator”);
+        user = new User(“John”, “Doe”);                     <span class="code-comment">//</span>
+        adminRole = new Role(“Administrator”);              <span class="code-comment">// Test Data Setup</span>
     }
 
 
@@ -179,13 +179,13 @@ public class UserAdminTest extends TestCase {
      */
     public void testAddUser_oldEnough() {
 
-        user.setAge(18);
+        user.setAge(18);                                    <span class="code-comment">// Extra Test Setup</span>
 
-        userAdmin.addUser(“jdoe”, user, adminRole);
+        userAdmin.addUser(“jdoe”, user, adminRole);         <span class="code-comment">// Perform Test</span>
 
-        User result = userAdmin.getUser(“jdoe”);
-        assertEquals(“John”, result.getFirstName());
-        assertEquals(“Doe”, result.getLastName());
+        User result = userAdmin.getUser(“jdoe”);            <span class="code-comment">//</span>
+        assertEquals(“John”, result.getFirstName());        <span class="code-comment">// Verify Results</span>
+        assertEquals(“Doe”, result.getLastName());          <span class="code-comment">//</span>
     }
 }
 </pre></div>
@@ -325,11 +325,11 @@ public class UserAdminTest extends TestCase {
     /* Class under test */
     private UserAdmin userAdmin;  
 
-    /* A simple test user */
-    private User user;  
-
-    /* An administrator role */
-    private Role adminRole;
+    /* A simple test user */                                <span class="code-comment">//</span>                     
+    private User user;                                      <span class="code-comment">//</span>
+                                                            <span class="code-comment">// Test Data (Fixture)</span>
+    /* An administrator role */                             <span class="code-comment">//</span>
+    private Role adminRole;                                 <span class="code-comment">//</span>
 
 
     /**
@@ -339,8 +339,8 @@ public class UserAdminTest extends TestCase {
         super.setUp();
 
         userAdmin = new UserAdmin();
-        user = new User(“John”, “Doe”);
-        adminRole = new Role(“Administrator”);
+        user = new User(“John”, “Doe”);                     <span class="code-comment">// Test Data Setup</span>
+        adminRole = new Role(“Administrator”);              <span class="code-comment">//</span>
     }
 
 
@@ -348,9 +348,10 @@ public class UserAdminTest extends TestCase {
      * Test for method with …
      */
     public void testAddUser_oldEnough() {
-        user.setAge(18);
 
-        userAdmin.addUser(“jdoe”, user, adminRole);
+        user.setAge(18);                                    <span class="code-comment">// Extra Test Setup</span>
+
+        userAdmin.addUser(“jdoe”, user, adminRole);         <span class="code-comment">// Use Test Data</span>
 
         User result = userAdmin.getUser(“jdoe”);
         assertEquals(“John”, result.getFirstName());
@@ -392,21 +393,21 @@ that contains code for maintaining users and their roles.</p>
 <div class="source"><pre>
 public class UserAdminTest extends TestCase {
 
-    /* A simple test user 1 */
-    private User user1;
-
-    ...
-
-    /* A simple test user 10 */
-    private User user10;
-
-    /* An administrator role 1 */
-    private Role adminRole1;
-
-    ...
-
-    /* An administrator role 10 */
-    private Role adminRole10;
+    /* A simple test user 1 */                              <span class="code-comment">//</span>
+    private User user1;                                     <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+    ...                                                     <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+    /* A simple test user 10 */                             <span class="code-comment">// Test Data (Fixture)</span>
+    private User user10;                                    <span class="code-comment">//  that is too large</span>
+                                                            <span class="code-comment">//</span>
+    /* An administrator role 1 */                           <span class="code-comment">//</span>
+    private Role adminRole1;                                <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+    ...                                                     <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+    /* An administrator role 10 */                          <span class="code-comment">//</span>
+    private Role adminRole10;                               <span class="code-comment">//</span>
 
 
     /**
@@ -432,42 +433,42 @@ UserAdminTest class to this new class.</p>
 <div class="source"><pre>
 public class UserAdminTest extends TestCase {
 
-    /* A simple test user 1 */
-    private User user1; 
+    /* A simple test user 1 */                              <span class="code-comment">//</span>
+    private User user1;                                     <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+    ...                                                     <span class="code-comment">// User Test Data (Fixture)</span>
+                                                            <span class="code-comment">//</span>
+    /* A simple test user 10 */                             <span class="code-comment">//</span>
+    private User user10;                                    <span class="code-comment">//</span>
 
-    ...
 
-    /* A simple test user 10 */
-    private User user10; 
-
-
-    /**
-     * Test for method with …
-     */
-    public void testAddUser1() {
-    }
-
-    ...
+    /**                                                     <span class="code-comment">//</span>
+     * Test for method with …                               <span class="code-comment">//</span>
+     */                                                     <span class="code-comment">//</span>
+    public void testAddUser1() {                            <span class="code-comment">// User Tests</span>
+    }                                                       <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+    ...                                                     <span class="code-comment">//</span>
 }
 
 public class UserAdminRolesTest extends TestCase {
 
-    /* An administrator role 1 */
-    private Role adminRole1;
+    /* An administrator role 1 */                           <span class="code-comment">//</span>
+    private Role adminRole1;                                <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+    ...                                                     <span class="code-comment">// Roles Test Data (Fixture)</span>
+                                                            <span class="code-comment">//</span>
+    /* An administrator role 10 */                          <span class="code-comment">//</span>
+    private Role adminRole10;                               <span class="code-comment">//</span>
 
-    ...
 
-    /* An administrator role 10 */
-    private Role adminRole10;
-
-
-    /**
-     * Test for method with …
-     */
-    public void testAddRole1() {
-    }
-
-    ...
+    /**                                                     <span class="code-comment">//</span>
+     * Test for method with …                               <span class="code-comment">//</span>
+     */                                                     <span class="code-comment">//</span>
+    public void testAddRole1() {                            <span class="code-comment">// Roles Tests</span>
+    }                                                       <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+    ...                                                     <span class="code-comment">//</span>
 }
 </pre></div>
 
@@ -564,7 +565,7 @@ public class UserAdmin
     /**
      * Adds a user and links it to the given role.
      *
-     * @param user the user to add, not null
+     * @param user the user to add, not null                <span class="code-comment">// Extra precondition</span>
      * @param role the user’s role
      */
      public void addUser(User user, Role role) {
@@ -583,7 +584,7 @@ public class UserAdminTest extends TestCase {
      * Test for method for a null role argument.
      */
     public void testAddUser_nullRole() {
-        userAdmin.addUser(user, null);
+        userAdmin.addUser(user, null);                      <span class="code-comment">// Boundary cond. test</span>
 
         //validate result
         ... 
@@ -647,12 +648,12 @@ public class User {
      *
      * @return the age in years
      */
-    public int getAge(){
-        if (age == 0) {
-            // calculate and set age 
-        }
-        return age;
-    }     
+    public int getAge(){                                    <span class="code-comment">//</span>
+                                                            <span class="code-comment">//</span>
+        // calculate age using birth date                   <span class="code-comment">// Non trivial getter</span>
+                                                            <span class="code-comment">//</span>
+        return age;                                         <span class="code-comment">//</span>
+    }                                                       <span class="code-comment">//</span>
 
 
     /**
@@ -660,19 +661,20 @@ public class User {
      *
      * @param birthDate the date, not null
      */
-    public void setBirthDate(Date birthDate){
-        this.birthDate = birthDate;
-    }     
+    public void setBirthDate(Date birthDate){               <span class="code-comment">//</span>
+        this.birthDate = birthDate;                         <span class="code-comment">// Trivial setter</span>
+    }                                                       <span class="code-comment">//</span>
 
 
     /**
-     * Factory method: creates a new role with the given name.
+     * Factory method: creates a new role with the 
+     * given name.
      * 
      * @return the role
      */
-    protected Role createRole(String roleName) {
-        return new Role(roleName);
-    }
+    protected Role createRole(String roleName) {            <span class="code-comment">//</span>
+        return new Role(roleName);                          <span class="code-comment">// Non-public method</span>
+    }                                                       <span class="code-comment">//</span>
 }
 </pre></div>
 
@@ -722,7 +724,7 @@ public class UserAdminTest extends TestCase {
         userAdmin.addUser(user);
         
         //validate result
-        Map userMap = userAdmin.getUserMap();
+        Map userMap = userAdmin.getUserMap();               <span class="code-comment">// Implementation detail</span>
         User result = userMap.get(“my ssn”);  
         ReflectionAssert.assertLenEquals(user, result);
     }
@@ -771,11 +773,13 @@ public class UserTest extends TestCase {
      * Test method for setting the age.
      */
     public void testSetAge() {
-        user.setName(“john”);
+    
+        user.setName(“john”);                               <span class="code-comment">// Useless setup</span>
+        
         user.setAge(50);
 
         assertEquals(50, user.getAge());
-        assertEquals(“john”, user.getName());
+        assertEquals(“john”, user.getName());               <span class="code-comment">// Useless assertion</span>
     }
 }
 </pre></div>
@@ -783,29 +787,6 @@ public class UserTest extends TestCase {
 <p>There is no reason for testing the name functionality in this test for the setting of the age. The code in this test should be limited
 to the testing of the age. This will make the test more maintainable because it is no longer dependent on the naming functionality and changes 
 to this functionality will not cause changes in this test.</p>
-
-<p>Following is an example of how ReflectionAssert can help in comparing objects:</p>
-
-<div class="source"><pre>
-public class UserTest extends TestCase {
-
-    /**
-     * Test method for setting the age.
-     */
-    public void testSetAge() {
-        
-        user.setAge(50);
-        
-        User expected = new User();
-        expected.setAge(50);
-        ReflectionAssert.assertLenEquals(expected, user);
-    }
-}
-</pre></div>
-
-<p>In this last assertion, only the age value will be compared, because all other values in the expected instance are set to their default
-values (e.g. null, 0). This means that the user object can for example have values for its first and last name fields, but this is ignored 
-by the assert (as it should, because it is not of value for testing of the age setting).</p>
 
 </div>
 
@@ -848,7 +829,7 @@ public class UserTest extends TestCase {
      */
     public void testRemoveUser() {
         
-        userAdmin.addUser(user);
+        userAdmin.addUser(user);                            <span class="code-comment">// Extra setup</span>
         
         userAdmin.removeUser(user);
         
@@ -942,11 +923,11 @@ public class User {
             return false;
         }
         
-        User user = (User) object;
-        if (ssn == null &amp;&amp; user.ssn == null) {
-            return true;
-        }
-        return (ssn != null &amp;&amp; ssn.equals(user.ssn))  
+        User user = (User) object;                          <span class="code-comment">//</span>
+        if (ssn == null &amp;&amp; user.ssn == null) {              <span class="code-comment">//</span>
+            return true;                                    <span class="code-comment">// Business logic</span>
+        }                                                   <span class="code-comment">//</span>
+        return (ssn != null &amp;&amp; ssn.equals(user.ssn))        <span class="code-comment">//</span>
     }
 
 
@@ -1150,8 +1131,8 @@ public class UserTest extends TestCase {
     /**
      * Test method for setting the age.
      */
-    public void testSetAge() throws Exception {
-        
+    public void testSetAge() throws Exception {             <span class="code-comment">// No try-catch for</span>
+                                                            <span class="code-comment">// NegativeAgeException</span>
         user.setAge(50);
 
         assertEquals(50, user.getAge());
@@ -1163,13 +1144,13 @@ public class UserTest extends TestCase {
     public void testSetAge_negative() {       
         try {
             user.setAge(-1);
-            fail();
+            fail("Epected NegativeAgeException.");          <span class="code-comment">// No exception, so fail</span>
             
         } catch (NegativeAgeException e) {
-            //expected
-        }
-        
-        assertEquals(20, user.getAge());
+            //expected                                      <span class="code-comment">//</span>
+        }                                                   <span class="code-comment">// Expected flow</span>
+                                                            <span class="code-comment">//</span>
+        assertEquals(20, user.getAge());                    <span class="code-comment">//</span>
     }
 }
 </pre></div>
@@ -1489,13 +1470,12 @@ example, to send them some kind of commercial mail).</p>
 <div class="source"><pre>
 public List findPartnershipUsers(Company comp) {
 
-    String query = &quot;select u.id, u.username, u.name, u.fname,u.roleid, &quot; +
-                   &quot;u.company &quot;  
+    String query = &quot;select u.id, u.username, u.name, u.fname, u.roleid, u.company &quot;  
                    &quot;from user u, company c1, company c2, partnership p &quot; +
                    &quot;where u.companyid = c1.id &quot; +
-                   &quot;and p.company1id = c1.id &quot; +
-                   &quot;and p.company2id = c2.id &quot; +
-                   &quot;and c2.name = ?&quot;;
+                   &quot; and p.company1id = c1.id &quot; +
+                   &quot; and p.company2id = c2.id &quot; +
+                   &quot; and c2.name = ?&quot;;
     
     // Code that executes query and returns result
 }
@@ -1504,13 +1484,14 @@ public List findPartnershipUsers(Company comp) {
 <p>And we’ve written following unit test:</p>
 
 <div class="source"><pre>
-    protected void setUp()
-    {
+    protected void setUp() {
+    
         company1 = new Company(1, &quot;Ordina&quot;);
     }
 
-    public void testFindPartnershipUsers() {
 
+    public void testFindPartnershipUsers() {
+    
         List foundUsers = userDao.findPartnershipUsers(company1);
         CollectionAssert.assertMatches(new String[] {“2”}, foundUsers, “id”);      
     }
@@ -1590,8 +1571,8 @@ the correct behavior of this stored procedure.</p>
 <p>Our unit test looks like the following (OrderDAOTest.java):</p>
 
 <div class="source"><pre>
-public void testArchiveOrders()
-{
+public void testArchiveOrders() {
+
     orderDao.archiveOrdersOlderThan(DateUtils.parseDate(&quot;21-05-2005&quot;);
     assertMatchesResultDataset(); 
 }
@@ -1829,32 +1810,65 @@ throughout the test suite.</p>
 <br />
 <h2>4 Hibernate testing guidelines</h2>
 
+<p>The past few years, most projects use some form of Object-Relational mapping framework. Mostly this is Hibernate, or some implementation 
+of JPA / EJB3 Persistence. The use of Hibernate greatly simplifies the persistence layer in an application. Unit testing is still valuable, because 
+errors can still exist in the mapping of the domain objects with the database, or in queries written in HQL or EJB3 QL. Unit testing helps in finding 
+these errors quickly and efficiently.</p>
+
+<p>The guidelines described in chapter 3 EIS tier testing guidelines also apply to testing with Hibernate. This chapter explains the specifics in 
+testing with Hibernate.</p>
 
 
-<div class="section"><h3><a name="4.1">4.1 Test Hibernate mapping file</a></h3>
+<div class="section"><h3><a name="4.1">4.1 Test mapping with database</a></h3>
 
 
 <h4>Short Description</h4>
 
-<p>Add a test for checking consistency between hibernate mapping and database.</p>
+<p>Unit tests for simple CRUD methods are overkill when using Hibernate. Instead, use a generic test that verifies the complete mapping with the database.</p>
 
 
 <h4>Description</h4>
 
-<p>A Hibernate mapping file that is inconsistent with the current domain model could lead to hard traceable bugs. The mapping files and/or
-annotations should always be perfectly consistent with the current database schema. This is not always the case, certainly in large development teams. It
-is thereby essential to highlight the mapping mismatch as soon as possible.</p>
-
-<p>Typical mapping problems that can arise:</p>
+<p><a href="#3.4">Testing simple CRUD methods</a> explains how CRUD methods can be tested when using plain old JDBC. When using Hibernate, the correct functioning of simple CRUD 
+depends mainly on the correct mapping of the domain model objects with the database. Here are some typical mapping problems:</p>
 
 <ul>
-    <li><p>Property isn’t mapped to a database column</p></li>
-    <li><p>Name mismatch between object property and mapping specification</p></li>
-    <li><p>Property of a class is mapped to a database column with a different name</p></li>
-    <li><p>Introduction of a new table or column that isn’t reflected to the Java property</p></li>
+    <li><p>Expected table or column is missing in the database</p></li>
+    <li><p>Database table or column has a different name as specified in the mapping</p></li>
+    <li><p>The name of a property in the mapping file differs from the property in the domain model class</p></li>
+    <li><p>A property of a certain class is not mapped</p></li>
 </ul>
 
-<p>The Unitils project provides a set of test methods that helps in finding these mapping mismatch problems at an early stage.</p>
+<p>The last 2 problems cannot occur when using annotations for defining the mapping with the database, only when using separate mapping files. These problems 
+are usually easy to trace and to fix, but adding a unit test that verifies the complete mapping with the database all at once, helps in finding these problems 
+quickly. This is also a very cheap solution, since you only have to define this unit test once.</p>
+
+<p>The Unitils project contains a class HibernateAssert, which implements the mapping check. The examples section shows how you can add this test to your test suite.</p>
+
+
+<h4>Examples</h4>
+
+<div class="source"><pre>
+public class HibernateMappingTest extends BaseDAOTestCase {
+
+    public void testMappingToDatabase() {
+        HibernateMappingAssert.assertMappingToDatabase();
+    }
+
+
+    @Override
+    protected DatabaseOperation getSetUpOperation() throws Exception {
+        return DatabaseOperation.NONE;
+    }
+}
+
+</pre></div>
+
+<p>The superclass BaseDAOTestCase in this example is a subclass of Unitils’ BaseHibernateTestCase. This unit test works for both a configuration with Hibernate XML mapping 
+files as a configuration with annotations.</p>
+
+<p>Note: The method getSetUpOperation() is overridden to prevent that the BaseHibernateTestCase complains that there is no data file.</p>
+
 
 </div>
 
@@ -1867,32 +1881,17 @@ is thereby essential to highlight the mapping mismatch as soon as possible.</p>
 
 <h4>Short Description</h4>
 
-<p>Add tests for all non-trivial queries and updates. Do not add tests for save, update, delete and load operations.</p>
+<p>Add unit tests for methods that implement HQL queries. The same rules apply as for testing queries in plain old JDBC.</p>
 
 
 <h4>Description</h4>
 
-<p>The testing of Hibernate mapping files ensures the mapping correctness of your domain model to the relational database schema. The trivial
-database operations can thus easily be covered by mapping file correctness assertion. More complex operations need to have tests that run against the
-database and are an essential part of testing the persistence domain model, even though they take a relatively longer time to execute.</p>
-
-<p>These tests are regular DAO tests. The only difference in this case is that the DAO uses Hibernate to implement the query. All DAO
-guidelines apply for the tests.</p>
+<p>The guideline <a href="#3.5">Testing queries</a> explains how maintainable unit tests can be written for queries. The same rules apply for testing with HQL queries.</p>
 
 
 <h4>Examples</h4>
 
-<div class="source"><pre>
-public class UserDAOTest extends BaseDAOTestCase {
-
-    public void testRetrieveUserAdmin() throws Exception {
-
-        List adminList = userDao.retrieveUserAdmins();
-
-        // assert list with specified data.
-    }
-}
-</pre></div>
+<p><a href="#3.5">Testing queries</a> provides a good example for testing HQL queries.</p>
 
 </div>
 
@@ -1901,64 +1900,29 @@ public class UserDAOTest extends BaseDAOTestCase {
 
 
 
-<div class="section"><h3><a name="4.3">4.3 Don’t test Hibernate</a></h3>
+<div class="section"><h3><a name="4.3">4.3 Test bulk data manipulation methods</a></h3>
 
 
 <h4>Short Description</h4>
 
-<p>Do not test Hibernate functionality such as transitive persistence, cascading, versioning and optimistic locking.</p>
+<p>Add unit tests for methods that implement bulk data manipulation. The same rules apply as for testing such methods written in plain old JDBC. Make sure 
+you explicitly flush and clear the session before executing assert statements.</p>
 
 
 <h4>Description</h4>
 
-<p>This is a variant of the <a href="#2.17">Test new project code, not library code</a> guideline. Hibernate has its own test
-suite and should therefore not be tested during your project code unit tests. If you doubt whether a certain feature of Hibernate 
-functions correctly, write a separate test specifically for this feature.</p>
+<p>The guideline <a href="#3.6">Testing bulk data manipulation methods</a> explains how unit tests can be written for bulk data manipulation methods. The same rules apply for 
+testing with such methods written in HQL.</p>
 
-</div>
-
-
-
-
-
-
-<div class="section"><h3><a name="4.4">4.4 Flush session when updating</a></h3>
-
-
-<h4>Short Description</h4>
-
-<p>Flush Hibernates session to make sure you are working on the database and not using values from a session cache.</p>
-
-
-<h4>Description</h4>
-
-<p>A Hibernate session must explicitly be flushed to make sure that all changes are made persistent in the database. As a result, things like
-triggers and sequences will not be executed unless such a flush is performed. If you want to be sure you are not working on in-memory cached objects, you
-will need to flush the session. Unitils provides a utility method to do this (see example below).</p>
+<p>Make sure that, when comparing the database contents with a result data file, the Hibernate session is explicity flushed. Otherwise, the update that you 
+want to test will most probably not be executed on the database yet when you call assertDBContentAsExpected().</p>
 
 
 <h4>Examples</h4>
 
-<div class="source"><pre>
-public class UserDAOTestCase extends HibernateDAOTestCase {
-     
-    /**
-     * Test transitive persistence.
-     */
-    public void testUserDocumentCascading() throws Exception {
+<p><a href="#3.6">Testing bulk data manipulation methods</a> provides a good example. The only difference is that flushAndClearSession() must be called before executing 
+assertDBContentAsExpected().</p>
 
-        User user = new User(“John”);
-        Long id = userDao.store(user);
-
-        // clear session to avoid cache retrieval
-        flushHibernateSession();
-
-        User result = userDao.get(id);            
-
-        assertNotNull(result);
-    }
-}
-</pre></div>
 
 </div>
 

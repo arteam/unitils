@@ -39,8 +39,7 @@ a:visited  {
 }
 
 .section h4 {
-    font-size: 14px;
-    font-style: bold
+	font-size: 14px;
 }
 
 .section h5 {
@@ -58,4 +57,9 @@ a:visited  {
 }
 
 .image-left {
+}
+
+.code-comment {
+	color: #47a;
+ 	font-weight: bold;
 }
