@@ -281,8 +281,17 @@ public void UserDAOTest extends UnitilsJUnit4 {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     A powerful DBMaintainer is provided to automatically update each developer's database schema individually. Unitils' DBMaintainer
     will automatically check if database structure updates are available before running a database test, and apply them if necessary.
+    
+    The DBMaintainer uses DBMS specific functionality, such as for disabling constraints and updating sequences. The DBMaintainer will
+    therefore only run properly when the property <database.dialect> is correctly set. Currently, there is support for following databases:
+    
+    * Oracle: Currently, only tested properly with Oracle 9i
+    
+    * Hsqldb: Tested with version 1.8.0
+    
+    * MySQL: Tested with version 5.0
 
-    The test script folder contains scripts that start with a version number and end on .sql, as in following example:
+    The database maintainer works as follows: The test script folder contains scripts that start with a version number and end on .sql, as in following example:
 
 +-----+
 dbscripts/ 001_initial.sql
