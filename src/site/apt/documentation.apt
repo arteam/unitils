@@ -388,7 +388,10 @@ public class HibernateMappingTest extends BaseHibernateTest {
     The method HibernateAssert.assertMappingToDatabase() checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
     the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
     
-    TODO example error message
++-----+
+alter table PERSON add column lastName varchar(255);
+alter table PRODUCT add column barCode varchar(255);
++-----+
 
 
 
@@ -497,11 +500,11 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 ** Lenient assertions
 ~~~~~~~~~~~~~~~~~~~~~
         
-    If you want to create unit tests that is maintainable care must be taken to only add assertions to your test that 
+    If you want to create unit tests that are maintainable care must be taken to only add assertions to your test that 
     are of value for the test. Let me clarify this with an example: suppose you have a test for a calulation of an account balance. 
     There is no need to add any assertions to this test that will check whether the name of the bank-customer is still correct.
     This will only add complexity to your test making it more difficult to understand and, more importantly, more brittle against changes 
-    in the code. If you want your code to more easyly survive refactorings and other code changes, make sure you limit your assertions and 
+    in the code. If you want your code to easily survive refactorings and other code changes, make sure you limit your assertions and 
     test data setup to the scope of the test.
     
     To help you in writing assertions that only test what is important, we added some levels of leniency to the ReflectionAssert checks, which 
@@ -511,8 +514,8 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 *** Lenient order
 ~~~~~~~~~~~~~~~~~
     A first type of leniency you can specify is ignoring the order of elements in a collection or an array. It is often the case that when working with 
-    lists, one is not interested in the actual real order of the elements, only that they comply to certain criteria. For example, code for retrieving 
-    all bankaccounts with a negative balance will typically return these in a list in a certain order that is unimportant for further processing.
+    lists, you are not interested in the order of the elements, only that they comply to certain criteria. For example, code for retrieving 
+    all bankaccounts with a negative balance will typically return them in a list in a certain order that is unimportant for further processing.
     
     To implement this behavior, the <ReflectionAssert.assertRefEquals> method can be configured to ignore ordering by 
     supplying it with the <ReflectionComparatorMode.LENIENT_ORDER> comparator mode:
@@ -522,7 +525,7 @@ List<Integer> myList = Arrays.asList(3, 2, 1);
 assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER); 
 +-----+
 
-    The <ReflectionAssert> class also offers an assertion for which some leniency levels, namely lenient order and 
+    The <ReflectionAssert> class also offers an assertion for which two leniency levels, lenient order and 
     ignore defaults (see below) are pre-set: <ReflectionAssert.assertLenEquals>. The above example can therefore be re-written as follows:
     
 +-----+
@@ -553,9 +556,11 @@ assertLenEquals(Arrays.asList(1, 2, 3), myList);
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unit tests should test code in isolation. Mock objects allow testing a component without having to care about other 
-    components or services that it depends on. Unitils builds further on EasyMock for its mock object testing support. Unitils 
+    components or services that it depends on. Unitils builds further on {{{http://www.easymock.org}EasyMock}} for its mock object testing support. Unitils 
     provides convenience functionality that greatly reduces the plumbing code that needs to be written when working with mocks. 
     This involves simplification of mock creation, argument matching and injection of mocks.
+    
+    If you don't have experience with EasyMock, first read {{{http://www.easymock.org/EasyMock2_2_Documentation.html}EasyMock 2.2's documentation}}, before proceeding with this tutorial.
 
 
 ** Mock creation
@@ -584,12 +589,69 @@ public void UserServiceTest extends UnitilsJUnit4 {
 } 
 +-----+
 
-   Mock creation and assignment to the test object's fields is performed before the test fixture.
+    Mock creation and assignment to the test object's fields is performed before executing the test fixture (this is the setUp method in JUnit3, or the @BeforeMethod methods in TestNG)
    
+    The mock objects created by Unitils by default use EasyMock's strict call expectations (i.e. the test fails when unexpected method calls occur) and lenient invocation order. You can
+    change these default values either by specifying attributes on the @Mock annotation, e.g.:
    
++-----+
+@Mock(returns = Returns.NICE, invocationOrder = InvocationOrder.STRICT)
+private UserDao mockUserDao;
++-----+
+
+    You can also change the default values for all unit tests in your project using the properties <EasyMockModule.Mock.InvocationOrder.default> and <EasyMockModule.Mock.Returns.default>. E.g.
+
++-----+
+EasyMockModule.Mock.InvocationOrder.default=lenient
+EasyMockModule.Mock.Returns.default=nice
++-----+
    
 **   Reflection lenient argument matching
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    The mocks that are supplied by Unitils differ from mocks objects that you get when directly using EasyMock. These mocks use a <LenientMocksControl>. 
+    This control makes sure that by default, arguments specified in expectation clauses are matched using Unitils' <ReflectionComparator>. By default, this comparator uses the 
+    leniency levels <IGNORE_DEFAULTS> and <LENIENT_ORDER>. E.g., in the above example, following expectation is set:
+    
++-----+
+mockUserDao.disableAccount(accounts.get(0));
++-----+
+
+    When this method invocation is occured during test execution (after <replay()>), the actual account object will be compared with the expected one using reflection equality with 
+    the leniency levels <IGNORE_DEFAULTS> and <LENIENT_ORDER>.
+    
+    Leniency levels also apply at top level. For example, when you look at following extract from the example above:
+    
++-----+
+expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
++-----+
+
+    The <null> parameter in this method call actually means that we don't care what argument is passed to this method. This provides a very convenient way of setting flexible expectations!
+
+    The leniency levels that are used for argument matching can be configured for each individual mock. E.g., for using strict order, no ignoring of defaults but lenient date checking:
+
++-----+
+@Mock(order = Order.STRICT, defaults = Defaults.STRICT, dates = Dates.LENIENT)
+private UserDao mockUserDao;
++-----+
+
+    The defaults can also be set project-wide, e.g. to do the same as above for the entire project:
+
++-----+
+EasyMockModule.Mock.Order.default=strict
+EasyMockModule.Mock.Dates.default=lenient
+EasyMockModule.Mock.Defaults.default=strict
++-----+
+
+    If you don't want to use reflection for lenient argument matching, you can also make Unitils inject regular EasyMock mocks into your test, using the RegularMock annotation.
+
++-----+
+@RegularMock
+private UserDao mockUserDao;
++-----+
+
+
+   
 
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
@@ -643,7 +705,6 @@ public void UserServiceTest extends UnitilsJUnit4 {
   
 +-----+
 
-  @AfterCreateMock
   @AfterCreateMock
   protected final void injectMock(Object mock, String name, Class type) {
      ServiceLocator.injectService(type, mock);
