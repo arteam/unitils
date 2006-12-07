@@ -513,18 +513,70 @@ assertLenEquals(Arrays.asList(1, 2, 3), myList);
     manually set the leniency levels, assert<<Len>>... is the version for which the lenient order and ignore defaults are pre-set. 
     
 
-
 *** Ignoring defaults
 ~~~~~~~~~~~~~~~~~~~~~
-    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode and is used 
+    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode. When this mode is set fields in the 
+    left (expected) instance will only be compared with the corresponding fields in the right (actual) instance if they have a non 
+    java default value, i.e. <null> or <0>. In other words, if you leave the value of a left-instance field to <null> or <0> it will not 
+    be used in the comparison.
     
+    As an example, suppose you have a user class with a first name, last name, street, ... field, but you only want to check that the 
+    resulting user instance has a certain first name and street value, the other fields can be ignored:
+
++-----+
+User actualUser   = new User("John", "Doe", new Address("First street", "12", "Brussels"));
+User expectedUser = new User("John",  null, new Address("First street", null,       null));
+assertLenEquals(expectedUser, actualUser);
++-----+
+
+    You specify that you want to ignore a field by setting this value to null in the left (=expected) instance. 
+    Right-instance fields that have default values will still be compared.
+    
++-----+
+assertLenEquals(null, "any");  // Succeeds
+assertLenEquals("any", null);  // Fails
++-----+    
+
 
 *** Lenient dates
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    A third and final type of leniency is <ReflectionComparatorMode.LENIENT_DATES>. This will assert that date field values in both instance 
+    are set or not set, but ignore the actual values of the date. E.g. a date from last year will equal the current date. 
+
++-----+
+Date actualDate =   new Date(44444);
+Date expectedDate = new Date();
+assertRefEquals(expectedDate, actualDate, LENIENT_DATES); 
++-----+
 
 
 
 
+** Property assertions
+~~~~~~~~~~~~~~~~~~~~~~
+    The <assertLenEquals> and <assertRefEquals> methods compare objects as a whole. ReflectionAssert also contains methods to compare 
+    a certain field of two objects: <assertPropertyLenEquals> and <assertPropertyRefEquals>. The actual field that needs to be compared 
+    is specified using the {{{http://www.ognl.org/}OGNL}} notation, in which the typical bean property notation, e.g. 
+    field1.innerField, and more powerful notations can be used.
+    
+    Some examples of property comparisons are:
+
++-----+
+assertPropertyLenEquals("id", 1, user);
+assertPropertyLenEquals("address.street", "first street", user);
++-----+
+
+    You can also supply collections as arguments. In that case the specified field will be taken of each element in the collection. This
+    provides an easy way to for example check whether all users in a retrieved list have certain id: 
+
++-----+
+assertPropertyLenEquals("id", Arrays.asList(1, 2, 3), users);
+assertPropertyLenEquals("address.street", Arrays.asList("first street", "second street", "third street"), users);
++-----+
+
+    There are again two versions of each method: an assertProperty<<Len>>Equals method and a assertProperty<<Ref>>Equals method. 
+    The ref version will have no leniency specified by default but provides the option to specify leniency modes, the len version
+    already has lenient order and ignore defaults set as fixed leniency modes.
 
 
 
@@ -532,11 +584,12 @@ assertLenEquals(Arrays.asList(1, 2, 3), myList);
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unit tests should test code in isolation. Mock objects allow testing a component without having to care about other 
-    components or services that it depends on. Unitils builds further on {{{http://www.easymock.org}EasyMock}} for its mock object testing support. Unitils 
-    provides convenience functionality that greatly reduces the plumbing code that needs to be written when working with mocks. 
-    This involves simplification of mock creation, argument matching and injection of mocks.
+    components or services that it depends on. Unitils builds further on {{{http://www.easymock.org}EasyMock}} for its mock object testing 
+    support. Unitils provides convenience functionality that greatly reduces the plumbing code that needs to be written when working with 
+    mocks. This involves simplification of mock creation, argument matching and injection of mocks.
     
-    If you don't have experience with EasyMock, first read {{{http://www.easymock.org/EasyMock2_2_Documentation.html}EasyMock 2.2's documentation}}, before proceeding with this tutorial.
+    If you don't have experience with EasyMock, first read {{{http://www.easymock.org/EasyMock2_2_Documentation.html}EasyMock 2.2's documentation}}, 
+    before proceeding with this tutorial.
 
 
 ** Mock creation
