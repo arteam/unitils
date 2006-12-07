@@ -17,8 +17,11 @@ package org.unitils.reflectionassert;
 
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
+import ognl.DefaultMemberAccess;
+import ognl.Ognl;
+import ognl.OgnlContext;
+import ognl.OgnlException;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
@@ -26,7 +29,6 @@ import org.unitils.reflectionassert.ReflectionComparator.Difference;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 
@@ -205,20 +207,9 @@ public class ReflectionAssert {
      */
     public static void assertPropertyRefEquals(String message, String propertyName, Object expectedPropertyValue, Object actualObject, ReflectionComparatorMode... modes) throws AssertionFailedError {
 
-        try {
-            Object propertyValue = PropertyUtils.getProperty(actualObject, propertyName);
-            String formattedMessage = formatMessage(message, "Incorrect value for property: " + propertyName);
-            assertRefEquals(formattedMessage, expectedPropertyValue, propertyValue, modes);
-
-        } catch (IllegalAccessException e) {
-            throw new UnitilsException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
-
-        } catch (InvocationTargetException e) {
-            throw new UnitilsException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
-
-        } catch (NoSuchMethodException e) {
-            throw new UnitilsException("Error while accessing property: " + propertyName + " of object: " + actualObject, e);
-        }
+        Object propertyValue = getProperty(actualObject, propertyName);
+        String formattedMessage = formatMessage(message, "Incorrect value for property: " + propertyName);
+        assertRefEquals(formattedMessage, expectedPropertyValue, propertyValue, modes);
     }
 
 
@@ -355,6 +346,23 @@ public class ReflectionAssert {
             return specificMessage;
         }
         return suppliedMessage + "\n" + specificMessage;
+    }
+
+    /**
+     * Evaluates the given OGNL expression, and returns the corresponding property value from the given object
+     * @param object The object on which the expression is evaluated
+     * @param ognlExpression The OGNL expression that is evaluated
+     * @return The value for the given OGNL expression
+     */
+    private static Object getProperty(Object object, String ognlExpression) {
+        try {
+            OgnlContext ognlContext = new OgnlContext();
+            ognlContext.setMemberAccess(new DefaultMemberAccess(true));
+            Object ognlExprObj = Ognl.parseExpression(ognlExpression);
+            return Ognl.getValue(ognlExprObj, ognlContext, object);
+        } catch (OgnlException e) {
+            throw new UnitilsException("Failed to get proerty value using OGNL expression " + ognlExpression, e);
+        }
     }
 
 }
