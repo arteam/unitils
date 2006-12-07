@@ -1,4 +1,4 @@
-package org.unitils.hibernate;
+package org.unitils.hibernate.util;
 
 import org.hibernate.HibernateException;
 import org.hibernate.connection.ConnectionProvider;

@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation indicating that a lenient mock object (see {@link org.unitils.easymock.LenientMocksControl} should be created
+ * Annotation indicating that a lenient mock object (see {@link org.unitils.easymock.util.LenientMocksControl} should be created
  * and set intp the annotated field.
  */
 @Target(ElementType.FIELD)

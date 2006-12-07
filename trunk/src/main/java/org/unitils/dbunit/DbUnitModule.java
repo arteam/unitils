@@ -30,6 +30,8 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.dbunit.util.TablePerRowXmlDataSet;
+import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.util.ConfigUtils;
 
 import java.io.IOException;

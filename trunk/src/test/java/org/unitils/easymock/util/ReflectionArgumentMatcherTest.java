@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.easymock;
+package org.unitils.easymock.util;
 
 import junit.framework.TestCase;
 import static org.easymock.EasyMock.*;
@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Test for {@link ReflectionArgumentMatcher}.
+ * Test for {@link org.unitils.easymock.util.ReflectionArgumentMatcher}.
  */
 public class ReflectionArgumentMatcherTest extends TestCase {
 

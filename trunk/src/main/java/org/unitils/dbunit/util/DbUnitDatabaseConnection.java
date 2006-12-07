@@ -1,4 +1,4 @@
-package org.unitils.dbunit;
+package org.unitils.dbunit.util;
 
 import org.dbunit.database.AbstractDatabaseConnection;
 
