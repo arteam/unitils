@@ -31,6 +31,7 @@ import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -61,6 +62,8 @@ import java.util.Properties;
  * @author Filip Neven
  */
 public class HibernateModule implements Module {
+
+    private static final Logger logger = Logger.getLogger(HibernateModule.class);
 
     /* Property key for a comma seperated list of Hibernate configuration files, that can be found in the classpath */
     public static final String PROPKEY_HIBERNATE_CONFIGFILES = "HibernateModule.hibernate.configfiles";
@@ -138,8 +141,13 @@ public class HibernateModule implements Module {
      */
     private Configuration createHibernateConfiguration(Object test) {
 
+        logger.info("Configuring Hibernate");
         Configuration hbnConfiguration = createHibernateConfiguration();
         callHibernateConfigurationMethods(test, hbnConfiguration);
+        if (hbnConfiguration.getProperty(Environment.CONNECTION_PROVIDER) != null) {
+            logger.warn("The property " + Environment.CONNECTION_PROVIDER + " is present in your Hibernate configuration. " +
+                    "This property will be overwritten with Unitils own ConnectionProvider implementation!");
+        }
         Properties connectionProviderProperty = new Properties();
         connectionProviderProperty.setProperty(Environment.CONNECTION_PROVIDER, HibernateConnectionProvider.class.getName());
         hbnConfiguration.addProperties(connectionProviderProperty);
@@ -216,7 +224,9 @@ public class HibernateModule implements Module {
         for (Method method : methods) {
             try {
                 ReflectionUtils.invokeMethod(testObject, method, getCurrentSession());
+
             } catch (UnitilsException e) {
+
                 throw new UnitilsException("Unable to invoke method annotated with @" +
                         HibernateSession.class.getSimpleName() + ". Ensure that this method has following signature: " +
                         "void myMethod(" + Session.class.getName() + " session)", e);
@@ -228,6 +238,8 @@ public class HibernateModule implements Module {
      * Creates the Hibernate <code>SessionFactory</code>
      */
     private void createHibernateSessionFactory() {
+
+        logger.debug("Creating Hibernate SessionFactory");
         hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
     }
 
@@ -248,6 +260,7 @@ public class HibernateModule implements Module {
     public Session getCurrentSession() {
 
         if (currentHibernateSession == null || !currentHibernateSession.isOpen()) {
+            logger.debug("No Hibernate Session available. Creating a new one");
             currentHibernateSession = hibernateSessionFactory.openSession();
         }
         return currentHibernateSession;
@@ -259,6 +272,7 @@ public class HibernateModule implements Module {
     public void closeHibernateSession() {
 
         if (currentHibernateSession != null && currentHibernateSession.isOpen()) {
+            logger.debug("Closing Hibernate Session");
             currentHibernateSession.close();
         }
     }
