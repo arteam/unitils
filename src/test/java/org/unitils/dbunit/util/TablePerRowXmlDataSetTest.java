@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit;
+package org.unitils.dbunit.util;
 
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ITableIterator;
 import org.unitils.UnitilsJUnit3;
+import org.unitils.dbunit.util.TablePerRowXmlDataSet;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 

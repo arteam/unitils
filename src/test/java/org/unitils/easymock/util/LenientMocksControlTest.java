@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.easymock;
+package org.unitils.easymock.util;
 
 import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.*;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import org.unitils.easymock.util.LenientMocksControl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * A test for {@link org.unitils.easymock.LenientMocksControl}
+ * A test for {@link org.unitils.easymock.util.LenientMocksControl}
  * <p/>
  * todo javadoc  + method javadoc
  */

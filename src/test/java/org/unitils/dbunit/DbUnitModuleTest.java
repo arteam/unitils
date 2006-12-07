@@ -19,6 +19,7 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
 import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
+import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.core.ModulesRepository;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.annotations.DatabaseTest;

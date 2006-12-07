@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.easymock;
+package org.unitils.easymock.util;
 
 import org.easymock.ArgumentsMatcher;
 import org.easymock.IAnswer;
@@ -21,6 +21,7 @@ import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.*;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
+import org.unitils.easymock.util.ReflectionArgumentMatcher;
 
 import java.lang.reflect.Method;
 import java.util.List;

@@ -27,6 +27,7 @@ import org.unitils.database.DatabaseModule;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateTest;
+import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 import org.apache.commons.lang.StringUtils;
