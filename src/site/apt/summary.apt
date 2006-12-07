@@ -23,6 +23,8 @@ Summary
     * <Database testing utilities>
 
         * Automatic maintenance and constraints disabling of unit test databases
+        
+           * Support for Oracle, Hsqldb and MySql (DB2 support is upcoming)
 
         * Simplify unit test database connection setup
 

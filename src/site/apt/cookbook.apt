@@ -25,10 +25,6 @@ Cookbook
   Create a file named unitils.properties and make it available in the root of your classpath. It should contain following properties:
   
 +------+
-###########################################################################
-# This file defines the Unitils configuration for Unitils' own unit tests #
-###########################################################################
-
 # Name or path of the user specific properties file. This file should contain the necessary parameters to connect to the
 # developer's own unit test schema. It is recommended to override the name of this file in the project specific properties
 # file, to include the name of the project. The system will try to find this file in the classpath, the user home folder
@@ -96,6 +92,7 @@ dbMaintainer.cleardb.itemsToPreserve=<Optional list of database items that shoul
   override the property HibernateModule.hibernate.configfiles in unitils.properties. E.g.
 
 +-----+
+# Name of hibernate config files for testing purposes. Should be in classpath.
 HibernateModule.hibernate.configfiles=
               hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
 +-----+
