@@ -13,39 +13,6 @@ Tutorial
     typical unit testing frameworks such as DbUnit and EasyMock. It started as a set of guidelines and
     eventually resulted in an open source library containing utilities that facilitate the application of these guidelines.
 
-    Currently Unitils offers following features:
-
-    * <General testing utilities>
-
-        * Equality assertion through reflection, with different options like ignoring Java default/null values and ignoring order of collections
-
-    []
-
-    * <Database testing utilities>
-
-        * Automatic maintenance and constraints disabling of unit test databases
-
-        * Simplify unit test database connection setup
-
-        * Simplify insertion of test data with DBUnit
-
-        * Simplify Hibernate session management for unit testing
-
-        * Automatically test the mapping of Hibernate mapped objects with the database
-
-    []
-
-    * <Mock object utilities>
-
-        * Simplify EasyMock mock object creation
-
-        * Simplify mock object injection
-
-        * EasyMock argument matching using reflection equality
-
-    []
-
-
     This tutorial will show you what Unitils can do for your projects, using examples.
     It is merely an introduction to Unitils, more in-depth documentation can be found in the {{{apidocs/index.html}javadoc}} of the modules.
     The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}.
