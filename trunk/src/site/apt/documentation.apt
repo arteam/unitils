@@ -49,7 +49,7 @@ dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 +-----+
 
     The file is not required, but if you create one, it should be placed somewhere in the classpath of your project. To get you started, 
-    you can find a sample file that contains most commonly used configuration settings in following unitils.properties template.
+    you can find a sample file that contains most commonly used configuration settings in following {{{unitils.properties}unitils.properties}} template.
 
     The last file, unitils-local.properties, is also optional and can contain settings that override the project settings and is used for
     defining per-user settings. For example, if each user uses its own unit-test database schema, you can
@@ -61,7 +61,8 @@ dataSource.userName=john
 dataSource.password=secret
 +-----+
 
-    Each of these unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>).
+    Each of these unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>). 
+    A typical local configuration can be found in following sample {{{unitils-local.properties}unitils-local.properties}} template.
 
     The name of the local file, unitils-local.properties, is also defined by a property. This makes it possible to use different names for each
     of the projects you are working on. For example, suppose you are working on a project named projectOne and want to start a new project
