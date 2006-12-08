@@ -63,6 +63,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
                 configuration, dataSource, statementHandler);
 
+        dropTestTables();
         createTestTables();
     }
 
@@ -107,8 +108,16 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("drop table table2 cascade");
-            st.execute("drop table table1 cascade");
+            try {
+                st.execute("drop table table2 cascade");
+            } catch (SQLException e) {
+                // Ignored
+            }
+            try {
+                st.execute("drop table table1 cascade");
+            } catch (SQLException e) {
+                // Ignored
+            }
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }

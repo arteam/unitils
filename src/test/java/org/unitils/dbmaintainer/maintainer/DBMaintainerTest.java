@@ -29,6 +29,7 @@ import org.unitils.dbmaintainer.script.SQLScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.annotation.RegularMock;
 import org.unitils.inject.annotation.AutoInject;
 import org.unitils.inject.annotation.TestedObject;
 
@@ -41,31 +42,31 @@ import java.util.List;
 @SuppressWarnings({"UnusedDeclaration"})
 public class DBMaintainerTest extends UnitilsJUnit3 {
 
-    @Mock
+    @RegularMock
     @AutoInject
     private VersionSource mockVersionSource;
 
-    @Mock
+    @RegularMock
     @AutoInject
     private ScriptSource mockScriptSource;
 
-    @Mock
+    @RegularMock
     @AutoInject
     private SQLScriptRunner mockScriptRunner;
 
-    @Mock
+    @RegularMock
     @AutoInject
     private DBClearer mockDbClearer;
 
-    @Mock
+    @RegularMock
     @AutoInject
     private ConstraintsDisabler mockConstraintsDisabler;
 
-    @Mock
+    @RegularMock
     @AutoInject
     private SequenceUpdater mockSequenceUpdater;
 
-    @Mock
+    @RegularMock
     @AutoInject
     private DtdGenerator mockDtdGenerator;
 
@@ -105,11 +106,11 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
     public void testDBMaintainer_incremental() throws Exception {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
         expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);
+        mockVersionSource.registerUpdateSucceeded(true);
         mockScriptRunner.execute("Script 2");
         mockVersionSource.setDbVersion(version2);
         mockVersionSource.registerUpdateSucceeded(true);
@@ -129,12 +130,12 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
     public void testDBMaintainer_fromScratch() throws Exception {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
         mockDbClearer.clearDatabase();
         expect(mockScriptSource.getAllScripts()).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);
+        mockVersionSource.registerUpdateSucceeded(true);
         mockScriptRunner.execute("Script 2");
         mockVersionSource.setDbVersion(version2);
         mockVersionSource.registerUpdateSucceeded(true);
@@ -153,11 +154,11 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
      */
     public void testDBMaintainer_errorInScript() throws Exception {
         expect(mockVersionSource.getDbVersion()).andReturn(version0).anyTimes();
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
         expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         expectLastCall().andThrow(new StatementHandlerException("Test exception"));
+        mockVersionSource.setDbVersion(version1);
         mockVersionSource.registerUpdateSucceeded(false);
 
         replay();
@@ -168,25 +169,6 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         } catch (StatementHandlerException e) {
             // Expected
         }
-    }
-
-    public void testDBMaintainer_lastUpdateFailed() throws Exception {
-        expect(mockVersionSource.getDbVersion()).andReturn(version0).anyTimes();
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(false);
-        mockDbClearer.clearDatabase();
-        expect(mockScriptSource.getAllScripts()).andReturn(versionScriptPairs);
-        mockScriptRunner.execute("Script 1");
-        mockVersionSource.setDbVersion(version1);
-        mockScriptRunner.execute("Script 2");
-        mockVersionSource.setDbVersion(version2);
-        mockVersionSource.registerUpdateSucceeded(true);
-        mockConstraintsDisabler.disableConstraints();
-        mockSequenceUpdater.updateSequences();
-        mockDtdGenerator.generateDtd();
-        replay();
-
-        // Execute test
-        dbMaintainer.updateDatabase();
     }
 
 }
