@@ -18,8 +18,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/summary.apt" afterPath="$PROJECT_DIR$/src/site/apt/summary.apt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/documentation.apt" afterPath="$PROJECT_DIR$/src/site/apt/documentation.apt" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
