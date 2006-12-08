@@ -23,7 +23,7 @@ Tutorial
 * Getting started
 ~~~~~~~~~~~~~~~~~
 
-** Configuration
+** {Configuration}
 ~~~~~~~~~~~~~~~~
     This section explains how the configuration of Unitils works. If you want to learn how you can setup Unitils to get started quickly, read the {{{cookbook.html}cookbook}}.
     
@@ -78,7 +78,7 @@ unitils.configuration.localFileName=projectTwo-local.properties
 
 
 
-** Making your test Unitils-enabled
+** {Making your test Unitils-enabled}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unitils offers services to test classes through a test listener system. To enable Unitils to provide services to your tests, you first have to Unitils-enable them.
     This can be done easily by (indirectly) extending from a Unitils base test-class. Currently there are base classes for the major test frameworks:
@@ -123,7 +123,7 @@ public class MyTest {
 
 
 
-** Module system
+** {Module system}
 ~~~~~~~~~~~~~~~~
     Before starting with the examples, let's first take a look at some of the concepts used in Unitils and how it functions under the hood.
 
@@ -153,7 +153,7 @@ public class MyTest {
 
 
 
-* Database testing
+* {Database testing}
 ~~~~~~~~~~~~~~~~~~
     Unit tests for the database layer can be extremely valuable when building enterprise applications, but are often abandoned because of 
     their complexity. Unitils greatly reduces this complexity, making database testing easy and maintainable. The following sections 
@@ -161,7 +161,7 @@ public class MyTest {
 
 
 
-** Managing test data with DbUnit
+** {Managing test data with DbUnit}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Database tests should be run on a unit test database, having complete and fine grained control over the test data that is used. Unitils
     builds further on DBUnit for providing support for working with test data sets. 
@@ -215,7 +215,7 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    This will first clear the user table and then insert a user record for John Doe. 
+    This will clear the user table and insert a user record for John Doe. 
     
     Suppose the <testFindByMinimalAge()> method needs a specific dataset instead of the class-level dataset. You could create a file named 
     <UserDAOTest.testFindByMinimalAge.xml> and put that file in the same directory as the test class:
@@ -228,11 +228,9 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    Always try to reuse the class-level dataset as much as possible. Only when it's really needed you should use such a test-specific 
-    dataset. The less data files, the less maintainance is needed to keep them up to date. An example when to use a method-specific dataset
-    could be when you want to test a complex query with many join-clauses and adding these to the dataset would result in an incoherent dataset.
+    Method-level datasets should not be overused, since having more data files means you have to do more maintenance. You should first try to reuse the data in the class level dataset - in most cases a small set of test records can be reused for multiple tests. If reusing a dataset mainly means adding extra records, it's better to create a method specific one. Otherwise, this will result in a big incoherent dataset.
     
-    Which dataset to use can also be specified explicitly using the <@DataSet> annotation:
+    The dataset filename can also be specified explicitly using the <@DataSet> annotation:
 
 +-----+
 @DatabaseTest
@@ -282,16 +280,13 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    In general following naming pattern is used for result datasets: <className>.<methodName>-result.xml
+    In general, following naming pattern is used for result datasets: <className>.<methodName>-result.xml
     
-    Again, the same rule as above applies: the less datasets are used, the less maintainance is needed. So typically you would only use such 
-    result-dataset assertions when it's not possible to perform the same check in the test code (e.g. there is no findByActive() method).
+    The use of result datasets should be kept minimal. If possible, you should try to perform the same check in the test code (e.g. by using a method <findActiveUsers()>).
 
-    In the above examples we left out 1 important thing: where is the datasource for connecting to the test database coming from and how
-    can we let our DAO classes make use of this datasource? The answer to these quesions is ofcourse: Unitils. Before the first database test
-    Unitils will create a Datasource instance and make it available to your test by injecting it in a field annotated with the <@TestDataSource> annotation.
-    During the setup of your test you can then set or inject the datasource in your DAO. Typically all this is implemented once in a project-specific superclass
-    for all your database tests. A simple example of such a base class could be:
+    In the above examples we left out 1 important thing: where is the DataSource for connecting to the test database coming from and how
+    can we let our DAO classes make use of this DataSource? The answer to these quesions is of course: Unitils. Before the first database test, Unitils creates a Datasource instance. If there is a field or method available annotated with <@TestDataSource>, Unitils will inject the DataSource into this field or call the method with the DataSource as parameter. This is done before each test, before executing the setUp() method or the methods annotated with <@Before> or <@BeforeMethod>.
+    This way, you can easily make sure that your project data access code uses the correct DataSource. Typically all this is implemented once in a project-specific superclass for all your database tests. A simple example of such a base class could be:
     
 +-----+
 @DatabaseTest
@@ -349,32 +344,27 @@ dbscripts/ 001_initial.sql
            003_auditing_updates.sql
 +-----+
 
-    By default Unitils expects that all scripts follow a certain naming pattern: they should start with a version number, then an underscore 
-    and end with '.sql'. The exact pattern can ofcourse be configured. Note that the leading zeroes in the example are actually not required, 
+    Unitils expects that all scripts follow a certain naming pattern: they start with a version number, followed by an underscore 
+    and end with '.sql' (the extension is configurable). Note that the leading zeroes in the example are not required, 
     they are only added to make sure the scripts are shown in proper sequence in a file explorer window.
 
-    Suppose you add a new script, this time with version number 4: <004_create_user_admin_tables.sql>. When you run a new database unit test, 
-    the db maintainer will notice that the database structure is no longer up to date. It will then update the database schema by executing all 
-    new scripts, in this case only <004_create_user_admin_tables.sql>. After the executing the scripts it will then perform the database test
-    on this up to date database schema.
+    Suppose you add a new script, this time with version number 4: <004_create_user_admin_tables.sql>. The next time you execute a database test, 
+    the database maintainer will notice that the database structure is no longer up to date. It will update the database schema incrementally by executing all 
+    new scripts, in this case only <004_create_user_admin_tables.sql>. After this, the database test are executed on this up to date schema.
         
-    Typically, new database scripts will be added and the db maintainer will incrementally update the database using these scripts. However, it could
-    also happen that one of the existing database scripts was altered. For example suppose that the <002_tracking_updates.sql> was changed by
-    someone. In that case, no incremental update can be performed, therefore the db maintainer will first clear the database, removing all tables 
+    If one of the existing database scripts was altered, the database maintainer will also notice. For example suppose that the <002_tracking_updates.sql> was changed by
+    someone. In that case, the database maintainer will first clear the database, removing all tables 
     and then recreated it from scratch, starting again from the first script.
     
-    By default the db maintainer will store the current version of a database schema in a <DB_VERSION> table. This way, it can determine whether
-    the database is up to date or not. 
+    For performance reasons, It is a good practice to add new update files for small database updates. 
+    This makes sure updates are executed very quickly. Once in a while, you can clean up the small update scripts and replace them with one large DDL script.
     
-    TODO SVN uitleggen
+    The database maintainer stores the current version of a database schema in a <DB_VERSION> table, with the columns <VERSION_INDEX>, <LAST_UPDATED_ON> and <LAST_UPDATE_SUCCEEDED>. 
     
-        
     Before doing an update, all data in the database is deleted, to avoid errors when adding not-null columns or adding foreign keys in update scripts.
-    It is possible to specify a number of tables for which the data is preserved. You can also configure a number of database items
-    (tables, views, sequences, ...) that are preserved. Look at the configuration section for more information.
+    It is possible to specify a number of tables for which the data is preserved (by configuring the property <dbMaintainer.cleanDb.tablesToPreserve> in unitils.properties). You can also configure a number of database items
+    (tables, views, sequences, ...) that are preserved (using <dbMaintainer.clearDb.itemsToPreserve>). 
 
-    It is a good practice to add new update files for small database updates. This makes sure updates are executed very quickly. Once in a while,
-    you can clean up the small update scripts and replace them with one large DDL script.
 
     After each update, the DBMaintainer performs following actions:
 
@@ -384,8 +374,9 @@ dbscripts/ 001_initial.sql
     * <Update sequences>: All sequences and identity columns are updated to a sufficiently high initial value (1000 by default). This way, you can
       use fixed primary key values when inserting test data.
 
-    * <Create a DTD>: A DTD that describes the structure of DbUnit's FlatXMLDataSet is created. This enables validness checking and auto-completion
-      when writing test data files.
+    * <Create a DTD>: A DTD that describes the structure of DbUnit's 
+    {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} is created. 
+    This enables validness checking and auto-completion when writing test data files.
 
     []
     
@@ -408,20 +399,16 @@ dbscripts/ 001_initial.sql
 
 
 
-
 ** Testing with Hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Unit tests remain valuable, for ensuring the
     mapping of the Hibernate mapped classes is always in sync with the database, and for easy and quick testing of HQL queries.
 
-    Unitils provides out-of-the box configuration support for Hibernate. When properly configured, Unitils' database and DbUnit support can be used like
-    described in database testing. 
     
-    A HQL test can be tested exacltly the same way as described in managing test data with DbUnit. The only difference is that you extend a superclass
-    that is configured as being a Hibernate test superclass (see configuration). 
     
-    The @ExpectedDataSet annotation can also be used for result checking with a data file. Unitils will make sure the Hibernate Session is flushed before
+    A HQL method can be tested exactly the same way as described above in Managing test data with DbUnit. 
+    The <@ExpectedDataSet> annotation can also be used for result checking with a data file. Unitils will make sure the Hibernate Session is flushed before
     performing the check, to make sure all database updates performed during the test are actually executed on the database.
 
 *** Testing the mapping
@@ -439,8 +426,8 @@ public class HibernateMappingTest extends BaseHibernateTest {
 }
 +-----+
 
-    In this example, BaseHibernateTest is a custom project base class, that handles all Unitils-Hibernate configuration. See the cookbook for more information.
-    The method HibernateAssert.assertMappingToDatabase() checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
+    In this example, <BaseHibernateTest> is a custom project base class, that handles all Unitils-Hibernate configuration. See the {{cookbook}} for an example.
+    The method <HibernateAssert.assertMappingToDatabase()> checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
     the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
     
 +-----+
@@ -449,9 +436,33 @@ alter table PRODUCT add column barCode varchar(255);
 +-----+
 
 
+    Unitils provides out-of-the box configuration support for Hibernate. When properly configured, Unitils' database and DbUnit support can be used like
+    described in the database testing chapter above. Unitils performs loading the configuration and managing the Hibernate Session for you. 
+    
+    A Hibernate test class or the superclass should be annotated with <@HibernateTest>.    
+    Using the property <HibernateModule.hibernate.configfiles>, you can specify one or more hibernate configuration files that should be loaded. You can also
+    do (extra) programmatic configuration by annotating a method with <@HibernateConfiguration> in your test superclass.
+    
+    To obtain a Hibernate Session for injection in your own data access layer, you can use the <@HibernateSession> annotation on a method or on a field.
+    An example Hibernate test base class could look like the following:
 
++-----+
+@HibernateTest
+public abstract void BaseHibernateDAOTest extends UnitilsJUnit4 {
 
-
+    @HibernateSession
+    private Session hibernateSession;
+    
+    @Before    
+    public void initializeDao() {
+        
+        BaseDAO dao = getDaoUnderTest();
+        dao.setHibernateSession(hibernateSession);
+    }
+    
+    protected abstract BaseDAO getDaoUnderTest();
+}
++-----+ 
 
 
 
