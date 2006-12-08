@@ -297,14 +297,17 @@ public void UserDAOTest extends UnitilsJUnit4 {
 @DatabaseTest
 public abstract void BaseDAOTest extends UnitilsJUnit4 {
 
-    @DataSource
+    @TestDataSource
     private DataSource dataSource;
     
     @Before    
     public void initializeDao() {
+        
         BaseDAO dao = getDaoUnderTest();
         dao.setDataSource(dataSource);
     }
+    
+    protected abstract BaseDAO getDaoUnderTest();
 }
 +-----+    
 
@@ -334,19 +337,11 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 
 ** Unit test database maintenance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    A powerful DBMaintainer is provided to automatically update each developer's database schema individually. Unitils' DBMaintainer
-    will automatically check if database structure updates are available before running a database test, and apply them if necessary.
+    A powerful <DBMaintainer> is provided to automatically update each developer's individual database schema when needed. It will check whether 
+    database structure updates are available and apply them if necessary.
     
-    The DBMaintainer uses DBMS specific functionality, such as for disabling constraints and updating sequences. The DBMaintainer will
-    therefore only run properly when the property <database.dialect> is correctly set. Currently, there is support for following databases:
-    
-    * Oracle: Currently, only tested properly with Oracle 9i
-    
-    * Hsqldb: Tested with version 1.8.0
-    
-    * MySQL: Tested with version 5.0
-
-    The database maintainer works as follows: The test script folder contains scripts that start with a version number and end on .sql, as in following example:
+    The database maintainer works as follows: a project should have a directory that contains all database scripts of the application. These are typically 
+    created incrementally, e.g. a first script creates a table USERS and a later script contains a statement for adding a column to that table.    
 
 +-----+
 dbscripts/ 001_initial.sql
@@ -354,10 +349,26 @@ dbscripts/ 001_initial.sql
            003_auditing_updates.sql
 +-----+
 
-    The leading zeroes are only added to make sure the scripts are shown in proper sequence in a file explorer window, they are not required.
+    By default Unitils expects that all scripts follow a certain naming pattern: they should start with a version number, then an underscore 
+    and end with '.sql'. The exact pattern can ofcourse be configured. Note that the leading zeroes in the example are actually not required, 
+    they are only added to make sure the scripts are shown in proper sequence in a file explorer window.
 
-    If a script is added with version number 4, the database will execute this script, bringing the database to version 4. When an
-    existing script is changed, e.g. 001_initial.sql is replaced with a new version, the database is cleared and recreated from scratch.
+    Suppose you add a new script, this time with version number 4: <004_create_user_admin_tables.sql>. When you run a new database unit test, 
+    the db maintainer will notice that the database structure is no longer up to date. It will then update the database schema by executing all 
+    new scripts, in this case only <004_create_user_admin_tables.sql>. After the executing the scripts it will then perform the database test
+    on this up to date database schema.
+        
+    Typically, new database scripts will be added and the db maintainer will incrementally update the database using these scripts. However, it could
+    also happen that one of the existing database scripts was altered. For example suppose that the <002_tracking_updates.sql> was changed by
+    someone. In that case, no incremental update can be performed, therefore the db maintainer will first clear the database, removing all tables 
+    and then recreated it from scratch, starting again from the first script.
+    
+    By default the db maintainer will store the current version of a database schema in a <DB_VERSION> table. This way, it can determine whether
+    the database is up to date or not. 
+    
+    TODO SVN uitleggen
+    
+        
     Before doing an update, all data in the database is deleted, to avoid errors when adding not-null columns or adding foreign keys in update scripts.
     It is possible to specify a number of tables for which the data is preserved. You can also configure a number of database items
     (tables, views, sequences, ...) that are preserved. Look at the configuration section for more information.
@@ -368,14 +379,27 @@ dbscripts/ 001_initial.sql
     After each update, the DBMaintainer performs following actions:
 
     * <Disable foreign key and not-null constraints>: To be able to work with the smallest possible test data sets, all foreign key and not null
-    constraints on the test database are disabled.
+      constraints on the test database are disabled.
 
     * <Update sequences>: All sequences and identity columns are updated to a sufficiently high initial value (1000 by default). This way, you can
-    use fixed primary key values when inserting test data.
+      use fixed primary key values when inserting test data.
 
     * <Create a DTD>: A DTD that describes the structure of DbUnit's FlatXMLDataSet is created. This enables validness checking and auto-completion
-    when writing test data files.
+      when writing test data files.
 
+    []
+    
+    The DBMaintainer uses DBMS specific functionality, such as for disabling constraints and updating sequences. The DBMaintainer will
+    therefore only run properly when the property <database.dialect> is correctly set. Currently there is support for following databases:
+    
+    * Oracle: Currently, only tested properly with Oracle 9i
+    
+    * Hsqldb: Tested with version 1.8.0
+    
+    * MySQL: Tested with version 5.0
+
+    []
+    
     The DBMaintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates, ... Look at
     the configuration for more information!
 
