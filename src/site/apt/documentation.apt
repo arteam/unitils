@@ -356,8 +356,13 @@ dbscripts/ 001_initial.sql
     someone. In that case, the database maintainer will first clear the database, removing all tables 
     and then recreated it from scratch, starting again from the first script.
     
+    By default the db maintainer will store the current version of a database schema in a <DB_VERSION> table. This way, it can determine whether
+    the database is up to date or not. This table will automatically be created if it does not yet exist. Other types of version sources are
+    also possible, you could for example create <FileVersionSource> that keeps the version in a local properties file.
+
     For performance reasons, It is a good practice to add new update files for small database updates. 
     This makes sure updates are executed very quickly. Once in a while, you can clean up the small update scripts and replace them with one large DDL script.
+
     
     The database maintainer stores the current version of a database schema in a <DB_VERSION> table, with the columns <VERSION_INDEX>, <LAST_UPDATED_ON> and <LAST_UPDATE_SUCCEEDED>. 
     
