@@ -332,7 +332,7 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 
 
 
-** Unit test database maintenance
+** {Unit test database maintenance}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     A powerful <DBMaintainer> is provided to automatically update each developer's individual database schema when needed. It will check whether 
     database structure updates are available and apply them if necessary.
@@ -442,7 +442,7 @@ database.dialect=oracle
 
 
 
-** Testing with Hibernate
+** {Testing with Hibernate}
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Even when using such a O/R mapping tool, unit 
@@ -519,7 +519,7 @@ public abstract void BaseHibernateDAOTest extends UnitilsJUnit4 {
 
 
 
-* Using reflection for assertion
+* {Using reflection for assertion}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ** Reflection versus equals()
@@ -599,10 +599,9 @@ assertRefEquals(user1, user2);
     first compare both <id> field values, next both <first> field values and finally both <last> fields values. 
     
     If a field value itself is also an object, it will recursively be compared field by field using reflection. The same is true for 
-    collections, maps and arrays. Their elements will be traversed and recusively be compared using reflection. 
-
-    If a value is of a primitive type (int, long, ...) or one of the primitive wrapper types (Integer, Long, ...) it will be 
-    compared by value (using ==). Following assertions, for example, will be successful:
+    collections, maps and arrays. Their elements will be traversed and recusively be compared using reflection. If a value is of a primitive 
+    type (int, long, ...) or one of the primitive wrapper types (Integer, Long, ...) it will be compared by value (using ==). 
+    Following assertions, for example, will be successful:
 
 +-----+
 assertRefEquals(1, 1L); 
@@ -634,7 +633,7 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 ~~~~~~~~~~~~~~~~~
     A first type of leniency you can specify is ignoring the order of elements in a collection or an array. It is often the case that when working with 
     lists, you are not interested in the order of the elements, only that they comply to certain criteria. For example, code for retrieving 
-    all bankaccounts with a negative balance will typically return them in a list in a certain order that is unimportant for further processing.
+    all bank-accounts with a negative balance will typically return them in a list in a certain order that is unimportant for further processing.
     
     To implement this behavior, the <ReflectionAssert.assertRefEquals> method can be configured to ignore ordering by 
     supplying it with the <ReflectionComparatorMode.LENIENT_ORDER> comparator mode:
@@ -658,7 +657,7 @@ assertLenEquals(Arrays.asList(1, 2, 3), myList);
 
 *** Ignoring defaults
 ~~~~~~~~~~~~~~~~~~~~~
-    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode. When this mode is set fields in the 
+    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode. When this mode is set, fields in the 
     left (expected) instance will only be compared with the corresponding fields in the right (actual) instance if they have a non 
     java default value, i.e. <null> or <0>. In other words, if you leave the value of a left-instance field to <null> or <0> it will not 
     be used in the comparison.
@@ -706,7 +705,7 @@ assertRefEquals(expectedDate, actualDate, LENIENT_DATES);
 
 +-----+
 assertPropertyLenEquals("id", 1, user);
-assertPropertyLenEquals("address.street", "first street", user);
+assertPropertyLenEquals("address.street", "First street", user);
 +-----+
 
     You can also supply collections as arguments. In that case the specified field will be taken of each element in the collection. This
@@ -714,20 +713,21 @@ assertPropertyLenEquals("address.street", "first street", user);
 
 +-----+
 assertPropertyLenEquals("id", Arrays.asList(1, 2, 3), users);
-assertPropertyLenEquals("address.street", Arrays.asList("first street", "second street", "third street"), users);
+assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second street", "Third street"), users);
 +-----+
 
-    There are again two versions of each method: an assertProperty<<Len>>Equals method and a assertProperty<<Ref>>Equals method. 
+    Again there are two versions of each method: an assertProperty<<Len>>Equals method and a assertProperty<<Ref>>Equals method. 
     The ref version will have no leniency specified by default but provides the option to specify leniency modes, the len version
     already has lenient order and ignore defaults set as fixed leniency modes.
 
 
 
 
+
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unit tests should test code in isolation. Mock objects allow testing a component without having to care about other 
-    components or services that it depends on. Unitils builds further on {{{http://www.easymock.org}EasyMock}} for its mock object testing 
+    Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other 
+    parts or services that it depends on. Unitils builds further on {{{http://www.easymock.org}EasyMock}} for its mock object testing 
     support. Unitils provides convenience functionality that greatly reduces the plumbing code that needs to be written when working with 
     mocks. This involves simplification of mock creation, argument matching and injection of mocks.
     
@@ -738,76 +738,96 @@ assertPropertyLenEquals("address.street", Arrays.asList("first street", "second 
 ** Mock creation
 ~~~~~~~~~~~~~~~~
     Unitils makes sure that mock objects are injected into a unit test class before the execution of each test. Following example 
-    shows a unit test for a method on a UserService that disables all inactive user accounts. All data access is delegated to a 
-    UserDao service, which is replaced by a mock object.
+    shows a unit test for a method on a UserService that disables all inactive user accounts:
     
 +-----+
 public void UserServiceTest extends UnitilsJUnit4 { 
 
-	@Mock
-	private UserDao mockUserDao;
+    @Mock
+    private UserDao mockUserDao;
 
-	private UserService userService;
+    private UserService userService;
 
-	@Test testDisableInActiveAccounts() {
+    @Test 
+    testDisableInActiveAccounts() {
     
-    expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
-		mockUserDao.disableAccount(accounts.get(0));
-		mockUserDao.disableAccount(accounts.get(1));
-		replay();
+        expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
+        mockUserDao.disableAccount(accounts.get(0));
+        mockUserDao.disableAccount(accounts.get(1));
+        replay();
 
-		userService.disableInActiveAccounts();	
-	}
+        userService.disableInActiveAccounts();	
+    }
 } 
 +-----+
 
-    Mock creation and assignment to the test object's fields is performed before executing the test fixture (this is the setUp method in JUnit3, or the @BeforeMethod methods in TestNG)
+    In the example all data access is delegated to a UserDao service, which is replaced by a mock object. This mock is created automatically by Unitils. If you 
+    annotate a field with the <@Mock> annotation, Unitils will create a mock of the same type as the field and inject the instance into that field. This mock creation 
+    and assignment is performed before executing the test fixture (this is the setUp method in JUnit3, or the @BeforeMethod methods in TestNG). This way
+    you can use the mock instance during the setup, for example, to install it in your code so that it will be used during the test. Later-on we will show you
+    how Unitils can help you perform this mock injection.
    
-    The mock objects created by Unitils by default use EasyMock's strict call expectations (i.e. the test fails when unexpected method calls occur) and lenient invocation order. You can
-    change these default values either by specifying attributes on the @Mock annotation, e.g.:
+    The mock objects created by Unitils by default use EasyMock's strict call expectations (i.e. the test fails when unexpected method calls occur) and lenient 
+    invocation order. You can change these default values by specifying attributes on the @Mock annotation, e.g.:
    
 +-----+
 @Mock(returns = Returns.NICE, invocationOrder = InvocationOrder.STRICT)
 private UserDao mockUserDao;
 +-----+
 
-    You can also change the default values for all unit tests in your project using the properties <EasyMockModule.Mock.InvocationOrder.default> and <EasyMockModule.Mock.Returns.default>. E.g.
+    You can also change the default values for all <@Mock> annotations in the configuration settings:
 
 +-----+
 EasyMockModule.Mock.InvocationOrder.default=lenient
 EasyMockModule.Mock.Returns.default=nice
 +-----+
    
+   
+   
 **   Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    The mocks that are supplied by Unitils differ from mocks objects that you get when directly using EasyMock. These mocks use a <LenientMocksControl>. 
-    This control makes sure that by default, arguments specified in expectation clauses are matched using Unitils' <ReflectionComparator>. By default, this comparator uses the 
-    leniency levels <IGNORE_DEFAULTS> and <LENIENT_ORDER>. E.g., in the above example, following expectation is set:
+    The mocks that are supplied by Unitils are slightly different from mocks objects that you get when directly using EasyMock: a <LenientMocksControl> is used 
+    for these mocks. If you want Unitils to create a normal EasyMock mock, the <@RegularMock> annotation can be used instead.
+    
+    The <LenientMocksControl> control will make sure that arguments specified in method calls are matched using reflection. The arguments of the
+    expected and actual method calls are compared in the same way as we saw in the {{{#Using reflection for assertion}Using reflection for assertion}} section. 
+    By default, it will use the ignore defaults and lenient order leniency levels. E.g., following expectation and actual method calls will match:
     
 +-----+
-mockUserDao.disableAccount(accounts.get(0));
+expected: dao.findById(0);
+actual:   dao.findById(99999);
+
+List<Integer> userIds = new ArrayList<Integer>();
+userIds.add(3);
+userIds.add(2);
+userIds.add(1);
+expected: dao.deleteById(Arrays.asList(1,2,3));
+actual:   dao.deleteById(userIds);
+
+expected: dao.update(0,    new User(null,   "Doe"));
+actual:   dao.update(9999, new User("John", "Doe"));
 +-----+
 
-    When this method invocation is occured during test execution (after <replay()>), the actual account object will be compared with the expected one using reflection equality with 
-    the leniency levels <IGNORE_DEFAULTS> and <LENIENT_ORDER>.
-    
-    Leniency levels also apply at top level. For example, when you look at following extract from the example above:
+    As you can see, the leniency levels not only apply to objects and their fields but also apply to the argurments themselves. For example, take a look at following expectation:
     
 +-----+
 expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
 +-----+
 
-    The <null> parameter in this method call actually means that we don't care what argument is passed to this method. This provides a very convenient way of setting flexible expectations!
+    The <null> parameter in this method call actually means that we don't care what argument is passed to this method. This provides a very convenient way of setting flexible 
+    expectations! There is no need to specify <anyInt>, <notNull> ... argument matchers for each of the arguments any more.
 
-    The leniency levels that are used for argument matching can be configured for each individual mock. E.g., for using strict order, no ignoring of defaults but lenient date checking:
+    By default, lenient order and ignore defaults are used as leniency levels. If you want to change this, you can specify wich levels to use by setting attributes 
+    on the <@Mock> annotation:
 
 +-----+
 @Mock(order = Order.STRICT, defaults = Defaults.STRICT, dates = Dates.LENIENT)
 private UserDao mockUserDao;
 +-----+
 
-    The defaults can also be set project-wide, e.g. to do the same as above for the entire project:
+    The levels can also be set project-wide, for all mocks at once, by changing the defaults in the configuration settings. E.g. to do the same as above for the 
+    entire project you could set following properties:
 
 +-----+
 EasyMockModule.Mock.Order.default=strict
@@ -823,7 +843,7 @@ private UserDao mockUserDao;
 +-----+
 
 
-   
+
 
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
