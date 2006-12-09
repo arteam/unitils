@@ -865,7 +865,8 @@ public class UserTest extends TestCase {
 
 <h4>Description</h4>
 
-<p>When you are writing code, you have to test it one way or another. So why not write a unit test directly instead of first writing a main() method.</p>
+<p>When you are writing code, you have to test it one way or another. So why not write a unit test directly? Testing your code through the 
+user interface is often difficult because the necessary test data is not available or certain boundary conditions are difficult to simulate.</p>
 
 <p>Some people prefer writing tests <i>before</i> writing the actual code. They start with writing the interface of the method, then write a
 few test for the functionality (that of course fail at that moment, because there is no code yet) and then implement the method until all tests 
