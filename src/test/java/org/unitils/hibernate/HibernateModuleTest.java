@@ -22,7 +22,7 @@ import org.hibernate.cfg.Configuration;
 import org.unitils.UnitilsJUnit3;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.easymock.util.Returns;
+import org.unitils.easymock.util.Calls;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateTest;
@@ -38,7 +38,7 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
      */
     private HibernateModule hibernateModule;
 
-    @Mock(returns = Returns.NICE)
+    @Mock(calls = Calls.LENIENT)
     private Configuration mockHibernateConfiguration;
 
     @Mock

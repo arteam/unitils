@@ -72,14 +72,14 @@ public class EasyMockUnitils {
      * @param returns  the returns setting, not null
      * @return a mock for the given class or interface, not null
      */
-    public static <T> T createRegularMock(Class<T> mockType, InvocationOrder order, Returns returns) {
+    public static <T> T createRegularMock(Class<T> mockType, InvocationOrder order, Calls returns) {
 
         return getEasyMockModule().createRegularMock(mockType, order, returns);
     }
 
 
     //todo javadoc
-    public static <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns, Order order, Dates dates, Defaults defaults) {
+    public static <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Calls returns, Order order, Dates dates, Defaults defaults) {
 
         return getEasyMockModule().createMock(mockType, invocationOrder, returns, order, dates, defaults);
     }
@@ -89,8 +89,8 @@ public class EasyMockUnitils {
      * <p/>
      * This method will make sure EasyMock's replay method is called on every mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createRegularMock(Class,InvocationOrder,Returns)} and
-     * {@link #createMock(Class,InvocationOrder,Returns,Order,Dates,Defaults)} methods.
+     * {@link #createRegularMock(Class,InvocationOrder,Calls)} and
+     * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} methods.
      * <p/>
      * After each test, the expected behavior will be verified automatically. Verification can also be performed
      * explicitly by calling the {@link #verify()} method.
@@ -107,8 +107,8 @@ public class EasyMockUnitils {
      * <p/>
      * This method will make sure EasyMock's verify method is called on every mock mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createRegularMock(Class,InvocationOrder,Returns)} and
-     * {@link #createMock(Class,InvocationOrder,Returns,Order,Dates,Defaults)} methods.
+     * {@link #createRegularMock(Class,InvocationOrder,Calls)} and
+     * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} methods.
      * <p/>
      * After each test, the expected behavior will be verified automatically. Verification can also be performed
      * explicitly by calling this method.

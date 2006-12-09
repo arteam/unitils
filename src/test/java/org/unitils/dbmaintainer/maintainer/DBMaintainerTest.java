@@ -42,31 +42,31 @@ import java.util.List;
 @SuppressWarnings({"UnusedDeclaration"})
 public class DBMaintainerTest extends UnitilsJUnit3 {
 
-    @RegularMock
+    @Mock
     @AutoInject
     private VersionSource mockVersionSource;
 
-    @RegularMock
+    @Mock
     @AutoInject
     private ScriptSource mockScriptSource;
 
-    @RegularMock
+    @Mock
     @AutoInject
     private SQLScriptRunner mockScriptRunner;
 
-    @RegularMock
+    @Mock
     @AutoInject
     private DBClearer mockDbClearer;
 
-    @RegularMock
+    @Mock
     @AutoInject
     private ConstraintsDisabler mockConstraintsDisabler;
 
-    @RegularMock
+    @Mock
     @AutoInject
     private SequenceUpdater mockSequenceUpdater;
 
-    @RegularMock
+    @Mock
     @AutoInject
     private DtdGenerator mockDtdGenerator;
 

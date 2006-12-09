@@ -33,7 +33,7 @@ import java.util.List;
 public class LenientMocksControlTest extends TestCase {
 
 
-    /* Class under test, with mock type NICE and ignore defaults */
+    /* Class under test, with mock type LENIENT and ignore defaults */
     private LenientMocksControl lenientMocksControl;
 
     /**

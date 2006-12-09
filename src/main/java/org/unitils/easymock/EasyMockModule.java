@@ -99,17 +99,17 @@ public class EasyMockModule implements Module {
      *
      * @param mockType        the class type for the mock, not null
      * @param invocationOrder the order setting, not null
-     * @param returns         the returns setting, not null
+     * @param calls         the calls setting, not null
      * @return a mock for the given class or interface, not null
      */
-    public <T> T createRegularMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns) {
+    public <T> T createRegularMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls) {
 
         // Get anotation arguments and replace default values if needed
         invocationOrder = getValueReplaceDefault(RegularMock.class, invocationOrder, defaultEnumValues);
-        returns = getValueReplaceDefault(RegularMock.class, returns, defaultEnumValues);
+        calls = getValueReplaceDefault(RegularMock.class, calls, defaultEnumValues);
 
         MocksControl mocksControl;
-        if (Returns.NICE == returns) {
+        if (Calls.LENIENT == calls) {
             mocksControl = new MocksClassControl(NICE);
 
         } else {
@@ -132,23 +132,23 @@ public class EasyMockModule implements Module {
      * Creates an EasyMock mock instance of the given type (class/interface). The type of mock is determined
      * as follows:
      * <p/>
-     * If returns is set to NICE, a nice mock is created, else a default mock is created
+     * If returns is set to LENIENT, a nice mock is created, else a default mock is created
      * If arguments is lenient a lenient control is create, else an EasyMock control is created
      * If order is set to strict, invocation order checking is enabled
      *
      * @param mockType        the class/interface, not null
      * @param invocationOrder the order setting, not null
-     * @param returns         the returns setting, not null
+     * @param calls         the calls setting, not null
      * @param order           todo
      * @param dates           todo
      * @param defaults        todo
      * @return a mockcontrol for the given class or interface, not null
      */
-    public <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Returns returns, Order order, Dates dates, Defaults defaults) {
+    public <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls, Order order, Dates dates, Defaults defaults) {
 
         // Get anotation arguments and replace default values if needed
         invocationOrder = getValueReplaceDefault(Mock.class, invocationOrder, defaultEnumValues);
-        returns = getValueReplaceDefault(Mock.class, returns, defaultEnumValues);
+        calls = getValueReplaceDefault(Mock.class, calls, defaultEnumValues);
         order = getValueReplaceDefault(Mock.class, order, defaultEnumValues);
         dates = getValueReplaceDefault(Mock.class, dates, defaultEnumValues);
         defaults = getValueReplaceDefault(Mock.class, defaults, defaultEnumValues);
@@ -165,7 +165,7 @@ public class EasyMockModule implements Module {
         }
 
         LenientMocksControl mocksControl;
-        if (Returns.NICE == returns) {
+        if (Calls.LENIENT == calls) {
             mocksControl = new LenientMocksControl(NICE, comparatorModes.toArray(new ReflectionComparatorMode[0]));
 
         } else {
@@ -227,7 +227,7 @@ public class EasyMockModule implements Module {
             Class<?> mockType = mockField.getType();
 
             RegularMock regularMockAnnotation = mockField.getAnnotation(RegularMock.class);
-            Object mockObject = createRegularMock(mockType, regularMockAnnotation.invocationOrder(), regularMockAnnotation.returns());
+            Object mockObject = createRegularMock(mockType, regularMockAnnotation.invocationOrder(), regularMockAnnotation.calls());
             setFieldValue(testObject, mockField, mockObject);
 
             callAfterCreateMockMethods(testObject, mockObject, mockField.getName(), mockType);
@@ -244,7 +244,7 @@ public class EasyMockModule implements Module {
             Class<?> mockType = mockField.getType();
 
             Mock mockAnnotation = mockField.getAnnotation(Mock.class);
-            Object mockObject = createMock(mockType, mockAnnotation.invocationOrder(), mockAnnotation.returns(), mockAnnotation.order(), mockAnnotation.dates(), mockAnnotation.defaults());
+            Object mockObject = createMock(mockType, mockAnnotation.invocationOrder(), mockAnnotation.calls(), mockAnnotation.order(), mockAnnotation.dates(), mockAnnotation.defaults());
             setFieldValue(testObject, mockField, mockObject);
 
             callAfterCreateMockMethods(testObject, mockObject, mockField.getName(), mockType);

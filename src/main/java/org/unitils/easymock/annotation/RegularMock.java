@@ -16,7 +16,7 @@
 package org.unitils.easymock.annotation;
 
 import org.unitils.easymock.util.InvocationOrder;
-import org.unitils.easymock.util.Returns;
+import org.unitils.easymock.util.Calls;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -40,11 +40,11 @@ public @interface RegularMock {
 
 
     /**
-     * Determines what to do when no return value is recorded for a method.
+     * Determines what to do when unexpected method calls occur.
      *
-     * @return the returns setting.
+     * @return the calls setting.
      */
-    public Returns returns() default Returns.DEFAULT;
+    public Calls calls() default Calls.DEFAULT;
 
 
 }
