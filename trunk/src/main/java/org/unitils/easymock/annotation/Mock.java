@@ -40,11 +40,11 @@ public @interface Mock {
 
 
     /**
-     * Determines what to do when no return value is recorded for a method.
+     * Determines what to do when unexpected method calls occur.
      *
-     * @return the returns setting.
+     * @return the calls setting.
      */
-    public Returns returns() default Returns.DEFAULT;
+    public Calls calls() default Calls.DEFAULT;
 
 
     /**

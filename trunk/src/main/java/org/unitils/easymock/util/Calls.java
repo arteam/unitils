@@ -16,22 +16,24 @@
 package org.unitils.easymock.util;
 
 /**
- * Possible values for default return values for non-void method invocations on the mock.
+ * Possible values for allowing unexpected (non-recorded) method calls on mock objects. When set to lenient, a 'Nice
+ * mock' is created, as called in the EasyMock terminology. For non-void methods this means that a Java default (null,
+ * 0 or false) is returned.
  */
-public enum Returns {
+public enum Calls {
 
     /**
-     * Defaults to the value of the org.unitils.easymock.annotation.LenientMock$Returns configuration setting.
+     * Defaults to the value of the org.unitils.easymock.annotation.LenientMock$Calls configuration setting.
      */
     DEFAULT,
 
     /**
-     * Return default values (null, 0…) when no return type is specified.
+     * Accept unexpected method calls. Return default values (null, 0…) for unexpected non-void method calls
      */
-    NICE,
+    LENIENT,
 
     /**
-     * Throw an exception when no return type is specified
+     * Throw an exception when unexpected method calls occur
      */
     STRICT
 }
