@@ -6,23 +6,25 @@
 Cookbook
 ~~~~~~~~
 
-  This page will guide you step-by-step through the process of getting Unitils properly configured in your own software project. This is only the typical configuration. 
-  There are a lot more configuration options in Unitils. A complete documented reference of all configuration options can be found in the source code in unitils-default.properties.
-  For more information about Unitils' system of configuration files, read the documentation.
+    This page will guide you step-by-step through the process of getting Unitils properly configured in your own software project. This 
+    cookbook contains only typical configuration. A complete documented reference of all configuration options can be found in the 
+    {{{unitils-default.properties} unitils-default.properties}}. For more general information about Unitils and also information on the way Unitils 
+    uses configuration files, we refer to the {{{documentation.html} documentation}} page.
+   
    
 * Enable Unitils' assertion utils (ReflectionAssert), EasyMock and injection support
-~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    To be able to use these features, it is sufficient to add the unitils jar to your project's classpath.
   
-  To be able to use these features, it is sufficient to add the unitils jar to your project's classpath.
   
   
 * Enable support for database tests
-~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    To enable database testing as foreseen in Unitils, you should start by setting up a unit test database for every developer in your 
+    team. In our typical configuration shown below, we assume that for every developer, a separate test database schema was created on the 
+    same database instance.
   
-  To enable database testing as foreseen in Unitils, you should start by setting up a unit test database for every developer in your team. In our typical configuration shown below,
-  we assume that for every developer, a separate test database schema was created on the same database instance.
-  
-  Create a file named unitils.properties and make it available in the root of your classpath. It should contain following properties:
+    Create a file named unitils.properties and make it available in the root of your classpath. It should contain following properties:
   
 +------+
 # Name or path of the user specific properties file. This file should contain the necessary parameters to connect to the
@@ -41,10 +43,8 @@ dataSource.url=<my database connection url>
 database.dialect=<my databasa dialect>
 +------+
 
-  Next, create a file unitils-<myproject>-local.properties on your local filesystem and fill in the path of this file as value for the property 'unitils.configuration.localFileName'.
-  It's recommended to store this file in your user home directory; this allows specifying the filename in a Operation System independent way.
-  
-  unitils-<myproject>-local.properties contains following properties:
+    Next, create a file unitils-<myproject>-local.properties and put this file in your local user home directory. The file shoudl contain 
+    following properties:
 
 +------+
 dataSource.schemaName=<developers database schema name>
@@ -52,12 +52,13 @@ dataSource.userName=<developers database login username>
 dataSource.password=<developers database login password>
 +------+
 
+
 * Enable automatic developers' database maintenance
-~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    To enable automatic maintenance of the developers' test databases, start with adding a database scripts folder to your source control system, 
+    in which you will add all your database schema update scripts.
   
-  To enable automatic maintenance of the developers' test databases, start with adding a database scripts folder to your source control system, in which you add all your database schema update scripts.
-  
-  Next, add following properties to unitils.properties:
+    Next, add following properties to unitils.properties:
   
 +------+
 # If set to true, the DBMaintainer will be used to update the unit test database schema. This is done once for each
@@ -85,79 +86,82 @@ dbMaintainer.cleandb.tablesToPreserve=<Optional list of tables from which the da
 dbMaintainer.cleardb.itemsToPreserve=<Optional list of database items that shouldn't be dropped>
 +------+
 
-* Enable Hibernate support
-~~~~~~
 
-  Unitils provides out-of-the box configuration support for Hibernate. Make sure you properly configure Unitils' database support first, and then correctly
-  override the property HibernateModule.hibernate.configfiles in unitils.properties. E.g.
+* Enable Hibernate support
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Unitils provides out-of-the box configuration support for Hibernate. First make sure the database support is configured correctly as described above and 
+    then specify the hibernate configuration files by overriding the <HibernateModule.hibernate.configfiles> property in your unitils.properties. E.g.
 
 +-----+
 # Name of hibernate config files for testing purposes. Should be in classpath.
-HibernateModule.hibernate.configfiles=
-              hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
+HibernateModule.hibernate.configfiles= hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
 +-----+
 
-  It is a good practice to split your Hibernate configuration in two parts: One config files containing shared configuration, such as the database dialect
-  and the mapped classes. A second one contains configuration that is specifically for unit testing. TODO example files.
+    It is a good practice to split your Hibernate configuration in two parts: One config files containing shared configuration, such as the database dialect
+    and the mapped classes. A second one contains configuration that is specifically for unit testing. 
 
-  We advise you to write a superclass that is used as base class for all Hibernate tests. This superclass looks like the following:
+    We advise you to write a superclass that is used as base class for all Hibernate tests. This superclass looks like the following:
 
 +-----+
 @HibernateTest
 public abstract class BaseHibernateTest extends UnitilsJUnit3 {
 
-  @HibernateConfiguration
-  public void configureHibernate(Configuration config) {
-      HibernateConfigHelper.addMappedClasses(config);
-  }
+    @HibernateConfiguration
+    public void configureHibernate(Configuration config) {
+        HibernateConfigHelper.addMappedClasses(config);
+    }
 
-  @HibernateSession
-  public void injectHibernateSession(Session session) {
-      HibernateSessionManager.injectSession(session);
-  }
+    @HibernateSession
+    public void injectHibernateSession(Session session) {
+        HibernateSessionManager.injectSession(session);
+    }
 }
 +-----+
 
-  The method annotated with @HibernateConfiguration allows performing some extra, programmatic Hibernate configuration, like e.g. registering mapped
-  classes with Hibernate. This method can be abandoned if all configuration is performed in the Hibernate config files.
+    The method annotated with <@HibernateConfiguration> allows performing some extra, programmatic Hibernate configuration, like e.g. registering mapped
+    classes with Hibernate. This method can be left out if all configuration is performed in the Hibernate config files.
 
-  The method annotated with @HibernateSession will be invoked before each test, with a Hibernate Session object as parameter. This method should make
-  sure that the tested data access code uses the Hibernate Session that is supplied by Unitils. The HibernateSessionManager that is invoked in this method
-  is also project specific code. The one in the example looks like the following:
+    The method annotated with <@HibernateSession> will be invoked before each test, with a Hibernate session object as parameter. This method should make
+    sure that the DAO code that is being tested uses this session. In the example this is done by setting the session in a HibernateSessionManager. This
+    session manager is a project specific class. An example implementation could look like the following:
 
 +-----+
 public class HibernateSessionManager {
 
-  private static Session externallyProvidedSession;
+    private static Session externallyProvidedSession;
 
-  private static SessionFactory sessionFactory;
+    private static SessionFactory sessionFactory;
 
-  public static Session getSession() {
-      if (externallyProvidedSession != null) {
-          return externallyProvidedSession;
-      } else {
-          return doGetSession();
-      }
-  }
 
-  private static Session doGetSession() {
-      if (sessionFactory == null) {
-          initSessionFactory();
-      }
-      return sessionFactory.openSession();
-  }
+    public static Session getSession() {
+        if (externallyProvidedSession != null) {
+            return externallyProvidedSession;
+        } else {
+            return doGetSession();
+        }
+    }
 
-  private static void initSessionFactory() {
-      Configuration configuration = new AnnotationConfiguration();
-      configuration.addFile("hibernate.cfg.xml");
-      configuration.addFile("hibernate-mappedClasses.cfg.xml");
-      configuration.configure();
-      sessionFactory = configuration.buildSessionFactory();
-  }
 
-  public static void injectSession(Session session) {
-      externallyProvidedSession = session;
-  }
+    private static Session doGetSession() {
+        if (sessionFactory == null) {
+            initSessionFactory();
+        }
+        return sessionFactory.openSession();
+    }
+
+
+    private static void initSessionFactory() {
+        Configuration configuration = new AnnotationConfiguration();
+        configuration.addFile("hibernate.cfg.xml");
+        configuration.addFile("hibernate-mappedClasses.cfg.xml");
+        configuration.configure();
+        sessionFactory = configuration.buildSessionFactory();
+    }
+
+
+    public static void injectSession(Session session) {
+        externallyProvidedSession = session;
+    }
 }
 +-----+
 
@@ -173,3 +177,4 @@ public class HibernateMappingTest extends BaseHibernateTest {
 }
 +-----+
   
+    

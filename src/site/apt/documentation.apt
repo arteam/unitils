@@ -38,8 +38,8 @@ Tutorial
 
     []
 
-    The first file, unitils-defaults.properties, contains default values and is packaged in the Unitils jar. There is no need to make changes
-    to this file, but it can be used as reference, since it contains all possible configuration settings for Unitils.
+    The first file, {{{unitils-default.properties} unitils-default.properties}}, contains default values and is packaged in the Unitils jar. 
+    There is no need to make changes to this file, but it can be used as reference, since it contains all possible configuration settings for Unitils.
 
     The second, unitils.properties, can override the defaults and is typically used to set values for configuration settings for all developers
     on a project. For example if your project uses an oracle database, you can create a unitils.properties file
