@@ -449,9 +449,9 @@ database.dialect=oracle
     tests remain valuable. They can ensure the mapping of the Hibernate mapped classes is always in sync with the database and can be used for 
     easy and quick testing of HQL queries.
 
-    A HQL method can be tested exactly the same way as described above in Managing test data with DbUnit. The <@ExpectedDataSet> annotation can also be 
-    used for result checking with a data file. To make sure all database updates performed during the test are actually executed on the database, Unitils 
-    will ensure that the Hibernate Session is flushed before performing the check, 
+    A HQL method can be tested exactly the same way as described above in {{{#Managing test data with DbUnit} Managing test data with DbUnit}}. 
+    The <@ExpectedDataSet> annotation can also be used for result checking with a data file. To make sure all database updates performed during the 
+    test are actually executed on the database, Unitils will ensure that the Hibernate Session is flushed before performing the check, 
     
 
 *** Testing the mapping
