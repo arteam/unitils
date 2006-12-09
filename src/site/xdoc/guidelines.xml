@@ -1867,7 +1867,7 @@ public class HibernateMappingTest extends BaseHibernateDAOTest {
 
 </pre></div>
 
-<p>The superclass <BaseHibernateDAOTest> in this example is a base class that is configured as a Unitils base Hibernate test (read the Unitils documentation for more information). 
+<p>The superclass &lt;BaseHibernateDAOTest&gt; in this example is a base class that is configured as a Unitils base Hibernate test (read the Unitils documentation for more information). 
 This unit test works for both a configuration with Hibernate XML mapping files as when using annotations.</p>
 
 <p>Note: The method getSetUpOperation() is overridden to prevent that the BaseHibernateTestCase complains that there is no data file.</p>
