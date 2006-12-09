@@ -189,7 +189,7 @@ public void UserDAOTest extends UnitilsJUnit4 {
 +-----+
 
     The <@DatabaseTest> annotation in the test marks the test as being a database test, instructing Unitils to look for DBUnit 
-    datafiles that need to loaded for the test. Unitils automatically looks for dataset files that are in the same directory as 
+    datafiles that need to be loaded for the test. Unitils automatically looks for dataset files that are in the same directory as 
     the test class and have following name pattern:
 
     * <className>.xml - for a dataset that is shared by all tests in the test class.
@@ -228,7 +228,9 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    Method-level datasets should not be overused, since having more data files means you have to do more maintenance. You should first try to reuse the data in the class level dataset - in most cases a small set of test records can be reused for multiple tests. If reusing a dataset mainly means adding extra records, it's better to create a method specific one. Otherwise, this will result in a big incoherent dataset.
+    Method-level datasets should not be overused, since having more data files means you have to do more maintenance. You should first try 
+    to reuse the data in the class level dataset - in most cases a small set of test records can be reused for multiple tests. If reusing 
+    a dataset mainly means adding extra records, it's better to create a method specific one. Otherwise, this will result in a big incoherent dataset.
     
     The dataset filename can also be specified explicitly using the <@DataSet> annotation:
 
@@ -255,7 +257,7 @@ public void UserDAOTest extends UnitilsJUnit4 {
     Unitils also offers support for checking the contents of a database with a certain dataset after a test was run. This can be useful for example when you want
     to check the result of a bulk update method or stored procedures. 
 
-    Following example tests a method that disables all user accounts that haven't been used for a whole year:
+    Following example tests a method that disables all user accounts that haven't been used for an entire year:
 
 +-----+
 @DatabaseTest
@@ -341,8 +343,8 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
     are performed on all of the test database. 
     
     This is especially powerful when you work with a SCM system such as Subversion. Suppose one developer creates a script that changes a certain 
-    table definition. The database maintainer will automatically make sure that the unit-test schema of this developer will be updated with these 
-    new changes. He can then work on the DAOs and corresponding tests to incorporate these database changes. In the mean while other developers, since 
+    table definition. The database maintainer will automatically make sure that the unit-test schema of this developer is updated with these 
+    new changes. He can then work on the DAOs and corresponding tests to incorporate these database changes. In the mean time other developers, since 
     nothing was committed, did not yet receive any new scripts or modified code. They are still working on the old database structure, but this is fine
     since they are also still using the old version of the code and corresponding tests. Eventually the developer will commit his changes and other 
     developers will receive the new script together with the code changes. The database maintainer will then automatically update their unit-test 
@@ -360,21 +362,21 @@ dbscripts/ 001_initial.sql
 
     Suppose you add a new script, this time with version number 4: <004_create_user_admin_tables.sql>. The next time you execute a database test, 
     the database maintainer will notice that the database structure is no longer up to date. It will update the database schema incrementally by 
-    executing all of the new scripts, in this case only <004_create_user_admin_tables.sql>. When the update succeeds, the database test is finally 
+    executing all of the new scripts, in this case only <004_create_user_admin_tables.sql>. When the update succeeds, the database test is 
     executed on this up to date schema.
         
     The database maintainer will also notice if one of the existing database scripts was altered. For example suppose that the <002_tracking_updates.sql> 
-    was changed by a developer. In that case, the database maintainer will first clear the database, thereby removing all tables and then recreated it 
+    was changed by a developer. In that case, the database maintainer will first clear the database, thereby removing all tables and then recreate it 
     from scratch, starting again from the first script.
     
     For performance reasons, it's a good practice to work incrementally, each time adding new update files for small database updates. This makes sure updates 
     can be executed very quickly. If desired, you can then once in a while clean up the small update scripts and replace them with one large DDL script.
+    If you database is small, you could of course also simply maintain one script and update it each time a database update is needed.
     
     By default the database maintainer will store the current version of a database schema in a <DB_VERSION> table. This way, it can determine whether
-    the database is up to date or not. This table will automatically be created if it does not yet exist. Other types of version sources are
-    also possible, you could for example create <FileVersionSource> that keeps the version in a local properties file.
+    the database is up to date or not. This table will automatically be created if it does not yet exist.
 
-    Before doing an update, all data in the database is deleted. This is done to avoid errors executing update scripts that add not-null columns or add foreign keys 
+    Before doing an update, all data in the database is deleted. This is done to avoid errors executing update scripts that add not-null columns or foreign keys 
     to existing tables. Sometimes, you can have tables of which the content may not be deleted. E.g. a table that contains read-only data such as configuration 
     settings. To enable this, it is possible to specify a number of tables for which the data should be preserved. The database maintainer can also be configured to 
     preserve tables, sequences ... that are normally dropped when rebuilding the schema from scratch. 
@@ -384,7 +386,7 @@ dbMaintainer.cleanDb.tablesToPreserve=CONFIG_TABLE, USER_TABLE  // will not be c
 dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be dropped or cleared
 +-----+
     
-    The database maintainer does more than just update the schema structure. After each update, the DBMaintainer also performs following actions:
+    The database maintainer does more than just update the schema structure. After each update, it performs following actions:
 
     * <Disable foreign key and not-null constraints>
 
@@ -403,7 +405,7 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
     
     If you're using an IDE like Eclipse or IntelliJ, the generated DTD can help you create datasets more quickly and with less chances of writing errors.
     Just add a doctype declaration to your dataset pointing to the generated DTD file and the IDE will offer you auto-completion and validation while
-    you are editing the file. The generated DTD describes the structure of the database in a DbUnit's 
+    you are editing the file. The generated DTD describes the structure of the database in DbUnit's 
     {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} format.
     
 +-----+
@@ -416,8 +418,8 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
 </dataset>
 +-----+
         
-    The database maintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates... Look at
-    the unitils-default.properties for more information! 
+    The database maintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates... Look in 
+    the source code at the file unitils-default.properties for more information! 
     
     Some functionality of the database maintainer such as for disabling constraints uses DBMS specific functionality. This functionality will only run 
     properly when the correct dialect is configured. For example, suppose you want to use oracle, you should set following property:
