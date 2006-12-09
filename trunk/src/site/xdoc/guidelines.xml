@@ -6,6 +6,15 @@
     <!-- The body of the document contains a number of sections -->
     <section name="Guidelines">        
     
+<p>Unitils started as a discussion group on unit testing. The result of this is the list of guidelines that you 
+can find on this page. These guidelines have emerged from the concrete experience of different people on various
+projects. Unitils is the result of these guidelines, it started in an attempt to write code to help implementing
+these guidelines on a project.</p>
+
+<p>The guidelines are intended to be open source as well. We have a <a href="http://sourcefore.net/forum/forum.php?forum_id=570579">
+guidelines forum</a> on which you are free to ask questions or discuss certain guidelines, or to propose new guidelines yourself.
+The source code of this page is also available in our SVN repository. To be able to edit them, you may request developer access to 
+our SVN repository.</p>
     
 <h2>1 Introduction</h2>
 
