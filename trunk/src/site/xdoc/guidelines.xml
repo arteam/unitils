@@ -1637,9 +1637,9 @@ public void testArchiveOrders() {
 <h4>Short Description</h4>
 
 <ul>
-    <li><p>Use DBUnit’s FlatXMLDataSet format for your data files</p></li>
+    <li><p>Use DBUnit’s <a href="http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html">FlatXMLDataSet</a> format for your data files</p></li>
     <li><p>Add no more data than necessary. Only fill ID columns, join condition columns and where condition columns.</p></li>
-    <li><p>When data files grow too large, split your class in multiple test classes or create method-specific data files.</p></li>
+    <li><p>When data files grow too large or become incoherent, split your class in multiple test classes or create method-specific data files.</p></li>
     <li><p>Don’t use DBUnit’s data file creation features, it will result in overly large data files.</p></li>
 </ul>
 
@@ -1677,15 +1677,35 @@ data file with the minimum required data.</p>
 
 </div>
 
+<div class="section"><h3><a name="3.8">3.8 Don't overly reuse test data between unit tests</a></h3>
 
+<h4>Short Description</h4>
 
+<p>Test data sets should only be reused between different unit tests on a limited scale. Reuse at small scale is good to limit the amount of data files, but too much reuse makes your data files brittle against change.</p>
 
-<div class="section"><h3><a name="3.8">3.8 Use a DTD in your test data files</a></h3>
+<h4>Description</h4>
+
+<p>A common misconception when thinking out a database testing strategy on a project, is that time can be saved by creating one or a few general test data sets,
+that can be reused by a large group of unit tests. This is in most cases not a good idea. The more unit tess reuse the same data set, the more brittle it becomes against 
+changes. The test data sets will also become large and incoherent.</p>
+
+<p>Image the situation that you want to add a value for a column or modify an existing one, for testing a certain boundary condition. 
+After doing the change, a number of existing tests appear to fail. As a reaction to this situation you will probably undo the change and try to find another way 
+to test this boundary condition (or not test it at all). Probably you can avoid impacting existing tests by simply adding your test data to the data set (but this 
+will also not always be the case!), which will eventually result in a very large and incoherent dataset.</p>
+
+<p>This doesn't mean you cannot share data among tests, because having more test data sets also brings along more maintenance. When changing the name of a database
+columns for example, you will probably have to update multiple datasets to make all tests pass. These changes however are mostly simple and can be performed quickly.
+A good practice is to use a test data set per test class, and in some exceptional cases a specific data set for a method.</p>
+
+</div>
+
+<div class="section"><h3><a name="3.9">3.9 Use a DTD in your test data files</a></h3>
 
 
 <h4>Short Description</h4>
 
-<p>Refer to a DTD that represents your database in your DBUnit test data files, to enable code completion when editing them.</p>
+<p>Refer to a DTD that represents your database in your DBUnit test data files, to enable code completion while editing them.</p>
 
 
 <h4>Description</h4>
@@ -1694,8 +1714,7 @@ data file with the minimum required data.</p>
 DTD from your database definition automatically using DBUnit.</p>
 
 <p>If you use Unitils’ DBMaintainer system, a DTD will be automatically created or updated on each developer’s workstation when his unit
-test database is updated. If you don’t use the DBMaintainer, you can use the ant task DBUnitDTDTask of the Unitils project to do this manually. In this
-case, it is best to maintain the DTD in your VCS and make sure that if someone changes the database structure he also updates this DTD.</p>
+test database is updated.</p>
 
 
 <h4>Examples</h4>
@@ -1721,7 +1740,7 @@ case, it is best to maintain the DTD in your VCS and make sure that if someone c
 
 
 
-<div class="section"><h3><a name="3.9">3.9 Do not test auto-generated fields</a></h3>
+<div class="section"><h3><a name="3.10">3.10 Do not test auto-generated fields</a></h3>
 
 
 <h4>Short Description</h4>
@@ -1743,12 +1762,12 @@ superclass methods. It is therefore not necessary to test it over and over again
 
 
 
-<div class="section"><h3><a name="3.10">3.10 Modify database sequences</a></h3>
+<div class="section"><h3><a name="3.11">3.11 Modify database sequences</a></h3>
 
 
 <h4>Short Description</h4>
 
-<p>When using identity or auto-increment columns and sequences,make sure they have a high enough value for running the tests. This way they
+<p>When using identity or auto-increment columns and sequences, make sure they have a high enough value for running the tests. This way they
 don’t interfere with the test data.</p>
 
 
@@ -1757,8 +1776,8 @@ don’t interfere with the test data.</p>
 <p>When a new sequence is created, it should be initialized to a sufficiently high value, so that auto generated ids and values don’t clash
 with the ids and values of the test data files.</p>
 
-<p>Many RDBMS allow identity and auto-increment columns to be overwritten with client values. Other databases, like Oracle, don’t support
-direct setting of these values but can use Unitils to make sure that the value of such a sequence contains a high enough value.</p>
+<p>When using Unitils' database maintainer for managing test database schema's, sequences and identity columns are automatically set to a
+configurable value after creation.</p>
 
 </div>
 
@@ -1766,7 +1785,7 @@ direct setting of these values but can use Unitils to make sure that the value o
 
 
 
-<div class="section"><h3><a name="3.11">3.11 Don’t use transactions</a></h3>
+<div class="section"><h3><a name="3.12">3.12 Don’t use transactions</a></h3>
 
 
 <h4>Short Description</h4>
@@ -1786,26 +1805,6 @@ transaction, so that the tests closely resemble the real situation.</p>
     <li><p>Failing tests are difficult to debug afterwards if the transaction rolled back all changes to the database.</p></li>
     <li><p>Extra baseline code is required to enable transactions in unit tests.</p></li>
 </ul>
-
-</div>
-
-
-
-
-
-<div class="section"><h3><a name="3.12">3.12 Reuse the connection</a></h3>
-
-<h4>Short Description</h4>
-
-<p>For quick execution of your unit tests, reuse the same DBUnit connection throughout a test run.</p>
-
-<h4>Description</h4>
-
-<p>Creating a new DbUnit connection every time has a cost. The overhead is much more than just creating a new JDBC connection. DbUnit needs to
-fetch tables' metadata to determine column data types. This information is cached in the DbUnit connection. Therefore we reuse the same DbUnit connection
-throughout the test suite.</p>
-
-<p>Unitils will make sure all tests will reuse the same DbUnit connection throughout a complete test run.</p>
 
 </div>
 
@@ -1850,7 +1849,8 @@ depends mainly on the correct mapping of the domain model objects with the datab
 
 <p>The last 2 problems cannot occur when using annotations for defining the mapping with the database, only when using separate mapping files. These problems 
 are usually easy to trace and to fix, but adding a unit test that verifies the complete mapping with the database all at once, helps in finding these problems 
-quickly. This is also a very cheap solution, since you only have to define this unit test once.</p>
+quickly. This is also a very cheap solution, since you only have to define this unit test once. Experience on projects has learnt us that this test ends up to
+be the most valuable test in the test suite.</p>
 
 <p>The Unitils project contains a class HibernateAssert, which implements the mapping check. The examples section shows how you can add this test to your test suite.</p>
 
@@ -1858,23 +1858,17 @@ quickly. This is also a very cheap solution, since you only have to define this 
 <h4>Examples</h4>
 
 <div class="source"><pre>
-public class HibernateMappingTest extends BaseDAOTestCase {
+public class HibernateMappingTest extends BaseHibernateDAOTest {
 
     public void testMappingToDatabase() {
-        HibernateMappingAssert.assertMappingToDatabase();
-    }
-
-
-    @Override
-    protected DatabaseOperation getSetUpOperation() throws Exception {
-        return DatabaseOperation.NONE;
+        HibernateAssert.assertMappingToDatabase();
     }
 }
 
 </pre></div>
 
-<p>The superclass BaseDAOTestCase in this example is a subclass of Unitils’ BaseHibernateTestCase. This unit test works for both a configuration with Hibernate XML mapping 
-files as a configuration with annotations.</p>
+<p>The superclass <BaseHibernateDAOTest> in this example is a base class that is configured as a Unitils base Hibernate test (read the Unitils documentation for more information). 
+This unit test works for both a configuration with Hibernate XML mapping files as when using annotations.</p>
 
 <p>Note: The method getSetUpOperation() is overridden to prevent that the BaseHibernateTestCase complains that there is no data file.</p>
 
@@ -1915,7 +1909,7 @@ files as a configuration with annotations.</p>
 <h4>Short Description</h4>
 
 <p>Add unit tests for methods that implement bulk data manipulation. The same rules apply as for testing such methods written in plain old JDBC. Make sure 
-you explicitly flush and clear the session before executing assert statements.</p>
+the Hibernate Session is flushed before you access the test database trough plain old JDBC, without the intervenience of Hibernate</p>
 
 
 <h4>Description</h4>
@@ -1923,15 +1917,14 @@ you explicitly flush and clear the session before executing assert statements.</
 <p>The guideline <a href="#3.6">Testing bulk data manipulation methods</a> explains how unit tests can be written for bulk data manipulation methods. The same rules apply for 
 testing with such methods written in HQL.</p>
 
-<p>Make sure that, when comparing the database contents with a result data file, the Hibernate session is explicity flushed. Otherwise, the update that you 
-want to test will most probably not be executed on the database yet when you call assertDBContentAsExpected().</p>
+<p>Make sure that, when comparing the database contents with a result data file, the Hibernate session is being flushed. Otherwise, the update that you 
+want to test will most probably not be executed on the database yet when you perform the check. When making use of Unitils, the Hibernate session is automatically flushed
+before doing the check.</p>
 
 
 <h4>Examples</h4>
 
-<p><a href="#3.6">Testing bulk data manipulation methods</a> provides a good example. The only difference is that flushAndClearSession() must be called before executing 
-assertDBContentAsExpected().</p>
-
+<p>The example in <a href="#3.6">Testing bulk data manipulation methods</a> is equally applicable when using Hibernate for doing the bulk data manipulation.</p>
 
 </div>
 
