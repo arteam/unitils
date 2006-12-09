@@ -445,7 +445,7 @@ database.dialect=oracle
 ** Testing with Hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Even when using such a mapping tool, unit 
+    An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Even when using such a O/R mapping tool, unit 
     tests remain valuable. They can ensure the mapping of the Hibernate mapped classes is always in sync with the database and can be used for 
     easy and quick testing of HQL queries.
 
