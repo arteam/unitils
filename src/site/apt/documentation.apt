@@ -445,19 +445,19 @@ database.dialect=oracle
 ** Testing with Hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Unit tests remain valuable, for ensuring the
-    mapping of the Hibernate mapped classes is always in sync with the database, and for easy and quick testing of HQL queries.
+    An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Even when using such a mapping tool, unit 
+    tests remain valuable. They can ensure the mapping of the Hibernate mapped classes is always in sync with the database and can be used for 
+    easy and quick testing of HQL queries.
 
+    A HQL method can be tested exactly the same way as described above in Managing test data with DbUnit. The <@ExpectedDataSet> annotation can also be 
+    used for result checking with a data file. To make sure all database updates performed during the test are actually executed on the database, Unitils 
+    will ensure that the Hibernate Session is flushed before performing the check, 
     
-    
-    A HQL method can be tested exactly the same way as described above in Managing test data with DbUnit. 
-    The <@ExpectedDataSet> annotation can also be used for result checking with a data file. Unitils will make sure the Hibernate Session is flushed before
-    performing the check, to make sure all database updates performed during the test are actually executed on the database.
 
 *** Testing the mapping
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-    Unitils is shipped with a ready-to-use unit test that verifies if the mapping of all your mapped classes is consistent with the database. This
+    Unitils is shipped with a ready-to-use unit test that verifies whether the mapping of all your mapped classes is consistent with the database. This
     test is not automatically executed; you should write a unit test that looks like the following:
 
 +-----+
@@ -469,7 +469,6 @@ public class HibernateMappingTest extends BaseHibernateTest {
 }
 +-----+
 
-    In this example, <BaseHibernateTest> is a custom project base class, that handles all Unitils-Hibernate configuration. See the {{cookbook}} for an example.
     The method <HibernateAssert.assertMappingToDatabase()> checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
     the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
     
@@ -478,16 +477,27 @@ alter table PERSON add column lastName varchar(255);
 alter table PRODUCT add column barCode varchar(255);
 +-----+
 
-
-    Unitils provides out-of-the box configuration support for Hibernate. When properly configured, Unitils' database and DbUnit support can be used like
-    described in the database testing chapter above. Unitils performs loading the configuration and managing the Hibernate Session for you. 
+    Unitils provides out-of-the box configuration support for Hibernate. When you annotate a Hibernate test class or the superclass with the 
+    <@HibernateTest> annotation, Unitils will perform loading the configuration and managing the Hibernate Session for you. In the configuration
+    you can specify one or more hibernate configuration files that should be loaded in the tests:
     
-    A Hibernate test class or the superclass should be annotated with <@HibernateTest>.    
-    Using the property <HibernateModule.hibernate.configfiles>, you can specify one or more hibernate configuration files that should be loaded. You can also
-    do (extra) programmatic configuration by annotating a method with <@HibernateConfiguration> in your test superclass.
++-----+
+HibernateModule.hibernate.configfiles=hibernate-general.cfg.xml, hibernate-unittest.cfg.xml
++-----+
     
-    To obtain a Hibernate Session for injection in your own data access layer, you can use the <@HibernateSession> annotation on a method or on a field.
-    An example Hibernate test base class could look like the following:
+    Extra programmatic configuration can also be performed by annotating a method with <@HibernateConfiguration> in your test (super)class. Unitils
+    will then call this method passing the hibernate configuration as an argument:
+    
++-----+
+@HibernateConfiguration
+void configureHibernate(org.hibernate.cfg.Configuration configuration) {
+    ...
+}   
++-----+
+    
+    To obtain a Hibernate Session you can use the <@HibernateSession> annotation on a method or on a field of your test. You can then inject this session
+    in your own data access layer. Typically this is coded once in a superclass for all your hibernate tests. An simple example Hibernate test base class 
+    could look as follows:
 
 +-----+
 @HibernateTest
