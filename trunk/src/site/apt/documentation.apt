@@ -847,63 +847,75 @@ private UserDao mockUserDao;
 
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
-   Unitils provides services that simplify mock injection in various ways. Unitils' injection support is in the first place intended for 
-   projects that use an IOC framework like Spring to wire up objects. E.g.
+    Unitils provides services that simplify mock injection in various ways. Following example shows how a 
+    UserDao mock is created and injected in the the userService:
 
 +-----+
-  @Mock @Inject(property = "userDao")
-  private UserDao mockUserDao;
+@Mock @Inject(property = "userDao")
+private UserDao mockUserDao;
 
-  @TestedObject
-  private UserService userService;
+@TestedObject
+private UserService userService;
 +-----+
 
-  Before executing a test method in the above example, but after the test fixture, the mockUserDao will be injected into the userDao property of the userService.
-  The value for the attribute property of @Inject can be an arbitrary OGNL expression. Getter / setter and field access may be mixed and private access is also supported.
+    Before executing a test method in the above example, but after the test fixture, the <@Inject> annotation will cause the 
+    mockUserDao to be injected into the userDao property of the userService. The value for the attribute property of @Inject can 
+    be an arbitrary {{{http://www.ognl.org/}OGNL}} expression. Getter / setter and field access may be mixed and private access 
+    is also supported.
   
-  The target object for injection is by default the field that is annotated as TestedObject. Multiple fields may be annotated as TestedObject, in this case the object
-  will be injected into every annotated field. If injection is not possible (e.g. a property in the OGNL expression doens't exist), the test fails.
+    The target object for injection is by default the field that is annotated as TestedObject. Multiple fields may be annotated as TestedObject, 
+    in this case the object will be injected into every annotated field. If injection is not possible (e.g. a property in the OGNL 
+    expression doens't exist), the test fails.
   
-  The target object can also specified explicitly, using the target attribute on the Inject annotation:
+    The target object can also specified explicitly, using the target attribute on the Inject annotation:
   
 +-----+
-  @Mock @Inject(target = "userService", property = "userDao")
-  private UserDao mockUserDao;
+@Mock @Inject(target = "userService", property = "userDao")
+private UserDao mockUserDao;
 
-  private UserService userService;
+private UserService userService;
 +-----+
   
-  The injection module also supports automatically injecting objects into the target by type. E.g.
+    The previous example showed how you could explicitly inject mocks by specifying the name of the target property. Unitils also 
+    supports injecting objects into the target automatically by type. E.g.
   
 +-----+
-  @Mock @AutoInject
-  private UserDao mockUserDao;
+@Mock @AutoInject
+private UserDao mockUserDao;
 
-  @TestedObject
-  private UserService userService;
+@TestedObject
+private UserService userService;
 +-----+
 
-  The mockUserDao will be injected into a property of userService with the type UserDao or a superclass or interface of UserDao. If more than one candidate target property exists, the most specific one
-  is chosen. If no single most specific target property can be found, a UnitilsException is thrown and the test fails.
+    The mockUserDao will be injected into a property of userService with the type UserDao or a superclass or interface of UserDao. 
+    If more than one candidate target property exists, the most specific one is chosen. If no single most specific target property can 
+    be found, a UnitilsException is thrown and the test fails.
   
-  The variant of the Inject and AutoInject annotation are foreseen, for injection into a static field or setter method. These are called InjectStatic and AutoInjectStatic, respectively.
-  A common use of these annotations is to inject a mock into a singleton class.
+    There are also a variant of the <@Inject> and <@AutoInject> annotations provided, for injection into static fields or setter methods. 
+    These are called <@InjectStatic> and <@AutoInjectStatic>, respectively. A common use of these annotations is to inject a mock 
+    into a singleton class.
+
+
+
 
 *** Mock injection when using a Service Locator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  An AfterCreateMock annotation is foreseen, that allows intercepting a mock immediately after creation. The annotated method takes as parameters an Object (the mock), a String (the name of the field
-  to which the mock is assigned) and a Class (the type of the mock object). This method could be implemented as follows:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The above way of injecting mocks is very powerful and easy, but sometimes applications are not coded in such a way that makes this possible. 
+    It could be for example, that an application uses a service locator instead of the typical {{{http://www.springframework.org}Spring}}
+    way of providing a setter and a field for your services, and so there nothing to inject the mock into. 
+    
+    To resolve this, an <@AfterCreateMock> annotation is provided that allows intercepting a mock immediately after creation. The annotated method 
+    takes as parameters an Object (the mock), a String (the name of the field to which the mock is assigned) and a Class 
+    (the type of the mock object). The mock instance can then be used to for example register the mock in the service locator. 
+    For example, this method could be implemented as follows:
   
 +-----+
-
-  @AfterCreateMock
-  protected final void injectMock(Object mock, String name, Class type) {
-     ServiceLocator.injectService(type, mock);
-  }
-  
+@AfterCreateMock
+protected final void injectMock(Object mock, String name, Class type) {
+    ServiceLocator.injectService(type, mock);
+}
 +----+
 
-  The method ServiceLocator.injectService make sure that when the ServiceLocator is requested for an implementation of UserDao, the mock is returned. This allows for a very simple way 
-  of using mock object in combination with a ServiceLocator.
+    The method ServiceLocator.injectService make sure that when the ServiceLocator is requested for an implementation of UserDao, 
+    the mock is returned. This allows for a very simple way of using mock object in combination with such a service locator.
 
