@@ -18,7 +18,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/cookbook.apt" afterPath="$PROJECT_DIR$/src/site/apt/cookbook.apt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/documentation.apt" afterPath="$PROJECT_DIR$/src/site/apt/documentation.apt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/site/resources/unitils-default.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
