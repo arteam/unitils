@@ -25,6 +25,7 @@ import org.unitils.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -228,7 +229,11 @@ public class InjectionUtils {
             }
         }
         // Setter to inject into found, inject the object
-        ReflectionUtils.invokeMethod(target, setterToInjectTo, objectToInject);
+        try {
+            ReflectionUtils.invokeMethod(target, setterToInjectTo, objectToInject);
+        } catch (InvocationTargetException e) {
+            throw new UnitilsException("Exception thrown by target", e);
+        }
     }
 
     /**
@@ -242,7 +247,11 @@ public class InjectionUtils {
 
         Method staticGetter = ReflectionUtils.getGetter(targetClass, staticProperty, true);
         if (staticGetter != null) {
-            return ReflectionUtils.invokeMethod(targetClass, staticGetter);
+            try {
+                return ReflectionUtils.invokeMethod(targetClass, staticGetter);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Exception thrown by target", e);
+            }
         } else {
             Field staticField = ReflectionUtils.getFieldWithName(targetClass, staticProperty, true);
             if (staticField != null) {
@@ -266,7 +275,11 @@ public class InjectionUtils {
     private static boolean setValueStatic(Class targetClass, String staticProperty, Object value) {
         Method staticSetter = ReflectionUtils.getSetter(targetClass, staticProperty, true);
         if (staticSetter != null) {
-            ReflectionUtils.invokeMethod(targetClass, staticSetter, value);
+            try {
+                ReflectionUtils.invokeMethod(targetClass, staticSetter, value);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Exception thrown by target", e);
+            }
             return true;
         } else {
             Field staticField = ReflectionUtils.getFieldWithName(targetClass, staticProperty, true);

@@ -36,6 +36,7 @@ import org.unitils.util.ReflectionUtils;
 import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
@@ -201,9 +202,14 @@ public class DatabaseModule implements Module {
 
             } catch (UnitilsException e) {
 
-                throw new UnitilsException("Unable to invoke method annotated with @" + TestDataSource.class.getSimpleName() +
+                throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." +
+                        methods.get(0).getName() + " annotated with @" + TestDataSource.class.getSimpleName() +
                         " Ensure that this method has following signature: void myMethod(" + DataSource.class.getName() +
                         " dataSource)", e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." +
+                        methods.get(0).getName() + " annotated with " + TestDataSource.class.getSimpleName() +
+                        " has thrown an exception", e.getCause());
             }
         }
     }

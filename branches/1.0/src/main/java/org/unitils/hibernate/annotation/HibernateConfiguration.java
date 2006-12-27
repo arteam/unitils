@@ -21,10 +21,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation indicating that this method should be executed after the Hibernate <code>org.hibernate.cfg.Configuration</code>
- * has been created, but before the Hibernate <code>SessionFactory</code> is instantiated. Annotated methods can perform
- * programmatic Hibernate configuration, such as registering mapped classes. Annotated methods should have following
- * signature: void myMethod(org.hibernate.cfg.Configuration configuration)
+ * Annotation indicating that this method creates and returns an instance of the <code>org.hibernate.cfg.Configuration</code>
+ * The annotated method should one or more hibernate configuration files and optionally do some extra programmatic Hibernate
+ * configuration, such as registering mapped classes. The returned configuration will be manipulated afterwards to make
+ * sure the <code>DataSource</code> provided by the {@link org.unitils.database.DatabaseModule} is used by Hibernate.
+ * The method should have following signature: <code>org.hibernate.Configuration myMethod()</code>
  *
  * @author Filip Neven
  */

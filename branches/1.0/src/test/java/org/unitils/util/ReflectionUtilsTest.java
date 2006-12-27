@@ -20,6 +20,7 @@ import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Test for {@link ReflectionUtils}.
@@ -153,7 +154,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for performing a method invocation.
      */
-    public void testInvokeMethod() {
+    public void testInvokeMethod() throws InvocationTargetException {
         Object result = ReflectionUtils.invokeMethod(testObject, fieldSetterMethod, "newValue");
         assertNull(result);
         assertEquals("newValue", testObject.getField());
@@ -163,7 +164,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Test for performing a method invocation. Null value
      */
-    public void testInvokeMethod_null() {
+    public void testInvokeMethod_null() throws InvocationTargetException {
         Object result = ReflectionUtils.invokeMethod(testObject, fieldSetterMethod, (Object) null);
         assertNull(result);
         assertNull(testObject.getField());

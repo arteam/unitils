@@ -30,11 +30,11 @@ import org.unitils.hibernate.annotation.HibernateTest;
 import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Properties;
 
@@ -44,13 +44,12 @@ import java.util.Properties;
  * <p/>
  * This module depends on the {@link DatabaseModule}, for managing connections to a unit test database.
  * <p/>
- * The configuration of Hibernate is performed by loading all configuration files associated with the property key
- * {@link #PROPKEY_HIBERNATE_CONFIGFILES}, using the Hibernate configuration class associated with the property key
- * {@link #PROPKEY_HIBERNATE_CONFIGURATION_CLASS}. Support for programmatic configuration is also foreseen: all methods
- * annotated with {@link HibernateConfiguration} will be invoked with the Hibernate <code>Configuration</code> object
- * as parameters, before the Hibernate <code>SesssionFactory</code> is constructed.
+ * The configuration of Hibernate is performed by executing the method annotated with {@link HibernateConfiguration}.
+ * This method should take no parameters and return a Hibernate <code>Configuration</code> object. The property
+ * 'hibernate.connection.provider_class' is overwritten by Unitils, it is set to {@link HibernateConnectionProvider}.
+ * This makes sure that Hibernate connects with the unit test database configured by the {@link DatabaseModule}.
  * <p/>
- * A Hibernate <code>Session</code> is created before each test setup, and closed after eacht test's teardown.
+ * A Hibernate <code>Session</code> is created before each test setup, and closed after each test's teardown.
  * This session will connect to the unit test database as configured by the {@link DatabaseModule}. The session will be
  * injected to fields or methods annotated with {@link HibernateSession} before each test setup. This way, the Hibernate
  * session can easily be injected into the tested environment.
@@ -65,12 +64,6 @@ public class HibernateModule implements Module {
 
     private static final Logger logger = Logger.getLogger(HibernateModule.class);
 
-    /* Property key for a comma seperated list of Hibernate configuration files, that can be found in the classpath */
-    public static final String PROPKEY_HIBERNATE_CONFIGFILES = "HibernateModule.hibernate.configfiles";
-
-    /* Property key for the Hibernate configuration class that is used */
-    public static final String PROPKEY_HIBERNATE_CONFIGURATION_CLASS = "HibernateModule.hibernate.configurationclass";
-
     /* The Hibernate configuration */
     private Configuration hibernateConfiguration;
 
@@ -80,24 +73,13 @@ public class HibernateModule implements Module {
     /* The Hibernate Session that is used in unit tests */
     private Session currentHibernateSession;
 
-    /* Fully qualified class name of the Hibernate Configuration class that is used */
-    private String configurationClassName;
-
-    /* List of Hibernate configuration files */
-    private List<String> configFileNames;
-
     /**
-     * Initializes the module. The given <code>Configuration</code> object should contain values for the properties
-     * {@link #PROPKEY_HIBERNATE_CONFIGFILES}, and {@link #PROPKEY_HIBERNATE_CONFIGURATION_CLASS}
+     * Initializes the module.
      *
      * @param configuration The Unitils configuration, not null
      */
     public void init(org.apache.commons.configuration.Configuration configuration) {
-
-        configFileNames = configuration.getList(PROPKEY_HIBERNATE_CONFIGFILES);
-        configurationClassName = configuration.getString(PROPKEY_HIBERNATE_CONFIGURATION_CLASS);
     }
-
 
     /**
      * Checks whether the given test instance is a hibernate test, i.e. is annotated with the {@link HibernateTest} annotation.
@@ -115,12 +97,13 @@ public class HibernateModule implements Module {
     }
 
     /**
-     * Configurates Hibernate, i.e. creates a Hibernate configuration object, and instantiates the Hibernate
-     * <code>SessionFactory</code>. The class-level JavaDoc explains how Hibernate is to be configured.
+     * Configurates Hibernate, i.e. calls that method that should create the Hibernate configuration object, and
+     * instantiates the Hibernate <code>SessionFactory</code>. The class-level JavaDoc explains how Hibernate is to be
+     * configured.
      *
      * @param testObject
      */
-    protected void configureHibernate(Object testObject) {
+    public void configureHibernate(Object testObject) {
 
         if (hibernateConfiguration == null) {
             hibernateConfiguration = createHibernateConfiguration(testObject);
@@ -129,21 +112,19 @@ public class HibernateModule implements Module {
     }
 
     /**
-     * Creates completely configured Hibernate <code>Configuration</code> object. Loads all hibernate configuration files
-     * listed in the property {@link #PROPKEY_HIBERNATE_CONFIGFILES} of the Unitils configuration. Also executes all
-     * methods in the test class annotated with {@link HibernateConfiguration}.
+     * Creates completely configured Hibernate <code>Configuration</code> object. Executes the method in the test class
+     * annotated with {@link HibernateConfiguration} to retrieve a <code>Configuration</code> object.
      * Unitils' own implementation of the Hibernate <code>ConnectionProvider</code>, {@link HibernateConnectionProvider},
      * is set as connection provider. This object makes sure that Hibernate uses connections of Unitils' own
      * <code>DataSource</code>.
      *
-     * @param test The test object
+     * @param testObject The test object
      * @return the Hibernate configuration
      */
-    private Configuration createHibernateConfiguration(Object test) {
+    private Configuration createHibernateConfiguration(Object testObject) {
 
         logger.info("Configuring Hibernate");
-        Configuration hbnConfiguration = createHibernateConfiguration();
-        callHibernateConfigurationMethods(test, hbnConfiguration);
+        Configuration hbnConfiguration = getUserHibernateConfiguration(testObject);
         if (hbnConfiguration.getProperty(Environment.CONNECTION_PROVIDER) != null) {
             logger.warn("The property " + Environment.CONNECTION_PROVIDER + " is present in your Hibernate configuration. " +
                     "This property will be overwritten with Unitils own ConnectionProvider implementation!");
@@ -155,47 +136,39 @@ public class HibernateModule implements Module {
     }
 
     /**
-     * Creates an unconfigured instance of <code>Configuration</code>
-     *
-     * @return a Hibernate <code>Configuration</code> object
-     */
-    protected Configuration createHibernateConfiguration() {
-
-        Configuration hbnConfiguration;
-        try {
-            hbnConfiguration = (Configuration) Class.forName(configurationClassName).newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new UnitilsException("Invalid configuration class " + configurationClassName, e);
-        } catch (IllegalAccessException e) {
-            throw new UnitilsException("Illegal access to configuration class " + configurationClassName, e);
-        } catch (InstantiationException e) {
-            throw new UnitilsException("Exception while instantiating instance of class " + configurationClassName, e);
-        }
-        for (String configFileName : configFileNames) {
-            if (!StringUtils.isEmpty(configFileName)) {
-                hbnConfiguration.configure(configFileName);
-            }
-        }
-        return hbnConfiguration;
-    }
-
-    /**
      * Calls all methods annotated with {@link HibernateConfiguration}, so that they can perform extra Hibernate
      * configuration before the <code>SessionFactory</code> is created.
      *
      * @param testObject
-     * @param configuration
      */
-    private void callHibernateConfigurationMethods(Object testObject, Configuration configuration) {
+    private Configuration getUserHibernateConfiguration(Object testObject) {
 
+        Configuration configuration;
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), HibernateConfiguration.class);
-        for (Method method : methods) {
+        if (methods.size() > 1) {
+            throw new UnitilsException(methods.size() + " methods found in " + testObject.getClass().getSimpleName() +
+                    " that are annotated with " + HibernateConfiguration.class.getSimpleName() +
+                    ". Only one such method should exist");
+        } else if (methods.size() == 0) {
+            throw new UnitilsException("No method found in " + testObject.getClass().getSimpleName() +
+                    " that is annotated with " + HibernateConfiguration.class.getSimpleName());
+        } else {
             try {
-                ReflectionUtils.invokeMethod(testObject, method, configuration);
+                configuration = ReflectionUtils.invokeMethod(testObject, methods.get(0));
+                 if (configuration == null) {
+                    throw new UnitilsException("The configuration object returned by " + testObject.getClass().getSimpleName() +
+                            "." + methods.get(0).getName() + " (annotated with " + HibernateConfiguration.class.getSimpleName() +
+                            ") should not return a null value");
+                }
+                return configuration;
             } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to invoke method annotated with @" +
-                        HibernateConfiguration.class.getSimpleName() + ". Ensure that this method has following signature: " +
-                        "void myMethod(" + Configuration.class.getName() + " configuration)", e);
+                throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." +
+                    methods.get(0).getName() + " (annotated with @" + HibernateConfiguration.class.getSimpleName() +
+                    "). Ensure that this method has following signature: " + Configuration.class.getName() + " myMethod()", e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." +
+                        methods.get(0).getName() + " (annotated with @" + HibernateConfiguration.class.getSimpleName() +
+                        ") has thrown an exception", e.getCause());
             }
         }
     }
@@ -205,7 +178,7 @@ public class HibernateModule implements Module {
      *
      * @param testObject
      */
-    protected void injectHibernateSession(Object testObject) {
+    public void injectHibernateSession(Object testObject) {
 
         List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), HibernateSession.class);
         for (Field field : fields) {
@@ -230,6 +203,10 @@ public class HibernateModule implements Module {
                 throw new UnitilsException("Unable to invoke method annotated with @" +
                         HibernateSession.class.getSimpleName() + ". Ensure that this method has following signature: " +
                         "void myMethod(" + Session.class.getName() + " session)", e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." +
+                        methods.get(0).getName() + " (annotated with " + HibernateSession.class.getSimpleName() +
+                        ") has thrown an exception", e.getCause());
             }
         }
     }
