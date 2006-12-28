@@ -16,13 +16,15 @@
  package org.unitils.sample.eshop.dao;
 
 import org.unitils.sample.eshop.model.User;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  *
  */
-public class DiscountDao extends HibernateDao {
+public class DiscountDao extends HibernateDaoSupport {
 
     public long calculateTotalPurchaseAmount(User user) {
+
         return (Long) getSession().createQuery("select sum(item.amount) from ShoppingBasket basket left join " +
                 "basket.items item where basket.user = :user").setParameter("user", user).uniqueResult();
     }
