@@ -218,7 +218,7 @@ abstract public class DbSupport {
      * @param sequenceName
      * @return the value of the sequence with the given name
      */
-    abstract public long getNextValueOfSequence(String sequenceName) throws SQLException;
+    abstract public long getCurrentValueOfSequence(String sequenceName) throws SQLException;
 
     /**
      * Sets the next value of the sequence with the given sequence name to the given sequence value.
@@ -330,7 +330,7 @@ abstract public class DbSupport {
     }
 
     /**
-     * Returns the constraint names for the table with the given name
+     * Returns the foreign key and not null constraint names that are enabled/enforced for the table with the given name
      *
      * @param tableName
      * @return

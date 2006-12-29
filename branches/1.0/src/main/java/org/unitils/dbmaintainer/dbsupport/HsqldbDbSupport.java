@@ -45,14 +45,15 @@ public class HsqldbDbSupport extends DbSupport {
         statementHandler.handle(dropTableSQL);
     }
 
-    public long getNextValueOfSequence(String sequenceName) throws SQLException {
+    public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         Connection conn = null;
         Statement st = null;
         ResultSet rset = null;
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rset = st.executeQuery("select next value for " + sequenceName + " from INFORMATION_SCHEMA.SYSTEM_SEQUENCES");
+            rset = st.executeQuery("select START_WITH from INFORMATION_SCHEMA.SYSTEM_SEQUENCES where SEQUENCE_SCHEMA = '" +
+                    schemaName + "' and SEQUENCE_NAME = '" + sequenceName + "'");
             rset.next();
             return rset.getLong(1);
         } finally {
