@@ -27,6 +27,7 @@ import org.unitils.database.DatabaseModule;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateTest;
+import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
@@ -155,12 +156,6 @@ public class HibernateModule implements Module {
         } else {
             try {
                 configuration = ReflectionUtils.invokeMethod(testObject, methods.get(0));
-                 if (configuration == null) {
-                    throw new UnitilsException("The configuration object returned by " + testObject.getClass().getSimpleName() +
-                            "." + methods.get(0).getName() + " (annotated with " + HibernateConfiguration.class.getSimpleName() +
-                            ") should not return a null value");
-                }
-                return configuration;
             } catch (UnitilsException e) {
                 throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." +
                     methods.get(0).getName() + " (annotated with @" + HibernateConfiguration.class.getSimpleName() +
@@ -168,6 +163,59 @@ public class HibernateModule implements Module {
             } catch (InvocationTargetException e) {
                 throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." +
                         methods.get(0).getName() + " (annotated with @" + HibernateConfiguration.class.getSimpleName() +
+                        ") has thrown an exception", e.getCause());
+            }
+        }
+        if (configuration == null) {
+        throw new UnitilsException("The configuration object returned by " + testObject.getClass().getSimpleName() +
+                "." + methods.get(0).getName() + " (annotated with " + HibernateConfiguration.class.getSimpleName() +
+                ") should not return a null value");
+        }
+        return configuration;
+    }
+
+    /**
+     * Creates the Hibernate <code>SessionFactory</code>
+     */
+    private void createHibernateSessionFactory() {
+
+        logger.debug("Creating Hibernate SessionFactory");
+        hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
+    }
+
+    /**
+     * Injects the Hibernate <code>SessionFactory</code> into all fields and methods that are annotated with
+     * {@link HibernateSessionFactory}
+     *
+     * @param testObject
+     */
+    public void injectHibernateSessionFactory(Object testObject) {
+        List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
+        for (Field field : fields) {
+            try {
+                ReflectionUtils.setFieldValue(testObject, field, getHibernateSessionFactory());
+
+            } catch (UnitilsException e) {
+
+                throw new UnitilsException("Unable to assign the hibernate Session to field annotated with @" +
+                        HibernateSessionFactory.class.getSimpleName() + "Ensure that this field is of type " +
+                        SessionFactory.class.getName(), e);
+            }
+        }
+
+        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
+        for (Method method : methods) {
+            try {
+                ReflectionUtils.invokeMethod(testObject, method, getHibernateSessionFactory());
+
+            } catch (UnitilsException e) {
+
+                throw new UnitilsException("Unable to invoke method annotated with @" +
+                        HibernateSessionFactory.class.getSimpleName() + ". Ensure that this method has following signature: " +
+                        "void myMethod(" + SessionFactory.class.getName() + " sessionFactory)", e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." +
+                        methods.get(0).getName() + " (annotated with " + HibernateSessionFactory.class.getSimpleName() +
                         ") has thrown an exception", e.getCause());
             }
         }
@@ -212,19 +260,22 @@ public class HibernateModule implements Module {
     }
 
     /**
-     * Creates the Hibernate <code>SessionFactory</code>
-     */
-    private void createHibernateSessionFactory() {
-
-        logger.debug("Creating Hibernate SessionFactory");
-        hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
-    }
-
-    /**
      * @return The Hibernate Configuration object
      */
     public Configuration getHibernateConfiguration() {
         return hibernateConfiguration;
+    }
+
+    /**
+     * @return The Hibernate SessionFactory
+     */
+    private SessionFactory getHibernateSessionFactory() {
+        if (hibernateSessionFactory == null) {
+            Configuration hibernateConfiguration = getHibernateConfiguration();
+            logger.debug("Creating Hibernate SessionFactory");
+            hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
+        }
+        return hibernateSessionFactory;
     }
 
     /**
@@ -238,7 +289,7 @@ public class HibernateModule implements Module {
 
         if (currentHibernateSession == null || !currentHibernateSession.isOpen()) {
             logger.debug("No Hibernate Session available. Creating a new one");
-            currentHibernateSession = hibernateSessionFactory.openSession();
+            currentHibernateSession = getHibernateSessionFactory().openSession();
         }
         return currentHibernateSession;
     }
@@ -271,8 +322,7 @@ public class HibernateModule implements Module {
     private DatabaseModule getDatabaseModule() {
 
         Unitils unitils = Unitils.getInstance();
-        DatabaseModule dbModule = unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
-        return dbModule;
+        return unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
     /**
@@ -308,6 +358,7 @@ public class HibernateModule implements Module {
         public void beforeTestMethod(Object testObject, Method testMethod) {
 
             if (isHibernateTest(testObject.getClass())) {
+                injectHibernateSessionFactory(testObject);
                 injectHibernateSession(testObject);
             }
         }
