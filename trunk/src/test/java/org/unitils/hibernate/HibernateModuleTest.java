@@ -61,15 +61,7 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        hibernateModule = new HibernateModule() {
-
-            @Override
-            protected Configuration createHibernateConfiguration() {
-                return mockHibernateConfiguration;
-            }
-
-        };
-
+        hibernateModule = new HibernateModule();
         hbnTest = new HbnTest();
     }
 
@@ -89,13 +81,12 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
     public void testConfigureHibernate() {
 
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
-        expect(mockHibernateConfiguration.addProperties(null)).andStubReturn(mockHibernateConfiguration);
         expect(mockHibernateSessionFactory.openSession()).andStubReturn(mockHibernateSession);
         replay();
 
         hibernateModule.configureHibernate(hbnTest);
 
-        assertSame(mockHibernateConfiguration, hbnTest.getConfiguration());
+        assertSame(mockHibernateConfiguration, hibernateModule.getHibernateConfiguration());
     }
 
     /**
@@ -105,7 +96,6 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
     public void testInjectHibernateSession() {
 
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
-        expect(mockHibernateConfiguration.addProperties(null)).andStubReturn(mockHibernateConfiguration);
         expect(mockHibernateSession.isOpen()).andReturn(false);
         expect(mockHibernateSessionFactory.openSession()).andStubReturn(mockHibernateSession);
         replay();
@@ -121,8 +111,8 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
      * Tests the correct closing of the active Hibernate Session
      */
     public void testCloseSession() {
+
         expect(mockHibernateConfiguration.buildSessionFactory()).andStubReturn(mockHibernateSessionFactory);
-        expect(mockHibernateConfiguration.addProperties(null)).andStubReturn(mockHibernateConfiguration);
         expect(mockHibernateSessionFactory.openSession()).andStubReturn(mockHibernateSession);
         expect(mockHibernateSession.isOpen()).andReturn(true);
         expect(mockHibernateSession.close()).andReturn(null);
@@ -138,9 +128,7 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
      * a method annotated with @HibernateConfiguration (should be called when configuring Hibernate)
      */
     @HibernateTest
-    public static class HbnTest {
-
-        private Configuration configuration;
+    public class HbnTest {
 
         @HibernateSession
         private Session sessionField;
@@ -148,17 +136,13 @@ public class HibernateModuleTest extends UnitilsJUnit3 {
         private Session sessionMethod;
 
         @HibernateConfiguration
-        public void configureHibernate(Configuration configuration) {
-            this.configuration = configuration;
+        public Configuration getHibernateConfiguration() {
+            return mockHibernateConfiguration;
         }
 
         @HibernateSession
         public void afterCreateHibernateSession(Session session) {
             this.sessionMethod = session;
-        }
-
-        public Configuration getConfiguration() {
-            return configuration;
         }
 
         public Session getSessionField() {
