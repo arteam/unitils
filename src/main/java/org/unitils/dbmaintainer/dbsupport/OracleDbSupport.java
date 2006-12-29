@@ -38,7 +38,7 @@ public class OracleDbSupport extends DbSupport {
         statementHandler.handle(dropTableSQL);
     }
 
-    public long getNextValueOfSequence(String sequenceName) throws SQLException {
+    public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -109,7 +109,7 @@ public class OracleDbSupport extends DbSupport {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             rs = st.executeQuery("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" +
-                    tableName + "' and CONSTRAINT_TYPE <> 'P'");
+                    tableName + "' and (CONSTRAINT_TYPE = 'R' or CONSTRAINT_TYPE = 'C') and STATUS = 'ENABLED'");
             Set<String> constraintNames = new HashSet<String>();
             while (rs.next()) {
                 constraintNames.add(rs.getString("CONSTRAINT_NAME"));
