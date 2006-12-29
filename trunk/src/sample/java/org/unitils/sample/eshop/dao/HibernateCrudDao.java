@@ -15,10 +15,12 @@
  */
 package org.unitils.sample.eshop.dao;
 
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+
 /**
  * 
  */
-public class HibernateCrudDao<T> extends HibernateDao {
+public class HibernateCrudDao<T> extends HibernateDaoSupport {
 
     private Class<T> mappedClass;
 

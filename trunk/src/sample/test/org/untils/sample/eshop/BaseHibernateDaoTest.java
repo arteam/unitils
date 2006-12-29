@@ -16,10 +16,21 @@
 package org.untils.sample.eshop;
 
 import org.unitils.UnitilsJUnit3;
+import org.unitils.inject.annotation.Inject;
 import org.unitils.sample.eshop.dao.HibernateSessionManager;
+import org.unitils.sample.eshop.dao.DiscountDao;
 import org.unitils.hibernate.annotation.HibernateTest;
 import org.unitils.hibernate.annotation.HibernateSession;
+import org.unitils.hibernate.annotation.HibernateConfiguration;
+import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
 
 /**
  * 
@@ -27,8 +38,16 @@ import org.hibernate.Session;
 @HibernateTest
 public abstract class BaseHibernateDaoTest extends UnitilsJUnit3 {
 
-    @HibernateSession
-    public void injectHibernateSession(Session session) {
-        HibernateSessionManager.injectSession(session);
+    @HibernateSessionFactory
+    @Inject(property = "sessionFactory")
+    private SessionFactory hibernateSessionFactory;
+
+    @HibernateConfiguration
+    private Configuration createHibernateConfiguration() {
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("/eshop-config.xml");
+        LocalSessionFactoryBean sessionFactoryBean = (LocalSessionFactoryBean)
+                applicationContext.getBean("&sessionFactoryBean");
+        return sessionFactoryBean.getConfiguration();
     }
+
 }
