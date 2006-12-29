@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer.constraints;
 
+import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
+
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -27,10 +29,7 @@ import java.sql.SQLException;
  *
  * @author Filip Neven
  */
-public class ConstraintsCheckDisablingDataSource implements DataSource {
-
-    /* The TestDataSource that is wrapped */
-    private DataSource wrappedDataSource;
+public class ConstraintsCheckDisablingDataSource extends BaseDataSourceDecorator {
 
     /* The implementation of ConstraintsDisabler that is used */
     private ConstraintsDisabler constraintsDisabler;
@@ -42,8 +41,8 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
      * @param constraintsDisabler
      */
     public ConstraintsCheckDisablingDataSource(DataSource wrappedDataSource, ConstraintsDisabler constraintsDisabler) {
+        super(wrappedDataSource);
         this.constraintsDisabler = constraintsDisabler;
-        this.wrappedDataSource = wrappedDataSource;
     }
 
     /**
@@ -53,7 +52,7 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
      * @see javax.sql.DataSource#getConnection()
      */
     public Connection getConnection() throws SQLException {
-        Connection conn = wrappedDataSource.getConnection();
+        Connection conn = super.getConnection();
         constraintsDisabler.disableConstraintsOnConnection(conn);
         return conn;
     }
@@ -65,36 +64,9 @@ public class ConstraintsCheckDisablingDataSource implements DataSource {
      * @see javax.sql.DataSource#getConnection(java.lang.String,java.lang.String)
      */
     public Connection getConnection(String username, String password) throws SQLException {
-        Connection conn = wrappedDataSource.getConnection(username, password);
+        Connection conn = super.getConnection(username, password);
         constraintsDisabler.disableConstraintsOnConnection(conn);
         return conn;
     }
 
-    /**
-     * @see javax.sql.DataSource#getLogWriter()
-     */
-    public PrintWriter getLogWriter() throws SQLException {
-        return wrappedDataSource.getLogWriter();
-    }
-
-    /**
-     * @see javax.sql.DataSource#setLogWriter(java.io.PrintWriter)
-     */
-    public void setLogWriter(PrintWriter out) throws SQLException {
-        wrappedDataSource.setLogWriter(out);
-    }
-
-    /**
-     * @see javax.sql.DataSource#setLoginTimeout(int)
-     */
-    public void setLoginTimeout(int seconds) throws SQLException {
-        wrappedDataSource.setLoginTimeout(seconds);
-    }
-
-    /**
-     * @see javax.sql.DataSource#getLoginTimeout()
-     */
-    public int getLoginTimeout() throws SQLException {
-        return wrappedDataSource.getLoginTimeout();
-    }
 }
