@@ -120,17 +120,16 @@ public class ReflectionUtils {
      * @param arguments the method arguments
      * @return the result of the invocation, null if void
      * @throws UnitilsException if the method could not be invoked
+     * @throws InvocationTargetException If the called method throwed an exception
      */
-    public static Object invokeMethod(Object target, Method method, Object... arguments) {
+    public static <T> T invokeMethod(Object target, Method method, Object... arguments) throws InvocationTargetException {
         try {
             method.setAccessible(true);
-            return method.invoke(target, arguments);
+            return (T) method.invoke(target, arguments);
 
         } catch (IllegalArgumentException e) {
             throw new UnitilsException("Error while invoking method " + method, e);
         } catch (IllegalAccessException e) {
-            throw new UnitilsException("Error while invoking method " + method, e);
-        } catch (InvocationTargetException e) {
             throw new UnitilsException("Error while invoking method " + method, e);
         }
     }
