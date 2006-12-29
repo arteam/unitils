@@ -199,9 +199,9 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      */
     public void testUpdateSequences() throws Exception {
         if (dbSupport.supportsSequences()) {
-            assertTrue(getNextTestSequenceValue() < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+            assertTrue(getCurrentTestSequenceValue() < LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
             sequenceUpdater.updateSequences();
-            assertTrue(getNextTestSequenceValue() >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+            assertTrue(getCurrentTestSequenceValue() >= LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
         }
     }
 
@@ -215,9 +215,9 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             try {
                 conn = dataSource.getConnection();
                 sequenceUpdater.updateSequences();
-                long updatedSequenceValue = getNextTestSequenceValue();
+                long updatedSequenceValue = getCurrentTestSequenceValue();
                 sequenceUpdater.updateSequences();
-                assertFalse(getNextTestSequenceValue() <= updatedSequenceValue);
+                assertEquals(updatedSequenceValue, getCurrentTestSequenceValue());
             } finally {
                 DbUtils.closeQuietly(conn);
             }
@@ -230,8 +230,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      *
      * @return the sequence
      */
-    private long getNextTestSequenceValue() throws SQLException {
-        return dbSupport.getNextValueOfSequence("testsequence");
+    private long getCurrentTestSequenceValue() throws SQLException {
+        return dbSupport.getCurrentValueOfSequence("TESTSEQUENCE");
     }
 
 }
