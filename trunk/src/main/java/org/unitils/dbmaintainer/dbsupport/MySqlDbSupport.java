@@ -79,7 +79,7 @@ public class MySqlDbSupport extends DbSupport {
         statementHandler.handle(dropTableSQL);
     }
 
-    public long getNextValueOfSequence(String sequenceName) throws SQLException {
+    public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
 

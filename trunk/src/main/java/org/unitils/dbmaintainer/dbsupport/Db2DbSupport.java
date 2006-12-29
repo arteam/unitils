@@ -44,7 +44,7 @@ public class Db2DbSupport extends DbSupport {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public long getNextValueOfSequence(String sequenceName) throws SQLException {
+    public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -83,7 +83,8 @@ public class Db2DbSupport extends DbSupport {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select CONSTNAME from SYSCAT.TABCONST where TABNAME = '" + tableName + "'");
+            rs = st.executeQuery("select CONSTNAME from SYSCAT.TABCONST where TABNAME = '" + tableName +
+                    "' and (TYPE = 'F' or TYPE = 'K') and ENFORCED = 'Y'");
             Set<String> constraintNames = new HashSet<String>();
             while (rs.next()) {
                 constraintNames.add(rs.getString("CONSTNAME"));
