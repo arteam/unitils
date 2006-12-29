@@ -74,7 +74,7 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
     private void incrementSequencesWithLowValue() throws SQLException, StatementHandlerException {
         Set<String> sequenceNames = dbSupport.getSequenceNames();
         for (String sequenceName : sequenceNames) {
-            if (dbSupport.getNextValueOfSequence(sequenceName) < lowestAcceptableSequenceValue) {
+            if (dbSupport.getCurrentValueOfSequence(sequenceName) < lowestAcceptableSequenceValue) {
                 dbSupport.incrementSequenceToValue(sequenceName, lowestAcceptableSequenceValue);
             }
         }
