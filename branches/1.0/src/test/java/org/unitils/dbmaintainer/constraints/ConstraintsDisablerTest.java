@@ -22,7 +22,10 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
+import org.unitils.dbmaintainer.clear.DBClearer;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -39,6 +42,11 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      * The tested object
      */
     private ConstraintsDisabler constraintsDisabler;
+
+    /**
+     * Database support class instance
+     */
+    private DbSupport dbSupport;
 
     /**
      * DataSource for the test database, is injected
@@ -59,6 +67,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
         StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
                 dataSource);
+
+        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
                 configuration, dataSource, statementHandler);
@@ -109,13 +119,13 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             try {
-                st.execute("drop table table2 cascade");
-            } catch (SQLException e) {
+                dbSupport.dropTable("table2");
+            } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                st.execute("drop table table1 cascade");
-            } catch (SQLException e) {
+                dbSupport.dropTable("table1");
+            } catch (StatementHandlerException e) {
                 // Ignored
             }
         } finally {

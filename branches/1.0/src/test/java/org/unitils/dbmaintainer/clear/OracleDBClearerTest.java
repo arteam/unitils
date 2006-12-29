@@ -36,7 +36,7 @@ public class OracleDBClearerTest extends DBClearerTest {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("create or replace trigger " + triggerName + " + before insert on " + tableName + " begin " +
+            st.execute("create or replace trigger " + triggerName + " before insert on " + tableName + " begin " +
                     "select 1 from dual end " + triggerName);
         } finally {
             DbUtils.closeQuietly(conn, st, null);
