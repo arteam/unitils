@@ -19,6 +19,9 @@ import junit.framework.TestCase;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 
 /**
  * Test class for {@link ReflectionComparator}.
@@ -211,6 +214,55 @@ public class ReflectionComparatorArrayTest extends TestCase {
         assertTrue(result.getFieldStack().empty());
         assertSame(arrayA, result.getLeftValue());
         assertEquals("Test string", result.getRightValue());
+    }
+
+    /**
+     * Test for an array and a collection containing equal values  (array == collection).
+     */
+    public void testGetDifference_equalsLeftCollection() {
+
+        Difference result = reflectionComparator.getDifference(arrayA, Arrays.asList(arrayA));
+
+        assertNull(result);
+    }
+
+    /**
+     * Test for an array and a collection containing equal values  (array == collection).
+     */
+    public void testGetDifference_equalsRightCollection() {
+
+        Difference result = reflectionComparator.getDifference(Arrays.asList(arrayA), arrayA);
+
+        assertNull(result);
+    }
+
+
+    /**
+     * Test for an array and a collection containing different values  (array != collection).
+     */
+    public void testGetDifference_notEqualsCollectionDifferentValues() {
+
+        Difference result = reflectionComparator.getDifference(arrayA, Arrays.asList(arrayDifferentValue));
+
+        assertNotNull(result);
+        assertEquals("1", result.getFieldStack().get(0));
+        assertEquals("test 2", result.getLeftValue());
+        assertEquals("XXXXXX", result.getRightValue());
+    }
+
+
+    /**
+     * Test for an array and a collection having a different size (array != collection).
+     */
+    public void testGetDifference_notEqualsCollectionDifferentSize() {
+
+        Collection<?> collectionDifferentSize = Arrays.asList(arrayDifferentSize);
+        Difference result = reflectionComparator.getDifference(arrayA, collectionDifferentSize);
+
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertSame(arrayA, result.getLeftValue());
+        assertSame(collectionDifferentSize, result.getRightValue());
     }
 
 
