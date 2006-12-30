@@ -29,6 +29,7 @@ import java.lang.annotation.Target;
  * attribute.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -37,11 +38,15 @@ public @interface Inject {
     /**
      * The name of the field that references the object to which the object in the annotated field should be injected.
      * If not specified, the target is defined by the field annotated with {@link TestedObject}
+     *
+     * @return the target class, null for tested object
      */
     String target() default "";
 
     /**
      * OGNL expression that defines the property to which the object referenced by the annotated field is injected
+     *
+     * @return the ognl expression, not null
      */
     String property();
 

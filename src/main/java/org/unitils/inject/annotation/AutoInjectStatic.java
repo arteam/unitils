@@ -15,7 +15,7 @@
  */
 package org.unitils.inject.annotation;
 
-import org.unitils.inject.util.PropertyAccessType;
+import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
 
 import java.lang.annotation.ElementType;
@@ -51,11 +51,11 @@ public @interface AutoInjectStatic {
     Class target();
 
     /**
-     * The property access type that is used for injection
+     * The property access that is used for injection
      *
      * @return the access type, not null
      */
-    PropertyAccessType propertyAccessType() default PropertyAccessType.DEFAULT;
+    PropertyAccess propertyAccess() default PropertyAccess.DEFAULT;
 
     /**
      * The action that needs to be performed after the test was performed. Should the old value be put back,

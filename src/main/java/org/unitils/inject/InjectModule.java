@@ -22,7 +22,7 @@ import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.inject.annotation.*;
 import org.unitils.inject.util.InjectionUtils;
-import org.unitils.inject.util.PropertyAccessType;
+import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
 import org.unitils.inject.util.ValueToRestore;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
@@ -217,10 +217,10 @@ public class InjectModule implements Module {
         List targets = getTargets(autoInjectAnnotation, fieldToInject, autoInjectAnnotation.target(), test);
         Object objectToInject = getFieldValue(test, fieldToInject);
 
-        PropertyAccessType propertyAccessType = getValueReplaceDefault(AutoInject.class, autoInjectAnnotation.propertyAccessType(), defaultEnumValues);
+        PropertyAccess propertyAccess = getValueReplaceDefault(AutoInject.class, autoInjectAnnotation.propertyAccess(), defaultEnumValues);
         for (Object target : targets) {
             try {
-                InjectionUtils.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccessType);
+                InjectionUtils.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccess);
 
             } catch (UnitilsException e) {
                 throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject, e.getMessage()), e);
@@ -244,10 +244,10 @@ public class InjectModule implements Module {
         Object objectToInject = getFieldValue(test, fieldToAutoInjectStatic);
 
         Restore restore = getValueReplaceDefault(AutoInjectStatic.class, autoInjectStaticAnnotation.restore(), defaultEnumValues);
-        PropertyAccessType propertyAccessType = getValueReplaceDefault(AutoInjectStatic.class, autoInjectStaticAnnotation.propertyAccessType(), defaultEnumValues);
+        PropertyAccess propertyAccess = getValueReplaceDefault(AutoInjectStatic.class, autoInjectStaticAnnotation.propertyAccess(), defaultEnumValues);
         try {
-            Object oldValue = InjectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccessType);
-            storeValueToRestoreAfterTest(targetClass, null, fieldToAutoInjectStatic.getType(), propertyAccessType, oldValue, restore);
+            Object oldValue = InjectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccess);
+            storeValueToRestoreAfterTest(targetClass, null, fieldToAutoInjectStatic.getType(), propertyAccess, oldValue, restore);
 
         } catch (UnitilsException e) {
             throw new UnitilsException(getSituatedErrorMessage(autoInjectStaticAnnotation, fieldToAutoInjectStatic, e.getMessage()), e);
@@ -285,11 +285,11 @@ public class InjectModule implements Module {
      * @param targetClass        The target class, not null
      * @param property           The OGNL expression that defines where the object will be injected, null for auto inject
      * @param fieldType          The type, not null
-     * @param propertyAccessType The access type in case auto injection is used
+     * @param propertyAccess The access type in case auto injection is used
      * @param oldValue           The value that was replaced during the injection
      * @param restore            The type of reset, not DEFAULT
      */
-    protected void storeValueToRestoreAfterTest(Class targetClass, String property, Class fieldType, PropertyAccessType propertyAccessType, Object oldValue, Restore restore) {
+    protected void storeValueToRestoreAfterTest(Class targetClass, String property, Class fieldType, PropertyAccess propertyAccess, Object oldValue, Restore restore) {
 
         if (Restore.NO_RESTORE == restore || Restore.DEFAULT == restore) {
             return;
@@ -299,7 +299,7 @@ public class InjectModule implements Module {
         valueToRestore.setTargetClass(targetClass);
         valueToRestore.setProperty(property);
         valueToRestore.setFieldType(fieldType);
-        valueToRestore.setPropertyAccessType(propertyAccessType);
+        valueToRestore.setPropertyAccessType(propertyAccess);
 
         if (Restore.OLD_VALUE == restore) {
             valueToRestore.setValue(oldValue);

@@ -114,11 +114,11 @@ public class InjectionUtils {
      * @param objectToInjectType The type of the object. This should be the type of the object or one of his super-types
      *                           or implemented interfaces. This type is used for property type matching on the target object
      * @param target             The object into which the objectToInject is injected
-     * @param propertyAccessType Defines if field or setter injection is used
+     * @param propertyAccess Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
-    public static Object autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccessType propertyAccessType) {
-        if (propertyAccessType == PropertyAccessType.FIELD) {
+    public static Object autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccess propertyAccess) {
+        if (propertyAccess == PropertyAccess.FIELD) {
             return autoInjectToField(objectToInject, objectToInjectType, target, target.getClass(), false);
         }
         return autoInjectToSetter(objectToInject, objectToInjectType, target, target.getClass(), false);
@@ -131,11 +131,11 @@ public class InjectionUtils {
      * @param objectToInjectType The type of the object. This should be the type of the object or one of his super-types
      *                           or implemented interfaces. This type is used for property type matching on the target class
      * @param targetClass        The class into which the objectToInject is injected
-     * @param propertyAccessType Defines if field or setter injection is used
+     * @param propertyAccess Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
-    public static Object autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccessType propertyAccessType) {
-        if (propertyAccessType == PropertyAccessType.FIELD) {
+    public static Object autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccess propertyAccess) {
+        if (propertyAccess == PropertyAccess.FIELD) {
             return autoInjectToField(objectToInject, objectToInjectType, null, targetClass, true);
         }
         return autoInjectToSetter(objectToInject, objectToInjectType, null, targetClass, true);

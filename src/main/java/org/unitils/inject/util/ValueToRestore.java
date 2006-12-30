@@ -34,7 +34,7 @@ public class ValueToRestore {
     private Class fieldType;
 
     /* In case auto-injection is to be used, this should hold the access type (field or setter) */
-    private PropertyAccessType propertyAccessType;
+    private PropertyAccess propertyAccess;
 
     /* The value to restore */
     private Object value;
@@ -64,12 +64,12 @@ public class ValueToRestore {
         this.fieldType = fieldType;
     }
 
-    public PropertyAccessType getPropertyAccessType() {
-        return propertyAccessType;
+    public PropertyAccess getPropertyAccessType() {
+        return propertyAccess;
     }
 
-    public void setPropertyAccessType(PropertyAccessType propertyAccessType) {
-        this.propertyAccessType = propertyAccessType;
+    public void setPropertyAccessType(PropertyAccess propertyAccess) {
+        this.propertyAccess = propertyAccess;
     }
 
     public Object getValue() {

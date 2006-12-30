@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
  * default target for injection.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
