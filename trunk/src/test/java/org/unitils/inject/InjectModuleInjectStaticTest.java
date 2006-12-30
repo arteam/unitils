@@ -21,17 +21,25 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectStatic;
 
 /**
+ * Test for the static injection behavior of the {@link InjectModule}
+ *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class InjectModuleInjectStaticTest extends TestCase {
 
-    InjectModule injectModule;
+    /* Tested object */
+    private InjectModule injectModule;
 
     private TestInjectStatic_simpleSetter testInjectStatic_simpleSetter = new TestInjectStatic_simpleSetter();
     private TestInjectStatic_simpleField testInjectStatic_simpleField = new TestInjectStatic_simpleField();
     private TestInjectStatic_compositeSetter testInjectStatic_compositeSetter = new TestInjectStatic_compositeSetter();
     private TestInjectStatic_compositeField testInjectStatic_compositeField = new TestInjectStatic_compositeField();
 
+
+    /**
+     * Initializes the test and test fixture.
+     */
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -41,10 +49,12 @@ public class InjectModuleInjectStaticTest extends TestCase {
         injectModule.init(configuration);
     }
 
+
     public void testInject_simpleSetter() {
         injectModule.injectObjects(testInjectStatic_simpleSetter);
         assertSame(testInjectStatic_simpleSetter.toInject, InjectOnStatic.getToInject());
     }
+
 
     public void testInject_simpleField() {
         injectModule.injectObjects(testInjectStatic_simpleField);
@@ -56,10 +66,12 @@ public class InjectModuleInjectStaticTest extends TestCase {
         assertSame(testInjectStatic_compositeSetter.toInject, InjectOnStatic.getTestObject().getToInject());
     }
 
+
     public void testInject_compositeField() {
         injectModule.injectObjects(testInjectStatic_compositeField);
         assertSame(testInjectStatic_compositeField.toInject, InjectOnStatic.getTestObjectField().getToInject());
     }
+
 
     public class TestInjectStatic_simpleSetter {
 
@@ -71,6 +83,7 @@ public class InjectModuleInjectStaticTest extends TestCase {
         }
     }
 
+
     public class TestInjectStatic_simpleField {
 
         @InjectStatic(target = InjectOnStatic.class, property = "toInjectField")
@@ -81,6 +94,7 @@ public class InjectModuleInjectStaticTest extends TestCase {
         }
     }
 
+
     public class TestInjectStatic_compositeSetter {
 
         @InjectStatic(target = InjectOnStatic.class, property = "testObject.toInject")
@@ -90,6 +104,7 @@ public class InjectModuleInjectStaticTest extends TestCase {
             toInject = new InjectOnStatic.ToInject();
         }
     }
+
 
     public class TestInjectStatic_compositeField {
 

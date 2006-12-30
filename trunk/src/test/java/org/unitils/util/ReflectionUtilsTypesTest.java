@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Test for {@link ReflectionUtils} working with field types, eg assignable from.
@@ -231,6 +232,34 @@ public class ReflectionUtilsTypesTest extends TestCase {
         assertNull(method);
     }
 
+    /**
+     * Test for getting a getter for a setter method.
+     */
+    public void testGetGetterForSetter() {
+        Method setter = ReflectionUtils.getSetter(TestObject.class, "stringField", false);
+        Method method = ReflectionUtils.getGetter(setter);
+        assertPropertyLenEquals("name", "getStringField", method);
+    }
+
+
+    /**
+     * Test for getting a getter for a static setter method.
+     */
+    public void testGetGetterForSetter_static() {
+        Method setter = ReflectionUtils.getSetter(TestObject.class, "staticStringField", true);
+        Method method = ReflectionUtils.getGetter(setter);
+        assertPropertyLenEquals("name", "getStaticStringField", method);
+    }
+
+    /**
+     * Test for getting a unexisting getter of a setter. Null should be returned.
+     * The setterOnlyStringField has no getter method.
+     */
+    public void testGetGetterForSetter_unexistingGetter() {
+        Method setter = ReflectionUtils.getSetter(TestObject.class, "setterOnlyField", false);
+        Method method = ReflectionUtils.getGetter(setter);
+        assertNull(method);
+    }
 
     /**
      * Test for getting a field.
@@ -274,6 +303,9 @@ public class ReflectionUtilsTypesTest extends TestCase {
         private String stringField;
 
         private int intField;
+
+        /* has no getter */
+        protected Map setterOnlyField;
 
 
         public static Object getStaticObjectField() {
@@ -323,5 +355,10 @@ public class ReflectionUtilsTypesTest extends TestCase {
         public void setIntField(int intField) {
             this.intField = intField;
         }
+
+        public void setSetterOnlyField(Map setterOnlyField) {
+            this.setterOnlyField = setterOnlyField;
+        }
+
     }
 }

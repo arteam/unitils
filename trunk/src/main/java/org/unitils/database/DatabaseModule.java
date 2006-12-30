@@ -59,6 +59,7 @@ import java.util.Set;
  */
 public class DatabaseModule implements Module {
 
+    /* The logger instance for this class */
     private static final Logger logger = Logger.getLogger(DatabaseModule.class);
 
     /* Property keys indicating if the database schema should be updated before performing the tests */

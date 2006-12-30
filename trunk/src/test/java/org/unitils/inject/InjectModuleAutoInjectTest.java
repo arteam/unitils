@@ -22,12 +22,17 @@ import org.unitils.inject.annotation.AutoInject;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.inject.util.PropertyAccessType;
 
+/**
+ * Test for the auto injection behavior of the {@link InjectModule}
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
+ */
+@SuppressWarnings({"UnusedDeclaration"})
 public class InjectModuleAutoInjectTest extends TestCase {
 
-    /**
-     * Tested object
-     */
-    InjectModule injectModule;
+    /* Tested object */
+    private InjectModule injectModule;
 
     /**
      * Objects that represent 'unit test classes', containing objects that should be injected on other objects.
@@ -42,6 +47,10 @@ public class InjectModuleAutoInjectTest extends TestCase {
     private TestAutoInject_targetPropertyOnSuperClass testAutoInject_targetPropertyOnSuperClass = new TestAutoInject_targetPropertyOnSuperClass();
     private TestAutoInject_targetPropertyOnSuperClass_fieldAccess testAutoInject_targetPropertyOnSuperClass_fieldAccess = new TestAutoInject_targetPropertyOnSuperClass_fieldAccess();
 
+
+    /**
+     * Initializes the test and test fixture.
+     */
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -51,6 +60,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         injectModule.init(configuration);
     }
 
+
     /**
      * Tests auto injection in case the target is explicitly specified
      */
@@ -59,6 +69,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         assertSame(testAutoInjectExplicitTarget.getToInject(), testAutoInjectExplicitTarget.getInjectOn().getToInject());
     }
 
+
     /**
      * Tests auto injection in case of field access
      */
@@ -66,6 +77,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         injectModule.injectObjects(testAutoInjectFieldAccess);
         assertSame(testAutoInjectFieldAccess.getToInject(), testAutoInjectFieldAccess.getInjectOnField().getToInject());
     }
+
 
     /**
      * Multiple fields are annotated with @TestedObject. Tests wether the objects are injected to all of these fields
@@ -76,6 +88,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         assertSame(testAutoInjectAnnotatedTarget.getToInject(), testAutoInjectAnnotatedTarget.getInjectOn2().getToInject());
     }
 
+
     /**
      * Tests the case when the target field is a supertype of the injected object, and no more specific field exists.
      */
@@ -83,6 +96,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         injectModule.injectObjects(testAutoInject_targetPropertyIsSuperType);
         assertSame(testAutoInject_targetPropertyIsSuperType.getToInject(), testAutoInject_targetPropertyIsSuperType.getInjectOn().getToInject());
     }
+
 
     /**
      * Tests the case when the target field is a supertype of the injected object, and no more specific field exists,
@@ -92,6 +106,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         injectModule.injectObjects(testAutoInject_targetPropertyIsSuperType_fieldAccess);
         assertSame(testAutoInject_targetPropertyIsSuperType_fieldAccess.getToInject(), testAutoInject_targetPropertyIsSuperType_fieldAccess.getInjectOn().getToInject());
     }
+
 
     /**
      * Tests the case where target fields of both the object's type and a super type exists. The object should be injected
@@ -103,6 +118,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         assertSame(testAutoInjectToMostSpecificallyTypedProperty.getToInjectSub(), testAutoInjectToMostSpecificallyTypedProperty.getInjectOn().getToInjectSub());
     }
 
+
     /**
      * Tests the case where target fields of both the object's type and a super type exists. The object should be injected
      * into the most specific type. Field access is used.
@@ -113,6 +129,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         assertSame(testAutoInjectToMostSpecificallyTypedProperty_fieldAccess.getToInjectSub(), testAutoInjectToMostSpecificallyTypedProperty_fieldAccess.getInjectOn().getToInjectSub());
     }
 
+
     /**
      * Tests the case where the target property of the object to inject on belongs to the superclass
      */
@@ -121,6 +138,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         assertSame(testAutoInject_targetPropertyOnSuperClass.getToInject(), testAutoInject_targetPropertyOnSuperClass.getInjectOn().getToInject());
     }
 
+
     /**
      * Tests the case where the target property of the object to inject on belongs to the superclass, using field access
      */
@@ -128,6 +146,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         injectModule.injectObjects(testAutoInject_targetPropertyOnSuperClass_fieldAccess);
         assertSame(testAutoInject_targetPropertyOnSuperClass_fieldAccess.getToInject(), testAutoInject_targetPropertyOnSuperClass_fieldAccess.getInjectOn().getToInject());
     }
+
 
     public class TestAutoInjectExplicitTarget {
 
@@ -147,8 +166,8 @@ public class InjectModuleAutoInjectTest extends TestCase {
         public InjectOn getInjectOn() {
             return injectOn;
         }
-
     }
+
 
     public class TestAutoInjectFieldAccess {
 
@@ -169,8 +188,8 @@ public class InjectModuleAutoInjectTest extends TestCase {
         public InjectOnField getInjectOnField() {
             return injectOnField;
         }
-
     }
+
 
     public class TestAutoInjectAnnotatedTarget {
 
@@ -198,8 +217,8 @@ public class InjectModuleAutoInjectTest extends TestCase {
         public InjectOn getInjectOn2() {
             return injectOn2;
         }
-
     }
+
 
     public class TestAutoInject_targetPropertyIsSuperType {
 
@@ -222,6 +241,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         }
     }
 
+
     public class TestAutoInject_targetPropertyIsSuperType_fieldAccess {
 
         @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
@@ -242,6 +262,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
             return injectOn;
         }
     }
+
 
     public class TestAutoInjectToMostSpecificallyTypedProperty {
 
@@ -271,6 +292,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         }
     }
 
+
     public class TestAutoInjectToMostSpecificallyTypedProperty_fieldAccess {
 
         @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
@@ -299,6 +321,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         }
     }
 
+
     public class TestAutoInject_targetPropertyOnSuperClass {
 
         @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
@@ -318,8 +341,8 @@ public class InjectModuleAutoInjectTest extends TestCase {
         public InjectOn_subClass getInjectOn() {
             return injectOn;
         }
-
     }
+
 
     public class TestAutoInject_targetPropertyOnSuperClass_fieldAccess {
 
@@ -340,22 +363,22 @@ public class InjectModuleAutoInjectTest extends TestCase {
         public InjectOn_subClass getInjectOn() {
             return injectOn;
         }
-
     }
+
 
     /**
      * Object to inject, superclass
      */
     public class ToInjectSuper {
-
     }
+
 
     /**
      * Object to inject, subclass
      */
     public class ToInjectSub extends ToInjectSuper {
-
     }
+
 
     /**
      * Object to inject into
@@ -371,8 +394,8 @@ public class InjectModuleAutoInjectTest extends TestCase {
         public void setToInject(ToInjectSuper toInject) {
             this.toInject = toInject;
         }
-
     }
+
 
     /**
      * Object to inject using field access
@@ -411,6 +434,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
         }
     }
 
+
     /**
      * Object to inject on using field access. Contains properties of a super- and a subtype.
      */
@@ -427,6 +451,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
             return toInjectSub;
         }
     }
+
 
     /**
      * Superclass of object to inject into
@@ -445,11 +470,11 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     }
 
+
     /**
      * Superclass of object to inject into
      */
     public class InjectOn_subClass extends InjectOn_superClass {
-
     }
 
 }

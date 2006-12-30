@@ -20,6 +20,7 @@ package org.unitils.inject.util;
  * in the Unitils configuration file.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public enum PropertyAccessType {
 
@@ -36,6 +37,6 @@ public enum PropertyAccessType {
     /**
      * Field or setter injection, defined by the configured default value
      */
-    DEFAULT;
+    DEFAULT
 
 }

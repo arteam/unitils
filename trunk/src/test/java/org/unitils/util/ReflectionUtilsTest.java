@@ -89,7 +89,6 @@ public class ReflectionUtilsTest extends TestCase {
 
         //get another field
         Field anotherField = getClass().getDeclaredField("testObject");
-
         try {
             ReflectionUtils.getFieldValue(testObject, anotherField);
             fail("UnitilsException expected");

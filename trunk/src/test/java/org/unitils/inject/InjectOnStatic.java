@@ -16,8 +16,12 @@
 package org.unitils.inject;
 
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class InjectOnStatic {
 
     private static ToInject toInject;

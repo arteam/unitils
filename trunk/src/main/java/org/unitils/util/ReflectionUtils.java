@@ -32,25 +32,18 @@ public class ReflectionUtils {
 
 
     /**
-     * The default name of the default enum value.
-     */
-    public static final String DEFAULT_ENUM_VALUE_NAME = "DEFAULT";
-
-
-    /**
      * Creates an instance of the class with the given name.
      * The class's no argument constructor is used to create an instance.
      *
-     * @param className the name of the class, not null
-     * @return an instance of this class
+     * @param className The name of the class, not null
+     * @return An instance of this class
      * @throws UnitilsException if the class could not be found or no instance could be created
      */
+    @SuppressWarnings({"unchecked"})
     public static <T> T createInstanceOfType(String className) {
         try {
             Class<?> clazz = Class.forName(className);
             Constructor<?> constructor = clazz.getConstructor();
-
-            //noinspection unchecked
             return (T) constructor.newInstance();
 
         } catch (NoClassDefFoundError e) {
@@ -71,16 +64,15 @@ public class ReflectionUtils {
     /**
      * Returns the value of the given field (may be private) in the given object
      *
-     * @param object the object containing the field, null for static fields
-     * @param field  the field, not null
-     * @return the value of the given field in the given object
+     * @param object The object containing the field, null for static fields
+     * @param field  The field, not null
+     * @return The value of the given field in the given object
      * @throws UnitilsException if the field could not be accessed
      */
     public static Object getFieldValue(Object object, Field field) {
-        Object fieldValue;
         try {
             field.setAccessible(true);
-            fieldValue = field.get(object);
+            return field.get(object);
 
         } catch (IllegalArgumentException e) {
             throw new UnitilsException("Error while trying to access field " + field, e);
@@ -88,15 +80,14 @@ public class ReflectionUtils {
         } catch (IllegalAccessException e) {
             throw new UnitilsException("Error while trying to access field " + field, e);
         }
-        return fieldValue;
     }
 
     /**
      * Sets the given value to the given field on the given object
      *
-     * @param object the object containing the field, not null
-     * @param field  the field, not null
-     * @param value  the value for the given field in the given object
+     * @param object The object containing the field, not null
+     * @param field  The field, not null
+     * @param value  The value for the given field in the given object
      * @throws UnitilsException if the field could not be accessed
      */
     public static void setFieldValue(Object object, Field field, Object value) {
@@ -115,13 +106,14 @@ public class ReflectionUtils {
     /**
      * Invokes the given method with the given parameters on the given target object
      *
-     * @param target    the object containing the method, not null
-     * @param method    the method, not null
-     * @param arguments the method arguments
-     * @return the result of the invocation, null if void
-     * @throws UnitilsException if the method could not be invoked
+     * @param target    The object containing the method, not null
+     * @param method    The method, not null
+     * @param arguments The method arguments
+     * @return The result of the invocation, null if void
+     * @throws UnitilsException          if the method could not be invoked
      * @throws InvocationTargetException If the called method throwed an exception
      */
+    @SuppressWarnings({"unchecked"})
     public static <T> T invokeMethod(Object target, Method method, Object... arguments) throws InvocationTargetException {
         try {
             method.setAccessible(true);
@@ -137,10 +129,10 @@ public class ReflectionUtils {
     /**
      * Returns all declared fields of the given class that are assignable from the given type.
      *
-     * @param clazz    the class to get fields from, not null
-     * @param type     the type, not null
-     * @param isStatic true if static fields are to be returned, false for non-static
-     * @return a List of Fields, empty list if none found
+     * @param clazz    The class to get fields from, not null
+     * @param type     The type, not null
+     * @param isStatic True if static fields are to be returned, false for non-static
+     * @return A list of Fields, empty list if none found
      */
     public static List<Field> getFieldsAssignableFrom(Class clazz, Class type, boolean isStatic) {
 
@@ -158,9 +150,9 @@ public class ReflectionUtils {
      * Returns the fields in the given class that have the exact given type. The class's superclasses are also
      * investigated.
      *
-     * @param clazz    the class to get the field from, not null
-     * @param type     the type, not null
-     * @param isStatic true if static fields are to be returned, false for non-static
+     * @param clazz    The class to get the field from, not null
+     * @param type     The type, not null
+     * @param isStatic True if static fields are to be returned, false for non-static
      * @return The fields with the given type
      */
     public static List<Field> getFieldsOfType(Class clazz, Class type, boolean isStatic) {
@@ -176,9 +168,9 @@ public class ReflectionUtils {
      * Returns the fields in the given class that have the exact given type. The class's superclasses are not
      * investigated.
      *
-     * @param clazz
-     * @param type
-     * @param isStatic
+     * @param clazz    The class to get the field from, not null
+     * @param type     The type, not null
+     * @param isStatic True if static fields are to be returned, false for non-static
      * @return The fields with the given type
      */
     private static List<Field> getFieldsOfTypeIgnoreSuper(Class clazz, Class type, boolean isStatic) {
@@ -196,10 +188,10 @@ public class ReflectionUtils {
     /**
      * Returns all declared setter methods of fields of the given class that are assignable from the given type.
      *
-     * @param clazz    the class to get setters from, not null
-     * @param type     the type, not null
-     * @param isStatic true if static setters are to be returned, false for non-static
-     * @return a List of Methods, empty list if none found
+     * @param clazz    The class to get setters from, not null
+     * @param type     The type, not null
+     * @param isStatic True if static setters are to be returned, false for non-static
+     * @return A list of Methods, empty list if none found
      */
     public static List<Method> getSettersAssignableFrom(Class clazz, Class type, boolean isStatic) {
         List<Method> settersAssignableFrom = new ArrayList<Method>();
@@ -218,9 +210,9 @@ public class ReflectionUtils {
      * Returns the setter methods in the given class that have an argument with the exact given type. The class's
      * superclasses are also investigated.
      *
-     * @param clazz    the class to get the setter from, not null
-     * @param type     the type, not null
-     * @param isStatic true if static setters are to be returned, false for non-static
+     * @param clazz    The class to get the setter from, not null
+     * @param type     The type, not null
+     * @param isStatic True if static setters are to be returned, false for non-static
      * @return All setters for an object of the given type
      */
     public static List<Method> getSettersOfType(Class clazz, Class type, boolean isStatic) {
@@ -236,9 +228,9 @@ public class ReflectionUtils {
      * Returns the setter methods in the given class that have an argument with the exact given type. The class's
      * superclasses are not investigated.
      *
-     * @param clazz    the class to get the setter from, not null
-     * @param type     the type, not null
-     * @param isStatic true if static setters are to be returned, false for non-static
+     * @param clazz    The class to get the setter from, not null
+     * @param type     The type, not null
+     * @param isStatic True if static setters are to be returned, false for non-static
      * @return All setters for an object of the given type
      */
     private static List<Method> getSettersOfTypeIgnoreSuper(Class clazz, Class type, boolean isStatic) {
@@ -258,10 +250,10 @@ public class ReflectionUtils {
      * From the given class, returns the setter for the property with the given name and 1 argument. If isStatic == true,
      * a static setter is searched. If no such setter exists in the given class, null is returned
      *
-     * @param clazz        the class to get the setter from, not null
-     * @param propertyName the name of the property, not null
-     * @param isStatic     true if a static setter is to be returned, false for non-static
-     * @return the setter method that matches the given parameters, null if not found
+     * @param clazz        The class to get the setter from, not null
+     * @param propertyName The name of the property, not null
+     * @param isStatic     True if a static setter is to be returned, false for non-static
+     * @return The setter method that matches the given parameters, null if not found
      */
     public static Method getSetter(Class clazz, String propertyName, boolean isStatic) {
         String setterName = "set" + StringUtils.capitalize(propertyName);
@@ -279,9 +271,9 @@ public class ReflectionUtils {
      * From the given class, returns the getter for the given propertyname. If isStatic == true,
      * a static getter is searched. If no such getter exists in the given class, null is returned.
      *
-     * @param clazz        the class to get the setter from, not null
-     * @param propertyName the name of the property, not null
-     * @param isStatic     true if a static getter is to be returned, false for non-static
+     * @param clazz        The class to get the setter from, not null
+     * @param propertyName The name of the property, not null
+     * @param isStatic     True if a static getter is to be returned, false for non-static
      * @return The getter method that matches the given parameters, or null if no such method exists
      */
     public static Method getGetter(Class clazz, String propertyName, boolean isStatic) {
@@ -299,13 +291,37 @@ public class ReflectionUtils {
     }
 
     /**
+     * From the given class, returns the getter for the given setter method. If no such getter exists in the
+     * given class, null is returned.
+     *
+     * @param setter The setter method, not null
+     * @return The getter method that matches the given setter, or null if no such method exists
+     */
+    public static Method getGetter(Method setter) {
+        if (!isSetter(setter)) {
+            return null;
+        }
+        String getterName = "get" + setter.getName().substring(3);
+        try {
+            Method getter = setter.getDeclaringClass().getDeclaredMethod(getterName);
+            if (Modifier.isStatic(setter.getModifiers()) == Modifier.isStatic(getter.getModifiers())) {
+                return getter;
+            } else {
+                return null;
+            }
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    /**
      * From the given class, returns the field with the given name. isStatic indicates if it should be a static
      * field or not.
      *
-     * @param clazz     the class to get the field from, not null
-     * @param fieldName the name, not null
-     * @param isStatic  true if a static field is to be returned, false for non-static
-     * @return the field that matches the given parameters, or null if no such field exists
+     * @param clazz     The class to get the field from, not null
+     * @param fieldName The name, not null
+     * @param isStatic  True if a static field is to be returned, false for non-static
+     * @return The field that matches the given parameters, or null if no such field exists
      */
     public static Field getFieldWithName(Class clazz, String fieldName, boolean isStatic) {
         try {
@@ -324,13 +340,12 @@ public class ReflectionUtils {
     /**
      * Gets the enum value that has the given name.
      *
-     * @param enumClass     the enum class, not null
-     * @param enumValueName the name of the enum value, not null
-     * @return the actual enum value, not null
+     * @param enumClass     The enum class, not null
+     * @param enumValueName The name of the enum value, not null
+     * @return The actual enum value, not null
      * @throws UnitilsException if no value could be found with the given name
      */
     public static <T extends Enum> T getEnumValue(Class<T> enumClass, String enumValueName) {
-
         T[] enumValues = enumClass.getEnumConstants();
         for (T enumValue : enumValues) {
             if (enumValueName.equalsIgnoreCase(enumValue.name())) {
@@ -351,8 +366,8 @@ public class ReflectionUtils {
      * <li>The method has one parameter, with the type of the property to set</li>
      * </ul>
      *
-     * @param method the method to check, not null
-     * @return true if the given method is a setter, false otherwise
+     * @param method The method to check, not null
+     * @return True if the given method is a setter, false otherwise
      */
     private static boolean isSetter(Method method) {
         String methodName = method.getName();
