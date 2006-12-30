@@ -60,13 +60,16 @@ import java.util.Map;
  * Switching to the replay state and verifying expectations of all mocks (including the mocks created with
  * the createMock() method can be done by calling
  * the {@link #replay()} and {@link #verify()} methods.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class EasyMockModule implements Module {
 
     /* All created mocks controls */
     private List<MocksControl> mocksControls;
 
-    //todo javadoc
+    /* Map holding the default configuration of the mock annotations */
     private Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues;
 
 
@@ -74,7 +77,6 @@ public class EasyMockModule implements Module {
      * Initializes the module
      */
     public void init(Configuration configuration) {
-
         this.mocksControls = new ArrayList<MocksControl>();
         defaultEnumValues = getAnnotationEnumDefaults(EasyMockModule.class, configuration, RegularMock.class, Mock.class);
     }
@@ -86,7 +88,6 @@ public class EasyMockModule implements Module {
      * @return the listener
      */
     public TestListener createTestListener() {
-
         return new EasyMockTestListener();
     }
 
@@ -99,7 +100,7 @@ public class EasyMockModule implements Module {
      *
      * @param mockType        the class type for the mock, not null
      * @param invocationOrder the order setting, not null
-     * @param calls         the calls setting, not null
+     * @param calls           the calls setting, not null
      * @return a mock for the given class or interface, not null
      */
     public <T> T createRegularMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls) {
@@ -138,7 +139,7 @@ public class EasyMockModule implements Module {
      *
      * @param mockType        the class/interface, not null
      * @param invocationOrder the order setting, not null
-     * @param calls         the calls setting, not null
+     * @param calls           the calls setting, not null
      * @param order           todo
      * @param dates           todo
      * @param defaults        todo
@@ -251,6 +252,7 @@ public class EasyMockModule implements Module {
         }
     }
 
+
     /**
      * Calls all {@link @AfterCreateMock} annotated methods on the test, passing the given mock.
      * These annotated methods must have following signature <code>void myMethod(Object mock, String name, Class type)</code>.
@@ -300,7 +302,6 @@ public class EasyMockModule implements Module {
          */
         @Override
         public void afterTestMethod(Object testObject, Method testMethod) {
-
             verify();
         }
     }

@@ -18,12 +18,15 @@ package org.unitils.easymock.util;
 
 /**
  * Possible values for checking the order of method invocation on the mock.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public enum InvocationOrder {
 
 
     /**
-     * Defaults to the value of the org.unitils.easymock.annotation.LenientMock$InvocationOrder configuration setting.
+     * NONE or STRICT as defined by the default value in the configuration.
      */
     DEFAULT,
 
