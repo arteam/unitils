@@ -159,19 +159,14 @@ public class ReflectionComparator {
         }
         traversedInstanceMap.put(left, left);
 
-        // check collections
-        if (left instanceof Collection && right instanceof Collection) {
-            return compareCollections((Collection<?>) left, (Collection<?>) right, fieldStack, traversedInstanceMap);
+        // check collections, primitive and object arrays
+        if ((left.getClass().isArray() || left instanceof Collection) && (right.getClass().isArray() || right instanceof Collection)) {
+            return compareArraysOrCollections(left, right, fieldStack, traversedInstanceMap);
         }
 
         // check maps
         if (left instanceof Map && right instanceof Map) {
             return compareMaps((Map<?, ?>) left, (Map<?, ?>) right, fieldStack, traversedInstanceMap);
-        }
-
-        // check primitive and object arrays
-        if (left.getClass().isArray() && right.getClass().isArray()) {
-            return compareArrays(left, right, fieldStack, traversedInstanceMap);
         }
 
         // check objects
@@ -215,36 +210,28 @@ public class ReflectionComparator {
 
 
     /**
-     * Checks equality of two arrays.
+     * Checks equality of two arrays or collections or mixed, an array and a collection.
      *
-     * @param left                 the left array for the comparison, not null and same type as right
-     * @param right                the right array for the comparison, not null and same type as right
+     * @param left                 the left array or collection for the comparison, not null and same type as right
+     * @param right                the right array or collection for the comparison, not null and same type as right
      * @param fieldStack           the current field names
      * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
      * @return the difference, null if there is no difference
      */
-    private Difference compareArrays(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-
-        // If needed convert primitive array to object array
-        Object[] leftObjectArray = convertToObjectArray(left);
-        Object[] rightObjectArray = convertToObjectArray(right);
-
-        if (leftObjectArray.length != rightObjectArray.length) {
-            return new Difference("Different array lengths. Left length: " + leftObjectArray.length + ", right size: " + rightObjectArray.length, left, right, fieldStack);
-        }
+    private Difference compareArraysOrCollections(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         // Convert to list and compare as collection
-        List<Object> leftList = Arrays.asList(leftObjectArray);
-        List<Object> rightList = Arrays.asList(rightObjectArray);
+        Collection<?> leftCollection = convertToCollection(left);
+        Collection<?> rightCollection = convertToCollection(right);
 
-        Difference difference = compareCollections(leftList, rightList, fieldStack, traversedInstanceMap);
+        Difference difference = compareCollections(leftCollection, rightCollection, fieldStack, traversedInstanceMap);
 
         // If needed switch back array in place of list
         if (difference != null) {
-            if (difference.leftValue == leftList) {
+            if (difference.leftValue == leftCollection) {
                 difference.leftValue = left;
             }
-            if (difference.rightValue == rightList) {
+            if (difference.rightValue == rightCollection) {
                 difference.rightValue = right;
             }
         }
@@ -264,7 +251,7 @@ public class ReflectionComparator {
     private Difference compareCollections(Collection<?> left, Collection<?> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
 
         if (left.size() != right.size()) {
-            return new Difference("Different collection sizes.", left, right, fieldStack);
+            return new Difference("Different array/collection sizes. Left size: " + left.size() + ", right size: " + right.size(), left, right, fieldStack);
         }
 
         if (lenientOrder) {
@@ -272,6 +259,7 @@ public class ReflectionComparator {
         }
         return compareCollectionsStrictOrder(left, right, fieldStack, traversedInstanceMap);
     }
+
 
     /**
      * Checks equality of two collections taking the order of the elements into account. The order used is the order
@@ -504,6 +492,26 @@ public class ReflectionComparator {
             return ((Number) object).doubleValue();
         }
         return (double) ((Character) object).charValue();
+    }
+
+
+    /**
+     * Converts the given array or collection object (possibly primitive array) to type Collection
+     *
+     * @param object the array or collection
+     * @return the object collection
+     */
+    private Collection<?> convertToCollection(Object object) {
+
+        if (object instanceof Collection<?>) {
+            return (Collection<?>) object;
+        }
+
+        // If needed convert primitive array to object array
+        Object[] objectArray = convertToObjectArray(object);
+
+        // Convert array to collection
+        return Arrays.asList(objectArray);
     }
 
 
