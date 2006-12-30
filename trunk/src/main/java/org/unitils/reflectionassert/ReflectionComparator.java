@@ -37,6 +37,11 @@ import java.util.*;
  * java.lang.* type field values. Eg a field of type java.lang.Integer will be compared using its equals method. No
  * superclass comparison is done on java.lang.* type classes. Eg the java.lang.Ojbect class fields will not be compared.
  * <p/>
+ * If an object is an array or a collection, all its elements will be traversed and compared with the other array or
+ * collection in the same way using reflection. The actual type of collection or whether a collection is compared with
+ * an array is not important. It will only go through the array or collection and compare the elements. For example, an
+ * Arraylist can be compared with an array or a LinkedList.
+ * <p/>
  * By default, a strict comparison is performed, but if needed, some leniency can be configured by setting one or more
  * comparator modes: <ul>
  * <li>ignore defaults: all fields that have a default java value for the left object will be ignored. Eg if
