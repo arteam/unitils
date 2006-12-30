@@ -18,25 +18,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/util/PropertyAccessType.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/util/PropertyAccessType.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/util/ReflectionUtilsTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/util/ReflectionUtilsTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/util/ReflectionUtilsTypesTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/util/ReflectionUtilsTypesTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectOnStatic.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectOnStatic.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/util/PropertyAccess.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectStatic.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectStatic.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectStaticTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectStaticTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/InvocationOrder.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/InvocationOrder.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreAutoInjectTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/util/ValueToRestore.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/util/ValueToRestore.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/util/ValueToRestore.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/AutoInject.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/AutoInject.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/TestedObject.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/TestedObject.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/Inject.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/Inject.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleAutoInjectTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleAutoInjectTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleAutoInjectTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleAutoInjectTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/util/InjectionUtils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/util/InjectionUtils.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/AutoInjectStatic.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/AutoInjectStatic.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreAutoInjectTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreAutoInjectTest.java" />
+      <change type="DELETED" beforePath="D:\_tim\Ordina\unitils\trunk\src\main\java\org\unitils\inject\util\PropertyAccessType.java" afterPath="" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -60,7 +54,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1167481982831" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1167487219401" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -201,84 +195,53 @@
       <file leaf-file-name="InjectModule.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="287" column="34" selection-start="12398" selection-end="12398" vertical-scroll-proportion="0.2765748">
+            <state line="83" column="0" selection-start="3447" selection-end="3447" vertical-scroll-proportion="0.01620591">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="InjectionUtils.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/util/InjectionUtils.java">
+      <file leaf-file-name="TestedObject.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/TestedObject.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="13" selection-start="1295" selection-end="1295" vertical-scroll-proportion="0.33267716">
+            <state line="27" column="23" selection-start="1019" selection-end="1019" vertical-scroll-proportion="0.38894185">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ReflectionUtils.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
+      <file leaf-file-name="AutoInject.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/AutoInject.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="163" column="0" selection-start="6431" selection-end="6431" vertical-scroll-proportion="0.3385063">
+            <state line="33" column="23" selection-start="1315" selection-end="1335" vertical-scroll-proportion="0.45376548">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EasyMockModule.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java">
+      <file leaf-file-name="InjectStatic.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectStatic.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="11" column="63" selection-start="493" selection-end="493" vertical-scroll-proportion="0.18405512">
+            <state line="54" column="44" selection-start="2268" selection-end="2305" vertical-scroll-proportion="0.6920877">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="InjectModuleAutoInjectTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleAutoInjectTest.java">
+      <file leaf-file-name="AutoInjectStatic.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/AutoInjectStatic.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="23" selection-start="1479" selection-end="1479" vertical-scroll-proportion="0.05019685">
+            <state line="50" column="55" selection-start="2186" selection-end="2186" vertical-scroll-proportion="0.6110582">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="InjectModuleRestoreTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreTest.java">
+      <file leaf-file-name="Inject.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/Inject.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="13" selection-start="511" selection-end="511" vertical-scroll-proportion="0.26382154">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ValueToRestore.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/util/ValueToRestore.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="13" selection-start="882" selection-end="882" vertical-scroll-proportion="0.33268672">
+            <state line="4" column="79" selection-start="190" selection-end="190" vertical-scroll-proportion="0.06482364">
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Restore.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/util/Restore.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="12" selection-start="260" selection-end="260" vertical-scroll-proportion="0.1483996">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="InjectModuleRestoreAutoInjectTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreAutoInjectTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="103" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -1075,13 +1038,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="30" y="-4" width="1574" height="1208" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297659" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32777777" order="7" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32258064" order="0" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32258064" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32777777" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24753127" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4925926" order="11" />
@@ -1190,68 +1153,12 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/resources/unitils.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="64" column="56" selection-start="4068" selection-end="4068" vertical-scroll-proportion="0.90276456">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectStatic.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="64" column="12" selection-start="2604" selection-end="2604" vertical-scroll-proportion="0.8541468">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/TestListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="41" column="16" selection-start="1061" selection-end="1061" vertical-scroll-proportion="0.6272641">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/EasyMockModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="63" selection-start="493" selection-end="493" vertical-scroll-proportion="0.18405512">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectOnStatic.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="13" selection-start="772" selection-end="772" vertical-scroll-proportion="0.3326978">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectStaticTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="55" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleAutoInjectTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="23" selection-start="1479" selection-end="1479" vertical-scroll-proportion="0.05019685">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreAutoInjectTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="103" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0">
+        <state line="0" column="27" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="287" column="34" selection-start="12398" selection-end="12398" vertical-scroll-proportion="0.2765748">
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1292,9 +1199,65 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="194" column="38" selection-start="12904" selection-end="12904" vertical-scroll-proportion="0.8379409">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/util/InjectionUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="13" selection-start="1295" selection-end="1295" vertical-scroll-proportion="0.33267716">
+        <state line="221" column="13" selection-start="11414" selection-end="11414" vertical-scroll-proportion="0.3241182">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/util/PropertyAccess.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="12" selection-start="870" selection-end="870" vertical-scroll-proportion="0.3957323">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="83" column="0" selection-start="3447" selection-end="3447" vertical-scroll-proportion="0.01620591">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/TestedObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="23" selection-start="1019" selection-end="1019" vertical-scroll-proportion="0.38894185">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/AutoInject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="23" selection-start="1315" selection-end="1335" vertical-scroll-proportion="0.45376548">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectStatic.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="54" column="44" selection-start="2268" selection-end="2305" vertical-scroll-proportion="0.6920877">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/AutoInjectStatic.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="55" selection-start="2186" selection-end="2186" vertical-scroll-proportion="0.6110582">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/Inject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="79" selection-start="190" selection-end="190" vertical-scroll-proportion="0.06482364">
           <folding />
         </state>
       </provider>

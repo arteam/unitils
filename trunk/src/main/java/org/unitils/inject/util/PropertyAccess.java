@@ -16,13 +16,13 @@
 package org.unitils.inject.util;
 
 /**
- * The type of accessing properties: by field or by setter. If default is chosen, the property access type is defined
+ * The type of accessing properties: by field or by setter. If default is chosen, the property access is defined
  * in the Unitils configuration file.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public enum PropertyAccessType {
+public enum PropertyAccess {
 
     /**
      * Field injection

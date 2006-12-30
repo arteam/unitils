@@ -20,7 +20,7 @@ import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.AutoInject;
 import org.unitils.inject.annotation.TestedObject;
-import org.unitils.inject.util.PropertyAccessType;
+import org.unitils.inject.util.PropertyAccess;
 
 /**
  * Test for the auto injection behavior of the {@link InjectModule}
@@ -150,7 +150,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectExplicitTarget {
 
-        @AutoInject(target = "injectOn", propertyAccessType = PropertyAccessType.SETTER)
+        @AutoInject(target = "injectOn", propertyAccess = PropertyAccess.SETTER)
         private ToInjectSuper toInject;
         private InjectOn injectOn;
 
@@ -171,7 +171,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectFieldAccess {
 
-        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
+        @AutoInject(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOnField injectOnField;
@@ -193,7 +193,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectAnnotatedTarget {
 
-        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
+        @AutoInject(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOn injectOn1;
@@ -222,7 +222,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInject_targetPropertyIsSuperType {
 
-        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
+        @AutoInject(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSub toInject;
         @TestedObject
         private InjectOn injectOn;
@@ -244,7 +244,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInject_targetPropertyIsSuperType_fieldAccess {
 
-        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
+        @AutoInject(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSub toInject;
         @TestedObject
         private InjectOnField injectOn;
@@ -266,9 +266,9 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectToMostSpecificallyTypedProperty {
 
-        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
+        @AutoInject(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSuper toInjectSuper;
-        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
+        @AutoInject(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSub toInjectSub;
         @TestedObject
         private InjectOnSuperSub injectOn;
@@ -295,9 +295,9 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInjectToMostSpecificallyTypedProperty_fieldAccess {
 
-        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
+        @AutoInject(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSuper toInjectSuper;
-        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
+        @AutoInject(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSub toInjectSub;
         @TestedObject
         private InjectOnSuperSubFieldAccess injectOn;
@@ -324,7 +324,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInject_targetPropertyOnSuperClass {
 
-        @AutoInject(propertyAccessType = PropertyAccessType.SETTER)
+        @AutoInject(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOn_subClass injectOn;
@@ -346,7 +346,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
 
     public class TestAutoInject_targetPropertyOnSuperClass_fieldAccess {
 
-        @AutoInject(propertyAccessType = PropertyAccessType.FIELD)
+        @AutoInject(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOn_subClass injectOn;

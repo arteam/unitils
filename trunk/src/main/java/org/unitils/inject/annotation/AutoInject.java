@@ -15,7 +15,7 @@
  */
 package org.unitils.inject.annotation;
 
-import org.unitils.inject.util.PropertyAccessType;
+import org.unitils.inject.util.PropertyAccess;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,6 +31,7 @@ import java.lang.annotation.Target;
  * assignable type.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -43,8 +44,8 @@ public @interface AutoInject {
     String target() default "";
 
     /**
-     * The property access type that should be used for injection.
+     * The property access that should be used for injection.
      */
-    PropertyAccessType propertyAccessType() default PropertyAccessType.DEFAULT;
+    PropertyAccess propertyAccess() default PropertyAccess.DEFAULT;
 
 }
