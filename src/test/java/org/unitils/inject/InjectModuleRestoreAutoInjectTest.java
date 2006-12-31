@@ -44,7 +44,7 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     public void testRestore_defaultRestore() {
         injectModule.injectObjects(new TestStaticSetterDefaultRestore());
-        injectModule.restoreObjects();
+        injectModule.restoreStaticInjectedObjects();
         assertEquals("original value", SetterInjectionTarget.stringProperty);
         assertEquals("original value", FieldInjectionTarget.stringProperty);
     }
@@ -55,7 +55,7 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     public void testRestore_restoreNothing() {
         injectModule.injectObjects(new TestStaticSetterRestoreNothing());
-        injectModule.restoreObjects();
+        injectModule.restoreStaticInjectedObjects();
         assertEquals("injected value", SetterInjectionTarget.stringProperty);
         assertEquals("injected value", FieldInjectionTarget.stringProperty);
     }
@@ -66,7 +66,7 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     public void testRestore_restoreOldValue() {
         injectModule.injectObjects(new TestStaticSetterRestoreOldValue());
-        injectModule.restoreObjects();
+        injectModule.restoreStaticInjectedObjects();
         assertEquals("original value", SetterInjectionTarget.stringProperty);
         assertEquals("original value", FieldInjectionTarget.stringProperty);
     }
@@ -76,7 +76,7 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     public void testRestore_restoreNull() {
         injectModule.injectObjects(new TestStaticSetterRestoreNull());
-        injectModule.restoreObjects();
+        injectModule.restoreStaticInjectedObjects();
         assertNull(SetterInjectionTarget.stringProperty);
         assertNull(FieldInjectionTarget.stringProperty);
     }
@@ -87,7 +87,7 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     public void testRestore_restore0() {
         injectModule.injectObjects(new TestStaticSetterRestore0());
-        injectModule.restoreObjects();
+        injectModule.restoreStaticInjectedObjects();
         assertEquals(0, SetterInjectionTarget.primitiveProperty);
         assertEquals(0, FieldInjectionTarget.primitiveProperty);
     }
