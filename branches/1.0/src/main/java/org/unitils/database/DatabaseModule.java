@@ -98,7 +98,6 @@ public class DatabaseModule implements Module {
     public void init(Configuration configuration) {
         this.configuration = configuration;
 
-        //todo add config utils that check on empty properties
         disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         updateDatabaseSchemaEnabled = configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED);
 
@@ -166,11 +165,17 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * @return The <code>TestDataSource</code>
+     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
+     * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
+     *
+     * @return The <code>DataSource</code>
      */
     public DataSource getDataSource() {
         if (dataSource == null) {
             dataSource = createDataSource();
+            if (updateDatabaseSchemaEnabled) {
+                updateDatabaseSchema();
+            }
         }
         return dataSource;
     }
@@ -219,15 +224,13 @@ public class DatabaseModule implements Module {
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link org.unitils.dbmaintainer.maintainer.DBMaintainer} for more information.
      */
-    protected void updateDatabaseSchemaIfNeeded() {
+    protected void updateDatabaseSchema() {
 
-        if (updateDatabaseSchemaEnabled) {
-            try {
-                DBMaintainer dbMaintainer = createDbMaintainer(configuration);
-                dbMaintainer.updateDatabase();
-            } catch (StatementHandlerException e) {
-                throw new UnitilsException("Error while updating database", e);
-            }
+        try {
+            DBMaintainer dbMaintainer = createDbMaintainer(configuration);
+            dbMaintainer.updateDatabase();
+        } catch (StatementHandlerException e) {
+            throw new UnitilsException("Error while updating database", e);
         }
     }
 
@@ -264,19 +267,6 @@ public class DatabaseModule implements Module {
      * annotation.
      */
     private class DatabaseTestListener extends TestListener {
-
-        /* Boolean that is set to false after the first database test has been occured in the beforeTestClass method,
-           to make sure database update is only performed once */
-        private boolean firstDatabaseTest = true;
-
-        @Override
-        public void beforeTestClass(Class<?> testClass) {
-
-            if (isDatabaseTest(testClass) && firstDatabaseTest) {
-                updateDatabaseSchemaIfNeeded();
-                firstDatabaseTest = false;
-            }
-        }
 
         @Override
         public void beforeTestSetUp(Object testObject) {

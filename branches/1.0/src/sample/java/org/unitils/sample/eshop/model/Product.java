@@ -45,9 +45,6 @@ public class Product {
     private String name;
 
     @Column
-    private String barCode;
-
-    @Column
     private int minimumAge;
 
     public Product() {}
