@@ -20,7 +20,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Utility that loads the configuration of unitils.
@@ -43,6 +45,9 @@ import org.apache.log4j.Logger;
  * A runtime exception is thrown when the default settings cannot be loaded.
  * A warning is logged when the custom propreties cannot be loaded.
  * A debug message is logged when the local configuration cannot be loaded.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class ConfigurationLoader {
 
@@ -62,9 +67,8 @@ public class ConfigurationLoader {
      */
     public static final String PROPKEY_LOCAL_CONFIGURATION = "unitils.configuration.localFileName";
 
-
     /* The logger instance for this class */
-    private static final Logger logger = Logger.getLogger(ConfigurationLoader.class);
+    private static Log logger = LogFactory.getLog(ConfigurationLoader.class);
 
 
     /**

@@ -16,8 +16,8 @@
 package org.unitils.dbmaintainer.maintainer;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
-import org.unitils.core.UnitilsException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clear.DBClearer;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
@@ -62,11 +62,12 @@ import java.util.List;
  * to the database and a <code>Configuration</code> object containing all necessary properties.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class DBMaintainer {
 
-    /* Logger */
-    private static final Logger logger = Logger.getLogger(DBMaintainer.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DBMaintainer.class);
 
     /* Property key of the database dialect */
     public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
@@ -113,64 +114,59 @@ public class DBMaintainer {
     /* Database DTD generator */
     private DtdGenerator dtdGenerator;
 
-
     /* Indicates if updateing the database from scratch is enabled. If yes, the database is cleared before updateing
       if an already executed script is modified */
     private boolean fromScratchEnabled;
 
+
+    /**
+     * Default constructor for testing.
+     */
     public DBMaintainer() {
     }
+
 
     /**
      * Create a new instance of <code>DBMaintainer</code>, The concrete implementations of all helper classes are
      * derived from the given <code>Configuration</code> object.
      *
-     * @param configuration
-     * @param dataSource
+     * @param configuration the configuration, not null
+     * @param dataSource    the data source, not null
      */
     public DBMaintainer(Configuration configuration, DataSource dataSource) {
 
-        StatementHandler statementHandler = new LoggingStatementHandlerDecorator(
-                DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
+        StatementHandler statementHandler = new LoggingStatementHandlerDecorator(DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
 
-        scriptRunner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration,
-                dataSource, statementHandler);
-        versionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class, configuration,
-                dataSource, statementHandler);
-
-        scriptSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration,
-                dataSource, statementHandler);
+        scriptRunner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
+        versionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
+        scriptSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
 
         boolean cleanDbEnabled = configuration.getBoolean(PROPKEY_DBCLEANER_ENABLED);
         if (cleanDbEnabled) {
-            dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration,
-                    dataSource, statementHandler);
+            dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
         }
 
         fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
         if (fromScratchEnabled) {
-            dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration,
-                    dataSource, statementHandler);
+            dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
         }
 
         boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         if (disableConstraints) {
-            constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
-                    configuration, dataSource, statementHandler);
+            constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
         }
 
         boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
         if (updateSequences) {
-            sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class,
-                    configuration, dataSource, statementHandler);
+            sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
         }
 
         boolean generateDtd = configuration.getBoolean(PROPKEY_GENERATEDTD_ENABLED);
         if (generateDtd) {
-            dtdGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration,
-                    dataSource, statementHandler);
+            dtdGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
         }
     }
+
 
     /**
      * Checks if the new scripts are available to update the version of the database. If yes, these scripts are
@@ -185,12 +181,10 @@ public class DBMaintainer {
         boolean rebuildDatabaseFromScratch = false;
         if (scriptSource.existingScriptsModified(currentVersion)) {
             if (fromScratchEnabled) {
-                logger.info("One or more existing database update scripts have been modified. Database will be " +
-                        "cleared and rebuilt from scratch");
+                logger.info("One or more existing database update scripts have been modified. Database will be cleared and rebuilt from scratch");
                 rebuildDatabaseFromScratch = true;
             } else {
-                logger.warn("Existing database update scripts have been modified, but updating " +
-                        "from scratch is disabled. The updated scripts are not executed again!!");
+                logger.warn("Existing database update scripts have been modified, but updating from scratch is disabled. The updated scripts are not executed again!!");
             }
         }
 
@@ -213,8 +207,7 @@ public class DBMaintainer {
                 try {
                     scriptRunner.execute(versionScriptPair.getScript());
                 } catch (StatementHandlerException e) {
-                    logger.error("Error while executing script with version number " + versionScriptPair.getVersion() +
-                            ": " + versionScriptPair.getScript(), e);
+                    logger.error("Error while executing script with version number " + versionScriptPair.getVersion() + ": " + versionScriptPair.getScript(), e);
                     if (fromScratchEnabled) {
                         // If rebuilding from scratch is disabled, the version is not incremented, to give the chance
                         // of fixing the erroneous script.
@@ -250,10 +243,11 @@ public class DBMaintainer {
         }
     }
 
+
     /**
      * Sets the fromScratchEnabled property
      *
-     * @param fromScratchEnabled
+     * @param fromScratchEnabled enabled or not
      */
     void setFromScratchEnabled(boolean fromScratchEnabled) {
         this.fromScratchEnabled = fromScratchEnabled;

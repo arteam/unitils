@@ -21,7 +21,6 @@ import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.*;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
-import org.unitils.easymock.util.ReflectionArgumentMatcher;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -44,6 +43,8 @@ import java.util.List;
  * Setting the {@link ReflectionComparatorMode#LENIENT_ORDER} mode will ignore the actual order of collections and
  * arrays arguments and inner fields of arguments. It will only check whether they both contain the same elements.
  *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  * @see ReflectionComparatorMode
  * @see org.unitils.reflectionassert.ReflectionComparator
  */

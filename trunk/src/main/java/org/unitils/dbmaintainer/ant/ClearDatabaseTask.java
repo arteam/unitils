@@ -16,7 +16,8 @@
 package org.unitils.dbmaintainer.ant;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.unitils.core.Unitils;
 import org.unitils.dbmaintainer.clear.DBClearer;
@@ -29,41 +30,40 @@ import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
  * that is configured in the Unitils configuration.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class ClearDatabaseTask extends BaseUnitilsTask {
 
-    /* Logger for this class */
-    private static final Logger logger = Logger.getLogger(ClearDatabaseTask.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(ClearDatabaseTask.class);
 
     /* Property key of the implementation class of the {@link DBClearer} */
     public static final String PROPKEY_DBCLEARER_START = "dbMaintainer.dbClearer.className";
 
+
     /**
-     * Clears the database, using the implementation of <code>DBClearer</code> that is configured in the Unitils
-     * configuration.
-     *
-     * @throws BuildException
+     * Clears the database, using the implementation of <code>DBClearer</code> that is configured
+     * in the Unitils configuration.
      */
     public void doExecute() throws BuildException {
         try {
             DBClearer dbClearer = createDBClearer();
             dbClearer.clearDatabase();
+
         } catch (StatementHandlerException e) {
             logger.error(e);
             throw new BuildException("Error while clearing database", e);
         }
     }
 
+
     /**
-     * @return the implementation of <code>DBClearer</code> that is configured in the Unitils
-     *         configuration.
+     * @return the implementation of <code>DBClearer</code> that is configured in the Unitils configuration.
      */
     private DBClearer createDBClearer() {
         Configuration configuration = Unitils.getInstance().getConfiguration();
 
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
-                dataSource);
-        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration,
-                dataSource, statementHandler);
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
+        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
     }
 }

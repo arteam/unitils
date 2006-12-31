@@ -16,7 +16,8 @@
 package org.unitils.dbmaintainer.handler;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.sql.DataSource;
 
@@ -25,23 +26,26 @@ import javax.sql.DataSource;
  * passed on to the {@link StatementHandler} that is decorated.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class LoggingStatementHandlerDecorator implements StatementHandler {
 
-    /* The log4j Logger to which all statements are logged */
-    private static final Logger logger = Logger.getLogger(StatementHandler.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(StatementHandler.class);
 
     /* The StatementHandler that is decorated */
     private StatementHandler decoratedStatementHandler;
 
+
     /**
      * Creates a new instance that decorates the given instance.
      *
-     * @param decoratedStatementHandler
+     * @param decoratedStatementHandler the handler, not null
      */
     public LoggingStatementHandlerDecorator(StatementHandler decoratedStatementHandler) {
         this.decoratedStatementHandler = decoratedStatementHandler;
     }
+
 
     /**
      * Initializes the decorated instance.
@@ -51,6 +55,7 @@ public class LoggingStatementHandlerDecorator implements StatementHandler {
     public void init(Configuration configuration, DataSource dataSource) {
         decoratedStatementHandler.init(configuration, dataSource);
     }
+
 
     /**
      * Handles the given statement, i.e. logs it and passes it through to the decorated {@link StatementHandler}

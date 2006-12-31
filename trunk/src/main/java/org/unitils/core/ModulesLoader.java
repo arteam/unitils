@@ -16,7 +16,8 @@
 package org.unitils.core;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.util.ReflectionUtils;
 
 import java.util.*;
@@ -39,11 +40,11 @@ import java.util.*;
  * order C, B, A.
  * <p/>
  * If a circular dependency is found in the runAfter configuration, a runtime exception will be thrown.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class ModulesLoader {
-
-    /* The logger instance for this class */
-    private static final Logger logger = Logger.getLogger(ModulesLoader.class);
 
     /**
      * Property that contains the names of the modules that are to be loaded
@@ -69,6 +70,9 @@ public class ModulesLoader {
      * Last part of the core specific property that specifies the names of the modules that should be run before this core
      */
     public static final String PROPKEY_MODULE_SUFFIX_RUN_AFTER = ".runAfter";
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(ModulesLoader.class);
 
 
     /**
@@ -139,7 +143,6 @@ public class ModulesLoader {
                 // create core instance
                 Object module = ReflectionUtils.createInstanceOfType(className);
                 if (!(module instanceof Module)) {
-
                     throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
                 }
                 // run initializer
@@ -180,7 +183,6 @@ public class ModulesLoader {
 
         // Check for infinite loops
         if (traversedModuleNames.containsKey(moduleName)) {
-
             throw new UnitilsException("Unable to load modules. Circular dependency found for modules: " + traversedModuleNames.keySet());
         }
         traversedModuleNames.put(moduleName, moduleName);
