@@ -16,7 +16,8 @@
 package org.unitils.database;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
@@ -56,11 +57,15 @@ import java.util.Set;
  * <li>A 'current connection' is associated with each thread from which the method #getCurrentConnection is called</li>
  * <li>If the updateDataBaseSchema.enabled property is set to true, the {@link DBMaintainer} is invoked to update the
  * database and prepare it for unit testing (see {@link DBMaintainer} Javadoc)</li>
+ * <p/>
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class DatabaseModule implements Module {
 
     /* The logger instance for this class */
-    private static final Logger logger = Logger.getLogger(DatabaseModule.class);
+    private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
     /* Property keys indicating if the database schema should be updated before performing the tests */
     static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
@@ -83,6 +88,7 @@ public class DatabaseModule implements Module {
     /* Set of annotations that identify a test as a DatabaseTest */
     private Set<Class<? extends Annotation>> databaseTestAnnotations = new HashSet<Class<? extends Annotation>>();
 
+
     /**
      * Creates a new instance of the module, and registers the {@link DatabaseTest} annotation as an annotation that
      * identifies a test class as a database test.
@@ -90,6 +96,7 @@ public class DatabaseModule implements Module {
     public DatabaseModule() {
         registerDatabaseTestAnnotation(DatabaseTest.class);
     }
+
 
     /**
      * Initializes this module using the given <code>Configuration</code>
@@ -105,15 +112,17 @@ public class DatabaseModule implements Module {
 
     }
 
+
     /**
      * Registers the given annotation as an annotation that identifies a test class as being a database test.
      *
-     * @param databaseTestAnnotation
+     * @param databaseTestAnnotation the annotation to register, not null
      */
     public void registerDatabaseTestAnnotation(Class<? extends Annotation> databaseTestAnnotation) {
 
         databaseTestAnnotations.add(databaseTestAnnotation);
     }
+
 
     /**
      * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
@@ -130,6 +139,7 @@ public class DatabaseModule implements Module {
         }
         return false;
     }
+
 
     /**
      * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
@@ -152,6 +162,7 @@ public class DatabaseModule implements Module {
         return dataSource;
     }
 
+
     /**
      * Creates the configured instance of the {@link ConstraintsDisabler}
      *
@@ -161,8 +172,7 @@ public class DatabaseModule implements Module {
     protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
 
         StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
-        ConstraintsDisabler constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
-        return constraintsDisabler;
+        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
     }
 
 
@@ -175,6 +185,7 @@ public class DatabaseModule implements Module {
         }
         return dataSource;
     }
+
 
     /**
      * Assigns the <code>TestDataSource</code> to every field annotated with {@link TestDataSource} and calls all methods
@@ -232,6 +243,7 @@ public class DatabaseModule implements Module {
         }
     }
 
+
     /**
      * Creates a new instance of the {@link DBMaintainer}
      *
@@ -242,6 +254,7 @@ public class DatabaseModule implements Module {
         return new DBMaintainer(configuration, getDataSource());
     }
 
+
     /**
      * Returns an instance of the configured {@link DataSourceFactory}
      *
@@ -251,12 +264,14 @@ public class DatabaseModule implements Module {
         return ConfigUtils.getConfiguredInstance(DataSourceFactory.class, configuration);
     }
 
+
     /**
      * @return The {@link TestListener} associated with this module
      */
     public TestListener createTestListener() {
         return new DatabaseTestListener();
     }
+
 
     /**
      * TestListener that makes callbacks to methods of this module while running tests. This TestListener makes

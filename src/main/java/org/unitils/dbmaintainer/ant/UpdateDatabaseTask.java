@@ -16,7 +16,8 @@
 package org.unitils.dbmaintainer.ant;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.unitils.core.Unitils;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -27,11 +28,13 @@ import org.unitils.dbmaintainer.maintainer.DBMaintainer;
  * Unitils configuration.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class UpdateDatabaseTask extends BaseUnitilsTask {
 
-    /* Logger for this class */
-    private static final Logger logger = Logger.getLogger(UpdateDatabaseTask.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(UpdateDatabaseTask.class);
+
 
     /**
      * Updates the database to the latest version. Invokes {@link DBMaintainer} as it is configured in the Unitils
@@ -44,6 +47,7 @@ public class UpdateDatabaseTask extends BaseUnitilsTask {
         DBMaintainer dbMaintainer = new DBMaintainer(configuration, dataSource);
         try {
             dbMaintainer.updateDatabase();
+
         } catch (StatementHandlerException e) {
             logger.error(e);
             throw new BuildException("Error updateing database", e);

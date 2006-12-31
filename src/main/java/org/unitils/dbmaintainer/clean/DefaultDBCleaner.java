@@ -16,7 +16,8 @@
 package org.unitils.dbmaintainer.clean;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -28,13 +29,15 @@ import java.util.*;
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
  * that are configured as tables to preserve. This includes the tables that are listed in the property
  * {@link #PROPKEY_TABLESTOPRESERVE}, {@link #PROPKEY_DBCLEARER_ITEMSTOPRESERVE}. and the table that is configured as
- * version table using the property {@link #PROPKEY_VERSION_TABLE_NAME}. 
+ * version table using the property {@link #PROPKEY_VERSION_TABLE_NAME}.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
 
-    private static final Logger logger = Logger.getLogger(DefaultDBCleaner.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DefaultDBCleaner.class);
 
     /* Property key for the tables that should not be cleaned */
     public static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.cleanDb.tablesToPreserve";
@@ -49,10 +52,11 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
     /* The tables that should not be cleaned */
     private Set<String> tablesToPreserve;
 
+
     /**
-     * Configures this object
+     * Configures this object.
      *
-     * @param configuration
+     * @param configuration the configuration, not null
      */
     protected void doInit(Configuration configuration) {
         tablesToPreserve = new HashSet<String>();
@@ -61,11 +65,10 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
         tablesToPreserve.addAll(toUpperCaseList(Arrays.asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
     }
 
+
     /**
      * Deletes all data from the database, except for the tables that have been
      * configured as <i>tablesToPreserve</i> , and the table in which the database version is stored
-     *
-     * @throws StatementHandlerException
      */
     public void cleanDatabase() throws StatementHandlerException {
         try {
@@ -78,11 +81,11 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
         }
     }
 
+
     /**
      * Deletes the data in the database tables with the given table names.
      *
-     * @param tableNames
-     * @throws StatementHandlerException
+     * @param tableNames The names of the tables that need to be cleared, not null
      */
     private void clearTables(Set<String> tableNames) throws StatementHandlerException, SQLException {
         for (String tableName : tableNames) {
@@ -92,10 +95,11 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
         }
     }
 
+
     /**
      * Converts the given list of strings to uppercase.
      *
-     * @param strings
+     * @param strings The strings to uppercase, not null
      * @return the given string list, converted to uppercase
      */
     private List<String> toUpperCaseList(List<String> strings) {

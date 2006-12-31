@@ -17,7 +17,8 @@ package org.unitils;
 
 import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
@@ -29,13 +30,13 @@ import java.lang.reflect.Method;
  * core unitils test listener methods are invoked in the expected order. See {@link TestListener} for
  * more information on the listener invocation order.
  *
+ * @author Filip Neven
  * @author Tim Ducheyne
  */
 public abstract class UnitilsJUnit3 extends TestCase {
 
-
     /* The logger instance for this class */
-    private static final Logger logger = Logger.getLogger(UnitilsJUnit3.class);
+    private static Log logger = LogFactory.getLog(UnitilsJUnit3.class);
 
     /* The main test listener, that hooks this test into unitils */
     private static TestListener testListener;

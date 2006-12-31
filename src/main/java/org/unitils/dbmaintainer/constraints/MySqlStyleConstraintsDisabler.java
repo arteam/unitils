@@ -16,7 +16,8 @@
 package org.unitils.dbmaintainer.constraints;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -35,13 +36,22 @@ import java.util.Set;
  *
  * @author Filip Neven
  * @author Bart Vermeiren
+ * @author Tim Ducheyne
  */
 public class MySqlStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
 
-    private static final Logger logger = Logger.getLogger(MySqlStyleConstraintsDisabler.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(MySqlStyleConstraintsDisabler.class);
 
+
+    /**
+     * Initializes the disabler.
+     *
+     * @param configuration The config, not null
+     */
     protected void doInit(Configuration configuration) {
     }
+
 
     /**
      * Remove all not-null constraints. Foreign key constraints are disabled directly on the connection (see method
@@ -56,11 +66,9 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
         }
     }
 
+
     /**
      * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
-     *
-     * @throws SQLException
-     * @throws StatementHandlerException
      */
     private void removeNotNullConstraints() throws SQLException, StatementHandlerException {
         // Iterate of all table names
@@ -70,13 +78,12 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
         }
     }
 
+
     /**
      * Sends statements to the StatementHandler that make sure all not-null constraints for the table with the given
      * name are disabled.
      *
-     * @param tableName
-     * @throws SQLException
-     * @throws StatementHandlerException
+     * @param tableName the name of the table to remove constraints from, not null
      */
     private void removeNotNullConstraints(String tableName) throws SQLException, StatementHandlerException {
         // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
@@ -91,13 +98,14 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
         }
     }
 
+
     /**
      * Makes sure foreign key checking is disabled
      *
-     * @param conn
+     * @param connection the db connection to use, not null
      */
-    public void disableConstraintsOnConnection(Connection conn) {
-        dbSupport.disableForeignKeyConstraintsCheckingOnConnection(conn);
+    public void disableConstraintsOnConnection(Connection connection) {
+        dbSupport.disableForeignKeyConstraintsCheckingOnConnection(connection);
     }
 
 

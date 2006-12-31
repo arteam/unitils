@@ -16,7 +16,8 @@
 package org.unitils.dbmaintainer.clear;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -31,23 +32,25 @@ import java.util.Set;
  * using the property {@link #PROPKEY_ITEMSTOPRESERVE}.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class DefaultDBClearer extends DatabaseTask implements DBClearer {
-
-    private static final Logger logger = Logger.getLogger(DefaultDBClearer.class);
 
     /* The key of the property that specifies which database items should not be deleted when clearing the database */
     public static final String PROPKEY_ITEMSTOPRESERVE = "dbMaintainer.clearDb.itemsToPreserve";
 
-    /* Names of database items (tables, views, sequences or triggers) that should not be deleted when clearning the
-        database */
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DefaultDBClearer.class);
+
+    /* Names of database items (tables, views, sequences or triggers) that should not be deleted when clearning the database */
     private Set<String> itemsToPreserve = new HashSet<String>();
+
 
     /**
      * Initializes the the DBClearer. The list of database items that should be preserved is retrieved from the given
      * <code>Configuration</code> object.
      *
-     * @param configuration
+     * @param configuration the config, not null
      */
     protected void doInit(Configuration configuration) {
         String[] itemsToPreserveArray = configuration.getStringArray(PROPKEY_ITEMSTOPRESERVE);
@@ -56,12 +59,11 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         }
     }
 
+
     /**
      * Clears the database schema. This means, all the tables, views, constraints, triggers and sequences are
      * dropped, so that the database schema is empty. The database items that are configured as items to preserve, are
      * left untouched.
-     *
-     * @throws StatementHandlerException
      */
     public void clearDatabase() throws StatementHandlerException {
         try {
@@ -75,11 +77,9 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         }
     }
 
+
     /**
      * Drops all views.
-     *
-     * @throws SQLException
-     * @throws StatementHandlerException
      */
     private void dropViews() throws SQLException, StatementHandlerException {
         Set<String> viewNames = dbSupport.getViewNames();
@@ -89,11 +89,9 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         }
     }
 
+
     /**
      * Drops all tables.
-     *
-     * @throws SQLException
-     * @throws StatementHandlerException
      */
     private void dropTables() throws SQLException, StatementHandlerException {
         Set<String> tableNames = dbSupport.getTableNames();
@@ -103,11 +101,9 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         }
     }
 
+
     /**
      * Drops all sequences
-     *
-     * @throws StatementHandlerException
-     * @throws SQLException
      */
     private void dropSequences() throws StatementHandlerException, SQLException {
         if (dbSupport.supportsSequences()) {
@@ -119,11 +115,9 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         }
     }
 
+
     /**
      * Drops all triggers
-     *
-     * @throws StatementHandlerException
-     * @throws SQLException
      */
     private void dropTriggers() throws StatementHandlerException, SQLException {
         if (dbSupport.supportsTriggers()) {

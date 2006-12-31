@@ -20,7 +20,8 @@ import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.util.ReflectionUtils;
 import static org.unitils.util.ReflectionUtils.*;
@@ -39,7 +40,8 @@ import java.util.List;
 public class InjectionUtils {
 
     /* The logger instance for this class */
-    private static final Logger logger = Logger.getLogger(InjectionUtils.class);
+    private static Log logger = LogFactory.getLog(InjectionUtils.class);
+
 
     /**
      * Explicit injection of the objectToInject into the specified property of the target. The property should be a
@@ -70,6 +72,7 @@ public class InjectionUtils {
             throw new UnitilsException("Failed to set value using OGNL expression " + property, e);
         }
     }
+
 
     /**
      * Explicit injection of the objectToInject into the specified static property of the target class. The property
@@ -107,6 +110,7 @@ public class InjectionUtils {
         }
     }
 
+
     /**
      * Performs auto-injection by type of the objectToInject on the target object.
      *
@@ -114,7 +118,7 @@ public class InjectionUtils {
      * @param objectToInjectType The type of the object. This should be the type of the object or one of his super-types
      *                           or implemented interfaces. This type is used for property type matching on the target object
      * @param target             The object into which the objectToInject is injected
-     * @param propertyAccess Defines if field or setter injection is used
+     * @param propertyAccess     Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
     public static Object autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccess propertyAccess) {
@@ -124,6 +128,7 @@ public class InjectionUtils {
         return autoInjectToSetter(objectToInject, objectToInjectType, target, target.getClass(), false);
     }
 
+
     /**
      * Performs auto-injection by type of the objectToInject into the target class.
      *
@@ -131,7 +136,7 @@ public class InjectionUtils {
      * @param objectToInjectType The type of the object. This should be the type of the object or one of his super-types
      *                           or implemented interfaces. This type is used for property type matching on the target class
      * @param targetClass        The class into which the objectToInject is injected
-     * @param propertyAccess Defines if field or setter injection is used
+     * @param propertyAccess     Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
     public static Object autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccess propertyAccess) {
@@ -140,6 +145,7 @@ public class InjectionUtils {
         }
         return autoInjectToSetter(objectToInject, objectToInjectType, null, targetClass, true);
     }
+
 
     /**
      * Performs auto-injection on a field by type of the objectToInject into the given target object or targetClass,
@@ -206,6 +212,7 @@ public class InjectionUtils {
         setFieldValue(target, fieldToInjectTo, objectToInject);
         return oldValue;
     }
+
 
     /**
      * Performs auto-injection on a setter by type of the objectToInject into the given target object or targetClass,
@@ -284,6 +291,7 @@ public class InjectionUtils {
         return oldValue;
     }
 
+
     /**
      * Retrieves the value of the static property from the given class
      *
@@ -310,6 +318,7 @@ public class InjectionUtils {
             }
         }
     }
+
 
     /**
      * Sets the given value on the static property of the given targetClass

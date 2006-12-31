@@ -17,7 +17,8 @@ package org.unitils.dbmaintainer.maintainer.version;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -35,7 +36,8 @@ import java.sql.*;
  */
 public class DBVersionSource extends DatabaseTask implements VersionSource {
 
-    private static final Logger logger = Logger.getLogger(DBVersionSource.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DBVersionSource.class);
 
     /* The key of the property that specifies the name of the datase table in which the DB version is stored */
     public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
@@ -61,10 +63,11 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
     /* The name of the database column in which is stored whether the last DB update succeeded */
     private String lastUpdateSucceededColumnName;
 
+
     /**
      * Initializes the name of the version table and its columns using the given <code>Configuration</code> object
      *
-     * @param configuration
+     * @param configuration the configuration, not null
      */
     protected void doInit(Configuration configuration) {
         this.versionTableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
@@ -87,6 +90,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " + versionTableName);
             rs.next();
             return new Version(rs.getLong(versionIndexColumnName), rs.getLong(versionTimestampColumnName));
+
         } catch (SQLException e) {
             throw new UnitilsException("Error while retrieving database version", e);
         } finally {
@@ -96,7 +100,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
 
     /**
      * Checks if the version table and columns are available and if a record exists in which the version info is stored.
-     *  If not, the table, columns and record are created.
+     * If not, the table, columns and record are created.
      *
      * @param conn The connection to the database
      */
@@ -113,8 +117,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
                 // The version table does not exist. Create it
                 logger.info("The table " + versionTableName + " doesn't exist yet. It is being created");
                 statementHandler.handle("create table " + versionTableName + " ( " + versionIndexColumnName + " " + longDataType +
-                        ", " + versionTimestampColumnName + " " + longDataType + ", " + lastUpdateSucceededColumnName +
-                        " " + longDataType + " )");
+                        ", " + versionTimestampColumnName + " " + longDataType + ", " + lastUpdateSucceededColumnName + " " + longDataType + " )");
             } else {
                 // Check if the version table has the expected column
                 rs = metadata.getColumns(null, schemaName, versionTableName, versionIndexColumnName);
@@ -202,8 +205,8 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         try {
             conn = dataSource.getConnection();
             checkVersionTable(conn);
-            statementHandler.handle("update " + versionTableName + " set " + lastUpdateSucceededColumnName + " = " +
-                    (succeeded ? "1" : "0"));
+            statementHandler.handle("update " + versionTableName + " set " + lastUpdateSucceededColumnName + " = " + (succeeded ? "1" : "0"));
+
         } catch (SQLException e) {
             throw new UnitilsException("Error while registering database update success = " + succeeded, e);
         } finally {

@@ -16,7 +16,8 @@
 package org.unitils.dbmaintainer.constraints;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
@@ -38,10 +39,18 @@ import java.util.Set;
  */
 public class OracleStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
 
-    private static final Logger logger = Logger.getLogger(OracleStyleConstraintsDisabler.class);
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(OracleStyleConstraintsDisabler.class);
 
+
+    /**
+     * Initializes the disabler.
+     *
+     * @param configuration the config, not null
+     */
     protected void doInit(Configuration configuration) {
     }
+
 
     /**
      * Permanently disable every foreign key or not-null constraint
@@ -61,10 +70,11 @@ public class OracleStyleConstraintsDisabler extends DatabaseTask implements Cons
         }
     }
 
+
     /**
      * @see ConstraintsDisabler#disableConstraintsOnConnection(java.sql.Connection)
      */
-    public void disableConstraintsOnConnection(Connection conn) {
+    public void disableConstraintsOnConnection(Connection connection) {
 
     }
 
