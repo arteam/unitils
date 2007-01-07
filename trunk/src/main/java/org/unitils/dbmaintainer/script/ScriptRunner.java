@@ -21,14 +21,14 @@ import org.unitils.dbmaintainer.handler.StatementHandlerException;
  * Defines the contract for an executer of a database update script.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public interface ScriptRunner {
 
     /**
      * Executes the given script
      *
-     * @param script
-     * @throws StatementHandlerException
+     * @param script The script as a string, not null
      */
     void execute(String script) throws StatementHandlerException;
 

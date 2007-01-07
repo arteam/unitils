@@ -20,6 +20,7 @@ package org.unitils.dbmaintainer.dtd;
  * be used in XML files containing test data for a unit test database
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public interface DtdGenerator {
 

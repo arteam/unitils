@@ -83,7 +83,7 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
      * Sends statements to the StatementHandler that make sure all not-null constraints for the table with the given
      * name are disabled.
      *
-     * @param tableName the name of the table to remove constraints from, not null
+     * @param tableName The name of the table to remove constraints from, not null
      */
     private void removeNotNullConstraints(String tableName) throws SQLException, StatementHandlerException {
         // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
@@ -102,7 +102,7 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
     /**
      * Makes sure foreign key checking is disabled
      *
-     * @param connection the db connection to use, not null
+     * @param connection The db connection to use, not null
      */
     public void disableConstraintsOnConnection(Connection connection) {
         dbSupport.disableForeignKeyConstraintsCheckingOnConnection(connection);
