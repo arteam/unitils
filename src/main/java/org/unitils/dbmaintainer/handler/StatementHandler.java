@@ -24,20 +24,24 @@ import javax.sql.DataSource;
  * on a database.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public interface StatementHandler {
+
 
     /**
      * Provides a <code>Configuration</code> and a <code>TestDataSource</code> object for initialization
      *
-     * @param dataSource
+     * @param configuration The config, not null
+     * @param dataSource    The data source, not null
      */
     void init(Configuration configuration, DataSource dataSource);
+
 
     /**
      * Handles the given SQL statement
      *
-     * @param statement the SQL statement
+     * @param statement The SQL statement
      * @throws StatementHandlerException If the statement could not org handled correctly
      */
     void handle(String statement) throws StatementHandlerException;

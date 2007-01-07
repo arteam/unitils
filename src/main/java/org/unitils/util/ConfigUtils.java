@@ -1,3 +1,18 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.util;
 
 import org.apache.commons.configuration.Configuration;
@@ -50,13 +65,13 @@ public class ConfigUtils {
 
         String propKey = type.getName() + ".implClassName";
         String implementationSpecificPropKey = propKey + "." + implementationDiscriminatorValue;
-        logger.debug("Creating instance of " + type + ". Trying to retrieve concrete implementation class from the property "
-                + implementationSpecificPropKey);
+        logger.debug("Creating instance of " + type + ". Trying to retrieve concrete implementation class from the property " + implementationSpecificPropKey);
+
         if (configuration.containsKey(implementationSpecificPropKey)) {
             return (T) ReflectionUtils.createInstanceOfType(configuration.getString(implementationSpecificPropKey));
+
         } else {
-            logger.debug("Property " + implementationSpecificPropKey + " not specified. Trying to retrieve concrete " +
-                    "implementation class from the property " + propKey);
+            logger.debug("Property " + implementationSpecificPropKey + " not specified. Trying to retrieve concrete " + "implementation class from the property " + propKey);
             if (configuration.containsKey(propKey)) {
                 return (T) ReflectionUtils.createInstanceOfType(configuration.getString(propKey));
             } else {
