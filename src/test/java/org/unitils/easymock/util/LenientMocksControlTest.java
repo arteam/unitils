@@ -18,23 +18,24 @@ package org.unitils.easymock.util;
 import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.*;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
+import static org.unitils.easymock.EasyMockUnitils.refEq;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
-import org.unitils.easymock.util.LenientMocksControl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * A test for {@link org.unitils.easymock.util.LenientMocksControl}
- * <p/>
- * todo javadoc  + method javadoc
+ * A test for {@link LenientMocksControl}.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class LenientMocksControlTest extends TestCase {
 
-
     /* Class under test, with mock type LENIENT and ignore defaults */
     private LenientMocksControl lenientMocksControl;
+
 
     /**
      * Initializes the test fixture.
@@ -45,10 +46,11 @@ public class LenientMocksControlTest extends TestCase {
         lenientMocksControl = new LenientMocksControl(DEFAULT, IGNORE_DEFAULTS);
     }
 
+
     /**
-     * Test for two equal objects without java defaults.
+     * Test for a mocked method call that is invoked with the expected arguments.
      */
-    public void testCheckEquals_equals() {
+    public void testLenientMocksControl_equals() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 999, "Test", new ArrayList())).andReturn("Result");
@@ -60,10 +62,11 @@ public class LenientMocksControlTest extends TestCase {
         verify(mock);
     }
 
+
     /**
-     * Test for two equal objects without java defaults.
+     * Test for a mocked method call that has no arguments.
      */
-    public void testCheckEquals_equalsNoArguments() {
+    public void testLenientMocksControl_equalsNoArguments() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         mock.someBehavior();
@@ -76,9 +79,9 @@ public class LenientMocksControlTest extends TestCase {
 
 
     /**
-     * Test for two equal objects without java defaults.
+     * Test for a invoking a mocked method call more than once.
      */
-    public void testCheckEquals_equalsDoubleInvocation() {
+    public void testLenientMocksControl_equalsDoubleInvocation() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 111, "Test1", Arrays.asList("1"))).andReturn("Result1");
@@ -93,10 +96,11 @@ public class LenientMocksControlTest extends TestCase {
         assertEquals("Result2", result2);
     }
 
+
     /**
-     * Test for two equal objects with all java defaults.
+     * Test for ignoring a default value for an argument.
      */
-    public void testCheckEquals_equalsIgnoreDefaults() {
+    public void testLenientMocksControl_equalsIgnoreDefaults() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(false, 0, null, null)).andReturn("Result");
@@ -110,9 +114,9 @@ public class LenientMocksControlTest extends TestCase {
 
 
     /**
-     * Test for two equal objects without java defaults.
+     * Test for a mocked method that is expected but was never called.
      */
-    public void testCheckEquals_notEqualsNotCalled() {
+    public void testLenientMocksControl_notEqualsNotCalled() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 999, "XXXX", new ArrayList())).andReturn("Result");
@@ -128,9 +132,9 @@ public class LenientMocksControlTest extends TestCase {
 
 
     /**
-     * Test for two equal objects without java defaults.
+     * Test for a mocked method call that is invoked with the different arguments.
      */
-    public void testCheckEquals_notEqualsDifferentArguments() {
+    public void testLenientMocksControl_notEqualsDifferentArguments() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
         expect(mock.someBehavior(true, 999, "XXXX", new ArrayList())).andReturn("Result");
@@ -145,7 +149,25 @@ public class LenientMocksControlTest extends TestCase {
     }
 
 
-    //todo javadoc
+    /**
+     * Test for using argument matchers (refEq and EasyMocks eq).
+     */
+    public void testLenientMocksControl_mixingArgumentMatchers() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
+        expect(mock.someBehavior(eq(true), refEq(999), eq("Test"), refEq(new ArrayList()))).andReturn("Result");
+        replay(mock);
+
+        String result = mock.someBehavior(true, 999, "Test", new ArrayList());
+
+        assertEquals("Result", result);
+        verify(mock);
+    }
+
+
+    /**
+     * The test class that is going to be mocked.
+     */
     private static class MockedClass {
 
         public void someBehavior() {
