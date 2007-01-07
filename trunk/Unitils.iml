@@ -190,7 +190,9 @@
           <root url="jar://$MODULE_DIR$/lib/easymockclassextension-2.2.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../../../_apps/java/easymockclassextension2.2/src.zip!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
@@ -235,7 +237,9 @@
           <root url="jar://$MODULE_DIR$/lib/easymock2.2-.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../../../_apps/java/easymock2.2/src.zip!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">

@@ -43,8 +43,8 @@ import java.util.List;
  * Setting the {@link ReflectionComparatorMode#LENIENT_ORDER} mode will ignore the actual order of collections and
  * arrays arguments and inner fields of arguments. It will only check whether they both contain the same elements.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @see ReflectionComparatorMode
  * @see org.unitils.reflectionassert.ReflectionComparator
  */
@@ -157,10 +157,14 @@ public class LenientMocksControl extends MocksClassControl {
          */
         private void createMatchers(Invocation invocation) {
             List<IArgumentMatcher> matchers = LastControl.pullMatchers();
-            if (matchers != null) {
+            if (matchers != null && !matchers.isEmpty()) {
                 if (matchers.size() != invocation.getArguments().length) {
                     throw new IllegalStateException("This mock control does not support mixing of no-argument matchers and per-argument matchers. " +
                             "Either no matchers are defined and the reflection argument matcher is used by default or all matchers are defined explicitly (Eg by using refEq()).");
+                }
+                // put all matchers back since pull removes them
+                for (IArgumentMatcher matcher : matchers) {
+                    LastControl.reportMatcher(matcher);
                 }
                 return;
             }
@@ -169,8 +173,8 @@ public class LenientMocksControl extends MocksClassControl {
                 return;
             }
 
-            for (int i = 0; i < arguments.length; i++) {
-                LastControl.reportMatcher(new ReflectionArgumentMatcher<Object>(arguments[i], modes));
+            for (Object argument : arguments) {
+                LastControl.reportMatcher(new ReflectionArgumentMatcher<Object>(argument, modes));
             }
         }
 
