@@ -31,7 +31,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Test class for the DBCleaner
+ * Test class for the DBCleaner.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 @DatabaseTest
 @SuppressWarnings({"UnusedDeclaration"})
@@ -44,11 +47,10 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     @TestDataSource
     private DataSource dataSource;
 
+
     /**
      * Test fixture. The DefaultDBCleaner is instantiated and configured. Test tables are created and filled with test
      * data. One of these tables is configured as 'tabletopreserve'.
-     *
-     * @throws Exception
      */
     protected void setUp() throws Exception {
         super.setUp();
@@ -65,10 +67,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         insertTestData();
     }
 
+
     /**
      * Removes the test database tables from the test database, to avoid inference with other tests
-     *
-     * @throws Exception
      */
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -76,10 +77,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         dropTestTables();
     }
 
+
     /**
      * Creates the test tables
-     *
-     * @throws SQLException
      */
     private void createTestTables() throws SQLException {
         Connection conn = null;
@@ -97,10 +97,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Inserts a test record in each test table
-     *
-     * @throws SQLException
      */
     private void insertTestData() throws SQLException {
         Connection conn = null;
@@ -116,10 +115,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Removes the test database tables
-     *
-     * @throws SQLException
      */
     private void dropTestTables() throws SQLException {
         Connection conn = null;
@@ -152,10 +150,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Tests if the tables that are not configured as tables to preserve are correctly cleaned
-     *
-     * @throws Exception
      */
     public void testCleanDatabase() throws Exception {
         Connection conn = null;
@@ -169,10 +166,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Tests if the tables that are configured as tables to preserve are left untouched
-     *
-     * @throws Exception
      */
     public void testCleanDatabase_preserveDbVersionTable() throws Exception {
         Connection conn = null;
@@ -186,10 +182,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Tests if db_version table is left untouched
-     *
-     * @throws Exception
      */
     public void testCleanDatabase_preserveTablesToPreserve() throws Exception {
         Connection conn = null;
@@ -203,9 +198,12 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
-     * @return
-     * @throws SQLException
+     * Utility method to check whether the given table is empty.
+     *
+     * @param tableName the table, not null
+     * @return true if empty
      */
     private boolean isEmpty(String tableName) throws SQLException {
         Connection conn = null;

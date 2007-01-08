@@ -35,6 +35,9 @@ import java.sql.Statement;
 /**
  * Test class for {@link org.unitils.dbmaintainer.maintainer.version.DBVersionSource}. The implementation is tested using
  * a test database. The dbms that is used depends on the database configuration in test/resources/unitils.properties
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 @DatabaseTest
 @DataSet(fileName = "DBVersionSourceTest.versionTableEmpty.xml")
@@ -45,37 +48,98 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
 
     /* The dataSource */
     @TestDataSource
-    private javax.sql.DataSource dataSource;
+    private javax.sql.DataSource dataSource = null;
 
+    /* Database type specific support */
     private DbSupport dbSupport;
 
+
     /**
-     * Initialize test fixture
-     *
-     * @throws Exception
+     * Initialize test fixture and creates a test version table.
      */
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
-
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
-                dataSource);
-        dbVersionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class,
-                configuration, dataSource, statementHandler);
+        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
+        dbVersionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
         dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         dropVersionTable();
         createVersionTable();
     }
 
+
+    /**
+     * Cleanup by dropping the test version table.
+     */
     protected void tearDown() throws Exception {
         super.tearDown();
-
         dropVersionTable();
     }
 
+
+    /**
+     * Tests retrieval of the version, when there is no version table yet (first use)
+     */
+    public void testGetDBVersion_noVersionTable() throws Exception {
+        dropVersionTable();
+        assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
+    }
+
+    /**
+     * Tests retrieval of the version, when the table is still empty (first use)
+     */
+    public void testGetDBVersion_emptyTable() throws Exception {
+        assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
+    }
+
+    /**
+     * Test normal retrieval of the version
+     */
+    @DataSet(fileName = "DBVersionSourceTest.versionTableFilled.xml")
+    public void testGetDBVersion() throws Exception {
+        Version expectedVersion = new Version(3L, DateUtils.parseDate("2006-10-08 12:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
+        assertRefEquals(expectedVersion, dbVersionSource.getDbVersion());
+    }
+
+    /**
+     * Tests setting the version
+     */
+    public void testSetDBVersion() throws Exception {
+        Version version = new Version(2L, DateUtils.parseDate("2006-10-09 14:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
+        dbVersionSource.setDbVersion(version);
+        assertRefEquals(version, dbVersionSource.getDbVersion());
+    }
+
+    /**
+     * Tests whether the dbVersion can be correctly set when the db_version table is empty
+     */
+    public void testSetDBVersion_emptyTable() throws Exception {
+        testSetDBVersion();
+    }
+
+    /**
+     * Test whether the update succeeded value can be correclty set and retrieved, when succeeded is true
+     */
+    public void testRegisterUpdateSucceeded_succeeded() throws Exception {
+        dbVersionSource.registerUpdateSucceeded(true);
+        assertTrue(dbVersionSource.lastUpdateSucceeded());
+    }
+
+    /**
+     * Test whether the update succeeded value can be correclty set and retrieved, when succeeded is false
+     */
+    public void testRegisterUpdateSucceeded_notSucceeded() throws Exception {
+        dbVersionSource.registerUpdateSucceeded(false);
+        assertFalse(dbVersionSource.lastUpdateSucceeded());
+    }
+
+
+    /**
+     * Utility method to create the test version table.
+     */
     private void createVersionTable() throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -94,6 +158,9 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Utility method to drop the test version table.
+     */
     private void dropVersionTable() throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -109,75 +176,4 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
-
-    /**
-     * Tests retrieval of the version, when there is no version table yet (first use)
-     *
-     * @throws Exception
-     */
-    public void testGetDBVersion_noVersionTable() throws Exception {
-        dropVersionTable();
-        assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
-    }
-
-    /**
-     * Tests retrieval of the version, when the table is still empty (first use)
-     *
-     * @throws Exception
-     */
-    public void testGetDBVersion_emptyTable() throws Exception {
-        assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
-    }
-
-    /**
-     * Test normal retrieval of the version
-     *
-     * @throws Exception
-     */
-    @DataSet(fileName = "DBVersionSourceTest.versionTableFilled.xml")
-    public void testGetDBVersion() throws Exception {
-        Version expectedVersion = new Version(3L, DateUtils.parseDate("2006-10-08 12:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
-        assertRefEquals(expectedVersion, dbVersionSource.getDbVersion());
-    }
-
-    /**
-     * Tests setting the version
-     *
-     * @throws Exception
-     */
-    public void testSetDBVersion() throws Exception {
-        Version version = new Version(2L, DateUtils.parseDate("2006-10-09 14:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
-        dbVersionSource.setDbVersion(version);
-        assertRefEquals(version, dbVersionSource.getDbVersion());
-    }
-
-    /**
-     * Tests whether the dbVersion can be correctly set when the db_version table is empty
-     *
-     * @throws Exception
-     */
-    public void testSetDBVersion_emptyTable() throws Exception {
-        testSetDBVersion();
-    }
-
-    /**
-     * Test whether the update succeeded value can be correclty set and retrieved, when succeeded is true
-     *
-     * @throws Exception
-     */
-    public void testRegisterUpdateSucceeded_succeeded() throws Exception {
-        dbVersionSource.registerUpdateSucceeded(true);
-        assertTrue(dbVersionSource.lastUpdateSucceeded());
-    }
-
-    /**
-     * Test whether the update succeeded value can be correclty set and retrieved, when succeeded is false
-     *
-     * @throws Exception
-     */
-    public void testRegisterUpdateSucceeded_notSucceeded() throws Exception {
-        dbVersionSource.registerUpdateSucceeded(false);
-        assertFalse(dbVersionSource.lastUpdateSucceeded());
-    }
-
 }
