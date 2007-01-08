@@ -33,6 +33,7 @@ import java.sql.*;
  * {@link #PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME}.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class DBVersionSource extends DatabaseTask implements VersionSource {
 
@@ -63,6 +64,9 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
     /* The name of the database column in which is stored whether the last DB update succeeded */
     private String lastUpdateSucceededColumnName;
 
+    /* True if the existence and structure of the version table was checked */
+    private boolean versionTableChecked;
+
 
     /**
      * Initializes the name of the version table and its columns using the given <code>Configuration</code> object
@@ -70,11 +74,13 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      * @param configuration the configuration, not null
      */
     protected void doInit(Configuration configuration) {
+        this.versionTableChecked = false;
         this.versionTableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
         this.versionIndexColumnName = configuration.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();
         this.versionTimestampColumnName = configuration.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME).toUpperCase();
         this.lastUpdateSucceededColumnName = configuration.getString(PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME).toUpperCase();
     }
+
 
     /**
      * @return The current version of the database
@@ -98,60 +104,6 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
-    /**
-     * Checks if the version table and columns are available and if a record exists in which the version info is stored.
-     * If not, the table, columns and record are created.
-     *
-     * @param conn The connection to the database
-     */
-    private void checkVersionTable(Connection conn) throws StatementHandlerException {
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            st = conn.createStatement();
-            // Check if the version table exists
-            DatabaseMetaData metadata = conn.getMetaData();
-            rs = metadata.getTables(null, schemaName, versionTableName, null);
-            String longDataType = dbSupport.getLongDataType();
-            if (!rs.next()) {
-                // The version table does not exist. Create it
-                logger.info("The table " + versionTableName + " doesn't exist yet. It is being created");
-                statementHandler.handle("create table " + versionTableName + " ( " + versionIndexColumnName + " " + longDataType +
-                        ", " + versionTimestampColumnName + " " + longDataType + ", " + lastUpdateSucceededColumnName + " " + longDataType + " )");
-            } else {
-                // Check if the version table has the expected column
-                rs = metadata.getColumns(null, schemaName, versionTableName, versionIndexColumnName);
-                if (!rs.next()) {
-                    // The version table exists but the version index column does not. Create it
-                    logger.info("Column " + versionIndexColumnName + " is missing on table " + versionTableName + ". It is being created");
-                    statementHandler.handle("alter table " + versionTableName + " add " + versionIndexColumnName + " " + longDataType);
-                }
-                rs = metadata.getColumns(null, schemaName, versionTableName, versionTimestampColumnName);
-                if (!rs.next()) {
-                    // The version table exists but the version timestamp column does not. Create it
-                    logger.info("Column " + versionTimestampColumnName + " is missing on table " + versionTableName + ". It is being created");
-                    statementHandler.handle("alter table " + versionTableName + " add " + versionTimestampColumnName + " " + longDataType);
-                }
-                rs = metadata.getColumns(null, schemaName, versionTableName, lastUpdateSucceededColumnName);
-                if (!rs.next()) {
-                    // The version table exists but the last update succeeded column does not. Create it
-                    logger.info("Column " + lastUpdateSucceededColumnName + " is missing on table " + versionTableName + ". It is being created");
-                    statementHandler.handle("alter table " + versionTableName + " add " + lastUpdateSucceededColumnName + " " + longDataType);
-                }
-            }
-            // The version table and columns exist. Check if a record with the version is available
-            rs = st.executeQuery("select * from " + versionTableName);
-            if (!rs.next()) {
-                // The version table is empty. Insert a record with default version numbers.
-                statementHandler.handle("insert into " + versionTableName + " (" + versionIndexColumnName + ", " +
-                        versionTimestampColumnName + ", " + lastUpdateSucceededColumnName + ") values (0, 0, 0)");
-            }
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while checking version table", e);
-        } finally {
-            DbUtils.closeQuietly(null, st, rs);
-        }
-    }
 
     /**
      * Updates the version of the database to the given value
@@ -171,6 +123,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             DbUtils.closeQuietly(conn);
         }
     }
+
 
     /**
      * Tells us whether the last database version update succeeded or not
@@ -197,6 +150,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+
     /**
      * Notifies the VersionSource of the fact that the lastest version update has succeeded or not
      */
@@ -214,4 +168,70 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+
+    /**
+     * Checks if the version table and columns are available and if a record exists in which the version info is stored.
+     * If not, the table, columns and record are created.
+     *
+     * @param connection The connection to the database, will not be closed, not null
+     */
+    protected void checkVersionTable(Connection connection) throws StatementHandlerException {
+
+        // only perform check once, skip if already checked
+        if (versionTableChecked) {
+            return;
+        }
+        versionTableChecked = true;
+
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.createStatement();
+            // Check if the version table exists
+            DatabaseMetaData metadata = connection.getMetaData();
+            rs = metadata.getTables(null, schemaName, versionTableName, null);
+            String longDataType = dbSupport.getLongDataType();
+            if (!rs.next()) {
+                // The version table does not exist. Create it
+                logger.info("The table " + versionTableName + " doesn't exist yet. It is being created");
+                statementHandler.handle("create table " + versionTableName + " ( " + versionIndexColumnName + " " + longDataType +
+                        ", " + versionTimestampColumnName + " " + longDataType + ", " + lastUpdateSucceededColumnName + " " + longDataType + " )");
+            } else {
+                // Check if the version table has the expected column
+                rs.close();
+                rs = metadata.getColumns(null, schemaName, versionTableName, versionIndexColumnName);
+                if (!rs.next()) {
+                    // The version table exists but the version index column does not. Create it
+                    logger.info("Column " + versionIndexColumnName + " is missing on table " + versionTableName + ". It is being created");
+                    statementHandler.handle("alter table " + versionTableName + " add " + versionIndexColumnName + " " + longDataType);
+                }
+                rs.close();
+                rs = metadata.getColumns(null, schemaName, versionTableName, versionTimestampColumnName);
+                if (!rs.next()) {
+                    // The version table exists but the version timestamp column does not. Create it
+                    logger.info("Column " + versionTimestampColumnName + " is missing on table " + versionTableName + ". It is being created");
+                    statementHandler.handle("alter table " + versionTableName + " add " + versionTimestampColumnName + " " + longDataType);
+                }
+                rs.close();
+                rs = metadata.getColumns(null, schemaName, versionTableName, lastUpdateSucceededColumnName);
+                if (!rs.next()) {
+                    // The version table exists but the last update succeeded column does not. Create it
+                    logger.info("Column " + lastUpdateSucceededColumnName + " is missing on table " + versionTableName + ". It is being created");
+                    statementHandler.handle("alter table " + versionTableName + " add " + lastUpdateSucceededColumnName + " " + longDataType);
+                }
+            }
+            // The version table and columns exist. Check if a record with the version is available
+            rs.close();
+            rs = st.executeQuery("select * from " + versionTableName);
+            if (!rs.next()) {
+                // The version table is empty. Insert a record with default version numbers.
+                statementHandler.handle("insert into " + versionTableName + " (" + versionIndexColumnName + ", " +
+                        versionTimestampColumnName + ", " + lastUpdateSucceededColumnName + ") values (0, 0, 0)");
+            }
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while checking version table", e);
+        } finally {
+            DbUtils.closeQuietly(null, st, rs);
+        }
+    }
 }

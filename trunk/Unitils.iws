@@ -18,10 +18,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iml" afterPath="$PROJECT_DIR$/Unitils.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/LenientMocksControl.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/LenientMocksControl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSourceTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -183,22 +184,47 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="LenientMocksControlTest.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java">
+      <file leaf-file-name="DBVersionSource.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="22" selection-start="1079" selection-end="1122" vertical-scroll-proportion="0.37273595">
+            <state line="35" column="23" selection-start="1549" selection-end="1592" vertical-scroll-proportion="0.43755957">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LenientMocksControl.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/LenientMocksControl.java">
+      <file leaf-file-name="DbSupport.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="406" column="8" selection-start="13586" selection-end="13586" vertical-scroll-proportion="0.6272641">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HsqldbDbSupport.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="146" column="8" selection-start="5012" selection-end="5012" vertical-scroll-proportion="0.6272641">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MySqlDbSupport.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="45" column="8" selection-start="1406" selection-end="1406" vertical-scroll-proportion="0.21830314">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OracleDbSupport.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="57" column="8" selection-start="1928" selection-end="1928" vertical-scroll-proportion="0.21830314">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -757,7 +783,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure ProjectPane="false" PackagesPane="false" Scope="false" Favorites="false" />
+      <showStructure Scope="false" ProjectPane="false" PackagesPane="false" Favorites="false" />
       <autoscrollToSource ProjectPane="false" />
       <autoscrollFromSource ProjectPane="false" />
       <sortByType />
@@ -803,14 +829,14 @@
     </key>
   </component>
   <component name="RestoreUpdateTree" />
-  <component name="RunManager" selected="JUnit.LenientMocksControlTest">
-    <tempConfiguration default="false" name="LenientMocksControlTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="org.unitils.easymock.util.*" />
+  <component name="RunManager" selected="JUnit.DBVersionSourceTest">
+    <tempConfiguration default="false" name="DBVersionSourceTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="org.unitils.dbmaintainer.maintainer.version.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.unitils.easymock.util" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.easymock.util.LenientMocksControlTest" />
+      <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.maintainer.version" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.maintainer.version.DBVersionSourceTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -826,6 +852,37 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -849,43 +906,12 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
       <option name="SHMEM_ADDRESS" value="javadebug" />
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
-    </configuration>
-    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <method>
-        <option name="Make" value="true" />
-      </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" />
@@ -1164,62 +1190,6 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/SQLScriptRunner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="72" column="72" selection-start="2364" selection-end="2364" vertical-scroll-proportion="0.8379409">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="406" column="0" selection-start="13578" selection-end="13578" vertical-scroll-proportion="0.9675882">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="140" column="98" selection-start="5672" selection-end="5672" vertical-scroll-proportion="0.21258341">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/SQLScriptParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="98" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/easymockclassextension-2.2.jar!/org/easymock/classextension/internal/ClassProxyFactory.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/easymock2.2-.jar!/org/easymock/internal/ObjectMethodsFilter.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="0" selection-start="607" selection-end="607" vertical-scroll-proportion="0.35818475">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/easymock2.2-.jar!/org/easymock/internal/MockInvocationHandler.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="0" selection-start="666" selection-end="666" vertical-scroll-proportion="0.21067683">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/easymock2.2-.jar!/org/easymock/internal/LastControl.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="43" selection-start="859" selection-end="859" vertical-scroll-proportion="0.24308866">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/internal/MocksControl.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="68" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
@@ -1255,18 +1225,72 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/LenientMocksControl.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="144" column="58" selection-start="4482" selection-end="4482" vertical-scroll-proportion="0.31935176">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/LenientMocksControl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="22" selection-start="1079" selection-end="1122" vertical-scroll-proportion="0.37273595">
+        <state line="163" column="55" selection-start="7097" selection-end="7097" vertical-scroll-proportion="0.6968542">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSourceTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="50" selection-start="1442" selection-end="1442" vertical-scroll-proportion="0.08960915">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="406" column="8" selection-start="13586" selection-end="13586" vertical-scroll-proportion="0.6272641">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="146" column="8" selection-start="5012" selection-end="5012" vertical-scroll-proportion="0.6272641">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="8" selection-start="1406" selection-end="1406" vertical-scroll-proportion="0.21830314">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="57" column="8" selection-start="1928" selection-end="1928" vertical-scroll-proportion="0.21830314">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="43" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="23" selection-start="1549" selection-end="1592" vertical-scroll-proportion="0.43755957">
           <folding />
         </state>
       </provider>
