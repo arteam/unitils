@@ -18,11 +18,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSourceTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/resources/log4j.properties" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\resources\log4j.properties" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -187,7 +185,7 @@
       <file leaf-file-name="DBVersionSource.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="35" column="23" selection-start="1549" selection-end="1592" vertical-scroll-proportion="0.43755957">
+            <state line="58" column="23" selection-start="2966" selection-end="2966" vertical-scroll-proportion="0.09723546">
               <folding />
             </state>
           </provider>
@@ -1290,7 +1288,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="23" selection-start="1549" selection-end="1592" vertical-scroll-proportion="0.43755957">
+        <state line="58" column="23" selection-start="2966" selection-end="2966" vertical-scroll-proportion="0.09723546">
           <folding />
         </state>
       </provider>
