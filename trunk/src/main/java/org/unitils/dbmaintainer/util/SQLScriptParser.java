@@ -28,10 +28,11 @@ import java.util.List;
  * This parser also takes quoted literals and double quoted text into account when parsing the statements and treating
  * the comments.
  * <p/>
- * New line charactars in the statements will be replaced by spaces.
+ * New line charactars within quotes and double quotes will be inclded in the statements, other new lines will
+ * be replaced by a single space.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class SQLScriptParser {
 
@@ -78,15 +79,15 @@ public class SQLScriptParser {
         List<String> statements = new ArrayList<String>();
         StringBuffer statement = new StringBuffer();
 
+        // loop over all chars and pass current and next char to handle methods (use 0 for next of last char)
         char[] chars = script.toCharArray();
         int length = chars.length;
-        for (int i = 0; i < length - 1; i++) {
-            boolean skipNext = handleChar(chars[i], chars[i + 1], statement, statements);
+        for (int i = 0; i < length; i++) {
+            boolean skipNext = handleChar(chars[i], (i + 1 < length) ? chars[i + 1] : 0, statement, statements);
             if (skipNext) {
                 i++;
             }
         }
-        handleChar(chars[length - 1], (char) 0, statement, statements);
 
         // Check whether last statement was not ended with a ;
         if (statement.length() > 0) {
@@ -130,7 +131,7 @@ public class SQLScriptParser {
      * line comment (-- comment), block comment (/ * comment * /), quoted text ('text') and double
      * quoted text ("text) and changes the state correspondingly. It also checks for the ending of
      * statements by a ;. If a statement is ended the it is trimmed and added to the statement list ( ; not included).
-     * All new lines (\n and \r) are replaced by spaces.
+     * New line chars (\n and \r) will be replaced by a single space.
      *
      * @param current    the current char
      * @param next       the next char, 0 if there is no next char
@@ -150,9 +151,11 @@ public class SQLScriptParser {
             state = IN_BLOCK_COMMENT;
             return true;
         }
-        // check new line
+        // check new line: replace by space if previous char or next char is not a space
         if (current == '\n' || current == '\r') {
-            statement.append(' ');
+            if (next != ' ' && (statement.length() == 0 || statement.charAt(statement.length() - 1) != ' ')) {
+                statement.append(' ');
+            }
             return false;
         }
         // check escaped characters (do not interpreted next char)
@@ -192,7 +195,9 @@ public class SQLScriptParser {
 
         // check for ending chars
         if (current == '\n' || current == '\r') {
-            statement.append(' ');
+            if (next != ' ' && (statement.length() == 0 || statement.charAt(statement.length() - 1) != ' ')) {
+                statement.append(' ');
+            }
             state = NORMAL;
         }
         // skip all chars
@@ -224,7 +229,7 @@ public class SQLScriptParser {
 
     /**
      * Handles a char in a quoted literal ('text'). Checks for the ending quote, but ignores escaped quotes. All
-     * chars are appended to the statement.
+     * chars, including newlines (\n \r), are appended to the statement.
      *
      * @param current    the current char
      * @param next       the next char, 0 if there is no next char
@@ -252,7 +257,7 @@ public class SQLScriptParser {
 
     /**
      * Handles a char in a double quoted string ("text"). Checks for the ending double quote, but ignores escaped
-     * double quotes. All chars are appended to the statement.
+     * double quotes. All chars, including newlines (\n \r), are appended to the statement.
      *
      * @param current    the current char
      * @param next       the next char, 0 if there is no next char

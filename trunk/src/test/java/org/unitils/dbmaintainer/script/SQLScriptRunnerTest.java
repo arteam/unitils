@@ -45,21 +45,22 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /* Same as previous script except on multiple lines (containing new lines and cariage returns) */
     private static final String SCRIPT_MULTILINE =
             "CREATE TABLE PERSON\n (ID INTEGER PRIMARY KEY,\r NAME VARCHAR2(50));\n" +
-                    "CREATE\n TABLE\r ROLE (ID\n INTEGER PRIMARY KEY,\r ROLENAME VARCHAR2(20));\r\n";
+                    "CREATE\n TABLE\r ROLE (ID\n INTEGER PRIMARY KEY,\r ROLENAME VARCHAR2(20));\r\n" +
+                    "INSERT INTO USERS(NAME) VALUES ('This is\na multiline\rvalue');";
 
     /* Script containing 2 line comments */
     private static final String SCRIPT_LINE_COMMENTS =
             "-- comment1\n" +
                     "CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, -- inline comment\n" +
                     "-- comment2 /* ignored block comment*/\n" +
-                    "NAME VARCHAR2(50));";
+                    "NAME VARCHAR2(50)); -- another comment";
 
     /* Script containing a block comment on one line */
     private static final String SCRIPT_BLOCK_COMMENTS =
             "/* comment1 */\n" +
                     "CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, /* inline comment */\n" +
                     "/* comment2 -- ignored line comment */\n" +
-                    "NAME VARCHAR2(50));";
+                    "NAME VARCHAR2(50)); /* another comment */";
 
     /* Script containing a block comment that spans multiple lines */
     private static final String SCRIPT_BLOCK_COMMENT_MULTIPLE_LINES =
@@ -69,7 +70,8 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
                     "CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, /* inline comment\n" +
                     "-- ignored line comment\n" +
                     "*/\n" +
-                    "NAME VARCHAR2(50));";
+                    "NAME VARCHAR2(50)); /* another\n" +
+                    "comment */";
 
     /* Script containing a ; within quotes */
     private static final String SCRIPT_SEMI_COLON_IN_QUOTES =
@@ -111,8 +113,9 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
      * Test a script that contains new lines and cariage returns, these should have been converted to spaces
      */
     public void testExecute_multiline() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON  (ID INTEGER PRIMARY KEY,  NAME VARCHAR2(50))");
-        mockStatementHandler.handle("CREATE  TABLE  ROLE (ID  INTEGER PRIMARY KEY,  ROLENAME VARCHAR2(20))");
+        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))");
+        mockStatementHandler.handle("CREATE TABLE ROLE (ID INTEGER PRIMARY KEY, ROLENAME VARCHAR2(20))");
+        mockStatementHandler.handle("INSERT INTO USERS(NAME) VALUES ('This is\na multiline\rvalue')");
         replay();
 
         sqlScriptRunner.execute(SCRIPT_MULTILINE);
@@ -123,7 +126,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
      * Test a script that contains line comments (these should have been ignored)
      */
     public void testExecute_lineComments() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,   NAME VARCHAR2(50))");
+        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))");
         replay();
 
         sqlScriptRunner.execute(SCRIPT_LINE_COMMENTS);
@@ -134,7 +137,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
      * Test with block comment on a single line
      */
     public void testExecute_blockCommentsSameLine() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,     NAME VARCHAR2(50))");
+        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,   NAME VARCHAR2(50))");
         replay();
 
         sqlScriptRunner.execute(SCRIPT_BLOCK_COMMENTS);
@@ -145,7 +148,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
      * Test with a block comment that spans multiple lines
      */
     public void testExecute_blockCommentsMultipleLines() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,   NAME VARCHAR2(50))");
+        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,  NAME VARCHAR2(50))");
         replay();
 
         sqlScriptRunner.execute(SCRIPT_BLOCK_COMMENT_MULTIPLE_LINES);
