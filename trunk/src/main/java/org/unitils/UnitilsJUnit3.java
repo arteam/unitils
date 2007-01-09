@@ -15,7 +15,9 @@
  */
 package org.unitils;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import junit.framework.TestResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,8 +74,37 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
 
     /**
-     * Overriden JUnit3 method to be able to call {@link TestListener#beforeAll}, {@link TestListener#beforeTestClass},
-     * {@link TestListener#afterTestClass}, {@link TestListener#beforeTestSetUp} and {@link TestListener#afterTestTearDown}.
+     * Overriden JUnit3 method to be able to call {@link TestListener#beforeAll}
+     *
+     * @param testResult junits test result, not null
+     */
+    public void run(TestResult testResult) {
+
+        try {
+            // if this the first test, call beforeAll
+            if (!beforeAllCalled) {
+                testListener.beforeAll();
+                beforeAllCalled = true;
+            }
+        } catch (AssertionFailedError e) {
+            testResult.addFailure(this, e);
+            testResult.stop(); // stop the test
+            return;
+
+        } catch (Exception e) {
+            testResult.addError(this, e);
+            testResult.stop(); // stop the test
+            return;
+        }
+
+        // run the test
+        super.run(testResult);
+    }
+
+
+    /**
+     * Overriden JUnit3 method to be able to call {@link TestListener#beforeTestClass}, {@link TestListener#afterTestClass},
+     * {@link TestListener#beforeTestSetUp} and {@link TestListener#afterTestTearDown}.
      * <p/>
      * JUnit3 does not have a concept of class level hooks, such as BeforeClass and AfterClass in JUnit4. Therefore
      * we need to simulate this behavior for unitils.
@@ -82,12 +113,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * during the shutdown of the VM.
      */
     public void runBare() throws Throwable {
-
-        // if this the first test, call beforeAll
-        if (!beforeAllCalled) {
-            testListener.beforeAll();
-            beforeAllCalled = true;
-        }
 
         // simulate class level methods
         // if this is the first test of a test class (previous test was of a different test class),
@@ -99,8 +124,8 @@ public abstract class UnitilsJUnit3 extends TestCase {
                 try {
                     testListener.afterTestClass(lastTestClass);
 
-                } catch (Throwable t) {
-                    logger.error("An exception occured during afterTestClass.", t);
+                } catch (Throwable e) {
+                    logger.error("An exception occured during afterTestClass.", e);
                 }
             }
             testListener.beforeTestClass(testClass);
