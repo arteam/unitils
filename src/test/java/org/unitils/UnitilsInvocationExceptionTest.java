@@ -45,6 +45,7 @@ import java.util.Iterator;
  * are expected to be the same (see assertInvocationOrder* methods).
  *
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @see UnitilsJUnit3Test_TestClass1
  * @see UnitilsJUnit4Test_TestClass1
  * @see UnitilsTestNGTest_TestClass1
@@ -122,7 +123,7 @@ public class UnitilsInvocationExceptionTest {
 
         assertInvocationOrder_beforeAll("JUnit3", tracingTestListener);
         assertEquals(0, result.failureCount());
-        assertEquals(2, result.errorCount());
+        assertEquals(1, result.errorCount());
     }
 
 
@@ -138,7 +139,7 @@ public class UnitilsInvocationExceptionTest {
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
         assertInvocationOrder_beforeAll("JUnit3", tracingTestListener);
-        assertEquals(2, result.failureCount());       // failures instead of errors
+        assertEquals(1, result.failureCount());       // failures instead of errors
         assertEquals(0, result.errorCount());
     }
 
@@ -853,7 +854,6 @@ public class UnitilsInvocationExceptionTest {
 
         if ("JUnit3".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
-            assertEquals("[Unitils] beforeAll", iterator.next()); // 2 times, once for each test
             // afterAll will be called when the runtime exits
         }
         if ("JUnit4".equals(type)) {

@@ -47,6 +47,7 @@ import java.util.Iterator;
  * that does not contain any methods. TestClass1 also contains an ignored test (not for JUnit3).
  *
  * @author Tim Ducheyne
+ * @author Filip Neven
  * @see UnitilsJUnit3Test_TestClass1
  * @see UnitilsJUnit3Test_TestClass2
  * @see UnitilsJUnit3Test_EmptyTestClass
