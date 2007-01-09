@@ -18,8 +18,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/resources/log4j.properties" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\resources\log4j.properties" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/SQLScriptParser.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/SQLScriptParser.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
@@ -182,46 +184,28 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DBVersionSource.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
+      <file leaf-file-name="SQLScriptParser.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/SQLScriptParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="58" column="23" selection-start="2966" selection-end="2966" vertical-scroll-proportion="0.09723546">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DbSupport.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
+      <file leaf-file-name="StringBuffer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/StringBuffer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="406" column="8" selection-start="13586" selection-end="13586" vertical-scroll-proportion="0.6272641">
+            <state line="126" column="28" selection-start="4908" selection-end="4908" vertical-scroll-proportion="0.3326978">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HsqldbDbSupport.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java">
+      <file leaf-file-name="SQLScriptRunnerTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="146" column="8" selection-start="5012" selection-end="5012" vertical-scroll-proportion="0.6272641">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MySqlDbSupport.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="8" selection-start="1406" selection-end="1406" vertical-scroll-proportion="0.21830314">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OracleDbSupport.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="57" column="8" selection-start="1928" selection-end="1928" vertical-scroll-proportion="0.21830314">
+            <state line="0" column="134" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -781,7 +765,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure Scope="false" ProjectPane="false" PackagesPane="false" Favorites="false" />
+      <showStructure Favorites="false" ProjectPane="false" Scope="false" PackagesPane="false" />
       <autoscrollToSource ProjectPane="false" />
       <autoscrollFromSource ProjectPane="false" />
       <sortByType />
@@ -827,14 +811,14 @@
     </key>
   </component>
   <component name="RestoreUpdateTree" />
-  <component name="RunManager" selected="JUnit.DBVersionSourceTest">
-    <tempConfiguration default="false" name="DBVersionSourceTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="org.unitils.dbmaintainer.maintainer.version.*" />
+  <component name="RunManager" selected="JUnit.SQLScriptRunnerTest">
+    <tempConfiguration default="false" name="SQLScriptRunnerTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="org.unitils.dbmaintainer.script.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.maintainer.version" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.maintainer.version.DBVersionSourceTest" />
+      <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.script" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.script.SQLScriptRunnerTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -850,6 +834,36 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <option name="PROPERTIES_FILE" />
+      <properties />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -880,36 +894,6 @@
       <option name="VM_PARAMETERS" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
-    <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
-      <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="SUITE_NAME" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="GROUP_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <option name="PROPERTIES_FILE" />
-      <properties />
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" />
@@ -1188,27 +1172,6 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/internal/MocksControl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="68" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/internal/IMocksControlState.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="0" selection-start="187" selection-end="187" vertical-scroll-proportion="0.12964728">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/internal/ExpectedInvocation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="54" selection-start="1736" selection-end="1736" vertical-scroll-proportion="0.7130601">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/internal/LastControl.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="54" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
@@ -1251,34 +1214,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="406" column="8" selection-start="13586" selection-end="13586" vertical-scroll-proportion="0.6272641">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="146" column="8" selection-start="5012" selection-end="5012" vertical-scroll-proportion="0.6272641">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="8" selection-start="1406" selection-end="1406" vertical-scroll-proportion="0.21830314">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="57" column="8" selection-start="1928" selection-end="1928" vertical-scroll-proportion="0.21830314">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="43" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
@@ -1286,9 +1221,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="1" selection-start="1" selection-end="1" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="163" column="0" selection-start="5658" selection-end="5658" vertical-scroll-proportion="0.90276456">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="62" selection-start="998" selection-end="998" vertical-scroll-proportion="0.3241182">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="0" selection-start="0" selection-end="615" vertical-scroll-proportion="0.24308866">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="58" column="23" selection-start="2966" selection-end="2966" vertical-scroll-proportion="0.09723546">
+        <state line="177" column="23" selection-start="7705" selection-end="7705" vertical-scroll-proportion="0.9237369">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/StringBuffer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="126" column="28" selection-start="4908" selection-end="4908" vertical-scroll-proportion="0.3326978">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="134" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/SQLScriptParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>

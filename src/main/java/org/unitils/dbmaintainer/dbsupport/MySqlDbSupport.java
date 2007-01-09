@@ -1,3 +1,18 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
@@ -18,8 +33,6 @@ import java.util.Set;
  */
 public class MySqlDbSupport extends DbSupport {
 
-    public MySqlDbSupport() {
-    }
 
     public Set<String> getTableNames() throws SQLException {
         Connection conn = null;
@@ -41,6 +54,7 @@ public class MySqlDbSupport extends DbSupport {
         }
     }
 
+
     public Set<String> getViewNames() throws SQLException {
         Connection conn = null;
         ResultSet rset = null;
@@ -61,43 +75,53 @@ public class MySqlDbSupport extends DbSupport {
         }
     }
 
+
     public Set<String> getSequenceNames() throws SQLException {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
 
+
     public Set<String> getTriggerNames() throws SQLException {
         return getDbItemsOfType("TRIGGER_NAME", "TRIGGERS", "TRIGGER_SCHEMA");
     }
+
 
     public void dropView(String viewName) throws StatementHandlerException {
         String dropViewSQL = "drop view " + viewName + " cascade";
         statementHandler.handle(dropViewSQL);
     }
 
+
     public void dropTable(String tableName) throws StatementHandlerException {
         String dropTableSQL = "drop table " + tableName + " cascade";
         statementHandler.handle(dropTableSQL);
     }
 
+
     public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
+
 
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
 
+
     public boolean supportsSequences() {
         return false;
     }
+
 
     public boolean supportsTriggers() {
         return true;
     }
 
+
     public boolean supportsIdentityColumns() {
         return true;
     }
+
 
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
@@ -106,6 +130,7 @@ public class MySqlDbSupport extends DbSupport {
             throw new UnitilsException(e);
         }
     }
+
 
     public void disableForeignKeyConstraintsCheckingOnConnection(Connection conn) {
         Statement st = null;
@@ -119,25 +144,29 @@ public class MySqlDbSupport extends DbSupport {
         }
     }
 
+
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         String type = getColumnType(tableName, columnName);
         statementHandler.handle("alter table " + tableName + " change column " + columnName + " " + columnName + " " + type + " NULL ");
     }
 
+
     public Set<String> getTableConstraintNames(String tableName) throws SQLException {
         throw new UnsupportedOperationException("Retrieval of table constraint names is not supported in MySQL");
     }
+
 
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         statementHandler.handle("alter table " + tableName + " disable constraint " + constraintName);
     }
 
+
     public String getLongDataType() {
         return "BIGINT";
     }
 
-    private Set<String> getDbItemsOfType(String dbItemColumnName,
-                                         String systemMetadataTableName, String schemaColumnName) throws SQLException {
+
+    private Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
         Connection conn = null;
         ResultSet rset = null;
         Statement st = null;
@@ -156,6 +185,7 @@ public class MySqlDbSupport extends DbSupport {
             DbUtils.closeQuietly(conn, st, rset);
         }
     }
+
 
     private String getColumnType(String tableName, String columnName) {
         String type = null;
