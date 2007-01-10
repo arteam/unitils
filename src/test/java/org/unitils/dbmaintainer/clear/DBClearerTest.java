@@ -79,7 +79,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             super.setUp();
 
             configuration = new ConfigurationLoader().loadConfiguration();
-            configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, "testtablepreserve,testviewpreserve,testsequencepreserve,testtriggerpreserve");
+            configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, "testtablepreserve,testviewpreserve,testsequencepreserve,testtriggerpreserv");
 
             StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
             dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
@@ -156,10 +156,10 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     public void testClearDatabase_triggers() throws Exception {
         if (isTestedDialectActivated() && dbSupport.supportsTriggers()) {
             assertTrue(dbSupport.triggerExists("testtrigger"));
-            assertTrue(dbSupport.triggerExists("testtriggerpreserve"));
+            assertTrue(dbSupport.triggerExists("testtriggerpreserv"));
             dbClearer.clearDatabase();
             assertFalse(dbSupport.triggerExists("testtrigger"));
-            assertTrue(dbSupport.triggerExists("testtriggerpreserve"));
+            assertTrue(dbSupport.triggerExists("testtriggerpreserv"));
         }
     }
 
@@ -277,7 +277,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     private void createTestTriggers() throws SQLException {
         if (dbSupport.supportsTriggers()) {
             createTestTrigger("testtable", "testtrigger");
-            createTestTrigger("testtablepreserve", "testtriggerpreserve");
+            createTestTrigger("testtablepreserve", "testtriggerpreserv");
         }
     }
 
@@ -290,7 +290,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
                 // Ignored
             }
             try {
-                dbSupport.dropTrigger("testtriggerpreserve");
+                dbSupport.dropTrigger("testtriggerpreserv");
             } catch (StatementHandlerException e) {
                 // Ignored
             }
@@ -308,4 +308,5 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * @return True if the tested dbms is equal to the configured one, false otherwise
      */
     abstract protected boolean isTestedDialectActivated();
+
 }

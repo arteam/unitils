@@ -172,7 +172,10 @@ abstract public class DbSupport {
      *
      * @param viewName the view to drop, not null
      */
-    abstract public void dropView(String viewName) throws StatementHandlerException;
+    public void dropView(String viewName) throws StatementHandlerException {
+        String dropTableSQL = "drop view " + viewName;
+        statementHandler.handle(dropTableSQL);
+    }
 
 
     /**
@@ -180,7 +183,10 @@ abstract public class DbSupport {
      *
      * @param tableName the table to drop, not null
      */
-    abstract public void dropTable(String tableName) throws StatementHandlerException;
+    public void dropTable(String tableName) throws StatementHandlerException {
+        String dropTableSQL = "drop table " + tableName;
+        statementHandler.handle(dropTableSQL);
+    }
 
 
     /**
@@ -419,6 +425,5 @@ abstract public class DbSupport {
             DbUtils.closeQuietly(conn, null, rset);
         }
     }
-
 
 }

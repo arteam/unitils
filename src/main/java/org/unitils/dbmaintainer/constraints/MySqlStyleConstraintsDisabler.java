@@ -108,5 +108,4 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
         dbSupport.disableForeignKeyConstraintsCheckingOnConnection(connection);
     }
 
-
 }
