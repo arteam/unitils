@@ -27,19 +27,18 @@ import org.unitils.inject.util.InjectionUtils;
 import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
 import org.unitils.inject.util.ValueToRestore;
+import org.unitils.util.AnnotationUtils;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
 import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
+import org.unitils.util.ReflectionUtils;
 import static org.unitils.util.ReflectionUtils.getFieldValue;
 import static org.unitils.util.ReflectionUtils.getFieldWithName;
-import org.unitils.util.AnnotationUtils;
-import org.unitils.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,9 +62,11 @@ import java.util.Map;
  */
 public class InjectModule implements Module {
 
-    private static final String PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED = "InjectModule.TestedObject.createIfNull.enabled";
-
+    /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(InjectModule.class);
+
+    /* Property key indicating if the tested objects should automatically be created if they are not created yet */
+    private static final String PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED = "InjectModule.TestedObject.createIfNull.enabled";
 
     /* Map holding the default configuration of the inject annotations */
     private Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues;
@@ -73,6 +74,7 @@ public class InjectModule implements Module {
     /* List holding all values to restore after test was performed */
     private List<ValueToRestore> valuesToRestoreAfterTest = new ArrayList<ValueToRestore>();
 
+    /* Indicates if tested object instance should be created if they are not created yet */
     private boolean createTestedObjectsIfNullEnabled;
 
 
@@ -83,15 +85,17 @@ public class InjectModule implements Module {
      */
     public void init(Configuration configuration) {
 
-        defaultEnumValues = getAnnotationEnumDefaults(InjectModule.class, configuration, Inject.class, InjectStatic.class,
-                AutoInject.class, AutoInjectStatic.class);
+        defaultEnumValues = getAnnotationEnumDefaults(InjectModule.class, configuration, Inject.class, InjectStatic.class, AutoInject.class, AutoInjectStatic.class);
         createTestedObjectsIfNullEnabled = configuration.getBoolean(PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED);
     }
+
 
     /**
      * For all fields annotated with {@link TestedObject} that are still null after the test fixture, an object is
      * created of the field's declared type and assigned to the field. If the field's declared type is an interface or
      * abstract class, or if the type doesn't have a default constructor, a warning is produced.
+     *
+     * @param testObject The test instance, not null
      */
     public void createTestedObjectsIfNull(Object testObject) {
 
@@ -103,32 +107,30 @@ public class InjectModule implements Module {
         }
     }
 
+
     /**
      * Creates an objects of the given fields' declared type and assigns it to this field on the given testObject
      *
-     * @param testObject
-     * @param testedObjectField
+     * @param testObject        The test instance, not null
+     * @param testedObjectField The tested object field, not null
      */
     protected void createObjectForField(Object testObject, Field testedObjectField) {
 
         Class declaredClass = testedObjectField.getType();
         if (declaredClass.isInterface()) {
-            logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " +
-                testedObjectField.getType().getSimpleName()
-                + " which is an interface type. It is not automatically instantiated.");
+            logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getType().getSimpleName()
+                    + " which is an interface type. It is not automatically instantiated.");
         } else if (Modifier.isAbstract(declaredClass.getModifiers())) {
-            logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " +
-                testedObjectField.getDeclaringClass().getSimpleName()
-                + " which is an abstract class. It is not automatically instantiated.");
+            logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getDeclaringClass().getSimpleName()
+                    + " which is an abstract class. It is not automatically instantiated.");
         } else {
             try {
-                declaredClass.getConstructor(new Class[] {});
+                declaredClass.getConstructor();
                 Object instance = ReflectionUtils.createInstanceOfType(declaredClass.getName());
                 ReflectionUtils.setFieldValue(testObject, testedObjectField, instance);
             } catch (NoSuchMethodException e) {
-                logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " +
-                    testedObjectField.getDeclaringClass().getSimpleName()
-                    + " which has no default (parameterless) constructor. It is not automatically instantiated.");
+                logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getDeclaringClass().getSimpleName()
+                        + " which has no default (parameterless) constructor. It is not automatically instantiated.");
             }
         }
     }
@@ -236,6 +238,7 @@ public class InjectModule implements Module {
         }
     }
 
+
     /**
      * Injects the fieldToAutoInjectStatic into the specified target class.
      *
@@ -342,12 +345,12 @@ public class InjectModule implements Module {
      * performed. The value that is stored depends on the restore value: OLD_VALUE will store the value that was replaced,
      * NULL_OR_0_VALUE will store 0 or null depeding whether it is a primitive or not, NO_RESTORE stores nothing.
      *
-     * @param targetClass        The target class, not null
-     * @param property           The OGNL expression that defines where the object will be injected, null for auto inject
-     * @param fieldType          The type, not null
+     * @param targetClass    The target class, not null
+     * @param property       The OGNL expression that defines where the object will be injected, null for auto inject
+     * @param fieldType      The type, not null
      * @param propertyAccess The access type in case auto injection is used
-     * @param oldValue           The value that was replaced during the injection
-     * @param restore            The type of reset, not DEFAULT
+     * @param oldValue       The value that was replaced during the injection
+     * @param restore        The type of reset, not DEFAULT
      */
     protected void storeValueToRestoreAfterTest(Class targetClass, String property, Class fieldType, PropertyAccess propertyAccess, Object oldValue, Restore restore) {
 

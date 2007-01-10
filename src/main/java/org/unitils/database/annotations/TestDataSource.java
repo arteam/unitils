@@ -15,17 +15,21 @@
  */
 package org.unitils.database.annotations;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that this field or method should be initialized with the <code>DataSource</code> that supplies
  * a connection to the unit test database. If a field is annotated, it should be of type <code>DataSource</code>. If
  * a method is annotated, the method should have following signature: void myMethod(DataSource dataSource)
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target({ElementType.METHOD, ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({METHOD, FIELD})
+@Retention(RUNTIME)
 public @interface TestDataSource {
 }

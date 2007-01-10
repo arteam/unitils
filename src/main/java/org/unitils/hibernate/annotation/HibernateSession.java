@@ -15,9 +15,10 @@
  */
 package org.unitils.hibernate.annotation;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
@@ -26,8 +27,9 @@ import java.lang.annotation.Target;
  * If a method is annotated, the method should have following signature: void myMethod(org.hibernate.Session session)
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target({ElementType.METHOD, ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({METHOD, FIELD})
+@Retention(RUNTIME)
 public @interface HibernateSession {
 }

@@ -15,10 +15,10 @@
  */
 package org.unitils.dbunit.annotation;
 
-import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
  * Indicates that after having executed the annotated test method, the contents of the unit test database should be
@@ -26,9 +26,10 @@ import java.lang.annotation.RetentionPolicy;
  * custom specified name (fileName property).
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(METHOD)
+@Retention(RUNTIME)
 public @interface ExpectedDataSet {
 
     String fileName() default "";

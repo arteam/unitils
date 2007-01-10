@@ -15,19 +15,22 @@
  */
 package org.unitils.easymock.annotation;
 
-import org.unitils.easymock.util.InvocationOrder;
 import org.unitils.easymock.util.Calls;
+import org.unitils.easymock.util.InvocationOrder;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that a regular EasyMock mock object should be created and set in the annotated field.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(FIELD)
+@Retention(RUNTIME)
 public @interface RegularMock {
 
 
@@ -36,7 +39,7 @@ public @interface RegularMock {
      *
      * @return the invocation order setting.
      */
-    public InvocationOrder invocationOrder() default InvocationOrder.DEFAULT;
+    InvocationOrder invocationOrder() default InvocationOrder.DEFAULT;
 
 
     /**
@@ -44,7 +47,7 @@ public @interface RegularMock {
      *
      * @return the calls setting.
      */
-    public Calls calls() default Calls.DEFAULT;
+    Calls calls() default Calls.DEFAULT;
 
 
 }

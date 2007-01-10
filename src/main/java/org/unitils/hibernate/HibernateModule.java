@@ -315,7 +315,6 @@ public class HibernateModule implements Module {
      * the method #getCurrentSession, flushing is not needed.
      */
     public void flushDatabaseUpdates() {
-
         getCurrentSession().flush();
     }
 
@@ -363,7 +362,6 @@ public class HibernateModule implements Module {
 
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-
             if (isHibernateTest(testObject.getClass())) {
                 injectHibernateSessionFactory(testObject);
                 injectHibernateSession(testObject);
@@ -372,7 +370,6 @@ public class HibernateModule implements Module {
 
         @Override
         public void afterTestMethod(Object testObject, Method testMethod) {
-
             if (isHibernateTest(testObject.getClass())) {
                 closeHibernateSession();
             }

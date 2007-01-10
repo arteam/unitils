@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.easymock.annotation;
+package org.unitils.spring.annotation;
 
-import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.FIELD;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that is called after a mock object has been created by the {@link org.unitils.easymock.EasyMockModule}
+ * todo javadoc
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@Target(METHOD)
+@Target(FIELD)
 @Retention(RUNTIME)
-public @interface AfterCreateMock {
+@Inherited
+public @interface SpringBeanByName {
 }

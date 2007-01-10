@@ -15,7 +15,11 @@
  */
 package org.unitils.hibernate.annotation;
 
-import java.lang.annotation.*;
+import static java.lang.annotation.ElementType.TYPE;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that the annotated test class tests methods using Hibernate to go to a database, so that the
@@ -24,9 +28,10 @@ import java.lang.annotation.*;
  * no need for an extra {@link org.unitils.database.annotations.DatabaseTest} annotation.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(TYPE)
+@Retention(RUNTIME)
 @Inherited
 public @interface HibernateTest {
 }

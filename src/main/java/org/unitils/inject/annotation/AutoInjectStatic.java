@@ -18,9 +18,9 @@ package org.unitils.inject.annotation;
 import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
@@ -39,8 +39,8 @@ import java.lang.annotation.Target;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(FIELD)
+@Retention(RUNTIME)
 public @interface AutoInjectStatic {
 
     /**
