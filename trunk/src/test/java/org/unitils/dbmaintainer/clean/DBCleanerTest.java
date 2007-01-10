@@ -22,7 +22,9 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -40,13 +42,17 @@ import java.sql.Statement;
 @SuppressWarnings({"UnusedDeclaration"})
 public class DBCleanerTest extends UnitilsJUnit3 {
 
-    /* Tested object */
-    private DBCleaner dbCleaner;
-
     /* DataSource for the test database, is injected */
     @TestDataSource
     private DataSource dataSource;
 
+    /* Tested object */
+    private DBCleaner dbCleaner;
+
+    /**
+     * The DbSupport object
+     */
+    protected DbSupport dbSupport;
 
     /**
      * Test fixture. The DefaultDBCleaner is instantiated and configured. Test tables are created and filled with test
@@ -61,6 +67,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
 
         StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
         dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
+        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         dropTestTables();
         createTestTables();
@@ -126,23 +133,23 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             try {
-                st.executeUpdate("drop view testview");
-            } catch (SQLException e) {
+                dbSupport.dropView("testview");
+            } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                st.executeUpdate("drop table tabletoclean");
-            } catch (SQLException e) {
+                dbSupport.dropTable("tabletoclean");
+            } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                st.executeUpdate("drop table db_version");
-            } catch (SQLException e) {
+                dbSupport.dropTable("db_version");
+            } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                st.executeUpdate("drop table tabletopreserve");
-            } catch (SQLException e) {
+                dbSupport.dropTable("tabletopreserve");
+            } catch (StatementHandlerException e) {
                 // Ignored
             }
         } finally {

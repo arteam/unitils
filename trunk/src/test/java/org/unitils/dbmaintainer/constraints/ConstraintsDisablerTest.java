@@ -100,7 +100,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("create table table1 (col1 varchar(10) primary key, col2 varchar(12) not null)");
+            dropTestTables();
+            st.execute("create table table1 (col1 varchar(10) not null primary key, col2 varchar(12) not null)");
             st.execute("create table table2 (col1 varchar(10), foreign key (col1) references table1(col1))");
         } finally {
             DbUtils.closeQuietly(conn, st, null);
