@@ -68,7 +68,7 @@ public class DatabaseModule implements Module {
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
     /* Property keys indicating if the database schema should be updated before performing the tests */
-    static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
+    private static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
     private static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
@@ -141,6 +141,38 @@ public class DatabaseModule implements Module {
 
 
     /**
+     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
+     * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
+     *
+     * @return The <code>DataSource</code>
+     */
+    public DataSource getDataSource() {
+        if (dataSource == null) {
+            dataSource = createDataSource();
+            if (updateDatabaseSchemaEnabled) {
+                updateDatabaseSchema();
+            }
+        }
+        return dataSource;
+    }
+
+
+    /**
+     * Determines whether the test database is outdated and, if that is the case, updates the database with the
+     * latest changes. See {@link DBMaintainer} for more information.
+     */
+    public void updateDatabaseSchema() {
+        try {
+            DBMaintainer dbMaintainer = createDbMaintainer(configuration);
+            dbMaintainer.updateDatabase();
+
+        } catch (StatementHandlerException e) {
+            throw new UnitilsException("Error while updating database", e);
+        }
+    }
+
+
+    /**
      * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
      *
      * @return the datasource
@@ -169,26 +201,8 @@ public class DatabaseModule implements Module {
      * @return The configured instance of the {@link ConstraintsDisabler}
      */
     protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
-
         StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
         return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
-    }
-
-
-    /**
-     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
-     * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
-     *
-     * @return The <code>DataSource</code>
-     */
-    public DataSource getDataSource() {
-        if (dataSource == null) {
-            dataSource = createDataSource();
-            if (updateDatabaseSchemaEnabled) {
-                updateDatabaseSchema();
-            }
-        }
-        return dataSource;
     }
 
 
@@ -205,10 +219,8 @@ public class DatabaseModule implements Module {
                 ReflectionUtils.setFieldValue(testObject, field, getDataSource());
 
             } catch (UnitilsException e) {
-
-                throw new UnitilsException("Unable to assign the DataSource to field annotated with @" +
-                        TestDataSource.class.getSimpleName() + "Ensure that this field is of type " +
-                        DataSource.class.getName(), e);
+                throw new UnitilsException("Unable to assign the DataSource to field annotated with @" + TestDataSource.class.getSimpleName() +
+                        "Ensure that this field is of type " + DataSource.class.getName(), e);
             }
         }
 
@@ -218,31 +230,14 @@ public class DatabaseModule implements Module {
                 ReflectionUtils.invokeMethod(testObject, method, getDataSource());
 
             } catch (UnitilsException e) {
+                throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
+                        " annotated with @" + TestDataSource.class.getSimpleName() + " Ensure that this method has following signature: void myMethod(" +
+                        DataSource.class.getName() + " dataSource)", e);
 
-                throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." +
-                        methods.get(0).getName() + " annotated with @" + TestDataSource.class.getSimpleName() +
-                        " Ensure that this method has following signature: void myMethod(" + DataSource.class.getName() +
-                        " dataSource)", e);
             } catch (InvocationTargetException e) {
-                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." +
-                        methods.get(0).getName() + " annotated with " + TestDataSource.class.getSimpleName() +
-                        " has thrown an exception", e.getCause());
+                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() + " annotated with "
+                        + TestDataSource.class.getSimpleName() + " has thrown an exception", e.getCause());
             }
-        }
-    }
-
-
-    /**
-     * Determines whether the test database is outdated and, if that is the case, updates the database with the
-     * latest changes. See {@link org.unitils.dbmaintainer.maintainer.DBMaintainer} for more information.
-     */
-    protected void updateDatabaseSchema() {
-
-        try {
-            DBMaintainer dbMaintainer = createDbMaintainer(configuration);
-            dbMaintainer.updateDatabase();
-        } catch (StatementHandlerException e) {
-            throw new UnitilsException("Error while updating database", e);
         }
     }
 

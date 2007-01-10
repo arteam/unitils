@@ -34,9 +34,7 @@ public class InjectModuleAutoInjectTest extends TestCase {
     /* Tested object */
     private InjectModule injectModule;
 
-    /**
-     * Objects that represent 'unit test classes', containing objects that should be injected on other objects.
-     */
+    /* Objects that represent 'unit test classes', containing objects that should be injected on other objects. */
     private TestAutoInjectExplicitTarget testAutoInjectExplicitTarget = new TestAutoInjectExplicitTarget();
     private TestAutoInjectFieldAccess testAutoInjectFieldAccess = new TestAutoInjectFieldAccess();
     private TestAutoInjectAnnotatedTarget testAutoInjectAnnotatedTarget = new TestAutoInjectAnnotatedTarget();

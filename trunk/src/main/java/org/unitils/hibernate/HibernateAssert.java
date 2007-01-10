@@ -33,8 +33,10 @@ import java.util.List;
  *
  * @author Timmy Maris
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class HibernateAssert {
+
 
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method assumes
@@ -51,15 +53,16 @@ public class HibernateAssert {
         assertMappingToDatabase(configuration, session, databaseDialect);
     }
 
+
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method does the
      * same as {@link #assertMappingToDatabase} without parameters, but can also be used without the using the
      * {@link HibernateModule} or the {@link org.unitils.database.DatabaseModule} (this means it can be used separately without
      * using any other feature of Unitils).
      *
-     * @param configuration
-     * @param session
-     * @param databaseDialect
+     * @param configuration   The hibernate config, not null
+     * @param session         The hibernate session, not null
+     * @param databaseDialect The database dialect, not null
      */
     public static void assertMappingToDatabase(Configuration configuration, Session session, Dialect databaseDialect) {
         String[] script = generateScript(configuration, session, databaseDialect);
@@ -71,32 +74,34 @@ public class HibernateAssert {
                 differences.add(line);
             }
         }
-        Assert.assertTrue("Found mismatches between Java objects and database tables. " +
-                "Applying following DDL statements to the database should resolve the problem: \n" +
-                formatMessage(differences), differences.isEmpty());
+        Assert.assertTrue("Found mismatches between Java objects and database tables. Applying following DDL statements to the " +
+                "database should resolve the problem: \n" + formatMessage(differences), differences.isEmpty());
     }
+
 
     /**
      * Generates a <code>String</code> array with DML statements based on the Hibernate mapping files.
      *
-     * @param dialect
-     * @param configuration
+     * @param configuration   The hibernate config, not null
+     * @param session         The hibernate session, not null
+     * @param databaseDialect The database dialect, not null
      * @return String[] array of DDL statements that were needed to keep the database in sync with the mapping file
      */
-    private static String[] generateScript(Configuration configuration, Session session, Dialect dialect) {
+    private static String[] generateScript(Configuration configuration, Session session, Dialect databaseDialect) {
         try {
-            DatabaseMetadata dbm = new DatabaseMetadata(session.connection(), dialect);
-            return configuration.generateSchemaUpdateScript(dialect, dbm);
+            DatabaseMetadata dbm = new DatabaseMetadata(session.connection(), databaseDialect);
+            return configuration.generateSchemaUpdateScript(databaseDialect, dbm);
         } catch (SQLException e) {
             throw new UnitilsException("Could not retrieve database metadata", e);
         }
     }
 
+
     /**
      * Gets the database dialect from the Hibernate <code>Configuration</code.
      *
-     * @param configuration
-     * @return Dialect
+     * @param configuration The hibernate config, not null
+     * @return the databazse Dialect, not null
      */
     private static Dialect getDatabaseDialect(Configuration configuration) {
         String dialectClassName = configuration.getProperty("hibernate.dialect");
@@ -109,6 +114,7 @@ public class HibernateAssert {
             throw new UnitilsException("Could not instantiate dialect class " + dialectClassName, e);
         }
     }
+
 
     /**
      * Formats the given list of messages.

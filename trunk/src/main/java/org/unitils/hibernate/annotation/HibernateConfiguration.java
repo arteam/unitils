@@ -15,9 +15,9 @@
  */
 package org.unitils.hibernate.annotation;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
@@ -28,8 +28,9 @@ import java.lang.annotation.Target;
  * The method should have following signature: <code>org.hibernate.Configuration myMethod()</code>
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(METHOD)
+@Retention(RUNTIME)
 public @interface HibernateConfiguration {
 }

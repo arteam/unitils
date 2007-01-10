@@ -15,13 +15,20 @@
  */
 package org.unitils.database.annotations;
 
-import java.lang.annotation.*;
+import static java.lang.annotation.ElementType.TYPE;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
  * Annotation that marks the annotated class as a database test.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(TYPE)
+@Retention(RUNTIME)
 @Inherited
 public @interface DatabaseTest {
 }

@@ -17,17 +17,20 @@ package org.unitils.easymock.annotation;
 
 import org.unitils.easymock.util.*;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that a lenient mock object (see {@link org.unitils.easymock.util.LenientMocksControl} should be created
  * and set intp the annotated field.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(FIELD)
+@Retention(RUNTIME)
 public @interface Mock {
 
 
@@ -36,7 +39,7 @@ public @interface Mock {
      *
      * @return the invocation order setting.
      */
-    public InvocationOrder invocationOrder() default InvocationOrder.DEFAULT;
+    InvocationOrder invocationOrder() default InvocationOrder.DEFAULT;
 
 
     /**
@@ -44,7 +47,7 @@ public @interface Mock {
      *
      * @return the calls setting.
      */
-    public Calls calls() default Calls.DEFAULT;
+    Calls calls() default Calls.DEFAULT;
 
 
     /**
@@ -52,7 +55,7 @@ public @interface Mock {
      *
      * @return the order setting.
      */
-    public Order order() default Order.DEFAULT;
+    Order order() default Order.DEFAULT;
 
 
     /**
@@ -60,7 +63,7 @@ public @interface Mock {
      *
      * @return the dates setting.
      */
-    public Dates dates() default Dates.DEFAULT;
+    Dates dates() default Dates.DEFAULT;
 
 
     /**
@@ -68,6 +71,6 @@ public @interface Mock {
      *
      * @return the default arguments setting.
      */
-    public Defaults defaults() default Defaults.DEFAULT;
+    Defaults defaults() default Defaults.DEFAULT;
 
 }

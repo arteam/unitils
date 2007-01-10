@@ -26,7 +26,7 @@ import org.unitils.inject.annotation.TestedObject;
  */
 public class InjectModuleInjectTest extends TestCase {
 
-    InjectModule injectModule;
+    private InjectModule injectModule;
 
     private TestInjectExplicitTarget testInjectExplicitTarget = new TestInjectExplicitTarget();
     private TestInjectAnnotatedTarget testInjectAnnotatedTarget = new TestInjectAnnotatedTarget();

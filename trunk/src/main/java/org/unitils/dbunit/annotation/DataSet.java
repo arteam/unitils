@@ -15,9 +15,10 @@
  */
 package org.unitils.dbunit.annotation;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
@@ -26,10 +27,11 @@ import java.lang.annotation.Target;
  * If at method level, indicates that before running this method, a DbUnit datafile must be loaded, either with the
  * default fileName (ClassName.xml), or with a custom specified fileName (fileName property).
  *
- * @author Filip Neven 
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({TYPE, METHOD})
+@Retention(RUNTIME)
 public @interface DataSet {
 
     String fileName();

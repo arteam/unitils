@@ -30,8 +30,8 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
-import org.unitils.dbunit.util.TablePerRowXmlDataSet;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
+import org.unitils.dbunit.util.TablePerRowXmlDataSet;
 import org.unitils.util.ConfigUtils;
 
 import java.io.IOException;
@@ -91,10 +91,11 @@ public class DbUnitModule implements Module {
     /* Instance of DbUnits IDataTypeFactory, that handles dbms specific data type issues */
     private IDataTypeFactory dataTypeFactory;
 
+
     /**
      * Initializes the DbUnitModule using the given Configuration
      *
-     * @param configuration the config, not null
+     * @param configuration The config, not null
      */
     public void init(Configuration configuration) {
 
@@ -103,25 +104,25 @@ public class DbUnitModule implements Module {
         dataTypeFactory = ConfigUtils.getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
     }
 
+
     /**
      * Checks whether the given test instance is a database test.
      *
-     * @param testClass the test class, not null
-     * @return true if the test class is a database test false otherwise
+     * @param testClass The test class, not null
+     * @return True if the test class is a database test false otherwise
      * @see DatabaseModule#isDatabaseTest(Class<?>)
      */
     protected boolean isDatabaseTest(Class<?> testClass) {
-
         return getDatabaseModule().isDatabaseTest(testClass);
     }
+
 
     /**
      * Creates a new instance of dbUnit's <code>IDatabaseConnection</code>
      *
-     * @return a new instance of dbUnit's <code>IDatabaseConnection</code>
+     * @return A new instance of dbUnit's <code>IDatabaseConnection</code>
      */
     protected DbUnitDatabaseConnection createDbUnitConnection() {
-
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(getDatabaseModule().getDataSource(), schemaName);
 
@@ -130,6 +131,7 @@ public class DbUnitModule implements Module {
         config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         return connection;
     }
+
 
     /**
      * @return The DbUnit connection
@@ -142,6 +144,7 @@ public class DbUnitModule implements Module {
         return dbUnitDatabaseConnection;
     }
 
+
     /**
      * This method will first try to load a method level defined dataset.
      * If no such file exists, a class level defined dataset will be loaded.
@@ -150,11 +153,10 @@ public class DbUnitModule implements Module {
      * DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
      * thrown.
      *
-     * @param testClass  the test class, not null
-     * @param testMethod the method, not null
+     * @param testClass  The test class, not null
+     * @param testMethod The method, not null
      */
     protected void insertTestData(Class testClass, Method testMethod) {
-
         try {
             IDataSet dataSet = getTestDataSet(testClass, testMethod);
             if (dataSet != null) { // Dataset is null when there is no data xml file.
@@ -167,13 +169,14 @@ public class DbUnitModule implements Module {
         }
     }
 
+
     /**
      * @return The DbUnit <code>DatabaseTask</code> that is used for loading the data file
      */
     protected DatabaseOperation getInsertDatabaseOperation() {
-
         return DatabaseOperation.CLEAN_INSERT;
     }
+
 
     /**
      * This method will first try to return a method level defined dataset.
@@ -183,9 +186,9 @@ public class DbUnitModule implements Module {
      * DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
      * thrown.
      *
-     * @param testClass the test class, not null
-     * @param method    the test method, not null
-     * @return the dataset, can be null if the files were not found
+     * @param testClass The test class, not null
+     * @param method    The test method, not null
+     * @return The dataset, can be null if the files were not found
      */
     protected IDataSet getTestDataSet(Class testClass, Method method) {
 
@@ -198,14 +201,15 @@ public class DbUnitModule implements Module {
         return dataSet;
     }
 
+
     /**
      * Returns the DbUnit dataSet that has been defined at method level, if it exists. By default, this dataSet is the
      * file located in the same package as the test class, with as name className + '.' + methodName + '.xml'. This default
      * name can be overridden using the {@link DataSet} annotation at method level. If the dataSet filename is
      * explicitly set but not found, a {@link UnitilsException} is thrown.
      *
-     * @param testClass the test class, not null
-     * @param method    the test method, not null
+     * @param testClass The test class, not null
+     * @param method    The test method, not null
      * @return The class level DbUnit DataSet
      */
     protected IDataSet getMethodLevelTestDataSet(Class testClass, Method method) {
@@ -221,18 +225,20 @@ public class DbUnitModule implements Module {
         }
     }
 
+
     /**
      * Gets the name of the default testdata file at method level
      * The default name is constructed as follows: classname + '.' + methodName + '.xml'
      *
-     * @param testClass the test class, not null
-     * @param method    the test method, not null
-     * @return the default filename
+     * @param testClass The test class, not null
+     * @param method    The test method, not null
+     * @return The default filename
      */
     protected String getMethodLevelDefaultTestDataSetFileName(Class<?> testClass, Method method) {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + ".xml";
     }
+
 
     /**
      * Returns the DbUnit dataSet that has been defined at class level. By default, this dataSet is the file located
@@ -240,7 +246,7 @@ public class DbUnitModule implements Module {
      * overridden using the {@link DataSet} annotation at class level. If the dataSet filename is explicitly set
      * but not found, a {@link UnitilsException} is thrown.
      *
-     * @param testClass the test class, not null
+     * @param testClass The test class, not null
      * @return The class level DbUnit DataSet
      */
     protected IDataSet getClassLevelTestDataSet(Class<?> testClass) {
@@ -261,26 +267,25 @@ public class DbUnitModule implements Module {
      * Gets the name of the default testdata file at class level
      * The default name is constructed as follows: 'classname without packagename'.xml
      *
-     * @param testClass the test class, not null
-     * @return the default filename
+     * @param testClass The test class, not null
+     * @return The default filename
      */
     protected String getClassLevelDefaultTestDataSetFileName(Class<?> testClass) {
-
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + ".xml";
     }
+
 
     /**
      * Returns the dataset from the file in the classpath with the given name.
      * Filenames that start with '/' are treated absolute. Filenames that do not start with '/', are relative
      * to the current class.
      *
-     * @param testClass       the test class, not null
-     * @param dataSetFilename the name, (start with '/' for absolute names)
-     * @return the data set, or null if the file did not exist
+     * @param testClass       The test class, not null
+     * @param dataSetFilename The name, (start with '/' for absolute names)
+     * @return The data set, or null if the file did not exist
      */
     protected IDataSet getDataSet(Class testClass, String dataSetFilename) {
-
         try {
             if (dataSetFilename == null) {
                 return null;
@@ -309,14 +314,14 @@ public class DbUnitModule implements Module {
         }
     }
 
+
     /**
      * Constructs a DbUnit DataSet object from the given InputStream
      *
-     * @param in the xml content stream, not null
-     * @return a DbUnit DataSet object
+     * @param in The xml content stream, not null
+     * @return A DbUnit DataSet object
      */
     protected IDataSet createDbUnitDataSet(InputStream in) {
-
         try {
             return new TablePerRowXmlDataSet(in);
 
@@ -339,15 +344,15 @@ public class DbUnitModule implements Module {
         }
     }
 
+
     /**
      * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
      * that occur in the expected DbUnitDataSet are compared with the database contents.
      *
-     * @param testObject              the test instance, not null
-     * @param expectedDataSetFileName the file name, not null
+     * @param testObject              The test instance, not null
+     * @param expectedDataSetFileName The file name, not null
      */
     public void assertDBContentAsExpected(Object testObject, String expectedDataSetFileName) {
-
         try {
             IDataSet expectedDataSet = getDataSet(testObject.getClass(), expectedDataSetFileName);
             IDataSet actualDataSet = getDbUnitDatabaseConnection().createDataSet(expectedDataSet.getTableNames());
@@ -369,6 +374,7 @@ public class DbUnitModule implements Module {
         }
     }
 
+
     /**
      * Closes (i.e. return to the pool) the JDBC Connection that is currently in use by the DbUnitDatabaseConnection
      */
@@ -389,9 +395,9 @@ public class DbUnitModule implements Module {
      * <p/>
      * todo method name or Method object?
      *
-     * @param testClass  the test class, not null
-     * @param methodName the test method name, not null
-     * @return the expected dataset filename
+     * @param testClass  The test class, not null
+     * @param methodName The test method name, not null
+     * @return The expected dataset filename
      */
     protected static String getDefaultExpectedDataSetFileName(Class<?> testClass, String methodName) {
 
@@ -403,6 +409,7 @@ public class DbUnitModule implements Module {
             return className.substring(className.lastIndexOf(".") + 1) + "." + methodName + "-result.xml";
         }
     }
+
 
     /**
      * @return Implementation of DatabaseModule, on which this module is dependent
@@ -419,7 +426,6 @@ public class DbUnitModule implements Module {
      * @return The TestListener object that implements Unitils' DbUnit support
      */
     public TestListener createTestListener() {
-
         return new DbUnitListener();
     }
 
