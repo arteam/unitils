@@ -113,7 +113,12 @@ public class SpringModule implements Module {
         SpringApplicationContext springApplicationContextAnnotation = testObject.getClass().getAnnotation(SpringApplicationContext.class);
         if (springApplicationContextAnnotation != null) {
             // create application context
+            try{
             result = new ClassPathXmlApplicationContext(springApplicationContextAnnotation.value());
+            }catch(Throwable t){
+                t.printStackTrace();
+            }
+            System.out.println("result = " + result);
         }
 
         List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), CreateSpringApplicationContext.class);
