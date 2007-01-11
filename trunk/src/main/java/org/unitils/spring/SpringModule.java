@@ -241,7 +241,6 @@ public class SpringModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject) {
-            createApplicationContext(testObject);
             assignSpringBeans(testObject);
             assignSpringBeansByType(testObject);
             assignSpringBeansByName(testObject);
