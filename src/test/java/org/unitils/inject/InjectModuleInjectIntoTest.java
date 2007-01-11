@@ -18,18 +18,19 @@ package org.unitils.inject;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.inject.annotation.Inject;
+import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.TestedObject;
 
 /**
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
-public class InjectModuleInjectTest extends TestCase {
+public class InjectModuleInjectIntoTest extends TestCase {
 
     private InjectModule injectModule;
 
-    private TestInjectExplicitTarget testInjectExplicitTarget = new TestInjectExplicitTarget();
-    private TestInjectAnnotatedTarget testInjectAnnotatedTarget = new TestInjectAnnotatedTarget();
+    private TestInjectIntoExplicitTarget testInjectIntoExplicitTarget = new TestInjectIntoExplicitTarget();
+    private TestInjectIntoAnnotatedTarget testInjectIntoAnnotatedTarget = new TestInjectIntoAnnotatedTarget();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -40,25 +41,25 @@ public class InjectModuleInjectTest extends TestCase {
         injectModule.init(configuration);
     }
 
-    public void testInject_explicitTarget() {
-        injectModule.injectObjects(testInjectExplicitTarget);
-        assertSame(testInjectExplicitTarget.getToInject(), testInjectExplicitTarget.getInjectOn().getTestObject1());
+    public void testInjectInto_explicitTarget() {
+        injectModule.injectObjects(testInjectIntoExplicitTarget);
+        assertSame(testInjectIntoExplicitTarget.getToInject(), testInjectIntoExplicitTarget.getInjectOn().getTestObject1());
     }
 
-    public void testInject_annotatedTargets() {
-        injectModule.injectObjects(testInjectAnnotatedTarget);
-        assertSame(testInjectAnnotatedTarget.getToInject(), testInjectAnnotatedTarget.getInjectOn1().getTestObject1());
-        assertSame(testInjectAnnotatedTarget.getToInject(), testInjectAnnotatedTarget.getInjectOn2().getTestObject1());
+    public void testInjectInto_annotatedTargets() {
+        injectModule.injectObjects(testInjectIntoAnnotatedTarget);
+        assertSame(testInjectIntoAnnotatedTarget.getToInject(), testInjectIntoAnnotatedTarget.getInjectOn1().getTestObject1());
+        assertSame(testInjectIntoAnnotatedTarget.getToInject(), testInjectIntoAnnotatedTarget.getInjectOn2().getTestObject1());
     }
 
-    public class TestInjectExplicitTarget {
+    public class TestInjectIntoExplicitTarget {
 
-        @Inject(target = "injectOn", property = "toInject")
+        @InjectInto(target = "injectOn", property = "toInject")
         private ToInject toInject;
 
         private InjectOn injectOn;
 
-        public TestInjectExplicitTarget() {
+        public TestInjectIntoExplicitTarget() {
             toInject = new ToInject();
             injectOn = new InjectOn();
         }
@@ -73,9 +74,9 @@ public class InjectModuleInjectTest extends TestCase {
 
     }
 
-    public class TestInjectAnnotatedTarget {
+    public class TestInjectIntoAnnotatedTarget {
 
-        @Inject(property = "toInject")
+        @InjectInto(property = "toInject")
         private ToInject toInject;
 
         @TestedObject
@@ -84,7 +85,7 @@ public class InjectModuleInjectTest extends TestCase {
         @TestedObject
         private InjectOn injectOn2;
 
-        public TestInjectAnnotatedTarget() {
+        public TestInjectIntoAnnotatedTarget() {
             toInject = new ToInject();
             injectOn1 = new InjectOn();
             injectOn2 = new InjectOn();

@@ -18,9 +18,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/resources/log4j.xml" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\resources\log4j.properties" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\inject\InjectModuleInjectStaticTest.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectIntoByType.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectIntoStaticByType.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreTest.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\inject\InjectModuleRestoreAutoInjectTest.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\inject\annotation\Inject.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\inject\annotation\AutoInjectStatic.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\inject\annotation\InjectStatic.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\inject\InjectModuleAutoInjectTest.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreInjectIntoByTypeTest.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\inject\annotation\AutoInject.java" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectInto.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectIntoStaticTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectIntoStatic.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/DBMaintainerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/DBMaintainerTest.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\inject\InjectModuleInjectTest.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectIntoTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectIntoByTypeTest.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -44,7 +62,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1168539145096" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1168542588067" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -182,7 +200,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="SpringModuleTest.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="SpringModuleTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/spring/SpringModuleTest.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="59" column="0" selection-start="1681" selection-end="1681" vertical-scroll-proportion="0.28650647">
@@ -191,46 +209,46 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SpringModule.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
+      <file leaf-file-name="InjectModule.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="101" column="25" selection-start="3669" selection-end="3669" vertical-scroll-proportion="0.03142329">
+            <state line="89" column="0" selection-start="4079" selection-end="4079" vertical-scroll-proportion="0.4201521">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="services-config.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/spring/services-config.xml">
+      <file leaf-file-name="InjectIntoStaticByType.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectIntoStaticByType.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="14" selection-start="166" selection-end="166" vertical-scroll-proportion="0.06284658">
+            <state line="65" column="8" selection-start="2643" selection-end="2643" vertical-scroll-proportion="1.6561922">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DbUnitModule.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
+      <file leaf-file-name="InjectModuleRestoreInjectIntoByTypeTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreInjectIntoByTypeTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="193" column="0" selection-start="6861" selection-end="6861" vertical-scroll-proportion="1.2162662">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DatabaseModule.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java">
+      <file leaf-file-name="ModuleUtils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ModuleUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="79" column="37" selection-start="3581" selection-end="3581" vertical-scroll-proportion="0.03142329">
+            <state line="40" column="0" selection-start="1364" selection-end="1364" vertical-scroll-proportion="0.40494296">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApplicationContext.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://D:/_apps/java/spring-framework-2.0/src/org/springframework/context/ApplicationContext.java">
+      <file leaf-file-name="unitils-default.properties" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="53" column="57" selection-start="2369" selection-end="2369" vertical-scroll-proportion="0.52390057">
+            <state line="197" column="35" selection-start="12988" selection-end="12988" vertical-scroll-proportion="1.6102662">
               <folding />
             </state>
           </provider>
@@ -910,36 +928,6 @@
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\lib\spring-beans.jar" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\lib\spring-beans.jar!\org\springframework\beans" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\lib\spring-beans.jar!\org\springframework\beans\factory" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\lib\spring-beans.jar!\org\springframework\beans\factory\config" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Libraries" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\lib\spring-beans.jar" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
       </PATH>
       <PATH>
         <PATH_ELEMENT>
@@ -974,6 +962,10 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\resources" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1112,6 +1104,10 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\resources" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1451,15 +1447,15 @@
   </component>
   <component name="RestoreUpdateTree" />
   <component name="RunManager" selected="JUnit.All in Unitils">
-    <tempConfiguration default="false" name="ReflectionComparatorMapTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="org.unitils.reflectionassert.*" />
+    <tempConfiguration default="false" name="InjectModuleRestoreInjectIntoByTypeTest.testRestore_restoreNothing" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="org.unitils.inject.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.unitils.reflectionassert" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.reflectionassert.ReflectionComparatorMapTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="org.unitils.inject" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.inject.InjectModuleRestoreInjectIntoByTypeTest" />
+      <option name="METHOD_NAME" value="testRestore_restoreNothing" />
+      <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -1702,7 +1698,7 @@
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3291639" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3269781" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20934826" order="0" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3067808" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3269781" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24753127" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.49166667" order="11" />
@@ -1713,9 +1709,9 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25361368" order="1" x="59" y="60" width="1515" height="1080" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32888466" order="8" />
       <window_info id="Run" active="true" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.46388888" order="2" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24983819" order="2" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24950625" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="4" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3584366" order="4" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35833332" order="4" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="10" />
@@ -1811,100 +1807,65 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/reflect/Field.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectIntoTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="191" column="20" selection-start="6377" selection-end="6377" vertical-scroll-proportion="0.3326978">
+        <state line="25" column="23" selection-start="928" selection-end="928" vertical-scroll-proportion="0.30997038">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/util/Map.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleCreateTestedObjectsTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="278" column="17" selection-start="13446" selection-end="13446" vertical-scroll-proportion="0.3403241">
+        <state line="30" column="13" selection-start="947" selection-end="947" vertical-scroll-proportion="0.32677165">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/_apps/java/spring-framework-2.0/src/org/springframework/beans/factory/ListableBeanFactory.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectIntoStaticTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="171" column="8" selection-start="9176" selection-end="9176" vertical-scroll-proportion="0.4461392">
+        <state line="28" column="13" selection-start="974" selection-end="974" vertical-scroll-proportion="0.3210475">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreAutoInjectTest.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectIntoByTypeTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="87" selection-start="2033" selection-end="2306" vertical-scroll-proportion="0.478551">
+        <state line="31" column="13" selection-start="1111" selection-end="1111" vertical-scroll-proportion="0.32086614">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/util/List.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/TestedObject.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="17" selection-start="178" selection-end="187" vertical-scroll-proportion="0.11344137">
+        <state line="31" column="18" selection-start="1105" selection-end="1105" vertical-scroll-proportion="0.45376548">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/_apps/java/spring-framework-2.0/src/org/springframework/context/support/ClassPathXmlApplicationContext.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectIntoStatic.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="75" column="11" selection-start="3033" selection-end="3033" vertical-scroll-proportion="0.3326978">
+        <state line="42" column="18" selection-start="1926" selection-end="1926" vertical-scroll-proportion="0.50630456">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/_apps/java/spring-framework-2.0/src/org/springframework/beans/factory/support/DefaultListableBeanFactory.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectIntoByType.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="354" column="0" selection-start="13509" selection-end="13509" vertical-scroll-proportion="0.49761677">
+        <state line="37" column="18" selection-start="1421" selection-end="1421" vertical-scroll-proportion="0.5276431">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/AnnotationUtils.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectInto.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="64" column="54" selection-start="2303" selection-end="2303" vertical-scroll-proportion="0.5786463">
+        <state line="35" column="18" selection-start="1373" selection-end="1373" vertical-scroll-proportion="0.5276431">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java">
+    <entry file="file://$PROJECT_DIR$/src/test/resources/unitils.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="155" column="12" selection-start="6893" selection-end="7034" vertical-scroll-proportion="0.61218566">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="101" column="25" selection-start="3669" selection-end="3669" vertical-scroll-proportion="0.03142329">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/spring/services-config.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="14" selection-start="166" selection-end="166" vertical-scroll-proportion="0.06284658">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="79" column="37" selection-start="3581" selection-end="3581" vertical-scroll-proportion="0.03142329">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/_apps/java/spring-framework-2.0/src/org/springframework/context/ApplicationContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="57" selection-start="2369" selection-end="2369" vertical-scroll-proportion="0.52390057">
+        <state line="64" column="25" selection-start="4068" selection-end="4068" vertical-scroll-proportion="0.9010669">
           <folding />
         </state>
       </provider>
@@ -1912,6 +1873,41 @@
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/spring/SpringModuleTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="59" column="0" selection-start="1681" selection-end="1681" vertical-scroll-proportion="0.28650647">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/annotation/InjectIntoStaticByType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="65" column="8" selection-start="2643" selection-end="2643" vertical-scroll-proportion="1.6561922">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ModuleUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="0" selection-start="1364" selection-end="1364" vertical-scroll-proportion="0.40494296">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="89" column="0" selection-start="4079" selection-end="4079" vertical-scroll-proportion="0.4201521">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleRestoreInjectIntoByTypeTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="193" column="0" selection-start="6861" selection-end="6861" vertical-scroll-proportion="1.2162662">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="197" column="35" selection-start="12988" selection-end="12988" vertical-scroll-proportion="1.6102662">
           <folding />
         </state>
       </provider>

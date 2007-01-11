@@ -18,7 +18,7 @@ package org.unitils.inject;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.inject.annotation.AutoInjectStatic;
+import org.unitils.inject.annotation.InjectIntoStaticByType;
 import static org.unitils.inject.util.PropertyAccess.FIELD;
 import static org.unitils.inject.util.PropertyAccess.SETTER;
 import org.unitils.inject.util.Restore;
@@ -27,11 +27,11 @@ import org.unitils.inject.util.Restore;
  * Test for restoring values that where replaced during the static auto injection of the {@link InjectModule} after
  * a test was performed.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public class InjectModuleRestoreAutoInjectTest extends TestCase {
+public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
 
     /* Tested object */
     private InjectModule injectModule;
@@ -113,10 +113,10 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     private class TestStaticSetterDefaultRestore {
 
-        @AutoInjectStatic(target = SetterInjectionTarget.class, propertyAccess = SETTER)
+        @InjectIntoStaticByType(target = SetterInjectionTarget.class, propertyAccess = SETTER)
         private String setterInject = "injected value";
 
-        @AutoInjectStatic(target = FieldInjectionTarget.class, propertyAccess = FIELD)
+        @InjectIntoStaticByType(target = FieldInjectionTarget.class, propertyAccess = FIELD)
         private String fieldInject = "injected value";
     }
 
@@ -125,10 +125,10 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     private class TestStaticSetterRestoreNothing {
 
-        @AutoInjectStatic(target = SetterInjectionTarget.class, restore = Restore.NO_RESTORE)
+        @InjectIntoStaticByType(target = SetterInjectionTarget.class, restore = Restore.NO_RESTORE)
         private String setterInject = "injected value";
 
-        @AutoInjectStatic(target = FieldInjectionTarget.class, propertyAccess = FIELD, restore = Restore.NO_RESTORE)
+        @InjectIntoStaticByType(target = FieldInjectionTarget.class, propertyAccess = FIELD, restore = Restore.NO_RESTORE)
         private String fieldInject = "injected value";
     }
 
@@ -137,10 +137,10 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     private class TestStaticSetterRestoreOldValue {
 
-        @AutoInjectStatic(target = SetterInjectionTarget.class, restore = Restore.OLD_VALUE)
+        @InjectIntoStaticByType(target = SetterInjectionTarget.class, restore = Restore.OLD_VALUE)
         private String setterInject = "injected value";
 
-        @AutoInjectStatic(target = FieldInjectionTarget.class, propertyAccess = FIELD, restore = Restore.OLD_VALUE)
+        @InjectIntoStaticByType(target = FieldInjectionTarget.class, propertyAccess = FIELD, restore = Restore.OLD_VALUE)
         private String fieldInject = "injected value";
     }
 
@@ -149,10 +149,10 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     private class TestStaticSetterRestoreNull {
 
-        @AutoInjectStatic(target = SetterInjectionTarget.class, restore = Restore.NULL_OR_0_VALUE)
+        @InjectIntoStaticByType(target = SetterInjectionTarget.class, restore = Restore.NULL_OR_0_VALUE)
         private String setterInject = "injected value";
 
-        @AutoInjectStatic(target = FieldInjectionTarget.class, propertyAccess = FIELD, restore = Restore.NULL_OR_0_VALUE)
+        @InjectIntoStaticByType(target = FieldInjectionTarget.class, propertyAccess = FIELD, restore = Restore.NULL_OR_0_VALUE)
         private String fieldInject = "injected value";
     }
 
@@ -162,10 +162,10 @@ public class InjectModuleRestoreAutoInjectTest extends TestCase {
      */
     private class TestStaticSetterRestore0 {
 
-        @AutoInjectStatic(target = SetterInjectionTarget.class, restore = Restore.NULL_OR_0_VALUE)
+        @InjectIntoStaticByType(target = SetterInjectionTarget.class, restore = Restore.NULL_OR_0_VALUE)
         private int setterInject = 111;
 
-        @AutoInjectStatic(target = FieldInjectionTarget.class, propertyAccess = FIELD, restore = Restore.NULL_OR_0_VALUE)
+        @InjectIntoStaticByType(target = FieldInjectionTarget.class, propertyAccess = FIELD, restore = Restore.NULL_OR_0_VALUE)
         private int fieldInject = 111;
     }
 

@@ -18,15 +18,15 @@ package org.unitils.inject;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.inject.annotation.InjectStatic;
+import org.unitils.inject.annotation.InjectIntoStatic;
 import static org.unitils.inject.util.Restore.*;
 
 /**
  * Test for restoring values that where replaced during the static injection of the {@link InjectModule} after
  * a test was performed.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class InjectModuleRestoreTest extends TestCase {
@@ -111,10 +111,10 @@ public class InjectModuleRestoreTest extends TestCase {
      */
     private class TestStaticSetterDefaultRestore {
 
-        @InjectStatic(target = SetterInjectionTarget.class, property = "stringProperty")
+        @InjectIntoStatic(target = SetterInjectionTarget.class, property = "stringProperty")
         private String setterInject = "injected value";
 
-        @InjectStatic(target = FieldInjectionTarget.class, property = "stringProperty")
+        @InjectIntoStatic(target = FieldInjectionTarget.class, property = "stringProperty")
         private String fieldInject = "injected value";
     }
 
@@ -123,10 +123,10 @@ public class InjectModuleRestoreTest extends TestCase {
      */
     private class TestStaticSetterRestoreNothing {
 
-        @InjectStatic(target = SetterInjectionTarget.class, property = "stringProperty", restore = NO_RESTORE)
+        @InjectIntoStatic(target = SetterInjectionTarget.class, property = "stringProperty", restore = NO_RESTORE)
         private String setterInject = "injected value";
 
-        @InjectStatic(target = FieldInjectionTarget.class, property = "stringProperty", restore = NO_RESTORE)
+        @InjectIntoStatic(target = FieldInjectionTarget.class, property = "stringProperty", restore = NO_RESTORE)
         private String fieldInject = "injected value";
     }
 
@@ -135,10 +135,10 @@ public class InjectModuleRestoreTest extends TestCase {
      */
     private class TestStaticSetterRestoreOldValue {
 
-        @InjectStatic(target = SetterInjectionTarget.class, property = "stringProperty", restore = OLD_VALUE)
+        @InjectIntoStatic(target = SetterInjectionTarget.class, property = "stringProperty", restore = OLD_VALUE)
         private String setterInject = "injected value";
 
-        @InjectStatic(target = FieldInjectionTarget.class, property = "stringProperty", restore = OLD_VALUE)
+        @InjectIntoStatic(target = FieldInjectionTarget.class, property = "stringProperty", restore = OLD_VALUE)
         private String fieldInject = "injected value";
     }
 
@@ -147,10 +147,10 @@ public class InjectModuleRestoreTest extends TestCase {
      */
     private class TestStaticSetterRestoreNull {
 
-        @InjectStatic(target = SetterInjectionTarget.class, property = "stringProperty", restore = NULL_OR_0_VALUE)
+        @InjectIntoStatic(target = SetterInjectionTarget.class, property = "stringProperty", restore = NULL_OR_0_VALUE)
         private String setterInject = "injected value";
 
-        @InjectStatic(target = FieldInjectionTarget.class, property = "stringProperty", restore = NULL_OR_0_VALUE)
+        @InjectIntoStatic(target = FieldInjectionTarget.class, property = "stringProperty", restore = NULL_OR_0_VALUE)
         private String fieldInject = "injected value";
     }
 
@@ -160,10 +160,10 @@ public class InjectModuleRestoreTest extends TestCase {
      */
     private class TestStaticSetterRestore0 {
 
-        @InjectStatic(target = SetterInjectionTarget.class, property = "primitiveProperty", restore = NULL_OR_0_VALUE)
+        @InjectIntoStatic(target = SetterInjectionTarget.class, property = "primitiveProperty", restore = NULL_OR_0_VALUE)
         private int setterInject = 111;
 
-        @InjectStatic(target = FieldInjectionTarget.class, property = "primitiveProperty", restore = NULL_OR_0_VALUE)
+        @InjectIntoStatic(target = FieldInjectionTarget.class, property = "primitiveProperty", restore = NULL_OR_0_VALUE)
         private int fieldInject = 111;
     }
 

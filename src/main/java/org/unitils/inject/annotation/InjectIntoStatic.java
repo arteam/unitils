@@ -15,7 +15,6 @@
  */
 package org.unitils.inject.annotation;
 
-import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -24,11 +23,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * Annotation indicating that the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
+ * Annotation indicating that the the {@link org.unitils.inject.InjectModule} should try to inject the object assigned to
  * the annotated field to a static property of the class defined by the target attribute.
  * <p/>
- * Automatic injection by type is used, which means that a the object is injected to the most specific static property
- * with an assignable type.
+ * Explicit injection is used, which means that the object is injected to the property indicated by the {@link #property()}
+ * attribute.
  * <p/>
  * You can also specify what action needs to be performed after the test. Suppose, for example, that you want to
  * mock a singleton instance by injecting the mock into the static <code>singleton</code> variable. After the test
@@ -41,7 +40,7 @@ import java.lang.annotation.Target;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface AutoInjectStatic {
+public @interface InjectIntoStatic {
 
     /**
      * The target class to which the object referenced by the annotated field is injected
@@ -51,11 +50,11 @@ public @interface AutoInjectStatic {
     Class target();
 
     /**
-     * The property access that is used for injection
+     * OGNL expression that defines the property to which the object referenced by the annotated fiel is injected
      *
-     * @return the access type, not null
+     * @return the ognl expression, not null
      */
-    PropertyAccess propertyAccess() default PropertyAccess.DEFAULT;
+    String property();
 
     /**
      * The action that needs to be performed after the test was performed. Should the old value be put back,

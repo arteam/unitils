@@ -48,12 +48,12 @@ import java.util.Map;
  * Module for injecting annotated objects into other objects. The intended usage is to inject mock objects, but it can
  * be used for regular objects too.
  * <p/>
- * Both explicit injection and automatic injection by type are supported. An object annotated with {@link Inject} is
- * explicitly injected into a target object. An object annotated with {@link AutoInject} is automatically injected into a
+ * Both explicit injection and automatic injection by type are supported. An object annotated with {@link InjectInto} is
+ * explicitly injected into a target object. An object annotated with {@link InjectIntoByType} is automatically injected into a
  * target property with the same type as the declared type of the annotated object.
  * <p/>
- * Explicit and automatic injection into static fields is also supported, by means of the {@link InjectStatic} and {@link
- * AutoInjectStatic} annotations.
+ * Explicit and automatic injection into static fields is also supported, by means of the {@link InjectIntoStatic} and {@link
+ * InjectIntoStaticByType} annotations.
  * <p/>
  * The target object can either be specified explicitly, or implicitly by annotating an object with {@link TestedObject}
  *
@@ -85,7 +85,7 @@ public class InjectModule implements Module {
      */
     public void init(Configuration configuration) {
 
-        defaultEnumValues = getAnnotationEnumDefaults(InjectModule.class, configuration, Inject.class, InjectStatic.class, AutoInject.class, AutoInjectStatic.class);
+        defaultEnumValues = getAnnotationEnumDefaults(InjectModule.class, configuration, InjectInto.class, InjectIntoStatic.class, InjectIntoByType.class, InjectIntoStaticByType.class);
         createTestedObjectsIfNullEnabled = configuration.getBoolean(PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED);
     }
 
@@ -143,60 +143,60 @@ public class InjectModule implements Module {
      */
     public void injectObjects(Object test) {
         injectAll(test);
-        autoInjectAll(test);
+        injectAllByType(test);
         injectAllStatic(test);
-        autoInjectAllStatic(test);
+        injectAllStaticByType(test);
     }
 
 
     /**
-     * Injects all fields that are annotated with {@link Inject}.
+     * Injects all fields that are annotated with {@link InjectInto}.
      *
      * @param test The instance to inject into, not null
      */
     public void injectAll(Object test) {
-        List<Field> fieldsToInject = getFieldsAnnotatedWith(test.getClass(), Inject.class);
-        for (Field fieldToInject : fieldsToInject) {
-            inject(test, fieldToInject);
+        List<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectInto.class);
+        for (Field field : fields) {
+            inject(test, field);
         }
     }
 
 
     /**
-     * Auto-injects all fields that are annotated with {@link AutoInject}
+     * Auto-injects all fields that are annotated with {@link InjectIntoByType}
      *
      * @param test The instance to inject into, not null
      */
-    public void autoInjectAll(Object test) {
-        List<Field> fieldsToAutoInject = getFieldsAnnotatedWith(test.getClass(), AutoInject.class);
-        for (Field fieldToAutoInject : fieldsToAutoInject) {
-            autoInject(test, fieldToAutoInject);
+    public void injectAllByType(Object test) {
+        List<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoByType.class);
+        for (Field field : fields) {
+            injectByType(test, field);
         }
     }
 
 
     /**
-     * Injects all fields that are annotated with {@link InjectStatic}.
+     * Injects all fields that are annotated with {@link InjectIntoStatic}.
      *
      * @param test The instance to inject into, not null
      */
     public void injectAllStatic(Object test) {
-        List<Field> fieldsToInjectStatic = getFieldsAnnotatedWith(test.getClass(), InjectStatic.class);
-        for (Field fieldToInjectStatic : fieldsToInjectStatic) {
-            injectStatic(test, fieldToInjectStatic);
+        List<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStatic.class);
+        for (Field field : fields) {
+            injectStatic(test, field);
         }
     }
 
 
     /**
-     * Auto-injects all fields that are annotated with {@link AutoInjectStatic}
+     * Auto-injects all fields that are annotated with {@link InjectIntoStaticByType}
      *
      * @param test The instance to inject into, not null
      */
-    public void autoInjectAllStatic(Object test) {
-        List<Field> fieldsToAutoInjectStatic = getFieldsAnnotatedWith(test.getClass(), AutoInjectStatic.class);
-        for (Field fieldToAutoInjectStatic : fieldsToAutoInjectStatic) {
-            autoInjectStatic(test, fieldToAutoInjectStatic);
+    public void injectAllStaticByType(Object test) {
+        List<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStaticByType.class);
+        for (Field field : fields) {
+            injectStaticByType(test, field);
         }
     }
 
@@ -219,12 +219,12 @@ public class InjectModule implements Module {
      * @param fieldToInject The field from which the value is injected into the target, not null
      */
     protected void inject(Object test, Field fieldToInject) {
-        Inject injectAnnotation = fieldToInject.getAnnotation(Inject.class);
+        InjectInto injectIntoAnnotation = fieldToInject.getAnnotation(InjectInto.class);
 
-        List targets = getTargets(injectAnnotation, fieldToInject, injectAnnotation.target(), test);
-        String ognlExpression = injectAnnotation.property();
+        List targets = getTargets(injectIntoAnnotation, fieldToInject, injectIntoAnnotation.target(), test);
+        String ognlExpression = injectIntoAnnotation.property();
         if (StringUtils.isEmpty(ognlExpression)) {
-            throw new UnitilsException(getSituatedErrorMessage(injectAnnotation, fieldToInject, "Property cannot be empty"));
+            throw new UnitilsException(getSituatedErrorMessage(injectIntoAnnotation, fieldToInject, "Property cannot be empty"));
         }
         Object objectToInject = getFieldValue(test, fieldToInject);
 
@@ -233,7 +233,7 @@ public class InjectModule implements Module {
                 InjectionUtils.inject(objectToInject, target, ognlExpression);
 
             } catch (UnitilsException e) {
-                throw new UnitilsException(getSituatedErrorMessage(injectAnnotation, fieldToInject, e.getMessage()), e);
+                throw new UnitilsException(getSituatedErrorMessage(injectIntoAnnotation, fieldToInject, e.getMessage()), e);
             }
         }
     }
@@ -246,22 +246,22 @@ public class InjectModule implements Module {
      * @param fieldToInjectStatic The field from which the value is injected into the target, not null
      */
     protected void injectStatic(Object test, Field fieldToInjectStatic) {
-        InjectStatic injectStaticAnnotation = fieldToInjectStatic.getAnnotation(InjectStatic.class);
+        InjectIntoStatic injectIntoStaticAnnotation = fieldToInjectStatic.getAnnotation(InjectIntoStatic.class);
 
-        Class targetClass = injectStaticAnnotation.target();
-        String property = injectStaticAnnotation.property();
+        Class targetClass = injectIntoStaticAnnotation.target();
+        String property = injectIntoStaticAnnotation.property();
         if (StringUtils.isEmpty(property)) {
-            throw new UnitilsException(getSituatedErrorMessage(injectStaticAnnotation, fieldToInjectStatic, "Property cannot be empty"));
+            throw new UnitilsException(getSituatedErrorMessage(injectIntoStaticAnnotation, fieldToInjectStatic, "Property cannot be empty"));
         }
         Object objectToInject = getFieldValue(test, fieldToInjectStatic);
 
-        Restore restore = getValueReplaceDefault(InjectStatic.class, injectStaticAnnotation.restore(), defaultEnumValues);
+        Restore restore = getValueReplaceDefault(InjectIntoStatic.class, injectIntoStaticAnnotation.restore(), defaultEnumValues);
         try {
             Object oldValue = InjectionUtils.injectStatic(objectToInject, targetClass, property);
             storeValueToRestoreAfterTest(targetClass, property, fieldToInjectStatic.getType(), null, oldValue, restore);
 
         } catch (UnitilsException e) {
-            throw new UnitilsException(getSituatedErrorMessage(injectStaticAnnotation, fieldToInjectStatic, e.getMessage()), e);
+            throw new UnitilsException(getSituatedErrorMessage(injectIntoStaticAnnotation, fieldToInjectStatic, e.getMessage()), e);
         }
     }
 
@@ -274,19 +274,19 @@ public class InjectModule implements Module {
      * @param test          The instance to inject into, not null
      * @param fieldToInject The field from which the value is injected into the target, not null
      */
-    protected void autoInject(Object test, Field fieldToInject) {
-        AutoInject autoInjectAnnotation = fieldToInject.getAnnotation(AutoInject.class);
+    protected void injectByType(Object test, Field fieldToInject) {
+        InjectIntoByType injectIntoByTypeAnnotation = fieldToInject.getAnnotation(InjectIntoByType.class);
 
-        List targets = getTargets(autoInjectAnnotation, fieldToInject, autoInjectAnnotation.target(), test);
+        List targets = getTargets(injectIntoByTypeAnnotation, fieldToInject, injectIntoByTypeAnnotation.target(), test);
         Object objectToInject = getFieldValue(test, fieldToInject);
 
-        PropertyAccess propertyAccess = getValueReplaceDefault(AutoInject.class, autoInjectAnnotation.propertyAccess(), defaultEnumValues);
+        PropertyAccess propertyAccess = getValueReplaceDefault(InjectIntoByType.class, injectIntoByTypeAnnotation.propertyAccess(), defaultEnumValues);
         for (Object target : targets) {
             try {
                 InjectionUtils.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccess);
 
             } catch (UnitilsException e) {
-                throw new UnitilsException(getSituatedErrorMessage(autoInjectAnnotation, fieldToInject, e.getMessage()), e);
+                throw new UnitilsException(getSituatedErrorMessage(injectIntoByTypeAnnotation, fieldToInject, e.getMessage()), e);
             }
         }
     }
@@ -300,20 +300,20 @@ public class InjectModule implements Module {
      * @param test                    The instance to inject into, not null
      * @param fieldToAutoInjectStatic The field from which the value is injected into the target, not null
      */
-    protected void autoInjectStatic(Object test, Field fieldToAutoInjectStatic) {
-        AutoInjectStatic autoInjectStaticAnnotation = fieldToAutoInjectStatic.getAnnotation(AutoInjectStatic.class);
+    protected void injectStaticByType(Object test, Field fieldToAutoInjectStatic) {
+        InjectIntoStaticByType injectIntoStaticByTypeAnnotation = fieldToAutoInjectStatic.getAnnotation(InjectIntoStaticByType.class);
 
-        Class targetClass = autoInjectStaticAnnotation.target();
+        Class targetClass = injectIntoStaticByTypeAnnotation.target();
         Object objectToInject = getFieldValue(test, fieldToAutoInjectStatic);
 
-        Restore restore = getValueReplaceDefault(AutoInjectStatic.class, autoInjectStaticAnnotation.restore(), defaultEnumValues);
-        PropertyAccess propertyAccess = getValueReplaceDefault(AutoInjectStatic.class, autoInjectStaticAnnotation.propertyAccess(), defaultEnumValues);
+        Restore restore = getValueReplaceDefault(InjectIntoStaticByType.class, injectIntoStaticByTypeAnnotation.restore(), defaultEnumValues);
+        PropertyAccess propertyAccess = getValueReplaceDefault(InjectIntoStaticByType.class, injectIntoStaticByTypeAnnotation.propertyAccess(), defaultEnumValues);
         try {
             Object oldValue = InjectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccess);
             storeValueToRestoreAfterTest(targetClass, null, fieldToAutoInjectStatic.getType(), propertyAccess, oldValue, restore);
 
         } catch (UnitilsException e) {
-            throw new UnitilsException(getSituatedErrorMessage(autoInjectStaticAnnotation, fieldToAutoInjectStatic, e.getMessage()), e);
+            throw new UnitilsException(getSituatedErrorMessage(injectIntoStaticByTypeAnnotation, fieldToAutoInjectStatic, e.getMessage()), e);
         }
     }
 
