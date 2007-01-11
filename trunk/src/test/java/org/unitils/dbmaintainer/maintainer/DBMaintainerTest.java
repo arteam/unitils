@@ -29,8 +29,7 @@ import org.unitils.dbmaintainer.script.SQLScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.easymock.annotation.RegularMock;
-import org.unitils.inject.annotation.AutoInject;
+import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.TestedObject;
 
 import java.util.ArrayList;
@@ -43,31 +42,31 @@ import java.util.List;
 public class DBMaintainerTest extends UnitilsJUnit3 {
 
     @Mock
-    @AutoInject
+    @InjectIntoByType
     private VersionSource mockVersionSource;
 
     @Mock
-    @AutoInject
+    @InjectIntoByType
     private ScriptSource mockScriptSource;
 
     @Mock
-    @AutoInject
+    @InjectIntoByType
     private SQLScriptRunner mockScriptRunner;
 
     @Mock
-    @AutoInject
+    @InjectIntoByType
     private DBClearer mockDbClearer;
 
     @Mock
-    @AutoInject
+    @InjectIntoByType
     private ConstraintsDisabler mockConstraintsDisabler;
 
     @Mock
-    @AutoInject
+    @InjectIntoByType
     private SequenceUpdater mockSequenceUpdater;
 
     @Mock
-    @AutoInject
+    @InjectIntoByType
     private DtdGenerator mockDtdGenerator;
 
     @TestedObject

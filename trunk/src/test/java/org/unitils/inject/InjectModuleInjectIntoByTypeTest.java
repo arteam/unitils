@@ -18,7 +18,7 @@ package org.unitils.inject;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.inject.annotation.AutoInject;
+import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.inject.util.PropertyAccess;
 
@@ -29,21 +29,21 @@ import org.unitils.inject.util.PropertyAccess;
  * @author Tim Ducheyne
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public class InjectModuleAutoInjectTest extends TestCase {
+public class InjectModuleInjectIntoByTypeTest extends TestCase {
 
     /* Tested object */
     private InjectModule injectModule;
 
     /* Objects that represent 'unit test classes', containing objects that should be injected on other objects. */
-    private TestAutoInjectExplicitTarget testAutoInjectExplicitTarget = new TestAutoInjectExplicitTarget();
-    private TestAutoInjectFieldAccess testAutoInjectFieldAccess = new TestAutoInjectFieldAccess();
-    private TestAutoInjectAnnotatedTarget testAutoInjectAnnotatedTarget = new TestAutoInjectAnnotatedTarget();
-    private TestAutoInject_targetPropertyIsSuperType testAutoInject_targetPropertyIsSuperType = new TestAutoInject_targetPropertyIsSuperType();
-    private TestAutoInject_targetPropertyIsSuperType_fieldAccess testAutoInject_targetPropertyIsSuperType_fieldAccess = new TestAutoInject_targetPropertyIsSuperType_fieldAccess();
-    private TestAutoInjectToMostSpecificallyTypedProperty testAutoInjectToMostSpecificallyTypedProperty = new TestAutoInjectToMostSpecificallyTypedProperty();
-    private TestAutoInjectToMostSpecificallyTypedProperty_fieldAccess testAutoInjectToMostSpecificallyTypedProperty_fieldAccess = new TestAutoInjectToMostSpecificallyTypedProperty_fieldAccess();
-    private TestAutoInject_targetPropertyOnSuperClass testAutoInject_targetPropertyOnSuperClass = new TestAutoInject_targetPropertyOnSuperClass();
-    private TestAutoInject_targetPropertyOnSuperClass_fieldAccess testAutoInject_targetPropertyOnSuperClass_fieldAccess = new TestAutoInject_targetPropertyOnSuperClass_fieldAccess();
+    private TestInjectIntoByTypeExplicitTarget testInjectIntoByTypeExplicitTarget = new TestInjectIntoByTypeExplicitTarget();
+    private TestInjectIntoByTypeFieldAccess testInjectIntoByTypeFieldAccess = new TestInjectIntoByTypeFieldAccess();
+    private TestInjectIntoByTypeAnnotatedTarget testInjectIntoByTypeAnnotatedTarget = new TestInjectIntoByTypeAnnotatedTarget();
+    private TestInjectIntoByType_targetPropertyIsSuperType testInjectIntoByType_targetPropertyIsSuperType = new TestInjectIntoByType_targetPropertyIsSuperType();
+    private TestInjectIntoByType_targetPropertyIsSuperType_fieldAccess testInjectIntoByType_targetPropertyIsSuperType_fieldAccess = new TestInjectIntoByType_targetPropertyIsSuperType_fieldAccess();
+    private TestInjectIntoByTypeToMostSpecificallyTypedProperty testInjectIntoByTypeToMostSpecificallyTypedProperty = new TestInjectIntoByTypeToMostSpecificallyTypedProperty();
+    private TestInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess testInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess = new TestInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess();
+    private TestInjectIntoByType_targetPropertyOnSuperClass testInjectIntoByType_targetPropertyOnSuperClass = new TestInjectIntoByType_targetPropertyOnSuperClass();
+    private TestInjectIntoByType_targetPropertyOnSuperClass_fieldAccess testInjectIntoByType_targetPropertyOnSuperClass_fieldAccess = new TestInjectIntoByType_targetPropertyOnSuperClass_fieldAccess();
 
 
     /**
@@ -62,37 +62,37 @@ public class InjectModuleAutoInjectTest extends TestCase {
     /**
      * Tests auto injection in case the target is explicitly specified
      */
-    public void testAutoInject_explicitTarget() {
-        injectModule.injectObjects(testAutoInjectExplicitTarget);
-        assertSame(testAutoInjectExplicitTarget.getToInject(), testAutoInjectExplicitTarget.getInjectOn().getToInject());
+    public void testInjectIntoByType_explicitTarget() {
+        injectModule.injectObjects(testInjectIntoByTypeExplicitTarget);
+        assertSame(testInjectIntoByTypeExplicitTarget.getToInject(), testInjectIntoByTypeExplicitTarget.getInjectOn().getToInject());
     }
 
 
     /**
      * Tests auto injection in case of field access
      */
-    public void testAutoInject_fieldAccess() {
-        injectModule.injectObjects(testAutoInjectFieldAccess);
-        assertSame(testAutoInjectFieldAccess.getToInject(), testAutoInjectFieldAccess.getInjectOnField().getToInject());
+    public void testInjectIntoByType_fieldAccess() {
+        injectModule.injectObjects(testInjectIntoByTypeFieldAccess);
+        assertSame(testInjectIntoByTypeFieldAccess.getToInject(), testInjectIntoByTypeFieldAccess.getInjectOnField().getToInject());
     }
 
 
     /**
      * Multiple fields are annotated with @TestedObject. Tests wether the objects are injected to all of these fields
      */
-    public void testAutoInject_annotatedTargets() {
-        injectModule.injectObjects(testAutoInjectAnnotatedTarget);
-        assertSame(testAutoInjectAnnotatedTarget.getToInject(), testAutoInjectAnnotatedTarget.getInjectOn1().getToInject());
-        assertSame(testAutoInjectAnnotatedTarget.getToInject(), testAutoInjectAnnotatedTarget.getInjectOn2().getToInject());
+    public void testInjectIntoByType_annotatedTargets() {
+        injectModule.injectObjects(testInjectIntoByTypeAnnotatedTarget);
+        assertSame(testInjectIntoByTypeAnnotatedTarget.getToInject(), testInjectIntoByTypeAnnotatedTarget.getInjectOn1().getToInject());
+        assertSame(testInjectIntoByTypeAnnotatedTarget.getToInject(), testInjectIntoByTypeAnnotatedTarget.getInjectOn2().getToInject());
     }
 
 
     /**
      * Tests the case when the target field is a supertype of the injected object, and no more specific field exists.
      */
-    public void testAutoInject_targetFieldIsSuperType() {
-        injectModule.injectObjects(testAutoInject_targetPropertyIsSuperType);
-        assertSame(testAutoInject_targetPropertyIsSuperType.getToInject(), testAutoInject_targetPropertyIsSuperType.getInjectOn().getToInject());
+    public void testInjectIntoByType_targetFieldIsSuperType() {
+        injectModule.injectObjects(testInjectIntoByType_targetPropertyIsSuperType);
+        assertSame(testInjectIntoByType_targetPropertyIsSuperType.getToInject(), testInjectIntoByType_targetPropertyIsSuperType.getInjectOn().getToInject());
     }
 
 
@@ -100,9 +100,9 @@ public class InjectModuleAutoInjectTest extends TestCase {
      * Tests the case when the target field is a supertype of the injected object, and no more specific field exists,
      * using field access
      */
-    public void testAutoInject_targetFieldIsSuperType_fieldAccess() {
-        injectModule.injectObjects(testAutoInject_targetPropertyIsSuperType_fieldAccess);
-        assertSame(testAutoInject_targetPropertyIsSuperType_fieldAccess.getToInject(), testAutoInject_targetPropertyIsSuperType_fieldAccess.getInjectOn().getToInject());
+    public void testInjectIntoByType_targetFieldIsSuperType_fieldAccess() {
+        injectModule.injectObjects(testInjectIntoByType_targetPropertyIsSuperType_fieldAccess);
+        assertSame(testInjectIntoByType_targetPropertyIsSuperType_fieldAccess.getToInject(), testInjectIntoByType_targetPropertyIsSuperType_fieldAccess.getInjectOn().getToInject());
     }
 
 
@@ -110,10 +110,10 @@ public class InjectModuleAutoInjectTest extends TestCase {
      * Tests the case where target fields of both the object's type and a super type exists. The object should be injected
      * into the most specific type
      */
-    public void testAutoInject_injectToMostSpecificallyTypedField() {
-        injectModule.injectObjects(testAutoInjectToMostSpecificallyTypedProperty);
-        assertSame(testAutoInjectToMostSpecificallyTypedProperty.getToInjectSuper(), testAutoInjectToMostSpecificallyTypedProperty.getInjectOn().getToInjectSuper());
-        assertSame(testAutoInjectToMostSpecificallyTypedProperty.getToInjectSub(), testAutoInjectToMostSpecificallyTypedProperty.getInjectOn().getToInjectSub());
+    public void testInjectIntoByType_injectToMostSpecificallyTypedField() {
+        injectModule.injectObjects(testInjectIntoByTypeToMostSpecificallyTypedProperty);
+        assertSame(testInjectIntoByTypeToMostSpecificallyTypedProperty.getToInjectSuper(), testInjectIntoByTypeToMostSpecificallyTypedProperty.getInjectOn().getToInjectSuper());
+        assertSame(testInjectIntoByTypeToMostSpecificallyTypedProperty.getToInjectSub(), testInjectIntoByTypeToMostSpecificallyTypedProperty.getInjectOn().getToInjectSub());
     }
 
 
@@ -121,38 +121,38 @@ public class InjectModuleAutoInjectTest extends TestCase {
      * Tests the case where target fields of both the object's type and a super type exists. The object should be injected
      * into the most specific type. Field access is used.
      */
-    public void testAutoInject_injectToMostSpecificallyTypedField_fieldAccess() {
-        injectModule.injectObjects(testAutoInjectToMostSpecificallyTypedProperty_fieldAccess);
-        assertSame(testAutoInjectToMostSpecificallyTypedProperty_fieldAccess.getToInjectSuper(), testAutoInjectToMostSpecificallyTypedProperty_fieldAccess.getInjectOn().getToInjectSuper());
-        assertSame(testAutoInjectToMostSpecificallyTypedProperty_fieldAccess.getToInjectSub(), testAutoInjectToMostSpecificallyTypedProperty_fieldAccess.getInjectOn().getToInjectSub());
+    public void testInjectIntoByType_injectToMostSpecificallyTypedField_fieldAccess() {
+        injectModule.injectObjects(testInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess);
+        assertSame(testInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess.getToInjectSuper(), testInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess.getInjectOn().getToInjectSuper());
+        assertSame(testInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess.getToInjectSub(), testInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess.getInjectOn().getToInjectSub());
     }
 
 
     /**
      * Tests the case where the target property of the object to inject on belongs to the superclass
      */
-    public void testAutoInject_targetPropertyOnSuperClass() {
-        injectModule.injectObjects(testAutoInject_targetPropertyOnSuperClass);
-        assertSame(testAutoInject_targetPropertyOnSuperClass.getToInject(), testAutoInject_targetPropertyOnSuperClass.getInjectOn().getToInject());
+    public void testInjectIntoByType_targetPropertyOnSuperClass() {
+        injectModule.injectObjects(testInjectIntoByType_targetPropertyOnSuperClass);
+        assertSame(testInjectIntoByType_targetPropertyOnSuperClass.getToInject(), testInjectIntoByType_targetPropertyOnSuperClass.getInjectOn().getToInject());
     }
 
 
     /**
      * Tests the case where the target property of the object to inject on belongs to the superclass, using field access
      */
-    public void testAutoInject_targetPropertyOnSuperClass_fieldAccess() {
-        injectModule.injectObjects(testAutoInject_targetPropertyOnSuperClass_fieldAccess);
-        assertSame(testAutoInject_targetPropertyOnSuperClass_fieldAccess.getToInject(), testAutoInject_targetPropertyOnSuperClass_fieldAccess.getInjectOn().getToInject());
+    public void testInjectIntoByType_targetPropertyOnSuperClass_fieldAccess() {
+        injectModule.injectObjects(testInjectIntoByType_targetPropertyOnSuperClass_fieldAccess);
+        assertSame(testInjectIntoByType_targetPropertyOnSuperClass_fieldAccess.getToInject(), testInjectIntoByType_targetPropertyOnSuperClass_fieldAccess.getInjectOn().getToInject());
     }
 
 
-    public class TestAutoInjectExplicitTarget {
+    public class TestInjectIntoByTypeExplicitTarget {
 
-        @AutoInject(target = "injectOn", propertyAccess = PropertyAccess.SETTER)
+        @InjectIntoByType(target = "injectOn", propertyAccess = PropertyAccess.SETTER)
         private ToInjectSuper toInject;
         private InjectOn injectOn;
 
-        public TestAutoInjectExplicitTarget() {
+        public TestInjectIntoByTypeExplicitTarget() {
             toInject = new ToInjectSuper();
             injectOn = new InjectOn();
         }
@@ -167,14 +167,14 @@ public class InjectModuleAutoInjectTest extends TestCase {
     }
 
 
-    public class TestAutoInjectFieldAccess {
+    public class TestInjectIntoByTypeFieldAccess {
 
-        @AutoInject(propertyAccess = PropertyAccess.FIELD)
+        @InjectIntoByType(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOnField injectOnField;
 
-        public TestAutoInjectFieldAccess() {
+        public TestInjectIntoByTypeFieldAccess() {
             toInject = new ToInjectSuper();
             injectOnField = new InjectOnField();
         }
@@ -189,16 +189,16 @@ public class InjectModuleAutoInjectTest extends TestCase {
     }
 
 
-    public class TestAutoInjectAnnotatedTarget {
+    public class TestInjectIntoByTypeAnnotatedTarget {
 
-        @AutoInject(propertyAccess = PropertyAccess.SETTER)
+        @InjectIntoByType(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOn injectOn1;
         @TestedObject
         private InjectOn injectOn2;
 
-        public TestAutoInjectAnnotatedTarget() {
+        public TestInjectIntoByTypeAnnotatedTarget() {
             toInject = new ToInjectSuper();
             injectOn1 = new InjectOn();
             injectOn2 = new InjectOn();
@@ -218,14 +218,14 @@ public class InjectModuleAutoInjectTest extends TestCase {
     }
 
 
-    public class TestAutoInject_targetPropertyIsSuperType {
+    public class TestInjectIntoByType_targetPropertyIsSuperType {
 
-        @AutoInject(propertyAccess = PropertyAccess.SETTER)
+        @InjectIntoByType(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSub toInject;
         @TestedObject
         private InjectOn injectOn;
 
-        public TestAutoInject_targetPropertyIsSuperType() {
+        public TestInjectIntoByType_targetPropertyIsSuperType() {
             toInject = new ToInjectSub();
             injectOn = new InjectOn();
         }
@@ -240,14 +240,14 @@ public class InjectModuleAutoInjectTest extends TestCase {
     }
 
 
-    public class TestAutoInject_targetPropertyIsSuperType_fieldAccess {
+    public class TestInjectIntoByType_targetPropertyIsSuperType_fieldAccess {
 
-        @AutoInject(propertyAccess = PropertyAccess.FIELD)
+        @InjectIntoByType(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSub toInject;
         @TestedObject
         private InjectOnField injectOn;
 
-        public TestAutoInject_targetPropertyIsSuperType_fieldAccess() {
+        public TestInjectIntoByType_targetPropertyIsSuperType_fieldAccess() {
             toInject = new ToInjectSub();
             injectOn = new InjectOnField();
         }
@@ -262,16 +262,16 @@ public class InjectModuleAutoInjectTest extends TestCase {
     }
 
 
-    public class TestAutoInjectToMostSpecificallyTypedProperty {
+    public class TestInjectIntoByTypeToMostSpecificallyTypedProperty {
 
-        @AutoInject(propertyAccess = PropertyAccess.SETTER)
+        @InjectIntoByType(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSuper toInjectSuper;
-        @AutoInject(propertyAccess = PropertyAccess.SETTER)
+        @InjectIntoByType(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSub toInjectSub;
         @TestedObject
         private InjectOnSuperSub injectOn;
 
-        public TestAutoInjectToMostSpecificallyTypedProperty() {
+        public TestInjectIntoByTypeToMostSpecificallyTypedProperty() {
             toInjectSuper = new ToInjectSuper();
             toInjectSub = new ToInjectSub();
             injectOn = new InjectOnSuperSub();
@@ -291,16 +291,16 @@ public class InjectModuleAutoInjectTest extends TestCase {
     }
 
 
-    public class TestAutoInjectToMostSpecificallyTypedProperty_fieldAccess {
+    public class TestInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess {
 
-        @AutoInject(propertyAccess = PropertyAccess.FIELD)
+        @InjectIntoByType(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSuper toInjectSuper;
-        @AutoInject(propertyAccess = PropertyAccess.FIELD)
+        @InjectIntoByType(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSub toInjectSub;
         @TestedObject
         private InjectOnSuperSubFieldAccess injectOn;
 
-        public TestAutoInjectToMostSpecificallyTypedProperty_fieldAccess() {
+        public TestInjectIntoByTypeToMostSpecificallyTypedProperty_fieldAccess() {
             toInjectSuper = new ToInjectSuper();
             toInjectSub = new ToInjectSub();
             injectOn = new InjectOnSuperSubFieldAccess();
@@ -320,14 +320,14 @@ public class InjectModuleAutoInjectTest extends TestCase {
     }
 
 
-    public class TestAutoInject_targetPropertyOnSuperClass {
+    public class TestInjectIntoByType_targetPropertyOnSuperClass {
 
-        @AutoInject(propertyAccess = PropertyAccess.SETTER)
+        @InjectIntoByType(propertyAccess = PropertyAccess.SETTER)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOn_subClass injectOn;
 
-        public TestAutoInject_targetPropertyOnSuperClass() {
+        public TestInjectIntoByType_targetPropertyOnSuperClass() {
             toInject = new ToInjectSuper();
             injectOn = new InjectOn_subClass();
         }
@@ -342,14 +342,14 @@ public class InjectModuleAutoInjectTest extends TestCase {
     }
 
 
-    public class TestAutoInject_targetPropertyOnSuperClass_fieldAccess {
+    public class TestInjectIntoByType_targetPropertyOnSuperClass_fieldAccess {
 
-        @AutoInject(propertyAccess = PropertyAccess.FIELD)
+        @InjectIntoByType(propertyAccess = PropertyAccess.FIELD)
         private ToInjectSuper toInject;
         @TestedObject
         private InjectOn_subClass injectOn;
 
-        public TestAutoInject_targetPropertyOnSuperClass_fieldAccess() {
+        public TestInjectIntoByType_targetPropertyOnSuperClass_fieldAccess() {
             toInject = new ToInjectSuper();
             injectOn = new InjectOn_subClass();
         }

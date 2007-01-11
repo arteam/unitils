@@ -35,16 +35,20 @@ import java.lang.annotation.Target;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface AutoInject {
+public @interface InjectIntoByType {
 
     /**
      * The name of the field that references the object to which the object in the annotated field should be injected.
      * If not specified, the target is defined by the field annotated with {@link TestedObject}
+     *
+     * @return the target field, null for tested object
      */
     String target() default "";
 
     /**
      * The property access that should be used for injection.
+     *
+     * @return the access type, not null
      */
     PropertyAccess propertyAccess() default PropertyAccess.DEFAULT;
 
