@@ -40,7 +40,7 @@ import java.sql.Statement;
  * @author Tim Ducheyne
  */
 @DatabaseTest
-@DataSet(fileName = "DBVersionSourceTest.versionTableEmpty.xml")
+@DataSet("DBVersionSourceTest.versionTableEmpty.xml")
 public class DBVersionSourceTest extends UnitilsJUnit3 {
 
     /* The tested instance */
@@ -98,7 +98,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
     /**
      * Test normal retrieval of the version
      */
-    @DataSet(fileName = "DBVersionSourceTest.versionTableFilled.xml")
+    @DataSet("DBVersionSourceTest.versionTableFilled.xml")
     public void testGetDBVersion() throws Exception {
         Version expectedVersion = new Version(3L, DateUtils.parseDate("2006-10-08 12:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
         assertRefEquals(expectedVersion, dbVersionSource.getDbVersion());

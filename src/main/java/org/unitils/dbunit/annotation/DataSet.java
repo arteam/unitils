@@ -23,9 +23,9 @@ import java.lang.annotation.Target;
 
 /**
  * If at class level, indicates that before the execution of each test method in this class, a DbUnit datafile must be
- * loaded, either with the default fileName (ClassName.xml), or with a custom specified fileName (fileName property).
+ * loaded, either with the default fileName (ClassName.xml), or with a custom specified fileName.
  * If at method level, indicates that before running this method, a DbUnit datafile must be loaded, either with the
- * default fileName (ClassName.xml), or with a custom specified fileName (fileName property).
+ * default fileName (ClassName.xml), or with a custom specified fileName.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -34,5 +34,5 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface DataSet {
 
-    String fileName();
+    String value();
 }

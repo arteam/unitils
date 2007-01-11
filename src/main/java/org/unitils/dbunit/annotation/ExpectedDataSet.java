@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 /**
  * Indicates that after having executed the annotated test method, the contents of the unit test database should be
  * equal to the contents of either the default result datafile (ClassName.methodName-result.xml), or a file with a
- * custom specified name (fileName property).
+ * custom specified name.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -32,6 +32,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface ExpectedDataSet {
 
-    String fileName() default "";
+    String value() default "";
 
 }
