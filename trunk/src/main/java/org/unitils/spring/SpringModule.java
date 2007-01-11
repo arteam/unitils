@@ -27,6 +27,7 @@ import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import java.util.Map;
  */
 public class SpringModule implements Module {
 
+    //todo cache context
     /* The Spring application context */
     private ApplicationContext applicationContext;
 
@@ -55,30 +57,39 @@ public class SpringModule implements Module {
     /**
      * Gets the spring bean with the given name. The given test instance, by using {@link SpringApplicationContext} and
      * {@link CreateSpringApplicationContext}, determines the application context in which to look for the bean.
+     * <p/>
+     * A UnitilsException is thrown when the no bean could be found for the given name.
      *
      * @param testObject The test instance, not null
      * @param name       The name, not null
-     * @return The bean, a <code>NoSuchBeanDefinitionException</code> if not found
+     * @return The bean, not null
      */
-    public Object getSpringBean(Object testObject, String name) throws BeansException {
-        return getApplicationContext(testObject).getBean(name);
+    public Object getSpringBean(Object testObject, String name) {
+        try {
+            return getApplicationContext(testObject).getBean(name);
+
+        } catch (BeansException e) {
+            throw new UnitilsException("Unable to get Spring bean. No Spring bean found for name " + name);
+        }
     }
 
 
     /**
      * Gets the spring bean with the given type. The given test instance, by using {@link SpringApplicationContext} and
      * {@link CreateSpringApplicationContext}, determines the application context in which to look for the bean.
+     * If more there is not exactly 1 possible bean assignment, an UnitilsException will be thrown.
      *
      * @param testObject The test instance, not null
      * @param type       The type, not null
-     * @return The bean, a <code>NoSuchBeanDefinitionException</code> if not found
+     * @return The bean, not null
      */
-    //Todo refactor
-    // todo implement correct typing and not found behavior
-    public Object getSpringBeanByType(Object testObject, Class<?> type) throws BeansException {
+    public Object getSpringBeanByType(Object testObject, Class<?> type) {
         Map beans = getApplicationContext(testObject).getBeansOfType(type);
         if (beans == null || beans.size() == 0) {
-            return null;
+            throw new UnitilsException("Unable to get Spring bean by type. No Spring bean found for type " + type.getSimpleName());
+        }
+        if (beans.size() > 1) {
+            throw new UnitilsException("Unable to get Spring bean by type. More than one possible Spring bean for type " + type.getSimpleName() + ". Possible beans; " + beans);
         }
         return beans.values().iterator().next();
     }
@@ -100,43 +111,11 @@ public class SpringModule implements Module {
 
 
     /**
-     * Creates an application context using the settings of the {@link SpringApplicationContext} and
-     * {@link CreateSpringApplicationContext} annotations.
-     *
-     * @param testObject The test instance, not null
-     * @return The application context, not null
-     */
-    protected ApplicationContext createApplicationContext(Object testObject) {
-        //todo impement
-        ApplicationContext result = null;
-
-        SpringApplicationContext springApplicationContextAnnotation = testObject.getClass().getAnnotation(SpringApplicationContext.class);
-        if (springApplicationContextAnnotation != null) {
-            // create application context
-            try{
-            result = new ClassPathXmlApplicationContext(springApplicationContextAnnotation.value());
-            }catch(Throwable t){
-                t.printStackTrace();
-            }
-            System.out.println("result = " + result);
-        }
-
-        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), CreateSpringApplicationContext.class);
-        for (Method method : methods) {
-            // todo implement method CreateSpring..
-        }
-
-        //todo what if no application context => exception
-        return result;
-    }
-
-
-    /**
      * Gets the spring beans for all fields that are annotated with {@link SpringBean}.
      *
      * @param testObject The test instance, not null
      */
-    public void getSpringBeans(Object testObject) {
+    public void assignSpringBeans(Object testObject) {
         List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), SpringBean.class);
         for (Field field : fields) {
             try {
@@ -144,7 +123,6 @@ public class SpringModule implements Module {
                 ReflectionUtils.setFieldValue(testObject, field, getSpringBean(testObject, springBeanAnnotation.value()));
 
             } catch (UnitilsException e) {
-                //todo check
                 throw new UnitilsException("Unable to assign the Spring bean value to field annotated with @" + SpringBean.class.getSimpleName(), e);
             }
         }
@@ -156,14 +134,13 @@ public class SpringModule implements Module {
      *
      * @param testObject The test instance, not null
      */
-    public void getSpringBeansByType(Object testObject) {
+    public void assignSpringBeansByType(Object testObject) {
         List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
         for (Field field : fields) {
             try {
                 ReflectionUtils.setFieldValue(testObject, field, getSpringBeanByType(testObject, field.getType()));
 
             } catch (UnitilsException e) {
-                //todo check
                 throw new UnitilsException("Unable to assign the Spring bean value to field annotated with @" + SpringBeanByType.class.getSimpleName(), e);
             }
         }
@@ -175,7 +152,7 @@ public class SpringModule implements Module {
      *
      * @param testObject The test instance, not null
      */
-    public void getSpringBeansByName(Object testObject) {
+    public void assignSpringBeansByName(Object testObject) {
 
         List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
         for (Field field : fields) {
@@ -183,10 +160,69 @@ public class SpringModule implements Module {
                 ReflectionUtils.setFieldValue(testObject, field, getSpringBean(testObject, field.getName()));
 
             } catch (UnitilsException e) {
-                //todo check
                 throw new UnitilsException("Unable to assign the Spring bean value to field annotated with @" + SpringBeanByName.class.getSimpleName(), e);
             }
         }
+    }
+
+
+    /**
+     * Creates an application context using the settings of the {@link SpringApplicationContext} and
+     * {@link CreateSpringApplicationContext} annotations.
+     * <p/>
+     * If a class level {@link SpringApplicationContext} annotation is found, the passed locations will be loaded using
+     * a <code>ClassPathXmlApplicationContext</code>.
+     * Custom creation methods can be created by annotating them with {@link CreateSpringApplicationContext}. They
+     * should have an <code>ApplicationContext</code> as return type and either no or exactly 1 argument of type
+     * <code>ApplicationContext</code>. In the latter case, the current configured application context is passed as the argument.
+     * <p/>
+     * A UnitilsException will be thrown if no context could be created.
+     *
+     * @param testObject The test instance, not null
+     * @return The application context, not null
+     */
+    protected ApplicationContext createApplicationContext(Object testObject) {
+        ApplicationContext result = null;
+
+        // create application context for class level @SpringApplicationContext
+        SpringApplicationContext springApplicationContextAnnotation = testObject.getClass().getAnnotation(SpringApplicationContext.class);
+        if (springApplicationContextAnnotation != null) {
+            String[] locations = springApplicationContextAnnotation.value();
+            try {
+                // create application context
+                result = new ClassPathXmlApplicationContext(locations);
+
+            } catch (Throwable t) {
+                throw new UnitilsException("Unable to create application context for locations " + locations);
+            }
+        }
+
+        // call methods annotated with @CreateSpringApplicationContext passing current application context if requested
+        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), CreateSpringApplicationContext.class);
+        for (Method method : methods) {
+            Class<?>[] argumentTypes = method.getParameterTypes();
+            if (argumentTypes.length > 1 || (argumentTypes.length == 1 && argumentTypes[0] != ApplicationContext.class) || method.getReturnType() != ApplicationContext.class) {
+                throw new UnitilsException("Unable to invoke method annotated with @" + CreateSpringApplicationContext.class.getSimpleName() +
+                        ". Ensure that this method has following signature: ApplicationContext myMethod(" + ApplicationContext.class.getName() + " context) or ApplicationContext myMethod()");
+            }
+            try {
+                if (argumentTypes.length == 0) {
+                    result = ReflectionUtils.invokeMethod(testObject, method);
+                } else {
+                    result = ReflectionUtils.invokeMethod(testObject, method, result);
+                }
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
+                        " (annotated with " + CreateSpringApplicationContext.class.getSimpleName() + ") has thrown an exception", e.getCause());
+            }
+        }
+
+        // no application context was created
+        if (result == null) {
+            throw new UnitilsException("No application context was created. Make sure the context can be created by annotating the class with a @" + SpringApplicationContext.class.getSimpleName() +
+                    " annotation or creating a method that is annotated with a @" + CreateSpringApplicationContext.class.getSimpleName() + " annotation that creates the ApplicationContext intstance.");
+        }
+        return result;
     }
 
 
@@ -206,9 +242,9 @@ public class SpringModule implements Module {
         @Override
         public void beforeTestSetUp(Object testObject) {
             createApplicationContext(testObject);
-            getSpringBeans(testObject);
-            getSpringBeansByType(testObject);
-            getSpringBeansByName(testObject);
+            assignSpringBeans(testObject);
+            assignSpringBeansByType(testObject);
+            assignSpringBeansByName(testObject);
         }
 
 
