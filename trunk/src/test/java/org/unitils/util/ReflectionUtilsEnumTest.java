@@ -20,6 +20,9 @@ import org.unitils.core.UnitilsException;
 
 /**
  * Test for {@link ReflectionUtils} that use enumeration values.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionUtilsEnumTest extends TestCase {
 

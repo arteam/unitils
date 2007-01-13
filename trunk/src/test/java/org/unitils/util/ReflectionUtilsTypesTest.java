@@ -26,6 +26,9 @@ import java.util.Map;
 
 /**
  * Test for {@link ReflectionUtils} working with field types, eg assignable from.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class ReflectionUtilsTypesTest extends TestCase {
 

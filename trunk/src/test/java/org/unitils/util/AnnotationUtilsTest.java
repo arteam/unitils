@@ -18,17 +18,21 @@ package org.unitils.util;
 import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.List;
 
 /**
  * Test for {@link AnnotationUtils}.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class AnnotationUtilsTest extends TestCase {
 
@@ -38,7 +42,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetFieldsAnnotatedWith() {
         List<Field> annotatedFields = AnnotationUtils.getFieldsAnnotatedWith(TestClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", Arrays.asList("field"), annotatedFields);
+        assertPropertyLenEquals("name", asList("field"), annotatedFields);
     }
 
 
@@ -50,12 +54,13 @@ public class AnnotationUtilsTest extends TestCase {
         assertTrue(annotatedFields.isEmpty());
     }
 
+
     /**
      * Test to get all annotated fields, including the fields of the annotated super class. Both fields should be returned.
      */
     public void testGetFieldsAnnotatedWith_fieldFromSuperClass() {
         List<Field> annotatedFields = AnnotationUtils.getFieldsAnnotatedWith(TestSubClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", Arrays.asList("field", "subField"), annotatedFields);
+        assertPropertyLenEquals("name", asList("field", "subField"), annotatedFields);
     }
 
 
@@ -64,8 +69,9 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith() {
         List<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", Arrays.asList("method"), annotatedMethods);
+        assertPropertyLenEquals("name", asList("method"), annotatedMethods);
     }
+
 
     /**
      * Test to get all annotated methods, but no methods are annotated. An empty list should be returned.
@@ -81,15 +87,24 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith_methodFromSuperClass() {
         List<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", Arrays.asList("method", "subMethod"), annotatedMethods);
+        assertPropertyLenEquals("name", asList("method", "subMethod"), annotatedMethods);
+    }
+
+
+    /**
+     * Test to get all annotated methods, excluding the methods of the annotated super class.
+     */
+    public void testGetMethodsAnnotatedWith_noMethodsFromSuperClass() {
+        List<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class, false);
+        assertPropertyLenEquals("name", asList("subMethod"), annotatedMethods);
     }
 
 
     /**
      * Test annotation.
      */
-    @Target({ElementType.FIELD, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
+    @Target({FIELD, METHOD})
+    @Retention(RUNTIME)
     private @interface TestAnnotation {
     }
 
