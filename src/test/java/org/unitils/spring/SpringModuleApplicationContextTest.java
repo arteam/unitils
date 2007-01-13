@@ -23,7 +23,6 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.spring.annotation.CreateSpringApplicationContext;
 import org.unitils.spring.annotation.SpringApplicationContext;
-import org.unitils.spring.annotation.SpringBean;
 
 import java.util.List;
 
@@ -54,81 +53,86 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context using SpringApplicationContext
      */
-    public void testCreateApplicationContext() {
+    public void testGetApplicationContext() {
         SpringTest springTest = new SpringTest();
-        springModule.assignSpringBeans(springTest);
+        ApplicationContext applicationContext = springModule.getApplicationContext(springTest);
 
-        assertTrue(springTest.testBean instanceof String);
+        assertNotNull(applicationContext);
     }
 
 
     /**
      * Tests creating an application context using a custom create method.
      */
-    public void testCreateApplicationContext_customCreate() {
+    public void testGetApplicationContext_customCreate() {
         SpringTestCreateMethod springTestCreateMethod = new SpringTestCreateMethod();
-        springModule.assignSpringBeans(springTestCreateMethod);
+        ApplicationContext applicationContext = springModule.getApplicationContext(springTestCreateMethod);
 
-        assertTrue(springTestCreateMethod.testBean instanceof String);
+        assertNotNull(applicationContext);
     }
 
 
     /**
      * Tests creating an application context using a custom create method with an application context argument.
      */
-    public void testCreateApplicationContext_customCreateWithApplicationContext() {
+    public void testGetApplicationContext_customCreateWithApplicationContext() {
         SpringTestCreateMethodWithApplicationContext springTestCreateMethod = new SpringTestCreateMethodWithApplicationContext();
-        springModule.assignSpringBeans(springTestCreateMethod);
+        ApplicationContext applicationContext = springModule.getApplicationContext(springTestCreateMethod);
 
-        assertTrue(springTestCreateMethod.testBean instanceof String);
+        assertNotNull(applicationContext);
     }
 
 
     /**
      * Tests creating an application context using class level annotation and 2 custom create methods.
      */
-    public void testCreateApplicationContext_mixing() {
+    public void testGetApplicationContext_mixing() {
         SpringTestMixing springTestMixing = new SpringTestMixing();
-        springModule.assignSpringBeans(springTestMixing);
+        ApplicationContext applicationContext = springModule.getApplicationContext(springTestMixing);
 
-        assertTrue(springTestMixing.testBean instanceof String);
+        assertNotNull(applicationContext);
         assertTrue(springTestMixing.createMethod1Called);
         assertTrue(springTestMixing.createMethod2Called);
     }
 
 
     /**
-     * Tests creating an application context using a custom create method with a wrong signature.
+     * Tests getting an application context a second time, the same application context should be returned.
      */
-    public void testCreateApplicationContext_customCreateWrongSignature() {
-        SpringTestCreateMethodWrongSignature springTestCreateMethodWrongSignature = new SpringTestCreateMethodWrongSignature();
-        try {
-            springModule.assignSpringBeans(springTestCreateMethodWrongSignature);
-            fail("Expected UnitilsException");
-        } catch (UnitilsException e) {
-            // expected
-        }
-        assertNull(springTestCreateMethodWrongSignature.testBean);
+    public void testGetApplicationContext_twice() {
+        SpringTestMixing springTestMixing = new SpringTestMixing();
+        ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
+        ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
+
+        assertSame(applicationContext1, applicationContext2);
     }
 
 
     /**
-     * Test SpringTest class.
+     * Tests creating an application context using a custom create method with a wrong signature.
+     */
+    public void testGetApplicationContext_customCreateWrongSignature() {
+        SpringTestCreateMethodWrongSignature springTestCreateMethodWrongSignature = new SpringTestCreateMethodWrongSignature();
+        try {
+            springModule.getApplicationContext(springTestCreateMethodWrongSignature);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            // expected
+        }
+    }
+
+
+    /**
+     * Test SpringTest class with class level locations.
      */
     @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml", "classpath:org/unitils/spring/services-config.xml"})
     private class SpringTest {
-
-        @SpringBean("aBeanName")
-        private String testBean = null;
     }
 
     /**
      * Test SpringTest class with a custom create method.
      */
     private class SpringTestCreateMethod {
-
-        @SpringBean("aBeanName")
-        private String testBean = null;
 
         @CreateSpringApplicationContext
         protected ApplicationContext createMethod() {
@@ -140,9 +144,6 @@ public class SpringModuleApplicationContextTest extends TestCase {
      * Test SpringTest class with a custom create method with application context argument.
      */
     private class SpringTestCreateMethodWithApplicationContext {
-
-        @SpringBean("aBeanName")
-        private String testBean = null;
 
         @CreateSpringApplicationContext
         protected ApplicationContext createMethod(ApplicationContext applicationContext) {
@@ -159,9 +160,6 @@ public class SpringModuleApplicationContextTest extends TestCase {
 
         protected boolean createMethod1Called = false;
         protected boolean createMethod2Called = false;
-
-        @SpringBean("aBeanName")
-        private String testBean = null;
 
         @CreateSpringApplicationContext
         protected ApplicationContext createMethod1(ApplicationContext applicationContext) {
@@ -182,9 +180,6 @@ public class SpringModuleApplicationContextTest extends TestCase {
      * Test SpringTest class with a custom create method having a wrong signature.
      */
     private class SpringTestCreateMethodWrongSignature {
-
-        @SpringBean("aBeanName")
-        private String testBean = null;
 
         @CreateSpringApplicationContext
         protected List createMethod(String a) {

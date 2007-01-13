@@ -19,11 +19,14 @@ import junit.framework.TestCase;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Test for {@link ReflectionUtils}.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class ReflectionUtilsTest extends TestCase {
 

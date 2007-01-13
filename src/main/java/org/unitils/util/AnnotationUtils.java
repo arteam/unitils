@@ -26,6 +26,7 @@ import java.util.List;
  * Utilities for retrieving and working with annotations.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class AnnotationUtils {
 
@@ -33,9 +34,9 @@ public class AnnotationUtils {
     /**
      * Returns the given class's declared fields that are marked with the given annotation
      *
-     * @param clazz      the class, not null
-     * @param annotation the annotation, not null
-     * @return a List containing fields annotated with the given annotation, empty list if none found
+     * @param clazz      The class, not null
+     * @param annotation The annotation, not null
+     * @return A List containing fields annotated with the given annotation, empty list if none found
      */
     public static <T extends Annotation> List<Field> getFieldsAnnotatedWith(Class clazz, Class<T> annotation) {
 
@@ -55,14 +56,28 @@ public class AnnotationUtils {
         }
     }
 
+
+    /**
+     * Returns the given class's (and superclasses) declared methods that are marked with the given annotation
+     *
+     * @param clazz      The class, not null
+     * @param annotation The annotation, not null
+     * @return A List containing methods annotated with the given annotation, empty list if none found
+     */
+    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation) {
+        return getMethodsAnnotatedWith(clazz, annotation, true);
+    }
+
+
     /**
      * Returns the given class's declared methods that are marked with the given annotation
      *
-     * @param clazz      the class, not null
-     * @param annotation the annotation, not null
-     * @return a List containing methods annotated with the given annotation, empty list if none found
+     * @param clazz            The class, not null
+     * @param annotation       The annotation, not null
+     * @param includeInherited True for also looking for methods in super-classes
+     * @return A List containing methods annotated with the given annotation, empty list if none found
      */
-    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation) {
+    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation, boolean includeInherited) {
 
         if (Object.class.equals(clazz)) {
             return Collections.emptyList();
@@ -75,7 +90,9 @@ public class AnnotationUtils {
                     annotatedMethods.add(method);
                 }
             }
-            annotatedMethods.addAll(getMethodsAnnotatedWith(clazz.getSuperclass(), annotation));
+            if (includeInherited) {
+                annotatedMethods.addAll(getMethodsAnnotatedWith(clazz.getSuperclass(), annotation));
+            }
             return annotatedMethods;
         }
     }

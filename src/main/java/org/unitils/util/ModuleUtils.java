@@ -27,6 +27,9 @@ import java.util.Map;
 
 /**
  * todo javadoc
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ModuleUtils {
 

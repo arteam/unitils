@@ -27,6 +27,9 @@ import java.util.Map;
 
 /**
  * Test for {@link ModuleUtils}.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ModuleUtilsTest extends TestCase {
 
