@@ -76,10 +76,10 @@ public class InjectModuleInjectIntoStaticTest extends TestCase {
     public class TestInjectIntoStatic_simpleSetter {
 
         @InjectIntoStatic(target = InjectOnStatic.class, property = "toInject")
-        private InjectOnStatic.ToInject toInject;
+        private ToInject toInject;
 
         public TestInjectIntoStatic_simpleSetter() {
-            toInject = new InjectOnStatic.ToInject();
+            toInject = new ToInject();
         }
     }
 
@@ -87,10 +87,10 @@ public class InjectModuleInjectIntoStaticTest extends TestCase {
     public class TestInjectIntoStatic_simpleField {
 
         @InjectIntoStatic(target = InjectOnStatic.class, property = "toInjectField")
-        private InjectOnStatic.ToInject toInject;
+        private ToInject toInject;
 
         public TestInjectIntoStatic_simpleField() {
-            toInject = new InjectOnStatic.ToInject();
+            toInject = new ToInject();
         }
     }
 
@@ -98,10 +98,10 @@ public class InjectModuleInjectIntoStaticTest extends TestCase {
     public class TestInjectIntoStatic_compositeSetter {
 
         @InjectIntoStatic(target = InjectOnStatic.class, property = "testObject.toInject")
-        private InjectOnStatic.ToInject toInject;
+        private ToInject toInject;
 
         public TestInjectIntoStatic_compositeSetter() {
-            toInject = new InjectOnStatic.ToInject();
+            toInject = new ToInject();
         }
     }
 
@@ -109,11 +109,67 @@ public class InjectModuleInjectIntoStaticTest extends TestCase {
     public class TestInjectIntoStatic_compositeField {
 
         @InjectIntoStatic(target = InjectOnStatic.class, property = "testObjectField.toInject")
-        private InjectOnStatic.ToInject toInject;
+        private ToInject toInject;
 
         public TestInjectIntoStatic_compositeField() {
-            toInject = new InjectOnStatic.ToInject();
+            toInject = new ToInject();
         }
+    }
+
+    private static class InjectOnStatic {
+
+        private static ToInject toInject;
+
+        private static ToInject toInjectField;
+
+        private static TestObject testObject;
+
+        private static TestObject testObjectField;
+
+        static {
+            testObject = new TestObject();
+            testObjectField = new TestObject();
+        }
+
+        public static void setToInject(ToInject toInject) {
+            InjectOnStatic.toInject = toInject;
+        }
+
+        public static void setTestObject(TestObject testObject) {
+            InjectOnStatic.testObject = testObject;
+        }
+
+        public static ToInject getToInject() {
+            return toInject;
+        }
+
+        public static ToInject getToInjectField() {
+            return toInjectField;
+        }
+
+        public static TestObject getTestObject() {
+            return testObject;
+        }
+
+        public static TestObject getTestObjectField() {
+            return testObjectField;
+        }
+    }
+
+    public static class TestObject {
+
+        private ToInject toInject;
+
+        public void setToInject(ToInject toInject) {
+            this.toInject = toInject;
+        }
+
+        public ToInject getToInject() {
+            return toInject;
+        }
+    }
+
+    public static class ToInject {
     }
 
 }

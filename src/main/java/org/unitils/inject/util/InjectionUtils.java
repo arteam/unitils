@@ -48,11 +48,15 @@ public class InjectionUtils {
      * correct OGNL expression.
      *
      * @param objectToInject The object that is injected
-     * @param target         The target object, not null
+     * @param target         The target object
      * @param property       The OGNL expression that defines where the object will be injected, not null
      * @return The object that was replaced by the injection
      */
     public static Object inject(Object objectToInject, Object target, String property) {
+
+        if (target == null) {
+            throw new UnitilsException("Target for injection should not be null");
+        }
         try {
             OgnlContext ognlContext = new OgnlContext();
             ognlContext.setMemberAccess(new DefaultMemberAccess(true));
@@ -84,6 +88,7 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     public static Object injectStatic(Object objectToInject, Class targetClass, String property) {
+
         String staticProperty = StringUtils.substringBefore(property, ".");
         if (property.equals(staticProperty)) {
             // Simple property: directly set value on this property
@@ -122,6 +127,10 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     public static Object autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccess propertyAccess) {
+
+        if (target == null) {
+            throw new UnitilsException("Target for injection should not be null");
+        }
         if (propertyAccess == PropertyAccess.FIELD) {
             return autoInjectToField(objectToInject, objectToInjectType, target, target.getClass(), false);
         }
@@ -140,6 +149,7 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     public static Object autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccess propertyAccess) {
+
         if (propertyAccess == PropertyAccess.FIELD) {
             return autoInjectToField(objectToInject, objectToInjectType, null, targetClass, true);
         }
@@ -184,7 +194,7 @@ public class InjectionUtils {
                 boolean moreSpecific = true;
                 for (Field compareToField : fieldsOfType) {
                     if (field != compareToField) {
-                        if (!compareToField.getClass().isAssignableFrom(field.getClass())) {
+                        if (field.getClass().isAssignableFrom(compareToField.getClass())) {
                             moreSpecific = false;
                             break;
                         }
@@ -196,8 +206,8 @@ public class InjectionUtils {
                 }
             }
             if (fieldToInjectTo == null) {
-                throw new UnitilsException("Multiple candidate target " + (isStatic ? "static " : "") + "fields found in " + target.getClass().getSimpleName() +
-                        ", with none of them more specific than all others: " + StringUtils.join(fieldsOfType.iterator(), ", "));
+                throw new UnitilsException("Multiple candidate target " + (isStatic ? "static " : "") + "fields found in " + targetClass.getSimpleName() +
+                        ", with none of them more specific than all others.");
             }
         }
 
@@ -252,7 +262,7 @@ public class InjectionUtils {
                 boolean moreSpecific = true;
                 for (Method compareToSetter : settersOfType) {
                     if (setter != compareToSetter) {
-                        if (!compareToSetter.getClass().isAssignableFrom(setter.getClass())) {
+                        if (setter.getClass().isAssignableFrom(compareToSetter.getClass())) {
                             moreSpecific = false;
                             break;
                         }
@@ -264,8 +274,8 @@ public class InjectionUtils {
                 }
             }
             if (setterToInjectTo == null) {
-                throw new UnitilsException("Multiple candidate target " + (isStatic ? "static " : "") + " setters found in " + targetClass.getSimpleName() +
-                        ", with none of them more specific than all others: " + StringUtils.join(settersOfType.iterator(), ", "));
+                throw new UnitilsException("Multiple candidate target " + (isStatic ? "static " : "") + "setters found in " + targetClass.getSimpleName() +
+                        ", with none of them more specific than all others.");
             }
         }
 
