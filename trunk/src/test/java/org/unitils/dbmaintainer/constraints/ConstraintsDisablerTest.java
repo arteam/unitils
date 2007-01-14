@@ -19,13 +19,11 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.clear.DBClearer;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -34,31 +32,26 @@ import java.sql.Statement;
 /**
  * Test class for the ConstraintsDisabler. This test is independent of the dbms that is used. The database dialect that
  * is tested depends on the configuration in test/resources/unitils.properties
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@DatabaseTest
 public class ConstraintsDisablerTest extends UnitilsJUnit3 {
 
-    /**
-     * The tested object
-     */
+    /* The tested object */
     private ConstraintsDisabler constraintsDisabler;
 
-    /**
-     * Database support class instance
-     */
+    /* Database support class instance */
     private DbSupport dbSupport;
 
-    /**
-     * DataSource for the test database, is injected
-     */
+    /* DataSource for the test database, is injected */
     @TestDataSource
-    private javax.sql.DataSource dataSource;
+    private javax.sql.DataSource dataSource = null;
+
 
     /**
      * Test fixture. Configures the ConstraintsDisabler with the implementation that matches the configured database
      * dialect
-     *
-     * @throws Exception
      */
     @Override
     protected void setUp() throws Exception {
@@ -77,10 +70,9 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         createTestTables();
     }
 
+
     /**
      * Drops the test tables, to avoid influencing other tests
-     *
-     * @throws Exception
      */
     @Override
     protected void tearDown() throws Exception {
@@ -89,10 +81,9 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         super.tearDown();
     }
 
+
     /**
      * Creates the test tables
-     *
-     * @throws SQLException
      */
     private void createTestTables() throws SQLException {
         Connection conn = null;
@@ -108,10 +99,9 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Drops the test tables
-     *
-     * @throws SQLException
      */
     private void dropTestTables() throws SQLException {
         Connection conn = null;
@@ -134,10 +124,9 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Tests whether foreign key constraints are correctly disabled
-     *
-     * @throws SQLException
      */
     public void testDisableConstraints_foreignKey() throws Exception {
         Connection conn = null;
@@ -159,26 +148,26 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Performs an insert that violates the foreign key constraint that table2.col1 has on table1
      *
-     * @param conn
+     * @param connection The database connection, not null
      * @throws SQLException Is thrown when the foreign key constraint is enabled
      */
-    private void insertForeignKeyViolation(Connection conn) throws SQLException {
+    private void insertForeignKeyViolation(Connection connection) throws SQLException {
         Statement st = null;
         try {
-            st = conn.createStatement();
+            st = connection.createStatement();
             st.executeUpdate("insert into table2 values ('test')");
         } finally {
             DbUtils.closeQuietly(st);
         }
     }
 
+
     /**
      * Tests whether not-null constraints are correctly disabled
-     *
-     * @throws SQLException
      */
     public void testDisableConstraints_notNull() throws Exception {
         Connection conn = null;
@@ -200,16 +189,17 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Performs an insert on table1 that violates the not-null constraint on col2
      *
-     * @param conn
+     * @param connection The database connection, not null
      * @throws SQLException Is thrown when the not null constraint is enabled
      */
-    private void insertNotNullViolation(Connection conn) throws SQLException {
+    private void insertNotNullViolation(Connection connection) throws SQLException {
         Statement st = null;
         try {
-            st = conn.createStatement();
+            st = connection.createStatement();
             st.execute("insert into table1 values ('test', null)");
         } finally {
             DbUtils.closeQuietly(st);

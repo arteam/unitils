@@ -23,8 +23,18 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that this field or method should be initialized with the <code>DataSource</code> that supplies
- * a connection to the unit test database. If a field is annotated, it should be of type <code>DataSource</code>. If
- * a method is annotated, the method should have following signature: void myMethod(DataSource dataSource)
+ * a connection to the unit test database.
+ * <p/>
+ * If a field is annotated, it should be of type <code>DataSource</code>. This field can be private. Example:
+ * <pre><code>
+ * '    @DataSource
+ *      private DataSource dataSource;
+ * </code></pre>
+ * If a method is annotated, the method should have 1 DataSource argument. Example:
+ * <pre><code>
+ * '    @DataSource
+ *      void myMethod(DataSource dataSource)
+ * </code></pre>
  *
  * @author Filip Neven
  * @author Tim Ducheyne

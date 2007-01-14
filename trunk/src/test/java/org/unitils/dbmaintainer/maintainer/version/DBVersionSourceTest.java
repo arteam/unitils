@@ -20,7 +20,6 @@ import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
@@ -39,7 +38,6 @@ import java.sql.Statement;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@DatabaseTest
 @DataSet("DBVersionSourceTest.versionTableEmpty.xml")
 public class DBVersionSourceTest extends UnitilsJUnit3 {
 

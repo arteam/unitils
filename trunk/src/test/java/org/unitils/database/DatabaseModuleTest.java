@@ -16,114 +16,81 @@
 package org.unitils.database;
 
 import org.apache.commons.configuration.Configuration;
-import static org.easymock.EasyMock.expect;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.database.annotations.DatabaseTest;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.maintainer.DBMaintainer;
-import org.unitils.easymock.annotation.Mock;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 
 /**
  * Tests for the DatabaseModule
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@SuppressWarnings({"UnusedDeclaration"})
 public class DatabaseModuleTest extends UnitilsJUnit3 {
 
+    /* Tested object */
+    private TestDatabaseModule databaseModule;
+
+
     /**
-     * Tested object
+     * Initializes the test fixture.
      */
-    private DatabaseModule databaseModule;
-
-    @Mock
-    private DataSource mockDataSource = null;
-
-    @Mock
-    private Connection mockConnection = null;
-
-    @Mock
-    private DBMaintainer mockDbMaintainer = null;
-
     public void setUp() throws Exception {
         super.setUp();
 
-        databaseModule = new DatabaseModule() {
+        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty(DatabaseModule.PROPKEY_UPDATEDATABASESCHEMA_ENABLED, true);
 
-            @Override
-            protected DBMaintainer createDbMaintainer(Configuration configuration) {
-                return mockDbMaintainer;
-            }
-
-            @Override
-            protected DataSource createDataSource() {
-                return mockDataSource;
-            }
-        };
-
-        databaseModule.registerDatabaseTestAnnotation(DatabaseTest.class);
-        expect(mockDataSource.getConnection()).andStubReturn(mockConnection);
+        databaseModule = new TestDatabaseModule();
+        databaseModule.init(configuration);
     }
 
-    /**
-     * Tests if isDatabaseTest returns true for a class annotated with DatabaseTest
-     */
-    public void testIsDatabaseTest() {
-
-        boolean result = databaseModule.isDatabaseTest(DbTest.class);
-        assertTrue(result);
-    }
 
     /**
-     * Test the injection of the dataSource into a test object
-     *
-     * @throws Exception
+     * Test the injection of the dataSource into a test object. This should also have triggered the
+     * DbMaintainer.
      */
     public void testInjectDataSource() throws Exception {
 
         DbTest dbTest = new DbTest();
         databaseModule.injectDataSource(dbTest);
-        assertSame(mockDataSource, databaseModule.getDataSource());
-        assertSame(mockDataSource, dbTest.getDataSourceFromMethod());
-        assertSame(mockDataSource, dbTest.getDataSourceFromField());
+
+        assertNotNull(dbTest.dataSourceFromField);
+        assertNotNull(dbTest.dataSourceFromMethod);
+        assertSame(dbTest.dataSourceFromField, dbTest.dataSourceFromMethod);
+        assertTrue(databaseModule.updateDataSchemaCalled);
     }
+
 
     /**
      * Object that plays the role of database test object in this class's tests.
      */
-    @DatabaseTest
     public static class DbTest {
 
-        /**
-         * DataSource that can be injected by calling the method setDataSource
-         */
         private DataSource dataSourceFromMethod;
 
-        /**
-         * Field on which a DataSource should be injected
-         */
         @TestDataSource
-        private DataSource dataSourceFromField;
+        private DataSource dataSourceFromField = null;
 
-        /**
-         * Method on which a DataSource should be injected
-         *
-         * @param dataSource not null
-         */
         @TestDataSource
-        public void setDataSource(javax.sql.DataSource dataSource) {
+        public void setDataSource(DataSource dataSource) {
             this.dataSourceFromMethod = dataSource;
         }
+    }
 
-        public DataSource getDataSourceFromMethod() {
-            return dataSourceFromMethod;
+
+    /**
+     * Database module that intercepts the updating of the database schema.
+     */
+    public class TestDatabaseModule extends DatabaseModule {
+
+        private boolean updateDataSchemaCalled = false;
+
+        public void updateDatabaseSchema() {
+            updateDataSchemaCalled = true;
         }
-
-        public javax.sql.DataSource getDataSourceFromField() {
-            return dataSourceFromField;
-        }
-
     }
 
 }

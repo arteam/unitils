@@ -22,9 +22,11 @@ import java.util.Map;
 
 /**
  * A class for holding and retrieving modules.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ModulesRepository {
-
 
     /* All modules */
     private List<Module> modules;
@@ -66,13 +68,13 @@ public class ModulesRepository {
 
     /**
      * Gets the modules that is of the given type or a sub-type.
+     * <p/>
+     * todo throw exception when module not found
      *
      * @param type the type, not null
      * @return the module, null if not found
      */
-    @SuppressWarnings({"unchecked"})
     public <T extends Module> T getModuleOfType(Class<T> type) {
-
         List<T> modulesOfType = getModulesOfType(type);
         if (modulesOfType.size() > 1) {
             throw new UnitilsException("More than one module found of type " + type.getName());
@@ -91,12 +93,9 @@ public class ModulesRepository {
      * @return the modules, an empty list if none found
      */
     @SuppressWarnings({"unchecked"})
-    public <T extends Module> List<T> getModulesOfType(Class<T> type) {
-
+    public <T> List<T> getModulesOfType(Class<T> type) {
         List<T> result = new ArrayList<T>();
-
         for (Module module : modules) {
-
             if (type.isAssignableFrom(module.getClass())) {
                 result.add((T) module);
             }
@@ -112,7 +111,6 @@ public class ModulesRepository {
      * @return the listener, null if the module could not be found
      */
     public TestListener getTestListener(Module module) {
-
         return testListeners.get(module);
     }
 
@@ -124,9 +122,7 @@ public class ModulesRepository {
      * @return the listeners for each module, not null
      */
     private Map<Module, TestListener> createTestListeners(List<Module> modules) {
-
         Map<Module, TestListener> result = new HashMap<Module, TestListener>(modules.size());
-
         for (Module module : modules) {
             result.put(module, module.createTestListener());
         }

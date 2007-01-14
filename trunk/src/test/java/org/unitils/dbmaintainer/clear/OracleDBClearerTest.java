@@ -21,14 +21,17 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
  * DbClearer test for an Oracle database
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class OracleDBClearerTest extends DBClearerTest {
+
 
     protected void createTestTrigger(String tableName, String triggerName) throws SQLException {
         Connection conn = null;
@@ -42,6 +45,7 @@ public class OracleDBClearerTest extends DBClearerTest {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     protected boolean isTestedDialectActivated() {
         Configuration config = new ConfigurationLoader().loadConfiguration();
