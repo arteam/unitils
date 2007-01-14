@@ -221,19 +221,25 @@ public class InjectModule implements Module {
     protected void inject(Object test, Field fieldToInject) {
         InjectInto injectIntoAnnotation = fieldToInject.getAnnotation(InjectInto.class);
 
-        List targets = getTargets(injectIntoAnnotation, fieldToInject, injectIntoAnnotation.target(), test);
         String ognlExpression = injectIntoAnnotation.property();
         if (StringUtils.isEmpty(ognlExpression)) {
-            throw new UnitilsException(getSituatedErrorMessage(injectIntoAnnotation, fieldToInject, "Property cannot be empty"));
+            throw new UnitilsException(getSituatedErrorMessage(InjectInto.class, fieldToInject, "Property cannot be empty"));
         }
         Object objectToInject = getFieldValue(test, fieldToInject);
+
+        List targets = getTargets(InjectInto.class, fieldToInject, injectIntoAnnotation.target(), test);
+        if (targets.size() == 0) {
+            throw new UnitilsException(getSituatedErrorMessage(InjectInto.class, fieldToInject, "The target should either be " +
+                    "specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() +
+                    " annotation"));   
+        }
 
         for (Object target : targets) {
             try {
                 InjectionUtils.inject(objectToInject, target, ognlExpression);
 
             } catch (UnitilsException e) {
-                throw new UnitilsException(getSituatedErrorMessage(injectIntoAnnotation, fieldToInject, e.getMessage()), e);
+                throw new UnitilsException(getSituatedErrorMessage(InjectInto.class, fieldToInject, e.getMessage()), e);
             }
         }
     }
@@ -251,7 +257,7 @@ public class InjectModule implements Module {
         Class targetClass = injectIntoStaticAnnotation.target();
         String property = injectIntoStaticAnnotation.property();
         if (StringUtils.isEmpty(property)) {
-            throw new UnitilsException(getSituatedErrorMessage(injectIntoStaticAnnotation, fieldToInjectStatic, "Property cannot be empty"));
+            throw new UnitilsException(getSituatedErrorMessage(InjectIntoStatic.class, fieldToInjectStatic, "Property cannot be empty"));
         }
         Object objectToInject = getFieldValue(test, fieldToInjectStatic);
 
@@ -261,7 +267,7 @@ public class InjectModule implements Module {
             storeValueToRestoreAfterTest(targetClass, property, fieldToInjectStatic.getType(), null, oldValue, restore);
 
         } catch (UnitilsException e) {
-            throw new UnitilsException(getSituatedErrorMessage(injectIntoStaticAnnotation, fieldToInjectStatic, e.getMessage()), e);
+            throw new UnitilsException(getSituatedErrorMessage(InjectIntoStatic.class, fieldToInjectStatic, e.getMessage()), e);
         }
     }
 
@@ -277,16 +283,22 @@ public class InjectModule implements Module {
     protected void injectByType(Object test, Field fieldToInject) {
         InjectIntoByType injectIntoByTypeAnnotation = fieldToInject.getAnnotation(InjectIntoByType.class);
 
-        List targets = getTargets(injectIntoByTypeAnnotation, fieldToInject, injectIntoByTypeAnnotation.target(), test);
         Object objectToInject = getFieldValue(test, fieldToInject);
-
         PropertyAccess propertyAccess = getValueReplaceDefault(InjectIntoByType.class, injectIntoByTypeAnnotation.propertyAccess(), defaultEnumValues);
+
+        List targets = getTargets(InjectIntoByType.class, fieldToInject, injectIntoByTypeAnnotation.target(), test);
+        if (targets.size() == 0) {
+            throw new UnitilsException(getSituatedErrorMessage(InjectIntoByType.class, fieldToInject, "The target should either be " +
+                    "specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() +
+                    " annotation"));
+        }
+
         for (Object target : targets) {
             try {
                 InjectionUtils.autoInject(objectToInject, fieldToInject.getType(), target, propertyAccess);
 
             } catch (UnitilsException e) {
-                throw new UnitilsException(getSituatedErrorMessage(injectIntoByTypeAnnotation, fieldToInject, e.getMessage()), e);
+                throw new UnitilsException(getSituatedErrorMessage(InjectIntoByType.class, fieldToInject, e.getMessage()), e);
             }
         }
     }
@@ -313,7 +325,7 @@ public class InjectModule implements Module {
             storeValueToRestoreAfterTest(targetClass, null, fieldToAutoInjectStatic.getType(), propertyAccess, oldValue, restore);
 
         } catch (UnitilsException e) {
-            throw new UnitilsException(getSituatedErrorMessage(injectIntoStaticByTypeAnnotation, fieldToAutoInjectStatic, e.getMessage()), e);
+            throw new UnitilsException(getSituatedErrorMessage(InjectIntoStaticByType.class, fieldToAutoInjectStatic, e.getMessage()), e);
         }
     }
 
@@ -379,13 +391,13 @@ public class InjectModule implements Module {
      * targetName is not equal to an empty string, the targets are the testObject's fields that are annotated with
      * {@link TestedObject}.
      *
-     * @param annotation     The injection annotation for which the targets are meant, not null
+     * @param annotationClass     The class of the annotation, not null
      * @param annotatedField The annotated field, not null
      * @param targetName     The explicit target name or empty string for TestedObject targets
      * @param test           The test instance
      * @return The target(s) for the injection
      */
-    protected List<Object> getTargets(Annotation annotation, Field annotatedField, String targetName, Object test) {
+    protected List<Object> getTargets(Class<? extends Annotation> annotationClass, Field annotatedField, String targetName, Object test) {
 
         List<Object> targets;
         if ("".equals(targetName)) {
@@ -398,7 +410,7 @@ public class InjectModule implements Module {
         } else {
             Field field = getFieldWithName(test.getClass(), targetName, false);
             if (field == null) {
-                throw new UnitilsException(getSituatedErrorMessage(annotation, annotatedField, "Target with name " + targetName + " does not exist"));
+                throw new UnitilsException(getSituatedErrorMessage(annotationClass, annotatedField, "Target with name " + targetName + " does not exist"));
             }
             Object target = getFieldValue(test, field);
             targets = Collections.singletonList(target);
@@ -411,13 +423,13 @@ public class InjectModule implements Module {
      * Given the errorDescription, returns a situated error message, i.e. specifying the annotated field and the
      * annotation type that was used.
      *
-     * @param processedAnnotation The injection annotation, not null
+     * @param annotationClass The injection annotation, not null
      * @param annotatedField      The annotated field, not null
      * @param errorDescription    A custom description, not null
      * @return A situated error message
      */
-    protected String getSituatedErrorMessage(Annotation processedAnnotation, Field annotatedField, String errorDescription) {
-        return "Error while processing @" + processedAnnotation.getClass().getSimpleName() + " annotation on field " + annotatedField.getName() + ": " + errorDescription;
+    protected String getSituatedErrorMessage(Class<? extends Annotation> annotationClass, Field annotatedField, String errorDescription) {
+        return "Error while processing @" + annotationClass.getSimpleName() + " annotation on field " + annotatedField.getName() + ": " + errorDescription;
     }
 
 
