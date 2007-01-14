@@ -23,9 +23,9 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
+import org.unitils.database.util.Flushable;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
@@ -56,14 +56,14 @@ import java.util.Properties;
  * injected to fields or methods annotated with {@link HibernateSession} before each test setup. This way, the Hibernate
  * session can easily be injected into the tested environment.
  * <p/>
- * It is highly recommended to write a unit test that invokes {@link org.unitils.hibernate.HibernateAssert#assertMappingToDatabase()},
+ * It is highly recommended to write a unit test that invokes {@link HibernateAssert#assertMappingToDatabase()},
  * This is a very powerful test that verifies if the mapping of all your Hibernate mapped objects with the database is
  * correct.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class HibernateModule implements Module {
+public class HibernateModule implements Module, Flushable {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(HibernateModule.class);
@@ -94,12 +94,10 @@ public class HibernateModule implements Module {
      * @return true if the test class is a hibernate test, false otherwise
      */
     public boolean isHibernateTest(Class<?> testClass) {
-
         if (testClass == null) {
             return false;
-        } else {
-            return testClass.getAnnotation(HibernateTest.class) != null;
         }
+        return testClass.getAnnotation(HibernateTest.class) != null;
     }
 
 
@@ -111,7 +109,6 @@ public class HibernateModule implements Module {
      * @param testObject The test object, not null
      */
     public void configureHibernate(Object testObject) {
-
         if (hibernateConfiguration == null) {
             hibernateConfiguration = createHibernateConfiguration(testObject);
             createHibernateSessionFactory();
@@ -130,64 +127,17 @@ public class HibernateModule implements Module {
      * @return The Hibernate configuration
      */
     private Configuration createHibernateConfiguration(Object testObject) {
-
-        logger.info("Configuring Hibernate");
+        logger.info("Configuring Hibernate for test " + testObject);
         Configuration hbnConfiguration = getUserHibernateConfiguration(testObject);
         if (hbnConfiguration.getProperty(Environment.CONNECTION_PROVIDER) != null) {
             logger.warn("The property " + Environment.CONNECTION_PROVIDER + " is present in your Hibernate configuration. " +
                     "This property will be overwritten with Unitils own ConnectionProvider implementation!");
         }
+
         Properties connectionProviderProperty = new Properties();
         connectionProviderProperty.setProperty(Environment.CONNECTION_PROVIDER, HibernateConnectionProvider.class.getName());
         hbnConfiguration.addProperties(connectionProviderProperty);
         return hbnConfiguration;
-    }
-
-
-    /**
-     * Calls all methods annotated with {@link HibernateConfiguration}, so that they can perform extra Hibernate
-     * configuration before the <code>SessionFactory</code> is created.
-     *
-     * @param testObject The test object, not null
-     * @return The Hibernate configuration
-     */
-    private Configuration getUserHibernateConfiguration(Object testObject) {
-
-        Configuration configuration;
-        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), HibernateConfiguration.class);
-        if (methods.size() > 1) {
-            throw new UnitilsException(methods.size() + " methods found in " + testObject.getClass().getSimpleName() +
-                    " that are annotated with " + HibernateConfiguration.class.getSimpleName() + ". Only one such method should exist");
-        } else if (methods.size() == 0) {
-            throw new UnitilsException("No method found in " + testObject.getClass().getSimpleName() +
-                    " that is annotated with " + HibernateConfiguration.class.getSimpleName());
-        } else {
-            try {
-                configuration = ReflectionUtils.invokeMethod(testObject, methods.get(0));
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." +
-                        methods.get(0).getName() + " (annotated with @" + HibernateConfiguration.class.getSimpleName() +
-                        "). Ensure that this method has following signature: " + Configuration.class.getName() + " myMethod()", e);
-            } catch (InvocationTargetException e) {
-                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
-                        " (annotated with @" + HibernateConfiguration.class.getSimpleName() + ") has thrown an exception", e.getCause());
-            }
-        }
-        if (configuration == null) {
-            throw new UnitilsException("The configuration object returned by " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
-                    " (annotated with " + HibernateConfiguration.class.getSimpleName() + ") should not return a null value");
-        }
-        return configuration;
-    }
-
-
-    /**
-     * Creates the Hibernate <code>SessionFactory</code>
-     */
-    private void createHibernateSessionFactory() {
-
-        logger.debug("Creating Hibernate SessionFactory");
-        hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
     }
 
 
@@ -231,7 +181,6 @@ public class HibernateModule implements Module {
      * @param testObject The test object, not null
      */
     public void injectHibernateSession(Object testObject) {
-
         List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), HibernateSession.class);
         for (Field field : fields) {
             try {
@@ -268,19 +217,6 @@ public class HibernateModule implements Module {
 
 
     /**
-     * @return The Hibernate SessionFactory
-     */
-    private SessionFactory getHibernateSessionFactory() {
-        if (hibernateSessionFactory == null) {
-            Configuration hibernateConfiguration = getHibernateConfiguration();
-            logger.debug("Creating Hibernate SessionFactory");
-            hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
-        }
-        return hibernateSessionFactory;
-    }
-
-
-    /**
      * Retrieves the current Hibernate <code>Session</code>. If there is no session yet, or if the current session is
      * closed, a new one is created. If the current session is disconnected, it is reconnected with a
      * <code>Connection</code> from the pool.
@@ -288,7 +224,6 @@ public class HibernateModule implements Module {
      * @return An open and connected Hibernate <code>Session</code>
      */
     public Session getCurrentSession() {
-
         if (currentHibernateSession == null || !currentHibernateSession.isOpen()) {
             logger.debug("No Hibernate Session available. Creating a new one");
             currentHibernateSession = getHibernateSessionFactory().openSession();
@@ -301,7 +236,6 @@ public class HibernateModule implements Module {
      * Closes the current Hibernate session.
      */
     public void closeHibernateSession() {
-
         if (currentHibernateSession != null && currentHibernateSession.isOpen()) {
             logger.debug("Closing Hibernate Session");
             currentHibernateSession.close();
@@ -315,18 +249,9 @@ public class HibernateModule implements Module {
      * the method #getCurrentSession, flushing is not needed.
      */
     public void flushDatabaseUpdates() {
-        getCurrentSession().flush();
-    }
-
-
-    /**
-     * @return The {@link DatabaseModule} that provides a connection pooled <code>DataSource</code> to the
-     *         HibernateModule.
-     */
-    private DatabaseModule getDatabaseModule() {
-
-        Unitils unitils = Unitils.getInstance();
-        return unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
+        if (currentHibernateSession != null) {
+            currentHibernateSession.flush();
+        }
     }
 
 
@@ -339,6 +264,66 @@ public class HibernateModule implements Module {
 
 
     /**
+     * Creates the Hibernate <code>SessionFactory</code>
+     */
+    private void createHibernateSessionFactory() {
+        logger.debug("Creating Hibernate SessionFactory");
+        hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
+    }
+
+
+    /**
+     * Calls all methods annotated with {@link HibernateConfiguration}, so that they can perform extra Hibernate
+     * configuration before the <code>SessionFactory</code> is created.
+     *
+     * @param testObject The test object, not null
+     * @return The Hibernate configuration
+     */
+    private Configuration getUserHibernateConfiguration(Object testObject) {
+        Configuration configuration;
+        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), HibernateConfiguration.class);
+        if (methods.size() > 1) {
+            throw new UnitilsException(methods.size() + " methods found in " + testObject.getClass().getSimpleName() +
+                    " that are annotated with " + HibernateConfiguration.class.getSimpleName() + ". Only one such method should exist");
+        } else if (methods.size() == 0) {
+            throw new UnitilsException("No method found in " + testObject.getClass().getSimpleName() +
+                    " that is annotated with " + HibernateConfiguration.class.getSimpleName());
+        } else {
+            try {
+                configuration = ReflectionUtils.invokeMethod(testObject, methods.get(0));
+            } catch (UnitilsException e) {
+                throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." +
+                        methods.get(0).getName() + " (annotated with @" + HibernateConfiguration.class.getSimpleName() +
+                        "). Ensure that this method has following signature: " + Configuration.class.getName() + " myMethod()", e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
+                        " (annotated with @" + HibernateConfiguration.class.getSimpleName() + ") has thrown an exception", e.getCause());
+            }
+        }
+        if (configuration == null) {
+            throw new UnitilsException("The configuration object returned by " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
+                    " (annotated with " + HibernateConfiguration.class.getSimpleName() + ") should not return a null value");
+        }
+        return configuration;
+    }
+
+
+    /**
+     * @return The Hibernate SessionFactory
+     */
+    private SessionFactory getHibernateSessionFactory() {
+        if (hibernateSessionFactory == null) {
+            Configuration hibernateConfiguration = getHibernateConfiguration();
+            logger.debug("Creating Hibernate SessionFactory");
+
+            //todo check for null hibernateConfiguration
+            hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
+        }
+        return hibernateSessionFactory;
+    }
+
+
+    /**
      * TestListener that makes callbacks to methods of this module while running tests. This TestListener makes sure that
      * <ul>
      * <li>The {@link HibernateTest} annotation is registered as a databasetest annotation in the {@link DatabaseModule}</li>
@@ -346,12 +331,6 @@ public class HibernateModule implements Module {
      * <li>A Hibernate Session is created and injected before each test setup and closed after each test teardown</li>
      */
     private class HibernateTestListener extends TestListener {
-
-        @Override
-        public void beforeAll() {
-            DatabaseModule databaseModule = getDatabaseModule();
-            databaseModule.registerDatabaseTestAnnotation(HibernateTest.class);
-        }
 
         @Override
         public void beforeTestSetUp(Object testObject) {

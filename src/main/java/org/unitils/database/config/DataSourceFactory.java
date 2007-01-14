@@ -21,15 +21,16 @@ import javax.sql.DataSource;
 
 /**
  * Interface for different sorts of Factories of a TestDataSource.
- * <p/>
- * todo javadoc
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public interface DataSourceFactory {
 
     /**
      * Initializes itself using the properties in the given <code>Configuration</code> object.
      *
-     * @param configuration
+     * @param configuration The config, not null
      */
     public void init(Configuration configuration);
 
@@ -37,7 +38,7 @@ public interface DataSourceFactory {
     /**
      * Creates a new <code>TestDataSource</code>
      *
-     * @return the TestDataSource
+     * @return The TestDataSource, not null
      */
     public DataSource createDataSource();
 

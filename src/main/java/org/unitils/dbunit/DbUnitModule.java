@@ -16,8 +16,8 @@
 package org.unitils.dbunit;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.dbunit.Assertion;
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.dbunit.Assertion.assertEquals;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -34,12 +34,13 @@ import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.TablePerRowXmlDataSet;
 import org.unitils.util.ConfigUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 
 /**
+ * todo javadoc
+ * <p/>
  * Module that provides support for managing database test data using DBUnit.
  * <p/>
  * This module depends on the {@link DatabaseModule} for database connection management and identificatiof database test
@@ -61,7 +62,7 @@ import java.sql.SQLException;
  * <li>If a file can be found in the classpath in the same package as the testclass, with the name
  * 'classname without packagename'.xml, this file is used</li>
  * <p/>
- * Using the method {@link #assertDBContentAsExpected(Object,String)}, the contents of the database can be compared with
+ * Using the method {@link #assertDbContentAsExpected}, the contents of the database can be compared with
  * the contents of a dataset. The expected dataset file should be located in the classpath in the same package as the
  * testclass, with the name 'classname without packagename'.'test method name'-result.xml.
  *
@@ -71,12 +72,12 @@ import java.sql.SQLException;
 public class DbUnitModule implements Module {
 
     /* Property key of the name of the database schema */
-    private static final String PROPKEY_SCHEMA_NAME = "dataSource.schemaName";
+    public static final String PROPKEY_SCHEMA_NAME = "dataSource.schemaName";
 
     /* Property key of the SQL dialect of the underlying DBMS implementation */
-    private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
+    public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
-    /**
+    /*
      * Object that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
      * caching is time-consuming, this object is created only once and used througout the entire test run. The
      * underlying JDBC Connection however is 'closed' (returned to the pool) after every database operation.
@@ -96,7 +97,6 @@ public class DbUnitModule implements Module {
      * @param configuration The config, not null
      */
     public void init(Configuration configuration) {
-
         schemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         dataTypeFactory = ConfigUtils.getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
@@ -104,14 +104,214 @@ public class DbUnitModule implements Module {
 
 
     /**
-     * Checks whether the given test instance is a database test.
+     * Gets the DbUnit connection or creates one if it does not exist yet.
      *
-     * @param testClass The test class, not null
-     * @return True if the test class is a database test false otherwise
-     * @see DatabaseModule#isDatabaseTest(Class<?>)
+     * @return The DbUnit connection, not null
      */
-    protected boolean isDatabaseTest(Class<?> testClass) {
-        return getDatabaseModule().isDatabaseTest(testClass);
+    public DbUnitDatabaseConnection getDbUnitDatabaseConnection() {
+        if (dbUnitDatabaseConnection == null) {
+            dbUnitDatabaseConnection = createDbUnitConnection();
+        }
+        return dbUnitDatabaseConnection;
+    }
+
+
+    /**
+     * This method will first try to load a method level defined dataset. If no such file exists, a class level defined
+     * dataset will be loaded. If neither of these files exist, nothing is done.
+     * The name of the test data file at both method level and class level can be overridden using the
+     * {@link DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
+     * thrown.
+     *
+     * @param testMethod The method, not null
+     */
+    public void insertTestData(Method testMethod) {
+        try {
+            IDataSet dataSet = getTestDataSet(testMethod);
+            if (dataSet == null) {
+                // no data set should be loaded
+                return;
+            }
+            DatabaseOperation.CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
+        } finally {
+            closeJdbcConnection();
+        }
+    }
+
+
+    /**
+     * todo javadoc
+     * <p/>
+     * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
+     * that occur in the expected DbUnitDataSet are compared with the database contents.
+     *
+     * @param testMethod The test method, not null
+     */
+    public void assertDbContentAsExpected(Method testMethod) {
+        try {
+            // get the expected dataset
+            IDataSet expectedDataSet = getExpectedTestDataSet(testMethod);
+            if (expectedDataSet == null) {
+                // no data set should be compared
+                return;
+            }
+
+            // first make sure every database update is flushed to the database
+            getDatabaseModule().flushDatabaseUpdates();
+
+            // get the actual data set
+            IDataSet actualDataSet = getDbUnitDatabaseConnection().createDataSet(expectedDataSet.getTableNames());
+            ITableIterator tables = expectedDataSet.iterator();
+
+            // compare expected and actual data set
+            while (tables.next()) {
+                ITable expectedTable = tables.getTable();
+                ITableMetaData metaData = expectedTable.getTableMetaData();
+                ITable actualTable = actualDataSet.getTable(expectedTable.getTableMetaData().getTableName());
+                ITable filteredActualTable = DefaultColumnFilter.includedColumnsTable(actualTable, metaData.getColumns());
+
+                assertEquals(new SortedTable(expectedTable), new SortedTable(filteredActualTable, expectedTable.getTableMetaData()));
+            }
+        } catch (Exception e) {
+            throw new UnitilsException("Error asserting db content as expected for test method " + testMethod, e);
+        } finally {
+            closeJdbcConnection();
+        }
+    }
+
+
+    /**
+     * Using the values of the method-level or class-level {@link DataSet} annotations, returns the data set for the
+     * given test method. If no method-level or class-level {@link DataSet} annotation is found, null is returned.
+     * If a method-level {@link DataSet} annotation is found this will be used, else the class-level will be used.
+     * <p/>
+     * The value of the found annotation determines which file needs to be used for the dataset. If a filename is
+     * explicitly specified, this name will be used. Filenames that start with '/' are treated absolute. Filenames
+     * that do not start with '/', are relative to the current class.
+     * If an empty filename ("") is specified, it will first look for a file named 'classname'.'testmethod'.xml (as defined
+     * in {@link #getMethodLevelDefaultTestDataSetFileName}). If that file does not exist it will look for a file
+     * named 'classname'.xml {@link #getClassLevelDefaultTestDataSetFileName}).
+     * <p/>
+     * If a file is not found or could not be loaded (but was requested, because there is an annotation), an exception
+     * is raised.
+     *
+     * @param testMethod The test method, not null
+     * @return The dataset, null if there is no data set
+     */
+    public IDataSet getTestDataSet(Method testMethod) {
+        Class<?> testClass = testMethod.getDeclaringClass();
+
+        // get the value of the method-level annotation
+        String dataSetFileName = null;
+        DataSet dataSetAnnotationMethod = testMethod.getAnnotation(DataSet.class);
+        if (dataSetAnnotationMethod != null) {
+            dataSetFileName = dataSetAnnotationMethod.value();
+
+        } else {
+            // no method-level found, try class-level
+            DataSet dataSetAnnotationClass = testClass.getAnnotation(DataSet.class);
+            if (dataSetAnnotationClass != null) {
+                dataSetFileName = dataSetAnnotationClass.value();
+            }
+        }
+
+        // check no annotations found
+        if (dataSetFileName == null) {
+            return null;
+        }
+
+        // empty means, use default file name
+        if ("".equals(dataSetFileName)) {
+            // first try method specific default file name
+            dataSetFileName = getMethodLevelDefaultTestDataSetFileName(testClass, testMethod);
+            IDataSet dataSet = createDataSet(testClass, dataSetFileName);
+            if (dataSet != null) {
+                // found file, so return
+                return dataSet;
+            }
+            // not found, try class default file name
+            dataSetFileName = getClassLevelDefaultTestDataSetFileName(testClass);
+        }
+
+        IDataSet dataSet = createDataSet(testClass, dataSetFileName);
+        if (dataSet == null) {
+            throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetFileName);
+        }
+        return dataSet;
+    }
+
+
+    //todo javadoc
+    /**
+     * @param testMethod The test method, not null
+     * @return The dataset, null if there is no data set
+     */
+    public IDataSet getExpectedTestDataSet(Method testMethod) {
+        Class<?> testClass = testMethod.getDeclaringClass();
+
+        // get the value of the method-level annotation
+        String dataSetFileName = null;
+        ExpectedDataSet expectedDataSetAnnotation = testMethod.getAnnotation(ExpectedDataSet.class);
+        if (expectedDataSetAnnotation != null) {
+            dataSetFileName = expectedDataSetAnnotation.value();
+
+        } else {
+            // no method-level found, try class-level
+            ExpectedDataSet expectedDataSetAnnotationClass = testClass.getAnnotation(ExpectedDataSet.class);
+            if (expectedDataSetAnnotationClass != null) {
+                dataSetFileName = expectedDataSetAnnotationClass.value();
+            }
+        }
+
+        // check no annotations found
+        if (dataSetFileName == null) {
+            return null;
+        }
+
+        // empty means, use default file name
+        if ("".equals(dataSetFileName)) {
+            // first try method specific default file name
+            dataSetFileName = getDefaultExpectedDataSetFileName(testClass, testMethod);
+        }
+
+        IDataSet dataSet = createDataSet(testClass, dataSetFileName);
+        if (dataSet == null) {
+            throw new UnitilsException("Could not find expected DbUnit dataset with name " + dataSetFileName);
+        }
+        return dataSet;
+    }
+
+
+    /**
+     * Creates the dataset for the given file. Filenames that start with '/' are treated absolute. Filenames that
+     * do not start with '/', are relative to the current class.
+     *
+     * @param testClass       The test class, not null
+     * @param dataSetFilename The name, (start with '/' for absolute names), not null
+     * @return The data set, null if the file does not exist
+     */
+    protected IDataSet createDataSet(Class testClass, String dataSetFilename) {
+        InputStream in = null;
+        try {
+            in = testClass.getResourceAsStream(dataSetFilename);
+            if (in == null) {
+                // file does not exist
+                return null;
+            }
+
+            IDataSet dataSet = new TablePerRowXmlDataSet(in);
+            ReplacementDataSet replacementDataSet = new ReplacementDataSet(dataSet);
+            replacementDataSet.addReplacementObject("[null]", null);
+            return replacementDataSet;
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unble to create DbUnit dataset for file " + dataSetFilename, e);
+        } finally {
+            closeQuietly(in);
+        }
     }
 
 
@@ -132,248 +332,6 @@ public class DbUnitModule implements Module {
 
 
     /**
-     * @return The DbUnit connection
-     */
-    public DbUnitDatabaseConnection getDbUnitDatabaseConnection() {
-
-        if (dbUnitDatabaseConnection == null) {
-            dbUnitDatabaseConnection = createDbUnitConnection();
-        }
-        return dbUnitDatabaseConnection;
-    }
-
-
-    /**
-     * This method will first try to load a method level defined dataset.
-     * If no such file exists, a class level defined dataset will be loaded.
-     * If neither of these files exist, nothing is done.
-     * The name of the test data file at both method level and class level can be overridden using the {@link
-     * DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
-     * thrown.
-     *
-     * @param testClass  The test class, not null
-     * @param testMethod The method, not null
-     */
-    protected void insertTestData(Class testClass, Method testMethod) {
-        try {
-            IDataSet dataSet = getTestDataSet(testClass, testMethod);
-            if (dataSet != null) { // Dataset is null when there is no data xml file.
-                getInsertDatabaseOperation().execute(getDbUnitDatabaseConnection(), dataSet);
-            }
-        } catch (Exception e) {
-            throw new UnitilsException("Error while trying to insert test data from DbUnit xml file", e);
-        } finally {
-            closeJdbcConnection();
-        }
-    }
-
-
-    /**
-     * @return The DbUnit <code>DatabaseTask</code> that is used for loading the data file
-     */
-    protected DatabaseOperation getInsertDatabaseOperation() {
-        return DatabaseOperation.CLEAN_INSERT;
-    }
-
-
-    /**
-     * This method will first try to return a method level defined dataset.
-     * If no such file exists, a class level defined dataset will be returned.
-     * If neither of these files exist, null is returned.
-     * The name of the test data file at both method level and class level can be overridden using the {@link
-     * DataSet} annotation. If specified using this annotation but not found, a {@link UnitilsException} is
-     * thrown.
-     *
-     * @param testClass The test class, not null
-     * @param method    The test method, not null
-     * @return The dataset, can be null if the files were not found
-     */
-    protected IDataSet getTestDataSet(Class testClass, Method method) {
-
-        //load the test specific dataset
-        IDataSet dataSet = getMethodLevelTestDataSet(testClass, method);
-        if (dataSet == null) {
-            //load the default dataset
-            dataSet = getClassLevelTestDataSet(testClass);
-        }
-        return dataSet;
-    }
-
-
-    /**
-     * Returns the DbUnit dataSet that has been defined at method level, if it exists. By default, this dataSet is the
-     * file located in the same package as the test class, with as name className + '.' + methodName + '.xml'. This default
-     * name can be overridden using the {@link DataSet} annotation at method level. If the dataSet filename is
-     * explicitly set but not found, a {@link UnitilsException} is thrown.
-     *
-     * @param testClass The test class, not null
-     * @param method    The test method, not null
-     * @return The class level DbUnit DataSet
-     */
-    protected IDataSet getMethodLevelTestDataSet(Class testClass, Method method) {
-        DataSet dataSetAnnotation = method.getAnnotation(DataSet.class);
-        if (dataSetAnnotation != null) {
-            IDataSet dataSet = getDataSet(testClass, dataSetAnnotation.value());
-            if (dataSet == null) {
-                throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetAnnotation.value());
-            }
-            return dataSet;
-        } else {
-            return getDataSet(testClass, getMethodLevelDefaultTestDataSetFileName(testClass, method));
-        }
-    }
-
-
-    /**
-     * Gets the name of the default testdata file at method level
-     * The default name is constructed as follows: classname + '.' + methodName + '.xml'
-     *
-     * @param testClass The test class, not null
-     * @param method    The test method, not null
-     * @return The default filename
-     */
-    protected String getMethodLevelDefaultTestDataSetFileName(Class<?> testClass, Method method) {
-        String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + ".xml";
-    }
-
-
-    /**
-     * Returns the DbUnit dataSet that has been defined at class level. By default, this dataSet is the file located
-     * in the same package as the test class, with as name name of class + '.xml'. This default name can be
-     * overridden using the {@link DataSet} annotation at class level. If the dataSet filename is explicitly set
-     * but not found, a {@link UnitilsException} is thrown.
-     *
-     * @param testClass The test class, not null
-     * @return The class level DbUnit DataSet
-     */
-    protected IDataSet getClassLevelTestDataSet(Class<?> testClass) {
-        DataSet dataSetAnnotation = testClass.getAnnotation(DataSet.class);
-        if (dataSetAnnotation != null) {
-            IDataSet dataSet = getDataSet(testClass, dataSetAnnotation.value());
-            if (dataSet == null) {
-                throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetAnnotation.value());
-            }
-            return dataSet;
-        } else {
-            return getDataSet(testClass, getClassLevelDefaultTestDataSetFileName(testClass));
-        }
-    }
-
-
-    /**
-     * Gets the name of the default testdata file at class level
-     * The default name is constructed as follows: 'classname without packagename'.xml
-     *
-     * @param testClass The test class, not null
-     * @return The default filename
-     */
-    protected String getClassLevelDefaultTestDataSetFileName(Class<?> testClass) {
-        String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + ".xml";
-    }
-
-
-    /**
-     * Returns the dataset from the file in the classpath with the given name.
-     * Filenames that start with '/' are treated absolute. Filenames that do not start with '/', are relative
-     * to the current class.
-     *
-     * @param testClass       The test class, not null
-     * @param dataSetFilename The name, (start with '/' for absolute names)
-     * @return The data set, or null if the file did not exist
-     */
-    protected IDataSet getDataSet(Class testClass, String dataSetFilename) {
-        try {
-            if (dataSetFilename == null) {
-                return null;
-            }
-
-            InputStream in = null;
-            try {
-                in = testClass.getResourceAsStream(dataSetFilename);
-                if (in == null) {
-                    return null;
-                }
-
-                IDataSet dataSet = createDbUnitDataSet(in);
-                // todo make configurable
-                ReplacementDataSet replacementDataSet = new ReplacementDataSet(dataSet);
-                replacementDataSet.addReplacementObject("[null]", null);
-                return replacementDataSet;
-
-            } finally {
-                if (in != null) {
-                    in.close();
-                }
-            }
-        } catch (IOException e) {
-            throw new UnitilsException("Error while loading DbUnit dataset", e);
-        }
-    }
-
-
-    /**
-     * Constructs a DbUnit DataSet object from the given InputStream
-     *
-     * @param in The xml content stream, not null
-     * @return A DbUnit DataSet object
-     */
-    protected IDataSet createDbUnitDataSet(InputStream in) {
-        try {
-            return new TablePerRowXmlDataSet(in);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Error while reading DbUnit dataset", e);
-        }
-    }
-
-
-    //todo javadoc
-    protected void assertDbContentsAsExpectedIfAnnotated(Object testObject, Method testMethod) {
-
-        ExpectedDataSet expectedDataSetAnnotation = testMethod.getAnnotation(ExpectedDataSet.class);
-        if (expectedDataSetAnnotation != null) {
-            String expectedDataSetFileName = expectedDataSetAnnotation.value();
-            if (StringUtils.isEmpty(expectedDataSetFileName)) {
-                expectedDataSetFileName = getDefaultExpectedDataSetFileName(testObject.getClass(), testMethod.getName());
-            }
-            assertDBContentAsExpected(testObject, expectedDataSetFileName);
-        }
-    }
-
-
-    /**
-     * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
-     * that occur in the expected DbUnitDataSet are compared with the database contents.
-     *
-     * @param testObject              The test instance, not null
-     * @param expectedDataSetFileName The file name, not null
-     */
-    public void assertDBContentAsExpected(Object testObject, String expectedDataSetFileName) {
-        try {
-            IDataSet expectedDataSet = getDataSet(testObject.getClass(), expectedDataSetFileName);
-            IDataSet actualDataSet = getDbUnitDatabaseConnection().createDataSet(expectedDataSet.getTableNames());
-            ITableIterator tables = expectedDataSet.iterator();
-
-            while (tables.next()) {
-                ITable expectedTable = tables.getTable();
-                ITableMetaData metaData = expectedTable.getTableMetaData();
-                ITable actualTable = actualDataSet.getTable(expectedTable.getTableMetaData().getTableName());
-                ITable filteredActualTable = DefaultColumnFilter.includedColumnsTable(actualTable, metaData.getColumns());
-
-                Assertion.assertEquals(new SortedTable(expectedTable), new SortedTable(filteredActualTable,
-                        expectedTable.getTableMetaData()));
-            }
-        } catch (Exception e) {
-            throw new UnitilsException("Error while verifying db contents", e);
-        } finally {
-            closeJdbcConnection();
-        }
-    }
-
-
-    /**
      * Closes (i.e. return to the pool) the JDBC Connection that is currently in use by the DbUnitDatabaseConnection
      */
     protected void closeJdbcConnection() {
@@ -385,27 +343,45 @@ public class DbUnitModule implements Module {
         }
     }
 
-    /**
-     * Gets the name of the expected dataset file.
-     * The default name of this file is constructed as follows: 'classname without packagename'.'testname'-result.xml.
-     * This default name can be overridden by annotating the test method with the {@link ExpectedDataSet}
-     * annotation.
-     * <p/>
-     * todo method name or Method object?
-     *
-     * @param testClass  The test class, not null
-     * @param methodName The test method name, not null
-     * @return The expected dataset filename
-     */
-    protected static String getDefaultExpectedDataSetFileName(Class<?> testClass, String methodName) {
 
-        ExpectedDataSet expectedDataSetAnnotation = testClass.getAnnotation(ExpectedDataSet.class);
-        if (expectedDataSetAnnotation != null) {
-            return expectedDataSetAnnotation.value();
-        } else {
-            String className = testClass.getName();
-            return className.substring(className.lastIndexOf(".") + 1) + "." + methodName + "-result.xml";
-        }
+    /**
+     * Gets the name of the default testdata file at method level. The default name is constructed as
+     * follows: classname + '.' + methodName + '.xml'
+     *
+     * @param testClass The test class, not null
+     * @param method    The test method, not null
+     * @return The default filename, not null
+     */
+    protected String getMethodLevelDefaultTestDataSetFileName(Class<?> testClass, Method method) {
+        String className = testClass.getName();
+        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + ".xml";
+    }
+
+
+    /**
+     * Gets the name of the default testdata file at class level The default name is constructed as
+     * follows: 'classname without packagename'.xml
+     *
+     * @param testClass The test class, not null
+     * @return The default filename, not null
+     */
+    protected String getClassLevelDefaultTestDataSetFileName(Class<?> testClass) {
+        String className = testClass.getName();
+        return className.substring(className.lastIndexOf(".") + 1) + ".xml";
+    }
+
+
+    /**
+     * Gets the name of the expected dataset file. The default name of this file is constructed as
+     * follows: 'classname without packagename'.'testname'-result.xml.
+     *
+     * @param testClass The test class, not null
+     * @param method    The test method, not null
+     * @return The expected dataset filename, not null
+     */
+    protected static String getDefaultExpectedDataSetFileName(Class<?> testClass, Method method) {
+        String className = testClass.getName();
+        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + "-result.xml";
     }
 
 
@@ -413,10 +389,7 @@ public class DbUnitModule implements Module {
      * @return Implementation of DatabaseModule, on which this module is dependent
      */
     protected DatabaseModule getDatabaseModule() {
-
-        //todo throw exception when module not found
-        Unitils unitils = Unitils.getInstance();
-        return unitils.getModulesRepository().getModuleOfType(DatabaseModule.class);
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 
@@ -443,16 +416,12 @@ public class DbUnitModule implements Module {
 
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-            if (isDatabaseTest(testObject.getClass())) {
-                insertTestData(testObject.getClass(), testMethod);
-            }
+            insertTestData(testMethod);
         }
 
         @Override
         public void afterTestMethod(Object testObject, Method testMethod) {
-            if (isDatabaseTest(testObject.getClass())) {
-                assertDbContentsAsExpectedIfAnnotated(testObject, testMethod);
-            }
+            assertDbContentAsExpected(testMethod);
         }
 
     }

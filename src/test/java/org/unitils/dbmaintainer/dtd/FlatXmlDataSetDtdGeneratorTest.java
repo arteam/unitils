@@ -6,7 +6,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.dtd.FlatXmlDataSetDtdGenerator.PROPKEY_DTD_FILENAME;
 import org.unitils.dbmaintainer.handler.StatementHandler;
@@ -23,9 +22,8 @@ import java.sql.Statement;
  * Test class for the FlatXmlDataSetDtdGenerator
  *
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
-@DatabaseTest
-@SuppressWarnings({"UnusedDeclaration"})
 public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
 
     /* Tested object */
@@ -36,15 +34,13 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
 
     /* DataSource for the test database. */
     @TestDataSource
-    private DataSource dataSource;
+    private DataSource dataSource = null;
 
 
     /**
      * Initializes the test by creating following tables in the test database:
      * tableOne(columnA not null, columnB not null, columnC) and
      * tableTwo(column1, column2)
-     *
-     * @throws Exception if the test database could not be initialized
      */
     protected void setUp() throws Exception {
         super.setUp();
@@ -65,8 +61,6 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
 
     /**
      * Tests the generation of the DTD file.
-     *
-     * @throws Exception if the test could not be performed
      */
     public void testGenerateDtd() throws Exception {
 
@@ -90,8 +84,6 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
 
     /**
      * Creates the test tables
-     *
-     * @throws SQLException if the tables could not be created
      */
     private void createTestTables() throws SQLException {
 
@@ -111,8 +103,6 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
 
     /**
      * Removes the test database tables
-     *
-     * @throws SQLException if the tables could not be dropped
      */
     private void dropTestTables() throws SQLException {
 

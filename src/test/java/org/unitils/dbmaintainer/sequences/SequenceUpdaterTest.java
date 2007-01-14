@@ -19,7 +19,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
@@ -37,27 +36,23 @@ import java.sql.Statement;
  * Tests are only executed for the currently activated database dialect. By default, a hsqldb in-memory database is used,
  * to avoid the need for setting up a database instance. If you want to run unit tests for other dbms's, change the
  * configuration in test/resources/unitils.properties
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@DatabaseTest
 public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
-    /**
-     * DataSource for the test database, is injected
-     */
+    /* DataSource for the test database, is injected */
     @TestDataSource
-    protected DataSource dataSource;
+    private DataSource dataSource = null;
 
-    /**
-     * Tested object
-     */
-    protected SequenceUpdater sequenceUpdater;
+    /* Tested object */
+    private SequenceUpdater sequenceUpdater;
 
     /* DbSupport instance */
     private DbSupport dbSupport;
 
-    /**
-     * Value that sequences should at least have after updating the sequences
-     */
+    /* Value that sequences should at least have after updating the sequences */
     protected static final int LOWEST_ACCEPTACLE_SEQUENCE_VALUE = 1000;
 
 

@@ -19,7 +19,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
@@ -38,47 +37,32 @@ import java.sql.Statement;
  * Tests are only executed for the currently activated database dialect. By default, a hsqldb in-memory database is used,
  * to avoid the need for setting up a database instance. If you want to run unit tests for other dbms's, change the
  * configuration in test/resources/unitils.properties
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@DatabaseTest
 abstract public class DBClearerTest extends UnitilsJUnit3 {
 
-    /**
-     * DataSource for the test database, is injected
-     */
+    /* DataSource for the test database, is injected */
     @TestDataSource
-    protected DataSource dataSource;
+    protected DataSource dataSource = null;
 
-    /**
-     * Tested object
-     */
-    protected DBClearer dbClearer;
+    /* Tested object */
+    private DBClearer dbClearer;
 
-    /**
-     * Test database schema name
-     */
-    protected String schemaName;
+    /* The DbSupport object */
+    private DbSupport dbSupport;
 
-    /**
-     * The Configuration object
-     */
-    protected Configuration configuration;
-
-    /**
-     * The DbSupport object
-     */
-    protected DbSupport dbSupport;
 
     /**
      * Configures the tested object. Creates a test table, index, view and sequence
-     *
-     * @throws Exception
      */
     @Override
     protected void setUp() throws Exception {
         if (isTestedDialectActivated()) {
             super.setUp();
 
-            configuration = new ConfigurationLoader().loadConfiguration();
+            Configuration configuration = new ConfigurationLoader().loadConfiguration();
             configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, "testtablepreserve,testviewpreserve,testsequencepreserve,testtriggerpreserv");
 
             StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
@@ -95,6 +79,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             createTestTriggers();
         }
     }
+
 
     protected void tearDown() throws Exception {
         if (isTestedDialectActivated()) {

@@ -1,18 +1,22 @@
 package org.unitils.dbmaintainer.clear;
 
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 
-import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
  * DBClearer test for a hsqldb database
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class DB2DBClearerTest extends DBClearerTest {
+
 
     protected void createTestTrigger(String tableName, String triggerName) throws SQLException {
         Connection conn = null;
@@ -25,6 +29,7 @@ public class DB2DBClearerTest extends DBClearerTest {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     /**
      * Verifies wether the hsqldb dialect is activated

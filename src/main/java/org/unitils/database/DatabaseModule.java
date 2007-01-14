@@ -20,60 +20,60 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DataSourceFactory;
+import org.unitils.database.util.Flushable;
 import org.unitils.dbmaintainer.constraints.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.constraints.ConstraintsDisabler;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.maintainer.DBMaintainer;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.util.AnnotationUtils;
-import org.unitils.util.ConfigUtils;
-import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 import javax.sql.DataSource;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Module that provides basic support for database testing.
+ * Module that provides basic support for database testing such as the creation of a datasource that connectes to the
+ * test database and the maintaince of the test database structure.
  * <p/>
- * This module only provides services to unit test classes that are annotated with an annotation that identifies it as a
- * database test. By default, the annotation {@link DatabaseTest} is supported, but other annotations can be added as
- * well by invoking {@link #registerDatabaseTestAnnotation(Class<? extends java.lang.annotation.Annotation>)}
+ * A datasource will be created the first time one is requested. Which type of datasource will be created depends on
+ * the configured {@link DataSourceFactory}. By default this will be a pooled datasource that gets its connection-url
+ * and username and password from the unitils configuration.
  * <p/>
- * Following services are provided:
- * <ul>
- * <li>Connection pooling: A connection pooled DataSource is created, and supplied to methods annotated with
- * {@link TestDataSource}</li>
- * <li>A 'current connection' is associated with each thread from which the method #getCurrentConnection is called</li>
- * <li>If the updateDataBaseSchema.enabled property is set to true, the {@link DBMaintainer} is invoked to update the
- * database and prepare it for unit testing (see {@link DBMaintainer} Javadoc)</li>
+ * The created datasource can be injected into a field of the test by annotating the field with {@link TestDataSource}.
+ * It can then be used to install it in your DAO or other class under test. See the javadoc of the annotation for more info
+ * on how you can use it.
  * <p/>
+ * If the DbMaintainer is enabled (by setting {@link #PROPKEY_UPDATEDATABASESCHEMA_ENABLED} to true), the test database
+ * schema will automatically be updated if needed. This check will be performed once during your test-suite run, namely
+ * when the data source is created. See {@link DBMaintainer} javadoc for more information on how this update is performed.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class DatabaseModule implements Module {
 
+    /* Property keys indicating if the database schema should be updated before performing the tests */
+    public static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
+
+    /* Property key indicating if the database constraints should org disabled after updating the database */
+    public static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
+
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
-    /* Property keys indicating if the database schema should be updated before performing the tests */
-    private static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
-
-    /* Property key indicating if the database constraints should org disabled after updating the database */
-    private static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
-
-    /* The pooled datasource instance */
+    /* The datasource instance */
     private DataSource dataSource;
 
     /* The Configuration of Unitils */
@@ -84,18 +84,6 @@ public class DatabaseModule implements Module {
 
     /* Indicates if the DBMaintainer should be invoked to update the database */
     private boolean updateDatabaseSchemaEnabled;
-
-    /* Set of annotations that identify a test as a DatabaseTest */
-    private Set<Class<? extends Annotation>> databaseTestAnnotations = new HashSet<Class<? extends Annotation>>();
-
-
-    /**
-     * Creates a new instance of the module, and registers the {@link DatabaseTest} annotation as an annotation that
-     * identifies a test class as a database test.
-     */
-    public DatabaseModule() {
-        registerDatabaseTestAnnotation(DatabaseTest.class);
-    }
 
 
     /**
@@ -108,35 +96,6 @@ public class DatabaseModule implements Module {
 
         disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         updateDatabaseSchemaEnabled = configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED);
-
-    }
-
-
-    /**
-     * Registers the given annotation as an annotation that identifies a test class as being a database test.
-     *
-     * @param databaseTestAnnotation the annotation to register, not null
-     */
-    public void registerDatabaseTestAnnotation(Class<? extends Annotation> databaseTestAnnotation) {
-
-        databaseTestAnnotations.add(databaseTestAnnotation);
-    }
-
-
-    /**
-     * Checks whether the given test instance is a database test, i.e. is annotated with the {@link DatabaseTest} annotation.
-     *
-     * @param testClass the test class, not null
-     * @return true if the test class is a database test false otherwise
-     */
-    public boolean isDatabaseTest(Class<?> testClass) {
-
-        for (Class<? extends Annotation> databaseTestAnnotation : databaseTestAnnotations) {
-            if (testClass.getAnnotation(databaseTestAnnotation) != null) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -158,12 +117,28 @@ public class DatabaseModule implements Module {
 
 
     /**
+     * Flushes all pending updates to the database. This method is useful when the effect of updates needs to
+     * be checked directly on the database.
+     * <p/>
+     * This will look for modules that implement {@link Flushable} and call flushDatabaseUpdates on these module.
+     */
+    public void flushDatabaseUpdates() {
+        logger.info("Flusing database updates.");
+        List<Flushable> flushables = Unitils.getInstance().getModulesRepository().getModulesOfType(Flushable.class);
+        for (Flushable flushable : flushables) {
+            flushable.flushDatabaseUpdates();
+        }
+    }
+
+
+    /**
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link DBMaintainer} for more information.
      */
     public void updateDatabaseSchema() {
         try {
-            DBMaintainer dbMaintainer = createDbMaintainer(configuration);
+            logger.info("Updating database schema if needed and enabled.");
+            DBMaintainer dbMaintainer = new DBMaintainer(configuration, getDataSource());
             dbMaintainer.updateDatabase();
 
         } catch (StatementHandlerException e) {
@@ -173,50 +148,16 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
-     *
-     * @return the datasource
-     */
-    protected DataSource createDataSource() {
-
-        logger.info("Creating DataSource");
-        DataSourceFactory dataSourceFactory = createDataSourceFactory();
-        dataSourceFactory.init(configuration);
-        DataSource dataSource = dataSourceFactory.createDataSource();
-
-        // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is
-        // returned that wrappes the TestDataSource object
-        if (disableConstraints) {
-            ConstraintsDisabler constraintsDisabler = createConstraintsDisabler(dataSource);
-            dataSource = new ConstraintsCheckDisablingDataSource(dataSource, constraintsDisabler);
-        }
-        return dataSource;
-    }
-
-
-    /**
-     * Creates the configured instance of the {@link ConstraintsDisabler}
-     *
-     * @param dataSource the datasource, not null
-     * @return The configured instance of the {@link ConstraintsDisabler}
-     */
-    protected ConstraintsDisabler createConstraintsDisabler(DataSource dataSource) {
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
-        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
-    }
-
-
-    /**
      * Assigns the <code>TestDataSource</code> to every field annotated with {@link TestDataSource} and calls all methods
      * annotated with {@link TestDataSource}
      *
      * @param testObject The test instance, not null
      */
-    protected void injectDataSource(Object testObject) {
-        List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+    public void injectDataSource(Object testObject) {
+        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         for (Field field : fields) {
             try {
-                ReflectionUtils.setFieldValue(testObject, field, getDataSource());
+                setFieldValue(testObject, field, getDataSource());
 
             } catch (UnitilsException e) {
                 throw new UnitilsException("Unable to assign the DataSource to field annotated with @" + TestDataSource.class.getSimpleName() +
@@ -224,10 +165,10 @@ public class DatabaseModule implements Module {
             }
         }
 
-        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         for (Method method : methods) {
             try {
-                ReflectionUtils.invokeMethod(testObject, method, getDataSource());
+                invokeMethod(testObject, method, getDataSource());
 
             } catch (UnitilsException e) {
                 throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
@@ -243,23 +184,24 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * Creates a new instance of the {@link DBMaintainer}
+     * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
      *
-     * @param configuration the config, not null
-     * @return a new instance of the DBMaintainer
+     * @return the datasource
      */
-    protected DBMaintainer createDbMaintainer(Configuration configuration) {
-        return new DBMaintainer(configuration, getDataSource());
-    }
+    protected DataSource createDataSource() {
+        // Get the factory for the data source
+        DataSourceFactory dataSourceFactory = getConfiguredInstance(DataSourceFactory.class, configuration);
+        dataSourceFactory.init(configuration);
+        DataSource dataSource = dataSourceFactory.createDataSource();
 
-
-    /**
-     * Returns an instance of the configured {@link DataSourceFactory}
-     *
-     * @return The configured {@link DataSourceFactory}
-     */
-    protected DataSourceFactory createDataSourceFactory() {
-        return ConfigUtils.getConfiguredInstance(DataSourceFactory.class, configuration);
+        // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is
+        // returned that wrappes the TestDataSource object
+        if (disableConstraints) {
+            StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
+            ConstraintsDisabler constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+            dataSource = new ConstraintsCheckDisablingDataSource(dataSource, constraintsDisabler);
+        }
+        return dataSource;
     }
 
 
@@ -272,16 +214,12 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * TestListener that makes callbacks to methods of this module while running tests. This TestListener makes
-     * sure that before running the first DatabaseTest, the database connection is initialized, and that before doing
-     * the setup of every test, the DataSource is injected to fields and methods annotated with the TestDataSource
-     * annotation.
+     * The {@link TestListener} for this module
      */
     private class DatabaseTestListener extends TestListener {
 
         @Override
         public void beforeTestSetUp(Object testObject) {
-
             injectDataSource(testObject);
         }
     }

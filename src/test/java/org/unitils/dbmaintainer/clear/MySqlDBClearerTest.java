@@ -11,8 +11,12 @@ import java.sql.Statement;
 
 /**
  * DBClearer test for a hsqldb database
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class MySqlDBClearerTest extends DBClearerTest {
+
 
     protected void createTestTrigger(String tableName, String triggerName) throws SQLException {
         Connection conn = null;
@@ -25,6 +29,7 @@ public class MySqlDBClearerTest extends DBClearerTest {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     /**
      * Verifies wether the hsqldb dialect is activated

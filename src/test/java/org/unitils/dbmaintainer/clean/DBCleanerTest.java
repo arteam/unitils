@@ -19,12 +19,11 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotations.DatabaseTest;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.handler.StatementHandler;
 import org.unitils.dbmaintainer.handler.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -38,21 +37,18 @@ import java.sql.Statement;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@DatabaseTest
-@SuppressWarnings({"UnusedDeclaration"})
 public class DBCleanerTest extends UnitilsJUnit3 {
 
     /* DataSource for the test database, is injected */
     @TestDataSource
-    private DataSource dataSource;
+    private DataSource dataSource = null;
 
     /* Tested object */
     private DBCleaner dbCleaner;
 
-    /**
-     * The DbSupport object
-     */
-    protected DbSupport dbSupport;
+    /* The DbSupport object */
+    private DbSupport dbSupport;
+
 
     /**
      * Test fixture. The DefaultDBCleaner is instantiated and configured. Test tables are created and filled with test

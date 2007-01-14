@@ -23,7 +23,10 @@ import org.unitils.core.UnitilsException;
 import javax.sql.DataSource;
 
 /**
- * {@link DataSourceFactory} that loads the necessary information from a properties file.
+ * A {@link DataSourceFactory} that loads the necessary information from a properties file.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class PropertiesDataSourceFactory implements DataSourceFactory {
 
@@ -39,16 +42,13 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     /* The database password. */
     private String password;
 
+
     /**
-     * todo javadoc
-     * todo initialize in constructor
-     * <p/>
      * Initializes itself using the properties in the given <code>Properties</code> object.
      *
-     * @throws UnitilsException when the given <code>Properties</code> misses one or more required properties.
+     * @param configuration The config, not null
      */
     public void init(Configuration configuration) {
-
         driverClassName = configuration.getString("dataSource.driverClassName");
         databaseUrl = configuration.getString("dataSource.url");
         userName = configuration.getString("dataSource.userName");
@@ -61,6 +61,7 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
             throw new UnitilsException("Could not determine database url. Missing property dataSource.databaseUrl");
         }
     }
+
 
     /**
      * @see DataSourceFactory#createDataSource()
@@ -75,6 +76,7 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
 
     }
 
+
     /**
      * Returns a concrete instance of <code>BasicDataSource</code>. This method can org overridden to return a mock
      * instance, for testing
@@ -84,6 +86,4 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     protected BasicDataSource getNewDataSource() {
         return new BasicDataSource();
     }
-
-
 }
