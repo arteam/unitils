@@ -60,6 +60,15 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
 
 
     /**
+     * Clean-up test database.
+     */
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        dropTestTables();
+    }
+
+
+    /**
      * Tests the generation of the DTD file.
      */
     public void testGenerateDtd() throws Exception {

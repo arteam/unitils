@@ -38,6 +38,7 @@ import java.util.*;
  * {@link #PROPKEY_SCRIPTFILES_FILEEXTENSION}.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class FileScriptSource extends DatabaseTask implements ScriptSource {
 
@@ -74,18 +75,20 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         }
     }
 
+
     /**
      * This methods returns true if one or more scripts that have a version index equal to or lower than
      * the index specified by the given version object has been modified since the timestamp specfied by
      * the given version.
      *
-     * @param currentVersion
+     * @param currentVersion The current database version, not null
      * @return true if an existing script has been modified, false otherwise
      */
     public boolean existingScriptsModified(Version currentVersion) {
         Long scriptsTimestamp = getTimestampOfAlreadyExecutedScripts(currentVersion);
         return (scriptsTimestamp > currentVersion.getTimeStamp());
     }
+
 
     /**
      * Returns a <code>List<VersionScriptPair></code> containing the statements that will update the database from the
@@ -100,6 +103,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return getVersionScriptPairsFromFiles(filesWithNewerVersion);
     }
 
+
     /**
      * @return All available scripts
      */
@@ -107,8 +111,9 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return getVersionScriptPairsFromFiles(getScriptFilesSorted());
     }
 
+
     /**
-     * @param currentVersion
+     * @param currentVersion The current database version, not null
      * @return The highest timestamp of all the scripts that were already executed
      */
     private Long getTimestampOfAlreadyExecutedScripts(final Version currentVersion) {
@@ -121,6 +126,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return getHighestScriptTimestamp(scriptFilesAlreadyExecuted);
     }
 
+
     /**
      * @return All available script files, sorted according to their version number
      */
@@ -128,6 +134,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         List<File> scriptFiles = getScriptFiles();
         return sortFilesByIndex(scriptFiles);
     }
+
 
     /**
      * @return All available script files
@@ -142,18 +149,16 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
                     return false;
                 }
                 String indexNrStr = StringUtils.substringBefore(name, "_");
-                if (!StringUtils.isNumeric(indexNrStr)) {
-                    return false;
-                }
-                return true;
+                return StringUtils.isNumeric(indexNrStr);
             }
         })));
     }
 
+
     /**
      * Sorts the given list of script files according to their index number
      *
-     * @param files
+     * @param files the list of files, not null
      * @return The sorted list of script files
      */
     protected List<File> sortFilesByIndex(List<File> files) {
@@ -168,6 +173,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return files;
     }
 
+
     /**
      * Returns the version index of the given script file
      *
@@ -178,10 +184,11 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return new Long(StringUtils.substringBefore(scriptFile.getName(), "_"));
     }
 
+
     /**
      * Returns the highest timestamp of the given list of scriptFiles.
      *
-     * @param scriptFiles
+     * @param scriptFiles the list of files, not null
      * @return highest timestamp of the given scriptFiles with index lower than maxIndex
      */
     private Long getHighestScriptTimestamp(List<File> scriptFiles) {
@@ -192,10 +199,11 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return highestTimestamp;
     }
 
+
     /**
      * Returns all script files having a higher version index than the given one
      *
-     * @param currentVersion
+     * @param currentVersion The current database version, not null
      * @return all script files having a newer version than the given one
      */
     private List<File> getFilesWithHigherIndex(long currentVersion) {
@@ -208,6 +216,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         }
         return filesWithNewerVersion;
     }
+
 
     /**
      * Returns the scripts from the given list of script files as a list of <code>VersionScriptPair</code> objects

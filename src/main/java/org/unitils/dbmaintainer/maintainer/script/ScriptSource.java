@@ -26,29 +26,33 @@ import java.util.List;
  * update the database to a given state.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public interface ScriptSource {
+
 
     /**
      * This methods returns true if one or more scripts that have a version index equal to or lower than
      * the index specified by the given version object has been modified since the timestamp specfied by
      * the given version.
      *
-     * @param currentVersion
-     * @return true if an existing script has been modified, false otherwise
+     * @param currentVersion The current database version, not null
+     * @return True if an existing script has been modified, false otherwise
      */
-    public boolean existingScriptsModified(Version currentVersion);
+    boolean existingScriptsModified(Version currentVersion);
+
 
     /**
-     * @param currentVersion The current database version
-     * @return A List<VersionScriptPair> containing the scripts that need to be executed to update the database
+     * @param currentVersion The current database version, not null
+     * @return A List containing the scripts that need to be executed to update the database
      *         from the given version to the latest one.
      */
     List<VersionScriptPair> getNewScripts(Version currentVersion);
 
+
     /**
-     * @return a <code>List<VersionScriptPair></code> containing all available database update scripts. These scripts
-     * can be used to completely recreate the database from scratch.
+     * @return A List containing all available database update scripts. These scripts
+     *         can be used to completely recreate the database from scratch.
      */
     List<VersionScriptPair> getAllScripts();
 
