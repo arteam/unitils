@@ -55,7 +55,17 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
         dbUnitModule = new DbUnitModule();
         dbUnitModule.init(configuration);
 
+        dropTestTable();
         createTestTable();
+    }
+
+
+    /**
+     * Clean-up test database.
+     */
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        dropTestTable();
     }
 
 
@@ -256,12 +266,27 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            try {
-                st.execute("drop table test");
-            } catch (SQLException e) {
-                // ignore
-            }
             st.execute("create table test (dataset varchar)");
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+
+    /**
+     * Removes the test database table
+     */
+    private void dropTestTable() throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            try {
+                st.executeUpdate("drop table test");
+            } catch (SQLException e) {
+                // Ignored
+            }
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }

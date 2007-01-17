@@ -21,6 +21,7 @@ import org.unitils.dbmaintainer.maintainer.version.Version;
  * Class representing the database update script for updating the database to a given version.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class VersionScriptPair {
 
@@ -30,21 +31,30 @@ public class VersionScriptPair {
     /* The list of DDL scripts that will update the database to this version */
     private String script;
 
+
     /**
      * Constructs a new instance with the given version and script
      *
-     * @param version
-     * @param script
+     * @param version The version, not null
+     * @param script  The script, not null
      */
     public VersionScriptPair(Version version, String script) {
         this.version = version;
         this.script = script;
     }
 
+
+    /**
+     * @return The version, not null
+     */
     public Version getVersion() {
         return version;
     }
 
+
+    /**
+     * @return The script, not null
+     */
     public String getScript() {
         return script;
     }

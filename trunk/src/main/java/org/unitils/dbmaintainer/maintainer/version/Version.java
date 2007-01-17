@@ -19,6 +19,7 @@ package org.unitils.dbmaintainer.maintainer.version;
  * Class representing the version of a database, or the version of a number of DDL scripts.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class Version {
 
@@ -28,19 +29,38 @@ public class Version {
     /* The timestamp of the script that was last modified, expressed as the number of milliseconds since January 1, 1970 */
     private Long timeStamp;
 
+
+    /**
+     * Creates a new version.
+     *
+     * @param index     The script index, not null
+     * @param timeStamp The script timestamp, not null
+     */
     public Version(Long index, Long timeStamp) {
         this.index = index;
         this.timeStamp = timeStamp;
     }
 
+
+    /**
+     * @return The script index, not null
+     */
     public Long getIndex() {
         return index;
     }
 
+
+    /**
+     * @return The script timestamp, not null
+     */
     public Long getTimeStamp() {
         return timeStamp;
     }
 
+
+    /**
+     * @return The string representation of the version.
+     */
     public String toString() {
         return "Index " + index + "; timestamp = " + timeStamp;
     }

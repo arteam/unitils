@@ -31,6 +31,7 @@ import org.unitils.dbmaintainer.maintainer.version.VersionSource;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.sequences.SequenceUpdater;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -81,6 +82,9 @@ public class DBMaintainer {
     /* Property key indicating if updating the database from scratch is enabled */
     public static final String PROPKEY_FROMSCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
 
+    /* Property key indicating if an retry of an update should only be performed when changes to script files were made */
+    public static final String PROPKEY_ONLY_REBUILD_FROMSCRATCH_WHEN_MODIFIED_ENABLED = "dbMaintainer.retryFromScratchOnlyWhenModificationsToScripts.enabled";
+
     /* Property key indicating if the database constraints should org disabled after updating the database */
     public static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
 
@@ -91,32 +95,37 @@ public class DBMaintainer {
     public static final String PROPKEY_GENERATEDTD_ENABLED = "dbMaintainer.generateDTD.enabled";
 
     /* Provider of the current version of the database, and means to increment it */
-    private VersionSource versionSource;
+    protected VersionSource versionSource;
 
     /* Provider of scripts for updating the database to a higher version */
-    private ScriptSource scriptSource;
+    protected ScriptSource scriptSource;
 
     /* Executer of the scripts */
-    private ScriptRunner scriptRunner;
+    protected ScriptRunner scriptRunner;
 
     /* Clearer of the database (removed all tables, sequences, ...) before updating */
-    private DBClearer dbClearer;
+    protected DBClearer dbClearer;
 
     /* Cleaner of the database (deletes all data from all tables before updating */
-    private DBCleaner dbCleaner;
+    protected DBCleaner dbCleaner;
 
     /* Disabler of constraints */
-    private ConstraintsDisabler constraintsDisabler;
+    protected ConstraintsDisabler constraintsDisabler;
 
     /* Database sequence updater */
-    private SequenceUpdater sequenceUpdater;
+    protected SequenceUpdater sequenceUpdater;
 
     /* Database DTD generator */
-    private DtdGenerator dtdGenerator;
+    protected DtdGenerator dtdGenerator;
 
-    /* Indicates if updateing the database from scratch is enabled. If yes, the database is cleared before updateing
+    /* Indicates whether updating the database from scratch is enabled. If true, the database is cleared before updating
       if an already executed script is modified */
-    private boolean fromScratchEnabled;
+    protected boolean fromScratchEnabled;
+
+    /* Indicates whether a from scratch update should be performed when the previous update failed, but
+      none of the scripts were modified since that last update. If true a new update will be tried only when
+      changes were made to the script files */
+    protected boolean onlyRebuildFromScratchAfterErrorWhenFilesModified;
 
 
     /**
@@ -137,33 +146,34 @@ public class DBMaintainer {
 
         StatementHandler statementHandler = new LoggingStatementHandlerDecorator(DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
 
-        scriptRunner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
-        versionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
-        scriptSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
+        scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
+        versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
+        scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
 
         boolean cleanDbEnabled = configuration.getBoolean(PROPKEY_DBCLEANER_ENABLED);
         if (cleanDbEnabled) {
-            dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
+            dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
         }
 
         fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
+        onlyRebuildFromScratchAfterErrorWhenFilesModified = configuration.getBoolean(PROPKEY_ONLY_REBUILD_FROMSCRATCH_WHEN_MODIFIED_ENABLED);
         if (fromScratchEnabled) {
-            dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+            dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
         }
 
         boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         if (disableConstraints) {
-            constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
         }
 
         boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
         if (updateSequences) {
-            sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
+            sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
         }
 
         boolean generateDtd = configuration.getBoolean(PROPKEY_GENERATEDTD_ENABLED);
         if (generateDtd) {
-            dtdGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
+            dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
         }
     }
 
@@ -177,17 +187,13 @@ public class DBMaintainer {
      * @throws StatementHandlerException If an error occurs with one of the scripts
      */
     public void updateDatabase() throws StatementHandlerException {
+        // Get current version
         Version currentVersion = versionSource.getDbVersion();
-        boolean rebuildDatabaseFromScratch = false;
-        if (scriptSource.existingScriptsModified(currentVersion)) {
-            if (fromScratchEnabled) {
-                logger.info("One or more existing database update scripts have been modified. Database will be cleared and rebuilt from scratch");
-                rebuildDatabaseFromScratch = true;
-            } else {
-                logger.warn("Existing database update scripts have been modified, but updating from scratch is disabled. The updated scripts are not executed again!!");
-            }
-        }
 
+        // Determine whether a from scratch update should be performed
+        boolean rebuildDatabaseFromScratch = checkUpdateDatabaseFromScratch(currentVersion);
+
+        // Clear the database and retrieve scripts
         List<VersionScriptPair> versionScriptPairs;
         if (rebuildDatabaseFromScratch) {
             dbClearer.clearDatabase();
@@ -196,61 +202,112 @@ public class DBMaintainer {
             versionScriptPairs = scriptSource.getNewScripts(currentVersion);
         }
 
-        if (versionScriptPairs.size() > 0) {
-            logger.info("Database update scripts have been found and will be executed on the database");
-            // Remove data from the database, that could cause errors when executing scripts. Such as for example
-            // when added a not null column.
-            if (dbCleaner != null) {
-                dbCleaner.cleanDatabase();
-            }
-            for (VersionScriptPair versionScriptPair : versionScriptPairs) {
-                try {
-                    scriptRunner.execute(versionScriptPair.getScript());
-                } catch (StatementHandlerException e) {
-                    logger.error("Error while executing script with version number " + versionScriptPair.getVersion() + ": " + versionScriptPair.getScript(), e);
-                    if (fromScratchEnabled) {
-                        // If rebuilding from scratch is disabled, the version is not incremented, to give the chance
-                        // of fixing the erroneous script.
-                        // If rebuilding from scratch is enabled, the version is set to the version of the erroneous
-                        // script anyway, so that the database is rebuilt from scratch when the erroneous script is
-                        // fixed.
-                        versionSource.setDbVersion(versionScriptPair.getVersion());
-                        logger.info("Database version incremented to " + versionScriptPair.getVersion());
-                    }
-                    logger.error("Current database version is " + versionSource.getDbVersion());
-                    // The fact that the update didn't succeed, is only stored for information purposes
-                    versionSource.registerUpdateSucceeded(false);
-                    throw e;
-                }
-                versionSource.setDbVersion(versionScriptPair.getVersion());
-                logger.info("Database version successfully incremented to " + versionScriptPair.getVersion());
-                // The fact that the update didn't succeed, is only stored for information purposes
-                versionSource.registerUpdateSucceeded(true);
-            }
-
-            // Disable FK and not null constraints, if enabled
-            if (constraintsDisabler != null) {
-                constraintsDisabler.disableConstraints();
-            }
-            // Update sequences to a sufficiently high value, if enabled
-            if (sequenceUpdater != null) {
-                sequenceUpdater.updateSequences();
-            }
-            // Generate a DTD to enable validation and completion in data xml files, if enabled
-            if (dtdGenerator != null) {
-                dtdGenerator.generateDtd();
-            }
+        // Check whether there are new scripts
+        if (versionScriptPairs.isEmpty()) {
+            return;
         }
+        logger.info("Database update scripts have been found and will be executed on the database");
+
+        // Remove data from the database, that could cause errors when executing scripts. Such as for example
+        // when added a not null column.
+        if (dbCleaner != null) {
+            dbCleaner.cleanDatabase();
+        }
+
+        // Excute all of the scripts
+        executeScripts(versionScriptPairs);
+
+        // Disable FK and not null constraints, if enabled
+        if (constraintsDisabler != null) {
+            constraintsDisabler.disableConstraints();
+        }
+        // Update sequences to a sufficiently high value, if enabled
+        if (sequenceUpdater != null) {
+            sequenceUpdater.updateSequences();
+        }
+        // Generate a DTD to enable validation and completion in data xml files, if enabled
+        if (dtdGenerator != null) {
+            dtdGenerator.generateDtd();
+        }
+
     }
 
 
     /**
-     * Sets the fromScratchEnabled property
+     * Checks whether the database should be updated from scratch or just incrementally.
+     * The database needs to be rebuild in following cases:<ul>
+     * <li>Some existing scripts were modified.</li>
+     * <li>The last update of the database was unsuccessful.</li>
+     * </ul>
+     * The database will only be rebuilt from scratch if {@link #PROPKEY_FROMSCRATCH_ENABLED} is set to true.
+     * If the {@link #PROPKEY_ONLY_REBUILD_FROMSCRATCH_WHEN_MODIFIED_ENABLED} is set to false, the database
+     * will only be rebuilt again after an unsuccessful build when changes were made to the script files.
      *
-     * @param fromScratchEnabled enabled or not
+     * @param currentVersion The current database version, not null
+     * @return True if a from scratch rebuild is needed, false otherwise
      */
-    void setFromScratchEnabled(boolean fromScratchEnabled) {
-        this.fromScratchEnabled = fromScratchEnabled;
+    protected boolean checkUpdateDatabaseFromScratch(Version currentVersion) {
+        if (scriptSource.existingScriptsModified(currentVersion)) {
+            if (!fromScratchEnabled) {
+                logger.warn("Existing database update scripts have been modified, but updating from scratch is disabled. The updated scripts are not executed again!!");
+                return false;
+            }
+            logger.info("One or more existing database update scripts have been modified. Database will be cleared and rebuilt from scratch");
+            return true;
+        }
+        if (!fromScratchEnabled) {
+            return false;
+        }
+        if (versionSource.lastUpdateSucceeded()) {
+            return false;
+        }
+
+        if (onlyRebuildFromScratchAfterErrorWhenFilesModified) {
+            logger.warn("The previous database update did not succeed and there were no modified script files. The updated scripts are not executed again!!");
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Executes the given scripts and updates the database version and state appropriatly. After each successful
+     * script execution, the new version is stored in the database and marked as succesful.
+     * If a script execution fails and fromScratch is enabled, that script version is stored in the database and
+     * marked as unsuccesful. If fromScratch is not enabled, the last succesful version is stored in the database
+     * that way, the next time an update is tried, the execution restarts from the last unsuccessful script .
+     *
+     * @param versionScriptPairs The scripts to execute, not null
+     * @throws StatementHandlerException If a script execution failed.
+     */
+    protected void executeScripts(List<VersionScriptPair> versionScriptPairs) throws StatementHandlerException {
+        for (VersionScriptPair versionScriptPair : versionScriptPairs) {
+            try {
+                scriptRunner.execute(versionScriptPair.getScript());
+
+            } catch (StatementHandlerException e) {
+                logger.error("Error while executing script with version number " + versionScriptPair.getVersion() + ": " + versionScriptPair.getScript(), e);
+                if (fromScratchEnabled) {
+                    // If rebuilding from scratch is disabled, the version is not incremented, to give the chance
+                    // of fixing the erroneous script.
+                    // If rebuilding from scratch is enabled, the version is set to the version of the erroneous
+                    // script anyway, so that the database is rebuilt from scratch when the erroneous script is
+                    // fixed.
+                    versionSource.setDbVersion(versionScriptPair.getVersion());
+                    logger.info("Database version incremented to " + versionScriptPair.getVersion());
+                }
+
+                // mark the db update as unsuccessful
+                logger.error("Current database version is " + versionSource.getDbVersion());
+                versionSource.registerUpdateSucceeded(false);
+                throw e;
+            }
+
+            // update the db version and mark as successful
+            versionSource.setDbVersion(versionScriptPair.getVersion());
+            versionSource.registerUpdateSucceeded(true);
+            logger.info("Database version successfully incremented to " + versionScriptPair.getVersion());
+        }
     }
 
 }

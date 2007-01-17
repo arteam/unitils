@@ -88,7 +88,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         super.setUp();
 
         dbMaintainer = new DBMaintainer();
-        dbMaintainer.setFromScratchEnabled(true);
+        dbMaintainer.fromScratchEnabled = true;
 
         versionScriptPairs = new ArrayList<VersionScriptPair>();
         version0 = new Version(0L, 0L);
@@ -102,10 +102,11 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
      * Tests incremental update of a database: No existing scripts are modified, but new ones are added. The database
      * is not cleared but the new scripts are executed on by one, incrementing the database version each time.
      */
-    public void testDBMaintainer_incremental() throws Exception {
+    public void testUpdateDatabase_incremental() throws Exception {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);
@@ -126,7 +127,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
      * Tests updating the database from scratch: Existing scripts have been modified. The database is cleared first
      * and all scripts are executed.
      */
-    public void testDBMaintainer_fromScratch() throws Exception {
+    public void testUpdateDatabase_fromScratch() throws Exception {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
@@ -147,19 +148,20 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         dbMaintainer.updateDatabase();
     }
 
+
     /**
      * Tests the behavior in case there is an error in a script supplied by the ScriptSource. In this case, the
      * database version must not org incremented and a StatementHandlerException must be thrown.
      */
-    public void testDBMaintainer_errorInScript() throws Exception {
+    public void testUpdateDatabase_errorInScript() throws Exception {
         expect(mockVersionSource.getDbVersion()).andReturn(version0).anyTimes();
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         expectLastCall().andThrow(new StatementHandlerException("Test exception"));
         mockVersionSource.setDbVersion(version1);
         mockVersionSource.registerUpdateSucceeded(false);
-
         replay();
 
         try {
@@ -168,6 +170,59 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         } catch (StatementHandlerException e) {
             // Expected
         }
+    }
+
+
+    /**
+     * Tests checking from scratch update but no scripts modified and last update was successful.
+     */
+    public void testCheckUpdateDatabaseFromScratch_notNeeded() throws Exception {
+        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
+        replay();
+
+        boolean result = dbMaintainer.checkUpdateDatabaseFromScratch(version1);
+        assertFalse(result);
+    }
+
+
+    /**
+     * Tests checking from scratch update. Needed because scripts were modified.
+     */
+    public void testCheckUpdateDatabaseFromScratch_modifiedScripts() throws Exception {
+        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
+        replay();
+
+        boolean result = dbMaintainer.checkUpdateDatabaseFromScratch(version1);
+        assertTrue(result);
+    }
+
+
+    /**
+     * Tests checking from scratch update. Needed because last update failed.
+     */
+    public void testCheckUpdateDatabaseFromScratch_lastUpdateFailed() throws Exception {
+        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(false);
+        replay();
+
+        boolean result = dbMaintainer.checkUpdateDatabaseFromScratch(version1);
+        assertTrue(result);
+    }
+
+
+    /**
+     * Tests checking from scratch update. Last update failed but no scripts were modified and
+     * onlyRebuildFromScratchAfterErrorWhenFilesModified is true.
+     */
+    public void testCheckUpdateDatabaseFromScratch_lastUpdateFailedButIgnored() throws Exception {
+        dbMaintainer.onlyRebuildFromScratchAfterErrorWhenFilesModified = true;
+        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(false);
+        replay();
+
+        boolean result = dbMaintainer.checkUpdateDatabaseFromScratch(version1);
+        assertFalse(result);
     }
 
 }
