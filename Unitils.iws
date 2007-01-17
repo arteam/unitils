@@ -18,17 +18,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/ScriptSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/ScriptSource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/FileScriptSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/FileScriptSource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/VersionScriptPair.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/VersionScriptPair.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/dtd/FlatXmlDataSetDtdGeneratorTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/dtd/FlatXmlDataSetDtdGeneratorTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/DBMaintainerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/DBMaintainerTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/handler/JDBCStatementHandler.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/handler/JDBCStatementHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSourceTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/VersionSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/VersionSource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/DBMaintainer.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/DBMaintainer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/Version.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/Version.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -52,7 +47,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169066517435" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169074370818" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -189,47 +184,7 @@
     <option name="myCurrentFavoritesList" value="Unitils" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="DBMaintainer.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/DBMaintainer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="126" column="46" selection-start="6276" selection-end="6531" vertical-scroll-proportion="0.31237912">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DbUnitModuleDataSetTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="292" column="5" selection-start="7478" selection-end="8418" vertical-scroll-proportion="0.8541468">
-              <folding>
-                <marker date="1169066408008" expanded="true" signature="7455:7471" placeholder="{...}" />
-                <marker date="1169066408008" expanded="true" signature="7455:7465" placeholder="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DbUnitModuleExpectedDataSetTest.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="300" column="5" selection-start="9450" selection-end="9450" vertical-scroll-proportion="0.9675882">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DBMaintainerTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/DBMaintainerTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="223" column="64" selection-start="8538" selection-end="8538" vertical-scroll-proportion="0.82173496">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -1116,6 +1071,78 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\database" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\database" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\database\config" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
     </subPane>
   </component>
   <component name="ProjectReloadState">
@@ -1175,16 +1202,16 @@
     </key>
   </component>
   <component name="RestoreUpdateTree" />
-  <component name="RunManager" selected="JUnit.DBMaintainerTest">
-    <tempConfiguration default="false" name="DBMaintainerTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="org.unitils.dbmaintainer.maintainer.*" />
+  <component name="RunManager" selected="JUnit.All in Unitils">
+    <tempConfiguration default="false" name="DBVersionSourceTest.testSetDBVersion" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="org.unitils.dbmaintainer.maintainer.version.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.maintainer" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.maintainer.DBMaintainerTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.maintainer.version" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.maintainer.version.DBVersionSourceTest" />
+      <option name="METHOD_NAME" value="testSetDBVersion" />
+      <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -1192,8 +1219,12 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="2566" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <ConfigurationWrapper RunnerId="Debug" />
       <method>
         <option name="Make" value="true" />
       </method>
@@ -1558,72 +1589,9 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="132" column="19" selection-start="5982" selection-end="6001" vertical-scroll-proportion="0.016732283">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="71" column="18" selection-start="2933" selection-end="2933" vertical-scroll-proportion="1.0824442">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/spring/SpringModuleApplicationContextTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="145" column="33" selection-start="5205" selection-end="5205" vertical-scroll-proportion="2.2755907">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/spring/SpringModuleTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="183" column="83" selection-start="5523" selection-end="5523" vertical-scroll-proportion="1.6595539">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="123" column="45" selection-start="5469" selection-end="5469" vertical-scroll-proportion="0.016732283">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="71" column="6" selection-start="2158" selection-end="2432" vertical-scroll-proportion="0.5121242">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="163" column="62" selection-start="7027" selection-end="7151" vertical-scroll-proportion="0.016732283">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="340" column="13" selection-start="15859" selection-end="15859" vertical-scroll-proportion="0.9232283">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script/FileScriptSource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="23" selection-start="1645" selection-end="1645" vertical-scroll-proportion="0.016732283">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/dtd/FlatXmlDataSetDtdGeneratorTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="7" selection-start="2060" selection-end="2209" vertical-scroll-proportion="0.8384913">
+        <state line="300" column="5" selection-start="9450" selection-end="9450" vertical-scroll-proportion="0.9675882">
           <folding />
         </state>
       </provider>
@@ -1635,33 +1603,93 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="292" column="5" selection-start="7478" selection-end="8418" vertical-scroll-proportion="0.8541468">
-          <folding>
-            <marker date="1169066408008" expanded="true" signature="7455:7471" placeholder="{...}" />
-            <marker date="1169066408008" expanded="true" signature="7455:7465" placeholder="{...}" />
-          </folding>
+        <state line="117" column="0" selection-start="5281" selection-end="5281" vertical-scroll-proportion="0.2630561">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
+    <entry file="jar://$PROJECT_DIR$/lib/commons-dbcp-1.2.1.jar!/org/apache/commons/dbcp/DelegatingResultSet.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="75" column="40" selection-start="3805" selection-end="3805" vertical-scroll-proportion="0.24661508">
+        <state line="79" column="0" selection-start="3588" selection-end="3588" vertical-scroll-proportion="0.20964567">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/UnitilsDataSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="13" selection-start="875" selection-end="875" vertical-scroll-proportion="0.29170638">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/PropertiesDataSourceFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="89" column="24" selection-start="2963" selection-end="2963" vertical-scroll-proportion="0.9010669">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/DataSourceFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="17" selection-start="881" selection-end="881" vertical-scroll-proportion="0.40514776">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/VersionSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="9" selection-start="1409" selection-end="1409" vertical-scroll-proportion="0.6110582">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/handler/StatementHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="9" selection-start="1479" selection-end="1479" vertical-scroll-proportion="0.7664122">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/UnitilsJUnit3.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="175" column="0" selection-start="5816" selection-end="5816" vertical-scroll-proportion="0.3328125">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSourceTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="114" column="0" selection-start="4166" selection-end="4166" vertical-scroll-proportion="0.3328125">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/Version.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="0" selection-start="1564" selection-end="1564" vertical-scroll-proportion="1.1343511">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/handler/JDBCStatementHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="0" selection-start="2084" selection-end="2084" vertical-scroll-proportion="1.2381679">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="117" column="0" selection-start="5145" selection-end="5145" vertical-scroll-proportion="0.3328125">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/DBMaintainer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="126" column="46" selection-start="6276" selection-end="6531" vertical-scroll-proportion="0.31237912">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="300" column="5" selection-start="9450" selection-end="9450" vertical-scroll-proportion="0.9675882">
+        <state line="199" column="38" selection-start="10116" selection-end="10116" vertical-scroll-proportion="0.3453125">
           <folding />
         </state>
       </provider>
