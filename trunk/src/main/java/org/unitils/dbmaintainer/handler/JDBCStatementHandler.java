@@ -28,6 +28,7 @@ import java.sql.Statement;
  * A <code>TestDataSource</code> is provided on creation to provide the connection to the database.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class JDBCStatementHandler implements StatementHandler {
 
@@ -37,7 +38,8 @@ public class JDBCStatementHandler implements StatementHandler {
     /**
      * Init of <code>TestDataSource</code> on which statements should org executed
      *
-     * @param dataSource
+     * @param configuration The config, not null
+     * @param dataSource    The database data source, not null
      */
     public void init(Configuration configuration, DataSource dataSource) {
         this.dataSource = dataSource;
@@ -46,8 +48,8 @@ public class JDBCStatementHandler implements StatementHandler {
     /**
      * Executes the given statement on the database
      *
-     * @param statement
-     * @throws StatementHandlerException
+     * @param statement The statement, not null
+     * @throws StatementHandlerException If the statement could not be executed
      */
     public void handle(String statement) throws StatementHandlerException {
         Connection conn = null;
@@ -56,6 +58,7 @@ public class JDBCStatementHandler implements StatementHandler {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             st.execute(statement);
+
         } catch (SQLException e) {
             throw new StatementHandlerException("Error while executing statement: " + statement, e);
         } finally {

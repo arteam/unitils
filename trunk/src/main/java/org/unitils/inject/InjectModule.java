@@ -115,7 +115,6 @@ public class InjectModule implements Module {
      * @param testedObjectField The tested object field, not null
      */
     protected void createObjectForField(Object testObject, Field testedObjectField) {
-
         Class declaredClass = testedObjectField.getType();
         if (declaredClass.isInterface()) {
             logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getType().getSimpleName()
@@ -231,7 +230,7 @@ public class InjectModule implements Module {
         if (targets.size() == 0) {
             throw new UnitilsException(getSituatedErrorMessage(InjectInto.class, fieldToInject, "The target should either be " +
                     "specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() +
-                    " annotation"));   
+                    " annotation"));
         }
 
         for (Object target : targets) {
@@ -391,10 +390,10 @@ public class InjectModule implements Module {
      * targetName is not equal to an empty string, the targets are the testObject's fields that are annotated with
      * {@link TestedObject}.
      *
-     * @param annotationClass     The class of the annotation, not null
-     * @param annotatedField The annotated field, not null
-     * @param targetName     The explicit target name or empty string for TestedObject targets
-     * @param test           The test instance
+     * @param annotationClass The class of the annotation, not null
+     * @param annotatedField  The annotated field, not null
+     * @param targetName      The explicit target name or empty string for TestedObject targets
+     * @param test            The test instance
      * @return The target(s) for the injection
      */
     protected List<Object> getTargets(Class<? extends Annotation> annotationClass, Field annotatedField, String targetName, Object test) {
@@ -423,9 +422,9 @@ public class InjectModule implements Module {
      * Given the errorDescription, returns a situated error message, i.e. specifying the annotated field and the
      * annotation type that was used.
      *
-     * @param annotationClass The injection annotation, not null
-     * @param annotatedField      The annotated field, not null
-     * @param errorDescription    A custom description, not null
+     * @param annotationClass  The injection annotation, not null
+     * @param annotatedField   The annotated field, not null
+     * @param errorDescription A custom description, not null
      * @return A situated error message
      */
     protected String getSituatedErrorMessage(Class<? extends Annotation> annotationClass, Field annotatedField, String errorDescription) {

@@ -64,9 +64,6 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
     /* The name of the database column in which is stored whether the last DB update succeeded */
     private String lastUpdateSucceededColumnName;
 
-    /* True if the existence and structure of the version table was checked */
-    private boolean versionTableChecked;
-
 
     /**
      * Initializes the name of the version table and its columns using the given <code>Configuration</code> object
@@ -74,7 +71,6 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      * @param configuration the configuration, not null
      */
     protected void doInit(Configuration configuration) {
-        this.versionTableChecked = false;
         this.versionTableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
         this.versionIndexColumnName = configuration.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();
         this.versionTimestampColumnName = configuration.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME).toUpperCase();
@@ -83,15 +79,92 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
 
 
     /**
-     * @return The current version of the database
+     * Gets the current version from the version table in the database.
+     * The version table will be created (or altered) if needed.
+     *
+     * @return The current version of the database, not null
      */
     public Version getDbVersion() throws StatementHandlerException {
+        try {
+            return getDbVersionImpl();
+
+        } catch (UnitilsException e) {
+            if (checkVersionTable()) {
+                throw e;
+            }
+            // try again, version table was not ok
+            return getDbVersionImpl();
+        }
+    }
+
+
+    /**
+     * Updates the version of the database to the given value.
+     * The version table will be created (or altered) if needed.
+     *
+     * @param version The new version that the database should be updated to, not null
+     */
+    public void setDbVersion(Version version) throws StatementHandlerException {
+        try {
+            setDbVersionImpl(version);
+
+        } catch (UnitilsException e) {
+            if (checkVersionTable()) {
+                throw e;
+            }
+            // try again, version table was not ok
+            setDbVersionImpl(version);
+        }
+    }
+
+
+    /**
+     * Tells us whether the last database version update succeeded or not.
+     * The version table will be created (or altered) if needed.
+     *
+     * @return true if the last database version update succeeded, false otherwise
+     */
+    public boolean lastUpdateSucceeded() {
+        try {
+            return lastUpdateSucceededImpl();
+
+        } catch (UnitilsException e) {
+            if (checkVersionTable()) {
+                throw e;
+            }
+            // try again, version table was not ok
+            return lastUpdateSucceededImpl();
+        }
+    }
+
+
+    /**
+     * Notifies the VersionSource of the fact that the lastest version update has succeeded or not.
+     * The version table will be created (or altered) if needed.
+     */
+    public void registerUpdateSucceeded(boolean succeeded) throws StatementHandlerException {
+        try {
+            registerUpdateSucceededImpl(succeeded);
+
+        } catch (UnitilsException e) {
+            if (checkVersionTable()) {
+                throw e;
+            }
+            // try again, version table was not ok
+            registerUpdateSucceededImpl(succeeded);
+        }
+    }
+
+
+    /**
+     * @return The current version of the database
+     */
+    private Version getDbVersionImpl() throws StatementHandlerException {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
         try {
             conn = dataSource.getConnection();
-            checkVersionTable(conn);
             st = conn.createStatement();
             rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " + versionTableName);
             rs.next();
@@ -110,17 +183,21 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      *
      * @param version The new version that the database should be updated to
      */
-    public void setDbVersion(Version version) throws StatementHandlerException {
+    private void setDbVersionImpl(Version version) throws StatementHandlerException {
         Connection conn = null;
+        Statement st = null;
         try {
             conn = dataSource.getConnection();
-            checkVersionTable(conn);
-            statementHandler.handle("update " + versionTableName + " set " + versionIndexColumnName + " = " + version.getIndex() + ", " +
-                    versionTimestampColumnName + " = " + version.getTimeStamp());
+            st = conn.createStatement();
+            int updateCount = st.executeUpdate("update " + versionTableName + " set " + versionIndexColumnName + " = " + version.getIndex() + ", " + versionTimestampColumnName + " = " + version.getTimeStamp());
+            if (updateCount != 1) {
+                throw new UnitilsException("Error while setting database version. There should be exactly 1 version record, found " + updateCount);
+            }
+
         } catch (SQLException e) {
-            throw new UnitilsException("Error while incrementing database version", e);
+            throw new UnitilsException("Error while setting database version", e);
         } finally {
-            DbUtils.closeQuietly(conn);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
@@ -128,9 +205,9 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
     /**
      * Tells us whether the last database version update succeeded or not
      *
-     * @return true if the last database version update succeeded, false otherwise
+     * @return True if the last database version update succeeded, false otherwise
      */
-    public boolean lastUpdateSucceeded() {
+    private boolean lastUpdateSucceededImpl() {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -153,18 +230,24 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
 
     /**
      * Notifies the VersionSource of the fact that the lastest version update has succeeded or not
+     *
+     * @param succeeded True for success
      */
-    public void registerUpdateSucceeded(boolean succeeded) throws StatementHandlerException {
+    private void registerUpdateSucceededImpl(boolean succeeded) throws StatementHandlerException {
         Connection conn = null;
+        Statement st = null;
         try {
             conn = dataSource.getConnection();
-            checkVersionTable(conn);
-            statementHandler.handle("update " + versionTableName + " set " + lastUpdateSucceededColumnName + " = " + (succeeded ? "1" : "0"));
+            st = conn.createStatement();
+            int updateCount = st.executeUpdate("update " + versionTableName + " set " + lastUpdateSucceededColumnName + " = " + (succeeded ? "1" : "0"));
+            if (updateCount != 1) {
+                throw new UnitilsException("Error while registering update succeeded. There should be exactly 1 version record, found " + updateCount);
+            }
 
         } catch (SQLException e) {
-            throw new UnitilsException("Error while registering database update success = " + succeeded, e);
+            throw new UnitilsException("Error while registering update succeeded.", e);
         } finally {
-            DbUtils.closeQuietly(conn);
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
@@ -173,22 +256,17 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      * Checks if the version table and columns are available and if a record exists in which the version info is stored.
      * If not, the table, columns and record are created.
      *
-     * @param connection The connection to the database, will not be closed, not null
+     * @return False if the version table was not ok and therefore updated or created
      */
-    protected void checkVersionTable(Connection connection) throws StatementHandlerException {
-
-        // only perform check once, skip if already checked
-        if (versionTableChecked) {
-            return;
-        }
-        versionTableChecked = true;
-
+    private boolean checkVersionTable() {
+        Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
         try {
-            st = connection.createStatement();
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
             // Check if the version table exists
-            DatabaseMetaData metadata = connection.getMetaData();
+            DatabaseMetaData metadata = conn.getMetaData();
             rs = metadata.getTables(null, schemaName, versionTableName, null);
             String longDataType = dbSupport.getLongDataType();
             if (!rs.next()) {
@@ -227,11 +305,16 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
                 // The version table is empty. Insert a record with default version numbers.
                 statementHandler.handle("insert into " + versionTableName + " (" + versionIndexColumnName + ", " +
                         versionTimestampColumnName + ", " + lastUpdateSucceededColumnName + ") values (0, 0, 0)");
+            } else {
+                // version table was ok
+                return true;
             }
-        } catch (SQLException e) {
+            return false;
+
+        } catch (Exception e) {
             throw new UnitilsException("Error while checking version table", e);
         } finally {
-            DbUtils.closeQuietly(null, st, rs);
+            DbUtils.closeQuietly(conn, st, rs);
         }
     }
 }

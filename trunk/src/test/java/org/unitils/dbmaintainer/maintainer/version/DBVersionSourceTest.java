@@ -86,12 +86,14 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
     }
 
+
     /**
      * Tests retrieval of the version, when the table is still empty (first use)
      */
     public void testGetDBVersion_emptyTable() throws Exception {
         assertRefEquals(new Version(0L, 0L), dbVersionSource.getDbVersion());
     }
+
 
     /**
      * Test normal retrieval of the version
@@ -102,6 +104,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         assertRefEquals(expectedVersion, dbVersionSource.getDbVersion());
     }
 
+
     /**
      * Tests setting the version
      */
@@ -111,12 +114,14 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         assertRefEquals(version, dbVersionSource.getDbVersion());
     }
 
+
     /**
      * Tests whether the dbVersion can be correctly set when the db_version table is empty
      */
     public void testSetDBVersion_emptyTable() throws Exception {
         testSetDBVersion();
     }
+
 
     /**
      * Test whether the update succeeded value can be correclty set and retrieved, when succeeded is true
@@ -125,6 +130,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         dbVersionSource.registerUpdateSucceeded(true);
         assertTrue(dbVersionSource.lastUpdateSucceeded());
     }
+
 
     /**
      * Test whether the update succeeded value can be correclty set and retrieved, when succeeded is false

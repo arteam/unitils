@@ -23,13 +23,16 @@ import org.unitils.dbmaintainer.handler.StatementHandlerException;
  * the lastest database update succeeded.
  *
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public interface VersionSource {
+
 
     /**
      * @return The current version of the database
      */
     Version getDbVersion() throws StatementHandlerException;
+
 
     /**
      * Updates the version of the database to the given value
@@ -38,6 +41,7 @@ public interface VersionSource {
      */
     void setDbVersion(Version version) throws StatementHandlerException;
 
+
     /**
      * Tells us whether the last database version update succeeded or not
      *
@@ -45,8 +49,11 @@ public interface VersionSource {
      */
     boolean lastUpdateSucceeded();
 
+
     /**
      * Notifies the VersionSource of the fact that the lastest version update has succeeded or not
+     *
+     * @param succeeded True for success
      */
     void registerUpdateSucceeded(boolean succeeded) throws StatementHandlerException;
 }
