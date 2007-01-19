@@ -16,9 +16,9 @@
 package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-import org.unitils.dbmaintainer.util.SQLScriptParser;
+import org.unitils.dbmaintainer.script.StatementHandler;
+import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.dbmaintainer.script.impl.SQLScriptParser;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -238,12 +238,14 @@ abstract public class DbSupport {
      */
     abstract public boolean supportsSequences();
 
+
     /**
      * Indicates whether the underlying DBMS supports triggers
      *
      * @return true if triggers are supported, false otherwise
      */
     abstract public boolean supportsTriggers();
+
 
     /**
      * Indicates whether the underlying DBMS supports identity columns
@@ -330,6 +332,7 @@ abstract public class DbSupport {
                 }
             }
             return notNullColumnNames;
+
         } finally {
             DbUtils.closeQuietly(conn, null, rs);
         }
@@ -374,6 +377,7 @@ abstract public class DbSupport {
             rs = st.executeQuery("select count(*) from " + tableName);
             rs.next();
             return rs.getLong(1);
+
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }
@@ -396,7 +400,6 @@ abstract public class DbSupport {
      * @return The statements, not null
      */
     public List<String> parseStatements(String script) {
-
         SQLScriptParser sqlScriptParser = new SQLScriptParser();
         return sqlScriptParser.parseStatements(script);
     }
@@ -421,6 +424,7 @@ abstract public class DbSupport {
                 tableNames.add(tableName);
             }
             return tableNames;
+
         } finally {
             DbUtils.closeQuietly(conn, null, rset);
         }

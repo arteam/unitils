@@ -16,7 +16,7 @@
 package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,16 +34,16 @@ import java.util.Set;
  */
 public class Db2DbSupport extends DbSupport {
 
-    public Db2DbSupport() {
-    }
 
     public Set<String> getSequenceNames() throws SQLException {
         return getDbItemsOfType("SEQNAME", "SYSSEQUENCES", "SEQSCHEMA");
     }
 
+
     public Set<String> getTriggerNames() throws SQLException {
         return getDbItemsOfType("NAME", "SYSTRIGGERS", "SCHEMA");
     }
+
 
     public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         Connection conn = null;
@@ -55,6 +55,7 @@ public class Db2DbSupport extends DbSupport {
             rs = st.executeQuery("VALUES PREVVAL FOR " + sequenceName);
             rs.next();
             return rs.getLong("1");
+
         } catch (SQLException e) {
             return 0;
         } finally {
@@ -62,10 +63,12 @@ public class Db2DbSupport extends DbSupport {
         }
     }
 
+
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         statementHandler.handle("ALTER SEQUENCE " + sequenceName + " RESTART WITH " + newSequenceValue);
         statementHandler.handle("VALUES NEXTVAL FOR " + sequenceName);
     }
+
 
     public boolean supportsSequences() {
         return true;
@@ -75,21 +78,26 @@ public class Db2DbSupport extends DbSupport {
         return true;
     }
 
+
     public boolean supportsIdentityColumns() {
         return true;
     }
+
 
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         // Not possible to manually set the identity column to a specific value in DB2
     }
 
+
     public void disableForeignKeyConstraintsCheckingOnConnection(Connection conn) {
         throw new UnsupportedOperationException("DB2 doesn't simple disabling of constraints checking on a connection");
     }
 
+
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         throw new UnsupportedOperationException("Removal of not null constraints is not supported for DB2");
     }
+
 
     public Set<String> getTableConstraintNames(String tableName) throws SQLException {
         Connection conn = null;
@@ -109,13 +117,16 @@ public class Db2DbSupport extends DbSupport {
         }
     }
 
+
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         statementHandler.handle("alter table " + tableName + " drop constraint " + constraintName);
     }
 
+
     public String getLongDataType() {
         return "BIGINT";
     }
+
 
     private Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
         Connection conn = null;
@@ -124,13 +135,13 @@ public class Db2DbSupport extends DbSupport {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rset = st.executeQuery("select " + dbItemColumnName + " from SYSIBM."
-                    + systemMetadataTableName + " where " + schemaColumnName + " = '" + schemaName + "'");
+            rset = st.executeQuery("select " + dbItemColumnName + " from SYSIBM." + systemMetadataTableName + " where " + schemaColumnName + " = '" + schemaName + "'");
             Set<String> names = new HashSet<String>();
             while (rset.next()) {
                 names.add(rset.getString(dbItemColumnName).toUpperCase());
             }
             return names;
+
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }

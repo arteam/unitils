@@ -18,7 +18,7 @@ package org.unitils.dbmaintainer.util;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.util.ConfigUtils;
 
 import javax.sql.DataSource;
@@ -54,7 +54,6 @@ public class DatabaseModuleConfigUtils {
      * @return The configured instance
      */
     public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
-
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         DatabaseTask instance = ConfigUtils.getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
         DbSupport dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
@@ -72,7 +71,6 @@ public class DatabaseModuleConfigUtils {
      * @return The dbms specific instance of {@link DbSupport}
      */
     public static DbSupport getConfiguredDbSupportInstance(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
-
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         DbSupport dbSupport = ConfigUtils.getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
         String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
@@ -89,7 +87,6 @@ public class DatabaseModuleConfigUtils {
      * @return Returns the configured instance of {@link StatementHandler}
      */
     public static StatementHandler getConfiguredStatementHandlerInstance(Configuration configuration, DataSource dataSource) {
-
         StatementHandler st = ConfigUtils.getConfiguredInstance(StatementHandler.class, configuration);
         st.init(configuration, dataSource);
         return st;

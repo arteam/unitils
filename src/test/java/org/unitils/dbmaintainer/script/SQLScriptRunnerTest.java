@@ -18,7 +18,7 @@ package org.unitils.dbmaintainer.script;
 import org.apache.commons.configuration.Configuration;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.RegularMock;

@@ -19,7 +19,7 @@ import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -88,6 +88,7 @@ public class HsqldbDbSupport extends DbSupport {
         return true;
     }
 
+
     public boolean supportsTriggers() {
         return true;
     }
@@ -142,7 +143,7 @@ public class HsqldbDbSupport extends DbSupport {
     }
 
 
-    private Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
+    protected Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
         Connection conn = null;
         ResultSet rset = null;
         Statement st = null;
@@ -156,6 +157,7 @@ public class HsqldbDbSupport extends DbSupport {
                 names.add(rset.getString(dbItemColumnName).toUpperCase());
             }
             return names;
+
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }

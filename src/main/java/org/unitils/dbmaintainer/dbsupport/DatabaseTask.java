@@ -16,7 +16,7 @@
 package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.configuration.Configuration;
-import org.unitils.dbmaintainer.handler.StatementHandler;
+import org.unitils.dbmaintainer.script.StatementHandler;
 
 import javax.sql.DataSource;
 
