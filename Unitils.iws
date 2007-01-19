@@ -18,129 +18,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\constraints\ConstraintsDisablerTest.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/OracleStyleConstraintsDisabler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl/LoggingStatementHandlerDecorator.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\handler\StatementHandler.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\handler\FileStatementHandler.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/DBMaintainerTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\handler\LoggingStatementHandlerDecorator.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsCheckDisablingDataSourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsCheckDisablingDataSourceTest.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\DBMaintainer.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\script\FileScriptSource.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\VersionScriptPair.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\clear\DefaultDBClearer.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\dtd\FlatXmlDataSetDtdGeneratorTest.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/sequences" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/ConstraintsCheckDisablingDataSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/ConstraintsCheckDisablingDataSource.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\sequences\DefaultSequenceUpdater.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\maintainer\version\DBVersionSourceTest.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/FlatXmlDataSetDtdGenerator.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\structure\OracleStyleConstraintsDisabler.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/MySqlDBClearerTest.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clear\OracleDBClearerTest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\script\ScriptSource.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl/FileScriptSource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DatabaseTask.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DatabaseTask.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/VersionSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/VersionSource.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/FileScriptSourceTest.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsDisablerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsDisablerTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/DBClearer.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/impl/DBVersionSource.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DB2DBClearerTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/FlatXmlDataSetDtdGeneratorTest.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\version\VersionSource.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\maintainer\script\FileScriptSourceTest.properties" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\ant\UpdateDatabaseTask.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/script" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\clean\DefaultDBCleaner.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/OracleDBClearerTest.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\clear\DBClearer.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\maintainer\DBMaintainerTest.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/ConstraintsDisabler.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/ConstraintsDisabler.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\version\DBVersionSource.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clear" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl/JDBCStatementHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\constraints\ConstraintsCheckDisablingDataSourceTest.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseModuleConfigUtils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseModuleConfigUtils.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/HsqldbTestTrigger.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\constraints\ConstraintsDisabler.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clear\DB2DBClearerTest.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/MySqlStyleConstraintsDisabler.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\ant\DBUnitDTDTask.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\util\SQLScriptParser.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\constraints\ConstraintsCheckDisablingDataSource.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\ant\BaseUnitilsTask.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\handler\JDBCStatementHandler.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clear" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\structure\MySqlStyleConstraintsDisabler.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\sequences\SequenceUpdaterTest.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/constraints" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\version\DBVersionSource.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\dtd\FlatXmlDataSetDtdGenerator.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/DefaultSequenceUpdater.java" />
       <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\version\Version.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/DBMaintainer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/Version.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/Version.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\maintainer\script\002_script.sql" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\script\SQLScriptRunner.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/ScriptRunner.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/ScriptRunner.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clear\MySqlDBClearerTest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\maintainer\version\DBVersionSourceTest.versionTableEmpty.xml" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/VersionScriptPair.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/StatementHandler.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/ant" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/002_script.sql" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clear\HsqldbDBClearerTest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\constraints\OracleStyleConstraintsDisabler.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\maintainer\script\FileScriptSourceTest.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/constraints" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\ant\ClearDatabaseTask.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl/StatementHandlerException.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\handler\StatementHandlerException.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/001_script.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl/FileStatementHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/DBCleaner.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/DBCleaner.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\version" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/DtdGenerator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clear\DBClearerTest.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/maintainer/version" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clear\HsqldbTestTrigger.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/HsqldbDBClearerTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl/SQLScriptRunner.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl/SQLScriptParser.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\sequences\SequenceUpdater.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/FileScriptSourceTest.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\maintainer\script\001_script.sql" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\maintainer\version\DBVersionSourceTest.versionTableFilled.xml" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/ScriptSource.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/SequenceUpdater.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\dtd\DtdGenerator.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/impl" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\constraints\MySqlStyleConstraintsDisabler.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\script\FileScriptSource.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\version\VersionSource.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\version\DBVersionSource.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\maintainer\script\ScriptSource.java" afterPath="" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -305,7 +187,7 @@
       <file leaf-file-name="MySqlDBClearerTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/MySqlDBClearerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="5" selection-start="939" selection-end="939" vertical-scroll-proportion="0.7801147">
+            <state line="31" column="5" selection-start="939" selection-end="939" vertical-scroll-proportion="0.3957323">
               <folding />
             </state>
           </provider>
@@ -314,7 +196,7 @@
       <file leaf-file-name="OracleDBClearerTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/OracleDBClearerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="43" column="0" selection-start="1527" selection-end="1527" vertical-scroll-proportion="1.1701721">
+            <state line="43" column="0" selection-start="1527" selection-end="1527" vertical-scroll-proportion="0.5935984">
               <folding />
             </state>
           </provider>
@@ -323,7 +205,7 @@
       <file leaf-file-name="FileScriptSourceTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/FileScriptSourceTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="97" column="0" selection-start="3684" selection-end="3684" vertical-scroll-proportion="1.4311024">
+            <state line="97" column="0" selection-start="3684" selection-end="3684" vertical-scroll-proportion="0.7155512">
               <folding />
             </state>
           </provider>
@@ -332,7 +214,7 @@
       <file leaf-file-name="SQLScriptRunnerTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="190" column="13" selection-start="7374" selection-end="7374" vertical-scroll-proportion="1.7992126">
+            <state line="190" column="13" selection-start="7374" selection-end="7374" vertical-scroll-proportion="0.8996063">
               <folding />
             </state>
           </provider>
@@ -341,7 +223,7 @@
       <file leaf-file-name="ConstraintsCheckDisablingDataSourceTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsCheckDisablingDataSourceTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="84" column="0" selection-start="2829" selection-end="2829" vertical-scroll-proportion="1.765748">
+            <state line="84" column="0" selection-start="2829" selection-end="2829" vertical-scroll-proportion="0.882874">
               <folding />
             </state>
           </provider>
@@ -350,7 +232,7 @@
       <file leaf-file-name="ConstraintsDisablerTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsDisablerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="208" column="13" selection-start="6881" selection-end="6881" vertical-scroll-proportion="1.7762907">
+            <state line="208" column="13" selection-start="6881" selection-end="6881" vertical-scroll-proportion="0.9010669">
               <folding />
             </state>
           </provider>
@@ -359,7 +241,7 @@
       <file leaf-file-name="FlatXmlDataSetDtdGeneratorTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/FlatXmlDataSetDtdGeneratorTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="139" column="13" selection-start="4405" selection-end="4405" vertical-scroll-proportion="1.7992126">
+            <state line="139" column="13" selection-start="4405" selection-end="4405" vertical-scroll-proportion="0.8996063">
               <folding />
             </state>
           </provider>
@@ -368,7 +250,7 @@
       <file leaf-file-name="SequenceUpdaterTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="234" column="13" selection-start="7675" selection-end="7675" vertical-scroll-proportion="1.7992126">
+            <state line="234" column="13" selection-start="7675" selection-end="7675" vertical-scroll-proportion="0.8996063">
               <folding />
             </state>
           </provider>
@@ -377,7 +259,7 @@
       <file leaf-file-name="DBVersionSourceTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="183" column="13" selection-start="6283" selection-end="6283" vertical-scroll-proportion="1.7992126">
+            <state line="183" column="13" selection-start="6283" selection-end="6283" vertical-scroll-proportion="0.8996063">
               <folding />
             </state>
           </provider>
@@ -386,7 +268,7 @@
       <file leaf-file-name="DBMaintainerTest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/DBMaintainerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="191" column="26" selection-start="7137" selection-end="7137" vertical-scroll-proportion="0.44359463">
+            <state line="191" column="26" selection-start="7137" selection-end="7137" vertical-scroll-proportion="0.22502425">
               <folding />
             </state>
           </provider>
@@ -789,124 +671,6 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\version" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\version" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\version\impl" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\util" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
     </subPane>
   </component>
   <component name="ProjectReloadState">
@@ -1244,7 +1008,7 @@
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3291639" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32685184" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.35747203" order="0" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.35747203" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32685184" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24753127" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.49166667" order="11" />
@@ -1254,7 +1018,7 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25345623" order="1" x="59" y="60" width="1515" height="1080" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32888466" order="8" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.46388888" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.46388888" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24950625" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="4" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35833332" order="4" />
@@ -1390,70 +1154,70 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/MySqlDBClearerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="5" selection-start="939" selection-end="939" vertical-scroll-proportion="0.7801147">
+        <state line="31" column="5" selection-start="939" selection-end="939" vertical-scroll-proportion="0.3957323">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/OracleDBClearerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="0" selection-start="1527" selection-end="1527" vertical-scroll-proportion="1.1701721">
+        <state line="43" column="0" selection-start="1527" selection-end="1527" vertical-scroll-proportion="0.5935984">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/FileScriptSourceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="97" column="0" selection-start="3684" selection-end="3684" vertical-scroll-proportion="1.4311024">
+        <state line="97" column="0" selection-start="3684" selection-end="3684" vertical-scroll-proportion="0.7155512">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="190" column="13" selection-start="7374" selection-end="7374" vertical-scroll-proportion="1.7992126">
+        <state line="190" column="13" selection-start="7374" selection-end="7374" vertical-scroll-proportion="0.8996063">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsCheckDisablingDataSourceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="0" selection-start="2829" selection-end="2829" vertical-scroll-proportion="1.765748">
+        <state line="84" column="0" selection-start="2829" selection-end="2829" vertical-scroll-proportion="0.882874">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsDisablerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="208" column="13" selection-start="6881" selection-end="6881" vertical-scroll-proportion="1.7762907">
+        <state line="208" column="13" selection-start="6881" selection-end="6881" vertical-scroll-proportion="0.9010669">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/FlatXmlDataSetDtdGeneratorTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="139" column="13" selection-start="4405" selection-end="4405" vertical-scroll-proportion="1.7992126">
+        <state line="139" column="13" selection-start="4405" selection-end="4405" vertical-scroll-proportion="0.8996063">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="234" column="13" selection-start="7675" selection-end="7675" vertical-scroll-proportion="1.7992126">
+        <state line="234" column="13" selection-start="7675" selection-end="7675" vertical-scroll-proportion="0.8996063">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="183" column="13" selection-start="6283" selection-end="6283" vertical-scroll-proportion="1.7992126">
+        <state line="183" column="13" selection-start="6283" selection-end="6283" vertical-scroll-proportion="0.8996063">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/DBMaintainerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="191" column="26" selection-start="7137" selection-end="7137" vertical-scroll-proportion="0.44359463">
+        <state line="191" column="26" selection-start="7137" selection-end="7137" vertical-scroll-proportion="0.22502425">
           <folding />
         </state>
       </provider>
