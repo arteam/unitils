@@ -21,7 +21,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import org.unitils.spring.annotation.CreateSpringApplicationContext;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
 import java.util.List;
@@ -51,11 +50,33 @@ public class SpringModuleApplicationContextTest extends TestCase {
 
 
     /**
-     * Tests creating an application context using SpringApplicationContext
+     * Tests creating an application context using SpringApplicationContext on class level
      */
     public void testGetApplicationContext() {
         SpringTest springTest = new SpringTest();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTest);
+
+        assertNotNull(applicationContext);
+    }
+
+
+    /**
+     * Tests creating an application context using SpringApplicationContext on field level
+     */
+    public void testGetApplicationContext_field() {
+        SpringTestField springTestField = new SpringTestField();
+        ApplicationContext applicationContext = springModule.getApplicationContext(springTestField);
+
+        assertNotNull(applicationContext);
+    }
+
+
+    /**
+     * Tests creating an application context using SpringApplicationContext on field level
+     */
+    public void testGetApplicationContext_setter() {
+        SpringTestSetter springTestSetter = new SpringTestSetter();
+        ApplicationContext applicationContext = springModule.getApplicationContext(springTestSetter);
 
         assertNotNull(applicationContext);
     }
@@ -90,7 +111,10 @@ public class SpringModuleApplicationContextTest extends TestCase {
         SpringTestMixing springTestMixing = new SpringTestMixing();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestMixing);
 
-        assertNotNull(applicationContext);
+        assertNotNull(applicationContext); // setter
+        assertNotNull(applicationContext.getParent()); // field 2
+        assertNotNull(applicationContext.getParent().getParent()); // field 1
+        assertNotNull(applicationContext.getParent().getParent().getParent()); // class
         assertTrue(springTestMixing.createMethod1Called);
         assertTrue(springTestMixing.createMethod2Called);
     }
@@ -130,11 +154,31 @@ public class SpringModuleApplicationContextTest extends TestCase {
     }
 
     /**
+     * Test SpringTest class with field level locations.
+     */
+    private class SpringTestField {
+
+        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml", "classpath:org/unitils/spring/services-config.xml"})
+        protected ApplicationContext field = null;
+
+    }
+
+    /**
+     * Test SpringTest class with setter level locations.
+     */
+    private class SpringTestSetter {
+
+        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml", "classpath:org/unitils/spring/services-config.xml"})
+        public void setField(ApplicationContext field) {
+        }
+    }
+
+    /**
      * Test SpringTest class with a custom create method.
      */
     private class SpringTestCreateMethod {
 
-        @CreateSpringApplicationContext
+        @SpringApplicationContext
         protected ApplicationContext createMethod() {
             return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
         }
@@ -145,7 +189,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
      */
     private class SpringTestCreateMethodWithApplicationContext {
 
-        @CreateSpringApplicationContext
+        @SpringApplicationContext
         protected ApplicationContext createMethod(ApplicationContext applicationContext) {
             assertNull(applicationContext);
             return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
@@ -153,26 +197,39 @@ public class SpringModuleApplicationContextTest extends TestCase {
     }
 
     /**
-     * Test SpringTest class with a custom create method.
+     * Test SpringTest class mixin class, field, setter and custom create methods.
+     * First the class level should be created, then a context for field1 with the class level as parent
+     * then for field2 with the previous a parent, then the setter context with the previous as parent
+     * and finally createMethod1 and createMethod2 should be called.
      */
     @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
     private class SpringTestMixing {
 
-        protected boolean createMethod1Called = false;
-        protected boolean createMethod2Called = false;
+        private boolean createMethod1Called = false;
+        private boolean createMethod2Called = false;
 
-        @CreateSpringApplicationContext
+        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
+        protected ApplicationContext field1;
+
+        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
+        protected ApplicationContext field2;
+
+        @SpringApplicationContext
         protected ApplicationContext createMethod1(ApplicationContext applicationContext) {
             assertNotNull(applicationContext);
             createMethod1Called = true;
             return applicationContext;
         }
 
-        @CreateSpringApplicationContext
+        @SpringApplicationContext
         protected ApplicationContext createMethod2(ApplicationContext applicationContext) {
             assertNotNull(applicationContext);
             createMethod2Called = true;
             return applicationContext;
+        }
+
+        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
+        public void setField(ApplicationContext applicationContext) {
         }
     }
 
@@ -181,7 +238,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
      */
     private class SpringTestCreateMethodWrongSignature {
 
-        @CreateSpringApplicationContext
+        @SpringApplicationContext
         protected List createMethod(String a) {
             return null;
         }

@@ -369,7 +369,7 @@ public class ReflectionUtils {
      * @param method The method to check, not null
      * @return True if the given method is a setter, false otherwise
      */
-    private static boolean isSetter(Method method) {
+    public static boolean isSetter(Method method) {
         String methodName = method.getName();
         if (methodName.length() > 3 && method.getName().startsWith("set") && method.getParameterTypes().length == 1) {
             String fourthLetter = methodName.substring(3, 4);
