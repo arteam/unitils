@@ -34,7 +34,7 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SpringModuleTest extends TestCase {
+public class SpringModuleSpringBeansTest extends TestCase {
 
     /* Tested object */
     private SpringModule springModule;
@@ -59,7 +59,7 @@ public class SpringModuleTest extends TestCase {
         SpringTest springTest = new SpringTest();
         springModule.assignSpringBeans(springTest);
 
-        assertTrue(springTest.testBean instanceof String);
+        assertNotNull(springTest.testBean);
     }
 
 

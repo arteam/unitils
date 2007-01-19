@@ -19,7 +19,6 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.springframework.context.ApplicationContext;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.spring.annotation.CreateSpringApplicationContext;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
 /**
@@ -99,7 +98,7 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
 
         protected boolean createMethod1Called = false;
 
-        @CreateSpringApplicationContext
+        @SpringApplicationContext
         protected ApplicationContext createMethod1(ApplicationContext applicationContext) {
             createMethod1Called = true;
             return applicationContext;
@@ -114,7 +113,7 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
 
         protected boolean createMethod2Called = false;
 
-        @CreateSpringApplicationContext
+        @SpringApplicationContext
         protected ApplicationContext createMethod2(ApplicationContext applicationContext) {
             createMethod2Called = true;
             return applicationContext;
