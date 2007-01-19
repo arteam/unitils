@@ -15,22 +15,36 @@
  */
 package org.unitils.dbmaintainer.script;
 
+import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
+import javax.sql.DataSource;
+
 /**
- * Defines the contract for an executer of a database update script.
+ * Defines the contract for classes that handle SQL statements. E.g. by logging these statements or by executing them
+ * on a database.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface ScriptRunner {
+public interface StatementHandler {
 
 
     /**
-     * Executes the given script
+     * Provides a <code>Configuration</code> and a <code>TestDataSource</code> object for initialization
      *
-     * @param script The script as a string, not null
+     * @param configuration The config, not null
+     * @param dataSource    The data source, not null
      */
-    void execute(String script) throws StatementHandlerException;
+    void init(Configuration configuration, DataSource dataSource);
+
+
+    /**
+     * Handles the given SQL statement
+     *
+     * @param statement The SQL statement
+     * @throws StatementHandlerException If the statement could not org handled correctly
+     */
+    void handle(String statement) throws StatementHandlerException;
 
 }

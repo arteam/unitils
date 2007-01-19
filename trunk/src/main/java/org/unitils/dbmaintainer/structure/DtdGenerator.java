@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.clean;
-
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+package org.unitils.dbmaintainer.structure;
 
 /**
- * Defines the contract for implementations that delete data from the database, that could cause problems when performing
- * updates to the database, such as adding not null columns or foreign key constraints.
+ * Defines the contract for implementations that create a DTD that describes a database. This DTD can
+ * be used in XML files containing test data for a unit test database
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DBCleaner {
+public interface DtdGenerator {
 
 
     /**
-     * Delete data from the database, that could cause problems when performing updates.
+     * Generates the DTD
      */
-    void cleanDatabase() throws StatementHandlerException;
+    void generateDtd();
 
 }

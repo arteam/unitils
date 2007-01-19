@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -49,6 +49,7 @@ public class MySqlDbSupport extends DbSupport {
                 names.add(rset.getString("TABLE_NAME").toUpperCase());
             }
             return names;
+
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }
@@ -70,6 +71,7 @@ public class MySqlDbSupport extends DbSupport {
                 names.add(rset.getString("TABLE_NAME").toUpperCase());
             }
             return names;
+
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }
@@ -126,6 +128,7 @@ public class MySqlDbSupport extends DbSupport {
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
             statementHandler.handle("alter table " + tableName + " AUTO_INCREMENT = " + identityValue);
+
         } catch (StatementHandlerException e) {
             throw new UnitilsException(e);
         }
@@ -137,6 +140,7 @@ public class MySqlDbSupport extends DbSupport {
         try {
             st = conn.createStatement();
             st.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
+
         } catch (SQLException e) {
             throw new UnitilsException("Error while disabling constraints", e);
         } finally {
@@ -166,7 +170,7 @@ public class MySqlDbSupport extends DbSupport {
     }
 
 
-    private Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
+    protected Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
         Connection conn = null;
         ResultSet rset = null;
         Statement st = null;
@@ -181,13 +185,14 @@ public class MySqlDbSupport extends DbSupport {
                 names.add(rset.getString(dbItemColumnName).toUpperCase());
             }
             return names;
+
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }
     }
 
 
-    private String getColumnType(String tableName, String columnName) {
+    protected String getColumnType(String tableName, String columnName) {
         String type = null;
         Connection conn = null;
         ResultSet rset = null;

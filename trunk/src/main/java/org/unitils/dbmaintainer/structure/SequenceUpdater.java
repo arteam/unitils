@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.clean;
+package org.unitils.dbmaintainer.structure;
 
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 /**
- * Defines the contract for implementations that delete data from the database, that could cause problems when performing
- * updates to the database, such as adding not null columns or foreign key constraints.
+ * Defines the contract for implementation classes that update all sequences and identity columns of a database to
+ * a sufficiently high value, so that test data be inserted easily.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DBCleaner {
+public interface SequenceUpdater {
 
 
     /**
-     * Delete data from the database, that could cause problems when performing updates.
+     * Updates all database sequences and identity columns to a sufficiently high value, so that test data be inserted
+     * easily.
      */
-    void cleanDatabase() throws StatementHandlerException;
+    void updateSequences() throws StatementHandlerException;
 
 }

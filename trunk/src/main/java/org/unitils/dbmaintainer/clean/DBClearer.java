@@ -18,18 +18,18 @@ package org.unitils.dbmaintainer.clean;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 /**
- * Defines the contract for implementations that delete data from the database, that could cause problems when performing
- * updates to the database, such as adding not null columns or foreign key constraints.
+ * Defines the contract for implementations that clear a database schema, so that it can be recreated from scratch by
+ * the {@link org.unitils.dbmaintainer.DBMaintainer}
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DBCleaner {
+public interface DBClearer {
 
 
     /**
-     * Delete data from the database, that could cause problems when performing updates.
+     * Clears the database schema.
      */
-    void cleanDatabase() throws StatementHandlerException;
+    void clearDatabase() throws StatementHandlerException;
 
 }

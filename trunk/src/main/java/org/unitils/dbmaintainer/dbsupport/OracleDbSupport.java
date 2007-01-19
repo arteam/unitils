@@ -16,7 +16,7 @@
 package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
+import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

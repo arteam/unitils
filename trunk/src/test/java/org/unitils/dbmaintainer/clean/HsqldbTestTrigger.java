@@ -15,21 +15,18 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.hsqldb.Trigger;
 
 /**
- * Defines the contract for implementations that delete data from the database, that could cause problems when performing
- * updates to the database, such as adding not null columns or foreign key constraints.
+ * Test trigger for testing that the HsqldbDbClearer correctly removes trigger from the database.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DBCleaner {
+public class HsqldbTestTrigger implements Trigger {
 
 
-    /**
-     * Delete data from the database, that could cause problems when performing updates.
-     */
-    void cleanDatabase() throws StatementHandlerException;
+    public void fire(int i, String string, String string1, Object[] objects, Object[] objects1) {
+    }
 
 }
