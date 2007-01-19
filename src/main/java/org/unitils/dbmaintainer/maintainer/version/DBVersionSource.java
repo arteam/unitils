@@ -167,7 +167,9 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " + versionTableName);
-            rs.next();
+            if (!rs.next()) {
+                throw new UnitilsException("Error while getting database version. No version record found.");
+            }
             return new Version(rs.getLong(versionIndexColumnName), rs.getLong(versionTimestampColumnName));
 
         } catch (SQLException e) {
@@ -193,7 +195,6 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             if (updateCount != 1) {
                 throw new UnitilsException("Error while setting database version. There should be exactly 1 version record, found " + updateCount);
             }
-
         } catch (SQLException e) {
             throw new UnitilsException("Error while setting database version", e);
         } finally {
@@ -215,11 +216,11 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             rs = st.executeQuery("select " + lastUpdateSucceededColumnName + " from " + versionTableName);
-            if (rs.next()) {
-                return (rs.getInt(lastUpdateSucceededColumnName) == 1);
-            } else {
-                return false;
+            if (!rs.next()) {
+                throw new UnitilsException("Error while checking last database update succeeded. No version record found.");
             }
+            return (rs.getInt(lastUpdateSucceededColumnName) == 1);
+
         } catch (SQLException e) {
             throw new UnitilsException("Error while checking whether last update succeeded", e);
         } finally {
@@ -243,7 +244,6 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             if (updateCount != 1) {
                 throw new UnitilsException("Error while registering update succeeded. There should be exactly 1 version record, found " + updateCount);
             }
-
         } catch (SQLException e) {
             throw new UnitilsException("Error while registering update succeeded.", e);
         } finally {

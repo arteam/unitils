@@ -18,9 +18,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/ExpectedDataSet.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/ExpectedDataSet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -44,7 +43,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169214964441" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169215222292" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -191,10 +190,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ExpectedDataSet.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ExpectedDataSet.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/ExpectedDataSet.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="74" column="10" selection-start="2984" selection-end="2984" vertical-scroll-proportion="1.3733826">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DBVersionSource.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="118" column="0" selection-start="5151" selection-end="5151" vertical-scroll-proportion="0.032319393">
               <folding />
             </state>
           </provider>
@@ -1648,13 +1656,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="117" column="0" selection-start="5145" selection-end="5145" vertical-scroll-proportion="0.3328125">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/DBMaintainer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="199" column="38" selection-start="10116" selection-end="10116" vertical-scroll-proportion="0.3453125">
@@ -1672,6 +1673,13 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/ExpectedDataSet.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="74" column="10" selection-start="2984" selection-end="2984" vertical-scroll-proportion="1.3733826">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/maintainer/version/DBVersionSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="118" column="0" selection-start="5151" selection-end="5151" vertical-scroll-proportion="0.032319393">
           <folding />
         </state>
       </provider>
