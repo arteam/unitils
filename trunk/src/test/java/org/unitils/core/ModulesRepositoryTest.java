@@ -25,6 +25,9 @@ import java.util.List;
 
 /**
  * Test for {@link ModulesRepositoryTest}.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ModulesRepositoryTest extends TestCase {
 
@@ -57,7 +60,6 @@ public class ModulesRepositoryTest extends TestCase {
      * Test initialisation of repository and creation of all test listeners for the modules.
      */
     public void testCreateListeners() {
-
         assertEquals(3, modulesRepository.getTestListeners().size());
         assertTrue(modulesRepository.getTestListener(testModule1a) instanceof TestModule1.TestListener1);
         assertTrue(modulesRepository.getTestListener(testModule1b) instanceof TestModule1.TestListener1);
@@ -70,26 +72,28 @@ public class ModulesRepositoryTest extends TestCase {
      * should be found first.
      */
     public void testGetModuleOfType_subType() {
-
         TestModule1 result = modulesRepository.getModuleOfType(TestModule2.class);
         assertLenEquals(testModule2, result);
     }
 
 
     /**
-     * Tests getting the first module of type DatabaseModule, but none found. Null should be returned.
+     * Tests getting the first module of type DatabaseModule, but none found.
      */
     public void testGetModuleOfType_noneFound() {
-
-        DatabaseModule result = modulesRepository.getModuleOfType(DatabaseModule.class);
-        assertNull(result);
+        try {
+            modulesRepository.getModuleOfType(DatabaseModule.class);
+            fail("A UnitilsException should have been thrown");
+        } catch (UnitilsException e) {
+            // Expected
+        }
     }
+
 
     /**
      * Tests getting the first module of type TestModule2
      */
     public void testGetModuleOfType_moreThanOneFound() {
-
         try {
             modulesRepository.getModuleOfType(TestModule1.class);
             fail("A UnitilsException should have been thrown");
@@ -103,7 +107,6 @@ public class ModulesRepositoryTest extends TestCase {
      * Tests getting all modules of type TestModule2.
      */
     public void testGetModulesOfType() {
-
         List<TestModule1> result = modulesRepository.getModulesOfType(TestModule1.class);
         assertLenEquals(Arrays.asList(testModule1a, testModule1b, testModule2), result);
     }
@@ -114,7 +117,6 @@ public class ModulesRepositoryTest extends TestCase {
      * should also be found.
      */
     public void testGetModulesOfType_subType() {
-
         List<TestModule2> result = modulesRepository.getModulesOfType(TestModule2.class);
         assertLenEquals(Arrays.asList(testModule2), result);
     }
@@ -124,7 +126,6 @@ public class ModulesRepositoryTest extends TestCase {
      * Tests getting all module of type DatabaseModule, but none found. An empty list should be returned.
      */
     public void testGetModulesOfType_noneFound() {
-
         List<DatabaseModule> result = modulesRepository.getModulesOfType(DatabaseModule.class);
         assertTrue(result.isEmpty());
     }
