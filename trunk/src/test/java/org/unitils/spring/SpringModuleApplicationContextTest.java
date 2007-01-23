@@ -147,6 +147,20 @@ public class SpringModuleApplicationContextTest extends TestCase {
 
 
     /**
+     * Tests creating an application context for an unknown location.
+     */
+    public void testGetHibernateConfiguration_wrongLocation() {
+        SpringTestWrongLocation springTestWrongLocation = new SpringTestWrongLocation();
+        try {
+            springModule.getApplicationContext(springTestWrongLocation);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            // expected
+        }
+    }
+
+
+    /**
      * Test SpringTest class with class level locations.
      */
     @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml", "classpath:org/unitils/spring/services-config.xml"})
@@ -242,6 +256,13 @@ public class SpringModuleApplicationContextTest extends TestCase {
         protected List createMethod(String a) {
             return null;
         }
+    }
+
+    /**
+     * Class level configuration a wrong location specified.
+     */
+    @SpringApplicationContext("xxxxxxx")
+    public class SpringTestWrongLocation {
     }
 
 }
