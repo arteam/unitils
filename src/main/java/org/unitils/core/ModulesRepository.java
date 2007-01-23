@@ -68,11 +68,10 @@ public class ModulesRepository {
 
     /**
      * Gets the modules that is of the given type or a sub-type.
-     * <p/>
-     * todo throw exception when module not found
+     * A UnitilsException is thrown when there is not exactly 1 possible match.
      *
      * @param type the type, not null
-     * @return the module, null if not found
+     * @return the module, not null
      */
     public <T extends Module> T getModuleOfType(Class<T> type) {
         List<T> modulesOfType = getModulesOfType(type);
@@ -81,7 +80,7 @@ public class ModulesRepository {
         } else if (modulesOfType.size() == 1) {
             return modulesOfType.get(0);
         } else {
-            return null;
+            throw new UnitilsException("No module found of type " + type.getName());
         }
     }
 

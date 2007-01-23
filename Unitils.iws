@@ -18,7 +18,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/ModulesRepository.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/ModulesRepository.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/core/ModulesRepositoryTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/core/ModulesRepositoryTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
@@ -43,7 +44,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169585345894" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169586048835" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -184,7 +185,25 @@
       <file leaf-file-name="DbUnitModule.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="336" column="38" selection-start="14583" selection-end="14602" vertical-scroll-proportion="0.29980657">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ModulesRepository.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ModulesRepository.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="47" column="6" selection-start="1330" selection-end="1330" vertical-scroll-proportion="0.7130601">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ModulesRepositoryTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/ModulesRepositoryTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -906,14 +925,14 @@
     </key>
   </component>
   <component name="RestoreUpdateTree" />
-  <component name="RunManager" selected="JUnit.SpringModuleApplicationContextTest">
-    <tempConfiguration default="false" name="SpringModuleApplicationContextTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="org.unitils.spring.*" />
+  <component name="RunManager" selected="JUnit.All in Unitils">
+    <tempConfiguration default="false" name="ModulesRepositoryTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="org.unitils.core.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.unitils.spring" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.spring.SpringModuleApplicationContextTest" />
+      <option name="PACKAGE_NAME" value="org.unitils.core" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.core.ModulesRepositoryTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -1335,20 +1354,6 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/annotation/HibernateSessionFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="18" selection-start="1514" selection-end="1514" vertical-scroll-proportion="0.51858914">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/_apps/java/hibernate-3.2/src/org/hibernate/SessionFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="212" column="65" selection-start="7962" selection-end="7962" vertical-scroll-proportion="0.7082936">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleInjectionTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="89" column="68" selection-start="3219" selection-end="3258" vertical-scroll-proportion="0.47817653">
@@ -1439,9 +1444,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/ModulesRepositoryTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ModulesRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="47" column="6" selection-start="1330" selection-end="1330" vertical-scroll-proportion="0.7130601">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="336" column="38" selection-start="14583" selection-end="14602" vertical-scroll-proportion="0.29980657">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
