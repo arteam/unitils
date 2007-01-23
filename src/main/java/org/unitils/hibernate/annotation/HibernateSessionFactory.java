@@ -22,6 +22,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
+ * todo javadoc
+ *
  * Annotation indicating that this field or method should be initialized with the Hibernate<code>SessionFactory</code> object
  * that can be used to create Hibernate <code>Session</code> object that provide a connection to the unit test database.
  * If a field is annotated, it should be of type <code>org.hibernate.SessionFactory</code>. If a method is annotated,

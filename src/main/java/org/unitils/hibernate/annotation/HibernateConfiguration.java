@@ -15,12 +15,14 @@
  */
 package org.unitils.hibernate.annotation;
 
-import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.*;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
+ * todo javadoc
+ * <p/>
  * Annotation indicating that this method creates and returns an instance of the <code>org.hibernate.cfg.Configuration</code>
  * The annotated method should one or more hibernate configuration files and optionally do some extra programmatic Hibernate
  * configuration, such as registering mapped classes. The returned configuration will be manipulated afterwards to make
@@ -30,7 +32,10 @@ import java.lang.annotation.Target;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@Target(METHOD)
+@Target({TYPE, FIELD, METHOD})
 @Retention(RUNTIME)
 public @interface HibernateConfiguration {
+
+    String[] value() default {};
+
 }
