@@ -336,8 +336,9 @@ public class DbUnitModule implements Module {
      */
     protected void closeJdbcConnection() {
         try {
-            getDbUnitDatabaseConnection().closeJdbcConnection();
-
+            if (dbUnitDatabaseConnection != null) {
+                dbUnitDatabaseConnection.closeJdbcConnection();
+            }
         } catch (SQLException e) {
             throw new UnitilsException("Error while closing connection", e);
         }
