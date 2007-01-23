@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.hibernate;
+package org.unitils.hibernate.util;
 
-import junit.framework.Assert;
-import org.apache.commons.lang.StringUtils;
+import static junit.framework.Assert.assertTrue;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
-import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 
 import java.sql.SQLException;
@@ -39,26 +37,7 @@ public class HibernateAssert {
 
 
     /**
-     * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method assumes
-     * that the {@link HibernateModule} is enabled and correctly configured.
-     */
-    public static void assertMappingToDatabase() {
-
-        Unitils unitils = Unitils.getInstance();
-        HibernateModule hibernateModule = unitils.getModulesRepository().getModuleOfType(HibernateModule.class);
-        Configuration configuration = hibernateModule.getHibernateConfiguration();
-        Session session = hibernateModule.getCurrentSession();
-        Dialect databaseDialect = getDatabaseDialect(configuration);
-
-        assertMappingToDatabase(configuration, session, databaseDialect);
-    }
-
-
-    /**
-     * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method does the
-     * same as {@link #assertMappingToDatabase} without parameters, but can also be used without the using the
-     * {@link HibernateModule} or the {@link org.unitils.database.DatabaseModule} (this means it can be used separately without
-     * using any other feature of Unitils).
+     * Checks if the mapping of the Hibernate managed objects with the database is still correct.
      *
      * @param configuration   The hibernate config, not null
      * @param session         The hibernate session, not null
@@ -74,7 +53,7 @@ public class HibernateAssert {
                 differences.add(line);
             }
         }
-        Assert.assertTrue("Found mismatches between Java objects and database tables. Applying following DDL statements to the " +
+        assertTrue("Found mismatches between Java objects and database tables. Applying following DDL statements to the " +
                 "database should resolve the problem: \n" + formatMessage(differences), differences.isEmpty());
     }
 
@@ -93,25 +72,6 @@ public class HibernateAssert {
             return configuration.generateSchemaUpdateScript(databaseDialect, dbm);
         } catch (SQLException e) {
             throw new UnitilsException("Could not retrieve database metadata", e);
-        }
-    }
-
-
-    /**
-     * Gets the database dialect from the Hibernate <code>Configuration</code.
-     *
-     * @param configuration The hibernate config, not null
-     * @return the databazse Dialect, not null
-     */
-    private static Dialect getDatabaseDialect(Configuration configuration) {
-        String dialectClassName = configuration.getProperty("hibernate.dialect");
-        if (StringUtils.isEmpty(dialectClassName)) {
-            throw new UnitilsException("Property hibernate.dialect not specified");
-        }
-        try {
-            return (Dialect) Class.forName(dialectClassName).newInstance();
-        } catch (Exception e) {
-            throw new UnitilsException("Could not instantiate dialect class " + dialectClassName, e);
         }
     }
 

@@ -133,7 +133,6 @@ public class SpringModule implements Module {
      * @param testObject The test instance, not null
      * @return The application context, not null
      */
-    @SuppressWarnings({"unchecked"})
     public ApplicationContext getApplicationContext(Object testObject) {
         // get or create context
         ApplicationContext applicationContext = getApplicationContext(testObject, testObject.getClass());
@@ -166,7 +165,7 @@ public class SpringModule implements Module {
             }
         }
 
-        // inject into methods annotated with @SpringApplicationContext
+        // inject into setter methods annotated with @SpringApplicationContext
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringApplicationContext.class, false);
         for (Method method : methods) {
             if (!(isSetter(method))) {
@@ -360,7 +359,7 @@ public class SpringModule implements Module {
 
 
     /**
-     * Creates an application context by calling all methods declared with @SpringApplicationContext.
+     * Creates an application context by calling all methods annotated with @SpringApplicationContext.
      * These methods should have one of following exact signatures:
      * <ul>
      * <li>ApplicationContext createMethodName() or</li>

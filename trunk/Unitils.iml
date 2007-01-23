@@ -37,7 +37,9 @@
           <root url="jar://$MODULE_DIR$/lib/hibernate-annotations-3.2.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../_apps/java/hibernate-3.2/src" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
@@ -181,7 +183,9 @@
           <root url="jar://$MODULE_DIR$/lib/hibernate3.2.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../_apps/java/hibernate-3.2/src" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
