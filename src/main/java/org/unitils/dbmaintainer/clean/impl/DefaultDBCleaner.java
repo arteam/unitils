@@ -24,7 +24,11 @@ import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
@@ -37,33 +41,41 @@ import java.util.*;
  */
 public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
 
+    /**
+     * Property key for the tables that should not be cleaned
+     */
+    public static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.cleanDb.tablesToPreserve";
+
+    /**
+     * Property key for the tables that should not be cleared (these tables should also not be cleaned
+     */
+    public static final String PROPKEY_DBCLEARER_ITEMSTOPRESERVE = "dbMaintainer.clearDb.itemsToPreserve";
+
+    /**
+     * The key of the property that specifies the name of the datase table in which the
+     * DB version is stored. This table should not be deleted
+     */
+    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
+
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBCleaner.class);
 
-    /* Property key for the tables that should not be cleaned */
-    public static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.cleanDb.tablesToPreserve";
-
-    /* Property key for the tables that should not be cleared (these tables should also not be cleaned */
-    public static final String PROPKEY_DBCLEARER_ITEMSTOPRESERVE = "dbMaintainer.clearDb.itemsToPreserve";
-
-    /* The key of the property that specifies the name of the datase table in which the
-* DB version is stored. This table should not be deleted */
-    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
-
-    /* The tables that should not be cleaned */
-    private Set<String> tablesToPreserve;
+    /**
+     * The tables that should not be cleaned
+     */
+    protected Set<String> tablesToPreserve;
 
 
     /**
      * Configures this object.
      *
-     * @param configuration the configuration, not null
+     * @param configuration The configuration, not null
      */
     protected void doInit(Configuration configuration) {
         tablesToPreserve = new HashSet<String>();
         tablesToPreserve.add(configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase());
-        tablesToPreserve.addAll(toUpperCaseList(Arrays.asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
-        tablesToPreserve.addAll(toUpperCaseList(Arrays.asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
+        tablesToPreserve.addAll(toUpperCaseTableNames(asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
+        tablesToPreserve.addAll(toUpperCaseTableNames(asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
     }
 
 
@@ -88,7 +100,7 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      *
      * @param tableNames The names of the tables that need to be cleared, not null
      */
-    private void clearTables(Set<String> tableNames) throws StatementHandlerException, SQLException {
+    protected void clearTables(Set<String> tableNames) throws StatementHandlerException, SQLException {
         for (String tableName : tableNames) {
             if (dbSupport.getRecordCount(tableName) > 0) {
                 statementHandler.handle("delete from " + tableName);
@@ -98,17 +110,24 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
 
 
     /**
-     * Converts the given list of strings to uppercase.
+     * Converts the given list of table names to uppercase. If a value is surrounded with double quotes (") it will
+     * not be converted. These values are treated as case sensitive table names.
      *
-     * @param strings The strings to uppercase, not null
-     * @return the given string list, converted to uppercase
+     * @param tableNames The names to uppercase, not null
+     * @return The names converted to uppercase if needed, not null
      */
-    private List<String> toUpperCaseList(List<String> strings) {
-        List<String> toUpperCaseList = new ArrayList<String>();
-        for (String string : strings) {
-            toUpperCaseList.add(string.toUpperCase());
+    protected List<String> toUpperCaseTableNames(List<String> tableNames) {
+        List<String> result = new ArrayList<String>();
+        for (String tableName : tableNames) {
+            if (tableName.startsWith("\"") && tableName.endsWith("\"")) {
+                // ignore values that are surrounded with double quotes
+                result.add(tableName);
+
+            } else {
+                result.add(tableName.toUpperCase());
+            }
         }
-        return toUpperCaseList;
+        return result;
     }
 
 }
