@@ -152,9 +152,8 @@ public class HibernateSessionManager {
 
     private static void initSessionFactory() {
         Configuration configuration = new AnnotationConfiguration();
-        configuration.addFile("hibernate.cfg.xml");
-        configuration.addFile("hibernate-mappedClasses.cfg.xml");
-        configuration.configure();
+        configuration.configure("hibernate.cfg.xml");
+        configuration.configure("hibernate-mappedClasses.cfg.xml");
         sessionFactory = configuration.buildSessionFactory();
     }
 
