@@ -188,6 +188,65 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
 
 
     /**
+     * Test reusing a configuration for the same class.
+     */
+    public void testGetHibernateConfiguration_twice() {
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+
+        assertNotNull(hibernateConfiguration1);
+        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
+        assertSame(hibernateConfiguration1, hibernateConfiguration2);
+    }
+
+
+    /**
+     * Test invalidating a cached configuration.
+     */
+    public void testInvalidateHibernateConfiguration() {
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+        hibernateModule.invalidateHibernateConfiguration();
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+
+        assertNotNull(hibernateConfiguration1);
+        assertNotNull(hibernateConfiguration2);
+        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
+        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration2.getProperty("name"));
+        assertNotSame(hibernateConfiguration1, hibernateConfiguration2);
+    }
+
+
+    /**
+     * Test invalidating a cached configuration using the class name.
+     */
+    public void testInvalidateHibernateConfiguration_classSpecified() {
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+        hibernateModule.invalidateHibernateConfiguration(HibernateTestClassLevel.class);
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+
+        assertNotNull(hibernateConfiguration1);
+        assertNotNull(hibernateConfiguration2);
+        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
+        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration2.getProperty("name"));
+        assertNotSame(hibernateConfiguration1, hibernateConfiguration2);
+    }
+
+
+    /**
+     * Test invalidating a cached configuration using a wrong class name.
+     */
+    public void testInvalidateHibernateConfiguration_otherClassSpecified() {
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+        hibernateModule.invalidateHibernateConfiguration(String.class, List.class);
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+
+        assertNotNull(hibernateConfiguration1);
+        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
+        assertSame(hibernateConfiguration1, hibernateConfiguration2);
+    }
+
+
+    /**
      * Class level configuration.
      */
     @HibernateConfiguration("org/unitils/hibernate/hibernate.cfg.xml")

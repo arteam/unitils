@@ -128,6 +128,51 @@ public class SpringModuleApplicationContextTest extends TestCase {
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
         ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
 
+        assertNotNull(applicationContext1);
+        assertSame(applicationContext1, applicationContext2);
+    }
+
+
+    /**
+     * Tests invalidating a cached application context.
+     */
+    public void testInvalidateApplicationContext() {
+        SpringTestMixing springTestMixing = new SpringTestMixing();
+        ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
+        springModule.invalidateApplicationContext();
+        ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
+
+        assertNotNull(applicationContext1);
+        assertNotNull(applicationContext2);
+        assertNotSame(applicationContext1, applicationContext2);
+    }
+
+
+    /**
+     * Tests invalidating a cached application context using the class name.
+     */
+    public void testInvalidateApplicationContext_classSpecified() {
+        SpringTestMixing springTestMixing = new SpringTestMixing();
+        ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
+        springModule.invalidateApplicationContext(SpringTestMixing.class);
+        ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
+
+        assertNotNull(applicationContext1);
+        assertNotNull(applicationContext2);
+        assertNotSame(applicationContext1, applicationContext2);
+    }
+
+
+    /**
+     * Tests invalidating a cached application context using a wrong class name.
+     */
+    public void testInvalidateApplicationContext_otherClassSpecified() {
+        SpringTestMixing springTestMixing = new SpringTestMixing();
+        ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
+        springModule.invalidateApplicationContext(String.class, List.class);
+        ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
+
+        assertNotNull(applicationContext1);
         assertSame(applicationContext1, applicationContext2);
     }
 

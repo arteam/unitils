@@ -64,7 +64,7 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
      * class should be used.
      */
     public void testGetHibernateConfiguration_onlyInSuperClass() {
-        HibernateTestNoCreation hibernateTestNoCreation = new HibernateTestNoCreation();
+        HibernateTestNoCreation1 hibernateTestNoCreation = new HibernateTestNoCreation1();
         Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(hibernateTestNoCreation);
 
         assertNotNull(hibernateConfiguration);
@@ -77,8 +77,8 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
      * Test reusing a configuration of a super class.
      */
     public void testGetHibernateConfiguration_twice() {
-        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestNoCreation());
-        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestNoCreation());
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestNoCreation1());
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestNoCreation2());
 
         assertNotNull(hibernateConfiguration1);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
@@ -116,11 +116,16 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
         }
     }
 
+    /**
+     * Test Hibernate sub-class without any context declaration.
+     */
+    private class HibernateTestNoCreation1 extends HibernateTestSuper {
+    }
 
     /**
      * Test Hibernate sub-class without any context declaration.
      */
-    private class HibernateTestNoCreation extends HibernateTestSuper {
+    private class HibernateTestNoCreation2 extends HibernateTestSuper {
     }
 
 }

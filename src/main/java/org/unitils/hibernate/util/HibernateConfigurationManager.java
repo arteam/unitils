@@ -19,13 +19,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import org.unitils.core.UnitilsException;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import org.unitils.util.ReflectionUtils;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.isSetter;
 
@@ -42,11 +42,29 @@ public class HibernateConfigurationManager {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(HibernateConfigurationManager.class);
 
-    /* All created hibernate configurations per class */
+    /**
+     * All created hibernate configurations per class
+     */
     protected Map<Class<?>, Configuration> hibernateConfigurations = new HashMap<Class<?>, Configuration>();
 
-    /* All created session factories per configuration */
+    /**
+     * All created session factories per configuration
+     */
     protected Map<Configuration, SessionFactory> hibernateSessionFactories = new HashMap<Configuration, SessionFactory>();
+
+    /* The class name to use when creating a hibernate configuration */
+    private String hibernateConfigurationImplClassName;
+
+
+    /**
+     * Creates a config manager that will use the given class name to create new configs when needed.
+     *
+     * @param hibernateConfigurationImplClassName
+     *         The class name, not null
+     */
+    public HibernateConfigurationManager(String hibernateConfigurationImplClassName) {
+        this.hibernateConfigurationImplClassName = hibernateConfigurationImplClassName;
+    }
 
 
     //todo javadoc
@@ -82,7 +100,24 @@ public class HibernateConfigurationManager {
         // store session factory
         hibernateSessionFactories.put(hibernateConfiguration, hibernateSessionFactory);
         return hibernateSessionFactory;
+    }
 
+
+    /**
+     * Forces the reloading of the hibernate configurations the next time that it is requested. If classes are given
+     * only hibernate configurations that are linked to those classes will be reset. If no classes are given, all cached
+     * hibernate configurations will be reset.
+     *
+     * @param classes The classes for which to reset the configs
+     */
+    public void invalidateHibernateConfiguration(Class<?>... classes) {
+        if (classes == null || classes.length == 0) {
+            hibernateConfigurations.clear();
+            return;
+        }
+        for (Class<?> clazz : classes) {
+            hibernateConfigurations.remove(clazz);
+        }
     }
 
 
@@ -218,18 +253,17 @@ public class HibernateConfigurationManager {
 
 
     /**
-     * Creates a hibernate configuration for the given locations.
-     * <p/>
-     * todo make configurable +javadoc
-     * <p/>
-     * A UnitilsException is thrown if the configuration could not be loaded.
+     * Creates a hibernate configuration for the given locations. If no locations are specified, the hibernate default
+     * (hibernate.cfg.xml) will be used. Which type of configuration will be created depends on the implementation
+     * class that was specified upon construction. A UnitilsException is thrown if the configuration could not be loaded.
      *
      * @param locations the file locations
      * @return The configuration, not null
      */
     protected Configuration createHibernateConfigurationForLocations(String[] locations) {
         try {
-            Configuration configuration = new AnnotationConfiguration();
+            // create instance
+            Configuration configuration = ReflectionUtils.createInstanceOfType(hibernateConfigurationImplClassName);
 
             // load default configuration if no locations were specified
             if (locations == null) {
