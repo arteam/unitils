@@ -20,11 +20,11 @@ import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -62,9 +62,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Configuration configuration = configurationLoader.loadConfiguration();
         configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "tabletopreserve");
 
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
-        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
+        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
+        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         dropTestTables();
         createTestTables();

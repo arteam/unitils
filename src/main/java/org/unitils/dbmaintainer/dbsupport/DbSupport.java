@@ -17,11 +17,12 @@ package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.dbmaintainer.script.StatementHandler;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.script.impl.SQLScriptParser;
+import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -121,7 +122,7 @@ abstract public class DbSupport {
         if (tableName == null) {
             return false;
         }
-        return getTableNames().contains(tableName.toUpperCase());
+        return getTableNames().contains(toUpperCaseName(tableName));
     }
 
 
@@ -135,7 +136,7 @@ abstract public class DbSupport {
         if (viewName == null) {
             return false;
         }
-        return getViewNames().contains(viewName.toUpperCase());
+        return getViewNames().contains(toUpperCaseName(viewName));
     }
 
 
@@ -149,7 +150,7 @@ abstract public class DbSupport {
         if (triggerName == null) {
             return false;
         }
-        return getTriggerNames().contains(triggerName.toUpperCase());
+        return getTriggerNames().contains(toUpperCaseName(triggerName));
     }
 
 
@@ -163,7 +164,7 @@ abstract public class DbSupport {
         if (sequenceName == null || !supportsSequences()) {
             return false;
         }
-        return getSequenceNames().contains(sequenceName.toUpperCase());
+        return getSequenceNames().contains(toUpperCaseName(sequenceName));
     }
 
 
@@ -402,6 +403,38 @@ abstract public class DbSupport {
     public List<String> parseStatements(String script) {
         SQLScriptParser sqlScriptParser = new SQLScriptParser();
         return sqlScriptParser.parseStatements(script);
+    }
+
+
+    /**
+     * Converts the given item name to uppercase. If the value is surrounded with double quotes (") it will
+     * not be converted. These items are treated as case sensitive names.
+     *
+     * @param name The name to uppercase, not null
+     * @return The name converted to uppercase if needed, not null
+     */
+    public String toUpperCaseName(String name) {
+        if (name.startsWith("\"") && name.endsWith("\"")) {
+            // ignore values that are surrounded with double quotes
+            return name;
+        }
+        return name.toUpperCase();
+    }
+
+
+    /**
+     * Converts the given list of item names to uppercase. If a value is surrounded with double quotes (") it will
+     * not be converted. These values are treated as case sensitive names.
+     *
+     * @param names The names to uppercase, not null
+     * @return The names converted to uppercase if needed, not null
+     */
+    public List<String> toUpperCaseNames(List<String> names) {
+        List<String> result = new ArrayList<String>();
+        for (String name : names) {
+            result.add(toUpperCaseName(name));
+        }
+        return result;
     }
 
 

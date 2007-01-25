@@ -24,10 +24,8 @@ import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -74,8 +72,8 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
     protected void doInit(Configuration configuration) {
         tablesToPreserve = new HashSet<String>();
         tablesToPreserve.add(configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase());
-        tablesToPreserve.addAll(toUpperCaseTableNames(asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
-        tablesToPreserve.addAll(toUpperCaseTableNames(asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
+        tablesToPreserve.addAll(dbSupport.toUpperCaseNames(asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
+        tablesToPreserve.addAll(dbSupport.toUpperCaseNames(asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
     }
 
 
@@ -106,28 +104,6 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
                 statementHandler.handle("delete from " + tableName);
             }
         }
-    }
-
-
-    /**
-     * Converts the given list of table names to uppercase. If a value is surrounded with double quotes (") it will
-     * not be converted. These values are treated as case sensitive table names.
-     *
-     * @param tableNames The names to uppercase, not null
-     * @return The names converted to uppercase if needed, not null
-     */
-    protected List<String> toUpperCaseTableNames(List<String> tableNames) {
-        List<String> result = new ArrayList<String>();
-        for (String tableName : tableNames) {
-            if (tableName.startsWith("\"") && tableName.endsWith("\"")) {
-                // ignore values that are surrounded with double quotes
-                result.add(tableName);
-
-            } else {
-                result.add(tableName.toUpperCase());
-            }
-        }
-        return result;
     }
 
 }
