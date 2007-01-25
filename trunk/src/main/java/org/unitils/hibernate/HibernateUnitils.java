@@ -18,10 +18,9 @@ package org.unitils.hibernate;
 import org.unitils.core.Unitils;
 
 /**
- * todo javadoc
- * Assert class that offers assert methods for testing things that are specific to Hibernate.
+ * Utility facade for handling Hibernate things such as asserting whether the mappings correspond to the actual
+ * structure of the database and for invalidating a cached configuration.
  *
- * @author Timmy Maris
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -37,6 +36,19 @@ public class HibernateUnitils {
     public static void assertMappingToDatabase(Object testObject) {
         HibernateModule hibernateModule = Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
         hibernateModule.assertMappingToDatabase(testObject);
+    }
+
+
+    /**
+     * Forces the reloading of the hibernate configurations the next time that it is requested. If classes are given
+     * only hibernate configurations that are linked to those classes will be reset. If no classes are given, all cached
+     * hibernate configurations will be reset.
+     *
+     * @param classes The classes for which to reset the configs, null for all configs
+     */
+    public static void invalidateHibernateConfiguration(Class<?>... classes) {
+        HibernateModule hibernateModule = Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
+        hibernateModule.invalidateHibernateConfiguration(classes);
     }
 
 }
