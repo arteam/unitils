@@ -16,6 +16,7 @@
 package org.unitils.hibernate;
 
 import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
 
 /**
  * Utility facade for handling Hibernate things such as asserting whether the mappings correspond to the actual
@@ -28,13 +29,17 @@ public class HibernateUnitils {
 
 
     /**
-     * Checks if the mapping of the Hibernate managed objects with the database is still correct. This method assumes
-     * that the {@link HibernateModule} is enabled and correctly configured.
-     *
-     * @param testObject The test instance, not null
+     * Checks if the mapping of the Hibernate managed objects with the database is still correct for the configurations
+     * that are loaded for the current test. This method assumes that the {@link HibernateModule} is enabled and
+     * correctly configured.
      */
-    public static void assertMappingToDatabase(Object testObject) {
-        HibernateModule hibernateModule = Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
+    public static void assertMappingToDatabase() {
+        Unitils unitils = Unitils.getInstance();
+        Object testObject = unitils.getTestContext().getTestObject();
+        if (testObject == null) {
+            throw new UnitilsException("Unable to assert hibernate mapping for current test. No current test found.");
+        }
+        HibernateModule hibernateModule = unitils.getModulesRepository().getModuleOfType(HibernateModule.class);
         hibernateModule.assertMappingToDatabase(testObject);
     }
 
