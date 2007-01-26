@@ -21,8 +21,8 @@ import ognl.DefaultMemberAccess;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
-import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
@@ -67,7 +67,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertLenEquals(Object expected, Object actual) throws AssertionFailedError {
-
         assertLenEquals(null, expected, actual);
     }
 
@@ -84,7 +83,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertRefEquals(Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
-
         assertRefEquals(null, expected, actual, modes);
     }
 
@@ -102,7 +100,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertLenEquals(String message, Object expected, Object actual) throws AssertionFailedError {
-
         assertRefEquals(message, expected, actual, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
 
@@ -120,7 +117,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertRefEquals(String message, Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
-
         ReflectionComparator reflectionComparator = new ReflectionComparator(modes);
         Difference difference = reflectionComparator.getDifference(expected, actual);
         if (difference != null) {
@@ -144,7 +140,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertPropertyLenEquals(String propertyName, Object expectedPropertyValue, Object actualObject) throws AssertionFailedError {
-
         assertPropertyLenEquals(null, propertyName, expectedPropertyValue, actualObject);
     }
 
@@ -164,7 +159,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertPropertyRefEquals(String propertyName, Object expectedPropertyValue, Object actualObject, ReflectionComparatorMode... modes) throws AssertionFailedError {
-
         assertPropertyRefEquals(null, propertyName, expectedPropertyValue, actualObject, modes);
     }
 
@@ -185,7 +179,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertPropertyLenEquals(String message, String propertyName, Object expectedPropertyValue, Object actualObject) throws AssertionFailedError {
-
         assertPropertyRefEquals(message, propertyName, expectedPropertyValue, actualObject, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
 
@@ -206,7 +199,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertPropertyRefEquals(String message, String propertyName, Object expectedPropertyValue, Object actualObject, ReflectionComparatorMode... modes) throws AssertionFailedError {
-
         Object propertyValue = getProperty(actualObject, propertyName);
         String formattedMessage = formatMessage(message, "Incorrect value for property: " + propertyName);
         assertRefEquals(formattedMessage, expectedPropertyValue, propertyValue, modes);
@@ -231,7 +223,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertPropertyLenEquals(String propertyName, Collection expectedPropertyValues, Collection actualObjects) throws AssertionFailedError {
-
         assertPropertyLenEquals(null, propertyName, expectedPropertyValues, actualObjects);
     }
 
@@ -254,7 +245,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertPropertyRefEquals(String propertyName, Collection expectedPropertyValues, Collection actualObjects, ReflectionComparatorMode... modes) throws AssertionFailedError {
-
         assertPropertyRefEquals(null, propertyName, expectedPropertyValues, actualObjects, modes);
     }
 
@@ -278,7 +268,6 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertPropertyLenEquals(String message, String propertyName, Collection expectedPropertyValues, Collection actualObjects) throws AssertionFailedError {
-
         assertPropertyRefEquals(message, propertyName, expectedPropertyValues, actualObjects, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
 
@@ -302,8 +291,7 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertPropertyRefEquals(String message, String propertyName, Collection expectedPropertyValues, Collection actualObjects, ReflectionComparatorMode... modes) throws AssertionFailedError {
-
-        Collection actualPropertyValues = CollectionUtils.collect(actualObjects, new BeanToPropertyValueTransformer(propertyName));
+        Collection actualPropertyValues = CollectionUtils.collect(actualObjects, new OgnlTransformer(propertyName));
         assertRefEquals(message, expectedPropertyValues, actualPropertyValues, modes);
     }
 
@@ -314,11 +302,10 @@ public class ReflectionAssert {
      * @param suppliedMessage the user supplied message
      * @param difference      the difference
      * @return the formatted message
-     *
-     * todo better output when left and right value are string arrays (now something like <[Ljava.lang.String;@1595f51>)
+     *         <p/>
+     *         todo better output when left and right value are string arrays (now something like <[Ljava.lang.String;@1595f51>)
      */
     private static String formatMessage(String suppliedMessage, Difference difference) {
-
         String result = formatMessage(suppliedMessage, difference.getMessage());
 
         String fieldString = difference.getFieldStackAsString();
@@ -341,16 +328,17 @@ public class ReflectionAssert {
      * @return the formatted message
      */
     private static String formatMessage(String suppliedMessage, String specificMessage) {
-
         if (StringUtils.isEmpty(suppliedMessage)) {
             return specificMessage;
         }
         return suppliedMessage + "\n" + specificMessage;
     }
 
+
     /**
-     * Evaluates the given OGNL expression, and returns the corresponding property value from the given object
-     * @param object The object on which the expression is evaluated
+     * Evaluates the given OGNL expression, and returns the corresponding property value from the given object.
+     *
+     * @param object         The object on which the expression is evaluated
      * @param ognlExpression The OGNL expression that is evaluated
      * @return The value for the given OGNL expression
      */
@@ -362,6 +350,39 @@ public class ReflectionAssert {
             return Ognl.getValue(ognlExprObj, ognlContext, object);
         } catch (OgnlException e) {
             throw new UnitilsException("Failed to get proerty value using OGNL expression " + ognlExpression, e);
+        }
+    }
+
+
+    /**
+     * A commons collections transformer that takes an object and returns the value of the property that is
+     * specified by the given ognl expression.
+     */
+    private static class OgnlTransformer implements Transformer {
+
+        /* The ognl expression */
+        private String ognlExpression;
+
+        /**
+         * Creates  a transformer with the given ognl expression.
+         *
+         * @param ognlExpression The expression, not null
+         */
+        public OgnlTransformer(String ognlExpression) {
+            this.ognlExpression = ognlExpression;
+        }
+
+        /**
+         * Transforms the given object in the value of the property that is specified by the ognl expression.
+         *
+         * @param object The object
+         * @return The value, null if object was null
+         */
+        public Object transform(Object object) {
+            if (object == null) {
+                return null;
+            }
+            return getProperty(object, ognlExpression);
         }
     }
 
