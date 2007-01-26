@@ -18,7 +18,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateUnitils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateUnitils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionAssert.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionAssert.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iml" afterPath="$PROJECT_DIR$/Unitils.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
@@ -43,7 +45,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169850056197" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169851636980" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -190,10 +192,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HibernateConfiguration.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="HibernateConfiguration.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/annotation/HibernateConfiguration.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="36" column="18" selection-start="1583" selection-end="1583" vertical-scroll-proportion="0.54413193">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pom.xml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="53" column="47" selection-start="1875" selection-end="1875" vertical-scroll-proportion="0.1483996">
               <folding />
             </state>
           </provider>
@@ -661,74 +672,6 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\spring" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\hibernate" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1220,33 +1163,12 @@
   </component>
   <component name="com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectRootMasterDetailsConfigurable" proportions="0.35875" version="1">
     <option name="myPlainMode" value="false" />
-    <option name="myLastEditedConfigurable" value="hibernate-annotations-3.2.jar" />
+    <option name="myLastEditedConfigurable" value="commons-collections-3.1.jar" />
   </component>
   <component name="com.intellij.profile.ui.ErrorOptionsConfigurable" proportions="0.16666667,0.5314286" version="1">
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/AnnotationUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="53" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/reflect/Method.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="199" column="20" selection-start="7279" selection-end="7279" vertical-scroll-proportion="0.29970902">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Void.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="40" selection-start="555" selection-end="559" vertical-scroll-proportion="0.6429725">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/_apps/java/hibernate-3.2/src/org/hibernate/cfg/Environment.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="160" column="88" selection-start="5919" selection-end="5954" vertical-scroll-proportion="0.33266532">
@@ -1331,6 +1253,29 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/annotation/HibernateConfiguration.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="36" column="18" selection-start="1583" selection-end="1583" vertical-scroll-proportion="0.54413193">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/ognl-2.6.9.jar!/ognl/Ognl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="35" selection-start="2616" selection-end="2616" vertical-scroll-proportion="0.33267716">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionAssert.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="26" selection-start="832" selection-end="832" vertical-scroll-proportion="0.31594488">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="53" column="47" selection-start="1875" selection-end="1875" vertical-scroll-proportion="0.1483996">
           <folding />
         </state>
       </provider>
