@@ -26,7 +26,6 @@ import org.unitils.spring.annotation.SpringBeanByType;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.isSetter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * todo javadoc
+ * A class for storing and creating Spring application contexts.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -54,16 +53,16 @@ public class SpringApplicationContextManager {
 
 
     /**
-     * Gets the application context for this test. A new one will be created if it does not exist yet. If a superclass
+     * Gets the application context for the given test. A new one will be created if it does not exist yet. If a superclass
      * has also declared the creation of an application context, this one will be retrieved (or created if it was not
      * created yet) and used as parent context for this classes context.
      * <p/>
-     * If needed, an application context will be created using the settings of the {@link org.unitils.spring.annotation.SpringApplicationContext}
+     * If needed, an application context will be created using the settings of the {@link SpringApplicationContext}
      * annotation.
      * <p/>
-     * If a class level {@link org.unitils.spring.annotation.SpringApplicationContext} annotation is found, the passed locations will be loaded using
+     * If a class level {@link SpringApplicationContext} annotation is found, the passed locations will be loaded using
      * a <code>ClassPathXmlApplicationContext</code>.
-     * Custom creation methods can be created by annotating them with {@link org.unitils.spring.annotation.SpringApplicationContext}. They
+     * Custom creation methods can be created by annotating them with {@link SpringApplicationContext}. They
      * should have an <code>ApplicationContext</code> as return type and either no or exactly 1 argument of type
      * <code>ApplicationContext</code>. In the latter case, the current configured application context is passed as the argument.
      * <p/>
@@ -252,13 +251,12 @@ public class SpringApplicationContextManager {
         // call all @SpringApplicationContext methods passing current application context if requested
         List<Method> methods = getMethodsAnnotatedWith(testClass, SpringApplicationContext.class, false);
         for (Method method : methods) {
-
             // create contexts if a location is specified
             SpringApplicationContext springApplicationContextAnnotation = method.getAnnotation(SpringApplicationContext.class);
             applicationContext = createApplicationContext(springApplicationContextAnnotation.value(), applicationContext);
 
             // do not invoke setter methods
-            if (isSetter(method)) {
+            if (method.getReturnType() == Void.TYPE) {
                 continue;
             }
             Class<?>[] argumentTypes = method.getParameterTypes();

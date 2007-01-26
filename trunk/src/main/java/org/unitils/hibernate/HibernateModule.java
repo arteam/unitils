@@ -36,7 +36,8 @@ import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.util.AnnotationUtils;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.*;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -213,7 +214,8 @@ public class HibernateModule implements Module, Flushable {
         // inject into setter methods annotated with @HibernateConfiguration
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), HibernateConfiguration.class, false);
         for (Method method : methods) {
-            if (!(isSetter(method))) {
+            // ignore custom create methods
+            if (method.getReturnType() != Void.TYPE) {
                 continue;
             }
             try {
