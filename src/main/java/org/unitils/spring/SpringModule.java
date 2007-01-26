@@ -28,7 +28,8 @@ import org.unitils.spring.annotation.SpringBeanByType;
 import org.unitils.spring.util.SpringApplicationContextManager;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.*;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -166,7 +167,8 @@ public class SpringModule implements Module {
         // inject into setter methods annotated with @SpringApplicationContext
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringApplicationContext.class, false);
         for (Method method : methods) {
-            if (!(isSetter(method))) {
+            // ignore custom create methods
+            if (method.getReturnType() != Void.TYPE) {
                 continue;
             }
             try {
