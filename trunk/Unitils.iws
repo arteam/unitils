@@ -18,7 +18,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionAssert.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionAssert.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\lib\jta.jar" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\lib\ant-1.6.5.jar" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\lib\commons-beanutils-1.7.0.jar" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iml" afterPath="$PROJECT_DIR$/Unitils.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
@@ -45,7 +47,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169851636980" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169889692587" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -186,7 +188,7 @@
       <file leaf-file-name="HibernateModuleConfigurationInheritanceTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationInheritanceTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="16" selection-start="593" selection-end="593" vertical-scroll-proportion="0.21435499">
+            <state line="13" column="16" selection-start="593" selection-end="593" vertical-scroll-proportion="0.44827586">
               <folding />
             </state>
           </provider>
@@ -195,16 +197,25 @@
       <file leaf-file-name="HibernateConfiguration.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/annotation/HibernateConfiguration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="18" selection-start="1583" selection-end="1583" vertical-scroll-proportion="0.54413193">
+            <state line="36" column="18" selection-start="1583" selection-end="1583" vertical-scroll-proportion="1.137931">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pom.xml" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="53" column="47" selection-start="1875" selection-end="1875" vertical-scroll-proportion="0.1483996">
+            <state line="265" column="14" selection-start="9473" selection-end="9473" vertical-scroll-proportion="0.4016227">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ReflectionAssertTest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="23" column="38" selection-start="963" selection-end="963" vertical-scroll-proportion="0.33263597">
               <folding />
             </state>
           </provider>
@@ -213,7 +224,7 @@
       <file leaf-file-name="Unitils.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="82" column="16" selection-start="2096" selection-end="2096" vertical-scroll-proportion="0.24733269">
+            <state line="82" column="16" selection-start="2096" selection-end="2096" vertical-scroll-proportion="0.51724136">
               <folding />
             </state>
           </provider>
@@ -222,7 +233,7 @@
       <file leaf-file-name="HibernateConfigurationManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateConfigurationManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="35" selection-start="1452" selection-end="1452" vertical-scroll-proportion="0.38484251">
+            <state line="36" column="35" selection-start="1452" selection-end="1452" vertical-scroll-proportion="0.8179916">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -233,7 +244,7 @@
       <file leaf-file-name="SpringApplicationContextManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/SpringApplicationContextManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="46" selection-start="1537" selection-end="1537" vertical-scroll-proportion="0.33464566">
+            <state line="38" column="46" selection-start="1537" selection-end="1537" vertical-scroll-proportion="0.7112971">
               <folding />
             </state>
           </provider>
@@ -1052,7 +1063,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="30" y="-4" width="1574" height="1208" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
@@ -1061,7 +1072,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.35747203" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32685184" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24753127" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.49166667" order="11" />
+      <window_info id="Messages" active="true" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.49166667" order="11" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39961758" order="6" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="9" />
@@ -1071,7 +1082,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.46388888" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24950625" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="4" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35833332" order="4" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35833332" order="4" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="10" />
@@ -1163,19 +1174,12 @@
   </component>
   <component name="com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectRootMasterDetailsConfigurable" proportions="0.35875" version="1">
     <option name="myPlainMode" value="false" />
-    <option name="myLastEditedConfigurable" value="commons-collections-3.1.jar" />
+    <option name="myLastEditedConfigurable" value="junit-addons-1.4.jar" />
   </component>
   <component name="com.intellij.profile.ui.ErrorOptionsConfigurable" proportions="0.16666667,0.5314286" version="1">
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://D:/_apps/java/hibernate-3.2/src/org/hibernate/cfg/Environment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="160" column="88" selection-start="5919" selection-end="5954" vertical-scroll-proportion="0.33266532">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="23" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
@@ -1185,14 +1189,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/SpringApplicationContextManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="46" selection-start="1537" selection-end="1537" vertical-scroll-proportion="0.33464566">
+        <state line="38" column="46" selection-start="1537" selection-end="1537" vertical-scroll-proportion="0.7112971">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateConfigurationManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="35" selection-start="1452" selection-end="1452" vertical-scroll-proportion="0.38484251">
+        <state line="36" column="35" selection-start="1452" selection-end="1452" vertical-scroll-proportion="0.8179916">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1201,7 +1205,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationInheritanceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="16" selection-start="593" selection-end="593" vertical-scroll-proportion="0.21435499">
+        <state line="13" column="16" selection-start="593" selection-end="593" vertical-scroll-proportion="0.44827586">
           <folding />
         </state>
       </provider>
@@ -1215,7 +1219,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="82" column="16" selection-start="2096" selection-end="2096" vertical-scroll-proportion="0.24733269">
+        <state line="82" column="16" selection-start="2096" selection-end="2096" vertical-scroll-proportion="0.51724136">
           <folding />
         </state>
       </provider>
@@ -1252,7 +1256,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/annotation/HibernateConfiguration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="18" selection-start="1583" selection-end="1583" vertical-scroll-proportion="0.54413193">
+        <state line="36" column="18" selection-start="1583" selection-end="1583" vertical-scroll-proportion="1.137931">
           <folding />
         </state>
       </provider>
@@ -1275,7 +1279,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="47" selection-start="1875" selection-end="1875" vertical-scroll-proportion="0.1483996">
+        <state line="265" column="14" selection-start="9473" selection-end="9473" vertical-scroll-proportion="0.4016227">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="38" selection-start="963" selection-end="963" vertical-scroll-proportion="0.33263597">
           <folding />
         </state>
       </provider>
