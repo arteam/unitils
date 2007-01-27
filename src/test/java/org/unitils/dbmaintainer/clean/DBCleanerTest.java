@@ -130,22 +130,22 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             try {
-                dbSupport.dropView("testview");
+                dbSupport.dropView("TESTVIEW");
             } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                dbSupport.dropTable("tabletoclean");
+                dbSupport.dropTable("TABLETOCLEAN");
             } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                dbSupport.dropTable("db_version");
+                dbSupport.dropTable("DB_VERSION");
             } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                dbSupport.dropTable("tabletopreserve");
+                dbSupport.dropTable("TABLETOPRESERVE");
             } catch (StatementHandlerException e) {
                 // Ignored
             }

@@ -16,6 +16,7 @@
 package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.configuration.Configuration;
+import static org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -23,9 +24,13 @@ import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -72,8 +77,8 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
     protected void doInit(Configuration configuration) {
         tablesToPreserve = new HashSet<String>();
         tablesToPreserve.add(configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase());
-        tablesToPreserve.addAll(dbSupport.toUpperCaseNames(asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
-        tablesToPreserve.addAll(dbSupport.toUpperCaseNames(asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
+        tablesToPreserve.addAll(toUpperCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
+        tablesToPreserve.addAll(toUpperCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
     }
 
 
@@ -83,10 +88,16 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      */
     public void cleanDatabase() throws StatementHandlerException {
         try {
-            logger.info("Cleaning database tables");
-            Set<String> tables = dbSupport.getTableNames();
-            tables.removeAll(tablesToPreserve);
-            clearTables(tables);
+            logger.info("Cleaning database tables.");
+
+            Set<String> tableNames = dbSupport.getTableNames();
+            for (String tableName : tableNames) {
+                // check whether table needs to be preserved
+                if (tablesToPreserve.contains(tableName)) {
+                    continue;
+                }
+                cleanTable(tableName);
+            }
         } catch (SQLException e) {
             throw new UnitilsException("Error while cleaning database", e);
         }
@@ -94,16 +105,46 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
 
 
     /**
-     * Deletes the data in the database tables with the given table names.
+     * Deletes the data in the table with the given name.
+     * Note: the table name is surrounded with quotes, to make sure that
+     * case-sensitive table names are also deleted correctly.
      *
-     * @param tableNames The names of the tables that need to be cleared, not null
+     * @param tableName The name of the table that need to be cleared, not null
      */
-    protected void clearTables(Set<String> tableNames) throws StatementHandlerException, SQLException {
-        for (String tableName : tableNames) {
-            if (dbSupport.getRecordCount(tableName) > 0) {
-                statementHandler.handle("delete from " + tableName);
-            }
+    protected void cleanTable(String tableName) throws StatementHandlerException, SQLException {
+        logger.debug("Cleaning database table: " + tableName);
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            st.executeUpdate("delete from \"" + tableName + "\"");
+
+        } finally {
+            closeQuietly(conn, st, null);
         }
     }
+
+
+    /**
+     * Converts the given list of identifiers to uppercase. If a value is surrounded with double quotes (") it will
+     * not be converted and the double quotes will be stripped. These values are treated as case sensitive names.
+     *
+     * @param identifiers The names to uppercase, not null
+     * @return The names converted to uppercase if needed, not null
+     */
+    protected List<String> toUpperCaseIdentifiers(List<String> identifiers) {
+        List<String> result = new ArrayList<String>();
+        for (String identifier : identifiers) {
+            identifier = identifier.trim();
+            if (identifier.startsWith("\"") && identifier.endsWith("\"")) {
+                result.add(identifier.substring(1, identifier.length() - 1));
+            } else {
+                result.add(identifier.toUpperCase());
+            }
+        }
+        return result;
+    }
+
 
 }

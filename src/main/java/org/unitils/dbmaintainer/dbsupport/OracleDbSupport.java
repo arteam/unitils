@@ -34,28 +34,56 @@ import java.util.Set;
 public class OracleDbSupport extends DbSupport {
 
 
+    /**
+     * Retrieves the names of all the sequences in the database schema.
+     *
+     * @return The names of all sequences in the database
+     */
     public Set<String> getSequenceNames() throws SQLException {
-        return getDbItemsOfType("SEQUENCE_NAME", "USER_SEQUENCES");
+        return getOracleIdentifiers("SEQUENCE_NAME", "USER_SEQUENCES");
     }
 
 
+    /**
+     * Retrieves the names of all the triggers in the database schema.
+     *
+     * @return The names of all triggers in the database
+     */
     public Set<String> getTriggerNames() throws SQLException {
-        return getDbItemsOfType("TRIGGER_NAME", "USER_TRIGGERS");
+        return getOracleIdentifiers("TRIGGER_NAME", "USER_TRIGGERS");
     }
 
 
-    public void dropView(String viewName) throws StatementHandlerException {
-        String dropTableSQL = "drop view " + viewName + " cascade constraints";
-        statementHandler.handle(dropTableSQL);
-    }
-
-
+    /**
+     * Removes the table with the given name from the database.
+     * Note: the table name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param tableName The table to drop (case-sensitive), not null
+     */
     public void dropTable(String tableName) throws StatementHandlerException {
-        String dropTableSQL = "drop table " + tableName + " cascade constraints";
+        String dropTableSQL = "drop table \"" + tableName + "\" cascade constraints";
         statementHandler.handle(dropTableSQL);
     }
 
 
+    /**
+     * Removes the view with the given name from the database
+     * Note: the view name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param viewName The view to drop (case-sensitive), not null
+     */
+    public void dropView(String viewName) throws StatementHandlerException {
+        String dropTableSQL = "drop view \"" + viewName + "\" cascade constraints";
+        statementHandler.handle(dropTableSQL);
+    }
+
+
+    /**
+     * Returns the value of the sequence with the given name
+     *
+     * @param sequenceName The sequence, not null
+     * @return The value of the sequence with the given name
+     */
     public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -72,6 +100,12 @@ public class OracleDbSupport extends DbSupport {
     }
 
 
+    /**
+     * Sets the next value of the sequence with the given sequence name to the given sequence value.
+     *
+     * @param sequenceName     The sequence, not null
+     * @param newSequenceValue The value to set
+     */
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException, SQLException {
         Connection conn = null;
         ResultSet rs = null;
@@ -83,12 +117,11 @@ public class OracleDbSupport extends DbSupport {
             while (rs.next()) {
                 long lastNumber = rs.getLong("LAST_NUMBER");
                 long incrementBy = rs.getLong("INCREMENT_BY");
-                String sqlChangeIncrement = "alter sequence " + sequenceName + " increment by " +
-                        (newSequenceValue - lastNumber);
+                String sqlChangeIncrement = "alter sequence \"" + sequenceName + "\" increment by " + (newSequenceValue - lastNumber);
                 statementHandler.handle(sqlChangeIncrement);
-                String sqlNextSequenceValue = "select " + sequenceName + ".NEXTVAL from DUAL";
+                String sqlNextSequenceValue = "select \"" + sequenceName + "\".NEXTVAL from DUAL";
                 statementHandler.handle(sqlNextSequenceValue);
-                String sqlResetIncrement = "alter sequence " + sequenceName + " increment by " + incrementBy;
+                String sqlResetIncrement = "alter sequence \"" + sequenceName + "\" increment by " + incrementBy;
                 statementHandler.handle(sqlResetIncrement);
             }
         } finally {
@@ -97,36 +130,76 @@ public class OracleDbSupport extends DbSupport {
     }
 
 
+    /**
+     * Sequences are supported.
+     *
+     * @return True
+     */
     public boolean supportsSequences() {
         return true;
     }
 
 
+    /**
+     * Triggers are supported.
+     *
+     * @return True
+     */
     public boolean supportsTriggers() {
         return true;
     }
 
 
+    /**
+     * Identity columns are not supported.
+     *
+     * @return False
+     */
     public boolean supportsIdentityColumns() {
         return false;
     }
 
 
+    /**
+     * Identity columns are not supported: an UnsupportedOperationException will be raised.
+     *
+     * @param tableName            The table with the identity column, not null
+     * @param primaryKeyColumnName The column, not null
+     * @param identityValue        The new value
+     */
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         throw new UnsupportedOperationException("Oracle doesn't support identity columns");
     }
 
 
-    public void disableForeignKeyConstraintsCheckingOnConnection(Connection conn) {
-        throw new UnsupportedOperationException("Oracle doesn't simple disabling of constraints checking on a connection");
+    /**
+     * Simple disabling of constraints checking on a connection is not supported: an
+     * UnsupportedOperationException will be raised.
+     *
+     * @param connection The database connection, not null
+     */
+    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
+        throw new UnsupportedOperationException("Oracle doesn't support simple disabling of constraints checking on a connection");
     }
 
 
+    /**
+     * Removal of not null constraints is not supported: an UnsupportedOperationException will be raised.
+     *
+     * @param tableName  The table with the column, not null
+     * @param columnName The column to remove constraints from, not null
+     */
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         throw new UnsupportedOperationException("Removal of not null constraints is not supported for Oracle");
     }
 
 
+    /**
+     * Returns the foreign key and not null constraint names that are enabled/enforced for the table with the given name
+     *
+     * @param tableName The table, not null
+     * @return The set of constraint names, not null
+     */
     public Set<String> getTableConstraintNames(String tableName) throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -147,27 +220,45 @@ public class OracleDbSupport extends DbSupport {
     }
 
 
+    /**
+     * Disables the constraint with the given name on table with the given name.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
-        statementHandler.handle("alter table " + tableName + " disable constraint " + constraintName);
+        statementHandler.handle("alter table \"" + tableName + "\" disable constraint " + constraintName);
     }
 
 
+    /**
+     * Gets the column type suitable to store values of the Java <code>java.lang.Long</code> type.
+     *
+     * @return The column type
+     */
     public String getLongDataType() {
         return "INTEGER";
     }
 
 
-    private Set<String> getDbItemsOfType(String dbItemName, String systemMetadataTableName) throws SQLException {
+    /**
+     * Returns the the idendtifiers for the given type (sequence names, trigger names)
+     *
+     * @param identifierName          The type of identifier: SEQUENCE_NAME or TRIGGER_NAME
+     * @param systemMetadataTableName The meta data table to retrieve the identifiers from: USER_SEQUENCES or USER_TRIGGERS
+     * @return The names, not null
+     */
+    protected Set<String> getOracleIdentifiers(String identifierName, String systemMetadataTableName) throws SQLException {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select " + dbItemName + " from " + systemMetadataTableName);
+            rs = st.executeQuery("select " + identifierName + " from " + systemMetadataTableName);
             Set<String> names = new HashSet<String>();
             while (rs.next()) {
-                names.add(rs.getString(dbItemName).toUpperCase());
+                names.add(rs.getString(identifierName));
             }
             return names;
         } finally {

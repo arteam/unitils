@@ -7,10 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.structure.impl.FlatXmlDataSetDtdGenerator.PROPKEY_DTD_FILENAME;
 import org.unitils.dbmaintainer.script.StatementHandler;
+import static org.unitils.dbmaintainer.structure.impl.FlatXmlDataSetDtdGenerator.PROPKEY_DTD_FILENAME;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.structure.DtdGenerator;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -122,12 +121,12 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             try {
-                st.executeUpdate("drop table tableOne");
+                st.executeUpdate("drop table TABLEONE");
             } catch (SQLException e) {
                 // Ignored
             }
             try {
-                st.executeUpdate("drop table tableTwo");
+                st.executeUpdate("drop table TABLETWO");
             } catch (SQLException e) {
                 // Ignored
             }

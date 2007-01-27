@@ -24,8 +24,10 @@ import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -59,7 +61,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      * @param configuration the config, not null
      */
     protected void doInit(Configuration configuration) {
-        itemsToPreserve.addAll(dbSupport.toUpperCaseNames(asList(configuration.getStringArray(PROPKEY_ITEMSTOPRESERVE))));
+        itemsToPreserve.addAll(toUpperCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_ITEMSTOPRESERVE))));
     }
 
 
@@ -70,11 +72,12 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      */
     public void clearDatabase() throws StatementHandlerException {
         try {
-            logger.info("Clearing (dropping) the unit test database");
+            logger.info("Clearing (dropping) the unit test database.");
             dropViews();
             dropTables();
             dropSequences();
             dropTriggers();
+
         } catch (SQLException e) {
             throw new UnitilsException("Error while clearing database", e);
         }
@@ -86,8 +89,12 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      */
     protected void dropViews() throws SQLException, StatementHandlerException {
         Set<String> viewNames = dbSupport.getViewNames();
-        viewNames.removeAll(itemsToPreserve);
         for (String viewName : viewNames) {
+            // check whether view needs to be preserved
+            if (itemsToPreserve.contains(viewName)) {
+                continue;
+            }
+            logger.debug("Dropping database view: " + viewName);
             dbSupport.dropView(viewName);
         }
     }
@@ -98,8 +105,12 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      */
     protected void dropTables() throws SQLException, StatementHandlerException {
         Set<String> tableNames = dbSupport.getTableNames();
-        tableNames.removeAll(itemsToPreserve);
         for (String tableName : tableNames) {
+            // check whether table needs to be preserved
+            if (itemsToPreserve.contains(tableName)) {
+                continue;
+            }
+            logger.debug("Dropping database table: " + tableName);
             dbSupport.dropTable(tableName);
         }
     }
@@ -111,8 +122,12 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     protected void dropSequences() throws StatementHandlerException, SQLException {
         if (dbSupport.supportsSequences()) {
             Set<String> sequenceNames = dbSupport.getSequenceNames();
-            sequenceNames.removeAll(itemsToPreserve);
             for (String sequenceName : sequenceNames) {
+                // check whether sequence needs to be preserved
+                if (itemsToPreserve.contains(sequenceName)) {
+                    continue;
+                }
+                logger.debug("Dropping database sequence: " + sequenceName);
                 dbSupport.dropSequence(sequenceName);
             }
         }
@@ -125,11 +140,36 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     protected void dropTriggers() throws StatementHandlerException, SQLException {
         if (dbSupport.supportsTriggers()) {
             Set<String> triggerNames = dbSupport.getTriggerNames();
-            triggerNames.removeAll(itemsToPreserve);
             for (String triggerName : triggerNames) {
+                // check whether trigger needs to be preserved
+                if (itemsToPreserve.contains(triggerName)) {
+                    continue;
+                }
+                logger.debug("Dropping database trigger: " + triggerName);
                 dbSupport.dropTrigger(triggerName);
             }
         }
+    }
+
+
+    /**
+     * Converts the given list of identifiers to uppercase. If a value is surrounded with double quotes (") it will
+     * not be converted and the double quotes will be stripped. These values are treated as case sensitive names.
+     *
+     * @param identifiers The names to uppercase, not null
+     * @return The names converted to uppercase if needed, not null
+     */
+    protected List<String> toUpperCaseIdentifiers(List<String> identifiers) {
+        List<String> result = new ArrayList<String>();
+        for (String identifier : identifiers) {
+            identifier = identifier.trim();
+            if (identifier.startsWith("\"") && identifier.endsWith("\"")) {
+                result.add(identifier.substring(1, identifier.length() - 1));
+            } else {
+                result.add(identifier.toUpperCase());
+            }
+        }
+        return result;
     }
 
 }

@@ -30,10 +30,17 @@ import java.util.Set;
  * Implementation of {@link DbSupport} for a MySql database
  *
  * @author Frederick Beernaert
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
 public class MySqlDbSupport extends DbSupport {
 
 
+    /**
+     * Returns the names of all tables in the database.
+     *
+     * @return The names of all tables in the database
+     */
     public Set<String> getTableNames() throws SQLException {
         Connection conn = null;
         ResultSet rset = null;
@@ -41,12 +48,10 @@ public class MySqlDbSupport extends DbSupport {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rset = st.executeQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where " +
-                    " TABLE_SCHEMA " + " = '" + schemaName + "'" +
-                    " and TABLE_TYPE = 'BASE TABLE'");
+            rset = st.executeQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA = '" + schemaName + "' and TABLE_TYPE = 'BASE TABLE'");
             Set<String> names = new HashSet<String>();
             while (rset.next()) {
-                names.add(rset.getString("TABLE_NAME").toUpperCase());
+                names.add(rset.getString("TABLE_NAME"));
             }
             return names;
 
@@ -56,6 +61,11 @@ public class MySqlDbSupport extends DbSupport {
     }
 
 
+    /**
+     * Retrieves the names of all the views in the database schema.
+     *
+     * @return The names of all views in the database
+     */
     public Set<String> getViewNames() throws SQLException {
         Connection conn = null;
         ResultSet rset = null;
@@ -63,12 +73,10 @@ public class MySqlDbSupport extends DbSupport {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rset = st.executeQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where " +
-                    " TABLE_SCHEMA " + " = '" + schemaName + "'" +
-                    " and TABLE_TYPE = 'VIEW'");
+            rset = st.executeQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA = '" + schemaName + "' and TABLE_TYPE = 'VIEW'");
             Set<String> names = new HashSet<String>();
             while (rset.next()) {
-                names.add(rset.getString("TABLE_NAME").toUpperCase());
+                names.add(rset.getString("TABLE_NAME"));
             }
             return names;
 
@@ -78,53 +86,100 @@ public class MySqlDbSupport extends DbSupport {
     }
 
 
+    /**
+     * Sequences are not supported, an UnsupportedOperationException will be raised.
+     *
+     * @return Nothing
+     */
     public Set<String> getSequenceNames() throws SQLException {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
 
 
+    /**
+     * Retrieves the names of all the triggers in the database schema.
+     *
+     * @return The names of all triggers in the database
+     */
     public Set<String> getTriggerNames() throws SQLException {
-        return getDbItemsOfType("TRIGGER_NAME", "TRIGGERS", "TRIGGER_SCHEMA");
+        Connection conn = null;
+        ResultSet rset = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rset = st.executeQuery("select TRIGGER_NAME from INFORMATION_SCHEMA.TRIGGERS where TRIGGER_SCHEMA = '" + schemaName + "'");
+            Set<String> names = new HashSet<String>();
+            while (rset.next()) {
+                names.add(rset.getString("TRIGGER_NAME"));
+            }
+            return names;
+
+        } finally {
+            DbUtils.closeQuietly(conn, st, rset);
+        }
     }
 
 
-    public void dropView(String viewName) throws StatementHandlerException {
-        String dropViewSQL = "drop view " + viewName + " cascade";
-        statementHandler.handle(dropViewSQL);
-    }
-
-
-    public void dropTable(String tableName) throws StatementHandlerException {
-        String dropTableSQL = "drop table " + tableName + " cascade";
-        statementHandler.handle(dropTableSQL);
-    }
-
-
+    /**
+     * Sequences are not supported, an UnsupportedOperationException will be raised.
+     *
+     * @return Nothing
+     */
     public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
 
 
+    /**
+     * Sequences are not supported, an UnsupportedOperationException will be raised.
+     *
+     * @param sequenceName     The sequence, not null
+     * @param newSequenceValue The value to set
+     */
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
 
 
+    /**
+     * Sequences are not supported.
+     *
+     * @return False
+     */
     public boolean supportsSequences() {
         return false;
     }
 
 
+    /**
+     * Triggers are supported.
+     *
+     * @return True
+     */
     public boolean supportsTriggers() {
         return true;
     }
 
 
+    /**
+     * Identity columns are supported.
+     *
+     * @return True
+     */
     public boolean supportsIdentityColumns() {
         return true;
     }
 
 
+    /**
+     * Increments the identity value for the specified primary key on the specified table to the given value. If there
+     * is no identity specified on the given primary key, the method silently finishes without effect.
+     *
+     * @param tableName            The table with the identity column, not null
+     * @param primaryKeyColumnName The column, not null
+     * @param identityValue        The new value
+     */
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
             statementHandler.handle("alter table " + tableName + " AUTO_INCREMENT = " + identityValue);
@@ -135,84 +190,87 @@ public class MySqlDbSupport extends DbSupport {
     }
 
 
-    public void disableForeignKeyConstraintsCheckingOnConnection(Connection conn) {
-        Statement st = null;
+    /**
+     * Disables foreign key checking on all subsequent operations that are performed on the given connection object
+     *
+     * @param connection The database connection, not null
+     */
+    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
+        Statement statement = null;
         try {
-            st = conn.createStatement();
-            st.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
+            statement = connection.createStatement();
+            statement.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
 
         } catch (SQLException e) {
             throw new UnitilsException("Error while disabling constraints", e);
         } finally {
-            DbUtils.closeQuietly(st);
+            DbUtils.closeQuietly(statement);
         }
     }
 
 
+    /**
+     * Removes the not-null constraint on the specified column and table
+     *
+     * @param tableName  The table with the column, not null
+     * @param columnName The column to remove constraints from, not null
+     */
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         String type = getColumnType(tableName, columnName);
         statementHandler.handle("alter table " + tableName + " change column " + columnName + " " + columnName + " " + type + " NULL ");
     }
 
 
+    /**
+     * Retrieval of table constraint names is not supported: an UnsupportedOperationException will be raised.
+     *
+     * @param tableName The table, not null
+     * @return Nothing
+     */
     public Set<String> getTableConstraintNames(String tableName) throws SQLException {
         throw new UnsupportedOperationException("Retrieval of table constraint names is not supported in MySQL");
     }
 
 
+    /**
+     * Disables the constraint with the given name on table with the given name.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         statementHandler.handle("alter table " + tableName + " disable constraint " + constraintName);
     }
 
 
-    public String getLongDataType() {
-        return "BIGINT";
-    }
-
-
-    protected Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
-        Connection conn = null;
-        ResultSet rset = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            rset = st.executeQuery("select " + dbItemColumnName + " from INFORMATION_SCHEMA."
-                    + systemMetadataTableName + " where " + schemaColumnName + " = '" + schemaName
-                    + "'");
-            Set<String> names = new HashSet<String>();
-            while (rset.next()) {
-                names.add(rset.getString(dbItemColumnName).toUpperCase());
-            }
-            return names;
-
-        } finally {
-            DbUtils.closeQuietly(conn, st, rset);
-        }
-    }
-
-
+    /**
+     * Gets the type of the column with the given name in the given table. An exception is thrown if
+     * the column could not be found
+     *
+     * @param tableName  The table, not null
+     * @param columnName The column, not null
+     * @return The type, not null
+     */
     protected String getColumnType(String tableName, String columnName) {
-        String type = null;
-        Connection conn = null;
-        ResultSet rset = null;
-        Statement st = null;
+        Connection connection = null;
+        ResultSet resultSet = null;
+        Statement statement = null;
         try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            rset = st.executeQuery("select COLUMN_TYPE from INFORMATION_SCHEMA.COLUMNS where " +
-                    " TABLE_SCHEMA " + " = '" + schemaName + "'" +
-                    " and TABLE_NAME " + " = '" + tableName + "'" +
-                    " and COLUMN_NAME " + " = '" + columnName + "'");
-            if (rset.next()) {
-                type = rset.getString("COLUMN_TYPE").toUpperCase();
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("select COLUMN_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA " + " = '" + schemaName + "'" +
+                    " and TABLE_NAME = '" + tableName + "' and COLUMN_NAME = '" + columnName + "'");
+
+            if (resultSet.next()) {
+                return resultSet.getString("COLUMN_TYPE");
             }
+            throw new UnitilsException("Could not get type of column " + columnName + " in table " + tableName + ": column not found.");
+
         } catch (SQLException e) {
-            throw new UnitilsException("Error while removing not null constraint", e);
+            throw new UnitilsException("Error while getting type of column " + columnName + " in table " + tableName, e);
         } finally {
-            DbUtils.closeQuietly(conn, st, rset);
+            DbUtils.closeQuietly(connection, statement, resultSet);
         }
-        return type;
     }
 
 }

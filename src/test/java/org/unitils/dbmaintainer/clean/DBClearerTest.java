@@ -20,12 +20,11 @@ import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.impl.DefaultDBClearer;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.clean.impl.DefaultDBClearer;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -64,21 +63,20 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         if (isTestedDialectActivated()) {
             super.setUp();
 
+            // case insensitive names
+            String itemsToPreserve = "Test_table_Preserve, Test_view_Preserve, Test_sequence_Preserve, Test_trigger_Preserve, ";
+            // case sensitive names
+            itemsToPreserve += "\"Test_CASE_Table_Preserve\", \"Test_CASE_View_Preserve\", \"Test_CASE_Sequence_Preserve\", \"Test_CASE_Trigger_Preserve\"";
+
             Configuration configuration = new ConfigurationLoader().loadConfiguration();
-            configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, "testtablepreserve,testviewpreserve,testsequencepreserve,testtriggerpreserv");
+            configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, itemsToPreserve);
 
             StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
             dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
             dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
 
-            dropTestViews();
-            dropTestTables();
-            dropTestSequences();
-            dropTestTriggers();
-            createTestTables();
-            createTestView();
-            createTestSequences();
-            createTestTriggers();
+            cleanupTestDatabase();
+            createTestDatabase();
         }
     }
 
@@ -86,11 +84,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     protected void tearDown() throws Exception {
         if (isTestedDialectActivated()) {
             super.tearDown();
-
-            dropTestViews();
-            dropTestTables();
-            dropTestSequences();
-            dropTestTriggers();
+            cleanupTestDatabase();
         }
     }
 
@@ -100,11 +94,15 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_tables() throws Exception {
         if (isTestedDialectActivated()) {
-            assertTrue(dbSupport.tableExists("testtable"));
-            assertTrue(dbSupport.tableExists("testtablepreserve"));
+            assertTrue(tableExists("TEST_TABLE"));
+            assertTrue(tableExists("TEST_TABLE_PRESERVE"));
+            assertTrue(tableExists("Test_CASE_Table"));
+            assertTrue(tableExists("Test_CASE_Table_Preserve"));
             dbClearer.clearDatabase();
-            assertFalse(dbSupport.tableExists("testtable"));
-            assertTrue(dbSupport.tableExists("testtablepreserve"));
+            assertFalse(tableExists("TEST_TABLE"));
+            assertTrue(tableExists("TEST_TABLE_PRESERVE"));
+            assertFalse(tableExists("Test_CASE_Table"));
+            assertTrue(tableExists("Test_CASE_Table_Preserve"));
         }
     }
 
@@ -114,11 +112,15 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_views() throws Exception {
         if (isTestedDialectActivated()) {
-            assertTrue(dbSupport.viewExists("testview"));
-            assertTrue(dbSupport.viewExists("testviewpreserve"));
+            assertTrue(viewExists("TEST_VIEW"));
+            assertTrue(viewExists("TEST_VIEW_PRESERVE"));
+            assertTrue(viewExists("Test_CASE_View"));
+            assertTrue(viewExists("Test_CASE_View_Preserve"));
             dbClearer.clearDatabase();
-            assertFalse(dbSupport.viewExists("testview"));
-            assertTrue(dbSupport.viewExists("testviewpreserve"));
+            assertFalse(viewExists("TEST_VIEW"));
+            assertTrue(viewExists("TEST_VIEW_PRESERVE"));
+            assertFalse(viewExists("Test_CASE_View"));
+            assertTrue(viewExists("Test_CASE_View_Preserve"));
         }
     }
 
@@ -128,11 +130,15 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_sequences() throws Exception {
         if (isTestedDialectActivated() && dbSupport.supportsSequences()) {
-            assertTrue(dbSupport.sequenceExists("testsequence"));
-            assertTrue(dbSupport.sequenceExists("testsequencepreserve"));
+            assertTrue(sequenceExists("TEST_SEQUENCE"));
+            assertTrue(sequenceExists("TEST_SEQUENCE_PRESERVE"));
+            assertTrue(sequenceExists("Test_CASE_Sequence"));
+            assertTrue(sequenceExists("Test_CASE_Sequence_Preserve"));
             dbClearer.clearDatabase();
-            assertFalse(dbSupport.sequenceExists("testsequence"));
-            assertTrue(dbSupport.sequenceExists("testsequencepreserve"));
+            assertFalse(sequenceExists("TEST_SEQUENCE"));
+            assertTrue(sequenceExists("TEST_SEQUENCE_PRESERVE"));
+            assertFalse(sequenceExists("Test_CASE_Sequence"));
+            assertTrue(sequenceExists("Test_CASE_Sequence_Preserve"));
         }
     }
 
@@ -142,145 +148,15 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_triggers() throws Exception {
         if (isTestedDialectActivated() && dbSupport.supportsTriggers()) {
-            assertTrue(dbSupport.triggerExists("testtrigger"));
-            assertTrue(dbSupport.triggerExists("testtriggerpreserv"));
+            assertTrue(triggerExists("TEST_TRIGGER"));
+            assertTrue(triggerExists("TEST_TRIGGER_PRESERVE"));
+            assertTrue(triggerExists("Test_CASE_Trigger"));
+            assertTrue(triggerExists("Test_CASE_Trigger_Preserve"));
             dbClearer.clearDatabase();
-            assertFalse(dbSupport.triggerExists("testtrigger"));
-            assertTrue(dbSupport.triggerExists("testtriggerpreserv"));
-        }
-    }
-
-
-    /**
-     * Creates the test tables
-     */
-    private void createTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create table testtable (col1 varchar(10))");
-            st.execute("create table testtablepreserve (col1 varchar(10))");
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
-
-    /**
-     * Drops the test tables
-     */
-    private void dropTestTables() {
-        try {
-            dbSupport.dropTable("testtable");
-        } catch (StatementHandlerException e) {
-            // Ignored
-        }
-        try {
-            dbSupport.dropTable("testtablepreserve");
-        } catch (StatementHandlerException e) {
-            // Ignored
-        }
-    }
-
-
-    /**
-     * Creates the test views
-     */
-    private void createTestView() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            // Make sure previous setup is cleaned up
-            st.execute("create view testview as select col1 from testtablepreserve");
-            st.execute("create view testviewpreserve as select col1 from testtablepreserve");
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
-
-    /**
-     * Drops the test views
-     */
-    private void dropTestViews() {
-        try {
-            dbSupport.dropView("testview");
-        } catch (StatementHandlerException e) {
-            // Ignored
-        }
-        try {
-            dbSupport.dropView("testviewpreserve");
-        } catch (StatementHandlerException e) {
-            // Ignored
-        }
-    }
-
-
-    /**
-     * Creates the test sequences
-     */
-    private void createTestSequences() {
-        if (dbSupport.supportsSequences()) {
-            Connection conn = null;
-            Statement st = null;
-            try {
-                conn = dataSource.getConnection();
-                st = conn.createStatement();
-                // Make sure previous setup is cleaned up
-                st.execute("create sequence testsequence");
-                st.execute("create sequence testsequencepreserve");
-            } catch (SQLException e) {
-                // No action is taken
-            } finally {
-                DbUtils.closeQuietly(conn, st, null);
-            }
-        }
-    }
-
-
-    /**
-     * Drops the test sequence
-     */
-    private void dropTestSequences() {
-        if (dbSupport.supportsSequences()) {
-            try {
-                dbSupport.dropSequence("testsequence");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-            try {
-                dbSupport.dropSequence("testsequencepreserve");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-        }
-    }
-
-
-    private void createTestTriggers() throws SQLException {
-        if (dbSupport.supportsTriggers()) {
-            createTestTrigger("testtable", "testtrigger");
-            createTestTrigger("testtablepreserve", "testtriggerpreserv");
-        }
-    }
-
-
-    private void dropTestTriggers() {
-        if (dbSupport.supportsTriggers()) {
-            try {
-                dbSupport.dropTrigger("testtrigger");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-            try {
-                dbSupport.dropTrigger("testtriggerpreserv");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
+            assertFalse(triggerExists("TEST_TRIGGER"));
+            assertTrue(triggerExists("TEST_TRIGGER_PRESERVE"));
+            assertFalse(triggerExists("Test_CASE_Trigger"));
+            assertTrue(triggerExists("Test_CASE_Trigger_Preserve"));
         }
     }
 
@@ -296,4 +172,167 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     abstract protected boolean isTestedDialectActivated();
 
+
+    /**
+     * Checks whether the table with the given name exists
+     *
+     * @param tableName The name of the table, not null
+     * @return True if the table with the given name exists, false otherwise
+     */
+    public boolean tableExists(String tableName) throws SQLException {
+        return dbSupport.getTableNames().contains(tableName);
+    }
+
+
+    /**
+     * Checks whether the table with the given name exists
+     *
+     * @param viewName The name of the view, not null
+     * @return True if the view with the given name exists, false otherwise
+     */
+    public boolean viewExists(String viewName) throws SQLException {
+        return dbSupport.getViewNames().contains(viewName);
+    }
+
+
+    /**
+     * Checks whether the trigger with the given name exists
+     *
+     * @param triggerName The name of the trigger, not null
+     * @return True if the trigger with the given name exists, false otherwise
+     */
+    public boolean triggerExists(String triggerName) throws SQLException {
+        return dbSupport.getTriggerNames().contains(triggerName);
+    }
+
+
+    /**
+     * Checks whether the sequence with the given name exists
+     *
+     * @param sequenceName The name of the sequence, not null
+     * @return True if the sequence with the given name exists, false otherwise
+     */
+    public boolean sequenceExists(String sequenceName) throws SQLException {
+        return dbSupport.getSequenceNames().contains(sequenceName);
+    }
+
+
+    /**
+     * Creates all test database structures (view, tables...)
+     */
+    private void createTestDatabase() throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            // create tables
+            st.execute("create table TEST_TABLE (col1 varchar(10))");
+            st.execute("create table TEST_TABLE_PRESERVE (col1 varchar(10))");
+            st.execute("create table \"Test_CASE_Table\" (col1 varchar(10))");
+            st.execute("create table \"Test_CASE_Table_Preserve\" (col1 varchar(10))");
+            // create views
+            st.execute("create view TEST_VIEW as select col1 from TEST_TABLE_PRESERVE");
+            st.execute("create view TEST_VIEW_PRESERVE as select col1 from TEST_TABLE_PRESERVE");
+            st.execute("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"");
+            st.execute("create view \"Test_CASE_View_Preserve\" as select col1 from \"Test_CASE_Table_Preserve\"");
+            // create sequences
+            if (dbSupport.supportsSequences()) {
+                st.execute("create sequence TEST_SEQUENCE");
+                st.execute("create sequence TEST_SEQUENCE_PRESERVE");
+                st.execute("create sequence \"Test_CASE_Sequence\"");
+                st.execute("create sequence \"Test_CASE_Sequence_Preserve\"");
+            }
+            // create triggers
+            if (dbSupport.supportsTriggers()) {
+                createTestTrigger("TEST_TABLE", "TEST_TRIGGER");
+                createTestTrigger("TEST_TABLE_PRESERVE", "TEST_TRIGGER_PRESERVE");
+                createTestTrigger("\"Test_CASE_Table\"", "\"Test_CASE_Trigger\"");
+                createTestTrigger("\"Test_CASE_Table_Preserve\"", "\"Test_CASE_Trigger_Preserve\"");
+            }
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+
+    /**
+     * Drops all created test database structures (views, tables...)
+     */
+    protected void cleanupTestDatabase() throws Exception {
+        dropTestTables("TEST_TABLE", "TEST_TABLE_PRESERVE", "Test_CASE_Table", "Test_CASE_Table_Preserve");
+        dropTestViews("TEST_VIEW", "TEST_VIEW_PRESERVE", "Test_CASE_View", "Test_CASE_View_Preserve");
+        dropTestSequences("TEST_SEQUENCE", "TEST_SEQUENCE_PRESERVE", "Test_CASE_Sequence", "Test_CASE_Sequence_Preserve");
+        dropTestTriggers("TEST_TRIGGER", "TEST_TRIGGER_PRESERVE", "Test_CASE_Trigger", "Test_CASE_Trigger_Preserve");
+    }
+
+
+    /**
+     * Drops the test tables
+     *
+     * @param tableNames The tables to drop
+     */
+    private void dropTestTables(String... tableNames) {
+        for (String tableName : tableNames) {
+            try {
+                dbSupport.dropTable(tableName);
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
+        }
+    }
+
+
+    /**
+     * Drops the test views
+     *
+     * @param viewNames The views to drop
+     */
+    private void dropTestViews(String... viewNames) {
+        for (String viewName : viewNames) {
+            try {
+                dbSupport.dropView(viewName);
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
+        }
+    }
+
+
+    /**
+     * Drops the test sequence
+     *
+     * @param sequenceNames The sequences to drop
+     */
+    private void dropTestSequences(String... sequenceNames) {
+        if (!dbSupport.supportsSequences()) {
+            return;
+        }
+        for (String sequenceName : sequenceNames) {
+            try {
+                dbSupport.dropSequence(sequenceName);
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
+        }
+    }
+
+
+    /**
+     * Drops the test triggers
+     *
+     * @param triggerNames The triggers to drop
+     */
+    private void dropTestTriggers(String... triggerNames) {
+        if (!dbSupport.supportsTriggers()) {
+            return;
+        }
+        for (String triggerName : triggerNames) {
+            try {
+                dbSupport.dropTrigger(triggerName);
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
+        }
+    }
 }

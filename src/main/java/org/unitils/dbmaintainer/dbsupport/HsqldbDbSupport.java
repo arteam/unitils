@@ -40,28 +40,32 @@ public class HsqldbDbSupport extends DbSupport {
     private static Log logger = LogFactory.getLog(HsqldbDbSupport.class);
 
 
+    /**
+     * Retrieves the names of all the sequences in the database schema.
+     *
+     * @return The names of all sequences in the database
+     */
     public Set<String> getSequenceNames() throws SQLException {
-        return getDbItemsOfType("SEQUENCE_NAME", "SYSTEM_SEQUENCES", "SEQUENCE_SCHEMA");
+        return getHsqlDbIdentifiers("SEQUENCE_NAME", "SYSTEM_SEQUENCES", "SEQUENCE_SCHEMA");
     }
 
 
+    /**
+     * Retrieves the names of all the triggers in the database schema.
+     *
+     * @return The names of all triggers in the database
+     */
     public Set<String> getTriggerNames() throws SQLException {
-        return getDbItemsOfType("TRIGGER_NAME", "SYSTEM_TRIGGERS", "TRIGGER_SCHEM");
+        return getHsqlDbIdentifiers("TRIGGER_NAME", "SYSTEM_TRIGGERS", "TRIGGER_SCHEM");
     }
 
 
-    public void dropView(String viewName) throws StatementHandlerException {
-        String dropTableSQL = "drop view " + viewName + " cascade";
-        statementHandler.handle(dropTableSQL);
-    }
-
-
-    public void dropTable(String tableName) throws StatementHandlerException {
-        String dropTableSQL = "drop table " + tableName + " cascade";
-        statementHandler.handle(dropTableSQL);
-    }
-
-
+    /**
+     * Returns the value of the sequence with the given name
+     *
+     * @param sequenceName The sequence, not null
+     * @return The value of the sequence with the given name
+     */
     public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -79,39 +83,73 @@ public class HsqldbDbSupport extends DbSupport {
     }
 
 
+    /**
+     * Sets the next value of the sequence with the given sequence name to the given sequence value.
+     *
+     * @param sequenceName     The sequence, not null
+     * @param newSequenceValue The value to set
+     */
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         statementHandler.handle("alter sequence " + sequenceName + " restart with " + newSequenceValue);
     }
 
 
+    /**
+     * Sequences are supported.
+     *
+     * @return True
+     */
     public boolean supportsSequences() {
         return true;
     }
 
 
+    /**
+     * Triggers are supported.
+     *
+     * @return True
+     */
     public boolean supportsTriggers() {
         return true;
     }
 
 
+    /**
+     * Identity columns are supported.
+     *
+     * @return True
+     */
     public boolean supportsIdentityColumns() {
         return true;
     }
 
 
+    /**
+     * Increments the identity value for the specified primary key on the specified table to the given value. If there
+     * is no identity specified on the given primary key, the method silently finishes without effect.
+     *
+     * @param tableName            The table with the identity column, not null
+     * @param primaryKeyColumnName The column, not null
+     * @param identityValue        The new value
+     */
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
-            statementHandler.handle("alter table " + tableName + " alter column " + primaryKeyColumnName + " RESTART WITH " + identityValue);
+            statementHandler.handle("alter table \"" + tableName + "\" alter column " + primaryKeyColumnName + " RESTART WITH " + identityValue);
         } catch (StatementHandlerException e) {
             logger.info("Column " + primaryKeyColumnName + " on table " + tableName + " is " + "not an identity column");
         }
     }
 
 
-    public void disableForeignKeyConstraintsCheckingOnConnection(Connection conn) {
+    /**
+     * Disables foreign key checking on all subsequent operations that are performed on the given connection object
+     *
+     * @param connection The database connection, not null
+     */
+    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
         Statement st = null;
         try {
-            st = conn.createStatement();
+            st = connection.createStatement();
             st.executeUpdate("set referential_integrity false");
 
         } catch (SQLException e) {
@@ -122,44 +160,65 @@ public class HsqldbDbSupport extends DbSupport {
     }
 
 
+    /**
+     * Removes the not-null constraint on the specified column and table
+     *
+     * @param tableName  The table with the column, not null
+     * @param columnName The column to remove constraints from, not null
+     */
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         String makeNullableSql = "alter table " + tableName + " alter column " + columnName + " set null";
         statementHandler.handle(makeNullableSql);
     }
 
 
+    /**
+     * Retrieval of table constraint names is not supported : an UnsupportedOperationException will be raised.
+     *
+     * @param tableName The table, not null
+     * @return Nothing
+     */
     public Set<String> getTableConstraintNames(String tableName) throws SQLException {
         throw new UnsupportedOperationException("Retrieval of table constraint names is not supported in HSQLDB");
     }
 
 
+    /**
+     * Disabling of individual constraints is not supported: an UnsupportedOperationException will be raised.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         throw new UnsupportedOperationException("Disabling of individual constraints is not supported in HSQLDB");
     }
 
 
-    public String getLongDataType() {
-        return "BIGINT";
-    }
-
-
-    protected Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
-        Connection conn = null;
-        ResultSet rset = null;
-        Statement st = null;
+    /**
+     * Returns the the idendtifiers for the given type (sequence names, trigger names)
+     *
+     * @param identifierName          The type of identifier: SEQUENCE_NAME or TRIGGER_NAME
+     * @param systemMetadataTableName The meta data table to retrieve the identifiers from: SYSTEM_SEQUENCES or SYSTEM_TRIGGERS
+     * @param schemaColumnName        The column containing the schema name: SEQUENCE_SCHEMA or TRIGGER_SCHEM
+     * @return The names, not null
+     */
+    protected Set<String> getHsqlDbIdentifiers(String identifierName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
+        Connection connection = null;
+        ResultSet resultSet = null;
+        Statement statement = null;
         try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            rset = st.executeQuery("select " + dbItemColumnName + " from INFORMATION_SCHEMA."
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("select " + identifierName + " from INFORMATION_SCHEMA."
                     + systemMetadataTableName + " where " + schemaColumnName + " = '" + schemaName + "'");
             Set<String> names = new HashSet<String>();
-            while (rset.next()) {
-                names.add(rset.getString(dbItemColumnName).toUpperCase());
+            while (resultSet.next()) {
+                names.add(resultSet.getString(identifierName));
             }
             return names;
 
         } finally {
-            DbUtils.closeQuietly(conn, st, rset);
+            DbUtils.closeQuietly(connection, statement, resultSet);
         }
     }
 

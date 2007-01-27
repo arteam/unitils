@@ -110,12 +110,12 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             try {
-                dbSupport.dropTable("table2");
+                dbSupport.dropTable("TABLE2");
             } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                dbSupport.dropTable("table1");
+                dbSupport.dropTable("TABLE1");
             } catch (StatementHandlerException e) {
                 // Ignored
             }

@@ -35,16 +35,32 @@ import java.util.Set;
 public class Db2DbSupport extends DbSupport {
 
 
+    /**
+     * Retrieves the names of all the sequences in the database schema.
+     *
+     * @return The names of all sequences in the database
+     */
     public Set<String> getSequenceNames() throws SQLException {
-        return getDbItemsOfType("SEQNAME", "SYSSEQUENCES", "SEQSCHEMA");
+        return getDb2DbIdentifiers("SEQNAME", "SYSSEQUENCES", "SEQSCHEMA");
     }
 
 
+    /**
+     * Retrieves the names of all the triggers in the database schema.
+     *
+     * @return The names of all triggers in the database
+     */
     public Set<String> getTriggerNames() throws SQLException {
-        return getDbItemsOfType("NAME", "SYSTRIGGERS", "SCHEMA");
+        return getDb2DbIdentifiers("NAME", "SYSTRIGGERS", "SCHEMA");
     }
 
 
+    /**
+     * Returns the value of the sequence with the given name
+     *
+     * @param sequenceName The sequence, not null
+     * @return The value of the sequence with the given name
+     */
     public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -64,21 +80,43 @@ public class Db2DbSupport extends DbSupport {
     }
 
 
+    /**
+     * Sets the next value of the sequence with the given sequence name to the given sequence value.
+     *
+     * @param sequenceName     The sequence, not null
+     * @param newSequenceValue The value to set
+     */
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         statementHandler.handle("ALTER SEQUENCE " + sequenceName + " RESTART WITH " + newSequenceValue);
         statementHandler.handle("VALUES NEXTVAL FOR " + sequenceName);
     }
 
 
+    /**
+     * Sequences are supported.
+     *
+     * @return True
+     */
     public boolean supportsSequences() {
         return true;
     }
 
+
+    /**
+     * Triggers are supported.
+     *
+     * @return True
+     */
     public boolean supportsTriggers() {
         return true;
     }
 
 
+    /**
+     * Identity columns are supported.
+     *
+     * @return True
+     */
     public boolean supportsIdentityColumns() {
         return true;
     }
@@ -89,16 +127,34 @@ public class Db2DbSupport extends DbSupport {
     }
 
 
-    public void disableForeignKeyConstraintsCheckingOnConnection(Connection conn) {
-        throw new UnsupportedOperationException("DB2 doesn't simple disabling of constraints checking on a connection");
+    /**
+     * Simple disabling of constraints checking on a connection is not supported: an
+     * UnsupportedOperationException will be raised.
+     *
+     * @param connection The database connection, not null
+     */
+    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
+        throw new UnsupportedOperationException("DB2 doesn't support simple disabling of constraints checking on a connection");
     }
 
 
+    /**
+     * Removal of not null constraints is not supported: an UnsupportedOperationException will be raised.
+     *
+     * @param tableName  The table with the column, not null
+     * @param columnName The column to remove constraints from, not null
+     */
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         throw new UnsupportedOperationException("Removal of not null constraints is not supported for DB2");
     }
 
 
+    /**
+     * Returns the foreign key and not null constraint names that are enabled/enforced for the table with the given name
+     *
+     * @param tableName The table, not null
+     * @return The set of constraint names, not null
+     */
     public Set<String> getTableConstraintNames(String tableName) throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -118,32 +174,41 @@ public class Db2DbSupport extends DbSupport {
     }
 
 
+    /**
+     * Disables the constraint with the given name on table with the given name.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         statementHandler.handle("alter table " + tableName + " drop constraint " + constraintName);
     }
 
 
-    public String getLongDataType() {
-        return "BIGINT";
-    }
-
-
-    private Set<String> getDbItemsOfType(String dbItemColumnName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
-        Connection conn = null;
-        ResultSet rset = null;
-        Statement st = null;
+    /**
+     * Returns the the idendtifiers for the given type (sequence names, trigger names)
+     *
+     * @param identifierName          The type of identifier: SEQNAME or NAME
+     * @param systemMetadataTableName The meta data table to retrieve the identifiers from: SYSSEQUENCES or SYSTRIGGERS
+     * @param schemaColumnName        The column containing the schema name: SEQSCHEMA or SCHEMA
+     * @return The names, not null
+     */
+    protected Set<String> getDb2DbIdentifiers(String identifierName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
+        Connection connection = null;
+        ResultSet resultSet = null;
+        Statement statement = null;
         try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            rset = st.executeQuery("select " + dbItemColumnName + " from SYSIBM." + systemMetadataTableName + " where " + schemaColumnName + " = '" + schemaName + "'");
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("select " + identifierName + " from SYSIBM." + systemMetadataTableName + " where " + schemaColumnName + " = '" + schemaName + "'");
             Set<String> names = new HashSet<String>();
-            while (rset.next()) {
-                names.add(rset.getString(dbItemColumnName).toUpperCase());
+            while (resultSet.next()) {
+                names.add(resultSet.getString(identifierName));
             }
             return names;
 
         } finally {
-            DbUtils.closeQuietly(conn, st, rset);
+            DbUtils.closeQuietly(connection, statement, resultSet);
         }
     }
 
