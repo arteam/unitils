@@ -39,7 +39,6 @@ public class Unitils implements Module {
     }
 
     public static void initSingletonInstance() {
-
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
         Configuration configuration = configurationLoader.loadConfiguration();
 
@@ -91,7 +90,6 @@ public class Unitils implements Module {
 
 
     protected ModulesRepository createModulesRepository(Configuration configuration) {
-
         ModulesLoader modulesLoader = new ModulesLoader();
         List<Module> modules = modulesLoader.loadModules(configuration);
         return new ModulesRepository(modules);
@@ -100,10 +98,8 @@ public class Unitils implements Module {
 
     private class UnitilsTestListener extends TestListener {
 
-
         @Override
         public void beforeAll() {
-
             TestContext testContext = getTestContext();
             testContext.setTestClass(null);
             testContext.setTestObject(null);
@@ -118,7 +114,6 @@ public class Unitils implements Module {
 
         @Override
         public void beforeTestClass(Class testClass) {
-
             TestContext testContext = getTestContext();
             testContext.setTestClass(testClass);
             testContext.setTestObject(null);
@@ -133,7 +128,6 @@ public class Unitils implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject) {
-
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
@@ -148,7 +142,6 @@ public class Unitils implements Module {
 
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
@@ -163,7 +156,6 @@ public class Unitils implements Module {
 
         @Override
         public void afterTestMethod(Object testObject, Method testMethod) {
-
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
@@ -178,7 +170,6 @@ public class Unitils implements Module {
 
         @Override
         public void afterTestTearDown(Object testObject) {
-
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
@@ -193,7 +184,6 @@ public class Unitils implements Module {
 
         @Override
         public void afterTestClass(Class testClass) {
-
             TestContext testContext = getTestContext();
             testContext.setTestClass(testClass);
             testContext.setTestObject(null);
@@ -208,7 +198,6 @@ public class Unitils implements Module {
 
         @Override
         public void afterAll() {
-
             TestContext testContext = getTestContext();
             testContext.setTestClass(null);
             testContext.setTestObject(null);
