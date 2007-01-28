@@ -16,6 +16,7 @@
 package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.configuration.Configuration;
+import static org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -23,6 +24,7 @@ import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
@@ -61,7 +63,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      * @param configuration the config, not null
      */
     protected void doInit(Configuration configuration) {
-        itemsToPreserve.addAll(toUpperCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_ITEMSTOPRESERVE))));
+        itemsToPreserve.addAll(toCorrectCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_ITEMSTOPRESERVE))));
     }
 
 
@@ -153,20 +155,38 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
 
 
     /**
-     * Converts the given list of identifiers to uppercase. If a value is surrounded with double quotes (") it will
-     * not be converted and the double quotes will be stripped. These values are treated as case sensitive names.
+     * Converts the given list of identifiers to uppercase/lowercase depending on what the default
+     * for the database is. If a value is surrounded with double quotes (") it will not be converted and
+     * the double quotes will be stripped. These values are treated as case sensitive names.
      *
-     * @param identifiers The names to uppercase, not null
-     * @return The names converted to uppercase if needed, not null
+     * @param identifiers The identifiers, not null
+     * @return The names converted to correct case if needed, not null
      */
-    protected List<String> toUpperCaseIdentifiers(List<String> identifiers) {
+    protected List<String> toCorrectCaseIdentifiers(List<String> identifiers) {
+        Connection connection = null;
+        boolean toUpperCase;
+        boolean toLowerCase;
+        try {
+            connection = dataSource.getConnection();
+            toUpperCase = connection.getMetaData().storesUpperCaseIdentifiers();
+            toLowerCase = connection.getMetaData().storesLowerCaseIdentifiers();
+        } catch (SQLException e) {
+            throw new UnitilsException("Unable to convert identifiers to correct case.", e);
+        } finally {
+            closeQuietly(connection, null, null);
+        }
+
         List<String> result = new ArrayList<String>();
         for (String identifier : identifiers) {
             identifier = identifier.trim();
             if (identifier.startsWith("\"") && identifier.endsWith("\"")) {
                 result.add(identifier.substring(1, identifier.length() - 1));
-            } else {
+            } else if (toUpperCase) {
                 result.add(identifier.toUpperCase());
+            } else if (toLowerCase) {
+                result.add(identifier.toLowerCase());
+            } else {
+                result.add(identifier);
             }
         }
         return result;
