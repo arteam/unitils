@@ -58,16 +58,19 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
+        // case sensitive and insensitive names
+        String itemsToPreserve = "Test_table_Preserve, \"Test_CASE_Table_Preserve\"";
+
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
         Configuration configuration = configurationLoader.loadConfiguration();
-        configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, "tabletopreserve");
+        configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, itemsToPreserve);
 
         StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
         dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
         dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
-        dropTestTables();
-        createTestTables();
+        cleanupTestDatabase();
+        createTestDatabase();
         insertTestData();
     }
 
@@ -77,81 +80,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      */
     protected void tearDown() throws Exception {
         super.tearDown();
-
-        dropTestTables();
-    }
-
-
-    /**
-     * Creates the test tables
-     */
-    private void createTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create table tabletoclean(testcolumn varchar(10))");
-            st.execute("create table db_version(testcolumn varchar(10))");
-            st.execute("create table tabletopreserve(testcolumn varchar(10))");
-            // Also create a view, to see if the DBCleaner doesn't crash on views
-            st.execute("create view testview as (select * from tabletopreserve)");
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
-
-    /**
-     * Inserts a test record in each test table
-     */
-    private void insertTestData() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("insert into tabletoclean values('test')");
-            st.execute("insert into db_version values('test')");
-            st.execute("insert into tabletopreserve values('test')");
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
-    }
-
-
-    /**
-     * Removes the test database tables
-     */
-    private void dropTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            try {
-                dbSupport.dropView("TESTVIEW");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-            try {
-                dbSupport.dropTable("TABLETOCLEAN");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-            try {
-                dbSupport.dropTable("DB_VERSION");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-            try {
-                dbSupport.dropTable("TABLETOPRESERVE");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
-        }
+        cleanupTestDatabase();
     }
 
 
@@ -162,9 +91,12 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            assertFalse(isEmpty("tabletoclean"));
+            assertFalse(isEmpty("TEST_TABLE"));
+            assertFalse(isEmpty("TEST_TABLE"));
+            assertFalse(isEmpty("\"Test_CASE_Table\""));
             dbCleaner.cleanDatabase();
-            assertTrue(isEmpty("tabletoclean"));
+            assertTrue(isEmpty("TEST_TABLE"));
+            assertTrue(isEmpty("\"Test_CASE_Table\""));
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -178,9 +110,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            assertFalse(isEmpty("db_version"));
+            assertFalse(isEmpty("DB_VERSION"));
             dbCleaner.cleanDatabase();
-            assertFalse(isEmpty("db_version"));
+            assertFalse(isEmpty("DB_VERSION"));
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -194,11 +126,93 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            assertFalse(isEmpty("tabletopreserve"));
+            assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
+            assertFalse(isEmpty("\"Test_CASE_Table_Preserve\""));
             dbCleaner.cleanDatabase();
-            assertFalse(isEmpty("tabletopreserve"));
+            assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
+            assertFalse(isEmpty("\"Test_CASE_Table_Preserve\""));
         } finally {
             DbUtils.closeQuietly(conn);
+        }
+    }
+
+
+    /**
+     * Creates the test tables
+     */
+    private void createTestDatabase() throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            st.execute("create table DB_VERSION(testcolumn varchar(10))");
+            st.execute("create table TEST_TABLE(testcolumn varchar(10))");
+            st.execute("create table TEST_TABLE_PRESERVE(testcolumn varchar(10))");
+            st.execute("create table \"Test_CASE_Table\" (col1 varchar(10))");
+            st.execute("create table \"Test_CASE_Table_Preserve\" (col1 varchar(10))");
+            // Also create a view, to see if the DBCleaner doesn't crash on views
+            st.execute("create view TEST_VIEW as (select * from TEST_TABLE_PRESERVE)");
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+
+    /**
+     * Removes the test database tables
+     */
+    private void cleanupTestDatabase() throws SQLException {
+        dropTestTables("TEST_TABLE", "TEST_TABLE_PRESERVE", "Test_CASE_Table", "Test_CASE_Table_Preserve", "DB_VERSION");
+
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            try {
+                dbSupport.dropView("TEST_VIEW");
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+
+    /**
+     * Drops the test tables
+     *
+     * @param tableNames The tables to drop
+     */
+    private void dropTestTables(String... tableNames) {
+        for (String tableName : tableNames) {
+            try {
+                dbSupport.dropTable(tableName);
+            } catch (StatementHandlerException e) {
+                // Ignored
+            }
+        }
+    }
+
+
+    /**
+     * Inserts a test record in each test table
+     */
+    private void insertTestData() throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            st.execute("insert into DB_VERSION values('test')");
+            st.execute("insert into TEST_TABLE values('test')");
+            st.execute("insert into TEST_TABLE_PRESERVE values('test')");
+            st.execute("insert into \"Test_CASE_Table\" values('test')");
+            st.execute("insert into \"Test_CASE_Table_Preserve\" values('test')");
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
         }
     }
 
