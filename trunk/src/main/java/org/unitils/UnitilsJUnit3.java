@@ -32,8 +32,8 @@ import java.lang.reflect.Method;
  * core unitils test listener methods are invoked in the expected order. See {@link TestListener} for
  * more information on the listener invocation order.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public abstract class UnitilsJUnit3 extends TestCase {
 
@@ -79,7 +79,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * @param testResult junits test result, not null
      */
     public void run(TestResult testResult) {
-
         try {
             // if this the first test, call beforeAll
             if (!beforeAllCalled) {
@@ -113,7 +112,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * during the shutdown of the VM.
      */
     public void runBare() throws Throwable {
-
         // simulate class level methods
         // if this is the first test of a test class (previous test was of a different test class),
         // first finalize the previous test class by calling afterTestClass, then call beforeTestClass
@@ -164,7 +162,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * {@link TestListener#afterTestMethod}.
      */
     protected void runTest() throws Throwable {
-
         Throwable firstThrowable = null;
         try {
             testListener.beforeTestMethod(this, getCurrentTestMethod());
@@ -203,7 +200,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * @return the unitils core instance, not null
      */
     protected Unitils createUnitils() {
-
         Unitils unitils = Unitils.getInstance();
         if (unitils == null) {
             Unitils.initSingletonInstance();
@@ -220,7 +216,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * @throws UnitilsException if the method could not be found
      */
     protected Method getCurrentTestMethod() {
-
         String testName = getName();
         if (StringUtils.isEmpty(testName)) {
             throw new UnitilsException("Unable to find current test method. No test name provided (null) for test. Test class: " + getClass());

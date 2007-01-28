@@ -144,7 +144,6 @@ public class DBMaintainer {
      * @param dataSource    the data source, not null
      */
     public DBMaintainer(Configuration configuration, DataSource dataSource) {
-
         StatementHandler statementHandler = new LoggingStatementHandlerDecorator(DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
 
         scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);

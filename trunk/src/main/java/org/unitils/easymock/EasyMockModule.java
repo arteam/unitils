@@ -34,11 +34,12 @@ import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
 import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
-import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +105,6 @@ public class EasyMockModule implements Module {
      * @return a mock for the given class or interface, not null
      */
     public <T> T createRegularMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls) {
-
         // Get anotation arguments and replace default values if needed
         invocationOrder = getValueReplaceDefault(RegularMock.class, invocationOrder, defaultEnumValues);
         calls = getValueReplaceDefault(RegularMock.class, calls, defaultEnumValues);
@@ -116,12 +116,10 @@ public class EasyMockModule implements Module {
         } else {
             mocksControl = new MocksClassControl(DEFAULT);
         }
-
         // Check order
         if (InvocationOrder.STRICT == invocationOrder) {
             mocksControl.checkOrder(true);
         }
-
         mocksControls.add(mocksControl);
         return mocksControl.createMock(mockType);
     }
@@ -146,7 +144,6 @@ public class EasyMockModule implements Module {
      * @return a mockcontrol for the given class or interface, not null
      */
     public <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls, Order order, Dates dates, Defaults defaults) {
-
         // Get anotation arguments and replace default values if needed
         invocationOrder = getValueReplaceDefault(Mock.class, invocationOrder, defaultEnumValues);
         calls = getValueReplaceDefault(Mock.class, calls, defaultEnumValues);
@@ -172,12 +169,10 @@ public class EasyMockModule implements Module {
         } else {
             mocksControl = new LenientMocksControl(DEFAULT, comparatorModes.toArray(new ReflectionComparatorMode[0]));
         }
-
         // Check order
         if (InvocationOrder.STRICT == invocationOrder) {
             mocksControl.checkOrder(true);
         }
-
         mocksControls.add(mocksControl);
         return mocksControl.createMock(mockType);
     }
@@ -188,7 +183,6 @@ public class EasyMockModule implements Module {
      * todo javadoc
      */
     public void replay() {
-
         for (MocksControl mocksControl : mocksControls) {
             mocksControl.replay();
         }
@@ -200,9 +194,7 @@ public class EasyMockModule implements Module {
      * todo javadoc
      */
     public void verify() {
-
         for (MocksControl mocksControl : mocksControls) {
-
             if (!(mocksControl.getState() instanceof ReplayState)) {
                 mocksControl.replay();
             }
@@ -221,7 +213,6 @@ public class EasyMockModule implements Module {
      * @param testObject the test, not null
      */
     protected void createAndInjectRegularMocksIntoTest(Object testObject) {
-
         List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), RegularMock.class);
         for (Field mockField : mockFields) {
 
@@ -238,7 +229,6 @@ public class EasyMockModule implements Module {
 
     //todo javadoc
     protected void createAndInjectMocksIntoTest(Object testObject) {
-
         List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
         for (Field mockField : mockFields) {
 
@@ -264,11 +254,13 @@ public class EasyMockModule implements Module {
      * @param type       the field(=mock) type
      */
     protected void callAfterCreateMockMethods(Object testObject, Object mockObject, String name, Class type) {
-
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
-                ReflectionUtils.invokeMethod(testObject, method, mockObject, name, type);
+                invokeMethod(testObject, method, mockObject, name, type);
+
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("An exception occurred while invoking an after create mock method.", e);
             } catch (Exception e) {
                 throw new UnitilsException("Unable to invoke after create mock method. Ensure that this method has following signature: " +
                         "void myMethod(Object mock, String name, Class type)", e);
@@ -288,7 +280,6 @@ public class EasyMockModule implements Module {
          */
         @Override
         public void beforeTestSetUp(Object testObject) {
-
             // Clear all previously created mocks controls
             mocksControls.clear();
 

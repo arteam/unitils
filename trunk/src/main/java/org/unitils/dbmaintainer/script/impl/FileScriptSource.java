@@ -118,13 +118,18 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      * @return The highest timestamp of all the scripts that were already executed
      */
     protected Long getTimestampOfAlreadyExecutedScripts(final Version currentVersion) {
-        List<File> scriptFilesAlreadyExecuted = getScriptFiles();
-        CollectionUtils.filter(scriptFilesAlreadyExecuted, new Predicate() {
+        // get all scripts
+        List<File> scriptFiles = getScriptFiles();
+
+        // filter out scripts that are not executed yet
+        CollectionUtils.filter(scriptFiles, new Predicate() {
             public boolean evaluate(Object file) {
                 return getIndex((File) file) <= currentVersion.getIndex();
             }
         });
-        return getHighestScriptTimestamp(scriptFilesAlreadyExecuted);
+
+        // get highest timestamp
+        return getHighestScriptTimestamp(scriptFiles);
     }
 
 
