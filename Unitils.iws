@@ -18,9 +18,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/dbunit-2.2.jar" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\lib\dbunit-2.1.jar" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iml" afterPath="$PROJECT_DIR$/Unitils.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
@@ -45,7 +45,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169982163496" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1169984789522" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -183,46 +183,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DefaultDBClearer.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java">
+      <file leaf-file-name="DbUnitModule.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="192" column="5" selection-start="7248" selection-end="7248" vertical-scroll-proportion="1.7282809">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DBClearerTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="262" column="107" selection-start="10523" selection-end="10622" vertical-scroll-proportion="1.2547529">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DefaultDBCleaner.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DBCleanerTest.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="61" selection-start="1345" selection-end="1345" vertical-scroll-proportion="-0.7227357">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DbSupport.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="363" column="22" selection-start="12547" selection-end="12547" vertical-scroll-proportion="1.7718631">
+            <state line="295" column="0" selection-start="13032" selection-end="13032" vertical-scroll-proportion="0.48479086">
               <folding />
             </state>
           </provider>
@@ -450,6 +414,20 @@
           <option name="myItemId" value="Libraries" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
         </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="&lt; 1.5 &gt;" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
@@ -531,20 +509,6 @@
         <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:D:\_apps\java\jdk1.5.0_06\jre\lib\rt.jar!\java\sql" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Libraries" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
         </PATH_ELEMENT>
       </PATH>
       <PATH>
@@ -789,125 +753,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\dbsupport" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\clean" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\clean" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\clean\impl" />
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbunit" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -971,13 +817,13 @@
   </component>
   <component name="RestoreUpdateTree" />
   <component name="RunManager" selected="JUnit.All in Unitils">
-    <tempConfiguration default="false" name="DBCleanerTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+    <tempConfiguration default="false" name="HsqldbDBClearerTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <pattern value="org.unitils.dbmaintainer.clean.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.clean" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.clean.DBCleanerTest" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.clean.HsqldbDBClearerTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -1399,40 +1245,12 @@
   </component>
   <component name="com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectRootMasterDetailsConfigurable" proportions="0.35875" version="1">
     <option name="myPlainMode" value="false" />
-    <option name="myLastEditedConfigurable" value="jta.jar" />
+    <option name="myLastEditedConfigurable" value="dbunit-2.2.jar" />
   </component>
   <component name="com.intellij.profile.ui.ErrorOptionsConfigurable" proportions="0.16666667,0.5314286" version="1">
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/String.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2404" column="18" selection-start="94848" selection-end="94848" vertical-scroll-proportion="0.016732283">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/script/impl/JDBCStatementHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="100" selection-start="2283" selection-end="2283" vertical-scroll-proportion="0.80552906">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/HsqldbDBClearerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="0" selection-start="1142" selection-end="1142" vertical-scroll-proportion="0.46168768">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="13" selection-start="1101" selection-end="1101" vertical-scroll-proportion="0.32688588">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
@@ -1475,27 +1293,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="363" column="22" selection-start="12547" selection-end="12547" vertical-scroll-proportion="1.7718631">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="192" column="5" selection-start="7248" selection-end="7248" vertical-scroll-proportion="1.7282809">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="262" column="107" selection-start="10523" selection-end="10622" vertical-scroll-proportion="1.2547529">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
@@ -1503,9 +1300,61 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/sql/Connection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="266" column="12" selection-start="11964" selection-end="11964" vertical-scroll-proportion="0.44519883">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/sql/DatabaseMetaData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="14" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="351" column="45" selection-start="12201" selection-end="12201" vertical-scroll-proportion="0.70406187">
+          <folding>
+            <marker date="1169984422895" expanded="true" signature="3026:3069" placeholder="/**...*/" />
+            <marker date="1169984422895" expanded="true" signature="5239:5268" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="61" selection-start="1345" selection-end="1345" vertical-scroll-proportion="-0.7227357">
+        <state line="3" column="10" selection-start="66" selection-end="66" vertical-scroll-proportion="0.04861773">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/HsqldbDBClearerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="6" selection-start="1141" selection-end="1141" vertical-scroll-proportion="0.43755957">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="259" column="2" selection-start="10380" selection-end="10380" vertical-scroll-proportion="0.26789168">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="99" column="24" selection-start="3791" selection-end="3791" vertical-scroll-proportion="0.37273595">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="295" column="0" selection-start="13032" selection-end="13032" vertical-scroll-proportion="0.48479086">
           <folding />
         </state>
       </provider>
