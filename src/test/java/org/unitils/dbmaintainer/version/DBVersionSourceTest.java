@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Test class for {@link org.unitils.dbmaintainer.version.impl.DBVersionSource}. The implementation is tested using
+ * Test class for {@link org.unitils.dbmaintainer.maintainer.version.DBVersionSource}. The implementation is tested using
  * a test database. The dbms that is used depends on the database configuration in test/resources/unitils.properties
  *
  * @author Filip Neven
@@ -128,7 +128,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      */
     public void testRegisterUpdateSucceeded_succeeded() throws Exception {
         dbVersionSource.registerUpdateSucceeded(true);
-        assertTrue(dbVersionSource.lastUpdateSucceeded());
+        assertTrue(dbVersionSource.isLastUpdateSucceeded());
     }
 
 
@@ -137,7 +137,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
      */
     public void testRegisterUpdateSucceeded_notSucceeded() throws Exception {
         dbVersionSource.registerUpdateSucceeded(false);
-        assertFalse(dbVersionSource.lastUpdateSucceeded());
+        assertFalse(dbVersionSource.isLastUpdateSucceeded());
     }
 
 

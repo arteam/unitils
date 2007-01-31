@@ -54,6 +54,12 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
     /* The key of the property that specifies the name of the column in which is stored whether the last update succeeded. */
     public static final String PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME = "dbMaintainer.dbVersionSource.lastUpdateSucceededColumnName";
 
+    /* The key of the property that specifies the name of the column in which the DB version index is stored */
+    public static final String PROPKEY_CODESCRIPTS_TIMESTAMP_COLUMN_NAME = "dbMaintainer.dbVersionSource.codeScriptsTimeStampColumnName";
+
+    /* The key of the property that specifies the name of the column in which is stored whether the last update succeeded. */
+    public static final String PROPKEY_LAST_CODE_UPDATE_SUCCEEDED_COLUMN_NAME = "dbMaintainer.dbVersionSource.lastCodeUpdateSucceededColumnName";
+
     /* The name of the datase table in which the DB version is stored */
     private String versionTableName;
 
@@ -66,6 +72,12 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
     /* The name of the database column in which is stored whether the last DB update succeeded */
     private String lastUpdateSucceededColumnName;
 
+    /* The name of the database column in which the DB code scripts timestamp is stored */
+    private String codeScriptsTimestampColumnName;
+
+    /* The name of the database column in which is stored whether the last code update succeeded */
+    private String lastCodeUpdateSucceededColumnName;
+
 
     /**
      * Initializes the name of the version table and its columns using the given <code>Configuration</code> object
@@ -77,6 +89,8 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         this.versionIndexColumnName = configuration.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();
         this.versionTimestampColumnName = configuration.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME).toUpperCase();
         this.lastUpdateSucceededColumnName = configuration.getString(PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME).toUpperCase();
+        this.codeScriptsTimestampColumnName = configuration.getString(PROPKEY_CODESCRIPTS_TIMESTAMP_COLUMN_NAME).toUpperCase();
+        this.lastCodeUpdateSucceededColumnName = configuration.getString(PROPKEY_LAST_CODE_UPDATE_SUCCEEDED_COLUMN_NAME).toUpperCase();
     }
 
 
@@ -126,16 +140,16 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      *
      * @return true if the last database version update succeeded, false otherwise
      */
-    public boolean lastUpdateSucceeded() {
+    public boolean isLastUpdateSucceeded() {
         try {
-            return lastUpdateSucceededImpl();
+            return isLastUpdateSucceededImpl();
 
         } catch (UnitilsException e) {
             if (checkVersionTable()) {
                 throw e;
             }
             // try again, version table was not ok
-            return lastUpdateSucceededImpl();
+            return isLastUpdateSucceededImpl();
         }
     }
 
@@ -157,11 +171,81 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+    /**
+     * Tells us whether the last database code update succeeded or not
+     *
+     * @return true if the last database code update succeeded, false otherwise
+     */
+    public boolean isLastCodeUpdateSucceeded() {
+        try {
+            return isLastCodeUpdateSucceededImpl();
+
+        } catch (UnitilsException e) {
+            if (checkVersionTable()) {
+                throw e;
+            }
+            // try again, version table was not ok
+            return isLastCodeUpdateSucceededImpl();
+        }
+    }
+
+    /**
+     * Notifies the VersionSource of the fact that the lastest code update has succeeded or not
+     *
+     * @param succeeded
+     * @throws StatementHandlerException
+     */
+    public void registerCodeUpdateSucceeded(boolean succeeded) throws StatementHandlerException {
+        try {
+            registerCodeUpdateSucceededImpl(succeeded);
+
+        } catch (UnitilsException e) {
+            if (checkVersionTable()) {
+                throw e;
+            }
+            // try again, version table was not ok
+            registerCodeUpdateSucceededImpl(succeeded);
+        }
+    }
+
+    /**
+     * @return The current timestamp of the code scripts
+     */
+    public long getCodeScriptsTimestamp() {
+        try {
+            return getCodeScriptsTimestampImpl();
+
+        } catch (UnitilsException e) {
+            if (checkVersionTable()) {
+                throw e;
+            }
+            // try again, version table was not ok
+            return getCodeScriptsTimestampImpl();
+        }
+    }
+
+    /**
+     * Stores the timestamp of the code scripts in the VersionSource
+     * @param codeScriptsTimestamp
+     */
+    public void setCodeScriptsTimestamp(long codeScriptsTimestamp) {
+        try {
+            setCodeScriptsTimestampImpl(codeScriptsTimestamp);
+
+        } catch (UnitilsException e) {
+            if (checkVersionTable()) {
+                throw e;
+            }
+            // try again, version table was not ok
+            setCodeScriptsTimestampImpl(codeScriptsTimestamp);
+        }
+    }
+
 
     /**
      * @return The current version of the database
      */
-    private Version getDbVersionImpl() throws StatementHandlerException {
+    private Version getDbVersionImpl() {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -169,9 +253,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " + versionTableName);
-            if (!rs.next()) {
-                throw new UnitilsException("Error while getting database version. No version record found.");
-            }
+            rs.next();
             return new Version(rs.getLong(versionIndexColumnName), rs.getLong(versionTimestampColumnName));
 
         } catch (SQLException e) {
@@ -187,7 +269,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      *
      * @param version The new version that the database should be updated to
      */
-    private void setDbVersionImpl(Version version) throws StatementHandlerException {
+    private void setDbVersionImpl(Version version) {
         Connection conn = null;
         Statement st = null;
         try {
@@ -197,6 +279,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             if (updateCount != 1) {
                 throw new UnitilsException("Error while setting database version. There should be exactly 1 version record, found " + updateCount);
             }
+
         } catch (SQLException e) {
             throw new UnitilsException("Error while setting database version", e);
         } finally {
@@ -210,7 +293,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      *
      * @return True if the last database version update succeeded, false otherwise
      */
-    private boolean lastUpdateSucceededImpl() {
+    private boolean isLastUpdateSucceededImpl() {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -218,11 +301,11 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             rs = st.executeQuery("select " + lastUpdateSucceededColumnName + " from " + versionTableName);
-            if (!rs.next()) {
-                throw new UnitilsException("Error while checking last database update succeeded. No version record found.");
+            if (rs.next()) {
+                return (rs.getInt(lastUpdateSucceededColumnName) == 1);
+            } else {
+                return false;
             }
-            return (rs.getInt(lastUpdateSucceededColumnName) == 1);
-
         } catch (SQLException e) {
             throw new UnitilsException("Error while checking whether last update succeeded", e);
         } finally {
@@ -236,7 +319,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      *
      * @param succeeded True for success
      */
-    private void registerUpdateSucceededImpl(boolean succeeded) throws StatementHandlerException {
+    private void registerUpdateSucceededImpl(boolean succeeded) {
         Connection conn = null;
         Statement st = null;
         try {
@@ -246,6 +329,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             if (updateCount != 1) {
                 throw new UnitilsException("Error while registering update succeeded. There should be exactly 1 version record, found " + updateCount);
             }
+
         } catch (SQLException e) {
             throw new UnitilsException("Error while registering update succeeded.", e);
         } finally {
@@ -253,6 +337,97 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+    /**
+     * @return The current version of the database
+     */
+    private long getCodeScriptsTimestampImpl() {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rs = st.executeQuery("select " + codeScriptsTimestampColumnName + " from " + versionTableName);
+            rs.next();
+            return rs.getLong(codeScriptsTimestampColumnName);
+
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while retrieving database version", e);
+        } finally {
+            DbUtils.closeQuietly(conn, st, rs);
+        }
+    }
+
+    /**
+     * Updates the timestamp of the database code to the given value
+     *
+     * @param timestamp The new timestamp
+     */
+    private void setCodeScriptsTimestampImpl(long timestamp) {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            int updateCount = st.executeUpdate("update " + versionTableName + " set " + codeScriptsTimestampColumnName + " = " + timestamp + "");
+            if (updateCount != 1) {
+                throw new UnitilsException("Error while setting database version. There should be exactly 1 version record, found " + updateCount);
+            }
+
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while setting database version", e);
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+    /**
+     * Tells us whether the last database version update succeeded or not
+     *
+     * @return True if the last database version update succeeded, false otherwise
+     */
+    private boolean isLastCodeUpdateSucceededImpl() {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            rs = st.executeQuery("select " + lastCodeUpdateSucceededColumnName + " from " + versionTableName);
+            if (rs.next()) {
+                return (rs.getInt(lastCodeUpdateSucceededColumnName) == 1);
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while checking whether last update succeeded", e);
+        } finally {
+            DbUtils.closeQuietly(conn, st, rs);
+        }
+    }
+
+    /**
+     * Notifies the VersionSource of the fact that the code script update has succeeded or not
+     *
+     * @param succeeded True for success
+     */
+    private void registerCodeUpdateSucceededImpl(boolean succeeded) {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.createStatement();
+            int updateCount = st.executeUpdate("update " + versionTableName + " set " + lastCodeUpdateSucceededColumnName + " = " + (succeeded ? "1" : "0"));
+            if (updateCount != 1) {
+                throw new UnitilsException("Error while registering update succeeded. There should be exactly 1 version record, found " + updateCount);
+            }
+
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while registering update succeeded.", e);
+        } finally {
+            DbUtils.closeQuietly(conn, st, null);
+        }
+    }
 
     /**
      * Checks if the version table and columns are available and if a record exists in which the version info is stored.
@@ -275,7 +450,9 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
                 // The version table does not exist. Create it
                 logger.info("The table " + versionTableName + " doesn't exist yet. It is being created");
                 statementHandler.handle("create table " + versionTableName + " ( " + versionIndexColumnName + " " + longDataType +
-                        ", " + versionTimestampColumnName + " " + longDataType + ", " + lastUpdateSucceededColumnName + " " + longDataType + " )");
+                        ", " + versionTimestampColumnName + " " + longDataType + ", " + lastUpdateSucceededColumnName + " " +
+                        longDataType + ", " + codeScriptsTimestampColumnName + " " + longDataType + ", " +
+                        lastCodeUpdateSucceededColumnName + " " + longDataType + " )");
             } else {
                 // Check if the version table has the expected column
                 rs.close();
@@ -299,6 +476,20 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
                     logger.info("Column " + lastUpdateSucceededColumnName + " is missing on table " + versionTableName + ". It is being created");
                     statementHandler.handle("alter table " + versionTableName + " add " + lastUpdateSucceededColumnName + " " + longDataType);
                 }
+                rs.close();
+                rs = metadata.getColumns(null, schemaName, versionTableName, codeScriptsTimestampColumnName);
+                if (!rs.next()) {
+                    // The version table exists but the version timestamp column does not. Create it
+                    logger.info("Column " + codeScriptsTimestampColumnName + " is missing on table " + versionTableName + ". It is being created");
+                    statementHandler.handle("alter table " + versionTableName + " add " + codeScriptsTimestampColumnName + " " + longDataType);
+                }
+                rs.close();
+                rs = metadata.getColumns(null, schemaName, versionTableName, lastCodeUpdateSucceededColumnName);
+                if (!rs.next()) {
+                    // The version table exists but the last update succeeded column does not. Create it
+                    logger.info("Column " + lastCodeUpdateSucceededColumnName + " is missing on table " + versionTableName + ". It is being created");
+                    statementHandler.handle("alter table " + versionTableName + " add " + lastCodeUpdateSucceededColumnName + " " + longDataType);
+                }
             }
             // The version table and columns exist. Check if a record with the version is available
             rs.close();
@@ -306,7 +497,8 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             if (!rs.next()) {
                 // The version table is empty. Insert a record with default version numbers.
                 statementHandler.handle("insert into " + versionTableName + " (" + versionIndexColumnName + ", " +
-                        versionTimestampColumnName + ", " + lastUpdateSucceededColumnName + ") values (0, 0, 0)");
+                        versionTimestampColumnName + ", " + lastUpdateSucceededColumnName + ", " +
+                        codeScriptsTimestampColumnName + ", " + lastCodeUpdateSucceededColumnName + ") values (0, 0, 0, 0, 0)");
             } else {
                 // version table was ok
                 return true;

@@ -18,6 +18,7 @@ package org.unitils.dbmaintainer.dbsupport;
 import static org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.SQLScriptParser;
+import org.unitils.dbmaintainer.util.SQLCodeScriptParser;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import javax.sql.DataSource;
@@ -333,6 +334,12 @@ abstract public class DbSupport {
     public List<String> parseStatements(String script) {
         SQLScriptParser sqlScriptParser = new SQLScriptParser();
         return sqlScriptParser.parseStatements(script);
+    }
+
+    public List<String> parseCodeStatements(String script) {
+
+        SQLCodeScriptParser sqlCodeScriptParser = new SQLCodeScriptParser();
+        return sqlCodeScriptParser.parseStatements(script);
     }
 
 

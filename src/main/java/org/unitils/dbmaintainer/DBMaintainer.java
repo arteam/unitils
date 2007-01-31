@@ -23,6 +23,8 @@ import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.StatementHandler;
+import org.unitils.dbmaintainer.script.CodeScriptRunner;
+import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.impl.LoggingStatementHandlerDecorator;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
@@ -104,6 +106,9 @@ public class DBMaintainer {
     /* Executer of the scripts */
     protected ScriptRunner scriptRunner;
 
+    /* Executer of code scripts */
+    private CodeScriptRunner codeScriptRunner;
+
     /* Clearer of the database (removed all tables, sequences, ...) before updating */
     protected DBClearer dbClearer;
 
@@ -147,6 +152,7 @@ public class DBMaintainer {
         StatementHandler statementHandler = new LoggingStatementHandlerDecorator(DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
 
         scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
+        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, dataSource, statementHandler);
         versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
         scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
 
@@ -190,12 +196,9 @@ public class DBMaintainer {
         // Get current version
         Version currentVersion = versionSource.getDbVersion();
 
-        // Determine whether a from scratch update should be performed
-        boolean rebuildDatabaseFromScratch = checkUpdateDatabaseFromScratch(currentVersion);
-
         // Clear the database and retrieve scripts
         List<VersionScriptPair> versionScriptPairs;
-        if (rebuildDatabaseFromScratch) {
+        if (updateDatabaseFromScratch(currentVersion)) {
             dbClearer.clearDatabase();
             versionScriptPairs = scriptSource.getAllScripts();
         } else {
@@ -203,33 +206,37 @@ public class DBMaintainer {
         }
 
         // Check whether there are new scripts
-        if (versionScriptPairs.isEmpty()) {
-            return;
-        }
-        logger.info("Database update scripts have been found and will be executed on the database");
+        if (!versionScriptPairs.isEmpty()) {
+            logger.info("Database update scripts have been found and will be executed on the database");
 
-        // Remove data from the database, that could cause errors when executing scripts. Such as for example
-        // when added a not null column.
-        if (dbCleaner != null) {
-            dbCleaner.cleanDatabase();
+            // Remove data from the database, that could cause errors when executing scripts. Such as for example
+            // when added a not null column.
+            if (dbCleaner != null) {
+                dbCleaner.cleanDatabase();
+            }
+
+            // Excute all of the scripts
+            executeScripts(versionScriptPairs);
+
+            // Disable FK and not null constraints, if enabled
+            if (constraintsDisabler != null) {
+                constraintsDisabler.disableConstraints();
+            }
+            // Update sequences to a sufficiently high value, if enabled
+            if (sequenceUpdater != null) {
+                sequenceUpdater.updateSequences();
+            }
+            // Generate a DTD to enable validation and completion in data xml files, if enabled
+            if (dtdGenerator != null) {
+                dtdGenerator.generateDtd();
+            }
         }
 
-        // Excute all of the scripts
-        executeScripts(versionScriptPairs);
-
-        // Disable FK and not null constraints, if enabled
-        if (constraintsDisabler != null) {
-            constraintsDisabler.disableConstraints();
+        if (!versionScriptPairs.isEmpty() // If the database structure was updated, also recreate the database code
+                || (!versionSource.isLastCodeUpdateSucceeded() && !onlyRebuildFromScratchAfterErrorWhenFilesModified) // If the last code update failed, retry if configured to do so
+                || scriptSource.getCodeScriptsTimestamp() > versionSource.getCodeScriptsTimestamp()) { // If a code script was added of changed, recreate the database code
+            executeCodeScripts(scriptSource.getAllCodeScripts());
         }
-        // Update sequences to a sufficiently high value, if enabled
-        if (sequenceUpdater != null) {
-            sequenceUpdater.updateSequences();
-        }
-        // Generate a DTD to enable validation and completion in data xml files, if enabled
-        if (dtdGenerator != null) {
-            dtdGenerator.generateDtd();
-        }
-
     }
 
 
@@ -246,27 +253,29 @@ public class DBMaintainer {
      * @param currentVersion The current database version, not null
      * @return True if a from scratch rebuild is needed, false otherwise
      */
-    protected boolean checkUpdateDatabaseFromScratch(Version currentVersion) {
+    protected boolean updateDatabaseFromScratch(Version currentVersion) {
         if (scriptSource.existingScriptsModified(currentVersion)) {
             if (!fromScratchEnabled) {
                 logger.warn("Existing database update scripts have been modified, but updating from scratch is disabled. The updated scripts are not executed again!!");
                 return false;
+            } else {
+                logger.info("One or more existing database update scripts have been modified. Database will be cleared and rebuilt from scratch");
+                return true;
             }
-            logger.info("One or more existing database update scripts have been modified. Database will be cleared and rebuilt from scratch");
-            return true;
-        }
-        if (!fromScratchEnabled) {
+        } else if (!versionSource.isLastUpdateSucceeded()) {
+            if (!fromScratchEnabled) {
+                logger.warn("The previous database update failed, so it would be a good idea to rebuild the database from scratch. " +
+                        "This is not done since updating from scratch is disabled!");
+                return false;
+            } else if (onlyRebuildFromScratchAfterErrorWhenFilesModified) {
+                logger.warn("The previous database update did not succeed and there were no modified script files. The updated scripts are not executed again!!");
+                return false;
+            } else {
+                return true;
+            }
+        } else {
             return false;
         }
-        if (versionSource.lastUpdateSucceeded()) {
-            return false;
-        }
-
-        if (onlyRebuildFromScratchAfterErrorWhenFilesModified) {
-            logger.warn("The previous database update did not succeed and there were no modified script files. The updated scripts are not executed again!!");
-            return false;
-        }
-        return true;
     }
 
 
@@ -275,7 +284,7 @@ public class DBMaintainer {
      * script execution, the new version is stored in the database and marked as succesful.
      * If a script execution fails and fromScratch is enabled, that script version is stored in the database and
      * marked as unsuccesful. If fromScratch is not enabled, the last succesful version is stored in the database
-     * that way, the next time an update is tried, the execution restarts from the last unsuccessful script .
+     * that way, the next time an update is tried, the execution restarts from the last unsuccessful script.
      *
      * @param versionScriptPairs The scripts to execute, not null
      * @throws StatementHandlerException If a script execution failed.
@@ -283,10 +292,10 @@ public class DBMaintainer {
     protected void executeScripts(List<VersionScriptPair> versionScriptPairs) throws StatementHandlerException {
         for (VersionScriptPair versionScriptPair : versionScriptPairs) {
             try {
-                scriptRunner.execute(versionScriptPair.getScript());
+                scriptRunner.execute(versionScriptPair.getScript().getScriptContent());
 
             } catch (StatementHandlerException e) {
-                logger.error("Error while executing script with version number " + versionScriptPair.getVersion() + ": " + versionScriptPair.getScript(), e);
+                logger.error("Error while executing script " + versionScriptPair.getScript().getFileName(), e);
                 if (fromScratchEnabled) {
                     // If rebuilding from scratch is disabled, the version is not incremented, to give the chance
                     // of fixing the erroneous script.
@@ -307,6 +316,33 @@ public class DBMaintainer {
             versionSource.setDbVersion(versionScriptPair.getVersion());
             versionSource.registerUpdateSucceeded(true);
             logger.info("Database version successfully incremented to " + versionScriptPair.getVersion());
+        }
+    }
+
+    /**
+     * Executes the given code scripts on the database and registers wether the update succeeded or not. If succeeded,
+     * the timestamp of the scripts is registered in the database.
+     *
+     * @param codeScripts The code scripts to execute, not null
+     * @throws StatementHandlerException If the script execution failed
+     */
+    protected void executeCodeScripts(List<Script> codeScripts) throws StatementHandlerException {
+        if (!codeScripts.isEmpty()) {
+            for (Script codeScript : codeScripts) {
+                try {
+                    codeScriptRunner.execute(codeScript.getScriptContent());
+
+                } catch (StatementHandlerException e) {
+
+                    logger.error("Error while executing code script " + codeScript.getFileName(), e);
+                    versionSource.registerCodeUpdateSucceeded(false);
+                    throw e;
+                }
+            }
+
+            // if the execution of all scripts succeeded, update the code scripts timestamp and mark as successful
+            versionSource.setCodeScriptsTimestamp(scriptSource.getCodeScriptsTimestamp());
+            versionSource.registerCodeUpdateSucceeded(true);
         }
     }
 

@@ -88,13 +88,12 @@ public class FileScriptSourceTest extends TestCase {
 
         // Initialize FileScriptSourceObject
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_DIR, DBCHANGE_FILE_DIRECTORY);
+        configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_LOCATION, DBCHANGE_FILE_DIRECTORY);
         configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_FILEEXTENSION, "sql");
 
         fileScriptSource = new FileScriptSource();
         fileScriptSource.doInit(configuration);
     }
-
 
     /**
      * Copies file from classpath to the given system path
@@ -112,7 +111,6 @@ public class FileScriptSourceTest extends TestCase {
         return new File(systemPath);
     }
 
-
     /**
      * Tests wether the FileScriptSource indicates that no existing scripts are modified when the current version is
      * one of the existing file versions, containing the existing file's timestamps.
@@ -123,7 +121,6 @@ public class FileScriptSourceTest extends TestCase {
         assertFalse(fileScriptSource.existingScriptsModified(versionIndex2));
     }
 
-
     /**
      * Tests wether the FileScriptSource indicates that one or more existing script are modified when the current version
      * has a timestamp older than the scripts
@@ -131,7 +128,6 @@ public class FileScriptSourceTest extends TestCase {
     public void testExistingScriptsModfied_modified() {
         assertTrue(fileScriptSource.existingScriptsModified(versionTimestampOld));
     }
-
 
     /**
      * Tests that script 1 and script 2 are returned when the current version is version 0
@@ -142,7 +138,6 @@ public class FileScriptSourceTest extends TestCase {
         checkScript2(scripts.get(1));
     }
 
-
     /**
      * Tests that script 2 is returned when the current version is version 1
      */
@@ -151,7 +146,6 @@ public class FileScriptSourceTest extends TestCase {
         checkScript2(scripts.get(0));
     }
 
-
     /**
      * Verifies that nothing is returned when the current version is version 2
      */
@@ -159,7 +153,6 @@ public class FileScriptSourceTest extends TestCase {
         List<VersionScriptPair> scripts = fileScriptSource.getNewScripts(versionIndex2); // There is no script2.sql, should return null
         assertTrue(scripts.isEmpty());
     }
-
 
     /**
      * Verifies that script 1 and script 2 are returned when requesting all scripts
@@ -170,16 +163,14 @@ public class FileScriptSourceTest extends TestCase {
         checkScript2(scripts.get(1));
     }
 
-
     /**
      * Checks if script 1 is returned with the correct version
      *
      * @param versionScriptPair the version and script to check, not null
      */
     private void checkScript1(VersionScriptPair versionScriptPair) {
-        assertRefEquals(new VersionScriptPair(new Version(1L, file2Timestamp), "Contents of script 1"), versionScriptPair);
+        assertRefEquals(new VersionScriptPair(new Version(1L, file2Timestamp), new Script(DBCHANGE_FILE1, "Contents of script 1")), versionScriptPair);
     }
-
 
     /**
      * Checks if script 1 is returned with the correct version
@@ -187,7 +178,7 @@ public class FileScriptSourceTest extends TestCase {
      * @param versionScriptPair the version and script to check, not null
      */
     private void checkScript2(VersionScriptPair versionScriptPair) {
-        assertRefEquals(new VersionScriptPair(new Version(2L, file2Timestamp), "Contents of script 2"), versionScriptPair);
+        assertRefEquals(new VersionScriptPair(new Version(2L, file2Timestamp), new Script(DBCHANGE_FILE2, "Contents of script 2")), versionScriptPair);
     }
 
 

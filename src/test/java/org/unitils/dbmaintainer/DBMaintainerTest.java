@@ -20,6 +20,7 @@ import static org.easymock.classextension.EasyMock.expectLastCall;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.script.ScriptSource;
+import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.impl.SQLScriptRunner;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
@@ -38,9 +39,6 @@ import java.util.List;
 
 /**
  * Tests the main algorithm of the DBMaintainer, using mocks for all implementation classes.
- *
- * @author Filip Neven
- * @author Tim Ducheyne
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class DBMaintainerTest extends UnitilsJUnit3 {
@@ -98,8 +96,8 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         version0 = new Version(0L, 0L);
         version1 = new Version(1L, 1L);
         version2 = new Version(2L, 2L);
-        versionScriptPairs.add(new VersionScriptPair(version1, "Script 1"));
-        versionScriptPairs.add(new VersionScriptPair(version2, "Script 2"));
+        versionScriptPairs.add(new VersionScriptPair(version1, new Script("script1.sql", "Script 1")));
+        versionScriptPairs.add(new VersionScriptPair(version2, new Script("script2.sql", "Script 2")));
     }
 
     /**
@@ -110,7 +108,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
+        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);
@@ -121,6 +119,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDtdGenerator.generateDtd();
+        expect(mockScriptSource.getAllCodeScripts()).andReturn(new ArrayList<Script>());
         replay();
 
         // Execute test
@@ -146,6 +145,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDtdGenerator.generateDtd();
+        expect(mockScriptSource.getAllCodeScripts()).andReturn(new ArrayList<Script>());
         replay();
 
         // Execute test
@@ -160,7 +160,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
     public void testUpdateDatabase_errorInScript() throws Exception {
         expect(mockVersionSource.getDbVersion()).andReturn(version0).anyTimes();
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
+        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         expectLastCall().andThrow(new StatementHandlerException("Test exception"));
@@ -182,10 +182,10 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
      */
     public void testCheckUpdateDatabaseFromScratch_notNeeded() throws Exception {
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(true);
+        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(true);
         replay();
 
-        boolean result = dbMaintainer.checkUpdateDatabaseFromScratch(version1);
+        boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
         assertFalse(result);
     }
 
@@ -197,7 +197,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
         replay();
 
-        boolean result = dbMaintainer.checkUpdateDatabaseFromScratch(version1);
+        boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
         assertTrue(result);
     }
 
@@ -207,10 +207,10 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
      */
     public void testCheckUpdateDatabaseFromScratch_lastUpdateFailed() throws Exception {
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(false);
+        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(false);
         replay();
 
-        boolean result = dbMaintainer.checkUpdateDatabaseFromScratch(version1);
+        boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
         assertTrue(result);
     }
 
@@ -222,10 +222,10 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
     public void testCheckUpdateDatabaseFromScratch_lastUpdateFailedButIgnored() throws Exception {
         dbMaintainer.onlyRebuildFromScratchAfterErrorWhenFilesModified = true;
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.lastUpdateSucceeded()).andReturn(false);
+        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(false);
         replay();
 
-        boolean result = dbMaintainer.checkUpdateDatabaseFromScratch(version1);
+        boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
         assertFalse(result);
     }
 

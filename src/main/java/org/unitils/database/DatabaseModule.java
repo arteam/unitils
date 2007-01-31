@@ -137,7 +137,7 @@ public class DatabaseModule implements Module {
      */
     public void updateDatabaseSchema() {
         try {
-            logger.info("Updating database schema if needed and enabled.");
+            logger.info("Updating database schema if needed.");
             DBMaintainer dbMaintainer = new DBMaintainer(configuration, getDataSource());
             dbMaintainer.updateDatabase();
 
