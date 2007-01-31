@@ -64,7 +64,7 @@ import java.util.List;
  * will load the {@link HibernateConnectionProvider} as provider. This way we can make sure that Hibernate will use
  * the unitils datasource and thus connect to the unit test database.
  * <p/>
- * It is highly recommended to write a unit test that invokes {@link HibernateUnitils#assertMappingToDatabase(Object)},
+ * It is highly recommended to write a unit test that invokes {@link HibernateUnitils#assertMappingWithDatabaseConsistent()},
  * This is a very powerful test that verifies if the mapping of all your Hibernate mapped objects with the database is
  * correct.
  * <p/>
@@ -84,9 +84,9 @@ public class HibernateModule implements Module, Flushable {
     /* Manager for storing and creating hibernate configurations */
     private HibernateConfigurationManager hibernateConfigurationManager;
 
-    /* The Hibernate Session that is used in unit tests */
-    private Session hibernateSession;
+    private SessionFactory currentSessionFactory;
 
+    private Session currentSession;
 
     /**
      * Initializes the module.
@@ -94,6 +94,7 @@ public class HibernateModule implements Module, Flushable {
      * @param configuration The Unitils configuration, not null
      */
     public void init(org.apache.commons.configuration.Configuration configuration) {
+
         String hibernateConfigurationImplClassName = configuration.getString(PROPKEY_CONFIGURATION_CLASS_NAME);
         this.hibernateConfigurationManager = new HibernateConfigurationManager(hibernateConfigurationImplClassName);
     }
@@ -104,12 +105,13 @@ public class HibernateModule implements Module, Flushable {
      *
      * @param testObject The test instance, not null
      */
-    public void assertMappingToDatabase(Object testObject) {
+    public void assertMappingWithDatabaseConsistent(Object testObject) {
+
         Configuration configuration = getHibernateConfiguration(testObject);
         Session session = getHibernateSession(testObject);
         Dialect databaseDialect = getDatabaseDialect(configuration);
 
-        HibernateAssert.assertMappingToDatabase(configuration, session, databaseDialect);
+        HibernateAssert.assertMappingWithDatabaseConsistent(configuration, session, databaseDialect);
     }
 
 
@@ -121,10 +123,12 @@ public class HibernateModule implements Module, Flushable {
      * @return An open and connected Hibernate <code>Session</code>, not null
      */
     public Session getHibernateSession(Object testObject) {
-        if (hibernateSession == null || !hibernateSession.isOpen()) {
-            hibernateSession = getHibernateSessionFactory(testObject).openSession();
+
+        currentSession = getHibernateSessionFactory(testObject).getCurrentSession();
+        if (currentSession == null || !currentSession.isOpen()) {
+            currentSession = getHibernateSessionFactory(testObject).openSession();
         }
-        return hibernateSession;
+        return currentSession;
     }
 
 
@@ -138,7 +142,9 @@ public class HibernateModule implements Module, Flushable {
      * @return The Hibernate <code>SessionFactory</code>, not null
      */
     public SessionFactory getHibernateSessionFactory(Object testObject) {
-        return hibernateConfigurationManager.getHibernateSessionFactory(testObject);
+
+        currentSessionFactory = hibernateConfigurationManager.getHibernateSessionFactory(testObject);
+        return currentSessionFactory;
     }
 
 
@@ -157,14 +163,46 @@ public class HibernateModule implements Module, Flushable {
 
 
     /**
-     * Closes the current Hibernate session.
+     * Closes the currently opened Hibernate session. Such a Session can exist if the test class contains an
+     * {@link HibernateSession} annotation to which a Session was injected, or if the {@link #getHibernateSession(Object)}
+     * was called to get a <code>Session</code>, or if the test class contains a {@link HibernateSessionFactory} annotation
+     * to which a <code>SessionFactory</code> was injected, or if the {@link #getHibernateSessionFactory(Object)} method
+     * was called to get a <code>SessionFactory</code>, and a <code>Session</code> is currently opened on this
+     * <code>SessionFactory</code> (i.e. a <code>Session</code> is available using <code>SessionFactory.getCurrentSession()</code>).
      */
-    public void closeHibernateSession() {
-        if (hibernateSession != null && hibernateSession.isOpen()) {
+    public void closeHibernateSession(Object testObject) {
+
+        Session currentlyOpenedSession = getCurrenltlyOpenSession();
+        if (currentlyOpenedSession != null && currentlyOpenedSession.isOpen()) {
             logger.debug("Closing Hibernate Session");
-            hibernateSession.close();
-            hibernateSession = null;
+            currentlyOpenedSession.close();
         }
+        currentSession = null;
+        currentSessionFactory = null;
+    }
+
+    /**
+     * @return The hibernate Session that is currently open. Such a Session can exist if the test class contains an
+     * {@link HibernateSession} annotation to which a Session was injected, or if the {@link #getHibernateSession(Object)}
+     * was called to get a <code>Session</code>, or if the test class contains a {@link HibernateSessionFactory} annotation
+     * to which a <code>SessionFactory</code> was injected, or if the {@link #getHibernateSessionFactory(Object)} method
+     * was called to get a <code>SessionFactory</code>, and a <code>Session</code> is currently opened on this
+     * <code>SessionFactory</code> (i.e. a <code>Session</code> is available using <code>SessionFactory.getCurrentSession()</code>).
+     * If no such <code>Session</code> exists, null is returned.
+     */
+    private Session getCurrenltlyOpenSession() {
+
+        Session currentlyOpenSession = null;
+        // If a hibernate Session was created by Unitils and injected into a field or method annotated with @Session,
+        // this Session is closed
+        if (currentSession != null) {
+            currentlyOpenSession = currentSession;
+        // If a hibernate SessionFactory was injected into a field or method annotated with @SessionFactory, and if
+        // a Session is opened on this SessionFactory and available using getCurrentSession(), this Session is closed
+        } else if (currentSessionFactory != null) {
+            currentlyOpenSession = currentSessionFactory.getCurrentSession();
+        }
+        return currentlyOpenSession;
     }
 
 
@@ -186,8 +224,10 @@ public class HibernateModule implements Module, Flushable {
      * the method #getCurrentSession, flushing is not needed.
      */
     public void flushDatabaseUpdates() {
-        if (hibernateSession != null) {
-            hibernateSession.flush();
+
+        Session currentlyOpenSession = getCurrenltlyOpenSession();
+        if (currentlyOpenSession != null) {
+            currentlyOpenSession.close();
         }
     }
 
@@ -335,7 +375,7 @@ public class HibernateModule implements Module, Flushable {
 
         @Override
         public void afterTestMethod(Object testObject, Method testMethod) {
-            closeHibernateSession();
+            closeHibernateSession(testObject);
         }
 
     }
