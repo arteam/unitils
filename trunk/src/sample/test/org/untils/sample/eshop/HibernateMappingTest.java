@@ -15,17 +15,15 @@
  */
 package org.untils.sample.eshop;
 
-import org.unitils.hibernate.annotation.HibernateTest;
-import org.unitils.hibernate.HibernateAssert;
+import org.unitils.hibernate.HibernateUnitils;
 
 /**
  * 
  */
-@HibernateTest
 public class HibernateMappingTest extends BaseHibernateDaoTest {
 
     public void testMappingToDatabase() {
-        HibernateAssert.assertMappingToDatabase();
+        HibernateUnitils.assertMappingWithDatabaseConsistent();
     }
 
 }

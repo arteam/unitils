@@ -43,8 +43,8 @@ public class HibernateAssert {
      * @param session         The hibernate session, not null
      * @param databaseDialect The database dialect, not null
      */
-    public static void assertMappingToDatabase(Configuration configuration, Session session, Dialect databaseDialect) {
-        String[] script = generateScript(configuration, session, databaseDialect);
+    public static void assertMappingWithDatabaseConsistent(Configuration configuration, Session session, Dialect databaseDialect) {
+        String[] script = generateDatabaseUpdateScript(configuration, session, databaseDialect);
 
         List<String> differences = new ArrayList<String>();
         for (String line : script) {
@@ -54,7 +54,7 @@ public class HibernateAssert {
             }
         }
         assertTrue("Found mismatches between Java objects and database tables. Applying following DDL statements to the " +
-                "database should resolve the problem: \n" + formatMessage(differences), differences.isEmpty());
+                "database should resolve the problem: \n" + formatErrorMessage(differences), differences.isEmpty());
     }
 
 
@@ -66,7 +66,7 @@ public class HibernateAssert {
      * @param databaseDialect The database dialect, not null
      * @return String[] array of DDL statements that were needed to keep the database in sync with the mapping file
      */
-    private static String[] generateScript(Configuration configuration, Session session, Dialect databaseDialect) {
+    private static String[] generateDatabaseUpdateScript(Configuration configuration, Session session, Dialect databaseDialect) {
         try {
             DatabaseMetadata dbm = new DatabaseMetadata(session.connection(), databaseDialect);
             return configuration.generateSchemaUpdateScript(databaseDialect, dbm);
@@ -82,7 +82,7 @@ public class HibernateAssert {
      * @param messageParts The different parts of the message
      * @return A formatted message, containing the different message parts.
      */
-    private static String formatMessage(List<String> messageParts) {
+    private static String formatErrorMessage(List<String> messageParts) {
         StringBuffer message = new StringBuffer();
         for (String messagePart : messageParts) {
             message.append(messagePart);

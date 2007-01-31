@@ -33,14 +33,14 @@ public class HibernateUnitils {
      * that are loaded for the current test. This method assumes that the {@link HibernateModule} is enabled and
      * correctly configured.
      */
-    public static void assertMappingToDatabase() {
+    public static void assertMappingWithDatabaseConsistent() {
         Unitils unitils = Unitils.getInstance();
         Object testObject = unitils.getTestContext().getTestObject();
         if (testObject == null) {
             throw new UnitilsException("Unable to assert hibernate mapping for current test. No current test found.");
         }
         HibernateModule hibernateModule = unitils.getModulesRepository().getModuleOfType(HibernateModule.class);
-        hibernateModule.assertMappingToDatabase(testObject);
+        hibernateModule.assertMappingWithDatabaseConsistent(testObject);
     }
 
 
