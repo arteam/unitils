@@ -55,6 +55,16 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
+     * Retrieves the names of all the types in the database schema.
+     *
+     * @return The names of all types in the database
+     */
+    public Set<String> getTypeNames() throws SQLException {
+        return getOracleIdentifiers("TYPE_NAME", "USER_TYPES");
+    }
+
+
+    /**
      * Removes the table with the given name from the database.
      * Note: the table name is surrounded with quotes, making it case-sensitive.
      *
@@ -157,6 +167,15 @@ public class OracleDbSupport extends DbSupport {
      */
     public boolean supportsIdentityColumns() {
         return false;
+    }
+
+    /**
+     * Types are supported
+     *
+     * @return true
+     */
+    public boolean supportsTypes() {
+        return true;
     }
 
 

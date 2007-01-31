@@ -111,6 +111,13 @@ abstract public class DbSupport {
      */
     abstract public Set<String> getTriggerNames() throws SQLException;
 
+    /**
+     * Retrieves the names of all the types in the database schema.
+     *
+     * @return The names of all types in the database
+     */
+    abstract public Set<String> getTypeNames() throws SQLException;
+
 
     /**
      * Removes the table with the given name from the database.
@@ -163,6 +170,19 @@ abstract public class DbSupport {
 
 
     /**
+     * Drops the type with the given name from the database
+     * Note: the type name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param typeName The type to drop (case-sensitive), not null
+     */
+    public void dropType(String typeName) throws StatementHandlerException {
+        if (supportsTypes()) {
+            statementHandler.handle("drop type \"" + typeName + "\"");
+        }
+    }
+
+
+    /**
      * Returns the value of the sequence with the given name
      *
      * @param sequenceName The sequence, not null
@@ -203,6 +223,12 @@ abstract public class DbSupport {
      */
     abstract public boolean supportsIdentityColumns();
 
+    /**
+     * Indicates whether the underlying DBMS supports database types
+     *
+     * @return True if types are supported, false otherwise
+     */
+    abstract public boolean supportsTypes();
 
     /**
      * Gets the names of all primary columns of the given table.
