@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import org.unitils.core.UnitilsException;
 import org.unitils.hibernate.annotation.HibernateConfiguration;
@@ -52,10 +53,14 @@ public class HibernateConfigurationManager {
     /**
      * All created session factories per configuration
      */
-    protected Map<Configuration, SessionFactory> hibernateSessionFactories = new HashMap<Configuration, SessionFactory>();
+    protected Map<Configuration, SessionInterceptingSessionFactory> hibernateSessionFactories
+            = new HashMap<Configuration, SessionInterceptingSessionFactory>();
 
     /* The class name to use when creating a hibernate configuration */
     private String hibernateConfigurationImplClassName;
+
+    /* todo javadoc */
+    private boolean manageCurrentSessionContext;
 
 
     /**
@@ -63,8 +68,9 @@ public class HibernateConfigurationManager {
      *
      * @param configurationImplClassName The class name, not null
      */
-    public HibernateConfigurationManager(String configurationImplClassName) {
+    public HibernateConfigurationManager(String configurationImplClassName, boolean manageCurrentSessionContext) {
         this.hibernateConfigurationImplClassName = configurationImplClassName;
+        this.manageCurrentSessionContext = manageCurrentSessionContext;
     }
 
 
@@ -116,16 +122,16 @@ public class HibernateConfigurationManager {
      * @param testObject The test object, not null
      * @return The Hibernate session factory, not null
      */
-    public SessionFactory getHibernateSessionFactory(Object testObject) {
+    public SessionInterceptingSessionFactory getHibernateSessionFactory(Object testObject) {
         // check whether it already exists
         Configuration hibernateConfiguration = getHibernateConfiguration(testObject);
-        SessionFactory hibernateSessionFactory = hibernateSessionFactories.get(hibernateConfiguration);
+        SessionInterceptingSessionFactory hibernateSessionFactory = hibernateSessionFactories.get(hibernateConfiguration);
         if (hibernateSessionFactory != null) {
             return hibernateSessionFactory;
         }
 
         // create session factory
-        hibernateSessionFactory = hibernateConfiguration.buildSessionFactory();
+        hibernateSessionFactory = new SessionInterceptingSessionFactory(hibernateConfiguration.buildSessionFactory());
 
         // store session factory
         hibernateSessionFactories.put(hibernateConfiguration, hibernateSessionFactory);
@@ -184,14 +190,25 @@ public class HibernateConfigurationManager {
             hibernateConfiguration = createHibernateConfigurationForLocations(null);
         }
 
+        Properties unitilsHibernateProperties = new Properties();
+
         // configure hibernate to use unitils datasource
         if (hibernateConfiguration.getProperty(CONNECTION_PROVIDER) != null) {
             logger.warn("The property " + CONNECTION_PROVIDER + " is present in your Hibernate configuration. " +
                     "This property will be overwritten with Unitils own ConnectionProvider implementation!");
         }
-        Properties connectionProviderProperty = new Properties();
-        connectionProviderProperty.setProperty(CONNECTION_PROVIDER, HibernateConnectionProvider.class.getName());
-        hibernateConfiguration.addProperties(connectionProviderProperty);
+        unitilsHibernateProperties.setProperty(CONNECTION_PROVIDER, HibernateConnectionProvider.class.getName());
+
+        // if enabled, configure hibernate's current session management
+        if (manageCurrentSessionContext) {
+            if (hibernateConfiguration.getProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS) != null) {
+                logger.warn("The property " + Environment.CURRENT_SESSION_CONTEXT_CLASS + " is present in your Hibernate " +
+                        "configuration. This property will be overwritten with Unitils own CurrentSessionContext implementation!");
+            }
+            unitilsHibernateProperties.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, HibernateCurrentSessionContext.class.getName());
+        }
+
+        hibernateConfiguration.addProperties(unitilsHibernateProperties);
         return hibernateConfiguration;
     }
 
