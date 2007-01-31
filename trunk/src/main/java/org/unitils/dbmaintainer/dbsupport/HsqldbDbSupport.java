@@ -59,6 +59,13 @@ public class HsqldbDbSupport extends DbSupport {
         return getHsqlDbIdentifiers("TRIGGER_NAME", "SYSTEM_TRIGGERS", "TRIGGER_SCHEM");
     }
 
+    /**
+     * Not supported
+     */
+    public Set<String> getTypeNames() {
+        throw new UnsupportedOperationException("Hsqldb doesn't support types");
+    }
+
 
     /**
      * Returns the value of the sequence with the given name
@@ -121,6 +128,15 @@ public class HsqldbDbSupport extends DbSupport {
      */
     public boolean supportsIdentityColumns() {
         return true;
+    }
+
+    /**
+     * Types are not supported
+     *
+     * @return false
+     */
+    public boolean supportsTypes() {
+        return false;
     }
 
 

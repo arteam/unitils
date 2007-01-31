@@ -56,6 +56,14 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
+     * Not supported
+     */
+    public Set<String> getTypeNames() {
+        throw new UnsupportedOperationException("DB2 doesn't support types");
+    }
+
+
+    /**
      * Returns the value of the sequence with the given name
      *
      * @param sequenceName The sequence, not null
@@ -119,6 +127,15 @@ public class Db2DbSupport extends DbSupport {
      */
     public boolean supportsIdentityColumns() {
         return true;
+    }
+
+    /**
+     * Types are not supported
+     *
+     * @return false
+     */
+    public boolean supportsTypes() {
+        return false;
     }
 
 

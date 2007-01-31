@@ -79,12 +79,12 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
             dropTables();
             dropSequences();
             dropTriggers();
+            dropTypes();
 
         } catch (SQLException e) {
             throw new UnitilsException("Error while clearing database", e);
         }
     }
-
 
     /**
      * Drops all views.
@@ -149,6 +149,20 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
                 }
                 logger.debug("Dropping database trigger: " + triggerName);
                 dbSupport.dropTrigger(triggerName);
+            }
+        }
+    }
+
+    protected void dropTypes() throws SQLException, StatementHandlerException {
+        if (dbSupport.supportsTypes()) {
+            Set<String> typeNames = dbSupport.getTypeNames();
+            for (String typeName : typeNames) {
+                // check whether type needs to be preserved
+                if (itemsToPreserve.contains(typeName)) {
+                    continue;
+                }
+                logger.debug("Dropping database type: " + typeName);
+                dbSupport.dropType(typeName);
             }
         }
     }
