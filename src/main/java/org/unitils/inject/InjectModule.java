@@ -428,7 +428,8 @@ public class InjectModule implements Module {
      * @return A situated error message
      */
     protected String getSituatedErrorMessage(Class<? extends Annotation> annotationClass, Field annotatedField, String errorDescription) {
-        return "Error while processing @" + annotationClass.getSimpleName() + " annotation on field " + annotatedField.getName() + ": " + errorDescription;
+        return "Error while processing @" + annotationClass.getSimpleName() + " annotation on field " + annotatedField.getName()
+                + " of class " + annotatedField.getDeclaringClass().getSimpleName() + ": " + errorDescription;
     }
 
 

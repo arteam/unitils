@@ -33,6 +33,7 @@ import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.hibernate.util.HibernateAssert;
 import org.unitils.hibernate.util.HibernateConfigurationManager;
 import org.unitils.hibernate.util.HibernateConnectionProvider;
+import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
 import org.unitils.util.AnnotationUtils;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
@@ -43,6 +44,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Module providing support for unit tests for code that uses Hibernate. It offers an easy way of loading hibernate
@@ -78,13 +81,16 @@ public class HibernateModule implements Module, Flushable {
     /* Property key of the class name of the hibernate configuration */
     public static final String PROPKEY_CONFIGURATION_CLASS_NAME = "HibernateModule.configuration.implClassName";
 
+    /* todo javadoc */
+    public static final String PROPKEY_MANAGECURRENTSESSIONCONTEXT_ENABLED = "HibernateModule.managecurrentsessioncontext.enabled";
+
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(HibernateModule.class);
 
     /* Manager for storing and creating hibernate configurations */
     private HibernateConfigurationManager hibernateConfigurationManager;
 
-    private SessionFactory currentSessionFactory;
+    private SessionInterceptingSessionFactory currentSessionFactory;
 
     private Session currentSession;
 
@@ -96,7 +102,9 @@ public class HibernateModule implements Module, Flushable {
     public void init(org.apache.commons.configuration.Configuration configuration) {
 
         String hibernateConfigurationImplClassName = configuration.getString(PROPKEY_CONFIGURATION_CLASS_NAME);
-        this.hibernateConfigurationManager = new HibernateConfigurationManager(hibernateConfigurationImplClassName);
+        boolean manageCurrentSessionContext = configuration.getBoolean(PROPKEY_MANAGECURRENTSESSIONCONTEXT_ENABLED);
+        this.hibernateConfigurationManager = new HibernateConfigurationManager(hibernateConfigurationImplClassName,
+                manageCurrentSessionContext);
     }
 
 
@@ -172,13 +180,18 @@ public class HibernateModule implements Module, Flushable {
      */
     public void closeHibernateSession(Object testObject) {
 
-        Session currentlyOpenedSession = getCurrenltlyOpenSession();
-        if (currentlyOpenedSession != null && currentlyOpenedSession.isOpen()) {
-            logger.debug("Closing Hibernate Session");
-            currentlyOpenedSession.close();
+        Set<Session> openedSessions = getOpenedSessions();
+        for (Session openedSession : openedSessions) {
+            if (openedSession.isOpen()) {
+                logger.debug("Closing Hibernate Session");
+                openedSession.close();
+            }
         }
         currentSession = null;
-        currentSessionFactory = null;
+        if (currentSessionFactory != null) {
+            currentSessionFactory.forgetOpenedSessions();
+            currentSessionFactory = null;
+        }
     }
 
     /**
@@ -190,19 +203,16 @@ public class HibernateModule implements Module, Flushable {
      * <code>SessionFactory</code> (i.e. a <code>Session</code> is available using <code>SessionFactory.getCurrentSession()</code>).
      * If no such <code>Session</code> exists, null is returned.
      */
-    private Session getCurrenltlyOpenSession() {
+    private Set<Session> getOpenedSessions() {
 
-        Session currentlyOpenSession = null;
-        // If a hibernate Session was created by Unitils and injected into a field or method annotated with @Session,
-        // this Session is closed
+        Set<Session> openedSessions = new HashSet<Session>();
         if (currentSession != null) {
-            currentlyOpenSession = currentSession;
-        // If a hibernate SessionFactory was injected into a field or method annotated with @SessionFactory, and if
-        // a Session is opened on this SessionFactory and available using getCurrentSession(), this Session is closed
-        } else if (currentSessionFactory != null) {
-            currentlyOpenSession = currentSessionFactory.getCurrentSession();
+            openedSessions.add(currentSession);
         }
-        return currentlyOpenSession;
+        if (currentSessionFactory != null) {
+            openedSessions.addAll(currentSessionFactory.getOpenedSessions());
+        }
+        return openedSessions;
     }
 
 
@@ -225,9 +235,9 @@ public class HibernateModule implements Module, Flushable {
      */
     public void flushDatabaseUpdates() {
 
-        Session currentlyOpenSession = getCurrenltlyOpenSession();
-        if (currentlyOpenSession != null) {
-            currentlyOpenSession.close();
+        Set<Session> openedSessions = getOpenedSessions();
+        for (Session openedSession : openedSessions) {
+            openedSession.flush();
         }
     }
 
