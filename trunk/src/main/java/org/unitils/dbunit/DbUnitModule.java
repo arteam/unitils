@@ -23,6 +23,7 @@ import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.operation.DatabaseOperation;
+import org.dbunit.DatabaseUnitException;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
@@ -129,10 +130,10 @@ public class DbUnitModule implements Module {
         try {
             IDataSet dataSet = getTestDataSet(testMethod);
             if (dataSet == null) {
-                // no data set should be loaded
+                // no dataset specified
                 return;
             }
-            DatabaseOperation.CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
+            insertDataSet(dataSet);
 
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
@@ -141,6 +142,21 @@ public class DbUnitModule implements Module {
         }
     }
 
+    public void insertTestData(String testDataFileName) {
+        try {
+            IDataSet dataSet = getTestDataSet(testDataFileName);
+            insertDataSet(dataSet);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error inserting test data from DbUnit dataset " + testDataFileName, e);
+        } finally {
+            closeJdbcConnection();
+        }
+    }
+
+    private void insertDataSet(IDataSet dataSet) throws DatabaseUnitException, SQLException {
+        DatabaseOperation.CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
+    }
 
     /**
      * todo javadoc
@@ -243,6 +259,19 @@ public class DbUnitModule implements Module {
         return dataSet;
     }
 
+    /**
+     * todo javadoc
+     * @param testDataSetFileName
+     * @return
+     */
+    public IDataSet getTestDataSet(String testDataSetFileName) {
+        IDataSet dataSet = createDataSet(testDataSetFileName);
+        if (dataSet == null) {
+            throw new UnitilsException("Could not find DbUnit dataset with name " + testDataSetFileName);
+        }
+        return dataSet;
+    }
+
 
     //todo javadoc
     /**
@@ -294,14 +323,40 @@ public class DbUnitModule implements Module {
      * @return The data set, null if the file does not exist
      */
     protected IDataSet createDataSet(Class testClass, String dataSetFilename) {
-        InputStream in = null;
-        try {
-            in = testClass.getResourceAsStream(dataSetFilename);
-            if (in == null) {
-                // file does not exist
-                return null;
-            }
+        InputStream in = testClass.getResourceAsStream(dataSetFilename);
+        if (in == null) {
+            // file does not exist
+            return null;
+        }
 
+        return createDataSet(in, dataSetFilename);
+    }
+
+    /**
+     * Creates the dataset for the given file. Filenames that start with '/' are treated absolute. Filenames that
+     * do not start with '/', are relative to the current class.
+     *
+     * @param dataSetFilename The name, (start with '/' for absolute names), not null
+     * @return The data set, null if the file does not exist
+     */
+    protected IDataSet createDataSet(String dataSetFilename) {
+        InputStream in = ClassLoader.getSystemResourceAsStream(dataSetFilename);
+        if (in == null) {
+            // file does not exist
+            return null;
+        }
+
+        return createDataSet(in, dataSetFilename);
+    }
+
+    /**
+     * TODO javadoc
+     * @param in
+     * @param dataSetFilename
+     * @return
+     */
+    private IDataSet createDataSet(InputStream in, String dataSetFilename) {
+        try {
             IDataSet dataSet = new TablePerRowXmlDataSet(in);
             ReplacementDataSet replacementDataSet = new ReplacementDataSet(dataSet);
             replacementDataSet.addReplacementObject("[null]", null);

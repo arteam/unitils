@@ -56,15 +56,18 @@ public class ConfigUtils {
      *
      * @param type          The type of the instance
      * @param configuration The configuration containing the necessary properties for configuring the instance
-     * @param implementationDiscriminatorValue
-     *                      The value that defines which specific implementation class should be used.
+     * @param implementationDiscriminatorValues
+     *                      The values that define which specific implementation class should be used.
      *                      This is typically an environment specific property, like the DBMS that is used.
      * @return The configured instance
      */
-    public static <T> T getConfiguredInstance(Class type, Configuration configuration, String implementationDiscriminatorValue) {
+    public static <T> T getConfiguredInstance(Class type, Configuration configuration, String... implementationDiscriminatorValues) {
 
         String propKey = type.getName() + ".implClassName";
-        String implementationSpecificPropKey = propKey + "." + implementationDiscriminatorValue;
+        String implementationSpecificPropKey = propKey;
+        for (String implementationDiscriminatorValue : implementationDiscriminatorValues) {
+            implementationSpecificPropKey += '.' + implementationDiscriminatorValue;
+        }
         logger.debug("Creating instance of " + type + ". Trying to retrieve concrete implementation class from the property " + implementationSpecificPropKey);
 
         if (configuration.containsKey(implementationSpecificPropKey)) {

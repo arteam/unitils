@@ -22,8 +22,10 @@ import java.util.List;
 
 /**
  * Defines the contract for a source that provides scripts for updating the database to a given state.<br>
- * Scripts are provided as {@link VersionScriptPair} objects, which indicate which scripts should be executed, to
- * update the database to a given state.
+ * Database update scripts are provided as {@link VersionScriptPair} objects, which indicate which scripts should be
+ * executed, to update the database to a given state.
+ * Code scripts (stored procedures etc) are provides as {@link Script} objects. Database code scripts are regarded to
+ * be repeatably executable on the database. Therefore, all code scripts are always returned as a whole.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -55,5 +57,15 @@ public interface ScriptSource {
      *         can be used to completely recreate the database from scratch.
      */
     List<VersionScriptPair> getAllScripts();
+
+    /**
+     * @return The highest timestamp of all the code scripts that are currently available
+     */
+    long getCodeScriptsTimestamp();
+
+    /**
+     * @return All the code scripts that are currently available
+     */
+    List<Script> getAllCodeScripts();
 
 }

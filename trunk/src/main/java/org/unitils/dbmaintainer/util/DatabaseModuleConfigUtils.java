@@ -53,14 +53,14 @@ public class DatabaseModuleConfigUtils {
      * @param statementHandler The statement handler, not null
      * @return The configured instance
      */
-    public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
+    public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Configuration configuration,
+                DataSource dataSource, StatementHandler statementHandler) {
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
         DatabaseTask instance = ConfigUtils.getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
         DbSupport dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
         instance.init(configuration, dbSupport, dataSource, statementHandler);
         return (T) instance;
     }
-
 
     /**
      * Returns the concrete, dbms specific instance of {@link DbSupport} which is configured by the given <code>Configuration</code>.
