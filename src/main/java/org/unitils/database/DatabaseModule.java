@@ -155,13 +155,14 @@ public class DatabaseModule implements Module {
      */
     public void injectDataSource(Object testObject) {
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+        DataSource dataSource = getDataSource();
         for (Field field : fields) {
             try {
-                setFieldValue(testObject, field, getDataSource());
+                setFieldValue(testObject, field, dataSource);
 
             } catch (UnitilsException e) {
                 throw new UnitilsException("Unable to assign the DataSource to field annotated with @" + TestDataSource.class.getSimpleName() +
-                        "Ensure that this field is of type " + DataSource.class.getName(), e);
+                        ". Ensure that this field is of type " + DataSource.class.getName(), e);
             }
         }
 
