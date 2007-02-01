@@ -28,6 +28,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.io.InputStream;
 
 /**
  * Test class for loading of data sets by the {@link DbUnitModule}.
@@ -164,6 +165,15 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
     public void testInsertTestData_customClassDataSetOverridenByDefault() throws Exception {
         dbUnitModule.insertTestData(DataSetTestCustomClassLevel.class.getMethod("testMethod2"));
         assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestCustomClassLevel.testMethod2.xml");
+    }
+
+    /**
+     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream)} 
+     */
+    public void testInsertTestData_directCall() throws Exception {
+        InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
+        dbUnitModule.insertTestData(dataSetIS);
+        assertLoadedDataSet("CustomDataSet.xml");
     }
 
 

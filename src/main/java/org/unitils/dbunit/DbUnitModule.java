@@ -142,15 +142,18 @@ public class DbUnitModule implements Module {
         }
     }
 
-
-    // todo javadoc
-    public void insertTestData(String testDataFileName) {
+    /**
+     * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
+     *
+     * @param testDataFile
+     */
+    public void insertTestData(InputStream testDataFile) {
         try {
-            IDataSet dataSet = getTestDataSet(testDataFileName);
+            IDataSet dataSet = getTestDataSet(testDataFile);
             insertDataSet(dataSet);
 
         } catch (Exception e) {
-            throw new UnitilsException("Error inserting test data from DbUnit dataset " + testDataFileName, e);
+            throw new UnitilsException("Error inserting test data from DbUnit dataset", e);
         } finally {
             closeJdbcConnection();
         }
@@ -264,22 +267,25 @@ public class DbUnitModule implements Module {
     }
 
     /**
-     * todo javadoc
+     * Creates a dbunit <code>IDataSet</code> object, in which the file coming from the given <code>InputStream</code>
+     * is loaded.
      *
-     * @param testDataSetFileName
-     * @return
+     * @param testDataSetFile
+     * @return A DbUnit <code>IDataSet</code> object
      */
-    public IDataSet getTestDataSet(String testDataSetFileName) {
-        IDataSet dataSet = createDataSet(testDataSetFileName);
+    public IDataSet getTestDataSet(InputStream testDataSetFile) {
+        IDataSet dataSet = createDataSet(testDataSetFile, null);
         if (dataSet == null) {
-            throw new UnitilsException("Could not find DbUnit dataset with name " + testDataSetFileName);
+            throw new UnitilsException("Could not load DbUnit dataset");
         }
         return dataSet;
     }
 
 
-    //todo javadoc
     /**
+     * Returns the DbUnit <code>IDataSet</code> that represents the state of a number of database tables after the given
+     * <code>Method</code> has been executed.
+     *
      * @param testMethod The test method, not null
      * @return The dataset, null if there is no data set
      */
@@ -357,11 +363,12 @@ public class DbUnitModule implements Module {
 
 
     /**
-     * TODO javadoc
-     *
-     * @param in
-     * @param dataSetFilename
-     * @return
+     * Create a dbunit <code>IDataSet</code> object, in which the file coming from the given <code>InputStream</code>
+     * is loaded.
+     * 
+     * @param in the InputStream, not null
+     * @param dataSetFilename, the name of the file. Only used for extra info in case of an exception, may be null
+     * @return The DbUnit <code>IDataSet</code>
      */
     private IDataSet createDataSet(InputStream in, String dataSetFilename) {
         try {
@@ -371,7 +378,7 @@ public class DbUnitModule implements Module {
             return replacementDataSet;
 
         } catch (Exception e) {
-            throw new UnitilsException("Unble to create DbUnit dataset for file " + dataSetFilename, e);
+            throw new UnitilsException("Unble to create DbUnit dataset for file " + (dataSetFilename == null?"":dataSetFilename), e);
         } finally {
             closeQuietly(in);
         }
