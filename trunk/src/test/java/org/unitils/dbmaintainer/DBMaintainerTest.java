@@ -19,8 +19,8 @@ import static org.easymock.classextension.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.expectLastCall;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.SQLScriptRunner;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
@@ -39,37 +39,39 @@ import java.util.List;
 
 /**
  * Tests the main algorithm of the DBMaintainer, using mocks for all implementation classes.
+ *
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-@SuppressWarnings({"UnusedDeclaration"})
 public class DBMaintainerTest extends UnitilsJUnit3 {
 
     @Mock
     @InjectIntoByType
-    private VersionSource mockVersionSource;
+    private VersionSource mockVersionSource = null;
 
     @Mock
     @InjectIntoByType
-    private ScriptSource mockScriptSource;
+    private ScriptSource mockScriptSource = null;
 
     @Mock
     @InjectIntoByType
-    private SQLScriptRunner mockScriptRunner;
+    private SQLScriptRunner mockScriptRunner = null;
 
     @Mock
     @InjectIntoByType
-    private DBClearer mockDbClearer;
+    private DBClearer mockDbClearer = null;
 
     @Mock
     @InjectIntoByType
-    private ConstraintsDisabler mockConstraintsDisabler;
+    private ConstraintsDisabler mockConstraintsDisabler = null;
 
     @Mock
     @InjectIntoByType
-    private SequenceUpdater mockSequenceUpdater;
+    private SequenceUpdater mockSequenceUpdater = null;
 
     @Mock
     @InjectIntoByType
-    private DtdGenerator mockDtdGenerator;
+    private DtdGenerator mockDtdGenerator = null;
 
     @TestedObject
     private DBMaintainer dbMaintainer;
@@ -100,6 +102,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         versionScriptPairs.add(new VersionScriptPair(version2, new Script("script2.sql", "Script 2")));
     }
 
+
     /**
      * Tests incremental update of a database: No existing scripts are modified, but new ones are added. The database
      * is not cleared but the new scripts are executed on by one, incrementing the database version each time.
@@ -125,6 +128,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         // Execute test
         dbMaintainer.updateDatabase();
     }
+
 
     /**
      * Tests updating the database from scratch: Existing scripts have been modified. The database is cleared first

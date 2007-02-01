@@ -22,8 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
-import org.unitils.dbmaintainer.version.VersionSource;
 import org.unitils.dbmaintainer.version.Version;
+import org.unitils.dbmaintainer.version.VersionSource;
 
 import java.sql.*;
 
@@ -171,6 +171,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+
     /**
      * Tells us whether the last database code update succeeded or not
      *
@@ -189,11 +190,11 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+
     /**
      * Notifies the VersionSource of the fact that the lastest code update has succeeded or not
      *
-     * @param succeeded
-     * @throws StatementHandlerException
+     * @param succeeded True for success
      */
     public void registerCodeUpdateSucceeded(boolean succeeded) throws StatementHandlerException {
         try {
@@ -207,6 +208,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             registerCodeUpdateSucceededImpl(succeeded);
         }
     }
+
 
     /**
      * @return The current timestamp of the code scripts
@@ -224,9 +226,11 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+
     /**
      * Stores the timestamp of the code scripts in the VersionSource
-     * @param codeScriptsTimestamp
+     *
+     * @param codeScriptsTimestamp The timestamp, not null
      */
     public void setCodeScriptsTimestamp(long codeScriptsTimestamp) {
         try {
@@ -337,6 +341,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+
     /**
      * @return The current version of the database
      */
@@ -381,6 +386,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+
     /**
      * Tells us whether the last database version update succeeded or not
      *
@@ -406,6 +412,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         }
     }
 
+
     /**
      * Notifies the VersionSource of the fact that the code script update has succeeded or not
      *
@@ -421,13 +428,13 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
             if (updateCount != 1) {
                 throw new UnitilsException("Error while registering update succeeded. There should be exactly 1 version record, found " + updateCount);
             }
-
         } catch (SQLException e) {
             throw new UnitilsException("Error while registering update succeeded.", e);
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     /**
      * Checks if the version table and columns are available and if a record exists in which the version info is stored.

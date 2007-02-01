@@ -15,8 +15,8 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.unitils.dbmaintainer.version.VersionScriptPair;
 import org.unitils.dbmaintainer.version.Version;
+import org.unitils.dbmaintainer.version.VersionScriptPair;
 
 import java.util.List;
 
@@ -58,10 +58,12 @@ public interface ScriptSource {
      */
     List<VersionScriptPair> getAllScripts();
 
+
     /**
      * @return The highest timestamp of all the code scripts that are currently available
      */
     long getCodeScriptsTimestamp();
+
 
     /**
      * @return All the code scripts that are currently available

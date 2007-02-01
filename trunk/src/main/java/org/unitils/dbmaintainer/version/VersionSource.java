@@ -45,9 +45,10 @@ public interface VersionSource {
     /**
      * Tells us whether the last database version update succeeded or not
      *
-     * @return true if the last database version update succeeded, false otherwise
+     * @return True if the last database version update succeeded, false otherwise
      */
     boolean isLastUpdateSucceeded();
+
 
     /**
      * Notifies the VersionSource of the fact that the lastest version update has succeeded or not
@@ -56,6 +57,7 @@ public interface VersionSource {
      */
     void registerUpdateSucceeded(boolean succeeded) throws StatementHandlerException;
 
+
     /**
      * Tells us whether the last database code update succeeded or not
      *
@@ -63,22 +65,25 @@ public interface VersionSource {
      */
     boolean isLastCodeUpdateSucceeded();
 
+
     /**
      * Notifies the VersionSource of the fact that the lastest code update has succeeded or not
      *
-     * @param succeeded
-     * @throws StatementHandlerException
+     * @param succeeded True for success
      */
     void registerCodeUpdateSucceeded(boolean succeeded) throws StatementHandlerException;
+
 
     /**
      * @return The current timestamp of the code scripts
      */
     long getCodeScriptsTimestamp();
 
+
     /**
      * Stores the timestamp of the code scripts in the VersionSource
-     * @param codeScriptsTimestamp
+     *
+     * @param codeScriptsTimestamp The timestamp, not null
      */
     void setCodeScriptsTimestamp(long codeScriptsTimestamp);
 

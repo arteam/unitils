@@ -18,12 +18,12 @@ package org.unitils.dbunit;
 import org.apache.commons.configuration.Configuration;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.dbunit.Assertion.assertEquals;
+import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.dbunit.dataset.filter.DefaultColumnFilter;
 import org.dbunit.operation.DatabaseOperation;
-import org.dbunit.DatabaseUnitException;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
@@ -142,6 +142,8 @@ public class DbUnitModule implements Module {
         }
     }
 
+
+    // todo javadoc
     public void insertTestData(String testDataFileName) {
         try {
             IDataSet dataSet = getTestDataSet(testDataFileName);
@@ -154,9 +156,11 @@ public class DbUnitModule implements Module {
         }
     }
 
+    // todo javadoc
     private void insertDataSet(IDataSet dataSet) throws DatabaseUnitException, SQLException {
         DatabaseOperation.CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
     }
+
 
     /**
      * todo javadoc
@@ -261,6 +265,7 @@ public class DbUnitModule implements Module {
 
     /**
      * todo javadoc
+     *
      * @param testDataSetFileName
      * @return
      */
@@ -332,6 +337,7 @@ public class DbUnitModule implements Module {
         return createDataSet(in, dataSetFilename);
     }
 
+
     /**
      * Creates the dataset for the given file. Filenames that start with '/' are treated absolute. Filenames that
      * do not start with '/', are relative to the current class.
@@ -349,8 +355,10 @@ public class DbUnitModule implements Module {
         return createDataSet(in, dataSetFilename);
     }
 
+
     /**
      * TODO javadoc
+     *
      * @param in
      * @param dataSetFilename
      * @return

@@ -15,10 +15,11 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * todo javadoc
+ * <p/>
  * A class for parsing statements out of sql scripts.
  * <p/>
  * All statements should be separated with a semicolon (;). The last statement will be
@@ -36,9 +37,11 @@ import java.util.List;
  */
 public class SQLScriptParser extends BaseScriptParser {
 
+
     public SQLScriptParser() {
         super(false, false);
     }
+
 
     protected boolean reachedEndOfStatement(char[] script, int currentIndexInScript, StatementBuilder statementBuilder, List<String> statements) {
         return (getCurrentChar(script, currentIndexInScript) == ';');
