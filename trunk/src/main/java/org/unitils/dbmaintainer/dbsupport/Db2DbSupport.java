@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * todo include schemanames in all statements where applicable
+ * 
  * Implementation of {@link DbSupport} for an IBM DB2 database
  *
  * @author Filip Neven
@@ -59,6 +61,13 @@ public class Db2DbSupport extends DbSupport {
      * Not supported
      */
     public Set<String> getTypeNames() {
+        throw new UnsupportedOperationException("DB2 doesn't support types");
+    }
+
+    /**
+     * Not supported
+     */
+    public void dropType(String typeName) throws StatementHandlerException {
         throw new UnsupportedOperationException("DB2 doesn't support types");
     }
 
@@ -208,6 +217,10 @@ public class Db2DbSupport extends DbSupport {
      */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         statementHandler.handle("alter table " + tableName + " drop constraint " + constraintName);
+    }
+
+    public String getDbmsName() {
+        return "db2";
     }
 
 

@@ -67,6 +67,13 @@ public class HsqldbDbSupport extends DbSupport {
         throw new UnsupportedOperationException("Hsqldb doesn't support types");
     }
 
+    /**
+     * Not supported
+     */
+    public void dropType(String typeName) throws StatementHandlerException {
+        throw new UnsupportedOperationException("Hsqldb doesn't support types");
+    }
+
 
     /**
      * Returns the value of the sequence with the given name
@@ -98,7 +105,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param newSequenceValue The value to set
      */
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
-        statementHandler.handle("alter sequence " + sequenceName + " restart with " + newSequenceValue);
+        statementHandler.handle("alter sequence \"" + schemaName + "\".\"" + sequenceName + "\" restart with " + newSequenceValue);
     }
 
 
@@ -152,7 +159,8 @@ public class HsqldbDbSupport extends DbSupport {
      */
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
-            statementHandler.handle("alter table \"" + tableName + "\" alter column " + primaryKeyColumnName + " RESTART WITH " + identityValue);
+            statementHandler.handle("alter table \"" + schemaName + "\".\"" + tableName + "\" alter column " +
+                    primaryKeyColumnName + " RESTART WITH " + identityValue);
         } catch (StatementHandlerException e) {
             logger.info("Column " + primaryKeyColumnName + " on table " + tableName + " is " + "not an identity column");
         }
@@ -185,7 +193,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param columnName The column to remove constraints from, not null
      */
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
-        String makeNullableSql = "alter table " + tableName + " alter column " + columnName + " set null";
+        String makeNullableSql = "alter table \"" + schemaName + "\".\"" + tableName + "\" alter column " + columnName + " set null";
         statementHandler.handle(makeNullableSql);
     }
 
@@ -209,6 +217,10 @@ public class HsqldbDbSupport extends DbSupport {
      */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         throw new UnsupportedOperationException("Disabling of individual constraints is not supported in HSQLDB");
+    }
+
+    public String getDbmsName() {
+        return "hsqldb";
     }
 
 

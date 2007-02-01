@@ -152,7 +152,9 @@ abstract public class DbSupport {
      */
     public void dropSequence(String sequenceName) throws StatementHandlerException {
         if (supportsSequences()) {
-            statementHandler.handle("drop sequence \"" + sequenceName + "\"");
+            statementHandler.handle("drop sequence \"" + schemaName + "\".\"" + sequenceName + "\"");
+        } else {
+            throw new UnsupportedOperationException("Triggers are not supported for " + getDbmsName());
         }
     }
 
@@ -165,7 +167,9 @@ abstract public class DbSupport {
      */
     public void dropTrigger(String triggerName) throws StatementHandlerException {
         if (supportsTriggers()) {
-            statementHandler.handle("drop trigger \"" + triggerName + "\"");
+            statementHandler.handle("drop trigger \"" + schemaName + "\".\"" + triggerName + "\"");
+        } else {
+            throw new UnsupportedOperationException("Triggers are not supported for " + getDbmsName());
         }
     }
 
@@ -176,11 +180,7 @@ abstract public class DbSupport {
      *
      * @param typeName The type to drop (case-sensitive), not null
      */
-    public void dropType(String typeName) throws StatementHandlerException {
-        if (supportsTypes()) {
-            statementHandler.handle("drop type \"" + typeName + "\"");
-        }
-    }
+    abstract public void dropType(String typeName) throws StatementHandlerException;
 
 
     /**
@@ -397,5 +397,10 @@ abstract public class DbSupport {
             closeQuietly(connection, null, resultSet);
         }
     }
+
+    /**
+     * @return The name of the DBMS implementation that is supported by this implementation of {@link DbSupport}
+     */
+    public abstract String getDbmsName();
 
 }

@@ -8,7 +8,8 @@ import java.sql.SQLException;
 
 /**
  * Implementation of DBUnits <code>IDatabaseConnection</code> interface. This implementation returns connections from
- * an underlying <code>DataSource</code>.
+ * an underlying <code>DataSource</code>. This implementation stores the <code>Connection</code> that was retrieved last,
+ * to enable closing it (or returing it to the pool) using {@link #closeJdbcConnection()}.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
