@@ -30,6 +30,18 @@ import javax.sql.DataSource;
  */
 public class PropertiesDataSourceFactory implements DataSourceFactory {
 
+    /* Propery key of the database driver class name */
+    private static final String PROPKEY_DATASOURCE_DRIVERCLASSNAME = "dataSource.driverClassName";
+
+    /* Property key of the datasource url */
+    private static final String PROPKEY_DATASOURCE_URL = "dataSource.url";
+
+    /* Property key of the datasource connect username */
+    private static final String PROPKEY_DATASOURCE_USERNAME = "dataSource.userName";
+
+    /* Property key of the datasource connect password */
+    private static final String PROPKEY_DATASOURCE_PASSWORD = "dataSource.password";
+
     /* The name of the <code>java.sql.Driver</code> class. */
     private String driverClassName;
 
@@ -49,16 +61,16 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
      * @param configuration The config, not null
      */
     public void init(Configuration configuration) {
-        driverClassName = configuration.getString("dataSource.driverClassName");
-        databaseUrl = configuration.getString("dataSource.url");
-        userName = configuration.getString("dataSource.userName");
-        password = configuration.getString("dataSource.password");
+        driverClassName = configuration.getString(PROPKEY_DATASOURCE_DRIVERCLASSNAME);
+        databaseUrl = configuration.getString(PROPKEY_DATASOURCE_URL);
+        userName = configuration.getString(PROPKEY_DATASOURCE_USERNAME);
+        password = configuration.getString(PROPKEY_DATASOURCE_PASSWORD);
 
         if (StringUtils.isEmpty(driverClassName)) {
-            throw new UnitilsException("Could not determine driver class name. Missing property dataSource.driverClassName");
+            throw new UnitilsException("Could not determine driver class name. Missing property " + PROPKEY_DATASOURCE_DRIVERCLASSNAME);
         }
         if (StringUtils.isEmpty(databaseUrl)) {
-            throw new UnitilsException("Could not determine database url. Missing property dataSource.databaseUrl");
+            throw new UnitilsException("Could not determine database url. Missing property " + PROPKEY_DATASOURCE_URL);
         }
     }
 
