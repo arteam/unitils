@@ -122,7 +122,7 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
-     * Not supported
+     * Types are not supported: an UnsupportedOperationException will be raised.
      */
     public Set<String> getTypeNames() {
         throw new UnsupportedOperationException("Mysql doesn't support types");
@@ -178,6 +178,7 @@ public class MySqlDbSupport extends DbSupport {
     public boolean supportsIdentityColumns() {
         return true;
     }
+
 
     /**
      * Types are not supported

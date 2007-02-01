@@ -20,11 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.script.ScriptRunner;
-import org.unitils.dbmaintainer.script.ScriptSource;
-import org.unitils.dbmaintainer.script.StatementHandler;
-import org.unitils.dbmaintainer.script.CodeScriptRunner;
-import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.*;
 import org.unitils.dbmaintainer.script.impl.LoggingStatementHandlerDecorator;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
@@ -319,6 +315,7 @@ public class DBMaintainer {
         }
     }
 
+
     /**
      * Executes the given code scripts on the database and registers wether the update succeeded or not. If succeeded,
      * the timestamp of the scripts is registered in the database.
@@ -327,23 +324,25 @@ public class DBMaintainer {
      * @throws StatementHandlerException If the script execution failed
      */
     protected void executeCodeScripts(List<Script> codeScripts) throws StatementHandlerException {
-        if (!codeScripts.isEmpty()) {
-            for (Script codeScript : codeScripts) {
-                try {
-                    codeScriptRunner.execute(codeScript.getScriptContent());
-
-                } catch (StatementHandlerException e) {
-
-                    logger.error("Error while executing code script " + codeScript.getFileName(), e);
-                    versionSource.registerCodeUpdateSucceeded(false);
-                    throw e;
-                }
-            }
-
-            // if the execution of all scripts succeeded, update the code scripts timestamp and mark as successful
-            versionSource.setCodeScriptsTimestamp(scriptSource.getCodeScriptsTimestamp());
-            versionSource.registerCodeUpdateSucceeded(true);
+        if (codeScripts.isEmpty()) {
+            // nothing to do
+            return;
         }
+
+        for (Script codeScript : codeScripts) {
+            try {
+                codeScriptRunner.execute(codeScript.getScriptContent());
+
+            } catch (StatementHandlerException e) {
+
+                logger.error("Error while executing code script " + codeScript.getFileName(), e);
+                versionSource.registerCodeUpdateSucceeded(false);
+                throw e;
+            }
+        }
+        // if the execution of all scripts succeeded, update the code scripts timestamp and mark as successful
+        versionSource.setCodeScriptsTimestamp(scriptSource.getCodeScriptsTimestamp());
+        versionSource.registerCodeUpdateSucceeded(true);
     }
 
 }

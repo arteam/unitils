@@ -139,8 +139,17 @@ public class Db2DbSupport extends DbSupport {
     }
 
 
+    /**
+     * Setting of identity column values is currently not supported: an UnsupportedOperationException will be raised.
+     *
+     * @param tableName            The table with the identity column, not null
+     * @param primaryKeyColumnName The column, not null
+     * @param identityValue        The new value
+     */
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         // Not possible to manually set the identity column to a specific value in DB2
+        // todo implement
+        throw new UnsupportedOperationException("Current implementation of Db2DbSupport does not support the setting of an indentiy column value.");
     }
 
 

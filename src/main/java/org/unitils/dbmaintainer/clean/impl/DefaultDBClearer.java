@@ -86,6 +86,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         }
     }
 
+
     /**
      * Drops all views.
      */
@@ -153,6 +154,10 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         }
     }
 
+
+    /**
+     * Drops all types.
+     */
     protected void dropTypes() throws SQLException, StatementHandlerException {
         if (dbSupport.supportsTypes()) {
             Set<String> typeNames = dbSupport.getTypeNames();

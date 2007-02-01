@@ -18,8 +18,8 @@ package org.unitils.dbmaintainer.dbsupport;
 import static org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.SQLScriptParser;
-import org.unitils.dbmaintainer.util.SQLCodeScriptParser;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.dbmaintainer.util.SQLCodeScriptParser;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -110,6 +110,7 @@ abstract public class DbSupport {
      * @return The names of all triggers in the database
      */
     abstract public Set<String> getTriggerNames() throws SQLException;
+
 
     /**
      * Retrieves the names of all the types in the database schema.
@@ -223,12 +224,14 @@ abstract public class DbSupport {
      */
     abstract public boolean supportsIdentityColumns();
 
+
     /**
      * Indicates whether the underlying DBMS supports database types
      *
      * @return True if types are supported, false otherwise
      */
     abstract public boolean supportsTypes();
+
 
     /**
      * Gets the names of all primary columns of the given table.
@@ -362,8 +365,9 @@ abstract public class DbSupport {
         return sqlScriptParser.parseStatements(script);
     }
 
-    public List<String> parseCodeStatements(String script) {
 
+    // todo javadoc
+    public List<String> parseCodeStatements(String script) {
         SQLCodeScriptParser sqlCodeScriptParser = new SQLCodeScriptParser();
         return sqlCodeScriptParser.parseStatements(script);
     }

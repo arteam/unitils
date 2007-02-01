@@ -15,15 +15,6 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.io.IOUtils;
-import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
-import org.unitils.dbmaintainer.handler.StatementHandler;
-import org.unitils.dbmaintainer.handler.StatementHandlerException;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -35,8 +26,11 @@ import java.util.List;
  */
 public class SQLScriptRunner extends BaseScriptRunner implements ScriptRunner {
 
+
+    // todo javadoc
     protected List<String> parseStatements(String script) {
         return dbSupport.parseStatements(script);
     }
+
 
 }

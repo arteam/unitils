@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.version;
 
-import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.script.Script;
 
 /**
@@ -52,10 +51,12 @@ public class VersionScriptPair {
         return version;
     }
 
-    public Script getScript() {
+
     /**
      * @return The script, not null
      */
+    public Script getScript() {
         return script;
     }
+
 }

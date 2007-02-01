@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Test class for {@link org.unitils.dbmaintainer.maintainer.version.DBVersionSource}. The implementation is tested using
+ * Test class for {@link org.unitils.dbmaintainer.version.impl.DBVersionSource}. The implementation is tested using
  * a test database. The dbms that is used depends on the database configuration in test/resources/unitils.properties
  *
  * @author Filip Neven
@@ -161,6 +161,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
             DbUtils.closeQuietly(conn, st, null);
         }
     }
+
 
     /**
      * Utility method to drop the test version table.

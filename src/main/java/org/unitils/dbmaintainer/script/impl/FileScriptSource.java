@@ -24,16 +24,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
-import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
-import org.springframework.context.ApplicationContext;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem.
@@ -135,13 +136,22 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return getVersionScriptPairsFromFiles(getScriptFilesSorted(true, scriptFilesLocation));
     }
 
+
+    /**
+     * @return The highest timestamp of all the code scripts that are currently available
+     */
     public long getCodeScriptsTimestamp() {
         return getHighestScriptTimestamp(getScriptFiles(false, codeScriptFilesLocation));
     }
 
+
+    /**
+     * @return All the code scripts that are currently available
+     */
     public List<Script> getAllCodeScripts() {
         return getScriptsFromFiles(getScriptFilesSorted(false, codeScriptFilesLocation));
     }
+
 
     /**
      * @param currentVersion The current database version, not null
@@ -149,7 +159,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      */
     private Long getTimestampOfAlreadyExecutedScripts(final Version currentVersion) {
         List<File> scriptFilesAlreadyExecuted = getScriptFiles(true, scriptFilesLocation);
-        
+
         // filter out scripts that are not executed yet
         CollectionUtils.filter(scriptFilesAlreadyExecuted, new Predicate() {
             public boolean evaluate(Object file) {
@@ -163,6 +173,10 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
 
 
     /**
+     * todo javadoc
+     *
+     * @param excludeFilesWithoutIndex
+     * @param filesLocation
      * @return All available script files, sorted according to their version number
      */
     protected List<File> getScriptFilesSorted(boolean excludeFilesWithoutIndex, List<String> filesLocation) {
@@ -172,6 +186,10 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
 
 
     /**
+     * todo javadoc
+     *
+     * @param excludeFilesWithoutIndex
+     * @param filesLocation
      * @return All available script files
      */
     private List<File> getScriptFiles(final boolean excludeFilesWithoutIndex, List<String> filesLocation) {
@@ -180,8 +198,11 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return scriptFiles;
     }
 
+
     /**
      * Adds all available script files in the given locations to the given List of files
+     * <p/>
+     * todo javadoc
      *
      * @param excludeFilesWithoutIndex
      * @param filesLocations
@@ -193,8 +214,11 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         }
     }
 
+
     /**
      * Adds all available script files in the given location to the given List of files
+     * <p/>
+     * todo javadoc
      *
      * @param excludeFilesWithoutIndex
      * @param filesLocation
@@ -202,7 +226,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      */
     private void getAllFilesIn(boolean excludeFilesWithoutIndex, File filesLocation, List<File> files) {
         if (filesLocation.isDirectory()) {
-            for (File subLocation: filesLocation.listFiles()) {
+            for (File subLocation : filesLocation.listFiles()) {
                 getAllFilesIn(excludeFilesWithoutIndex, subLocation, files);
             }
         } else {
@@ -212,7 +236,10 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         }
     }
 
+
     /**
+     * todo javadoc
+     *
      * @param file
      * @param excludeFilesWithoutIndex
      * @return True if the given file is regarded as a script file.
@@ -326,6 +353,8 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         return scripts;
     }
 
+
+    // todo javadoc
     private List<Script> getScriptsFromFiles(List<File> files) {
         List<Script> scripts = new ArrayList<Script>();
         for (File file : files) {

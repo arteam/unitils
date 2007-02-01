@@ -18,7 +18,6 @@ package org.unitils.hibernate.util;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
@@ -53,8 +52,7 @@ public class HibernateConfigurationManager {
     /**
      * All created session factories per configuration
      */
-    protected Map<Configuration, SessionInterceptingSessionFactory> hibernateSessionFactories
-            = new HashMap<Configuration, SessionInterceptingSessionFactory>();
+    protected Map<Configuration, SessionInterceptingSessionFactory> hibernateSessionFactories = new HashMap<Configuration, SessionInterceptingSessionFactory>();
 
     /* The class name to use when creating a hibernate configuration */
     private String hibernateConfigurationImplClassName;
@@ -66,7 +64,8 @@ public class HibernateConfigurationManager {
     /**
      * Creates a config manager that will use the given class name to create new configs when needed.
      *
-     * @param configurationImplClassName The class name, not null
+     * @param configurationImplClassName  The class name, not null
+     * @param manageCurrentSessionContext todo javadoc
      */
     public HibernateConfigurationManager(String configurationImplClassName, boolean manageCurrentSessionContext) {
         this.hibernateConfigurationImplClassName = configurationImplClassName;
@@ -329,6 +328,7 @@ public class HibernateConfigurationManager {
 
         }
     }
+
 
     /**
      * Finds the level in the class hierarchy for which a hibernate configuration should
