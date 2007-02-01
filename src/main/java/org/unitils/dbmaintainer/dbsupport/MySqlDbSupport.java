@@ -128,6 +128,13 @@ public class MySqlDbSupport extends DbSupport {
         throw new UnsupportedOperationException("Mysql doesn't support types");
     }
 
+    /**
+     * Not supported
+     */
+    public void dropType(String typeName) throws StatementHandlerException {
+        throw new UnsupportedOperationException("Mysql doesn't support types");
+    }
+
 
     /**
      * Sequences are not supported, an UnsupportedOperationException will be raised.
@@ -200,7 +207,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
-            statementHandler.handle("alter table " + tableName + " AUTO_INCREMENT = " + identityValue);
+            statementHandler.handle("alter table \"" + schemaName + "\".\"" + tableName + "\" AUTO_INCREMENT = " + identityValue);
 
         } catch (StatementHandlerException e) {
             throw new UnitilsException(e);
@@ -235,7 +242,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         String type = getColumnType(tableName, columnName);
-        statementHandler.handle("alter table " + tableName + " change column " + columnName + " " + columnName + " " + type + " NULL ");
+        statementHandler.handle("alter table \"" + schemaName + "\".\"" + tableName + "\" change column " + columnName + " " + columnName + " " + type + " NULL ");
     }
 
 
@@ -257,7 +264,11 @@ public class MySqlDbSupport extends DbSupport {
      * @param constraintName The constraint, not null
      */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
-        statementHandler.handle("alter table " + tableName + " disable constraint " + constraintName);
+        statementHandler.handle("alter table \"" + schemaName + "\".\"" + tableName + " disable constraint " + constraintName);
+    }
+
+    public String getDbmsName() {
+        return "mysql";
     }
 
 

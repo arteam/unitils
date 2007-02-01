@@ -71,7 +71,7 @@ public class OracleDbSupport extends DbSupport {
      * @param tableName The table to drop (case-sensitive), not null
      */
     public void dropTable(String tableName) throws StatementHandlerException {
-        String dropTableSQL = "drop table \"" + tableName + "\" cascade constraints";
+        String dropTableSQL = "drop table \"" + schemaName + "." + tableName + "\" cascade constraints";
         statementHandler.handle(dropTableSQL);
     }
 
@@ -83,8 +83,18 @@ public class OracleDbSupport extends DbSupport {
      * @param viewName The view to drop (case-sensitive), not null
      */
     public void dropView(String viewName) throws StatementHandlerException {
-        String dropTableSQL = "drop view \"" + viewName + "\" cascade constraints";
+        String dropTableSQL = "drop view \"" + schemaName + "." + viewName + "\" cascade constraints";
         statementHandler.handle(dropTableSQL);
+    }
+
+    /**
+     * Drops the type with the given name from the database
+     * Note: the type name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param typeName The type to drop (case-sensitive), not null
+     */
+    public void dropType(String typeName) throws StatementHandlerException {
+        statementHandler.handle("drop type \"" + schemaName + "." + typeName + "\"" + " force");
     }
 
 
@@ -247,7 +257,7 @@ public class OracleDbSupport extends DbSupport {
      * @param constraintName The constraint, not null
      */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
-        statementHandler.handle("alter table \"" + tableName + "\" disable constraint " + constraintName);
+        statementHandler.handle("alter table \"" + schemaName + "." + tableName + "\" disable constraint " + constraintName);
     }
 
 
@@ -258,6 +268,10 @@ public class OracleDbSupport extends DbSupport {
      */
     public String getLongDataType() {
         return "INTEGER";
+    }
+
+    public String getDbmsName() {
+        return "oracle";
     }
 
 
