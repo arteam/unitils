@@ -302,7 +302,7 @@ public class SpringApplicationContextManager {
             return new ClassPathXmlApplicationContext(locations, parentApplicationContext);
 
         } catch (Throwable t) {
-            throw new UnitilsException("Unable to create application context for locations " + Arrays.toString(locations));
+            throw new UnitilsException("Unable to create application context for locations " + Arrays.toString(locations), t);
         }
     }
 }
