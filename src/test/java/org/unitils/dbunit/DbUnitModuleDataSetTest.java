@@ -276,7 +276,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            st.execute("create table test (dataset varchar)");
+            st.execute("create table test (dataset varchar(100))");
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }

@@ -76,7 +76,7 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      */
     protected void doInit(Configuration configuration) {
         tablesToPreserve = new HashSet<String>();
-        tablesToPreserve.add(configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase());
+        tablesToPreserve.add(dbSupport.toCorrectCaseIdentifier(configuration.getString(PROPKEY_VERSION_TABLE_NAME)));
         tablesToPreserve.addAll(toCorrectCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
         tablesToPreserve.addAll(toCorrectCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
     }
@@ -118,7 +118,7 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
         try {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
-            statement.executeUpdate("delete from \"" + tableName + "\"");
+            statement.executeUpdate("delete from " + dbSupport.quoted(tableName));
 
         } finally {
             closeQuietly(connection, statement, null);
@@ -135,31 +135,9 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      * @return The names converted to correct case if needed, not null
      */
     protected List<String> toCorrectCaseIdentifiers(List<String> identifiers) {
-        Connection connection = null;
-        boolean toUpperCase;
-        boolean toLowerCase;
-        try {
-            connection = dataSource.getConnection();
-            toUpperCase = connection.getMetaData().storesUpperCaseIdentifiers();
-            toLowerCase = connection.getMetaData().storesLowerCaseIdentifiers();
-        } catch (SQLException e) {
-            throw new UnitilsException("Unable to convert identifiers to correct case.", e);
-        } finally {
-            closeQuietly(connection, null, null);
-        }
-
         List<String> result = new ArrayList<String>();
         for (String identifier : identifiers) {
-            identifier = identifier.trim();
-            if (identifier.startsWith("\"") && identifier.endsWith("\"")) {
-                result.add(identifier.substring(1, identifier.length() - 1));
-            } else if (toUpperCase) {
-                result.add(identifier.toUpperCase());
-            } else if (toLowerCase) {
-                result.add(identifier.toLowerCase());
-            } else {
-                result.add(identifier);
-            }
+            result.add(dbSupport.toCorrectCaseIdentifier(identifier));
         }
         return result;
     }

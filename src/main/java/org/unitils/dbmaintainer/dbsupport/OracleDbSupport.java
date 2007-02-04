@@ -71,7 +71,7 @@ public class OracleDbSupport extends DbSupport {
      * @param tableName The table to drop (case-sensitive), not null
      */
     public void dropTable(String tableName) throws StatementHandlerException {
-        String dropTableSQL = "drop table \"" + schemaName + "." + tableName + "\" cascade constraints";
+        String dropTableSQL = "drop table " + qualified(tableName) + " cascade constraints";
         statementHandler.handle(dropTableSQL);
     }
 
@@ -83,7 +83,7 @@ public class OracleDbSupport extends DbSupport {
      * @param viewName The view to drop (case-sensitive), not null
      */
     public void dropView(String viewName) throws StatementHandlerException {
-        String dropTableSQL = "drop view \"" + schemaName + "." + viewName + "\" cascade constraints";
+        String dropTableSQL = "drop view " + qualified(viewName) + " cascade constraints";
         statementHandler.handle(dropTableSQL);
     }
 
@@ -94,7 +94,7 @@ public class OracleDbSupport extends DbSupport {
      * @param typeName The type to drop (case-sensitive), not null
      */
     public void dropType(String typeName) throws StatementHandlerException {
-        statementHandler.handle("drop type \"" + schemaName + "." + typeName + "\"" + " force");
+        statementHandler.handle("drop type " + qualified(typeName) + " force");
     }
 
 
@@ -137,11 +137,11 @@ public class OracleDbSupport extends DbSupport {
             while (rs.next()) {
                 long lastNumber = rs.getLong("LAST_NUMBER");
                 long incrementBy = rs.getLong("INCREMENT_BY");
-                String sqlChangeIncrement = "alter sequence \"" + sequenceName + "\" increment by " + (newSequenceValue - lastNumber);
+                String sqlChangeIncrement = "alter sequence " + qualified(sequenceName) + " increment by " + (newSequenceValue - lastNumber);
                 statementHandler.handle(sqlChangeIncrement);
-                String sqlNextSequenceValue = "select \"" + sequenceName + "\".NEXTVAL from DUAL";
+                String sqlNextSequenceValue = "select " + qualified(sequenceName) + ".NEXTVAL from DUAL";
                 statementHandler.handle(sqlNextSequenceValue);
-                String sqlResetIncrement = "alter sequence \"" + sequenceName + "\" increment by " + incrementBy;
+                String sqlResetIncrement = "alter sequence " + qualified(sequenceName) + " increment by " + incrementBy;
                 statementHandler.handle(sqlResetIncrement);
             }
         } finally {
@@ -257,7 +257,7 @@ public class OracleDbSupport extends DbSupport {
      * @param constraintName The constraint, not null
      */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
-        statementHandler.handle("alter table \"" + schemaName + "." + tableName + "\" disable constraint " + constraintName);
+        statementHandler.handle("alter table " + qualified(tableName) + " disable constraint " + constraintName);
     }
 
 

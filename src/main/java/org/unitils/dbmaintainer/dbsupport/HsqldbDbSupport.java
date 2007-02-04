@@ -105,7 +105,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param newSequenceValue The value to set
      */
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
-        statementHandler.handle("alter sequence \"" + schemaName + "\".\"" + sequenceName + "\" restart with " + newSequenceValue);
+        statementHandler.handle("alter sequence " + qualified(sequenceName) + " restart with " + newSequenceValue);
     }
 
 
@@ -159,7 +159,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
-            statementHandler.handle("alter table \"" + schemaName + "\".\"" + tableName + "\" alter column " +
+            statementHandler.handle("alter table " + qualified(tableName) + " alter column " +
                     primaryKeyColumnName + " RESTART WITH " + identityValue);
         } catch (StatementHandlerException e) {
             logger.info("Column " + primaryKeyColumnName + " on table " + tableName + " is " + "not an identity column");
@@ -193,7 +193,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param columnName The column to remove constraints from, not null
      */
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
-        String makeNullableSql = "alter table \"" + schemaName + "\".\"" + tableName + "\" alter column " + columnName + " set null";
+        String makeNullableSql = "alter table " + qualified(tableName) + " alter column " + columnName + " set null";
         statementHandler.handle(makeNullableSql);
     }
 
