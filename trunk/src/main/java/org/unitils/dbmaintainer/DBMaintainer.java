@@ -82,7 +82,7 @@ public class DBMaintainer {
     public static final String PROPKEY_FROMSCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
 
     /* Property key indicating if an retry of an update should only be performed when changes to script files were made */
-    public static final String PROPKEY_ONLY_REBUILD_FROMSCRATCH_WHEN_MODIFIED_ENABLED = "dbMaintainer.retryFromScratchOnlyWhenModificationsToScripts.enabled";
+    public static final String PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED = "dbMaintainer.keepRetryingAfterError.enabled";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
     public static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
@@ -127,7 +127,7 @@ public class DBMaintainer {
     /* Indicates whether a from scratch update should be performed when the previous update failed, but
       none of the scripts were modified since that last update. If true a new update will be tried only when
       changes were made to the script files */
-    protected boolean onlyRebuildFromScratchAfterErrorWhenFilesModified;
+    protected boolean keepRetryingAfterError;
 
 
     /**
@@ -158,7 +158,7 @@ public class DBMaintainer {
         }
 
         fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
-        onlyRebuildFromScratchAfterErrorWhenFilesModified = configuration.getBoolean(PROPKEY_ONLY_REBUILD_FROMSCRATCH_WHEN_MODIFIED_ENABLED);
+        keepRetryingAfterError = configuration.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED);
         if (fromScratchEnabled) {
             dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
         }
@@ -229,7 +229,7 @@ public class DBMaintainer {
         }
 
         if (!versionScriptPairs.isEmpty() // If the database structure was updated, also recreate the database code
-                || (!versionSource.isLastCodeUpdateSucceeded() && !onlyRebuildFromScratchAfterErrorWhenFilesModified) // If the last code update failed, retry if configured to do so
+                || (!versionSource.isLastCodeUpdateSucceeded() && keepRetryingAfterError) // If the last code update failed, retry if configured to do so
                 || scriptSource.getCodeScriptsTimestamp() > versionSource.getCodeScriptsTimestamp()) { // If a code script was added of changed, recreate the database code
             executeCodeScripts(scriptSource.getAllCodeScripts());
         }
@@ -243,7 +243,7 @@ public class DBMaintainer {
      * <li>The last update of the database was unsuccessful.</li>
      * </ul>
      * The database will only be rebuilt from scratch if {@link #PROPKEY_FROMSCRATCH_ENABLED} is set to true.
-     * If the {@link #PROPKEY_ONLY_REBUILD_FROMSCRATCH_WHEN_MODIFIED_ENABLED} is set to false, the database
+     * If the {@link #PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED} is set to false, the database
      * will only be rebuilt again after an unsuccessful build when changes were made to the script files.
      *
      * @param currentVersion The current database version, not null
@@ -263,7 +263,7 @@ public class DBMaintainer {
                 logger.warn("The previous database update failed, so it would be a good idea to rebuild the database from scratch. " +
                         "This is not done since updating from scratch is disabled!");
                 return false;
-            } else if (onlyRebuildFromScratchAfterErrorWhenFilesModified) {
+            } else if (!keepRetryingAfterError) {
                 logger.warn("The previous database update did not succeed and there were no modified script files. The updated scripts are not executed again!!");
                 return false;
             } else {

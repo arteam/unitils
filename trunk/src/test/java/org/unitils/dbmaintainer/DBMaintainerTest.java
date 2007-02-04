@@ -221,10 +221,10 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
 
     /**
      * Tests checking from scratch update. Last update failed but no scripts were modified and
-     * onlyRebuildFromScratchAfterErrorWhenFilesModified is true.
+     * keepRetryingAfterError is true.
      */
     public void testCheckUpdateDatabaseFromScratch_lastUpdateFailedButIgnored() throws Exception {
-        dbMaintainer.onlyRebuildFromScratchAfterErrorWhenFilesModified = true;
+        dbMaintainer.keepRetryingAfterError = false;
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
         expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(false);
         replay();
