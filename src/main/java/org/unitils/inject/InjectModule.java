@@ -369,18 +369,17 @@ public class InjectModule implements Module {
             return;
         }
 
-        ValueToRestore valueToRestore = new ValueToRestore();
-        valueToRestore.setTargetClass(targetClass);
-        valueToRestore.setProperty(property);
-        valueToRestore.setFieldType(fieldType);
-        valueToRestore.setPropertyAccessType(propertyAccess);
-
+        ValueToRestore valueToRestore;
         if (Restore.OLD_VALUE == restore) {
-            valueToRestore.setValue(oldValue);
+            valueToRestore = new ValueToRestore(targetClass, property, fieldType, propertyAccess, oldValue);
 
         } else if (Restore.NULL_OR_0_VALUE == restore) {
-            valueToRestore.setValue(fieldType.isPrimitive() ? 0 : null);
+            valueToRestore = new ValueToRestore(targetClass, property, fieldType, propertyAccess, fieldType.isPrimitive() ? 0 : null);
+
+        } else {
+            throw new RuntimeException("Unkown value for " + Restore.class.getSimpleName() + " " + restore);
         }
+
         valuesToRestoreAfterTest.add(valueToRestore);
     }
 

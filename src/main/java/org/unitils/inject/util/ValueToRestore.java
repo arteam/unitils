@@ -39,44 +39,32 @@ public class ValueToRestore {
     /* The value to restore */
     private Object value;
 
+    public ValueToRestore(Class targetClass, String property, Class fieldType, PropertyAccess propertyAccess, Object value) {
+        this.fieldType = fieldType;
+        this.property = property;
+        this.propertyAccess = propertyAccess;
+        this.targetClass = targetClass;
+        this.value = value;
+    }
 
     public Class getTargetClass() {
         return targetClass;
-    }
-
-    public void setTargetClass(Class targetClass) {
-        this.targetClass = targetClass;
     }
 
     public String getProperty() {
         return property;
     }
 
-    public void setProperty(String property) {
-        this.property = property;
-    }
-
     public Class getFieldType() {
         return fieldType;
-    }
-
-    public void setFieldType(Class fieldType) {
-        this.fieldType = fieldType;
     }
 
     public PropertyAccess getPropertyAccessType() {
         return propertyAccess;
     }
 
-    public void setPropertyAccessType(PropertyAccess propertyAccess) {
-        this.propertyAccess = propertyAccess;
-    }
-
     public Object getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
-    }
 }
