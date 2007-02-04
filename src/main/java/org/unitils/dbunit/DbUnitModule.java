@@ -311,7 +311,7 @@ public class DbUnitModule implements Module {
             return null;
         }
 
-        // empty means, use default file name
+        // empty means use default file name
         if ("".equals(dataSetFileName)) {
             // first try method specific default file name
             dataSetFileName = getDefaultExpectedDataSetFileName(testClass, testMethod);

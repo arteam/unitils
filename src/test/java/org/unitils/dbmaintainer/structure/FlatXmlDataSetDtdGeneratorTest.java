@@ -10,6 +10,7 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import static org.unitils.dbmaintainer.structure.impl.FlatXmlDataSetDtdGenerator.PROPKEY_DTD_FILENAME;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.dbmaintainer.clean.DBClearer;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -36,6 +37,8 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
     @TestDataSource
     private DataSource dataSource = null;
 
+    private DBClearer dbClearer;
+
 
     /**
      * Initializes the test by creating following tables in the test database:
@@ -53,8 +56,9 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
 
         StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
         dtdGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
+        dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
 
-        dropTestTables();
+        dbClearer.clearDatabase();
         createTestTables();
     }
 
@@ -83,6 +87,7 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
                 "<!ATTLIST TABLETWO" +
                 "   COLUMN1 CDATA #IMPLIED" +
                 "   COLUMN2 CDATA #IMPLIED>";
+
 
         dtdGenerator.generateDtd();
 

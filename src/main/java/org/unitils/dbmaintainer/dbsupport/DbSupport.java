@@ -420,7 +420,7 @@ abstract public class DbSupport {
      * @return The qualified database object name
      */
     public String qualified(String databaseObjectName) {
-        return ((supportsSchemaQualification() && StringUtils.isNotEmpty(schemaName)) ? quoted(schemaName) : "") + quoted(databaseObjectName);
+        return ((supportsSchemaQualification() && StringUtils.isNotEmpty(schemaName)) ? quoted(schemaName) : "") + "." + quoted(databaseObjectName);
     }
 
     /**
