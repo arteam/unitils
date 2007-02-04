@@ -85,7 +85,7 @@ public class Db2DbSupport extends DbSupport {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("VALUES PREVVAL FOR " + sequenceName);
+            rs = st.executeQuery("VALUES PREVVAL FOR " + qualified(sequenceName));
             rs.next();
             return rs.getLong("1");
 
@@ -96,7 +96,6 @@ public class Db2DbSupport extends DbSupport {
         }
     }
 
-
     /**
      * Sets the next value of the sequence with the given sequence name to the given sequence value.
      *
@@ -104,8 +103,8 @@ public class Db2DbSupport extends DbSupport {
      * @param newSequenceValue The value to set
      */
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
-        statementHandler.handle("ALTER SEQUENCE " + sequenceName + " RESTART WITH " + newSequenceValue);
-        statementHandler.handle("VALUES NEXTVAL FOR " + sequenceName);
+        statementHandler.handle("ALTER SEQUENCE " + qualified(sequenceName) + " RESTART WITH " + newSequenceValue);
+        statementHandler.handle("VALUES NEXTVAL FOR " + qualified(sequenceName));
     }
 
 
@@ -185,6 +184,7 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
+     * todo add schemaname to query
      * Returns the foreign key and not null constraint names that are enabled/enforced for the table with the given name
      *
      * @param tableName The table, not null
@@ -216,7 +216,7 @@ public class Db2DbSupport extends DbSupport {
      * @param constraintName The constraint, not null
      */
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
-        statementHandler.handle("alter table " + tableName + " drop constraint " + constraintName);
+        statementHandler.handle("alter table " + qualified(tableName) + " drop constraint " + constraintName);
     }
 
     public String getDbmsName() {

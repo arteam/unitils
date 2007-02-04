@@ -26,7 +26,7 @@ import java.util.List;
  * added even if it does not end with a semicolon. The semicolons will not be included in the returned statements.
  * <p/>
  * All comments in-line (--comment) and block (/ * comment * /) are removed from the statements.
- * This parser also takes quoted literals and double quoted text into account when parsing the statements and treating
+ * This parser also takes quotedOrEmpty literals and double quotedOrEmpty text into account when parsing the statements and treating
  * the comments.
  * <p/>
  * New line charactars within quotes and double quotes will be inclded in the statements, other new lines will

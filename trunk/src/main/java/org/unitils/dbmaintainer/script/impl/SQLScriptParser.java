@@ -25,7 +25,7 @@ import java.util.List;
  * added even if it does not end with a semicolon. The semicolons will not be included in the returned statements.
  * <p/>
  * All comments in-line (--comment) and block (/ * comment * /) are removed from the statements.
- * This parser also takes quoted literals and double quoted text into account when parsing the statements and treating
+ * This parser also takes quotedOrEmpty literals and double quotedOrEmpty text into account when parsing the statements and treating
  * the comments.
  * <p/>
  * New line charactars within quotes and double quotes will be inclded in the statements, other new lines will
@@ -124,9 +124,9 @@ public class SQLScriptParser {
 
 
     /**
-     * Handles a char in the normal (not quoted, not commented) state. Checks for the beginning of a
-     * line comment (-- comment), block comment (/ * comment * /), quoted text ('text') and double
-     * quoted text ("text) and changes the state correspondingly. It also checks for the ending of
+     * Handles a char in the normal (not quotedOrEmpty, not commented) state. Checks for the beginning of a
+     * line comment (-- comment), block comment (/ * comment * /), quotedOrEmpty text ('text') and double
+     * quotedOrEmpty text ("text) and changes the state correspondingly. It also checks for the ending of
      * statements by a ;. If a statement is ended the it is trimmed and added to the statement list ( ; not included).
      * New line chars (\n and \r) will be replaced by a single space.
      *
@@ -222,7 +222,7 @@ public class SQLScriptParser {
 
 
     /**
-     * Handles a char in a quoted literal ('text'). Checks for the ending quote, but ignores escaped quotes. All
+     * Handles a char in a quotedOrEmpty literal ('text'). Checks for the ending quote, but ignores escaped quotes. All
      * chars, including newlines (\n \r), are appended to the statement.
      *
      * @param current    the current char
@@ -249,7 +249,7 @@ public class SQLScriptParser {
 
 
     /**
-     * Handles a char in a double quoted string ("text"). Checks for the ending double quote, but ignores escaped
+     * Handles a char in a double quotedOrEmpty string ("text"). Checks for the ending double quote, but ignores escaped
      * double quotes. All chars, including newlines (\n \r), are appended to the statement.
      *
      * @param current    the current char

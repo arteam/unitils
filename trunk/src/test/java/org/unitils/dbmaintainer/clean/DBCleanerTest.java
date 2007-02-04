@@ -93,10 +93,10 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             assertFalse(isEmpty("TEST_TABLE"));
             assertFalse(isEmpty("TEST_TABLE"));
-            assertFalse(isEmpty("\"Test_CASE_Table\""));
+            assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table")));
             dbCleaner.cleanDatabase();
             assertTrue(isEmpty("TEST_TABLE"));
-            assertTrue(isEmpty("\"Test_CASE_Table\""));
+            assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table")));
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -120,17 +120,17 @@ public class DBCleanerTest extends UnitilsJUnit3 {
 
 
     /**
-     * Tests if db_version table is left untouched
+     * Tests if the tables to preserve are left untouched
      */
     public void testCleanDatabase_preserveTablesToPreserve() throws Exception {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
             assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
-            assertFalse(isEmpty("\"Test_CASE_Table_Preserve\""));
+            assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
             dbCleaner.cleanDatabase();
             assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
-            assertFalse(isEmpty("\"Test_CASE_Table_Preserve\""));
+            assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -149,8 +149,8 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             st.execute("create table DB_VERSION(testcolumn varchar(10))");
             st.execute("create table TEST_TABLE(testcolumn varchar(10))");
             st.execute("create table TEST_TABLE_PRESERVE(testcolumn varchar(10))");
-            st.execute("create table \"Test_CASE_Table\" (col1 varchar(10))");
-            st.execute("create table \"Test_CASE_Table_Preserve\" (col1 varchar(10))");
+            st.execute("create table " + dbSupport.quoted("Test_CASE_Table") + " (col1 varchar(10))");
+            st.execute("create table " + dbSupport.quoted("Test_CASE_Table_Preserve") + " (col1 varchar(10))");
             // Also create a view, to see if the DBCleaner doesn't crash on views
             st.execute("create view TEST_VIEW as (select * from TEST_TABLE_PRESERVE)");
         } finally {
@@ -209,8 +209,8 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             st.execute("insert into DB_VERSION values('test')");
             st.execute("insert into TEST_TABLE values('test')");
             st.execute("insert into TEST_TABLE_PRESERVE values('test')");
-            st.execute("insert into \"Test_CASE_Table\" values('test')");
-            st.execute("insert into \"Test_CASE_Table_Preserve\" values('test')");
+            st.execute("insert into " + dbSupport.quoted("Test_CASE_Table") + " values('test')");
+            st.execute("insert into " + dbSupport.quoted("Test_CASE_Table_Preserve") + " values('test')");
         } finally {
             DbUtils.closeQuietly(conn, st, null);
         }

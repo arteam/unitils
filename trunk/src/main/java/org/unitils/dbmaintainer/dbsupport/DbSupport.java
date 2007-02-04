@@ -16,10 +16,12 @@
 package org.unitils.dbmaintainer.dbsupport;
 
 import static org.apache.commons.dbutils.DbUtils.closeQuietly;
+import org.apache.commons.lang.StringUtils;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.SQLScriptParser;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.util.SQLCodeScriptParser;
+import org.unitils.core.UnitilsException;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -53,6 +55,11 @@ abstract public class DbSupport {
      */
     protected DataSource dataSource;
 
+    /* Indicates whether database object names are stored in uppercase in system metadata tables */
+    private Boolean storesUpperCaseIdentifiers;
+
+    /* Indicates whether database object names are stored in lowercase in system metadata tables */
+    private Boolean storesLowerCaseIdentifiers;
 
     /**
      * Creates a new, unconfigured instance. To have a instance that can be used, the {@link #init} method must be
@@ -127,7 +134,7 @@ abstract public class DbSupport {
      * @param tableName The table to drop (case-sensitive), not null
      */
     public void dropTable(String tableName) throws StatementHandlerException {
-        String dropTableSQL = "drop table \"" + tableName + "\" cascade";
+        String dropTableSQL = "drop table " + qualified(tableName) + " cascade";
         statementHandler.handle(dropTableSQL);
     }
 
@@ -139,7 +146,7 @@ abstract public class DbSupport {
      * @param viewName The view to drop (case-sensitive), not null
      */
     public void dropView(String viewName) throws StatementHandlerException {
-        String dropTableSQL = "drop view \"" + viewName + "\" cascade";
+        String dropTableSQL = "drop view " + qualified(viewName) + " cascade";
         statementHandler.handle(dropTableSQL);
     }
 
@@ -152,7 +159,7 @@ abstract public class DbSupport {
      */
     public void dropSequence(String sequenceName) throws StatementHandlerException {
         if (supportsSequences()) {
-            statementHandler.handle("drop sequence \"" + schemaName + "\".\"" + sequenceName + "\"");
+            statementHandler.handle("drop sequence " + qualified(sequenceName));
         } else {
             throw new UnsupportedOperationException("Triggers are not supported for " + getDbmsName());
         }
@@ -167,7 +174,7 @@ abstract public class DbSupport {
      */
     public void dropTrigger(String triggerName) throws StatementHandlerException {
         if (supportsTriggers()) {
-            statementHandler.handle("drop trigger \"" + schemaName + "\".\"" + triggerName + "\"");
+            statementHandler.handle("drop trigger " + qualified(triggerName));
         } else {
             throw new UnsupportedOperationException("Triggers are not supported for " + getDbmsName());
         }
@@ -352,7 +359,7 @@ abstract public class DbSupport {
      * added even if it does not end with a semicolon. The semicolons will not be included in the returned statements.
      * <p/>
      * All comments in-line (--comment) and block (/ * comment * /) are removed from the statements.
-     * This parser also takes quoted literals and double quoted text into account when parsing the statements and treating
+     * This parser also takes quotedOrEmpty literals and double quotedOrEmpty text into account when parsing the statements and treating
      * the comments.
      * <p/>
      * New line charactars in the statements will be replaced by spaces.
@@ -402,5 +409,114 @@ abstract public class DbSupport {
      * @return The name of the DBMS implementation that is supported by this implementation of {@link DbSupport}
      */
     public abstract String getDbmsName();
+
+    /**
+     * Qualifies the given database object name with the name of the database schema. Quotes are put around both
+     * schemaname and object name. If the schemaName is not supplied, the database object is returned surrounded with
+     * quotes. If the DBMS doesn't support quoted database object names, no quotes are put around neither schema name
+     * nor database object name.
+     *
+     * @param databaseObjectName The database object name to be qualified
+     * @return The qualified database object name
+     */
+    public String qualified(String databaseObjectName) {
+        return ((supportsSchemaQualification() && StringUtils.isNotEmpty(schemaName)) ? quoted(schemaName) : "") + quoted(databaseObjectName);
+    }
+
+    /**
+     * Put quotes around the given databaseObjectName, if the underlying DBMS supports quoted database object names.
+     * If not, the databaseObjectName is returned unchanged.
+     *
+     * @param databaseObjectName
+     * @return Quoted version of the given databaseObjectName, if supported by the underlying DBMS
+     */
+    public String quoted(String databaseObjectName) {
+        if (supportsQuotedDatabaseObjectNames()) {
+            return "\"" + databaseObjectName + "\"";
+        } else {
+            return databaseObjectName;
+        }
+    }
+
+    /**
+     * Indicates whether the underlying DBMS supports database object names that are qualified by the schema name.
+     *
+     * @return true by default. If the underlying DBMS doesn't support qualified database object names,
+     * this method should be overwritten
+     */
+    public boolean supportsSchemaQualification() {
+        return true;
+    }
+
+    /**
+     * Indicates whether the underlying DBMS supports quoted database object names.
+     *
+     * @return true by default. If the underlying DBMS doesn't support quoted database object names,
+     * this method should be overwritten
+     */
+    public boolean supportsQuotedDatabaseObjectNames() {
+        return true;
+    }
+
+    /**
+     * Converts the given identifier to uppercase/lowercase depending on the DBMS. If a value is surrounded with double
+     * quotes (") and the DBMS supports quoted database object names, the case is left untouched and the double quotes
+     * are stripped. These values are treated as case sensitive names.
+     *
+     * @param identifier The identifier, not null
+     * @return The name converted to correct case if needed, not null
+     */
+    public String toCorrectCaseIdentifier(String identifier) {
+        identifier = identifier.trim();
+        if (identifier.startsWith("\"") && identifier.endsWith("\"")) {
+            identifier = identifier.substring(1, identifier.length() - 1);
+            if (supportsQuotedDatabaseObjectNames()) {
+                return identifier;
+            }
+        }
+        if (isStoresUpperCaseIdentifiers()) {
+            return identifier.toUpperCase();
+        } else if (isStoresLowerCaseIdentifiers()) {
+            return identifier.toLowerCase();
+        } else {
+            return identifier;
+        }
+    }
+
+    /**
+     * @return True if database object names are stored in uppercase in database metadata tables, false otherwise.
+     */
+    public boolean isStoresUpperCaseIdentifiers() {
+        if (storesUpperCaseIdentifiers == null) {
+            Connection connection = null;
+            try {
+                connection = dataSource.getConnection();
+                storesUpperCaseIdentifiers = connection.getMetaData().storesUpperCaseIdentifiers();
+            } catch (SQLException e) {
+                throw new UnitilsException("Unable to convert identifiers to correct case.", e);
+            } finally {
+                closeQuietly(connection, null, null);
+            }
+        }
+        return storesUpperCaseIdentifiers;
+    }
+
+    /**
+     * @return True if database object names are stored in uppercase in database metadata tables, false otherwise.
+     */
+    public boolean isStoresLowerCaseIdentifiers() {
+        if (storesLowerCaseIdentifiers == null) {
+            Connection connection = null;
+            try {
+                connection = dataSource.getConnection();
+                storesLowerCaseIdentifiers = connection.getMetaData().storesLowerCaseIdentifiers();
+            } catch (SQLException e) {
+                throw new UnitilsException("Unable to convert identifiers to correct case.", e);
+            } finally {
+                closeQuietly(connection, null, null);
+            }
+        }
+        return storesLowerCaseIdentifiers;
+    }
 
 }

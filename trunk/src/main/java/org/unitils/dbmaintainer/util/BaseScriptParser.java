@@ -123,9 +123,9 @@ abstract public class BaseScriptParser {
 
 
     /**
-     * Handles a char in the normal (not quoted, not commented) state. Checks for the beginning of a
-     * line comment (-- comment), block comment (/ * comment * /), quoted text ('text') and double
-     * quoted text ("text) and changes the state correspondingly. It also checks for the ending of
+     * Handles a char in the normal (not quotedOrEmpty, not commented) state. Checks for the beginning of a
+     * line comment (-- comment), block comment (/ * comment * /), quotedOrEmpty text ('text') and double
+     * quotedOrEmpty text ("text) and changes the state correspondingly. It also checks for the ending of
      * statements by a ;. If a statement is ended the it is trimmed and added to the statement list ( ; not included).
      * New line chars (\n and \r) will be replaced by a single space.
      *
@@ -236,7 +236,7 @@ abstract public class BaseScriptParser {
 
 
     /**
-     * Handles a char in a quoted literal ('text'). Checks for the ending quote, but ignores escaped quotes. All
+     * Handles a char in a quotedOrEmpty literal ('text'). Checks for the ending quote, but ignores escaped quotes. All
      * chars, including newlines (\n \r), are appended to the statement.
      *
      * @param current    the current char
@@ -262,7 +262,7 @@ abstract public class BaseScriptParser {
 
 
     /**
-     * Handles a char in a double quoted string ("text"). Checks for the ending double quote, but ignores escaped
+     * Handles a char in a double quotedOrEmpty string ("text"). Checks for the ending double quote, but ignores escaped
      * double quotes. All chars, including newlines (\n \r), are appended to the statement.
      *
      * @param current    the current char
