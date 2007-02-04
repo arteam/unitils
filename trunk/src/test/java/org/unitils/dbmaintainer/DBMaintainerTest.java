@@ -93,6 +93,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
 
         dbMaintainer = new DBMaintainer();
         dbMaintainer.fromScratchEnabled = true;
+        dbMaintainer.keepRetryingAfterError = true;
 
         versionScriptPairs = new ArrayList<VersionScriptPair>();
         version0 = new Version(0L, 0L);
