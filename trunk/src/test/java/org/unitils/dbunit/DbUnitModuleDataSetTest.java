@@ -24,11 +24,11 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 
 import javax.sql.DataSource;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.io.InputStream;
 
 /**
  * Test class for loading of data sets by the {@link DbUnitModule}.
@@ -167,70 +167,14 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
         assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestCustomClassLevel.testMethod2.xml");
     }
 
+
     /**
-     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream)} 
+     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream)}
      */
     public void testInsertTestData_directCall() throws Exception {
         InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
         dbUnitModule.insertTestData(dataSetIS);
         assertLoadedDataSet("CustomDataSet.xml");
-    }
-
-
-    /**
-     * Test class with a class level dataset
-     */
-    @DataSet
-    public class DataSetTest {
-
-        public void testMethod1() {
-        }
-
-        @DataSet("CustomDataSet.xml")
-        public void testMethod2() {
-        }
-
-        @DataSet
-        public void testMethod3() {
-        }
-
-        public void testNotFound1() {
-        }
-
-        @DataSet("xxxxxx.xml")
-        public void testNotFound2() {
-        }
-    }
-
-    /**
-     * Test class without a class level dataset
-     */
-    public class DataSetTestNoClassLevel {
-
-        @DataSet
-        public void testMethod1() {
-        }
-
-        @DataSet("CustomDataSet.xml")
-        public void testMethod2() {
-        }
-
-        public void testMethod3() {
-        }
-    }
-
-    /**
-     * Test class with a custom class level dataset
-     */
-    @DataSet("CustomDataSet.xml")
-    public class DataSetTestCustomClassLevel {
-
-        public void testMethod1() {
-        }
-
-        @DataSet
-        public void testMethod2() {
-        }
     }
 
 
@@ -299,6 +243,65 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
             }
         } finally {
             DbUtils.closeQuietly(conn, st, null);
+        }
+    }
+
+
+    /**
+     * Test class with a class level dataset
+     */
+    @DataSet
+    public class DataSetTest {
+
+        public void testMethod1() {
+        }
+
+        @DataSet("CustomDataSet.xml")
+        public void testMethod2() {
+        }
+
+        @DataSet
+        public void testMethod3() {
+        }
+
+        public void testNotFound1() {
+        }
+
+        @DataSet("xxxxxx.xml")
+        public void testNotFound2() {
+        }
+    }
+
+
+    /**
+     * Test class without a class level dataset
+     */
+    public class DataSetTestNoClassLevel {
+
+        @DataSet
+        public void testMethod1() {
+        }
+
+        @DataSet("CustomDataSet.xml")
+        public void testMethod2() {
+        }
+
+        public void testMethod3() {
+        }
+    }
+
+
+    /**
+     * Test class with a custom class level dataset
+     */
+    @DataSet("CustomDataSet.xml")
+    public class DataSetTestCustomClassLevel {
+
+        public void testMethod1() {
+        }
+
+        @DataSet
+        public void testMethod2() {
         }
     }
 

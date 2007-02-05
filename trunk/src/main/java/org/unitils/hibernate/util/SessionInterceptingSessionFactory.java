@@ -18,10 +18,19 @@ package org.unitils.hibernate.util;
 import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.classic.Session;
+import org.hibernate.engine.FilterDefinition;
+import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.metadata.CollectionMetadata;
+import org.hibernate.stat.Statistics;
 
+import javax.naming.NamingException;
+import javax.naming.Reference;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,46 +39,48 @@ import java.util.Set;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SessionInterceptingSessionFactory extends BaseSessionFactoryDecorator {
+public class SessionInterceptingSessionFactory implements SessionFactory {
 
-    private Set<Session> sessions = new HashSet<Session>();
+    protected SessionFactory wrappedSessionFactory;
+
+    protected Set<org.hibernate.Session> sessions = new HashSet<org.hibernate.Session>();
 
 
     public SessionInterceptingSessionFactory(SessionFactory sessionFactory) {
-        super(sessionFactory);
+        this.wrappedSessionFactory = sessionFactory;
     }
 
 
     public Session openSession() throws HibernateException {
-        Session session = super.openSession();
+        Session session = wrappedSessionFactory.openSession();
         registerOpenedSession(session);
         return session;
     }
 
 
     public Session openSession(Connection connection) {
-        Session session = super.openSession(connection);
+        Session session = wrappedSessionFactory.openSession(connection);
         registerOpenedSession(session);
         return session;
     }
 
 
     public Session openSession(Connection connection, Interceptor interceptor) {
-        Session session = super.openSession(connection, interceptor);
+        Session session = wrappedSessionFactory.openSession(connection, interceptor);
         registerOpenedSession(session);
         return session;
     }
 
 
     public Session openSession(Interceptor interceptor) throws HibernateException {
-        Session session = super.openSession(interceptor);
+        Session session = wrappedSessionFactory.openSession(interceptor);
         registerOpenedSession(session);
         return session;
     }
 
 
     public Session getCurrentSession() throws HibernateException {
-        Session session = super.getCurrentSession();
+        Session session = wrappedSessionFactory.getCurrentSession();
         registerOpenedSession(session);
         return session;
     }
@@ -80,12 +91,138 @@ public class SessionInterceptingSessionFactory extends BaseSessionFactoryDecorat
     }
 
 
-    public Set<Session> getOpenedSessions() {
+    public Set<org.hibernate.Session> getOpenedSessions() {
         return sessions;
     }
 
 
-    public void forgetOpenedSessions() {
-        sessions = new HashSet<Session>();
+    /**
+     * Closes all open sessions.
+     */
+    public void closeOpenSessions() {
+        for (org.hibernate.Session session : sessions) {
+            if (session.isOpen()) {
+                session.close();
+            }
+        }
     }
+
+
+    /**
+     * Flushes all open sessions.
+     */
+    public void flushOpenSessions() {
+        for (org.hibernate.Session session : sessions) {
+            if (session.isOpen()) {
+                session.flush();
+            }
+        }
+    }
+
+
+    public ClassMetadata getClassMetadata(Class persistentClass) throws HibernateException {
+        return wrappedSessionFactory.getClassMetadata(persistentClass);
+    }
+
+
+    public ClassMetadata getClassMetadata(String entityName) throws HibernateException {
+        return wrappedSessionFactory.getClassMetadata(entityName);
+    }
+
+
+    public CollectionMetadata getCollectionMetadata(String roleName) throws HibernateException {
+        return wrappedSessionFactory.getCollectionMetadata(roleName);
+    }
+
+
+    public Map getAllClassMetadata() throws HibernateException {
+        return wrappedSessionFactory.getAllClassMetadata();
+    }
+
+
+    public Map getAllCollectionMetadata() throws HibernateException {
+        return wrappedSessionFactory.getAllCollectionMetadata();
+    }
+
+
+    public Statistics getStatistics() {
+        return wrappedSessionFactory.getStatistics();
+    }
+
+
+    public void close() throws HibernateException {
+        wrappedSessionFactory.close();
+    }
+
+
+    public boolean isClosed() {
+        return wrappedSessionFactory.isClosed();
+    }
+
+
+    public void evict(Class persistentClass) throws HibernateException {
+        wrappedSessionFactory.evict(persistentClass);
+    }
+
+
+    public void evict(Class persistentClass, Serializable id) throws HibernateException {
+        wrappedSessionFactory.evict(persistentClass, id);
+    }
+
+
+    public void evictEntity(String entityName) throws HibernateException {
+        wrappedSessionFactory.evictEntity(entityName);
+    }
+
+
+    public void evictEntity(String entityName, Serializable id) throws HibernateException {
+        wrappedSessionFactory.evictEntity(entityName, id);
+    }
+
+
+    public void evictCollection(String roleName) throws HibernateException {
+        wrappedSessionFactory.evictCollection(roleName);
+    }
+
+
+    public void evictCollection(String roleName, Serializable id) throws HibernateException {
+        wrappedSessionFactory.evictCollection(roleName, id);
+    }
+
+
+    public void evictQueries() throws HibernateException {
+        wrappedSessionFactory.evictQueries();
+    }
+
+
+    public void evictQueries(String cacheRegion) throws HibernateException {
+        wrappedSessionFactory.evictQueries(cacheRegion);
+    }
+
+
+    public StatelessSession openStatelessSession() {
+        return wrappedSessionFactory.openStatelessSession();
+    }
+
+
+    public StatelessSession openStatelessSession(Connection connection) {
+        return wrappedSessionFactory.openStatelessSession(connection);
+    }
+
+
+    public Set getDefinedFilterNames() {
+        return wrappedSessionFactory.getDefinedFilterNames();
+    }
+
+
+    public FilterDefinition getFilterDefinition(String filterName) throws HibernateException {
+        return wrappedSessionFactory.getFilterDefinition(filterName);
+    }
+
+
+    public Reference getReference() throws NamingException {
+        return wrappedSessionFactory.getReference();
+    }
+
+
 }

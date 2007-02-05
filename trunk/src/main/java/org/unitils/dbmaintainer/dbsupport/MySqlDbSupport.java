@@ -128,8 +128,11 @@ public class MySqlDbSupport extends DbSupport {
         throw new UnsupportedOperationException("Mysql doesn't support types");
     }
 
+
     /**
-     * Not supported
+     * Types are not supported: an UnsupportedOperationException will be raised.
+     *
+     * @param typeName The type to drop (case-sensitive), not null
      */
     public void dropType(String typeName) throws StatementHandlerException {
         throw new UnsupportedOperationException("Mysql doesn't support types");

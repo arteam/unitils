@@ -142,6 +142,7 @@ public class DbUnitModule implements Module {
         }
     }
 
+
     /**
      * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
      *
@@ -158,6 +159,7 @@ public class DbUnitModule implements Module {
             closeJdbcConnection();
         }
     }
+
 
     // todo javadoc
     private void insertDataSet(IDataSet dataSet) throws DatabaseUnitException, SQLException {
@@ -266,6 +268,7 @@ public class DbUnitModule implements Module {
         return dataSet;
     }
 
+
     /**
      * Creates a dbunit <code>IDataSet</code> object, in which the file coming from the given <code>InputStream</code>
      * is loaded.
@@ -339,7 +342,6 @@ public class DbUnitModule implements Module {
             // file does not exist
             return null;
         }
-
         return createDataSet(in, dataSetFilename);
     }
 
@@ -357,7 +359,6 @@ public class DbUnitModule implements Module {
             // file does not exist
             return null;
         }
-
         return createDataSet(in, dataSetFilename);
     }
 
@@ -365,8 +366,8 @@ public class DbUnitModule implements Module {
     /**
      * Create a dbunit <code>IDataSet</code> object, in which the file coming from the given <code>InputStream</code>
      * is loaded.
-     * 
-     * @param in the InputStream, not null
+     *
+     * @param in               the InputStream, not null
      * @param dataSetFilename, the name of the file. Only used for extra info in case of an exception, may be null
      * @return The DbUnit <code>IDataSet</code>
      */
@@ -378,7 +379,7 @@ public class DbUnitModule implements Module {
             return replacementDataSet;
 
         } catch (Exception e) {
-            throw new UnitilsException("Unble to create DbUnit dataset for file " + (dataSetFilename == null?"":dataSetFilename), e);
+            throw new UnitilsException("Unble to create DbUnit dataset for file " + (dataSetFilename == null ? "" : dataSetFilename), e);
         } finally {
             closeQuietly(in);
         }

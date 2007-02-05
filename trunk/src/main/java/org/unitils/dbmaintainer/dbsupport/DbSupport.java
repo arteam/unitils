@@ -405,6 +405,7 @@ abstract public class DbSupport {
         }
     }
 
+
     /**
      * @return The name of the DBMS implementation that is supported by this implementation of {@link DbSupport}
      */

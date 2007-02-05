@@ -17,10 +17,8 @@ package org.unitils.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.hibernate.annotation.HibernateConfiguration;
 import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 
@@ -73,21 +71,9 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
 
 
     /**
-     * Tests hibernate configuration injection for a field and a setter method.
-     */
-    public void testInjectHibernateConfiguration() {
-        HibernateTestConfiguration hibernateTestConfiguration = new HibernateTestConfiguration();
-        hibernateModule.injectHibernateConfiguration(hibernateTestConfiguration);
-
-        assertNotNull(hibernateTestConfiguration.configurationField);
-        assertSame(hibernateTestConfiguration.configurationField, hibernateTestConfiguration.configurationSetter);
-    }
-
-
-    /**
      * Test hibernate test for session injection.
      */
-    @HibernateConfiguration("org/unitils/hibernate/hibernate.cfg.xml")
+    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
     public class HibernateTestSession {
 
         @HibernateSession
@@ -105,7 +91,7 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
     /**
      * Test hibernate test for session factory injection.
      */
-    @HibernateConfiguration("org/unitils/hibernate/hibernate.cfg.xml")
+    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
     public class HibernateTestSessionFactory {
 
         @HibernateSessionFactory
@@ -116,24 +102,6 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
         @HibernateSessionFactory
         public void setSessionFactorySetter(SessionFactory sessionFactorySetter) {
             this.sessionFactorySetter = sessionFactorySetter;
-        }
-    }
-
-
-    /**
-     * Test hibernate test for configuration injection.
-     */
-    @HibernateConfiguration("org/unitils/hibernate/hibernate.cfg.xml")
-    public class HibernateTestConfiguration {
-
-        @HibernateConfiguration
-        private Configuration configurationField = null;
-
-        private Configuration configurationSetter;
-
-        @HibernateConfiguration
-        public void setConfigurationSetter(Configuration configurationSetter) {
-            this.configurationSetter = configurationSetter;
         }
     }
 
