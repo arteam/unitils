@@ -27,7 +27,7 @@ import java.util.Set;
 
 /**
  * todo include schemanames in all statements where applicable
- * 
+ * <p/>
  * Implementation of {@link DbSupport} for an IBM DB2 database
  *
  * @author Filip Neven
@@ -58,14 +58,15 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
-     * Not supported
+     * Types are not supported: an UnsupportedOperationException will be raised.
      */
     public Set<String> getTypeNames() {
         throw new UnsupportedOperationException("DB2 doesn't support types");
     }
 
+
     /**
-     * Not supported
+     * Types are not supported: an UnsupportedOperationException will be raised.
      */
     public void dropType(String typeName) throws StatementHandlerException {
         throw new UnsupportedOperationException("DB2 doesn't support types");
@@ -136,6 +137,7 @@ public class Db2DbSupport extends DbSupport {
     public boolean supportsIdentityColumns() {
         return true;
     }
+
 
     /**
      * Types are not supported
@@ -219,6 +221,12 @@ public class Db2DbSupport extends DbSupport {
         statementHandler.handle("alter table " + qualified(tableName) + " drop constraint " + constraintName);
     }
 
+
+    /**
+     * The name of the DBMS implementation that is supported by this implementation of {@link DbSupport}
+     *
+     * @return db2
+     */
     public String getDbmsName() {
         return "db2";
     }

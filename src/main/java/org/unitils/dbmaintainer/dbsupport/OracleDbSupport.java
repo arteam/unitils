@@ -87,6 +87,7 @@ public class OracleDbSupport extends DbSupport {
         statementHandler.handle(dropTableSQL);
     }
 
+
     /**
      * Drops the type with the given name from the database
      * Note: the type name is surrounded with quotes, making it case-sensitive.
@@ -270,6 +271,12 @@ public class OracleDbSupport extends DbSupport {
         return "INTEGER";
     }
 
+
+    /**
+     * The name of the DBMS implementation that is supported by this implementation of {@link DbSupport}
+     *
+     * @return oracle
+     */
     public String getDbmsName() {
         return "oracle";
     }

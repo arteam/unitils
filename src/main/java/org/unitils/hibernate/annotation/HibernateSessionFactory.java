@@ -15,15 +15,14 @@
  */
 package org.unitils.hibernate.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.*;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
  * todo javadoc
- *
+ * <p/>
  * Annotation indicating that this field or method should be initialized with the Hibernate<code>SessionFactory</code> object
  * that can be used to create Hibernate <code>Session</code> object that provide a connection to the unit test database.
  * If a field is annotated, it should be of type <code>org.hibernate.SessionFactory</code>. If a method is annotated,
@@ -32,7 +31,12 @@ import java.lang.annotation.Target;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@Target({METHOD, FIELD})
+@Target({TYPE, METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface HibernateSessionFactory {
+
+    //todo javadoc
+
+    String[] value() default {};
+
 }
