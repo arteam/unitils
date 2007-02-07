@@ -27,6 +27,8 @@ import static java.util.Arrays.asList;
 import java.util.List;
 
 /**
+ * todo javadoc
+ * <p/>
  * A class for storing and creating Spring application contexts.
  *
  * @author Tim Ducheyne
