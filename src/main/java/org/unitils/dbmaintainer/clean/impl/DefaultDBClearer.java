@@ -77,6 +77,8 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
             logger.info("Clearing (dropping) the unit test database.");
             dropViews();
             dropTables();
+            // todo test dropping synonmys
+            dropSynonyms();
             dropSequences();
             dropTriggers();
             dropTypes();
@@ -115,6 +117,24 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
             }
             logger.debug("Dropping database table: " + tableName);
             dbSupport.dropTable(tableName);
+        }
+    }
+
+
+    /**
+     * Drops all synonyms
+     */
+    protected void dropSynonyms() throws SQLException, StatementHandlerException {
+        if (dbSupport.supportsSynonyms()) {
+            Set<String> synonymNames = dbSupport.getSynonymNames();
+            for (String synonymName : synonymNames) {
+                // check whether table needs to be preserved
+                if (itemsToPreserve.contains(synonymName)) {
+                    continue;
+                }
+                logger.debug("Dropping database table: " + synonymName);
+                dbSupport.dropSynonym(synonymName);
+            }
         }
     }
 

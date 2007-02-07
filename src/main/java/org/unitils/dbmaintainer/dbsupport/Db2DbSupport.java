@@ -38,6 +38,16 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
+     * todo implement
+     * 
+     * @return
+     * @throws SQLException
+     */
+    public Set<String> getSynonymNames() throws SQLException {
+        throw new UnsupportedOperationException("Synonyms not yet implemented for db2");
+    }
+
+    /**
      * Retrieves the names of all the sequences in the database schema.
      *
      * @return The names of all sequences in the database
@@ -106,6 +116,16 @@ public class Db2DbSupport extends DbSupport {
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         statementHandler.handle("ALTER SEQUENCE " + qualified(sequenceName) + " RESTART WITH " + newSequenceValue);
         statementHandler.handle("VALUES NEXTVAL FOR " + qualified(sequenceName));
+    }
+
+
+    /**
+     * Synonyms are not supported
+     *
+     * @return False
+     */
+    public boolean supportsSynonyms() {
+        return false;
     }
 
 

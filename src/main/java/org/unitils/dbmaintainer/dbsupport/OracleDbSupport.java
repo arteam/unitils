@@ -39,6 +39,15 @@ public class OracleDbSupport extends DbSupport {
      *
      * @return The names of all sequences in the database
      */
+    public Set<String> getSynonymNames() throws SQLException {
+        return getOracleIdentifiers("SYNONYM_NAME", "USER_SYNONYMS");
+    }
+
+    /**
+     * Retrieves the names of all the sequences in the database schema.
+     *
+     * @return The names of all sequences in the database
+     */
     public Set<String> getSequenceNames() throws SQLException {
         return getOracleIdentifiers("SEQUENCE_NAME", "USER_SEQUENCES");
     }
@@ -148,6 +157,15 @@ public class OracleDbSupport extends DbSupport {
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }
+    }
+
+
+    /**
+     * Synonyms are supported
+     * @return True
+     */
+    public boolean supportsSynonyms() {
+        return true;
     }
 
 

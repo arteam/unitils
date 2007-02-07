@@ -39,6 +39,14 @@ public class HsqldbDbSupport extends DbSupport {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(HsqldbDbSupport.class);
 
+    /**
+     * todo implement
+     * @return
+     * @throws SQLException
+     */
+    public Set<String> getSynonymNames() throws SQLException {
+        throw new UnsupportedOperationException("Synonyms not yet implemented for hsqldb");
+    }
 
     /**
      * Retrieves the names of all the sequences in the database schema.
@@ -108,6 +116,15 @@ public class HsqldbDbSupport extends DbSupport {
         statementHandler.handle("alter sequence " + qualified(sequenceName) + " restart with " + newSequenceValue);
     }
 
+
+    /**
+     * Synonyms are not supported
+     *
+     * @return false
+     */
+    public boolean supportsSynonyms() {
+        return false;
+    }
 
     /**
      * Sequences are supported.

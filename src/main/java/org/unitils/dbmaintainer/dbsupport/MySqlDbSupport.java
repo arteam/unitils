@@ -85,6 +85,16 @@ public class MySqlDbSupport extends DbSupport {
         }
     }
 
+    /**
+     * todo implement
+     *
+     * @return
+     * @throws SQLException
+     */
+    public Set<String> getSynonymNames() throws SQLException {
+        throw new UnsupportedOperationException("Synonyms not yet implemented for mysql");
+    }
+
 
     /**
      * Sequences are not supported, an UnsupportedOperationException will be raised.
@@ -157,6 +167,15 @@ public class MySqlDbSupport extends DbSupport {
      */
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
+    }
+
+    /**
+     * Synonyms are not supported
+     *
+     * @return False
+     */
+    public boolean supportsSynonyms() {
+        return false;
     }
 
 

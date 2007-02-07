@@ -104,6 +104,14 @@ abstract public class DbSupport {
 
 
     /**
+     * Retrieves the names of all the synonyms in the database schema.
+     *
+     * @return The names of all synonyms in the database
+     */
+    abstract public Set<String> getSynonymNames() throws SQLException;
+
+
+    /**
      * Retrieves the names of all the sequences in the database schema.
      *
      * @return The names of all sequences in the database
@@ -148,6 +156,17 @@ abstract public class DbSupport {
     public void dropView(String viewName) throws StatementHandlerException {
         String dropTableSQL = "drop view " + qualified(viewName) + " cascade";
         statementHandler.handle(dropTableSQL);
+    }
+
+    /**
+     * Removes the synonym with the given name from the database
+     * Note: the synonym name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param synonymName The synonym to drop (case-sensitive), not null
+     */
+    public void dropSynonym(String synonymName) throws StatementHandlerException {
+        String dropSynonymSQL = "drop synonym " + qualified(synonymName);
+        statementHandler.handle(dropSynonymSQL);
     }
 
 
@@ -206,6 +225,14 @@ abstract public class DbSupport {
      * @param newSequenceValue The value to set
      */
     abstract public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException, SQLException;
+
+
+    /**
+     * Indicates whether the underlying DBMS supports synonyms
+     *
+     * @return True if synonyms are supported, false otherwise
+     */
+    abstract public boolean supportsSynonyms();
 
 
     /**
