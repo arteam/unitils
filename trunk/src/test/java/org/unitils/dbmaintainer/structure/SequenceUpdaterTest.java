@@ -22,9 +22,8 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -68,9 +67,9 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
 
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
-        sequenceUpdater = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
-        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
+        sequenceUpdater = (SequenceUpdater) getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
+        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         if (dbSupport.supportsSequences()) {
             dropTestSequence();

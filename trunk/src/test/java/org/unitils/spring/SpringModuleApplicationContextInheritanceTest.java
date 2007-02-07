@@ -18,8 +18,13 @@ package org.unitils.spring;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.unitils.core.ConfigurationLoader;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.spring.annotation.SpringApplicationContext;
+
+import static java.util.Arrays.asList;
+import java.util.List;
 
 /**
  * Test for ApplicationContext creation in a test class hierarchy for the {@link SpringModule}.
@@ -54,8 +59,7 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
         ApplicationContext applicationContext = springModule.getApplicationContext(springTest1);
 
         assertNotNull(applicationContext);
-        assertNotNull(applicationContext.getParent());
-        assertTrue(springTest1.createMethod1Called);
+        assertFalse(springTest1.createMethod1Called);
         assertTrue(springTest1.createMethod2Called);
     }
 
@@ -65,14 +69,11 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
      * superclass (parent) should have been reused.
      */
     public void testCreateApplicationContext_twice() {
-        ApplicationContext applicationContext1 = springModule.getApplicationContext(new SpringTest1());
-        ApplicationContext applicationContext2 = springModule.getApplicationContext(new SpringTest2());
+        ApplicationContext applicationContext1 = springModule.getApplicationContext(new SpringTestNoCreation1());
+        ApplicationContext applicationContext2 = springModule.getApplicationContext(new SpringTestNoCreation2());
 
         assertNotNull(applicationContext1);
-        assertNotNull(applicationContext2);
-        assertNotNull(applicationContext1.getParent());
-        assertNotNull(applicationContext2.getParent());
-        assertSame(applicationContext1.getParent(), applicationContext2.getParent());
+        assertSame(applicationContext1, applicationContext2);
     }
 
 
@@ -81,11 +82,10 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
      * class should be used.
      */
     public void testCreateApplicationContext_onlyInSuperClass() {
-        SpringTestNoCreation springTestNoCreation = new SpringTestNoCreation();
+        SpringTestNoCreation1 springTestNoCreation = new SpringTestNoCreation1();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestNoCreation);
 
         assertNotNull(applicationContext);
-        assertNull(applicationContext.getParent());
         assertTrue(springTestNoCreation.createMethod1Called);
     }
 
@@ -99,9 +99,9 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
         protected boolean createMethod1Called = false;
 
         @SpringApplicationContext
-        protected ApplicationContext createMethod1(ApplicationContext applicationContext) {
+        protected ApplicationContext createMethod1(List<String> locations) {
             createMethod1Called = true;
-            return applicationContext;
+            return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
         }
     }
 
@@ -114,9 +114,11 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
         protected boolean createMethod2Called = false;
 
         @SpringApplicationContext
-        protected ApplicationContext createMethod2(ApplicationContext applicationContext) {
+        protected ApplicationContext createMethod2(List<String> locations) {
             createMethod2Called = true;
-            return applicationContext;
+            assertLenEquals(asList("classpath:org/unitils/spring/services-config.xml", "classpath:org/unitils/spring/services-config.xml"), locations);
+            createMethod2Called = true;
+            return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
         }
     }
 
@@ -131,7 +133,13 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
     /**
      * Test SpringTest sub-class without any context declaration.
      */
-    private class SpringTestNoCreation extends SpringTestSuper {
+    private class SpringTestNoCreation1 extends SpringTestSuper {
+    }
+
+    /**
+     * Test SpringTest sub-class without any context declaration.
+     */
+    private class SpringTestNoCreation2 extends SpringTestSuper {
     }
 
 

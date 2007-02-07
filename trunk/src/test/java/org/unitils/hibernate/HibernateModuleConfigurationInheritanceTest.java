@@ -50,12 +50,12 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration() {
         HibernateTest1 hibernateTest1 = new HibernateTest1();
-        Configuration hibernateConfiguration = sessionFactoryManager.getHibernateConfiguration(hibernateTest1);
+        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTest1);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
         assertEquals("overriden", hibernateConfiguration.getProperty("superValue"));
-        assertTrue(hibernateTest1.createMethod1Called);
+        assertFalse(hibernateTest1.createMethod1Called);
         assertTrue(hibernateTest1.createMethod2Called);
     }
 
@@ -66,7 +66,7 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_onlyInSuperClass() {
         HibernateTestNoCreation1 hibernateTestNoCreation = new HibernateTestNoCreation1();
-        Configuration hibernateConfiguration = sessionFactoryManager.getHibernateConfiguration(hibernateTestNoCreation);
+        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestNoCreation);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
@@ -78,8 +78,8 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
      * Test reusing a configuration of a super class.
      */
     public void testGetHibernateConfiguration_twice() {
-        Configuration hibernateConfiguration1 = sessionFactoryManager.getHibernateConfiguration(new HibernateTestNoCreation1());
-        Configuration hibernateConfiguration2 = sessionFactoryManager.getHibernateConfiguration(new HibernateTestNoCreation2());
+        Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestNoCreation1());
+        Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestNoCreation2());
 
         assertNotNull(hibernateConfiguration1);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));

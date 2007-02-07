@@ -33,7 +33,7 @@ import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.TablePerRowXmlDataSet;
-import org.unitils.util.ConfigUtils;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -100,7 +100,7 @@ public class DbUnitModule implements Module {
     public void init(Configuration configuration) {
         schemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
-        dataTypeFactory = ConfigUtils.getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
+        dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
     }
 
 

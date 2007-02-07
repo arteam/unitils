@@ -46,6 +46,9 @@ public class ReflectionUtils {
             Constructor<?> constructor = clazz.getConstructor();
             return (T) constructor.newInstance();
 
+        } catch (ClassCastException e) {
+            throw new UnitilsException("Class " + className + " is not of expeted type.", e);
+
         } catch (NoClassDefFoundError e) {
             throw new UnitilsException("Unable to load class " + className, e);
 
@@ -119,8 +122,12 @@ public class ReflectionUtils {
             method.setAccessible(true);
             return (T) method.invoke(target, arguments);
 
+        } catch (ClassCastException e) {
+            throw new UnitilsException("Unable to invoke method. Unexpected return type " + method, e);
+
         } catch (IllegalArgumentException e) {
             throw new UnitilsException("Error while invoking method " + method, e);
+
         } catch (IllegalAccessException e) {
             throw new UnitilsException("Error while invoking method " + method, e);
         }
@@ -135,7 +142,6 @@ public class ReflectionUtils {
      * @return A list of Fields, empty list if none found
      */
     public static List<Field> getFieldsAssignableFrom(Class clazz, Class type, boolean isStatic) {
-
         List<Field> fieldsOfType = new ArrayList<Field>();
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {

@@ -15,23 +15,19 @@
  */
 package org.unitils.hibernate.util;
 
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.cfg.Configuration;
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import static org.hibernate.cfg.Environment.CURRENT_SESSION_CONTEXT_CLASS;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
+import static java.util.Arrays.asList;
 
 /**
  * A class for storing and creating Hibernate configurations and session factories.
@@ -39,15 +35,11 @@ import java.util.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SessionFactoryManager {
+public class SessionFactoryManager extends AnnotatedInstanceManager<Configuration, HibernateSessionFactory> {
+
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(SessionFactoryManager.class);
-
-    /**
-     * All created hibernate configurations per class
-     */
-    protected Map<Class<?>, Configuration> hibernateConfigurations = new HashMap<Class<?>, Configuration>();
 
     /**
      * All created session factories per configuration
@@ -68,6 +60,7 @@ public class SessionFactoryManager {
      * @param manageCurrentSessionContext todo javadoc
      */
     public SessionFactoryManager(String configurationImplClassName, boolean manageCurrentSessionContext) {
+        super(Configuration.class, HibernateSessionFactory.class);
         this.hibernateConfigurationImplClassName = configurationImplClassName;
         this.manageCurrentSessionContext = manageCurrentSessionContext;
     }
@@ -94,22 +87,8 @@ public class SessionFactoryManager {
      * @param testObject The test object, not null
      * @return The Hibernate configuration, not null
      */
-    public Configuration getHibernateConfiguration(Object testObject) {
-        // find class level for wich a new config should be created
-        Class<?> testClass = findClassLevelForCreateHibernateConfiguration(testObject.getClass());
-
-        // check whether it already exists
-        Configuration hibernateConfiguration = hibernateConfigurations.get(testClass);
-        if (hibernateConfiguration != null) {
-            return hibernateConfiguration;
-        }
-
-        // create hibernate configuration
-        hibernateConfiguration = createHibernateConfiguration(testObject);
-
-        // store hibernate configuration
-        hibernateConfigurations.put(testClass, hibernateConfiguration);
-        return hibernateConfiguration;
+    public Configuration getConfiguration(Object testObject) {
+        return getInstance(testObject);
     }
 
 
@@ -121,9 +100,9 @@ public class SessionFactoryManager {
      * @param testObject The test object, not null
      * @return The Hibernate session factory, not null
      */
-    public SessionInterceptingSessionFactory getHibernateSessionFactory(Object testObject) {
+    public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
         // check whether it already exists
-        Configuration hibernateConfiguration = getHibernateConfiguration(testObject);
+        Configuration hibernateConfiguration = getConfiguration(testObject);
         SessionInterceptingSessionFactory hibernateSessionFactory = hibernateSessionFactories.get(hibernateConfiguration);
         if (hibernateSessionFactory != null) {
             return hibernateSessionFactory;
@@ -156,13 +135,7 @@ public class SessionFactoryManager {
      * @param classes The classes for which to reset the configs
      */
     public void invalidateHibernateConfiguration(Class<?>... classes) {
-        if (classes == null || classes.length == 0) {
-            hibernateConfigurations.clear();
-            return;
-        }
-        for (Class<?> clazz : classes) {
-            hibernateConfigurations.remove(clazz);
-        }
+        super.invalidateInstance(classes);
     }
 
 
@@ -178,258 +151,65 @@ public class SessionFactoryManager {
      * the unitils datasource and thus connect to the unit test database.
      *
      * @param testObject The test object, not null
+     * @param testClass  The level in the hierarchy
      * @return The Hibernate configuration, not null
      */
-    protected Configuration createHibernateConfiguration(Object testObject) {
-        // create hibernate configuration for locations
-        List<String> locations = new ArrayList<String>();
-        getConfigurationLocations(testObject, testObject.getClass(), locations);
-
-        // call custom create methods
-        Configuration hibernateConfiguration = invokeCreateHibernateConfigurationMethod(testObject, locations);
-
-        // check no hibernate configuration was created
-        // create configuration using hibernate defaults
-        if (hibernateConfiguration == null) {
-            hibernateConfiguration = createHibernateConfigurationForLocations(locations);
-        }
-
-        Properties unitilsHibernateProperties = new Properties();
+    @Override
+    protected Configuration createInstance(Object testObject, Class<?> testClass) {
+        // create instance
+        Configuration configuration = super.createInstance(testObject, testClass);
 
         // configure hibernate to use unitils datasource
-        if (hibernateConfiguration.getProperty(CONNECTION_PROVIDER) != null) {
-            logger.warn("The property " + CONNECTION_PROVIDER + " is present in your Hibernate configuration. " +
-                    "This property will be overwritten with Unitils own ConnectionProvider implementation!");
+        Properties unitilsHibernateProperties = new Properties();
+        if (configuration.getProperty(CONNECTION_PROVIDER) != null) {
+            logger.warn("The property " + CONNECTION_PROVIDER + " is present in your Hibernate configuration. This property will be overwritten with Unitils own ConnectionProvider implementation!");
         }
         unitilsHibernateProperties.setProperty(CONNECTION_PROVIDER, HibernateConnectionProvider.class.getName());
 
         // if enabled, configure hibernate's current session management
         if (manageCurrentSessionContext) {
-            if (hibernateConfiguration.getProperty(CURRENT_SESSION_CONTEXT_CLASS) != null) {
+            if (configuration.getProperty(CURRENT_SESSION_CONTEXT_CLASS) != null) {
                 logger.warn("The property " + CURRENT_SESSION_CONTEXT_CLASS + " is present in your Hibernate " +
                         "configuration. This property will be overwritten with Unitils own CurrentSessionContext implementation!");
             }
             unitilsHibernateProperties.setProperty(CURRENT_SESSION_CONTEXT_CLASS, HibernateCurrentSessionContext.class.getName());
         }
-        hibernateConfiguration.addProperties(unitilsHibernateProperties);
-        return hibernateConfiguration;
+        configuration.addProperties(unitilsHibernateProperties);
+        return configuration;
     }
 
 
-    /**
-     * Gets all locations specified in {@link HibernateSessionFactory} annotations for the given testClass
-     * and all its superclasses.
-     *
-     * @param testObject The test object, not null
-     * @param testClass  The current class in the hierarchy, can be null
-     * @param result     The list to which the locations will be added, not null
-     */
-    protected void getConfigurationLocations(Object testObject, Class<?> testClass, List<String> result) {
-        // nothing to do (ends the recursion)
-        if (testClass == null || testClass == Object.class) {
-            return;
-        }
-
-        // add locations of super classes  
-        getConfigurationLocations(testObject, testClass.getSuperclass(), result);
-
-        // get class level locations
-        String[] classLevelLocations = getLocationsValue(testClass.getAnnotation(HibernateSessionFactory.class));
-        if (classLevelLocations != null) {
-            result.addAll(Arrays.asList(classLevelLocations));
-        }
-        // get field level locations
-        List<Field> fields = getFieldsAnnotatedWith(testClass, HibernateSessionFactory.class);
-        for (Field field : fields) {
-            String[] fieldLevelLocations = getLocationsValue(field.getAnnotation(HibernateSessionFactory.class));
-            if (fieldLevelLocations != null) {
-                result.addAll(Arrays.asList(fieldLevelLocations));
-            }
-        }
-        // get method level locations
-        List<Method> methods = getMethodsAnnotatedWith(testClass, HibernateSessionFactory.class, false);
-        for (Method method : methods) {
-            String[] methodLevelLocations = getLocationsValue(method.getAnnotation(HibernateSessionFactory.class));
-            if (methodLevelLocations != null) {
-                result.addAll(Arrays.asList(methodLevelLocations));
-            }
-        }
-    }
-
-
-    /**
-     * Creates a configuration by calling all methods annotated with @HibernateConfiguration.
-     * These methods should have one of following exact signatures:
-     * <ul>
-     * <li>Configuration createMethodName() or</li>
-     * <li>Configuration createMethodName(List<String> locations)</li>
-     * </ul>
-     * The second version receives the current created hibernate configuration, for example one that was created by a class or
-     * superclasses @HibernateConfiguration).
-     * They both should return a configuration, either a new one or the given parent context (after for
-     * example changing some values).
-     *
-     * @param testObject The test object, not null
-     * @param locations  The specified locations if there are any, not null
-     * @return The new hibernate configuration or the current hibernate configuration
-     */
-    protected Configuration invokeCreateHibernateConfigurationMethod(Object testObject, List<String> locations) {
-        // get all annotated methods, superclass methods included
-        Class<?> testClass = testObject.getClass();
-        List<Method> methods = getMethodsAnnotatedWith(testClass, HibernateSessionFactory.class, true);
-
-        Configuration result = null;
-        for (Method method : methods) {
-            // do not invoke setter methods
-            if (method.getReturnType() == Void.TYPE) {
-                continue;
-            }
-            if (!isCreateHibernateConfigurationMethod(method)) {
-                throw new UnitilsException("Unable to invoke method annotated with @" + HibernateSessionFactory.class.getSimpleName() +
-                        ". Ensure that this method has following signature: " + Configuration.class.getName() + " myMethod( String[] locations ) or " +
-                        Configuration.class.getName() + " myMethod()");
-            }
-
-            // check whether there is more than 1 custom create method
-            if (result != null) {
-                throw new UnitilsException("There can only be 1 method per class annotated with @" + HibernateSessionFactory.class.getSimpleName() + " for creating a session factory.");
-            }
-
-            try {
-                // call method
-                if (method.getParameterTypes().length == 0) {
-                    result = invokeMethod(testObject, method);
-                } else {
-                    result = invokeMethod(testObject, method, locations);
-                }
-            } catch (InvocationTargetException e) {
-                throw new UnitilsException("Method " + testClass.getSimpleName() + "." + methods.get(0).getName() +
-                        " (annotated with " + HibernateSessionFactory.class.getSimpleName() + ") has thrown an exception", e.getCause());
-            }
-        }
-        return result;
-    }
-
-
-    /**
-     * Creates a hibernate configuration for the given locations. If no locations are specified, the hibernate default
-     * (hibernate.cfg.xml) will be used. Which type of configuration will be created depends on the implementation
-     * class that was specified upon construction. A UnitilsException is thrown if the configuration could not be loaded.
-     *
-     * @param locations the file locations
-     * @return The configuration, not null
-     */
-    protected Configuration createHibernateConfigurationForLocations(List<String> locations) {
+    protected Configuration createInstanceForValues(List<String> values) {
         try {
             // create instance
             Configuration configuration = createInstanceOfType(hibernateConfigurationImplClassName);
 
             // load default configuration if no locations were specified
-            if (locations == null || locations.isEmpty()) {
+            if (values == null || values.isEmpty()) {
                 configuration.configure();
                 return configuration;
             }
             // load specified configurations
-            for (String location : locations) {
-                configuration.configure(location);
+            for (String value : values) {
+                configuration.configure(value);
             }
             return configuration;
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to create hibernate configuration for locations: " + locations, e);
-
+            throw new UnitilsException("Unable to create hibernate configuration for locations: " + values, e);
         }
     }
 
 
-    /**
-     * Finds the level in the class hierarchy for which a hibernate configuration should
-     * be created. That is, a class level that contains a custom create method or specifies
-     * a location in one of the {@link HibernateSessionFactory} annotations. Such a level should
-     * have its own hibernate configuration and cannot reuse the config of a superclass.
-     * <p/>
-     * If a class only contains {@link HibernateSessionFactory} annotations without locations (for example
-     * for injecting the configuration into a field), the superclasses will be checked untill a level
-     * is found for which a config should be created. If no level is found, null is returned.
-     *
-     * @param testClass The current level in the hierarchy
-     * @return The level for which a config should created, null if none found
-     */
-    protected Class<?> findClassLevelForCreateHibernateConfiguration(Class<?> testClass) {
-        // nothing to do (ends the recursion)
-        if (testClass == null || testClass == Object.class) {
-            return null;
-        }
-
-        // check class level locations
-        if (getLocationsValue(testClass.getAnnotation(HibernateSessionFactory.class)) != null) {
-            return testClass;
-        }
-
-        // check field level locations
-        List<Field> fields = getFieldsAnnotatedWith(testClass, HibernateSessionFactory.class);
-        for (Field field : fields) {
-            if (getLocationsValue(field.getAnnotation(HibernateSessionFactory.class)) != null) {
-                return testClass;
-            }
-        }
-
-        // check custom create methods and method level locations
-        List<Method> methods = getMethodsAnnotatedWith(testClass, HibernateSessionFactory.class, false);
-        for (Method method : methods) {
-            if (isCreateHibernateConfigurationMethod(method)) {
-                return testClass;
-            }
-            if (getLocationsValue(method.getAnnotation(HibernateSessionFactory.class)) != null) {
-                return testClass;
-            }
-        }
-        // nothing found on this level, check superclass
-        return findClassLevelForCreateHibernateConfiguration(testClass.getSuperclass());
-    }
-
-
-    /**
-     * Checks whether the given method is a custom create method.
-     * A custom create method must have following signature:
-     * <ul>
-     * <li>Configuration createMethodName() or</li>
-     * <li>Configuration createMethodName(String[] locations)</li>
-     * </ul>
-     *
-     * @param method The method, not null
-     * @return True if it has the correct signature
-     */
-    protected boolean isCreateHibernateConfigurationMethod(Method method) {
-        Class<?>[] argumentTypes = method.getParameterTypes();
-        if (argumentTypes.length > 1) {
-            return false;
-        }
-        if (argumentTypes.length == 1 && argumentTypes[0] != List.class) {
-            return false;
-        }
-        return (method.getReturnType() == Configuration.class);
-    }
-
-
-    /**
-     * Gets the locations that are specified for the given annotation. If the annotation is null or
-     * if no locations were specified, null will be returned. An array with 1 empty string will
-     * also be considered to be empty.
-     *
-     * @param annotation The annotation
-     * @return The locations, null if no locations were specified
-     */
-    protected String[] getLocationsValue(HibernateSessionFactory annotation) {
+    protected List<String> getAnnotationValues(HibernateSessionFactory annotation) {
         if (annotation == null) {
             return null;
         }
         String[] locations = annotation.value();
-        if (locations.length == 0 || (locations.length == 1 && StringUtils.isEmpty(locations[0]))) {
+        if (locations.length == 0 || (locations.length == 1 && isEmpty(locations[0]))) {
             return null;
         }
-        return locations;
+        return asList(locations);
     }
-
 }
                          

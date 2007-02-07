@@ -24,7 +24,7 @@ import org.unitils.dbmaintainer.clean.impl.DefaultDBClearer;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -71,9 +71,9 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             Configuration configuration = new ConfigurationLoader().loadConfiguration();
             configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, itemsToPreserve);
 
-            StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
-            dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
-            dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+            StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
+            dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+            dbClearer = (DBClearer) getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
 
             cleanupTestDatabase();
             createTestDatabase();

@@ -147,35 +147,35 @@ public class DBMaintainer {
     public DBMaintainer(Configuration configuration, DataSource dataSource) {
         StatementHandler statementHandler = new LoggingStatementHandlerDecorator(DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
 
-        scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
-        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, dataSource, statementHandler);
-        versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
-        scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
+        scriptRunner = (ScriptRunner) getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
+        codeScriptRunner = (CodeScriptRunner) getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, dataSource, statementHandler);
+        versionSource = (VersionSource) getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
+        scriptSource = (ScriptSource) getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
 
         boolean cleanDbEnabled = configuration.getBoolean(PROPKEY_DBCLEANER_ENABLED);
         if (cleanDbEnabled) {
-            dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
+            dbCleaner = (DBCleaner) getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
         }
 
         fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
         keepRetryingAfterError = configuration.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED);
         if (fromScratchEnabled) {
-            dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+            dbClearer = (DBClearer) getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
         }
 
         boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
         if (disableConstraints) {
-            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+            constraintsDisabler = (ConstraintsDisabler) getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
         }
 
         boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
         if (updateSequences) {
-            sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
+            sequenceUpdater = (SequenceUpdater) getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
         }
 
         boolean generateDtd = configuration.getBoolean(PROPKEY_GENERATEDTD_ENABLED);
         if (generateDtd) {
-            dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
+            dtdGenerator = (DtdGenerator) getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
         }
     }
 

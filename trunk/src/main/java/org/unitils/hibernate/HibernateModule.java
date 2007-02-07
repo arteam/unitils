@@ -25,7 +25,6 @@ import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.util.Flushable;
-import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.hibernate.util.HibernateAssert;
 import org.unitils.hibernate.util.HibernateConnectionProvider;
@@ -41,12 +40,14 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
+ * todo javadoc
+ * <p/>
  * Module providing support for unit tests for code that uses Hibernate. It offers an easy way of loading hibernate
  * configuration files, creating Sessions and SessionFactories and injecting them in the test. It also offers a test
  * to check whether the hibernate mappings are consistent with the structure of the database.
  * <p/>
  * A Hibernate <code>Session</code> is created when requested and can be injected into the test by annotating a field
- * or setter method with the {@link HibernateSession} annotation. The same is true for the <code>SessionFactory</code>,
+ * or setter method with the HibernateSession annotation. The same is true for the <code>SessionFactory</code>,
  * it will lazily be created and can be injected by annotating a field or setter method with the {@link HibernateSessionFactory}
  * annotation.
  * <p/>
@@ -103,7 +104,7 @@ public class HibernateModule implements Module, Flushable {
      * @param testObject The test instance, not null
      */
     public void assertMappingWithDatabaseConsistent(Object testObject) {
-        Configuration configuration = getSessionFactoryManager().getHibernateConfiguration(testObject);
+        Configuration configuration = getSessionFactoryManager().getConfiguration(testObject);
         Session session = getHibernateSessionFactory(testObject).openSession();
         Dialect databaseDialect = getDatabaseDialect(configuration);
 
@@ -121,7 +122,7 @@ public class HibernateModule implements Module, Flushable {
      * @return The Hibernate <code>SessionFactory</code>, not null
      */
     public SessionFactory getHibernateSessionFactory(Object testObject) {
-        return getSessionFactoryManager().getHibernateSessionFactory(testObject);
+        return getSessionFactoryManager().getSessionFactory(testObject);
     }
 
 
@@ -212,43 +213,6 @@ public class HibernateModule implements Module, Flushable {
 
 
     /**
-     * Injects the Hibernate <code>Session</code> into all fields and methods that are annotated with {@link HibernateSession}
-     *
-     * @param testObject The test object, not null
-     */
-    public void injectHibernateSession(Object testObject) {
-        // open a new session
-        Session session = getHibernateSessionFactory(testObject).openSession();
-
-        // inject into fields
-        List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), HibernateSession.class);
-        for (Field field : fields) {
-            try {
-                setFieldValue(testObject, field, session);
-
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to assign the hibernate Session to field annotated with @" +
-                        HibernateSession.class.getSimpleName() + "Ensure that this field is of type " + Session.class.getName(), e);
-            }
-        }
-        // inject into setters
-        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), HibernateSession.class);
-        for (Method method : methods) {
-            try {
-                invokeMethod(testObject, method, session);
-
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to invoke method annotated with @" + HibernateSession.class.getSimpleName() +
-                        ". Ensure that this method has following signature: void myMethod(" + Session.class.getName() + " session)", e);
-            } catch (InvocationTargetException e) {
-                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
-                        " (annotated with " + HibernateSession.class.getSimpleName() + ") has thrown an exception", e.getCause());
-            }
-        }
-    }
-
-
-    /**
      * Gets the database dialect from the Hibernate <code>Configuration</code.
      *
      * @param configuration The hibernate config, not null
@@ -283,7 +247,6 @@ public class HibernateModule implements Module, Flushable {
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
             injectHibernateSessionFactory(testObject);
-            injectHibernateSession(testObject);
         }
 
         @Override

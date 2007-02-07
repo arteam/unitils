@@ -25,7 +25,8 @@ Tutorial
 
 ** {Configuration}
 ~~~~~~~~~~~~~~~~
-    This section explains how the configuration of Unitils works. If you want to learn how you can setup Unitils to get started quickly, read the {{{cookbook.html}cookbook}}.
+    This section explains how the configuration of Unitils works. If you want to learn how you can setup Unitils to get started 
+    quickly, read the {{{cookbook.html}cookbook}}.
     
     As with many projects, Unitils needs some configuration of its services. By default, there are 3 levels
     of configuration, each level overriding the settings of the previous one:
@@ -147,6 +148,8 @@ public class MyTest {
    * <EasyMockModule>: support for creating mocks and lenient reflection argument matching
 
    * <InjectModule>: support for injecting (mock) objects into other objects
+   
+   * <SpringModule>: support for loading application contexts and retrieving and injecting Spring beans
 
    * Planned: support for JPA.
 
@@ -162,15 +165,18 @@ public class MyTest {
 
 
 ** {Managing test data with DbUnit}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Database tests should be run on a unit test database, having complete and fine grained control over the test data that is used. Unitils
     builds further on DBUnit for providing support for working with test data sets. 
 
+
+*** {Loading test datasets}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Let's start with an example of a UserDAO with a simple findByName method for retrieving a user based on it's first and last 
     name. A typical unit test would look as follows:
 
 +-----+
-@DatabaseTest
+@DataSet
 public void UserDAOTest extends UnitilsJUnit4 {
 
     @Test
@@ -188,9 +194,8 @@ public void UserDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    The <@DatabaseTest> annotation in the test marks the test as being a database test, instructing Unitils to look for DBUnit 
-    datafiles that need to be loaded for the test. Unitils automatically looks for dataset files that are in the same directory as 
-    the test class and have following name pattern:
+    The <@DataSet> annotation in the test instructs Unitils to look for DBUnit datafiles that need to be loaded for the test. Unitils 
+    automatically looks for dataset files that are in the same directory as the test class and have following name pattern:
 
     * <className>.xml - for a dataset that is shared by all tests in the test class.
     
@@ -232,11 +237,13 @@ public void UserDAOTest extends UnitilsJUnit4 {
     to reuse the data in the class level dataset - in most cases a small set of test records can be reused for multiple tests. If reusing 
     a dataset mainly means adding extra records, it's better to create a method specific one. Otherwise, this will result in a big incoherent dataset.
     
-    The dataset filename can also be specified explicitly using the <@DataSet> annotation:
+    By setting the <@DataSet> annotation on class level a dataset is loaded for every test in the class. If a dataset should
+    only be loaded for some of the tests, you can leave the class level annotation off and annotate the test methods instead. That way 
+    datasets will only be loaded for those tests. If needed, you can also specify the filename of the dataset explicitly by passing it as argument 
+    to the <@DataSet> annotation:
 
 +-----+
-@DatabaseTest
-@DataSet(fileName = "UserDAOTest_general.xml")
+@DataSet("UserDAOTest_general.xml")
 public void UserDAOTest extends UnitilsJUnit4 {
 
     @Test
@@ -245,7 +252,7 @@ public void UserDAOTest extends UnitilsJUnit4 {
         assertEquals("jdoe", johnDoe.getUserName());
     }
 
-    @DataSet(fileName = "UserDAOTest_ages.xml")
+    @DataSet("UserDAOTest_ages.xml")
     public void testFindByMinimalAge {
         List<User> min18 = userDao.findByMinimalAge(18);
         assertEquals(1, min18.size());
@@ -254,13 +261,15 @@ public void UserDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
+
+*** {Asserting test results}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unitils also offers support for checking the contents of a database with a certain dataset after a test was run. This can be useful for example when you want
     to check the result of a bulk update method or stored procedures. 
 
     Following example tests a method that disables all user accounts that haven't been used for an entire year:
 
 +-----+
-@DatabaseTest
 public void UserDAOTest extends UnitilsJUnit4 {
 
     @Test
@@ -282,16 +291,23 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    In general, following naming pattern is used for result datasets: <className>.<methodName>-result.xml
+    As with the <@DataSet> annotation, a file name can explicitly be specified. If no name is specified, following naming pattern will be used: <className>.<methodName>-result.xml
     
-    The use of result datasets should be kept minimal. If possible, you should try to perform the same check in the test code (e.g. by using a method <findActiveUsers()>).
+    The use of result datasets should be kept minimal, since adding new datasets means more maintenance. As an alternative, you should try to 
+    perform the same check in the test code (e.g. by using a method <findActiveUsers()>).
 
+
+*** {Connecting to the test database}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     In the above examples we left out 1 important thing: where is the DataSource for connecting to the test database coming from and how
-    can we let our DAO classes make use of this DataSource? The answer to these quesions is of course: Unitils. Before the first database test, Unitils creates a Datasource instance. If there is a field or method available annotated with <@TestDataSource>, Unitils will inject the DataSource into this field or call the method with the DataSource as parameter. This is done before each test, before executing the setUp() method or the methods annotated with <@Before> or <@BeforeMethod>.
-    This way, you can easily make sure that your project data access code uses the correct DataSource. Typically all this is implemented once in a project-specific superclass for all your database tests. A simple example of such a base class could be:
+    can we let our DAO classes make use of this <DataSource>? 
+    
+    Before the first database test, Unitils creates a <Datasource> instance. If there is a field or method available annotated with <@TestDataSource>, Unitils 
+    will inject the DataSource into this field or call the method with the DataSource as parameter. This is done before the setup of each test. This way, you can 
+    easily make sure that your project data access code uses the correct DataSource. Typically all this is implemented once in a project-specific 
+    superclass for all your database tests. A simple example of such a base class could be:
     
 +-----+
-@DatabaseTest
 public abstract void BaseDAOTest extends UnitilsJUnit4 {
 
     @TestDataSource
@@ -299,7 +315,6 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
     
     @Before    
     public void initializeDao() {
-        
         BaseDAO dao = getDaoUnderTest();
         dao.setDataSource(dataSource);
     }
@@ -308,6 +323,10 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 }
 +-----+    
 
+
+
+** {Unit test database maintenance}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     When writing database tests, keep in mind following guidelines:
 
     * Use small sets of test data, containing as few data as possible. In your data files,
@@ -328,12 +347,6 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
     
     Following section describes how Unitils provides support for these 2 last guidelines: automatic test database schema maintenance and constraints disabling.
 
-
-
-
-
-** {Unit test database maintenance}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     A powerful <DBMaintainer> is provided to automatically update each developer's individual database schema when needed. It will check whether 
     database structure updates are available and apply them if necessary.
     
@@ -449,48 +462,27 @@ database.dialect=oracle
     tests remain valuable. They can ensure the mapping of the Hibernate mapped classes is always in sync with the database and can be used for 
     easy and quick testing of HQL queries.
 
-    A HQL method can be tested exactly the same way as described above in {{{#Managing test data with DbUnit} Managing test data with DbUnit}}. 
-    The <@ExpectedDataSet> annotation can also be used for result checking with a data file. To make sure all database updates performed during the 
+    A HQL method can be tested exactly the same way as described above in {{{#Loading test data with DbUnit} Managing test data with DbUnit}}. 
+    The <@ExpectedDataSet> annotation can also be used for result checking with a data file. 
+    
+    
+*** {Loading Hibernate configurations}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+    Unitils provides out-of-the box configuration support for Hibernate. When you annotate a Hibernate test class or the superclass with the 
+    <@HibernateConfiguration> annotation, Unitils will perform the loading and managing of the Hibernate configuration for you. 
+    
+    To make sure all database updates performed during the 
     test are actually executed on the database, Unitils will ensure that the Hibernate Session is flushed before performing the check. 
     
-
-*** Testing the mapping
-~~~~~~~~~~~~~~~~~~~~~~~
-
-    Unitils is shipped with a ready-to-use unit test that verifies whether the mapping of all your mapped classes is consistent with the database. This
-    test is not automatically executed; you should write a unit test that looks like the following:
-
-+-----+
-public class HibernateMappingTest extends BaseHibernateTest {
-
-    public void testMappingToDatabase() {
-        HibernateAssert.assertMappingToDatabase();
-    }
-}
-+-----+
-
-    The method <HibernateAssert.assertMappingToDatabase()> checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
-    the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
-    
-+-----+
-alter table PERSON add column lastName varchar(255);
-alter table PRODUCT add column barCode varchar(255);
-+-----+
-
-    Unitils provides out-of-the box configuration support for Hibernate. When you annotate a Hibernate test class or the superclass with the 
-    <@HibernateTest> annotation, Unitils will perform loading the configuration and managing the Hibernate Session for you. In the configuration
+    In the configuration
     you can specify one or more hibernate configuration files that should be loaded in the tests:
-    
-+-----+
-HibernateModule.hibernate.configfiles=hibernate-general.cfg.xml, hibernate-unittest.cfg.xml
-+-----+
     
     Extra programmatic configuration can also be performed by annotating a method with <@HibernateConfiguration> in your test (super)class. Unitils
     will then call this method passing the hibernate configuration as an argument:
     
 +-----+
 @HibernateConfiguration
-void configureHibernate(org.hibernate.cfg.Configuration configuration) {
+Configuration configureHibernate(Configuration configuration) {
     ...
 }   
 +-----+
@@ -500,7 +492,6 @@ void configureHibernate(org.hibernate.cfg.Configuration configuration) {
     could look as follows:
 
 +-----+
-@HibernateTest
 public abstract void BaseHibernateDAOTest extends UnitilsJUnit4 {
 
     @HibernateSession
@@ -518,6 +509,33 @@ public abstract void BaseHibernateDAOTest extends UnitilsJUnit4 {
 +-----+ 
 
 
+
+*** {Testing the mapping}
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Unitils is shipped with a ready-to-use unit test that verifies whether the mapping of all your mapped classes is consistent with the database. This
+    test is not automatically executed; you should write a unit test that looks like the following:
+
++-----+
+@HibernateConfiguration(hibernate-general.cfg.xml, hibernate-unittest.cfg.xml)
+public class HibernateMappingTest extends UnitilsJUnit4 {
+
+    @Test
+    public void testMappingToDatabase() {
+        HibernateUnitils.assertMappingToDatabase();
+    }
+}
++-----+
+
+    The method <HibernateUnitils.assertMappingToDatabase()> checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
+    the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
+    
++-----+
+alter table PERSON add column lastName varchar(255);
+alter table PRODUCT add column barCode varchar(255);
++-----+
+
+    
 
 * {Using reflection for assertion}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -854,7 +872,7 @@ private UserDao mockUserDao;
     UserDao mock is created and injected in the the userService:
 
 +-----+
-@Mock @Inject(property = "userDao")
+@Mock @InjectInto(property = "userDao")
 private UserDao mockUserDao;
 
 @TestedObject
@@ -873,7 +891,7 @@ private UserService userService;
     The target object can also specified explicitly, using the target attribute on the Inject annotation:
   
 +-----+
-@Mock @Inject(target = "userService", property = "userDao")
+@Mock @InjectInto(target = "userService", property = "userDao")
 private UserDao mockUserDao;
 
 private UserService userService;
@@ -883,7 +901,7 @@ private UserService userService;
     supports injecting objects into the target automatically by type. E.g.
   
 +-----+
-@Mock @AutoInject
+@Mock @InjectIntoByType
 private UserDao mockUserDao;
 
 @TestedObject

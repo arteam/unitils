@@ -1,13 +1,14 @@
 a:link {
-    color:#47a;
-}
-a:visited  {
-    color:#47a;
-}
-#bodyColumn a, #bodyColumn a:visited, #bodyColumn a:link, #bodyColumn a:active, #bodyColumn a:hover {
-    font-weight:bold;
+    color: #47a;
 }
 
+a:visited {
+    color: #47a;
+}
+
+#bodyColumn a, #bodyColumn a:visited, #bodyColumn a:link, #bodyColumn a:active, #bodyColumn a:hover {
+    font-weight: bold;
+}
 
 #banner {
     height: 75px;
@@ -15,7 +16,7 @@ a:visited  {
 }
 
 #poweredBy img {
-    display:block;
+    display: block;
     margin: 5px 0 5px 17px;
     border: none;
     width: none;
@@ -39,27 +40,28 @@ a:visited  {
 }
 
 .section h4 {
-	font-size: 14px;
+    font-size: 14px;
 }
 
 .section h5 {
+    margin-top: 5px;
     font-size: 13px;
     font-style: italic
 }
 
 .externalLink {
-    background: url(../images/external.png) right top no-repeat;
+    background: url( ../images/external.png ) right top no-repeat;
     padding-right: 18px;
 }
 
 .image-center {
-	text-align: center;
+    text-align: center;
 }
 
 .image-left {
 }
 
 .code-comment {
-	color: #47a;
- 	font-weight: bold;
+    color: #47a;
+    font-weight: bold;
 }
