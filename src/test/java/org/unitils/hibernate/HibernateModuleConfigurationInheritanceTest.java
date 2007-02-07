@@ -98,7 +98,11 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
         @HibernateSessionFactory
         protected Configuration createMethod1(List<String> locations) {
             createMethod1Called = true;
-            return null;
+            AnnotationConfiguration config = new AnnotationConfiguration();
+            for (String location : locations) {
+                config.configure(location);
+            }
+            return config;
         }
     }
 
@@ -113,7 +117,11 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
         @HibernateSessionFactory
         protected Configuration createMethod2(List<String> locations) {
             createMethod2Called = true;
-            return null;
+            AnnotationConfiguration config = new AnnotationConfiguration();
+            for (String location : locations) {
+                config.configure(location);
+            }
+            return config;
         }
     }
 

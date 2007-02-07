@@ -30,6 +30,8 @@ import java.util.*;
 import static java.util.Arrays.asList;
 
 /**
+ * todo javadoc
+ * <p/>
  * A class for storing and creating Hibernate configurations and session factories.
  *
  * @author Tim Ducheyne

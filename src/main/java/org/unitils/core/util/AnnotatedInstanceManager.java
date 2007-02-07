@@ -139,7 +139,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
      * only instances on those class levels will be reset. If no classes are given, all cached
      * instances will be reset.
      *
-     * @param classes The classes for which to reset the isntances
+     * @param classes The classes for which to reset the instances
      */
     protected void invalidateInstance(Class<?>... classes) {
         if (classes == null || classes.length == 0) {
@@ -153,30 +153,24 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
 
     /**
-     * Creates a configured Hibernate <code>Configuration</code> object.
-     * This will first retrieve all locations specified in {@link org.unitils.hibernate.annotation.HibernateSessionFactory} annotations. If a locations
-     * were specified, a new config is created. Next, all custom create hibernate configuration methods are invoked
-     * passing the created config if requested (null if no context was created yet). If there still was no config
-     * created yet, a default hibernate configuration will be created, using hibernate.cfg.xml as config file.
-     * <p/>
-     * Once a configuration is loaded, the property 'hibernate.connection.provider_class' will be overwritten so that Hibernate
-     * will load the {@link org.unitils.hibernate.util.HibernateConnectionProvider} as provider. This way we can make sure that Hibernate will use
-     * the unitils datasource and thus connect to the unit test database.
+     * Creates a new instance for the given test. This will first retrieve the values of all annotations on
+     * the test class and its super classes. If there is a custom create method, that method is then used
+     * to create the instance (passing the values). If no create was found, {@link #createInstanceForValues} is
+     * called to create the instance.
      *
      * @param testObject The test object, not null
      * @param testClass  The level in the hierarchy
-     * @return The Hibernate configuration, not null
+     * @return The instance, not null
      */
     protected T createInstance(Object testObject, Class<?> testClass) {
-        // create hibernate configuration for locations
+        // retrieve annotations values of test class and super classes
         List<String> annotationValues = new ArrayList<String>();
         getAnnotationValues(testObject, testClass, annotationValues);
 
-        // call custom create methods
+        // let custom create-method (if any) create instance
         T instance = invokeCreateInstanceMethod(testObject, testClass, annotationValues);
 
-        // check no hibernate configuration was created
-        // create configuration using hibernate defaults
+        // if no instance was created, use default creation mechanism
         if (instance == null) {
             instance = createInstanceForValues(annotationValues);
         }
@@ -185,12 +179,12 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
 
     /**
-     * Gets all locations specified in {@link org.unitils.hibernate.annotation.HibernateSessionFactory} annotations for the given testClass
-     * and all its superclasses.
+     * Gets all values specified in annotations for the given testClass and all its super classes. Super class values
+     * in front of sub class values.
      *
      * @param testObject The test object, not null
      * @param testClass  The current class in the hierarchy, can be null
-     * @param result     The list to which the locations will be added, not null
+     * @param result     The list to which the values will be added, not null
      */
     protected void getAnnotationValues(Object testObject, Class<?> testClass, List<String> result) {
         // nothing to do (ends the recursion)
@@ -198,7 +192,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
             return;
         }
 
-        // add locations of super classes
+        // add values of super classes
         getAnnotationValues(testObject, testClass.getSuperclass(), result);
 
         // get class level annotation values
@@ -226,23 +220,20 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
 
     /**
-     * todo javadoc
-     * <p/>
-     * Creates a configuration by calling all methods annotated with @HibernateConfiguration.
-     * These methods should have one of following exact signatures:
+     * Creates an instance by calling a custom create method (if there is one). Such a create method should have one of
+     * following exact signatures:
      * <ul>
      * <li>Configuration createMethodName() or</li>
      * <li>Configuration createMethodName(List<String> locations)</li>
      * </ul>
-     * The second version receives the current created hibernate configuration, for example one that was created by a class or
-     * superclasses @HibernateConfiguration).
-     * They both should return a configuration, either a new one or the given parent context (after for
-     * example changing some values).
+     * The second version receives the given locations. They both should return an instance (not null)
+     * <p/>
+     * If no create method was found, null is returned. If there is more than 1 create method found, an exception is raised.
      *
      * @param testObject The test object, not null
      * @param testClass  The level in the hierarchy
      * @param locations  The specified locations if there are any, not null
-     * @return The new hibernate configuration or the current hibernate configuration
+     * @return The instance, null if no create method was found
      */
     @SuppressWarnings({"unchecked"})
     protected T invokeCreateInstanceMethod(Object testObject, Class<?> testClass, List<String> locations) {
@@ -279,23 +270,28 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
                 throw new UnitilsException("Method " + testClass.getSimpleName() + "." + methods.get(0).getName() +
                         " (annotated with " + annotationClass.getSimpleName() + ") has thrown an exception", e.getCause());
             }
+            // check whether create returned a value
+            if (result == null) {
+                throw new UnitilsException("Method " + testClass.getSimpleName() + "." + methods.get(0).getName() +
+                        " (annotated with " + annotationClass.getSimpleName() + ") has returned null.");
+
+            }
         }
         return result;
     }
 
 
     /**
-     * Finds the level in the class hierarchy for which a hibernate configuration should
-     * be created. That is, a class level that contains a custom create method or specifies
-     * a location in one of the {@link org.unitils.hibernate.annotation.HibernateSessionFactory} annotations. Such a level should
-     * have its own hibernate configuration and cannot reuse the config of a superclass.
+     * Finds the level in the class hierarchy for which an instance should be created. That is, a class level that contains
+     * a custom create method or specifies a location in one of the annotations. Such a level should have its own instance
+     * and cannot reuse the instance of a superclass.
      * <p/>
-     * If a class only contains {@link org.unitils.hibernate.annotation.HibernateSessionFactory} annotations without locations (for example
-     * for injecting the configuration into a field), the superclasses will be checked untill a level
-     * is found for which a config should be created. If no level is found, null is returned.
+     * If a class only contains annotations without locations (for example for injecting the instance into a field), the
+     * superclasses will be checked untill a level is found for which a config should be created. If no level is found,
+     * null is returned.
      *
      * @param testClass The current level in the hierarchy
-     * @return The level for which a config should created, null if none found
+     * @return The level for which an instance should created, null if none found
      */
     protected Class<?> findClassLevelForCreateInstance(Class<?> testClass) {
         // nothing to do (ends the recursion)
@@ -332,11 +328,10 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
 
     /**
-     * Checks whether the given method is a custom create method.
-     * A custom create method must have following signature:
+     * Checks whether the given method is a custom create method. A custom create method must have following signature:
      * <ul>
-     * <li>Configuration createMethodName() or</li>
-     * <li>Configuration createMethodName(List values)</li>
+     * <li>T createMethodName() or</li>
+     * <li>T createMethodName(List<String> values)</li>
      * </ul>
      *
      * @param method The method, not null
@@ -355,22 +350,21 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
 
     /**
-     * Gets the locations that are specified for the given annotation. If the annotation is null or
-     * if no locations were specified, null will be returned. An array with 1 empty string will
+     * Gets the values that are specified for the given annotation. If the annotation is null or
+     * if no locations were specified, null should be returned. An array with 1 empty string should
      * also be considered to be empty.
      *
      * @param annotation The annotation
-     * @return The locations, null if no locations were specified
+     * @return The values, null if no values were specified
      */
     abstract protected List<String> getAnnotationValues(A annotation);
 
+
     /**
-     * Creates a hibernate configuration for the given locations. If no locations are specified, the hibernate default
-     * (hibernate.cfg.xml) will be used. Which type of configuration will be created depends on the implementation
-     * class that was specified upon construction. A UnitilsException is thrown if the configuration could not be loaded.
+     * Creates an instance for the given values.
      *
-     * @param values the file locations
-     * @return The configuration, not null
+     * @param values The values, not null
+     * @return The instance, not null
      */
     abstract protected T createInstanceForValues(List<String> values);
 }
