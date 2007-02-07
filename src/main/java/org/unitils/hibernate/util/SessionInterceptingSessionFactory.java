@@ -97,7 +97,7 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
 
 
     /**
-     * Closes all open sessions.
+     * Closes and clears all open sessions.
      */
     public void closeOpenSessions() {
         for (org.hibernate.Session session : sessions) {
@@ -105,6 +105,7 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
                 session.close();
             }
         }
+        sessions.clear();
     }
 
 

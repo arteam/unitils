@@ -25,7 +25,7 @@ import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBean;
 import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
-import org.unitils.spring.util.SpringApplicationContextManager;
+import org.unitils.spring.util.ApplicationContextManager;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
@@ -56,7 +56,7 @@ import java.util.Map;
 public class SpringModule implements Module {
 
     /* Manager for storing and creating spring application contexts */
-    private SpringApplicationContextManager springApplicationContextManager = new SpringApplicationContextManager();
+    private ApplicationContextManager applicationContextManager = new ApplicationContextManager();
 
 
     /**
@@ -129,7 +129,7 @@ public class SpringModule implements Module {
      * @return The application context, not null
      */
     public ApplicationContext getApplicationContext(Object testObject) {
-        return springApplicationContextManager.getApplicationContext(testObject);
+        return applicationContextManager.getApplicationContext(testObject);
     }
 
 
@@ -141,7 +141,7 @@ public class SpringModule implements Module {
      * @param classes The classes for which to reset the contexts
      */
     public void invalidateApplicationContext(Class<?>... classes) {
-        springApplicationContextManager.invalidateApplicationContext(classes);
+        applicationContextManager.invalidateApplicationContext(classes);
     }
 
 

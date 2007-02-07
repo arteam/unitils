@@ -15,11 +15,9 @@
  */
 package org.unitils.hibernate;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.hibernate.annotation.HibernateSession;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 
 /**
@@ -47,18 +45,6 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
 
 
     /**
-     * Tests hibernate session injection for a field and a setter method.
-     */
-    public void testInjectHibernateSession() {
-        HibernateTestSession hibernateTestSession = new HibernateTestSession();
-        hibernateModule.injectHibernateSession(hibernateTestSession);
-
-        assertNotNull(hibernateTestSession.sessionField);
-        assertSame(hibernateTestSession.sessionField, hibernateTestSession.sessionSetter);
-    }
-
-
-    /**
      * Tests hibernate session factory injection for a field and a setter method.
      */
     public void testInjectHibernateSessionFactory() {
@@ -67,24 +53,6 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
 
         assertNotNull(hibernateTestSessionFactory.sessionFactoryField);
         assertSame(hibernateTestSessionFactory.sessionFactoryField, hibernateTestSessionFactory.sessionFactorySetter);
-    }
-
-
-    /**
-     * Test hibernate test for session injection.
-     */
-    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
-    public class HibernateTestSession {
-
-        @HibernateSession
-        private Session sessionField = null;
-
-        private Session sessionSetter;
-
-        @HibernateSession
-        public void setSessionSetter(Session sessionSetter) {
-            this.sessionSetter = sessionSetter;
-        }
     }
 
 

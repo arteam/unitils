@@ -25,12 +25,13 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.util.Flushable;
-import org.unitils.dbmaintainer.structure.ConstraintsCheckDisablingDataSource;
-import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
+import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
-import org.unitils.dbmaintainer.DBMaintainer;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.dbmaintainer.structure.ConstraintsCheckDisablingDataSource;
+import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
@@ -198,8 +199,8 @@ public class DatabaseModule implements Module {
         // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is
         // returned that wrappes the TestDataSource object
         if (disableConstraints) {
-            StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
-            ConstraintsDisabler constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+            StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
+            ConstraintsDisabler constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
             dataSource = new ConstraintsCheckDisablingDataSource(dataSource, constraintsDisabler);
         }
         return dataSource;

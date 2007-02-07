@@ -39,21 +39,18 @@ public class AnnotationUtils {
      * @return A List containing fields annotated with the given annotation, empty list if none found
      */
     public static <T extends Annotation> List<Field> getFieldsAnnotatedWith(Class clazz, Class<T> annotation) {
-
         if (Object.class.equals(clazz)) {
             return Collections.emptyList();
-
-        } else {
-            List<Field> annotatedFields = new ArrayList<Field>();
-            Field[] fields = clazz.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.getAnnotation(annotation) != null) {
-                    annotatedFields.add(field);
-                }
-            }
-            annotatedFields.addAll(getFieldsAnnotatedWith(clazz.getSuperclass(), annotation));
-            return annotatedFields;
         }
+        List<Field> annotatedFields = new ArrayList<Field>();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getAnnotation(annotation) != null) {
+                annotatedFields.add(field);
+            }
+        }
+        annotatedFields.addAll(getFieldsAnnotatedWith(clazz.getSuperclass(), annotation));
+        return annotatedFields;
     }
 
 
@@ -78,23 +75,20 @@ public class AnnotationUtils {
      * @return A List containing methods annotated with the given annotation, empty list if none found
      */
     public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation, boolean includeInherited) {
-
         if (Object.class.equals(clazz)) {
             return Collections.emptyList();
-
-        } else {
-            List<Method> annotatedMethods = new ArrayList<Method>();
-            Method[] methods = clazz.getDeclaredMethods();
-            for (Method method : methods) {
-                if (method.getAnnotation(annotation) != null) {
-                    annotatedMethods.add(method);
-                }
-            }
-            if (includeInherited) {
-                annotatedMethods.addAll(getMethodsAnnotatedWith(clazz.getSuperclass(), annotation));
-            }
-            return annotatedMethods;
         }
+        List<Method> annotatedMethods = new ArrayList<Method>();
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.getAnnotation(annotation) != null) {
+                annotatedMethods.add(method);
+            }
+        }
+        if (includeInherited) {
+            annotatedMethods.addAll(getMethodsAnnotatedWith(clazz.getSuperclass(), annotation));
+        }
+        return annotatedMethods;
     }
 
 

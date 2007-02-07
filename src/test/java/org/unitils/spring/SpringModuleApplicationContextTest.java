@@ -21,8 +21,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
+import static java.util.Arrays.asList;
 import java.util.List;
 
 /**
@@ -111,12 +113,22 @@ public class SpringModuleApplicationContextTest extends TestCase {
         SpringTestMixing springTestMixing = new SpringTestMixing();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestMixing);
 
-        assertNotNull(applicationContext); // setter
-        assertNotNull(applicationContext.getParent()); // field 2
-        assertNotNull(applicationContext.getParent().getParent()); // field 1
-        assertNotNull(applicationContext.getParent().getParent().getParent()); // class
-        assertTrue(springTestMixing.createMethod1Called);
-        assertTrue(springTestMixing.createMethod2Called);
+        assertNotNull(applicationContext);
+        assertTrue(springTestMixing.createMethodCalled);
+    }
+
+
+    /**
+     * Tests for more than 1 custom create methods. An exception should have been raised.
+     */
+    public void testGetApplicationContext_twoCustomCreateMethods() {
+        SpringTestTwoCreateMethods springTestTwoCreateMethods = new SpringTestTwoCreateMethods();
+        try {
+            springModule.getApplicationContext(springTestTwoCreateMethods);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            // expected
+        }
     }
 
 
@@ -249,8 +261,8 @@ public class SpringModuleApplicationContextTest extends TestCase {
     private class SpringTestCreateMethodWithApplicationContext {
 
         @SpringApplicationContext
-        protected ApplicationContext createMethod(ApplicationContext applicationContext) {
-            assertNull(applicationContext);
+        protected ApplicationContext createMethod(List<String> locations) {
+            assertTrue(locations.isEmpty());
             return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
         }
     }
@@ -261,34 +273,42 @@ public class SpringModuleApplicationContextTest extends TestCase {
      * then for field2 with the previous a parent, then the setter context with the previous as parent
      * and finally createMethod1 and createMethod2 should be called.
      */
-    @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
+    @SpringApplicationContext({"1"})
     private class SpringTestMixing {
 
-        private boolean createMethod1Called = false;
-        private boolean createMethod2Called = false;
+        private boolean createMethodCalled = false;
 
-        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
+        @SpringApplicationContext({"2"})
         protected ApplicationContext field1;
 
-        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
+        @SpringApplicationContext({"3"})
         protected ApplicationContext field2;
 
         @SpringApplicationContext
-        protected ApplicationContext createMethod1(ApplicationContext applicationContext) {
-            assertNotNull(applicationContext);
-            createMethod1Called = true;
-            return applicationContext;
+        protected ApplicationContext createMethod1(List<String> locations) {
+            assertLenEquals(asList("1", "2", "3", "4"), locations);
+            createMethodCalled = true;
+            return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
+        }
+
+        @SpringApplicationContext({"4"})
+        public void setField(ApplicationContext applicationContext) {
+        }
+    }
+
+    /**
+     * Test SpringTest class with 2 custom create methods.
+     */
+    private class SpringTestTwoCreateMethods {
+
+        @SpringApplicationContext
+        protected ApplicationContext createMethod1(List<String> locations) {
+            return null;
         }
 
         @SpringApplicationContext
-        protected ApplicationContext createMethod2(ApplicationContext applicationContext) {
-            assertNotNull(applicationContext);
-            createMethod2Called = true;
-            return applicationContext;
-        }
-
-        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
-        public void setField(ApplicationContext applicationContext) {
+        protected ApplicationContext createMethod2(List<String> locations) {
+            return null;
         }
     }
 

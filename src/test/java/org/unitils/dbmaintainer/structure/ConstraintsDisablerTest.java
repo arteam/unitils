@@ -23,7 +23,7 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -58,13 +58,9 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         super.setUp();
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration,
-                dataSource);
-
-        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
-
-        constraintsDisabler = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class,
-                configuration, dataSource, statementHandler);
+        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
+        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+        constraintsDisabler = (ConstraintsDisabler) getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
 
         dropTestTables();
         createTestTables();

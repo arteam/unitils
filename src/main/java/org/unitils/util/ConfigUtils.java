@@ -27,7 +27,6 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@SuppressWarnings({"unchecked"})
 public class ConfigUtils {
 
     /* The logger instance for this class */
@@ -41,6 +40,7 @@ public class ConfigUtils {
      *         The configuration should contain a property with as key the fully qualified name of the interface type followed by
      *         '.impl.className', and as value the fully qualified classname of the implementation type.
      */
+    @SuppressWarnings({"unchecked"})
     public static <T> T getConfiguredInstance(Class type, Configuration configuration) {
         String propKey = type.getName() + ".implClassName";
         logger.debug("Creating instance of " + type + ". Concrete implementation class is defined by the property " + propKey);
@@ -61,6 +61,7 @@ public class ConfigUtils {
      *                      This is typically an environment specific property, like the DBMS that is used.
      * @return The configured instance
      */
+    @SuppressWarnings({"unchecked"})
     public static <T> T getConfiguredInstance(Class type, Configuration configuration, String... implementationDiscriminatorValues) {
         String propKey = type.getName() + ".implClassName";
         String implementationSpecificPropKey = propKey;

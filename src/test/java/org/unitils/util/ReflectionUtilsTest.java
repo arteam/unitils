@@ -17,6 +17,7 @@ package org.unitils.util;
 
 import junit.framework.TestCase;
 import org.unitils.core.UnitilsException;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -57,7 +58,7 @@ public class ReflectionUtilsTest extends TestCase {
      * Test for creating a class instance.
      */
     public void testCreateInstanceOfType() {
-        String result = ReflectionUtils.createInstanceOfType("java.lang.String");
+        String result = (String) createInstanceOfType("java.lang.String");
         assertNotNull(result);
     }
 
@@ -67,7 +68,7 @@ public class ReflectionUtilsTest extends TestCase {
      */
     public void testCreateInstanceOfType_classNotFound() {
         try {
-            ReflectionUtils.createInstanceOfType("xxxxxx");
+            createInstanceOfType("xxxxxx");
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {

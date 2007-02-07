@@ -66,7 +66,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, itemsToPreserve);
 
         StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
+        dbCleaner = (DBCleaner) getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
         dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         cleanupTestDatabase();

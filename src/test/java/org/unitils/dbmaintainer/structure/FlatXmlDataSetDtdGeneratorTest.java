@@ -7,10 +7,11 @@ import org.apache.commons.lang.StringUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import static org.unitils.dbmaintainer.structure.impl.FlatXmlDataSetDtdGenerator.PROPKEY_DTD_FILENAME;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.clean.DBClearer;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -37,8 +38,6 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
     @TestDataSource
     private DataSource dataSource = null;
 
-    private DBClearer dbClearer;
-
 
     /**
      * Initializes the test by creating following tables in the test database:
@@ -54,9 +53,9 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
         Configuration configuration = configurationLoader.loadConfiguration();
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dtdGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
-        dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
+        dtdGenerator = (DtdGenerator) getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
+        DBClearer dbClearer = (DBClearer) getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
 
         dbClearer.clearDatabase();
         createTestTables();

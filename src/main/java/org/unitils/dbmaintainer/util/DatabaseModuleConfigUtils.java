@@ -19,7 +19,7 @@ import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
-import org.unitils.util.ConfigUtils;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 
 import javax.sql.DataSource;
 
@@ -30,7 +30,6 @@ import javax.sql.DataSource;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@SuppressWarnings({"unchecked"})
 public class DatabaseModuleConfigUtils {
 
     /* Property key of the SQL dialect of the underlying DBMS implementation */
@@ -53,9 +52,10 @@ public class DatabaseModuleConfigUtils {
      * @param statementHandler The statement handler, not null
      * @return The configured instance
      */
+    @SuppressWarnings({"unchecked"})
     public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
-        DatabaseTask instance = ConfigUtils.getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
+        DatabaseTask instance = getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
         DbSupport dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
         instance.init(configuration, dbSupport, dataSource, statementHandler);
         return (T) instance;
@@ -72,7 +72,7 @@ public class DatabaseModuleConfigUtils {
      */
     public static DbSupport getConfiguredDbSupportInstance(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
         String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
-        DbSupport dbSupport = ConfigUtils.getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
+        DbSupport dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
         String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
         dbSupport.init(dataSource, schemaName, statementHandler);
         return dbSupport;
@@ -87,7 +87,7 @@ public class DatabaseModuleConfigUtils {
      * @return Returns the configured instance of {@link StatementHandler}
      */
     public static StatementHandler getConfiguredStatementHandlerInstance(Configuration configuration, DataSource dataSource) {
-        StatementHandler st = ConfigUtils.getConfiguredInstance(StatementHandler.class, configuration);
+        StatementHandler st = getConfiguredInstance(StatementHandler.class, configuration);
         st.init(configuration, dataSource);
         return st;
     }

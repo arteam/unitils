@@ -23,7 +23,7 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
 import org.unitils.dbunit.annotation.DataSet;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 
@@ -60,9 +60,9 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         super.setUp();
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        StatementHandler statementHandler = DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dbVersionSource = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
-        dbSupport = DatabaseModuleConfigUtils.getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
+        dbVersionSource = (VersionSource) getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
+        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         dropVersionTable();
         createVersionTable();

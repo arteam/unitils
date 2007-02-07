@@ -19,7 +19,7 @@ import org.apache.commons.configuration.Configuration;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.script.impl.LoggingStatementHandlerDecorator;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
 
@@ -94,7 +94,7 @@ public class DefaultCodeScriptRunnerTest extends UnitilsJUnit3 {
 
         Configuration configuration = new ConfigurationLoader().loadConfiguration();
         StatementHandler loggingStatementHandler = new LoggingStatementHandlerDecorator(mockStatementHandler);
-        codeScriptRunner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, null, loggingStatementHandler);
+        codeScriptRunner = (CodeScriptRunner) getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, null, loggingStatementHandler);
     }
 
 
