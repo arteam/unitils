@@ -1,5 +1,6 @@
 package org.untils.sample.eshop;
 
+import org.unitils.spring.annotation.SpringApplicationContext;
 import org.hibernate.cfg.Configuration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -11,12 +12,15 @@ import org.unitils.hibernate.annotation.HibernateSessionFactory;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
+@SpringApplicationContext("classpath:/eshop-config.xml")
 public class BaseHibernateTest extends UnitilsJUnit3 {
+
+    @SpringApplicationContext
+    ApplicationContext springApplicationContext;
 
     @HibernateSessionFactory
     private Configuration createHibernateConfiguration() {
-        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("/eshop-config.xml");
-        LocalSessionFactoryBean sessionFactoryBean = (LocalSessionFactoryBean) applicationContext.getBean("&sessionFactoryBean");
+        LocalSessionFactoryBean sessionFactoryBean = (LocalSessionFactoryBean) springApplicationContext.getBean("&sessionFactoryBean");
         return sessionFactoryBean.getConfiguration();
     }
 }

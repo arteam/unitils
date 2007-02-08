@@ -24,8 +24,5 @@ import org.unitils.inject.annotation.InjectInto;
  */
 public abstract class BaseHibernateDaoTest extends BaseHibernateTest {
 
-    @HibernateSessionFactory
-    @InjectInto(property = "sessionFactory")
-    private SessionFactory sessionFactory;
 
 }
