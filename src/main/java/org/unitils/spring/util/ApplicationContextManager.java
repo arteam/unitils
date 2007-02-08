@@ -123,9 +123,11 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
      */
     protected ApplicationContext createApplicationContext(List<String> locations) {
         ConfigurableApplicationContext applicationContext = applicationContextFactory.createApplicationContext(locations);
-        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+
+        // todo add BeanPostProcessor's
+        /*for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
             applicationContext.getBeanFactory().addBeanPostProcessor(beanPostProcessor);
-        }
+        }*/
         applicationContext.refresh();
         return applicationContext;
     }
