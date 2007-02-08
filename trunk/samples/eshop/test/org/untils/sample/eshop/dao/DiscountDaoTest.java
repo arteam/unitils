@@ -5,6 +5,7 @@ import org.unitils.sample.eshop.dao.DiscountDao;
 import org.unitils.sample.eshop.model.User;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.spring.annotation.SpringBeanByType;
 
 /**
  * 
@@ -12,7 +13,7 @@ import org.unitils.dbunit.annotation.DataSet;
 @DataSet
 public class DiscountDaoTest extends BaseHibernateDaoTest {
 
-    @TestedObject
+    @SpringBeanByType
     private DiscountDao discountDao = new DiscountDao();
 
     public void testCalculateTotalPurchaseAmount() {

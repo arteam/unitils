@@ -4,6 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="productService" class="org.unitils.sample.eshop.service.ProductService">
+        <property name="productDao" ref="productDao"/>
+    </bean>
+
     <bean id="discountDao" class="org.unitils.sample.eshop.dao.DiscountDao">
         <property name="sessionFactory" ref="sessionFactoryBean"/>
     </bean>
