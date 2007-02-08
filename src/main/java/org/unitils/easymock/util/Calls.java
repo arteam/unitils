@@ -19,6 +19,9 @@ package org.unitils.easymock.util;
  * Possible values for allowing unexpected (non-recorded) method calls on mock objects. When set to lenient, a 'Nice
  * mock' is created, as called in the EasyMock terminology. For non-void methods this means that a Java default (null,
  * 0 or false) is returned.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public enum Calls {
 

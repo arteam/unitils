@@ -17,6 +17,9 @@ package org.unitils.easymock.util;
 
 /**
  * Possible values for checking arguments with date values.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public enum Dates {
 

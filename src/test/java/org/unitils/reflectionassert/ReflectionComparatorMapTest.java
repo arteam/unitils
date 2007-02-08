@@ -26,6 +26,9 @@ import java.util.Map;
 /**
  * Test class for {@link ReflectionComparator}.
  * Contains tests with map types.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionComparatorMapTest extends TestCase {
 
@@ -53,6 +56,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /* Class under test */
     private ReflectionComparator reflectionComparator;
 
+
     /**
      * Initializes the test fixture.
      */
@@ -76,9 +80,7 @@ public class ReflectionComparatorMapTest extends TestCase {
      * Test for two equal maps.
      */
     public void testGetDifference_equals() {
-
         Difference result = reflectionComparator.getDifference(mapA, mapB);
-
         assertNull(result);
     }
 
@@ -87,9 +89,7 @@ public class ReflectionComparatorMapTest extends TestCase {
      * Test for two equal maps as an inner field of an object.
      */
     public void testGetDifference_equalsInner() {
-
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerB);
-
         assertNull(result);
     }
 
@@ -98,7 +98,6 @@ public class ReflectionComparatorMapTest extends TestCase {
      * Test for two maps that contain different values.
      */
     public void testGetDifference_notEqualsDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentValue);
 
         assertNotNull(result);
@@ -129,7 +128,6 @@ public class ReflectionComparatorMapTest extends TestCase {
      * Test for objects with inner maps that contain different values.
      */
     public void testGetDifference_notEqualsInnerDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerDifferentValue);
 
         assertNotNull(result);
@@ -144,7 +142,6 @@ public class ReflectionComparatorMapTest extends TestCase {
      * Test for objects with inner maps that contain different keys.
      */
     public void testGetDifference_notEqualsDifferentKeys() {
-
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentKey);
 
         assertNotNull(result);
@@ -175,7 +172,6 @@ public class ReflectionComparatorMapTest extends TestCase {
      * Tests for maps but right value is not a map.
      */
     public void testGetDifference_notEqualsRightNotMap() {
-
         Difference result = reflectionComparator.getDifference(mapA, "Test string");
 
         assertNotNull(result);

@@ -25,6 +25,8 @@ package org.unitils.reflectionassert;
  * </ul>
  * The modes can be combined if needed.
  *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  * @see org.unitils.reflectionassert.ReflectionComparator
  */
 public enum ReflectionComparatorMode {
@@ -43,6 +45,6 @@ public enum ReflectionComparatorMode {
      * Do not compare the order of collections and arrays. Only check that all values of the left-hand (expected) side
      * collection or array are also contained in the right-hand (actual) side and vice versa.
      */
-    LENIENT_ORDER;
+    LENIENT_ORDER
 
 }

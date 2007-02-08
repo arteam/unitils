@@ -22,6 +22,9 @@ import org.unitils.reflectionassert.ReflectionComparator.Difference;
 /**
  * Test class for {@link ReflectionComparator}.
  * Contains tests with primitive types.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionComparatorPrimitivesTest extends TestCase {
 
@@ -49,6 +52,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /* Class under test */
     private ReflectionComparator reflectionComparator;
 
+
     /**
      * Initializes the test fixture.
      */
@@ -72,21 +76,18 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      * Test for two equal primitives.
      */
     public void testGetDifference_equals() {
-
         Difference result = reflectionComparator.getDifference(primitivesA, primitivesB);
-
         assertNull(result);
     }
+
 
     /**
      * Test for two equal autoboxing.
      * An autoboxed primitive should be considered equals to the object version.
      */
+    @SuppressWarnings({"UnnecessaryBoxing"})
     public void testGetDifference_equalsAutoboxing() {
-
-        //noinspection UnnecessaryBoxing
         Difference result = reflectionComparator.getDifference(5L, new Long(5));
-
         assertNull(result);
     }
 
@@ -95,19 +96,16 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      * Test for two equal primitives as an inner field of an object.
      */
     public void testGetDifference_equalsInner() {
-
         Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerB);
-
         assertNull(result);
     }
+
 
     /**
      * Test for two equal primitives but of different type (int vs long).
      */
     public void testGetDifference_differentTypes() {
-
         Difference result = reflectionComparator.getDifference(5L, 5);
-        
         assertNull(result);
     }
 
@@ -116,7 +114,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      * Test for two primitives that contain different values.
      */
     public void testGetDifference_notEqualsDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(primitivesA, primitiveDifferentValue);
 
         assertNotNull(result);
@@ -130,7 +127,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      * Test for two primitives with right value 0.
      */
     public void testGetDifference_notEqualsRight0() {
-
         Difference result = reflectionComparator.getDifference(primitivesA, primitives0Value);
 
         assertNotNull(result);
@@ -144,7 +140,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      * Test for two primitives with left value 0.
      */
     public void testGetDifference_notEqualsLeft0() {
-
         Difference result = reflectionComparator.getDifference(primitives0Value, primitivesA);
 
         assertNotNull(result);
@@ -158,7 +153,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      * Test for objects with inner primitives that contain different values.
      */
     public void testGetDifference_notEqualsInnerDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerDifferentValue);
 
         assertNotNull(result);

@@ -27,13 +27,10 @@ import org.unitils.inject.util.InjectionUtils;
 import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
 import org.unitils.inject.util.ValueToRestore;
-import org.unitils.util.AnnotationUtils;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
 import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
-import org.unitils.util.ReflectionUtils;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
-import static org.unitils.util.ReflectionUtils.getFieldWithName;
+import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -98,10 +95,9 @@ public class InjectModule implements Module {
      * @param testObject The test instance, not null
      */
     public void createTestedObjectsIfNull(Object testObject) {
-
-        List<Field> testedObjectFields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), TestedObject.class);
+        List<Field> testedObjectFields = getFieldsAnnotatedWith(testObject.getClass(), TestedObject.class);
         for (Field testedObjectField : testedObjectFields) {
-            if (ReflectionUtils.getFieldValue(testObject, testedObjectField) == null) {
+            if (getFieldValue(testObject, testedObjectField) == null) {
                 createObjectForField(testObject, testedObjectField);
             }
         }
@@ -125,8 +121,8 @@ public class InjectModule implements Module {
         } else {
             try {
                 declaredClass.getConstructor();
-                Object instance = ReflectionUtils.createInstanceOfType(declaredClass.getName());
-                ReflectionUtils.setFieldValue(testObject, testedObjectField, instance);
+                Object instance = createInstanceOfType(declaredClass.getName());
+                setFieldValue(testObject, testedObjectField, instance);
             } catch (NoSuchMethodException e) {
                 logger.warn("Field " + testedObjectField.getName() + " (annotated with @TestedObject) has type " + testedObjectField.getDeclaringClass().getSimpleName()
                         + " which has no default (parameterless) constructor. It is not automatically instantiated.");
@@ -364,7 +360,6 @@ public class InjectModule implements Module {
      * @param restore        The type of reset, not DEFAULT
      */
     protected void storeValueToRestoreAfterTest(Class targetClass, String property, Class fieldType, PropertyAccess propertyAccess, Object oldValue, Restore restore) {
-
         if (Restore.NO_RESTORE == restore || Restore.DEFAULT == restore) {
             return;
         }
@@ -379,7 +374,6 @@ public class InjectModule implements Module {
         } else {
             throw new RuntimeException("Unkown value for " + Restore.class.getSimpleName() + " " + restore);
         }
-
         valuesToRestoreAfterTest.add(valueToRestore);
     }
 

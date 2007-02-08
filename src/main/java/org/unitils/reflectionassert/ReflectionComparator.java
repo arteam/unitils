@@ -71,6 +71,7 @@ public class ReflectionComparator {
        considered equal when they both contain the same elements. */
     private boolean lenientOrder = false;
 
+
     /**
      * Creates a comparator using the given modes.
      * If no modes are given, a srict comparison will be performed.
@@ -78,7 +79,6 @@ public class ReflectionComparator {
      * @param modes the comparator modes
      */
     public ReflectionComparator(ReflectionComparatorMode... modes) {
-
         if (modes == null) {
             return;
         }
@@ -97,6 +97,7 @@ public class ReflectionComparator {
         }
     }
 
+
     /**
      * Checks whether there is no difference between the left and right objects. The meaning of no difference is
      * determined by the set comparator modes. See class javadoc for more info.
@@ -109,6 +110,7 @@ public class ReflectionComparator {
         Difference difference = getDifference(left, right);
         return difference == null;
     }
+
 
     /**
      * Checks whether there is a difference between the left and right objects. The meaning of no difference is
@@ -133,7 +135,6 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     private Difference getDifferenceImpl(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-
         // check same instances or both null
         if (left == right) {
             return null;
@@ -190,7 +191,6 @@ public class ReflectionComparator {
      */
     private Difference compareDates(Date left, Date right, Stack<String> fieldStack) {
         if (!lenientDates) {
-
             // check ignored default
             if (ignoreDefaults && left == null) {
                 return null;
@@ -224,7 +224,6 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     private Difference compareArraysOrCollections(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-
         // Convert to list and compare as collection
         Collection<?> leftCollection = convertToCollection(left);
         Collection<?> rightCollection = convertToCollection(right);
@@ -254,7 +253,6 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     private Difference compareCollections(Collection<?> left, Collection<?> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-
         if (left.size() != right.size()) {
             return new Difference("Different array/collection sizes. Left size: " + left.size() + ", right size: " + right.size(), left, right, fieldStack);
         }
@@ -277,7 +275,6 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     private Difference compareCollectionsStrictOrder(Collection<?> left, Collection<?> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-
         int i = 0;
         Iterator lhsIterator = left.iterator();
         Iterator rhsIterator = right.iterator();
@@ -307,7 +304,6 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     private Difference compareCollectionsLenientOrder(Collection<?> left, Collection<?> right, Stack<String> fieldStack) {
-
         // Create copy from which we can remove elements.
         ArrayList rightCopy = new ArrayList<Object>(right);
 
@@ -345,7 +341,6 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     private Difference compareMaps(Map<?, ?> left, Map<?, ?> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-
         if (left.size() != right.size()) {
             return new Difference("Different map sizes.", left, right, fieldStack);
         }
@@ -376,7 +371,6 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     private Difference compareObjects(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-
         // check same primitive values
         if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
 
@@ -416,7 +410,6 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     private Difference compareFields(Object left, Object right, Class clazz, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
 
@@ -430,6 +423,11 @@ public class ReflectionComparator {
             }
             try {
                 Object leftValue = f.get(left);
+                // do not evaluate right value if left is ignored default values
+                // this avoids lazy loading of right value (eg in hibernate)
+                if (!(left instanceof Date) && isIgnoredDefault(left)) {
+                    continue;
+                }
                 Object rightValue = f.get(right);
 
                 // recursively check the value of the fields
@@ -468,7 +466,6 @@ public class ReflectionComparator {
      * @return true if the value should be ignored
      */
     private boolean isIgnoredDefault(Object value) {
-
         if (!ignoreDefaults) {
             return false;
         }
@@ -492,7 +489,6 @@ public class ReflectionComparator {
      * @return the value as a double
      */
     private double getDoubleValue(Object object) {
-
         if (object instanceof Number) {
             return ((Number) object).doubleValue();
         }
@@ -507,7 +503,6 @@ public class ReflectionComparator {
      * @return the object collection
      */
     private Collection<?> convertToCollection(Object object) {
-
         if (object instanceof Collection<?>) {
             return (Collection<?>) object;
         }
@@ -527,7 +522,6 @@ public class ReflectionComparator {
      * @return the object array
      */
     private Object[] convertToObjectArray(Object object) {
-
         if (object instanceof byte[]) {
             return ArrayUtils.toObject((byte[]) object);
 

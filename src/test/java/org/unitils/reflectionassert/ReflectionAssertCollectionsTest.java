@@ -18,6 +18,8 @@ package org.unitils.reflectionassert;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;
@@ -25,6 +27,9 @@ import java.util.List;
 
 /**
  * Test class for {@link ReflectionAssert} tests for with assertProperty methods with collection arguments.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionAssertCollectionsTest extends TestCase {
 
@@ -70,7 +75,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
      * Test for two equal collections.
      */
     public void testAssertRefEquals() {
-        ReflectionAssert.assertRefEquals(listA, listB);
+        assertRefEquals(listA, listB);
     }
 
 
@@ -78,9 +83,8 @@ public class ReflectionAssertCollectionsTest extends TestCase {
      * Test for two equal collections but with different order.
      */
     public void testAssertRefEquals_notEqualsDifferentOrder() {
-
         try {
-            ReflectionAssert.assertRefEquals(listA, listDifferentOrder);
+            assertRefEquals(listA, listDifferentOrder);
             Assert.fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError e) {
@@ -93,7 +97,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
      * Test for two equal collections but with different order.
      */
     public void testAssertRefEquals_equalsDifferentOrder() {
-        ReflectionAssert.assertRefEquals(listA, listDifferentOrder, LENIENT_ORDER);
+        assertRefEquals(listA, listDifferentOrder, LENIENT_ORDER);
     }
 
 
@@ -101,7 +105,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
      * Test for two equal collections but with different order.
      */
     public void testAssertLenEquals_equalsDifferentOrder() {
-        ReflectionAssert.assertLenEquals(listA, listDifferentOrder);
+        assertLenEquals(listA, listDifferentOrder);
     }
 
 
@@ -109,9 +113,8 @@ public class ReflectionAssertCollectionsTest extends TestCase {
      * Test for two collections with different elements.
      */
     public void testAssertEquals_differentListSameSize() {
-
         try {
-            ReflectionAssert.assertRefEquals(listA, listDifferentValues);
+            assertRefEquals(listA, listDifferentValues);
             Assert.fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError e) {
@@ -124,9 +127,8 @@ public class ReflectionAssertCollectionsTest extends TestCase {
      * Test for a collection with a duplicate element.
      */
     public void testAssertEquals_duplicateElement() {
-
         try {
-            ReflectionAssert.assertRefEquals(listA, listDuplicateElement);
+            assertRefEquals(listA, listDuplicateElement);
             Assert.fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError e) {
@@ -139,9 +141,8 @@ public class ReflectionAssertCollectionsTest extends TestCase {
      * Test for with a collection that has one element less.
      */
     public void testAssertEquals_oneElementLess() {
-
         try {
-            ReflectionAssert.assertRefEquals(listA, listOneElementLess);
+            assertRefEquals(listA, listOneElementLess);
             Assert.fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError e) {
@@ -154,9 +155,8 @@ public class ReflectionAssertCollectionsTest extends TestCase {
      * Test for with a collection that has one element more.
      */
     public void testAssertEquals_oneElementMore() {
-
         try {
-            ReflectionAssert.assertRefEquals(listA, listOneElementMore);
+            assertRefEquals(listA, listOneElementMore);
             Assert.fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError e) {

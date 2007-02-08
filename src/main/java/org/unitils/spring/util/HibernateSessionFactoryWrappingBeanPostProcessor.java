@@ -16,12 +16,16 @@
 
 package org.unitils.spring.util;
 
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.BeansException;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.unitils.core.Unitils;
+import org.unitils.hibernate.HibernateModule;
 import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
 
 /**
+ * todo watch out: loading this class causes a link of the SpringModule with the HibernateModule and Hibernate
+ * <p/>
  * <code>BeanPostProcessor</code> that checks wether beans are created in spring's <code>ApplicationContext</code>
  * of type <code>SessionFactory</code>. If such a bean is created, it is wrapped in a {@link SessionInterceptingSessionFactory},
  * to make sure all hibernate <code>Session</code>s that are created are intercepted, to be able to implement features
@@ -32,48 +36,56 @@ import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
  */
 public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPostProcessor {
 
+
     /**
      * Simply passes through all beans before they are initialized.
      *
-     * @param bean
-     * @param beanName
-     * @return
-     * @throws BeansException
+     * @param bean     The new bean instance
+     * @param beanName The name of the bean
+     * @return The given bean
      */
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
 
+
     /**
      * Simply passes through all beans, except for objects of type <code>SessionFactory</code>. Such objects are wrapped
      * in a {@link SessionInterceptingSessionFactory}
      *
-     * @param bean
-     * @param beanName
-     * @return
-     * @throws BeansException
+     * @param bean     The new bean instance
+     * @param beanName The name of the bean
+     * @return The given bean or a wrapped session factory if its a session factory
      */
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        // if its a session factory bean, wrap the session factory
         if (bean instanceof SessionFactory) {
             SessionInterceptingSessionFactory wrappedSessionFactory = wrapHibernateSessionFactory((SessionFactory) bean);
             registerSessionFactoryWithHibernateModule(wrappedSessionFactory);
             return wrappedSessionFactory;
-        } else {
-            return bean;
         }
+        return bean;
     }
+
 
     /**
      * Wraps the given <code>SessionFactory</code> in a {@link SessionInterceptingSessionFactory}
-     * @param sessionFactory
+     *
+     * @param sessionFactory The session factory to wrap, not null
      * @return A {@link SessionInterceptingSessionFactory} wrapping the given <code>SessionFactory</code>
      */
-    private SessionInterceptingSessionFactory wrapHibernateSessionFactory(SessionFactory sessionFactory) {
+    protected SessionInterceptingSessionFactory wrapHibernateSessionFactory(SessionFactory sessionFactory) {
         return new SessionInterceptingSessionFactory(sessionFactory);
     }
 
-    // todo!!!
-    private void registerSessionFactoryWithHibernateModule(SessionInterceptingSessionFactory sessionFactory) {
-        // todo register SessionFactory with hibernate module
+
+    /**
+     * Registers the given session factory in the Hibernate module.
+     *
+     * @param sessionFactory The session factory, not null
+     */
+    protected void registerSessionFactoryWithHibernateModule(SessionInterceptingSessionFactory sessionFactory) {
+        HibernateModule hibernateModule = Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
+        hibernateModule.getSessionFactoryManager().registerSessionFactory(sessionFactory, null);
     }
 }

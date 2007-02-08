@@ -26,6 +26,9 @@ import java.util.Collection;
 /**
  * Test class for {@link ReflectionComparator}.
  * Contains tests with non-primitive array types.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionComparatorArrayTest extends TestCase {
 
@@ -89,9 +92,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for two equal arrays.
      */
     public void testGetDifference_equals() {
-
         Difference result = reflectionComparator.getDifference(arrayA, arrayB);
-
         assertNull(result);
     }
 
@@ -100,9 +101,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for two equal arrays as an inner field of an object.
      */
     public void testGetDifference_equalsInner() {
-
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerB);
-
         assertNull(result);
     }
 
@@ -111,7 +110,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for two arrays that contain different values.
      */
     public void testGetDifference_notEqualsDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentValue);
 
         assertNotNull(result);
@@ -125,7 +123,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for two arrays that have a different size.
      */
     public void testGetDifference_notEqualsDifferentSize() {
-
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentSize);
 
         assertNotNull(result);
@@ -139,7 +136,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for objects with inner arrays that contain different values.
      */
     public void testGetDifference_notEqualsInnerDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentValue);
 
         assertNotNull(result);
@@ -154,7 +150,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Tests for objects with inner arrays that have a different size.
      */
     public void testGetDifference_notEqualsInnerDifferentSize() {
-
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentSize);
 
         assertNotNull(result);
@@ -168,7 +163,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Tests for objects with inner arrays that have a element order.
      */
     public void testGetDifference_notEqualsDifferentOrderNotLenient() {
-
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentOrder);
 
         assertNotNull(result);
@@ -182,9 +176,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
     public void testGetDifference_equalsDifferentOrderLenient() {
-
         Difference result = new ReflectionComparator(LENIENT_ORDER).getDifference(arrayA, arrayDifferentOrder);
-
         assertNull(result);
     }
 
@@ -193,7 +185,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
     public void testGetDifference_notEqualsDifferentOrderLenientDifferentValues() {
-
         Difference result = new ReflectionComparator(LENIENT_ORDER).getDifference(arrayA, arrayDifferentOrderDifferentValue);
 
         assertNotNull(result);
@@ -207,7 +198,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Tests for arrays but right value is not an array.
      */
     public void testGetDifference_notEqualsRightNotArray() {
-
         Difference result = reflectionComparator.getDifference(arrayA, "Test string");
 
         assertNotNull(result);
@@ -220,9 +210,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for an array and a collection containing equal values  (array == collection).
      */
     public void testGetDifference_equalsLeftCollection() {
-
         Difference result = reflectionComparator.getDifference(arrayA, Arrays.asList(arrayA));
-
         assertNull(result);
     }
 
@@ -230,9 +218,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for an array and a collection containing equal values  (array == collection).
      */
     public void testGetDifference_equalsRightCollection() {
-
         Difference result = reflectionComparator.getDifference(Arrays.asList(arrayA), arrayA);
-
         assertNull(result);
     }
 
@@ -241,7 +227,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for an array and a collection containing different values  (array != collection).
      */
     public void testGetDifference_notEqualsCollectionDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(arrayA, Arrays.asList(arrayDifferentValue));
 
         assertNotNull(result);
@@ -255,7 +240,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Test for an array and a collection having a different size (array != collection).
      */
     public void testGetDifference_notEqualsCollectionDifferentSize() {
-
         Collection<?> collectionDifferentSize = Arrays.asList(arrayDifferentSize);
         Difference result = reflectionComparator.getDifference(arrayA, collectionDifferentSize);
 

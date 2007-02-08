@@ -18,6 +18,8 @@ package org.unitils.reflectionassert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import junitx.framework.StringAssert;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
@@ -26,6 +28,9 @@ import java.util.Arrays;
 
 /**
  * Test class for {@link ReflectionAssert}.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionAssertTest extends TestCase {
 
@@ -55,8 +60,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal objects.
      */
     public void testAssertRefEquals_equals() {
-
-        ReflectionAssert.assertRefEquals(testObjectA, testObjectB);
+        assertRefEquals(testObjectA, testObjectB);
     }
 
 
@@ -64,8 +68,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal objects (message version).
      */
     public void testAssertRefEquals_equalsMessage() {
-
-        ReflectionAssert.assertRefEquals("a message", testObjectA, testObjectB);
+        assertRefEquals("a message", testObjectA, testObjectB);
     }
 
 
@@ -73,8 +76,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal objects.
      */
     public void testAssertLenEquals_equals() {
-
-        ReflectionAssert.assertLenEquals(testObjectA, testObjectB);
+        assertLenEquals(testObjectA, testObjectB);
     }
 
 
@@ -82,8 +84,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal objects (message version).
      */
     public void testAssertLenEquals_equalsMessage() {
-
-        ReflectionAssert.assertLenEquals("a message", testObjectA, testObjectB);
+        assertLenEquals("a message", testObjectA, testObjectB);
     }
 
 
@@ -91,10 +92,9 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two objects that contain different values.
      */
     public void testAssertRefEquals_notEqualsDifferentValues() {
-
         String message = null;
         try {
-            ReflectionAssert.assertRefEquals(testObjectA, testObjectDifferentValue);
+            assertRefEquals(testObjectA, testObjectDifferentValue);
 
         } catch (AssertionFailedError a) {
             message = a.getMessage();
@@ -111,9 +111,8 @@ public class ReflectionAssertTest extends TestCase {
      * Test case for a null left-argument.
      */
     public void testAssertRefEquals_leftNull() {
-
         try {
-            ReflectionAssert.assertRefEquals(null, testObjectA);
+            assertRefEquals(null, testObjectA);
             fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError a) {
@@ -126,9 +125,8 @@ public class ReflectionAssertTest extends TestCase {
      * Test case for a null right-argument.
      */
     public void testAssertRefEquals_rightNull() {
-
         try {
-            ReflectionAssert.assertRefEquals(testObjectA, null);
+            assertRefEquals(testObjectA, null);
             fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError a) {
@@ -141,8 +139,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test case for both null arguments.
      */
     public void testAssertRefEquals_null() {
-
-        ReflectionAssert.assertRefEquals(null, null);
+        assertRefEquals(null, null);
     }
 
 
@@ -150,8 +147,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal collections but with different order.
      */
     public void testAssertRefEquals_equalsLenientOrder() {
-
-        ReflectionAssert.assertRefEquals(Arrays.asList("element1", "element2", "element3"), Arrays.asList("element3", "element1", "element2"), LENIENT_ORDER);
+        assertRefEquals(Arrays.asList("element1", "element2", "element3"), Arrays.asList("element3", "element1", "element2"), LENIENT_ORDER);
     }
 
 
@@ -159,8 +155,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal collections but with different order.
      */
     public void testAssertLenEquals_equalsLenientOrder() {
-
-        ReflectionAssert.assertLenEquals(Arrays.asList("element1", "element2", "element3"), Arrays.asList("element3", "element1", "element2"));
+        assertLenEquals(Arrays.asList("element1", "element2", "element3"), Arrays.asList("element3", "element1", "element2"));
     }
 
 
@@ -168,11 +163,10 @@ public class ReflectionAssertTest extends TestCase {
      * Test for ignored default left value.
      */
     public void testAssertRefEquals_equalsIgnoredDefault() {
-
         testObjectA.setString1(null);
         testObjectB.setString1("xxxxxx");
 
-        ReflectionAssert.assertRefEquals(testObjectA, testObjectB, IGNORE_DEFAULTS);
+        assertRefEquals(testObjectA, testObjectB, IGNORE_DEFAULTS);
     }
 
 
@@ -180,11 +174,10 @@ public class ReflectionAssertTest extends TestCase {
      * Test for ignored default left value.
      */
     public void testAssertLenEquals_equalsIgnoredDefault() {
-
         testObjectA.setString1(null);
         testObjectB.setString1("xxxxxx");
 
-        ReflectionAssert.assertLenEquals(testObjectA, testObjectB);
+        assertLenEquals(testObjectA, testObjectB);
     }
 
 
