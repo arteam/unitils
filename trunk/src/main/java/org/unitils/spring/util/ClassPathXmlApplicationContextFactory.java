@@ -25,7 +25,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
     public ConfigurableApplicationContext createApplicationContext(List<String> locations) {
 
         // create application context
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext((String[])locations.toArray(), false);
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(locations.toArray(new String[locations.size()]), false);
 
         return applicationContext;
     }
