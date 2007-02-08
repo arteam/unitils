@@ -143,7 +143,7 @@ public class HibernateModule implements Module, Flushable {
      */
     public void closeHibernateSessions(Object testObject) {
         // get all open session factories
-        List<SessionInterceptingSessionFactory> sessionFactories = getSessionFactoryManager().getHibernateSessionFactories();
+        List<SessionInterceptingSessionFactory> sessionFactories = getSessionFactoryManager().getSessionFactories();
         for (SessionInterceptingSessionFactory sessionFactory : sessionFactories) {
             // close all open sessions
             sessionFactory.closeOpenSessions();
@@ -170,7 +170,7 @@ public class HibernateModule implements Module, Flushable {
      */
     public void flushDatabaseUpdates() {
         // get all open session factories
-        List<SessionInterceptingSessionFactory> sessionFactories = getSessionFactoryManager().getHibernateSessionFactories();
+        List<SessionInterceptingSessionFactory> sessionFactories = getSessionFactoryManager().getSessionFactories();
         for (SessionInterceptingSessionFactory sessionFactory : sessionFactories) {
             // flush all open sessions
             sessionFactory.flushOpenSessions();

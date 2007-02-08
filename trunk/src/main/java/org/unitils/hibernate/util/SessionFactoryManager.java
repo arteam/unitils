@@ -119,12 +119,18 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     }
 
 
+    public void registerSessionFactory(SessionInterceptingSessionFactory sessionInterceptingSessionFactory, Configuration configuration) {
+
+
+    }
+
+
     /**
      * Gets all existing hibernate session factories. This will not create any session factories.
      *
      * @return The Hibernate session factories, not null
      */
-    public List<SessionInterceptingSessionFactory> getHibernateSessionFactories() {
+    public List<SessionInterceptingSessionFactory> getSessionFactories() {
         return new ArrayList<SessionInterceptingSessionFactory>(hibernateSessionFactories.values());
     }
 

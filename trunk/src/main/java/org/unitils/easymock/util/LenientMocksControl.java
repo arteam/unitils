@@ -54,6 +54,7 @@ public class LenientMocksControl extends MocksClassControl {
     /* The interceptor that wraps the record state */
     private InvocationInterceptor invocationInterceptor;
 
+
     /**
      * Creates a default (no default returns and no order checking) mock control.
      *
@@ -62,6 +63,7 @@ public class LenientMocksControl extends MocksClassControl {
     public LenientMocksControl(ReflectionComparatorMode... modes) {
         this(MockType.DEFAULT, modes);
     }
+
 
     /**
      * Creates a mock control.<ul>

@@ -16,9 +16,7 @@
 
 package org.unitils.spring.util;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 
 import java.util.List;
 
@@ -31,6 +29,7 @@ import java.util.List;
  */
 public interface ApplicationContextFactory {
 
+
     /**
      * Create an <code>ApplicationContext</code>, in which the complete list of the given resources is loaded. The way in
      * which these locations are interpreted depends on the concrete implementation of the interface. More in particular,
@@ -40,9 +39,8 @@ public interface ApplicationContextFactory {
      * method.
      *
      * @param locations
-     * @return A <code>ConfigurableApplicationContext</code>, on which the <code>refresh()</code> method hasn't been
-     * called yet
+     * @return A <code>ConfigurableApplicationContext</code>, on which the <code>refresh()</code> method hasn't been called yet
      */
-    public ConfigurableApplicationContext createApplicationContext(List<String> locations);
+    ConfigurableApplicationContext createApplicationContext(List<String> locations);
 
 }

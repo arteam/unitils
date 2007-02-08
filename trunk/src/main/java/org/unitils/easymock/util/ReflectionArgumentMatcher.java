@@ -30,6 +30,8 @@ import org.unitils.reflectionassert.ReflectionComparatorMode;
  * <li>lenient order: order is not important when comparing collections or arrays</li>
  * </ul>
  *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  * @see ReflectionComparator
  * @see ReflectionComparatorMode
  */
@@ -66,7 +68,6 @@ public class ReflectionArgumentMatcher<T> extends Equals {
      * @throws AssertionError in case expected and actual did not match
      */
     public boolean matches(Object actual) {
-
         return reflectionComparator.isEqual(getExpected(), actual);
     }
 

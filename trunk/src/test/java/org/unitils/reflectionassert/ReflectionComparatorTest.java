@@ -17,10 +17,19 @@ package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
 
 
 /**
  * Test class for {@link ReflectionComparator}.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionComparatorTest extends TestCase {
 
@@ -54,6 +63,7 @@ public class ReflectionComparatorTest extends TestCase {
     /* Class under test */
     private ReflectionComparator reflectionComparator;
 
+
     /**
      * Initializes the test fixture.
      */
@@ -84,9 +94,7 @@ public class ReflectionComparatorTest extends TestCase {
      * Test for two equal objects.
      */
     public void testGetDifference_equals() {
-
         Difference result = reflectionComparator.getDifference(objectsA, objectsB);
-
         assertNull(result);
     }
 
@@ -95,9 +103,7 @@ public class ReflectionComparatorTest extends TestCase {
      * * Test for two equal objects as an inner field of an object.
      */
     public void testGetDifference_equalsInner() {
-
         Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerB);
-
         assertNull(result);
     }
 
@@ -107,9 +113,7 @@ public class ReflectionComparatorTest extends TestCase {
      * This may not cause an infinite loop.
      */
     public void testGetDifference_equalsCircularDependency() {
-
         Difference result = reflectionComparator.getDifference(objectsCircularDependencyA, objectsCircularDependencyB);
-
         assertNull(result);
     }
 
@@ -118,7 +122,6 @@ public class ReflectionComparatorTest extends TestCase {
      * Test for two objects that contain different values.
      */
     public void testGetDifference_notEqualsDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(objectsA, objectsDifferentValue);
 
         assertNotNull(result);
@@ -132,7 +135,6 @@ public class ReflectionComparatorTest extends TestCase {
      * Test case for 2 objects with a right value null.
      */
     public void testGetDifference_notEqualsRightNull() {
-
         Difference result = reflectionComparator.getDifference(objectsA, objectsNullValue);
 
         assertNotNull(result);
@@ -146,7 +148,6 @@ public class ReflectionComparatorTest extends TestCase {
      * Test case for 2 objects with a left value null.
      */
     public void testGetDifference_notEqualsLeftNull() {
-
         Difference result = reflectionComparator.getDifference(objectsNullValue, objectsA);
 
         assertNotNull(result);
@@ -160,7 +161,6 @@ public class ReflectionComparatorTest extends TestCase {
      * Test for objects with inner objects that contain different values.
      */
     public void testGetDifference_notEqualsInnerDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerDifferentValue);
 
         assertNotNull(result);
@@ -175,7 +175,6 @@ public class ReflectionComparatorTest extends TestCase {
      * Test case for a null left-argument.
      */
     public void testGetDifference_leftNull() {
-
         Difference result = reflectionComparator.getDifference(null, objectsA);
 
         assertNotNull(result);
@@ -189,7 +188,6 @@ public class ReflectionComparatorTest extends TestCase {
      * Test case for a null right-argument.
      */
     public void testGetDifference_rightNull() {
-
         Difference result = reflectionComparator.getDifference(objectsA, null);
 
         assertNotNull(result);
@@ -203,9 +201,7 @@ public class ReflectionComparatorTest extends TestCase {
      * Test case for both null arguments.
      */
     public void testGetDifference_null() {
-
         Difference result = reflectionComparator.getDifference(null, null);
-
         assertNull(result);
     }
 
@@ -214,9 +210,7 @@ public class ReflectionComparatorTest extends TestCase {
      * Test for two equal objects.
      */
     public void testIsEquals() {
-
         boolean result = reflectionComparator.isEqual(objectsA, objectsB);
-
         assertTrue(result);
     }
 
@@ -225,11 +219,29 @@ public class ReflectionComparatorTest extends TestCase {
      * Test case for getting the field stack as a string.
      */
     public void testGetDifferenceFieldStackAsString() {
-
         Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerDifferentValue);
         String differenceFieldString = result.getFieldStackAsString();
 
         assertEquals("inner.string2", differenceFieldString);
+    }
+
+
+    /**
+     * Test for ignored default left value and to check that the right value is
+     * not being evaluated (causing a lazy loading).
+     */
+    public void testGetDifference_equalsIgnoredDefaultNoLazyLoading() {
+        // create a proxy, that will fail if is accessed
+        Collection collection = (Collection) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Collection.class}, new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                fail("Should not be invoked");
+                return null;
+            }
+        });
+
+        reflectionComparator = new ReflectionComparator(IGNORE_DEFAULTS);
+        Difference result = reflectionComparator.getDifference(new CollectionWrapper(null), new CollectionWrapper(collection));
+        assertNull(result);
     }
 
 
@@ -306,5 +318,26 @@ public class ReflectionComparatorTest extends TestCase {
             return false;
         }
     }
+
+
+    /**
+     * Test class with a Collection as field. This is declared as interface
+     * so that a proxy can be installed in the field.
+     */
+    private class CollectionWrapper {
+
+        /* Collection instance */
+        protected Collection innerCollection;
+
+        /**
+         * Creates a wrapper for the given collection.
+         *
+         * @param innerCollection The collection
+         */
+        public CollectionWrapper(Collection innerCollection) {
+            this.innerCollection = innerCollection;
+        }
+    }
+
 
 }

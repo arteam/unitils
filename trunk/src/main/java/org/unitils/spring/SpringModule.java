@@ -17,33 +17,22 @@ package org.unitils.spring;
 
 import org.apache.commons.configuration.Configuration;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.spring.annotation.SpringApplicationContext;
-import org.unitils.spring.annotation.SpringBean;
-import org.unitils.spring.annotation.SpringBeanByName;
-import org.unitils.spring.annotation.SpringBeanByType;
-import org.unitils.spring.annotation.InjectIntoContext;
-import org.unitils.spring.annotation.InjectIntoContextByType;
-import org.unitils.spring.annotation.InjectIntoContextByName;
-import org.unitils.spring.util.ApplicationContextManager;
-import org.unitils.spring.util.ClassPathXmlApplicationContextFactory;
-import org.unitils.spring.util.HibernateSessionFactoryWrappingBeanPostProcessor;
-import org.unitils.spring.util.ProxyingBeanPostProcessor;
-import org.unitils.spring.util.SpringBeanProxyManager;
+import org.unitils.spring.annotation.*;
+import org.unitils.spring.util.*;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
-import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and
@@ -65,10 +54,11 @@ import java.util.Arrays;
 public class SpringModule implements Module {
 
     /* Manager for storing and creating spring application contexts */
-    private ApplicationContextManager applicationContextManager = initApplicationContextManager();
+    private ApplicationContextManager applicationContextManager;
 
     /* Manager for spring beans who's proxy temporarily refers to another object */
     private SpringBeanProxyManager springBeanProxyManager;
+
 
     /**
      * Initializes this module using the given <code>Configuration</code> object
@@ -76,22 +66,14 @@ public class SpringModule implements Module {
      * @param configuration The configuration, not null
      */
     public void init(Configuration configuration) {
+        //todo make configureable
+        ApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
+        List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
+        beanPostProcessors.add(new HibernateSessionFactoryWrappingBeanPostProcessor());
+
+        applicationContextManager = new ApplicationContextManager(applicationContextFactory, beanPostProcessors);
     }
 
-
-    /**
-     * todo!! make configurable
-     *
-     * Initializes the {@link ApplicationContextManager} that is used by the {@link SpringModule}
-     * @return A ready-to-use {@link ApplicationContextManager}
-     */
-    private ApplicationContextManager initApplicationContextManager() {
-        // todo!! make configurable which ApplicationContextFactory and which BeanPostProcessors are instantiated
-        ApplicationContextManager applicationContextManager = new ApplicationContextManager(
-                new ClassPathXmlApplicationContextFactory(),
-                Arrays.asList(new HibernateSessionFactoryWrappingBeanPostProcessor(), new ProxyingBeanPostProcessor()));
-        return applicationContextManager;
-    }
 
     /**
      * Gets the spring bean with the given name. The given test instance, by using {@link SpringApplicationContext},
@@ -249,7 +231,6 @@ public class SpringModule implements Module {
      * @param testObject The test instance, not null
      */
     public void assignSpringBeansByName(Object testObject) {
-
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
         for (Field field : fields) {
             try {
@@ -261,8 +242,13 @@ public class SpringModule implements Module {
         }
     }
 
-    public void initSpringBeanProxyManager(Object testObject) {
 
+    /**
+     * todo javadoc
+     *
+     * @param testObject The test instance, not null
+     */
+    public void initSpringBeanProxyManager(Object testObject) {
         // todo check if ProxyingBeanPostProcessor is activated. If not, don't init springbeanproxymanager
         springBeanProxyManager = new SpringBeanProxyManager(getApplicationContext(testObject));
     }
@@ -270,54 +256,55 @@ public class SpringModule implements Module {
 
     /**
      * todo javadoc
-     * @param testObject
+     *
+     * @param testObject The test instance, not null
      */
     public void injectIntoContext(Object testObject) {
-
         // todo verify is ProxyingBeanPostProcessor is activated and throw an exception if not
         List<Field> annotatedFields = getFieldsAnnotatedWith(testObject.getClass(), InjectIntoContext.class);
         for (Field annotatedField : annotatedFields) {
             InjectIntoContext annotation = annotatedField.getAnnotation(InjectIntoContext.class);
             String springBeanName = annotation.value();
-            Object annotatedObject = ReflectionUtils.getFieldValue(testObject, annotatedField);
+            Object annotatedObject = getFieldValue(testObject, annotatedField);
             springBeanProxyManager.replaceSpringBeanByName(springBeanName, annotatedObject);
         }
         // todo inject result of method into context
     }
 
+
     /**
      * todo javadoc
-     * @param testObject
+     *
+     * @param testObject The test instance, not null
      */
     public void injectIntoContextByType(Object testObject) {
-
         // todo verify is ProxyingBeanPostProcessor is activated and throw an exception if not
         List<Field> annotatedFields = getFieldsAnnotatedWith(testObject.getClass(), InjectIntoContextByType.class);
         for (Field annotatedField : annotatedFields) {
-            InjectIntoContextByType annotation = annotatedField.getAnnotation(InjectIntoContextByType.class);
             Class springBeanType = annotatedField.getType();
-            Object annotatedObject = ReflectionUtils.getFieldValue(testObject, annotatedField);
+            Object annotatedObject = getFieldValue(testObject, annotatedField);
             springBeanProxyManager.replaceSpringBeanByType(springBeanType, annotatedObject);
         }
         // todo inject result of method into context
     }
 
+
     /**
      * todo javadoc
-     * @param testObject
+     *
+     * @param testObject The test instance, not null
      */
     public void injectIntoContextByName(Object testObject) {
-
         // todo verify is ProxyingBeanPostProcessor is activated and throw an exception if not
         List<Field> annotatedFields = getFieldsAnnotatedWith(testObject.getClass(), InjectIntoContextByName.class);
         for (Field annotatedField : annotatedFields) {
-            InjectIntoContextByName annotation = annotatedField.getAnnotation(InjectIntoContextByName.class);
             String springBeanName = annotatedField.getName();
-            Object annotatedObject = ReflectionUtils.getFieldValue(testObject, annotatedField);
+            Object annotatedObject = getFieldValue(testObject, annotatedField);
             springBeanProxyManager.replaceSpringBeanByName(springBeanName, annotatedObject);
         }
         // todo inject result of method into context
     }
+
 
     /**
      * @return The {@link TestListener} for this module
@@ -342,12 +329,12 @@ public class SpringModule implements Module {
 
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-            initSpringBeanProxyManager(testObject);
-            injectIntoContext(testObject);
-            injectIntoContextByType(testObject);
-            injectIntoContextByName(testObject);
+            //todo only let methods create context if needed 
+//            initSpringBeanProxyManager(testObject);
+//            injectIntoContext(testObject);
+//            injectIntoContextByType(testObject);
+//            injectIntoContextByName(testObject);
         }
-
     }
 
 }

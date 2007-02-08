@@ -16,15 +16,16 @@
 package org.unitils.spring.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
-import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.List;
 
@@ -39,10 +40,11 @@ import java.util.List;
 public class ApplicationContextManager extends AnnotatedInstanceManager<ApplicationContext, SpringApplicationContext> {
 
     /* Factory for creating ApplicationContexts */
-    private ApplicationContextFactory applicationContextFactory;
+    protected ApplicationContextFactory applicationContextFactory;
 
     /* BeanPostProcessors that are registered on the ApplicationContexts that are created */
-    private List<BeanPostProcessor> beanPostProcessors;
+    protected List<BeanPostProcessor> beanPostProcessors;
+
 
     /**
      * Creates a new instance, using the given {@link ApplicationContextFactory}. The given list of
@@ -50,8 +52,8 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
      * created.
      *
      * @param applicationContextFactory The factory for creating <code>ApplicationContext</code>s.
-     * @param beanPostProcessors The spring <code>BeanPostProcessor</code> that are registered on the
-     * <code>ApplicationContext</code>s that are created.
+     * @param beanPostProcessors        The spring <code>BeanPostProcessor</code> that are registered on the
+     *                                  <code>ApplicationContext</code>s that are created.
      */
     public ApplicationContextManager(ApplicationContextFactory applicationContextFactory, List<BeanPostProcessor> beanPostProcessors) {
         super(ApplicationContext.class, SpringApplicationContext.class);
@@ -116,22 +118,29 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
         }
     }
 
+
     /**
      * @param locations The locations where to find configuration files that define the <code>ApplicationContext</code>
      * @return A <code>ApplicationContext</code> in which the given locations are loaded, and all registered
-     * <code>BeanPostProcessor</code>s are added.
+     *         <code>BeanPostProcessor</code>s are added.
      */
     protected ApplicationContext createApplicationContext(List<String> locations) {
+        // register post processors 
+        // todo do nothing if there are no processors
         ConfigurableApplicationContext applicationContext = applicationContextFactory.createApplicationContext(locations);
-
-        // todo add BeanPostProcessor's
-        /*for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
-            applicationContext.getBeanFactory().addBeanPostProcessor(beanPostProcessor);
-        }*/
+        applicationContext.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
+            public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+                for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+                    beanFactory.addBeanPostProcessor(beanPostProcessor);
+                }
+            }
+        });
         applicationContext.refresh();
         return applicationContext;
     }
 
+
+    //todo javadoc
     protected List<String> getAnnotationValues(SpringApplicationContext annotation) {
         if (annotation == null) {
             return null;

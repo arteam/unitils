@@ -27,6 +27,9 @@ import java.util.LinkedList;
 /**
  * Test class for {@link ReflectionComparator}.
  * Contains tests with collection types.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionComparatorCollectionTest extends TestCase {
 
@@ -54,6 +57,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /* Class under test */
     private ReflectionComparator reflectionComparator;
 
+
     /**
      * Initializes the test fixture.
      */
@@ -77,29 +81,25 @@ public class ReflectionComparatorCollectionTest extends TestCase {
      * Test for two equal collections.
      */
     public void testGetDifference_equals() {
-
         Difference result = reflectionComparator.getDifference(collectionA, collectionB);
-
         assertNull(result);
     }
+
 
     /**
      * Test for two equal collections that are of a different type.
      */
     public void testGetDifference_equalsDifferentType() {
-
         Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentType);
-
         assertNull(result);
     }
+
 
     /**
      * Test for two equal collections as an inner field of an object.
      */
     public void testGetDifference_equalsInner() {
-
         Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerB);
-
         assertNull(result);
     }
 
@@ -108,7 +108,6 @@ public class ReflectionComparatorCollectionTest extends TestCase {
      * Test for two collections that contain different values.
      */
     public void testGetDifference_notEqualsDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentValue);
 
         assertNotNull(result);
@@ -139,7 +138,6 @@ public class ReflectionComparatorCollectionTest extends TestCase {
      * Test for objects with inner collections that contain different values.
      */
     public void testGetDifference_notEqualsInnerDifferentValues() {
-
         Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerDifferentValue);
 
         assertNotNull(result);
@@ -171,7 +169,6 @@ public class ReflectionComparatorCollectionTest extends TestCase {
      * Tests for collections but right value is not a collection.
      */
     public void testGetDifference_notEqualsRightNotCollection() {
-
         Difference result = reflectionComparator.getDifference(collectionA, "Test string");
 
         assertNotNull(result);
