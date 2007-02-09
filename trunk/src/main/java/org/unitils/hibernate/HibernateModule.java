@@ -159,7 +159,7 @@ public class HibernateModule implements Module, Flushable {
      * @param classes The classes for which to reset the configs
      */
     public void invalidateHibernateConfiguration(Class<?>... classes) {
-        getSessionFactoryManager().invalidateHibernateConfiguration(classes);
+        getSessionFactoryManager().invalidateSessionFactory(classes);
     }
 
 

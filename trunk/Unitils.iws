@@ -18,35 +18,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionInterceptingSessionFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionInterceptingSessionFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorMapTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorMapTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/annotation/SpringHibernateSessionFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/Calls.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/Calls.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertPropertiesTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertPropertiesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/Dates.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/Dates.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorLenientTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorLenientTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertCollectionsTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertCollectionsTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/Defaults.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/Defaults.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/ReflectionArgumentMatcher.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/ReflectionArgumentMatcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/LenientMocksControl.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/LenientMocksControl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorArrayTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorArrayTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupport.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\spring\annotation\SpringHibernateSessionFactory.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorCollectionTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorCollectionTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertPropertiesCollectionsTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertPropertiesCollectionsTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparatorMode.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparatorMode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesArrayTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesArrayTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -70,7 +51,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1170973698803" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1171045595524" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -208,28 +189,50 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ReflectionComparatorTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="242" column="61" selection-start="8190" selection-end="8190" vertical-scroll-proportion="0.3174452">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReflectionComparator.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="427" column="22" selection-start="19111" selection-end="19111" vertical-scroll-proportion="0.3403241">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SpringModule.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="SpringModule.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="244" column="25" selection-start="10885" selection-end="10885" vertical-scroll-proportion="0.35653004">
+            <state line="373" column="8" selection-start="15476" selection-end="15476" vertical-scroll-proportion="1.7376146">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ReflectionComparator.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="412" column="96" selection-start="18514" selection-end="18514" vertical-scroll-proportion="0.4256881">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HibernateSupportImpl.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="32" column="33" selection-start="1072" selection-end="1092" vertical-scroll-proportion="0.59816515">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SessionFactoryManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="125" column="0" selection-start="5481" selection-end="5481" vertical-scroll-proportion="0.71926606">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HibernateSessionFactoryWrappingBeanPostProcessor.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="62" column="22" selection-start="2377" selection-end="2377" vertical-scroll-proportion="-0.011009174">
               <folding />
             </state>
           </provider>
@@ -238,7 +241,7 @@
       <file leaf-file-name="ApplicationContextManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="0" selection-start="0" selection-end="615" vertical-scroll-proportion="0.24308866">
+            <state line="17" column="0" selection-start="649" selection-end="649" vertical-scroll-proportion="0.09357798">
               <folding />
             </state>
           </provider>
@@ -247,7 +250,7 @@
       <file leaf-file-name="ClassPathXmlApplicationContextFactory.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="25" column="98" selection-start="965" selection-end="965" vertical-scroll-proportion="0.35653004">
+            <state line="25" column="98" selection-start="965" selection-end="965" vertical-scroll-proportion="0.6862385">
               <folding />
             </state>
           </provider>
@@ -916,147 +919,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\reflectionassert" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\hibernate" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\hibernate" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\hibernate\annotation" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\database" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1115,7 +978,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure Favorites="false" PackagesPane="false" Scope="false" ProjectPane="false" />
+      <showStructure ProjectPane="false" PackagesPane="false" Scope="false" Favorites="false" />
       <autoscrollToSource ProjectPane="false" />
       <autoscrollFromSource ProjectPane="false" />
       <sortByType />
@@ -1162,15 +1025,15 @@
   </component>
   <component name="RestoreUpdateTree" />
   <component name="RunManager" selected="JUnit.All in Unitils">
-    <tempConfiguration default="false" name="ReflectionComparatorTest.testGetDifference_equalsIgnoredDefaultNoLazyLoading" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+    <tempConfiguration default="false" name="ReflectionComparatorLenientTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <pattern value="org.unitils.reflectionassert.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="org.unitils.reflectionassert" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.reflectionassert.ReflectionComparatorTest" />
-      <option name="METHOD_NAME" value="testGetDifference_equalsIgnoredDefaultNoLazyLoading" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.reflectionassert.ReflectionComparatorLenientTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -1184,6 +1047,19 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="" />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -1199,26 +1075,6 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="" />
       <method>
         <option name="Make" value="true" />
       </method>
@@ -1245,6 +1101,13 @@
       <method>
         <option name="Make" value="true" />
       </method>
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module name="" />
@@ -1479,14 +1342,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="30" y="-4" width="1574" height="1208" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3291639" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32685184" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35747203" order="0" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32685184" order="1" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35737923" order="0" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32649255" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24753127" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.49166667" order="11" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39961758" order="6" />
@@ -1495,7 +1358,7 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25345623" order="1" x="59" y="60" width="1515" height="1080" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32888466" order="8" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.46388888" order="2" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4601852" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24950625" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="4" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35833332" order="4" />
@@ -1596,108 +1459,112 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertPropertiesCollectionsTest.java">
+    <entry file="jar://$PROJECT_DIR$/../../../_apps/java/spring-framework-2.0/dist/spring-src.zip!/org/springframework/orm/hibernate3/LocalSessionFactoryBean.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="165" column="0" selection-start="4767" selection-end="4767" vertical-scroll-proportion="0.9670223">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertPropertiesTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="184" column="0" selection-start="5102" selection-end="5102" vertical-scroll-proportion="0.9670223">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="223" column="0" selection-start="5886" selection-end="5886" vertical-scroll-proportion="0.9670223">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorArrayTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="278" column="0" selection-start="9778" selection-end="9778" vertical-scroll-proportion="-0.053384174">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorCollectionTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="247" column="0" selection-start="7670" selection-end="7670" vertical-scroll-proportion="0.9675882">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorLenientTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="380" column="0" selection-start="11893" selection-end="11893" vertical-scroll-proportion="0.90276456">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorMapTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="184" column="0" selection-start="5781" selection-end="5781" vertical-scroll-proportion="0.35176358">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesArrayTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="183" column="0" selection-start="5933" selection-end="5933" vertical-scroll-proportion="0.40038133">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="193" column="0" selection-start="5971" selection-end="5971" vertical-scroll-proportion="0.9675882">
+        <state line="103" column="36" selection-start="4658" selection-end="4681" vertical-scroll-proportion="0.8973607">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="117" column="0" selection-start="4763" selection-end="4763" vertical-scroll-proportion="0.171592">
+        <state line="138" column="9" selection-start="5603" selection-end="5603" vertical-scroll-proportion="0.33333334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="13" selection-start="4095" selection-end="4095" vertical-scroll-proportion="0.33333334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="49" column="38" selection-start="1683" selection-end="1699" vertical-scroll-proportion="0.44965786">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="98" selection-start="965" selection-end="965" vertical-scroll-proportion="0.35653004">
+        <state line="25" column="98" selection-start="965" selection-end="965" vertical-scroll-proportion="0.6862385">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java">
+    <entry file="jar://$PROJECT_DIR$/../../../_apps/java/jdk1.5.0_06/src.zip!/java/util/Date.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="0" selection-start="0" selection-end="615" vertical-scroll-proportion="0.24308866">
+        <state line="111" column="13" selection-start="5194" selection-end="5194" vertical-scroll-proportion="0.33267522">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../../../_apps/java/jdk1.5.0_06/src.zip!/java/lang/reflect/Field.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="191" column="20" selection-start="6377" selection-end="6377" vertical-scroll-proportion="0.33859822">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../../../_apps/java/jdk1.5.0_06/src.zip!/java/lang/Class.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="395" column="36" selection-start="16494" selection-end="16494" vertical-scroll-proportion="0.16485687">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="62" column="22" selection-start="2377" selection-end="2377" vertical-scroll-proportion="-0.011009174">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="125" column="0" selection-start="5481" selection-end="5481" vertical-scroll-proportion="0.71926606">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="9" selection-start="838" selection-end="838" vertical-scroll-proportion="0.46168768">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorLenientTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="150" column="58" selection-start="5284" selection-end="5284" vertical-scroll-proportion="0.24733269">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="33" selection-start="1072" selection-end="1092" vertical-scroll-proportion="0.59816515">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="412" column="96" selection-start="18514" selection-end="18514" vertical-scroll-proportion="0.4256881">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="244" column="25" selection-start="10885" selection-end="10885" vertical-scroll-proportion="0.35653004">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="242" column="61" selection-start="8190" selection-end="8190" vertical-scroll-proportion="0.3174452">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="427" column="22" selection-start="19111" selection-end="19111" vertical-scroll-proportion="0.3403241">
-          <folding />
+        <state line="373" column="8" selection-start="15476" selection-end="15476" vertical-scroll-proportion="1.7376146">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -210,7 +210,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testInvalidateHibernateConfiguration() {
         Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
-        sessionFactoryManager.invalidateHibernateConfiguration();
+        sessionFactoryManager.invalidateSessionFactory();
         Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
 
         assertNotNull(hibernateConfiguration1);
@@ -226,7 +226,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testInvalidateHibernateConfiguration_classSpecified() {
         Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
-        sessionFactoryManager.invalidateHibernateConfiguration(HibernateTestClassLevel.class);
+        sessionFactoryManager.invalidateSessionFactory(HibernateTestClassLevel.class);
         Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
 
         assertNotNull(hibernateConfiguration1);
@@ -242,7 +242,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testInvalidateHibernateConfiguration_otherClassSpecified() {
         Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
-        sessionFactoryManager.invalidateHibernateConfiguration(String.class, List.class);
+        sessionFactoryManager.invalidateSessionFactory(String.class, List.class);
         Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
 
         assertNotNull(hibernateConfiguration1);

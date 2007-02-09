@@ -17,11 +17,14 @@
 package org.unitils.spring.util;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.unitils.core.Unitils;
-import org.unitils.hibernate.HibernateModule;
+import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * todo watch out: loading this class causes a link of the SpringModule with the HibernateModule and Hibernate
@@ -35,6 +38,16 @@ import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
  * @author Filip Neven
  */
 public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPostProcessor {
+
+    /**
+     * todo javadoc
+     */
+    protected Map<String, SessionInterceptingSessionFactory> sessionFactories = new HashMap<String, SessionInterceptingSessionFactory>();
+
+    /**
+     * todo javadoc
+     */
+    protected Map<String, Configuration> configurations = new HashMap<String, Configuration>();
 
 
     /**
@@ -58,13 +71,39 @@ public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPos
      * @return The given bean or a wrapped session factory if its a session factory
      */
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        // if its a session factory bean, wrap the session factory
+        // if it's a session factory bean, wrap the session factory and store it
         if (bean instanceof SessionFactory) {
             SessionInterceptingSessionFactory wrappedSessionFactory = wrapHibernateSessionFactory((SessionFactory) bean);
-            registerSessionFactoryWithHibernateModule(wrappedSessionFactory);
+            sessionFactories.put(beanName, wrappedSessionFactory);
             return wrappedSessionFactory;
         }
+        // if it's a session factory factory bean, get and store configuration
+        if (bean instanceof LocalSessionFactoryBean) {
+            Configuration configuration = ((LocalSessionFactoryBean) bean).getConfiguration();
+            configurations.put(beanName, configuration);
+        }
         return bean;
+    }
+
+
+    /**
+     * todo javadoc
+     * Gets the names of the wrapped session factory beans.
+     *
+     * @return the bean names, not null
+     */
+    public Map<SessionInterceptingSessionFactory, Configuration> getSessionFactories() {
+        Map<SessionInterceptingSessionFactory, Configuration> result = new HashMap<SessionInterceptingSessionFactory, Configuration>();
+        for (String beanName : sessionFactories.keySet()) {
+            SessionInterceptingSessionFactory sessionFactory = sessionFactories.get(beanName);
+            Configuration configuration = configurations.get(beanName);
+            if (configuration == null) {
+                //todo implement  warning??
+                continue;
+            }
+            result.put(sessionFactory, configuration);
+        }
+        return result;
     }
 
 
@@ -79,13 +118,4 @@ public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPos
     }
 
 
-    /**
-     * Registers the given session factory in the Hibernate module.
-     *
-     * @param sessionFactory The session factory, not null
-     */
-    protected void registerSessionFactoryWithHibernateModule(SessionInterceptingSessionFactory sessionFactory) {
-        HibernateModule hibernateModule = Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
-        hibernateModule.getSessionFactoryManager().registerSessionFactory(sessionFactory, null);
-    }
 }
