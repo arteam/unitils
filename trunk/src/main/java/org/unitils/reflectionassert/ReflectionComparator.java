@@ -425,7 +425,8 @@ public class ReflectionComparator {
                 Object leftValue = f.get(left);
                 // do not evaluate right value if left is ignored default values
                 // this avoids lazy loading of right value (eg in hibernate)
-                if (!(left instanceof Date) && isIgnoredDefault(left)) {
+                if (!(Date.class.isAssignableFrom(f.getType())) && isIgnoredDefault(leftValue)) {
+                    fieldStack.pop();
                     continue;
                 }
                 Object rightValue = f.get(right);
