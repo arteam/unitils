@@ -46,10 +46,10 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     /**
      * All created session factories per configuration
      */
-    protected Map<Configuration, SessionInterceptingSessionFactory> hibernateSessionFactories = new HashMap<Configuration, SessionInterceptingSessionFactory>();
+    protected Map<Configuration, SessionInterceptingSessionFactory> sessionFactories = new HashMap<Configuration, SessionInterceptingSessionFactory>();
 
     /* The class name to use when creating a hibernate configuration */
-    private String hibernateConfigurationImplClassName;
+    private String configurationImplClassName;
 
     /* todo javadoc */
     private boolean manageCurrentSessionContext;
@@ -63,7 +63,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      */
     public SessionFactoryManager(String configurationImplClassName, boolean manageCurrentSessionContext) {
         super(Configuration.class, HibernateSessionFactory.class);
-        this.hibernateConfigurationImplClassName = configurationImplClassName;
+        this.configurationImplClassName = configurationImplClassName;
         this.manageCurrentSessionContext = manageCurrentSessionContext;
     }
 
@@ -104,24 +104,25 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      */
     public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
         // check whether it already exists
-        Configuration hibernateConfiguration = getConfiguration(testObject);
-        SessionInterceptingSessionFactory hibernateSessionFactory = hibernateSessionFactories.get(hibernateConfiguration);
-        if (hibernateSessionFactory != null) {
-            return hibernateSessionFactory;
+        Configuration configuration = getConfiguration(testObject);
+        SessionInterceptingSessionFactory sessionFactory = sessionFactories.get(configuration);
+        if (sessionFactory != null) {
+            return sessionFactory;
         }
 
         // create session factory
-        hibernateSessionFactory = new SessionInterceptingSessionFactory(hibernateConfiguration.buildSessionFactory());
+        sessionFactory = new SessionInterceptingSessionFactory(configuration.buildSessionFactory());
 
         // store session factory
-        hibernateSessionFactories.put(hibernateConfiguration, hibernateSessionFactory);
-        return hibernateSessionFactory;
+        sessionFactories.put(configuration, sessionFactory);
+        return sessionFactory;
     }
 
 
-    public void registerSessionFactory(SessionInterceptingSessionFactory sessionInterceptingSessionFactory, Configuration configuration) {
-
-
+    //todo javadoc
+    public void registerSessionFactory(Class<?> testClass, SessionInterceptingSessionFactory sessionInterceptingSessionFactory, Configuration configuration) {
+        registerInstance(testClass, configuration);
+        sessionFactories.put(configuration, sessionInterceptingSessionFactory);
     }
 
 
@@ -131,19 +132,20 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @return The Hibernate session factories, not null
      */
     public List<SessionInterceptingSessionFactory> getSessionFactories() {
-        return new ArrayList<SessionInterceptingSessionFactory>(hibernateSessionFactories.values());
+        return new ArrayList<SessionInterceptingSessionFactory>(sessionFactories.values());
     }
 
 
     /**
-     * Forces the reloading of the hibernate configurations the next time that it is requested. If classes are given
-     * only hibernate configurations that are linked to those classes will be reset. If no classes are given, all cached
-     * hibernate configurations will be reset.
+     * Forces the reloading of the session factory the next time that it is requested. If classes are given
+     * only session factories that are linked to those classes will be reset. If no classes are given, all cached
+     * session factories will be reset.
      *
      * @param classes The classes for which to reset the configs
      */
-    public void invalidateHibernateConfiguration(Class<?>... classes) {
-        super.invalidateInstance(classes);
+    public void invalidateSessionFactory(Class<?>... classes) {
+        invalidateInstance(classes);       
+        //todo also remove sessionfactory
     }
 
 
@@ -190,7 +192,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     protected Configuration createInstanceForValues(List<String> values) {
         try {
             // create instance
-            Configuration configuration = createInstanceOfType(hibernateConfigurationImplClassName);
+            Configuration configuration = createInstanceOfType(configurationImplClassName);
 
             // load default configuration if no locations were specified
             if (values == null || values.isEmpty()) {

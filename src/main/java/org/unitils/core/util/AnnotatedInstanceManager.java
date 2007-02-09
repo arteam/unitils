@@ -129,8 +129,14 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         instance = createInstance(testObject, testClass);
 
         // store instance in cache
-        instances.put(testClass, instance);
+        registerInstance(testClass, instance);
         return instance;
+    }
+
+
+    //todo javadoc
+    protected void registerInstance(Class<?> testClass, T instance){
+        instances.put(testClass, instance);        
     }
 
 

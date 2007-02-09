@@ -59,6 +59,8 @@ public class SpringModule implements Module {
     /* Manager for spring beans who's proxy temporarily refers to another object */
     private SpringBeanProxyManager springBeanProxyManager;
 
+    //todo javadoc
+    private HibernateSupport hibernateSupport;
 
     /**
      * Initializes this module using the given <code>Configuration</code> object
@@ -66,11 +68,14 @@ public class SpringModule implements Module {
      * @param configuration The configuration, not null
      */
     public void init(Configuration configuration) {
+        hibernateSupport = createHibernateSupport();
+
+        List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
+        if (hibernateSupport != null) {
+            beanPostProcessors.add(hibernateSupport.getSessionFactoryBeanPostProcessor());
+        }
         //todo make configureable
         ApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
-        List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
-        beanPostProcessors.add(new HibernateSessionFactoryWrappingBeanPostProcessor());
-
         applicationContextManager = new ApplicationContextManager(applicationContextFactory, beanPostProcessors);
     }
 
@@ -248,6 +253,22 @@ public class SpringModule implements Module {
      *
      * @param testObject The test instance, not null
      */
+    public void registerHibernateSessionFactories(Object testObject) {
+
+        //todo make sure context is loaded (but only load context if needed) getApplicationContext(testObject);
+        if (hibernateSupport == null) {
+            // no hibernate available, do nothing
+            return;
+        }
+        hibernateSupport.registerHibernateSessionFactories(testObject);
+    }
+
+
+    /**
+     * todo javadoc
+     *
+     * @param testObject The test instance, not null
+     */
     public void initSpringBeanProxyManager(Object testObject) {
         // todo check if ProxyingBeanPostProcessor is activated. If not, don't init springbeanproxymanager
         springBeanProxyManager = new SpringBeanProxyManager(getApplicationContext(testObject));
@@ -306,6 +327,17 @@ public class SpringModule implements Module {
     }
 
 
+    // todo javadoc
+    protected HibernateSupport createHibernateSupport() {
+        try {
+            return createInstanceOfType("org.unitils.spring.util.HibernateSupportImpl");
+        } catch (UnitilsException e) {
+            //todo log warning?
+            return null;
+        }
+    }
+
+
     /**
      * @return The {@link TestListener} for this module
      */
@@ -325,6 +357,7 @@ public class SpringModule implements Module {
             assignSpringBeans(testObject);
             assignSpringBeansByType(testObject);
             assignSpringBeansByName(testObject);
+            registerHibernateSessionFactories(testObject);
         }
 
         @Override
