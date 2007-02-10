@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.unitils.spring.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.beans.BeansException;
@@ -27,23 +28,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>BeanPostProcessor</code> that checks wether beans are created in spring's <code>ApplicationContext</code>
+ * A <code>BeanPostProcessor</code> that checks wether beans are created in spring's <code>ApplicationContext</code>
  * of type <code>SessionFactory</code>. If such a bean is created, it is wrapped in a {@link SessionInterceptingSessionFactory},
  * to make sure all hibernate <code>Session</code>s that are created are intercepted, to be able to implement features
  * like flushing and closing these <code>Session</code>s.
  *
- * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Tim Ducheyne
  */
-public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPostProcessor {
+public class SessionFactoryWrappingBeanPostProcessor implements BeanPostProcessor {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(SessionFactoryWrappingBeanPostProcessor.class);
 
     /**
-     * todo javadoc
+     * All intercepted session factories with the bean name as key
      */
     protected Map<String, SessionInterceptingSessionFactory> sessionFactories = new HashMap<String, SessionInterceptingSessionFactory>();
 
     /**
-     * todo javadoc
+     * All intercepted configurations with the bean name as key
      */
     protected Map<String, Configuration> configurations = new HashMap<String, Configuration>();
 
@@ -61,8 +65,9 @@ public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPos
 
 
     /**
-     * Simply passes through all beans, except for objects of type <code>SessionFactory</code>. Such objects are wrapped
-     * in a {@link SessionInterceptingSessionFactory}
+     * Intercepts all <code>SessionFactory</code> and <code>LocalSessionFactoryBean</code> beans.
+     * The session factories are wrapped in a {@link SessionInterceptingSessionFactory} instance. The factory beans
+     * are intercepted to be able to get to the Hibernate configuration that was used to create the session factories.
      *
      * @param bean     The new bean instance
      * @param beanName The name of the bean
@@ -70,8 +75,8 @@ public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPos
      */
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         // if it's a session factory bean, wrap the session factory and store it
-        if (bean instanceof SessionFactory) {
-            SessionInterceptingSessionFactory wrappedSessionFactory = wrapHibernateSessionFactory((SessionFactory) bean);
+        if (bean instanceof SessionFactory && !(bean instanceof SessionInterceptingSessionFactory)) {
+            SessionInterceptingSessionFactory wrappedSessionFactory = wrapSessionFactory((SessionFactory) bean);
             sessionFactories.put(beanName, wrappedSessionFactory);
             return wrappedSessionFactory;
         }
@@ -85,10 +90,9 @@ public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPos
 
 
     /**
-     * todo javadoc
-     * Gets the names of the wrapped session factory beans.
+     * Gets all intercepted session factories and corresponding configurations.
      *
-     * @return the bean names, not null
+     * @return the sessionfactories and configurations, not null
      */
     public Map<SessionInterceptingSessionFactory, Configuration> getSessionFactories() {
         Map<SessionInterceptingSessionFactory, Configuration> result = new HashMap<SessionInterceptingSessionFactory, Configuration>();
@@ -96,7 +100,8 @@ public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPos
             SessionInterceptingSessionFactory sessionFactory = sessionFactories.get(beanName);
             Configuration configuration = configurations.get(beanName);
             if (configuration == null) {
-                //todo implement  warning??
+                logger.warn("Application context contained a session factory with bean name " + beanName + " for which no session factory bean " +
+                        "could be found. This session factory will not be managed during the test.");
                 continue;
             }
             result.put(sessionFactory, configuration);
@@ -111,7 +116,7 @@ public class HibernateSessionFactoryWrappingBeanPostProcessor implements BeanPos
      * @param sessionFactory The session factory to wrap, not null
      * @return A {@link SessionInterceptingSessionFactory} wrapping the given <code>SessionFactory</code>
      */
-    protected SessionInterceptingSessionFactory wrapHibernateSessionFactory(SessionFactory sessionFactory) {
+    protected SessionInterceptingSessionFactory wrapSessionFactory(SessionFactory sessionFactory) {
         return new SessionInterceptingSessionFactory(sessionFactory);
     }
 

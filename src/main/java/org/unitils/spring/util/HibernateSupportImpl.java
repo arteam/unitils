@@ -36,14 +36,14 @@ import java.util.Map;
 public class HibernateSupportImpl implements HibernateSupport {
 
     /* The bean post processor that intercepts the session factory creation */
-    private HibernateSessionFactoryWrappingBeanPostProcessor hibernateSessionFactoryWrappingBeanPostProcessor;
+    private SessionFactoryWrappingBeanPostProcessor sessionFactoryWrappingBeanPostProcessor;
 
 
     /**
      * Creates a new support instance.
      */
     public HibernateSupportImpl() {
-        hibernateSessionFactoryWrappingBeanPostProcessor = new HibernateSessionFactoryWrappingBeanPostProcessor();
+        sessionFactoryWrappingBeanPostProcessor = new SessionFactoryWrappingBeanPostProcessor();
     }
 
 
@@ -57,7 +57,7 @@ public class HibernateSupportImpl implements HibernateSupport {
         SessionFactoryManager sessionFactoryManager = getSessionFactoryManager();
 
         // register all session factories
-        Map<SessionInterceptingSessionFactory, Configuration> sessionFactories = hibernateSessionFactoryWrappingBeanPostProcessor.getSessionFactories();
+        Map<SessionInterceptingSessionFactory, Configuration> sessionFactories = sessionFactoryWrappingBeanPostProcessor.getSessionFactories();
         for (Map.Entry<SessionInterceptingSessionFactory, Configuration> sessionFactory : sessionFactories.entrySet()) {
             sessionFactoryManager.registerSessionFactory(testClass, sessionFactory.getKey(), sessionFactory.getValue());
         }
@@ -81,7 +81,7 @@ public class HibernateSupportImpl implements HibernateSupport {
      * @return The post processor, not null
      */
     public BeanPostProcessor getSessionFactoryBeanPostProcessor() {
-        return hibernateSessionFactoryWrappingBeanPostProcessor;
+        return sessionFactoryWrappingBeanPostProcessor;
     }
 
 

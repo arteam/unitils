@@ -49,7 +49,7 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
      */
     public void testInjectHibernateSessionFactory() {
         HibernateTestSessionFactory hibernateTestSessionFactory = new HibernateTestSessionFactory();
-        hibernateModule.injectHibernateSessionFactory(hibernateTestSessionFactory);
+        hibernateModule.injectSessionFactory(hibernateTestSessionFactory);
 
         assertNotNull(hibernateTestSessionFactory.sessionFactoryField);
         assertSame(hibernateTestSessionFactory.sessionFactoryField, hibernateTestSessionFactory.sessionFactorySetter);

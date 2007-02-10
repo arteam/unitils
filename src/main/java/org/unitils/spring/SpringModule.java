@@ -31,6 +31,7 @@ import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -204,6 +205,7 @@ public class SpringModule implements Module {
      * @param testObject The test instance, not null
      */
     public void assignSpringBeans(Object testObject) {
+        // assign to fields
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBean.class);
         for (Field field : fields) {
             try {
@@ -214,15 +216,35 @@ public class SpringModule implements Module {
                 throw new UnitilsException("Unable to assign the Spring bean value to field annotated with @" + SpringBean.class.getSimpleName(), e);
             }
         }
+
+        // assign to setters
+        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBean.class);
+        for (Method method : methods) {
+            try {
+                if (!isSetter(method)) {
+                    throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBean.class.getSimpleName() + ". Method " +
+                            method.getName() + " is not a setter method.");
+                }
+                SpringBean springBeanAnnotation = method.getAnnotation(SpringBean.class);
+                invokeMethod(testObject, method, getSpringBean(testObject, springBeanAnnotation.value()));
+
+            } catch (UnitilsException e) {
+                throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBean.class.getSimpleName(), e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBean.class.getSimpleName() + ". Method " +
+                        "has thrown an exception.", e.getCause());
+            }
+        }
     }
 
 
     /**
-     * Gets the spring beans for all fields that are annotated with {@link SpringBeanByType}.
+     * Gets the spring beans for all fields methods that are annotated with {@link SpringBeanByType}.
      *
      * @param testObject The test instance, not null
      */
     public void assignSpringBeansByType(Object testObject) {
+        // assign to fields
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
         for (Field field : fields) {
             try {
@@ -230,6 +252,24 @@ public class SpringModule implements Module {
 
             } catch (UnitilsException e) {
                 throw new UnitilsException("Unable to assign the Spring bean value to field annotated with @" + SpringBeanByType.class.getSimpleName(), e);
+            }
+        }
+
+        // assign to setters
+        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
+        for (Method method : methods) {
+            try {
+                if (!isSetter(method)) {
+                    throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBeanByType.class.getSimpleName() + ". Method " +
+                            method.getName() + " is not a setter method.");
+                }
+                invokeMethod(testObject, method, getSpringBeanByType(testObject, method.getParameterTypes()[0]));
+
+            } catch (UnitilsException e) {
+                throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBeanByType.class.getSimpleName(), e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBeanByType.class.getSimpleName() + ". Method " +
+                        "has thrown an exception.", e.getCause());
             }
         }
     }
@@ -241,6 +281,7 @@ public class SpringModule implements Module {
      * @param testObject The test instance, not null
      */
     public void assignSpringBeansByName(Object testObject) {
+        // assign to fields
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
         for (Field field : fields) {
             try {
@@ -248,6 +289,24 @@ public class SpringModule implements Module {
 
             } catch (UnitilsException e) {
                 throw new UnitilsException("Unable to assign the Spring bean value to field annotated with @" + SpringBeanByName.class.getSimpleName(), e);
+            }
+        }
+
+        // assign to setters
+        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
+        for (Method method : methods) {
+            try {
+                if (!isSetter(method)) {
+                    throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBeanByName.class.getSimpleName() + ". Method " +
+                            method.getName() + " is not a setter method.");
+                }
+                invokeMethod(testObject, method, getSpringBean(testObject, getFieldName(method)));
+
+            } catch (UnitilsException e) {
+                throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBeanByName.class.getSimpleName(), e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBeanByName.class.getSimpleName() + ". Method " +
+                        "has thrown an exception.", e.getCause());
             }
         }
     }
@@ -372,7 +431,7 @@ public class SpringModule implements Module {
 
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-            //todo only let methods create context if needed 
+            //todo only let methods create context if needed
 //            initSpringBeanProxyManager(testObject);
 //            injectIntoContext(testObject);
 //            injectIntoContextByType(testObject);
