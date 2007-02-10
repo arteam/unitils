@@ -18,7 +18,7 @@ package org.unitils.spring.util;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * todo javadoc
+ * A support class containing Hibernate related actions for the spring module.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -26,12 +26,27 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 public interface HibernateSupport {
 
 
+    /**
+     * Registers all intercepted session factories for the given test.
+     *
+     * @param testObject The test instance, not null
+     */
     void registerHibernateSessionFactories(Object testObject);
 
 
+    /**
+     * Unregisters all intercepted session factories for the given test.
+     *
+     * @param testObject The test instance, not null
+     */
     void unregisterHibernateSessionFactories(Object testObject);
 
 
+    /**
+     * Gets the bean post processor that will intercept the session factory creation.
+     *
+     * @return The post processor, not null
+     */
     BeanPostProcessor getSessionFactoryBeanPostProcessor();
 
 }

@@ -18,16 +18,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupport.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\spring\annotation\SpringHibernateSessionFactory.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -51,7 +49,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1171045595524" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1171105017452" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -189,10 +187,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="SpringModule.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="SpringModule.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="373" column="8" selection-start="15476" selection-end="15476" vertical-scroll-proportion="1.7376146">
+            <state line="93" column="52" selection-start="4036" selection-end="4063" vertical-scroll-proportion="1.0293578">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -200,22 +198,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ReflectionComparator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java">
+      <file leaf-file-name="HibernateModuleConfigurationTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="412" column="96" selection-start="18514" selection-end="18514" vertical-scroll-proportion="0.4256881">
+            <state line="213" column="79" selection-start="8666" selection-end="8666" vertical-scroll-proportion="0.13394496">
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HibernateSupportImpl.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="33" selection-start="1072" selection-end="1092" vertical-scroll-proportion="0.59816515">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -223,16 +210,7 @@
       <file leaf-file-name="SessionFactoryManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="125" column="0" selection-start="5481" selection-end="5481" vertical-scroll-proportion="0.71926606">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HibernateSessionFactoryWrappingBeanPostProcessor.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="62" column="22" selection-start="2377" selection-end="2377" vertical-scroll-proportion="-0.011009174">
+            <state line="103" column="64" selection-start="4474" selection-end="4474" vertical-scroll-proportion="0.34862384">
               <folding />
             </state>
           </provider>
@@ -241,16 +219,34 @@
       <file leaf-file-name="ApplicationContextManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="649" selection-end="649" vertical-scroll-proportion="0.09357798">
+            <state line="116" column="7" selection-start="4136" selection-end="4827" vertical-scroll-proportion="0.40550458">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClassPathXmlApplicationContextFactory.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java">
+      <file leaf-file-name="HibernateCurrentSessionContext.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateCurrentSessionContext.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="25" column="98" selection-start="965" selection-end="965" vertical-scroll-proportion="0.6862385">
+            <state line="31" column="33" selection-start="1083" selection-end="1083" vertical-scroll-proportion="0.8733945">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HibernateSessionFactoryWrappingBeanPostProcessor.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="119" column="0" selection-start="4726" selection-end="4726" vertical-scroll-proportion="1.8623853">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AnnotatedInstanceManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="184" column="10" selection-start="7053" selection-end="7247" vertical-scroll-proportion="0.84770644">
               <folding />
             </state>
           </provider>
@@ -1025,15 +1021,15 @@
   </component>
   <component name="RestoreUpdateTree" />
   <component name="RunManager" selected="JUnit.All in Unitils">
-    <tempConfiguration default="false" name="ReflectionComparatorLenientTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="org.unitils.reflectionassert.*" />
+    <tempConfiguration default="false" name="HibernateModuleConfigurationTest.testInvalidateHibernateConfiguration" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="org.unitils.hibernate.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.unitils.reflectionassert" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.reflectionassert.ReflectionComparatorLenientTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="org.unitils.hibernate" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.hibernate.HibernateModuleConfigurationTest" />
+      <option name="METHOD_NAME" value="testInvalidateHibernateConfiguration" />
+      <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -1342,7 +1338,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="30" y="-4" width="1574" height="1208" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
@@ -1358,7 +1354,7 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25345623" order="1" x="59" y="60" width="1515" height="1080" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32888466" order="8" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4601852" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4601852" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24950625" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="4" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35833332" order="4" />
@@ -1459,79 +1455,9 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$PROJECT_DIR$/../../../_apps/java/spring-framework-2.0/dist/spring-src.zip!/org/springframework/orm/hibernate3/LocalSessionFactoryBean.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="103" column="36" selection-start="4658" selection-end="4681" vertical-scroll-proportion="0.8973607">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="138" column="9" selection-start="5603" selection-end="5603" vertical-scroll-proportion="0.33333334">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="76" column="13" selection-start="4095" selection-end="4095" vertical-scroll-proportion="0.33333334">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="49" column="38" selection-start="1683" selection-end="1699" vertical-scroll-proportion="0.44965786">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="98" selection-start="965" selection-end="965" vertical-scroll-proportion="0.6862385">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/../../../_apps/java/jdk1.5.0_06/src.zip!/java/util/Date.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="111" column="13" selection-start="5194" selection-end="5194" vertical-scroll-proportion="0.33267522">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/../../../_apps/java/jdk1.5.0_06/src.zip!/java/lang/reflect/Field.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="191" column="20" selection-start="6377" selection-end="6377" vertical-scroll-proportion="0.33859822">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/../../../_apps/java/jdk1.5.0_06/src.zip!/java/lang/Class.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="395" column="36" selection-start="16494" selection-end="16494" vertical-scroll-proportion="0.16485687">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="22" selection-start="2377" selection-end="2377" vertical-scroll-proportion="-0.011009174">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="125" column="0" selection-start="5481" selection-end="5481" vertical-scroll-proportion="0.71926606">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="9" selection-start="838" selection-end="838" vertical-scroll-proportion="0.46168768">
           <folding />
         </state>
       </provider>
@@ -1543,28 +1469,98 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="33" selection-start="1072" selection-end="1092" vertical-scroll-proportion="0.59816515">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="76" column="13" selection-start="4095" selection-end="4095" vertical-scroll-proportion="0.33268672">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/inject/InjectModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="62" column="70" selection-start="2572" selection-end="2683" vertical-scroll-proportion="0.38215324">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="412" column="96" selection-start="18514" selection-end="18514" vertical-scroll-proportion="0.4256881">
+        <state line="412" column="96" selection-start="18514" selection-end="18514" vertical-scroll-proportion="0.22502425">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="98" selection-start="941" selection-end="941" vertical-scroll-proportion="0.34626576">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="184" column="10" selection-start="7053" selection-end="7247" vertical-scroll-proportion="0.84770644">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="48" column="7" selection-start="1472" selection-end="1472" vertical-scroll-proportion="0.7914646">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupportImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="97" column="93" selection-start="3748" selection-end="3748" vertical-scroll-proportion="0.9010669">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="373" column="8" selection-start="15476" selection-end="15476" vertical-scroll-proportion="1.7376146">
+        <state line="93" column="52" selection-start="4036" selection-end="4063" vertical-scroll-proportion="1.0293578">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="213" column="79" selection-start="8666" selection-end="8666" vertical-scroll-proportion="0.13394496">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="103" column="64" selection-start="4474" selection-end="4474" vertical-scroll-proportion="0.34862384">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="116" column="7" selection-start="4136" selection-end="4827" vertical-scroll-proportion="0.40550458">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateCurrentSessionContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="33" selection-start="1083" selection-end="1083" vertical-scroll-proportion="0.8733945">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSessionFactoryWrappingBeanPostProcessor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="119" column="0" selection-start="4726" selection-end="4726" vertical-scroll-proportion="1.8623853">
+          <folding />
         </state>
       </provider>
     </entry>

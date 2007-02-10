@@ -30,15 +30,22 @@ import java.util.*;
 import static java.util.Arrays.asList;
 
 /**
+ * A class for managing and creating Hibernate configurations and session factories.
  * todo javadoc
  * <p/>
- * A class for storing and creating Hibernate configurations and session factories.
+ * Creating a new config is done following steps:
+ * <ul>
+ * <li>First find all locations specified in {@link HibernateSessionFactory} annotation</li>
+ * <li>Create a <code>Configuration</code> using the className provided at construction</li>
+ * <li>Load all locations into this config. Subclasses override settings of superclasses. In the same class method level
+ * overrides field level which in turn overrrides class level settings</li>
+ * <li>Call all custom create methods, passing the current config if requested. The returned config is taken as current config.</li>
+ * </ul>
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class SessionFactoryManager extends AnnotatedInstanceManager<Configuration, HibernateSessionFactory> {
-
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(SessionFactoryManager.class);
@@ -51,7 +58,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     /* The class name to use when creating a hibernate configuration */
     private String configurationImplClassName;
 
-    /* todo javadoc */
+    /* True if the HibernateCurrentSessionContext should be registered */
     private boolean manageCurrentSessionContext;
 
 
@@ -59,7 +66,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * Creates a config manager that will use the given class name to create new configs when needed.
      *
      * @param configurationImplClassName  The class name, not null
-     * @param manageCurrentSessionContext todo javadoc
+     * @param manageCurrentSessionContext True if the {@link HibernateCurrentSessionContext} should be registered
      */
     public SessionFactoryManager(String configurationImplClassName, boolean manageCurrentSessionContext) {
         super(Configuration.class, HibernateSessionFactory.class);
@@ -69,35 +76,8 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
 
 
     /**
-     * Gets the hibernate configuration for the given test.
-     * This method first will check whether an existing configuration can be reused and if so, returns that config.
-     * A config can be reused, if it is created and there are no {@link HibernateSessionFactory} annotations to
-     * force the creation of a new one. For example, suppose a config was create for a superclass and the
-     * subclass has a {@link HibernateSessionFactory} annotation specifying a new location, a new config will need
-     * to be created for this subclass. If the subclass did not specify a location, the superclass config can
-     * be reused and will thus be returned.
-     * <p/>
-     * Creating a new config is done following steps:
-     * <ul>
-     * <li>First find all locations specified in {@link HibernateSessionFactory} annotation</li>
-     * <li>Create a <code>Configuration</code> using the className provided at construction</li>
-     * <li>Load all locations into this config. Subclasses override settings of superclasses. In the same class method level
-     * overrides field level which in turn overrrides class level settings</li>
-     * <li>Call all custom create methods, passing the current config if requested. The returned config is taken as current config.</li>
-     * </ul>
-     *
-     * @param testObject The test object, not null
-     * @return The Hibernate configuration, not null
-     */
-    public Configuration getConfiguration(Object testObject) {
-        return getInstance(testObject);
-    }
-
-
-    /**
-     * Gets the hibernate session factory for the given test.
-     * If a session factory already exists, this one is returned, else a new one is constructed using the
-     * configuration for the given test.
+     * Gets the hibernate session factory for the given test as described in the class javadoc. A UnitilsException will
+     * be thrown if no configuration could be retrieved or created.
      *
      * @param testObject The test object, not null
      * @return The Hibernate session factory, not null
@@ -119,6 +99,18 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     }
 
 
+    /**
+     * Gets the hibernate configuration for the given test. A UnitilsException will be thrown if no configuration
+     * could be retrieved or created.
+     *
+     * @param testObject The test object, not null
+     * @return The Hibernate configuration, not null
+     */
+    public Configuration getConfiguration(Object testObject) {
+        return getInstance(testObject);
+    }
+
+
     //todo javadoc
     public void registerSessionFactory(Class<?> testClass, SessionInterceptingSessionFactory sessionInterceptingSessionFactory, Configuration configuration) {
         registerInstance(testClass, configuration);
@@ -137,28 +129,34 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
 
 
     /**
-     * Forces the reloading of the session factory the next time that it is requested. If classes are given
-     * only session factories that are linked to those classes will be reset. If no classes are given, all cached
-     * session factories will be reset.
+     * Forces the reloading of the session factory and configurations the next time that it is requested. If classes
+     * are given only session factories and configurations that are linked to those classes will be reset. If no
+     * classes are given, all cached session factories and configurations will be reset.
      *
-     * @param classes The classes for which to reset the configs
+     * @param classes The classes for which to reset the factories and configs
      */
     public void invalidateSessionFactory(Class<?>... classes) {
-        invalidateInstance(classes);       
-        //todo also remove sessionfactory
+        // remove all session factories
+        if (classes == null || classes.length == 0) {
+            sessionFactories.clear();
+
+        } else {
+            for (Class<?> clazz : classes) {
+                Configuration configuration = instances.get(clazz);
+                sessionFactories.remove(configuration);
+            }
+        }
+        // remove all configurations
+        invalidateInstance(classes);
     }
 
 
     /**
      * Creates a configured Hibernate <code>Configuration</code> object.
-     * This will first retrieve all locations specified in {@link HibernateSessionFactory} annotations. If a locations
-     * were specified, a new config is created. Next, all custom create hibernate configuration methods are invoked
-     * passing the created config if requested (null if no context was created yet). If there still was no config
-     * created yet, a default hibernate configuration will be created, using hibernate.cfg.xml as config file.
      * <p/>
-     * Once a configuration is loaded, the property 'hibernate.connection.provider_class' will be overwritten so that Hibernate
-     * will load the {@link HibernateConnectionProvider} as provider. This way we can make sure that Hibernate will use
-     * the unitils datasource and thus connect to the unit test database.
+     * Once a configuration is loaded, the property 'hibernate.connection.provider_class' will be overwritten so that
+     * Hibernate will load the {@link HibernateConnectionProvider} as connection provider. This way we can make sure
+     * that Hibernate will use the unitils datasource and thus connect to the unit test database.
      *
      * @param testObject The test object, not null
      * @param testClass  The level in the hierarchy
@@ -189,28 +187,43 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     }
 
 
-    protected Configuration createInstanceForValues(List<String> values) {
+    /**
+     * Creates a new configuration for the given locations. The configuration implementation class name provided at
+     * construction time, determines what type of instance will be created.
+     *
+     * @param locations The locations where to find configuration files, not null
+     * @return the configuration, not null
+     */
+    protected Configuration createInstanceForValues(List<String> locations) {
         try {
             // create instance
             Configuration configuration = createInstanceOfType(configurationImplClassName);
 
             // load default configuration if no locations were specified
-            if (values == null || values.isEmpty()) {
+            if (locations == null || locations.isEmpty()) {
                 configuration.configure();
                 return configuration;
             }
             // load specified configurations
-            for (String value : values) {
-                configuration.configure(value);
+            for (String location : locations) {
+                configuration.configure(location);
             }
             return configuration;
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to create hibernate configuration for locations: " + values, e);
+            throw new UnitilsException("Unable to create hibernate configuration for locations: " + locations, e);
         }
     }
 
 
+    /**
+     * Gets the locations that are specified for the given {@link HibernateSessionFactory} annotation. If the
+     * annotation is null or if no locations were specified, null is returned. An array with 1 empty string is
+     * also be considered to be empty.
+     *
+     * @param annotation The annotation
+     * @return The locations, null if no values were specified
+     */
     protected List<String> getAnnotationValues(HibernateSessionFactory annotation) {
         if (annotation == null) {
             return null;
