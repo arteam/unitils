@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * todo watch out: loading this class causes a link of the SpringModule with the HibernateModule and Hibernate
- * <p/>
  * <code>BeanPostProcessor</code> that checks wether beans are created in spring's <code>ApplicationContext</code>
  * of type <code>SessionFactory</code>. If such a bean is created, it is wrapped in a {@link SessionInterceptingSessionFactory},
  * to make sure all hibernate <code>Session</code>s that are created are intercepted, to be able to implement features

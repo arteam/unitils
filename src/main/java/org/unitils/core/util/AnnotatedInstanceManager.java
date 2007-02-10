@@ -103,6 +103,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         this.annotationClass = annotationClass;
     }
 
+
     /**
      * Gets an instance for the given test. An exception will be raised if no instance could be created because
      * of an incorrect or missing configuration. For example, the annotation could not be found in the test object class
@@ -112,6 +113,12 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
      * @return The instance, not null
      */
     protected T getInstance(Object testObject) {
+        // check whether it already exists for the test class (eg registered instance)
+        T instance = instances.get(testObject.getClass());
+        if (instance != null) {
+            return instance;
+        }
+
         // find class level for wich a new instance should be created
         Class<?> testClass = findClassLevelForCreateInstance(testObject.getClass());
         if (testClass == null) {
@@ -120,7 +127,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         }
 
         // check whether it already exists
-        T instance = instances.get(testClass);
+        instance = instances.get(testClass);
         if (instance != null) {
             return instance;
         }
@@ -134,9 +141,30 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
     }
 
 
-    //todo javadoc
-    protected void registerInstance(Class<?> testClass, T instance){
-        instances.put(testClass, instance);        
+    /**
+     * Registers an instance for a given class. This will cause {@link #getInstance} to return the given instance
+     * if the testObject is of the given test type.
+     *
+     * @param testClass The test type, not null
+     * @param instance  The instance, not null
+     */
+    protected void registerInstance(Class<?> testClass, T instance) {
+        instances.put(testClass, instance);
+    }
+
+
+    /**
+     * Checks whether {@link #getInstance} will return an instance. If false is returned, {@link #getInstance} will
+     * throw an exception.
+     *
+     * @param testObject The test object, not null
+     * @return True if an instance is linked to the given test object
+     */
+    protected boolean hasInstance(Object testObject) {
+        if (instances.get(testObject.getClass()) != null) {
+            return true;
+        }
+        return findClassLevelForCreateInstance(testObject.getClass()) != null;
     }
 
 
@@ -357,7 +385,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
     /**
      * Gets the values that are specified for the given annotation. If the annotation is null or
-     * if no locations were specified, null should be returned. An array with 1 empty string should
+     * if no values were specified, null should be returned. An array with 1 empty string should
      * also be considered to be empty.
      *
      * @param annotation The annotation

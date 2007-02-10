@@ -16,6 +16,8 @@
 package org.unitils.spring;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -52,6 +54,9 @@ import java.util.Map;
  * @author Filip Neven
  */
 public class SpringModule implements Module {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(SpringModule.class);
 
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
@@ -254,10 +259,8 @@ public class SpringModule implements Module {
      * @param testObject The test instance, not null
      */
     public void registerHibernateSessionFactories(Object testObject) {
-
-        //todo make sure context is loaded (but only load context if needed) getApplicationContext(testObject);
-        if (hibernateSupport == null) {
-            // no hibernate available, do nothing
+        if (hibernateSupport == null || !applicationContextManager.hasApplicationContext(testObject)) {
+            // no hibernate or application context available, do nothing
             return;
         }
         hibernateSupport.registerHibernateSessionFactories(testObject);
@@ -327,12 +330,19 @@ public class SpringModule implements Module {
     }
 
 
-    // todo javadoc
+    /**
+     * Creates the spring hibernate support using reflection. This way the class dependency to Hibernate is
+     * eliminated. If Hibernate is not in the classpath, the support will not be loaded and null
+     * will be returned.
+     *
+     * @return The support, null if it could not be loaded
+     */
     protected HibernateSupport createHibernateSupport() {
         try {
             return createInstanceOfType("org.unitils.spring.util.HibernateSupportImpl");
+
         } catch (UnitilsException e) {
-            //todo log warning?
+            logger.debug("Hibernate will not be supported. Unable to load hibernate support. This could be because Hibernate is not in the classpath.", e);
             return null;
         }
     }

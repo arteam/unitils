@@ -25,22 +25,33 @@ import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
 import java.util.Map;
 
 /**
- * todo javadoc
+ * A support class containing Hibernate and {@link HibernateModule} related actions for the spring module.
+ * <p/>
+ * By encapsulating these operations, we can remove the strong dependency to Hibernate and the HibernateModule from
+ * the SpringModule. This way, the SpringModule will still function if Hibernate is not used.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class HibernateSupportImpl implements HibernateSupport {
 
-
+    /* The bean post processor that intercepts the session factory creation */
     private HibernateSessionFactoryWrappingBeanPostProcessor hibernateSessionFactoryWrappingBeanPostProcessor;
 
 
+    /**
+     * Creates a new support instance.
+     */
     public HibernateSupportImpl() {
         hibernateSessionFactoryWrappingBeanPostProcessor = new HibernateSessionFactoryWrappingBeanPostProcessor();
     }
 
 
+    /**
+     * Registers all intercepted session factories for the given test in the HibernateModule.
+     *
+     * @param testObject The test instance, not null
+     */
     public void registerHibernateSessionFactories(Object testObject) {
         Class<?> testClass = testObject.getClass();
         SessionFactoryManager sessionFactoryManager = getSessionFactoryManager();
@@ -53,17 +64,32 @@ public class HibernateSupportImpl implements HibernateSupport {
     }
 
 
+    /**
+     * Unregisters all intercepted session factories for the given test in the HibernateModule.
+     *
+     * @param testObject The test instance, not null
+     */
     public void unregisterHibernateSessionFactories(Object testObject) {
         Class<?> testClass = testObject.getClass();
         getSessionFactoryManager().invalidateSessionFactory(testClass);
     }
 
 
+    /**
+     * Gets the bean post processor that will intercept the session factory creation.
+     *
+     * @return The post processor, not null
+     */
     public BeanPostProcessor getSessionFactoryBeanPostProcessor() {
         return hibernateSessionFactoryWrappingBeanPostProcessor;
     }
 
 
+    /**
+     * Gets the session factory manager of the {@link HibernateModule}.
+     *
+     * @return the session factory manager, not null
+     */
     protected SessionFactoryManager getSessionFactoryManager() {
         HibernateModule hibernateModule = Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
         return hibernateModule.getSessionFactoryManager();
