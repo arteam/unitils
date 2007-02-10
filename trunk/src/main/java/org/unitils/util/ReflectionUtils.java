@@ -64,6 +64,7 @@ public class ReflectionUtils {
         }
     }
 
+
     /**
      * Returns the value of the given field (may be private) in the given object
      *
@@ -85,6 +86,7 @@ public class ReflectionUtils {
         }
     }
 
+
     /**
      * Sets the given value to the given field on the given object
      *
@@ -105,6 +107,39 @@ public class ReflectionUtils {
             throw new UnitilsException("Error while trying to access field " + field, e);
         }
     }
+
+
+    /**
+     * Sets the given value to the given field and setters on the given object.
+     *
+     * @param object        The object containing the field and setters, not null
+     * @param fields        The fields, not null
+     * @param setterMethods The setter methods, not null
+     * @param value         The value for the given field and setters in the given object
+     */
+    public static void setFieldAndSetterValue(Object object, List<Field> fields, List<Method> setterMethods, Object value) {
+        for (Field field : fields) {
+            try {
+                setFieldValue(object, field, value);
+
+            } catch (UnitilsException e) {
+                throw new UnitilsException("Unable to assign the value to field: " + field.getName() + ". Ensure that this field is of the correct type.", e);
+            }
+        }
+        for (Method method : setterMethods) {
+            try {
+                invokeMethod(object, method, value);
+
+            } catch (UnitilsException e) {
+                throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + method.getName() + ". Ensure that " +
+                        "this method has following signature: void myMethod(ValueType value).", e);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Unable to invoke method: " + object.getClass().getSimpleName() + "." + method.getName() + ". Method " +
+                        "has thrown an exception.", e.getCause());
+            }
+        }
+    }
+
 
     /**
      * Invokes the given method with the given parameters on the given target object
@@ -133,6 +168,7 @@ public class ReflectionUtils {
         }
     }
 
+
     /**
      * Returns all declared fields of the given class that are assignable from the given type.
      *
@@ -152,6 +188,7 @@ public class ReflectionUtils {
         return fieldsOfType;
     }
 
+
     /**
      * Returns the fields in the given class that have the exact given type. The class's superclasses are also
      * investigated.
@@ -169,6 +206,7 @@ public class ReflectionUtils {
         }
         return fields;
     }
+
 
     /**
      * Returns the fields in the given class that have the exact given type. The class's superclasses are not
@@ -273,6 +311,7 @@ public class ReflectionUtils {
         return null;
     }
 
+
     /**
      * From the given class, returns the getter for the given propertyname. If isStatic == true,
      * a static getter is searched. If no such getter exists in the given class, null is returned.
@@ -295,6 +334,7 @@ public class ReflectionUtils {
             return null;
         }
     }
+
 
     /**
      * From the given class, returns the getter for the given setter method. If no such getter exists in the
@@ -319,6 +359,7 @@ public class ReflectionUtils {
             return null;
         }
     }
+
 
     /**
      * From the given class, returns the field with the given name. isStatic indicates if it should be a static
@@ -384,6 +425,22 @@ public class ReflectionUtils {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Gets the name of the field for the given setter method. An exception is raised when
+     * the field name could not be extracted.
+     *
+     * @param setterMethod The method, not null
+     * @return The field name, not null
+     */
+    public static String getFieldName(Method setterMethod) {
+        String methodName = setterMethod.getName();
+        if (methodName.length() < 4 || !methodName.startsWith("set")) {
+            throw new UnitilsException("Unable to get field name for setter method " + setterMethod);
+        }
+        return methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
     }
 
 }

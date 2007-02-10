@@ -53,7 +53,6 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     public static Object inject(Object objectToInject, Object target, String property) {
-
         if (target == null) {
             throw new UnitilsException("Target for injection should not be null");
         }
@@ -88,7 +87,6 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     public static Object injectStatic(Object objectToInject, Class targetClass, String property) {
-
         String staticProperty = StringUtils.substringBefore(property, ".");
         if (property.equals(staticProperty)) {
             // Simple property: directly set value on this property
@@ -127,7 +125,6 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     public static Object autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccess propertyAccess) {
-
         if (target == null) {
             throw new UnitilsException("Target for injection should not be null");
         }
@@ -149,7 +146,6 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     public static Object autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccess propertyAccess) {
-
         if (propertyAccess == PropertyAccess.FIELD) {
             return autoInjectToField(objectToInject, objectToInjectType, null, targetClass, true);
         }
@@ -172,7 +168,6 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     private static Object autoInjectToField(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
-
         // Try to find a field with an exact matching type
         Field fieldToInjectTo = null;
         List<Field> fieldsWithExactType = ReflectionUtils.getFieldsOfType(targetClass, objectToInjectType, isStatic);
@@ -240,7 +235,6 @@ public class InjectionUtils {
      * @return The object that was replaced by the injection
      */
     private static Object autoInjectToSetter(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
-
         // Try to find a method with an exact matching type
         Method setterToInjectTo = null;
         List<Method> settersWithExactType = getSettersOfType(targetClass, objectToInjectType, isStatic);
@@ -310,7 +304,6 @@ public class InjectionUtils {
      * @return The value of the static property from the given class
      */
     private static Object getValueStatic(Class targetClass, String staticProperty) {
-
         Method staticGetter = getGetter(targetClass, staticProperty, true);
         if (staticGetter != null) {
             try {

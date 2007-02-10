@@ -53,7 +53,7 @@ public class HibernateUnitils {
      */
     public static void invalidateHibernateConfiguration(Class<?>... classes) {
         HibernateModule hibernateModule = Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
-        hibernateModule.invalidateHibernateConfiguration(classes);
+        hibernateModule.invalidateConfiguration(classes);
     }
 
 }

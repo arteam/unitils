@@ -60,17 +60,19 @@ public class SpringModuleSpringBeansTest extends TestCase {
         springModule.assignSpringBeans(springTest);
 
         assertNotNull(springTest.testBean);
+        assertNotNull(springTest.testBeanSetter);
     }
 
 
     /**
-     * Tests assigning a spring bean by declared type of field.
+     * Tests assigning a spring bean by declared type of field and setter.
      */
     public void testAssignSpringBeansByType() {
         SpringTestByType springTestByType = new SpringTestByType();
         springModule.assignSpringBeansByType(springTestByType);
 
         assertNotNull(springTestByType.testBean);
+        assertNotNull(springTestByType.testBeanSetter);
     }
 
 
@@ -82,6 +84,17 @@ public class SpringModuleSpringBeansTest extends TestCase {
         springModule.assignSpringBeansByName(springTestByName);
 
         assertNotNull(springTestByName.testBeanByName);
+    }
+
+
+    /**
+     * Tests assigning a spring bean by name of setter.
+     */
+    public void testAssignSpringBeansByName_setter() {
+        SpringTestByNameSetter springTestByNameSetter = new SpringTestByNameSetter();
+        springModule.assignSpringBeansByName(springTestByNameSetter);
+
+        assertNotNull(springTestByNameSetter.testBeanByName);
     }
 
 
@@ -153,6 +166,13 @@ public class SpringModuleSpringBeansTest extends TestCase {
 
         @SpringBean("aBeanName")
         private String testBean = null;
+
+        private String testBeanSetter = null;
+
+        @SpringBean("aBeanName")
+        public void setTestBeanSetter(String testBeanSetter) {
+            this.testBeanSetter = testBeanSetter;
+        }
     }
 
     /**
@@ -163,10 +183,17 @@ public class SpringModuleSpringBeansTest extends TestCase {
 
         @SpringBeanByType
         private List testBean = null;
+
+        private List testBeanSetter = null;
+
+        @SpringBeanByType
+        public void setTestBeanSetter(List testBeanSetter) {
+            this.testBeanSetter = testBeanSetter;
+        }
     }
 
     /**
-     * Test SpringTest class by type but type is ambiguous (TreeSet en HashSet).
+     * Test SpringTest class by type but type is ambiguous (TreeSet and HashSet).
      */
     @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
     private class SpringTestByTypeAmbiguous {
@@ -183,6 +210,20 @@ public class SpringModuleSpringBeansTest extends TestCase {
 
         @SpringBeanByName
         private String testBeanByName = null;
+    }
+
+    /**
+     * Test SpringTest class by name.
+     */
+    @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
+    private class SpringTestByNameSetter {
+
+        private String testBeanByName = null;
+
+        @SpringBeanByName
+        public void setTestBeanByName(String testBeanByName) {
+            this.testBeanByName = testBeanByName;
+        }
     }
 
     /**

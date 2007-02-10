@@ -30,12 +30,11 @@ import org.unitils.hibernate.util.HibernateAssert;
 import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.hibernate.util.SessionFactoryManager;
 import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
-import org.unitils.util.AnnotationUtils;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -57,7 +56,7 @@ import java.util.List;
  * <p/>
  * This module also manages the hibernate configurations that need to be loaded for the tests. Configurations will be reused
  * when possible by caching them on class level. If a superclass loads a configuration and a test-subclass does not define
- * its own, the cached configuration of the superclass will be used. The {@link #invalidateHibernateConfiguration}
+ * its own, the cached configuration of the superclass will be used. The {@link #invalidateConfiguration}
  * method can be used to force a reloading of a configuration if needed. What and how a hibernate configuration is loaded,
  * is specified by using {@link HibernateSessionFactory} annotations. See the annotation javadoc for more information.
  * <p/>
@@ -92,9 +91,9 @@ public class HibernateModule implements Module, Flushable {
      * @param configuration The Unitils configuration, not null
      */
     public void init(org.apache.commons.configuration.Configuration configuration) {
-        String hibernateConfigurationImplClassName = configuration.getString(PROPKEY_CONFIGURATION_CLASS_NAME);
+        String configurationImplClassName = configuration.getString(PROPKEY_CONFIGURATION_CLASS_NAME);
         boolean manageCurrentSessionContext = configuration.getBoolean(PROPKEY_MANAGECURRENTSESSIONCONTEXT_ENABLED);
-        this.sessionFactoryManager = new SessionFactoryManager(hibernateConfigurationImplClassName, manageCurrentSessionContext);
+        this.sessionFactoryManager = new SessionFactoryManager(configurationImplClassName, manageCurrentSessionContext);
     }
 
 
@@ -105,7 +104,7 @@ public class HibernateModule implements Module, Flushable {
      */
     public void assertMappingWithDatabaseConsistent(Object testObject) {
         Configuration configuration = getSessionFactoryManager().getConfiguration(testObject);
-        Session session = getHibernateSessionFactory(testObject).openSession();
+        Session session = getSessionFactory(testObject).openSession();
         Dialect databaseDialect = getDatabaseDialect(configuration);
 
         HibernateAssert.assertMappingWithDatabaseConsistent(configuration, session, databaseDialect);
@@ -121,7 +120,7 @@ public class HibernateModule implements Module, Flushable {
      * @param testObject The test instance, not null
      * @return The Hibernate <code>SessionFactory</code>, not null
      */
-    public SessionFactory getHibernateSessionFactory(Object testObject) {
+    public SessionFactory getSessionFactory(Object testObject) {
         return getSessionFactoryManager().getSessionFactory(testObject);
     }
 
@@ -141,7 +140,7 @@ public class HibernateModule implements Module, Flushable {
      *
      * @param testObject The test instance, not null
      */
-    public void closeHibernateSessions(Object testObject) {
+    public void closeSessions(Object testObject) {
         // get all open session factories
         List<SessionInterceptingSessionFactory> sessionFactories = getSessionFactoryManager().getSessionFactories();
         for (SessionInterceptingSessionFactory sessionFactory : sessionFactories) {
@@ -158,7 +157,7 @@ public class HibernateModule implements Module, Flushable {
      *
      * @param classes The classes for which to reset the configs
      */
-    public void invalidateHibernateConfiguration(Class<?>... classes) {
+    public void invalidateConfiguration(Class<?>... classes) {
         getSessionFactoryManager().invalidateSessionFactory(classes);
     }
 
@@ -184,31 +183,16 @@ public class HibernateModule implements Module, Flushable {
      *
      * @param testObject The test object, not null
      */
-    public void injectHibernateSessionFactory(Object testObject) {
-        List<Field> fields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
-        for (Field field : fields) {
-            try {
-                setFieldValue(testObject, field, getHibernateSessionFactory(testObject));
-
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to assign the hibernate Session to field annotated with @" + HibernateSessionFactory.class.getSimpleName() +
-                        "Ensure that this field is of type " + SessionFactory.class.getName(), e);
-            }
+    public void injectSessionFactory(Object testObject) {
+        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
+        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
+        if (fields.isEmpty() && methods.isEmpty()) {
+            // nothing to do
+            return;
         }
 
-        List<Method> methods = AnnotationUtils.getMethodsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
-        for (Method method : methods) {
-            try {
-                invokeMethod(testObject, method, getHibernateSessionFactory(testObject));
-
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to invoke method annotated with @" + HibernateSessionFactory.class.getSimpleName() +
-                        ". Ensure that this method has following signature: void myMethod(" + SessionFactory.class.getName() + " sessionFactory)", e);
-            } catch (InvocationTargetException e) {
-                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
-                        " (annotated with " + HibernateSessionFactory.class.getSimpleName() + ") has thrown an exception", e.getCause());
-            }
-        }
+        SessionFactory sessionFactory = getSessionFactory(testObject);
+        setFieldAndSetterValue(testObject, fields, methods, sessionFactory);
     }
 
 
@@ -246,12 +230,12 @@ public class HibernateModule implements Module, Flushable {
 
         @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-            injectHibernateSessionFactory(testObject);
+            injectSessionFactory(testObject);
         }
 
         @Override
         public void afterTestMethod(Object testObject, Method testMethod) {
-            closeHibernateSessions(testObject);
+            closeSessions(testObject);
         }
 
     }
