@@ -153,7 +153,7 @@ public abstract class UnitilsTestNG implements IHookable {
     /**
      * Creates and initializes a unitils core instance.
      * <p/>
-     * This will create and set the default singleton instance by calling {@link Unitils#initSingletonInstance}.
+     * This will return the default singleton instance by calling {@link Unitils#getInstance()}.
      * <p/>
      * You can override this method to let it create and set your own singleton instance. For example, you
      * can let it create an instance of your own Unitils subclass and set it by using {@link Unitils#setInstance}.
@@ -161,13 +161,7 @@ public abstract class UnitilsTestNG implements IHookable {
      * @return the unitils core instance, not null
      */
     protected Unitils createUnitils() {
-
-        Unitils unitils = Unitils.getInstance();
-        if (unitils == null) {
-            Unitils.initSingletonInstance();
-            unitils = Unitils.getInstance();
-        }
-        return unitils;
+        return Unitils.getInstance();
     }
 
 }

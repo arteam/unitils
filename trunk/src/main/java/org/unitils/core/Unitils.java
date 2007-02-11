@@ -31,6 +31,13 @@ public class Unitils implements Module {
     private static Unitils unitils;
 
     public static Unitils getInstance() {
+        if (unitils == null) {
+            synchronized(Unitils.class) {
+                if (unitils == null) {
+                    initSingletonInstance();
+                }
+            }
+        }
         return unitils;
     }
 
