@@ -23,7 +23,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 
 
 /**
@@ -147,7 +147,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal collections but with different order.
      */
     public void testAssertRefEquals_equalsLenientOrder() {
-        assertRefEquals(Arrays.asList("element1", "element2", "element3"), Arrays.asList("element3", "element1", "element2"), LENIENT_ORDER);
+        assertRefEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"), LENIENT_ORDER);
     }
 
 
@@ -155,7 +155,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal collections but with different order.
      */
     public void testAssertLenEquals_equalsLenientOrder() {
-        assertLenEquals(Arrays.asList("element1", "element2", "element3"), Arrays.asList("element3", "element1", "element2"));
+        assertLenEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"));
     }
 
 
@@ -178,6 +178,20 @@ public class ReflectionAssertTest extends TestCase {
         testObjectB.setString1("xxxxxx");
 
         assertLenEquals(testObjectA, testObjectB);
+    }
+
+
+    /**
+     * Test for message of 2 not equal arrays. Should return return actual content instead of something like String[234
+     */
+    public void testAssertLenEquals_formatArraysMessage() {
+        try {
+            assertLenEquals(new String[]{"test1", "test2"}, new Integer[]{1, 2});
+        } catch (AssertionFailedError a) {
+            // expected
+            assertTrue(a.getMessage().contains("[test1, test2]"));
+            assertTrue(a.getMessage().contains("[1, 2]"));
+        }
     }
 
 

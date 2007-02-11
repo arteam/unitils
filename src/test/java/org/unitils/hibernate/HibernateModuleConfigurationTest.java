@@ -43,8 +43,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     protected void setUp() throws Exception {
         super.setUp();
-
-        sessionFactoryManager = new SessionFactoryManager(AnnotationConfiguration.class.getName(), true);
+        sessionFactoryManager = new SessionFactoryManager(AnnotationConfiguration.class.getName(), "org.unitils.hibernate.util.SimpleCurrentSessionContext");
     }
 
 

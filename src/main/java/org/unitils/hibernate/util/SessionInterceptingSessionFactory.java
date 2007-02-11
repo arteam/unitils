@@ -35,71 +35,108 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * todo javadoc
+ * A wrapper for a Hibernate session factory that will intercept all opened session factories and
+ * offers operations to get those opened session and close or flush them.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class SessionInterceptingSessionFactory implements SessionFactory {
 
+    /**
+     * The wrapped session factory.
+     */
     protected SessionFactory wrappedSessionFactory;
 
+    /**
+     * The intercepted sessions.
+     */
     protected Set<org.hibernate.Session> sessions = new HashSet<org.hibernate.Session>();
 
 
+    /**
+     * Creates a wrapper for the given session factory.
+     *
+     * @param sessionFactory The factory, not null
+     */
     public SessionInterceptingSessionFactory(SessionFactory sessionFactory) {
         this.wrappedSessionFactory = sessionFactory;
     }
 
 
+    /**
+     * Opens a new hibernate session. Overriden to store the opened session.
+     *
+     * @return the session, not null
+     */
     public Session openSession() throws HibernateException {
         Session session = wrappedSessionFactory.openSession();
-        registerOpenedSession(session);
-
+        sessions.add(session);
         simulateTransactionBegin();
         return session;
     }
 
 
+    /**
+     * Opens a new hibernate session. Overriden to store the opened session.
+     *
+     * @param connection The connection to use
+     * @return the session, not null
+     */
     public Session openSession(Connection connection) {
         Session session = wrappedSessionFactory.openSession(connection);
-        registerOpenedSession(session);
-
+        sessions.add(session);
         simulateTransactionBegin();
         return session;
     }
 
 
+    /**
+     * Opens a new hibernate session. Overriden to store the opened session.
+     *
+     * @param connection  The connection to use
+     * @param interceptor The session interceptor to use
+     * @return the session, not null
+     */
     public Session openSession(Connection connection, Interceptor interceptor) {
         Session session = wrappedSessionFactory.openSession(connection, interceptor);
-        registerOpenedSession(session);
-
+        sessions.add(session);
         simulateTransactionBegin();
         return session;
     }
 
 
+    /**
+     * Opens a new hibernate session. Overriden to store the opened session.
+     *
+     * @param interceptor The session interceptor to use
+     * @return the session, not null
+     */
     public Session openSession(Interceptor interceptor) throws HibernateException {
         Session session = wrappedSessionFactory.openSession(interceptor);
-        registerOpenedSession(session);
-
+        sessions.add(session);
         simulateTransactionBegin();
         return session;
     }
 
 
+    /**
+     * Gets the current session if <code>CurrentSessionContext</code> is configured.
+     *
+     * @return The current session
+     */
     public Session getCurrentSession() throws HibernateException {
         Session session = wrappedSessionFactory.getCurrentSession();
-        registerOpenedSession(session);
+        sessions.add(session);
         return session;
     }
 
 
-    private void registerOpenedSession(Session session) {
-        sessions.add(session);
-    }
-
-
+    /**
+     * Gets all open intercepted sessions.
+     *
+     * @return The sessions, not null
+     */
     public Set<org.hibernate.Session> getOpenedSessions() {
         return sessions;
     }
@@ -133,7 +170,7 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
     private boolean transactionWasSimulated = false;
     private boolean simulateTransactionEnabled = true;
 
-    //todo implement
+    //todo class dependency problem
     //todo javadoc
     protected void simulateTransactionBegin() {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
@@ -150,7 +187,8 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
     }
 
 
-    //todo implement
+    //todo class dependency problem
+    //todo use
     //todo javadoc
     protected void simulateTransactionEnd() {
         if (!transactionWasSimulated) {

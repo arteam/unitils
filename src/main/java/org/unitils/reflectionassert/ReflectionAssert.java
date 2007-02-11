@@ -29,6 +29,7 @@ import org.unitils.reflectionassert.ReflectionComparator.Difference;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 
@@ -302,8 +303,6 @@ public class ReflectionAssert {
      * @param suppliedMessage the user supplied message
      * @param difference      the difference
      * @return the formatted message
-     *         <p/>
-     *         todo better output when left and right value are string arrays (now something like <[Ljava.lang.String;@1595f51>)
      */
     private static String formatMessage(String suppliedMessage, Difference difference) {
         String result = formatMessage(suppliedMessage, difference.getMessage());
@@ -314,8 +313,8 @@ public class ReflectionAssert {
         }
 
         result += "\nField: <" + fieldString;
-        result += "> expected: <" + difference.getLeftValue();
-        result += "> but was: <" + difference.getRightValue() + ">";
+        result += "> expected: <" + formatObject(difference.getLeftValue());
+        result += "> but was: <" + formatObject(difference.getRightValue()) + ">";
         return result;
     }
 
@@ -332,6 +331,44 @@ public class ReflectionAssert {
             return specificMessage;
         }
         return suppliedMessage + "\n" + specificMessage;
+    }
+
+
+    /**
+     * Gets the string representation of the given object. This also correctly handles array types.
+     *
+     * @param object The instance
+     * @return The string representation, not null
+     */
+    private static String formatObject(Object object) {
+        if (object instanceof byte[]) {
+            return Arrays.toString((byte[]) object);
+
+        } else if (object instanceof short[]) {
+            return Arrays.toString((short[]) object);
+
+        } else if (object instanceof int[]) {
+            return Arrays.toString((int[]) object);
+
+        } else if (object instanceof long[]) {
+            return Arrays.toString((long[]) object);
+
+        } else if (object instanceof char[]) {
+            return Arrays.toString((char[]) object);
+
+        } else if (object instanceof float[]) {
+            return Arrays.toString((float[]) object);
+
+        } else if (object instanceof double[]) {
+            return Arrays.toString((double[]) object);
+
+        } else if (object instanceof boolean[]) {
+            return Arrays.toString((boolean[]) object);
+
+        } else if (object instanceof Object[]) {
+            return Arrays.toString((Object[]) object);
+        }
+        return String.valueOf(object);
     }
 
 

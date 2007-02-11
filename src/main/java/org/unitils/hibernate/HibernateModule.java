@@ -32,7 +32,7 @@ import org.unitils.hibernate.util.SessionFactoryManager;
 import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import org.unitils.util.PropertyUtils;
+import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.reflect.Field;
@@ -53,8 +53,9 @@ import java.util.Properties;
  * annotation.
  * <p/>
  * All created session will be tracked during a test and automatically closed after the test's teardown.
- * If the {@link #PROPKEY_MANAGECURRENTSESSIONCONTEXT_ENABLED} property is set, the current session
- * will also be available during your test using {@link SessionFactory#getCurrentSession()}.
+ * The {@link #PROPKEY_CURRENTSESSIONCONTEXT_CLASS_NAME} property determines which <code>CurrentSessionContext</code> is
+ * used for the session factory. If this is null no CurrentSessionContext is installed. If this is set to a valid value, the
+ * current session will also be available during your test using {@link SessionFactory#getCurrentSession()}.
  * <p/>
  * This module also manages the hibernate configurations that need to be loaded for the tests. Configurations will be reused
  * when possible by caching them on class level. If a superclass loads a configuration and a test-subclass does not define
@@ -80,8 +81,8 @@ public class HibernateModule implements Module, Flushable {
     /* Property key of the class name of the hibernate configuration */
     public static final String PROPKEY_CONFIGURATION_CLASS_NAME = "HibernateModule.configuration.implClassName";
 
-    /* todo javadoc */
-    public static final String PROPKEY_MANAGECURRENTSESSIONCONTEXT_ENABLED = "HibernateModule.managecurrentsessioncontext.enabled";
+    /* Property key of the class name of the CurrentSessionContext to use, null for no context */
+    public static final String PROPKEY_CURRENTSESSIONCONTEXT_CLASS_NAME = "HibernateModule.currentsessioncontext.implClassName";
 
     /* Manager for storing and creating hibernate configurations */
     private SessionFactoryManager sessionFactoryManager;
@@ -93,9 +94,10 @@ public class HibernateModule implements Module, Flushable {
      * @param configuration The Unitils configuration, not null
      */
     public void init(Properties configuration) {
-        String configurationImplClassName = PropertyUtils.getString(PROPKEY_CONFIGURATION_CLASS_NAME, configuration);
-        boolean manageCurrentSessionContext = PropertyUtils.getBoolean(PROPKEY_MANAGECURRENTSESSIONCONTEXT_ENABLED, configuration);
-        this.sessionFactoryManager = new SessionFactoryManager(configurationImplClassName, manageCurrentSessionContext);
+        String configurationImplClassName = getString(PROPKEY_CONFIGURATION_CLASS_NAME, configuration);
+
+        String currentSessionContextImplClassName = getString(PROPKEY_CURRENTSESSIONCONTEXT_CLASS_NAME, configuration);
+        this.sessionFactoryManager = new SessionFactoryManager(configurationImplClassName, currentSessionContextImplClassName);
     }
 
 
