@@ -62,9 +62,6 @@ public class SpringModule implements Module {
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
 
-    /* Manager for spring beans who's proxy temporarily refers to another object */
-    private SpringBeanProxyManager springBeanProxyManager;
-
     //todo javadoc
     private HibernateSupport hibernateSupport;
 
@@ -327,69 +324,6 @@ public class SpringModule implements Module {
 
 
     /**
-     * todo javadoc
-     *
-     * @param testObject The test instance, not null
-     */
-    public void initSpringBeanProxyManager(Object testObject) {
-        // todo check if ProxyingBeanPostProcessor is activated. If not, don't init springbeanproxymanager
-        springBeanProxyManager = new SpringBeanProxyManager(getApplicationContext(testObject));
-    }
-
-
-    /**
-     * todo javadoc
-     *
-     * @param testObject The test instance, not null
-     */
-    public void injectIntoContext(Object testObject) {
-        // todo verify is ProxyingBeanPostProcessor is activated and throw an exception if not
-        List<Field> annotatedFields = getFieldsAnnotatedWith(testObject.getClass(), InjectIntoContext.class);
-        for (Field annotatedField : annotatedFields) {
-            InjectIntoContext annotation = annotatedField.getAnnotation(InjectIntoContext.class);
-            String springBeanName = annotation.value();
-            Object annotatedObject = getFieldValue(testObject, annotatedField);
-            springBeanProxyManager.replaceSpringBeanByName(springBeanName, annotatedObject);
-        }
-        // todo inject result of method into context
-    }
-
-
-    /**
-     * todo javadoc
-     *
-     * @param testObject The test instance, not null
-     */
-    public void injectIntoContextByType(Object testObject) {
-        // todo verify is ProxyingBeanPostProcessor is activated and throw an exception if not
-        List<Field> annotatedFields = getFieldsAnnotatedWith(testObject.getClass(), InjectIntoContextByType.class);
-        for (Field annotatedField : annotatedFields) {
-            Class springBeanType = annotatedField.getType();
-            Object annotatedObject = getFieldValue(testObject, annotatedField);
-            springBeanProxyManager.replaceSpringBeanByType(springBeanType, annotatedObject);
-        }
-        // todo inject result of method into context
-    }
-
-
-    /**
-     * todo javadoc
-     *
-     * @param testObject The test instance, not null
-     */
-    public void injectIntoContextByName(Object testObject) {
-        // todo verify is ProxyingBeanPostProcessor is activated and throw an exception if not
-        List<Field> annotatedFields = getFieldsAnnotatedWith(testObject.getClass(), InjectIntoContextByName.class);
-        for (Field annotatedField : annotatedFields) {
-            String springBeanName = annotatedField.getName();
-            Object annotatedObject = getFieldValue(testObject, annotatedField);
-            springBeanProxyManager.replaceSpringBeanByName(springBeanName, annotatedObject);
-        }
-        // todo inject result of method into context
-    }
-
-
-    /**
      * Creates the spring hibernate support using reflection. This way the class dependency to Hibernate is
      * eliminated. If Hibernate is not in the classpath, the support will not be loaded and null
      * will be returned.
@@ -428,15 +362,5 @@ public class SpringModule implements Module {
             assignSpringBeansByName(testObject);
             registerHibernateSessionFactories(testObject);
         }
-
-        @Override
-        public void beforeTestMethod(Object testObject, Method testMethod) {
-            //todo only let methods create context if needed
-//            initSpringBeanProxyManager(testObject);
-//            injectIntoContext(testObject);
-//            injectIntoContextByType(testObject);
-//            injectIntoContextByName(testObject);
-        }
     }
-
 }
