@@ -21,26 +21,37 @@ import org.hibernate.context.CurrentSessionContext;
 import org.hibernate.engine.SessionFactoryImplementor;
 
 /**
- * todo javadoc
- * <p/>
- * todo violates CurrentSessionContext contract: is not thread safe. Should be fixed by making unitils completely
- * tread safe.
+ * Simple implementation of <code>CurrentSessionContext</code> that manages a single open session.
+ * If the session was closed, a new one is opened.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class SimpleCurrentSessionContext implements CurrentSessionContext {
 
+    /* The session factory */
     protected SessionFactoryImplementor factory;
 
+    /* The current session, if there is one */
     private Session currentSession;
 
 
+    /**
+     * Creates a context.
+     *
+     * @param factory The session factory to use for opening new sessions, not null
+     */
     public SimpleCurrentSessionContext(SessionFactoryImplementor factory) {
         this.factory = factory;
     }
 
 
+    /**
+     * Gets the current session. If there is no current session or the current session is no
+     * longer open, a new one is opened.
+     *
+     * @return The current session, not null
+     */
     public Session currentSession() throws HibernateException {
         if (currentSession == null || !currentSession.isOpen()) {
             currentSession = factory.openSession();
