@@ -18,8 +18,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/util/PropertyUtils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/util/PropertyUtils.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/util/PropertyUtilsTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/Module.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/Module.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestListener.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestContext.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestContext.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/util/PropertyUtilsTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/util/PropertyUtilsTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
@@ -44,7 +52,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1171199473731" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1171221141583" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -182,30 +190,64 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="PropertyUtils.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/PropertyUtils.java">
+      <file leaf-file-name="Unitils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="27" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1171219060220" expanded="true" signature="0:614" placeholder="/.../" />
-                <marker date="1171219060220" expanded="true" signature="649:764" placeholder="..." />
-                <marker date="1171219060220" expanded="true" signature="766:869" placeholder="/**...*/" />
-                <marker date="1171219060220" expanded="true" signature="1306:1556" placeholder="{...}" />
-                <marker date="1171219060220" expanded="true" signature="2038:2234" placeholder="{...}" />
-                <marker date="1171219060220" expanded="true" signature="2783:3202" placeholder="{...}" />
-                <marker date="1171219060220" expanded="true" signature="3606:3873" placeholder="{...}" />
-                <marker date="1171219060220" expanded="true" signature="4352:4565" placeholder="{...}" />
-                <marker date="1171219060220" expanded="true" signature="4988:5439" placeholder="{...}" />
-                <marker date="1171219060220" expanded="true" signature="5985:6382" placeholder="{...}" />
-              </folding>
+            <state line="0" column="7" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Unitils.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java">
+      <file leaf-file-name="SpringModule.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="5" selection-start="896" selection-end="1054" vertical-scroll-proportion="0.01620591">
+            <state line="60" column="22" selection-start="2784" selection-end="2827" vertical-scroll-proportion="0.55100095">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ModuleUtils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ModuleUtils.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="3" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ApplicationContextFactory.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextFactory.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="41" column="7" selection-start="922" selection-end="1769" vertical-scroll-proportion="0.6320305">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="unitils-default.properties" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="102" column="114" selection-start="6134" selection-end="6134" vertical-scroll-proportion="0.9561487">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HibernateModule.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="80" column="112" selection-start="4204" selection-end="4384" vertical-scroll-proportion="0.38131553">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PropertyUtilsTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/util/PropertyUtilsTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="267" column="41" selection-start="7142" selection-end="7142" vertical-scroll-proportion="0.6110582">
               <folding />
             </state>
           </provider>
@@ -741,6 +783,10 @@
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
       </PATH>
       <PATH>
         <PATH_ELEMENT>
@@ -941,7 +987,7 @@
     </key>
   </component>
   <component name="RestoreUpdateTree" />
-  <component name="RunManager" selected="JUnit.PropertyUtilsTest">
+  <component name="RunManager" selected="JUnit.All in Unitils">
     <tempConfiguration default="false" name="PropertyUtilsTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <pattern value="org.unitils.util.*" />
       <module name="Unitils" />
@@ -1385,90 +1431,9 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DatabaseTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="659" selection-end="659" vertical-scroll-proportion="0.26382154">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/MySqlStyleConstraintsDisabler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="664" selection-end="664" vertical-scroll-proportion="0.26382154">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="81" column="0" selection-start="3483" selection-end="3483" vertical-scroll-proportion="0.04003813">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/inject/InjectModuleInjectIntoByTypeExceptionsTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="16" selection-start="3003" selection-end="3003" vertical-scroll-proportion="0.44232604">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/PropertiesDataSourceFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="30" selection-start="2142" selection-end="2142" vertical-scroll-proportion="0.40038133">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/util/ReflectionUtilsTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="144" column="0" selection-start="3841" selection-end="3841" vertical-scroll-proportion="0.24308866">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionAssert.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="68" column="23" selection-start="2950" selection-end="2950" vertical-scroll-proportion="0.28336558">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/script/SQLScriptRunnerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="95" column="26" selection-start="4103" selection-end="4103" vertical-scroll-proportion="0.01620591">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsDisablerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="85" column="26" selection-start="2902" selection-end="2902" vertical-scroll-proportion="0.01620591">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/resources/unitils.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="55" column="63" selection-start="1726" selection-end="1726" vertical-scroll-proportion="0.01620591">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="5" selection-start="896" selection-end="1054" vertical-scroll-proportion="0.01620591">
           <folding />
         </state>
       </provider>
@@ -1480,28 +1445,106 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/HibernateSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="9" selection-start="1262" selection-end="1262" vertical-scroll-proportion="0.6644423">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/util/PropertyUtilsTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="267" column="41" selection-start="7142" selection-end="7142" vertical-scroll-proportion="0.6110582">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="80" column="112" selection-start="4204" selection-end="4384" vertical-scroll-proportion="0.38131553">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="102" column="114" selection-start="6134" selection-end="6134" vertical-scroll-proportion="0.9561487">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="7" selection-start="922" selection-end="1769" vertical-scroll-proportion="0.6320305">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="0" selection-start="1499" selection-end="1499" vertical-scroll-proportion="0.5996187">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/PropertyUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="27" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+        <state line="202" column="19" selection-start="7815" selection-end="7815" vertical-scroll-proportion="0.8541468">
           <folding>
-            <marker date="1171219060220" expanded="true" signature="0:614" placeholder="/.../" />
-            <marker date="1171219060220" expanded="true" signature="649:764" placeholder="..." />
-            <marker date="1171219060220" expanded="true" signature="766:869" placeholder="/**...*/" />
-            <marker date="1171219060220" expanded="true" signature="1306:1556" placeholder="{...}" />
-            <marker date="1171219060220" expanded="true" signature="2038:2234" placeholder="{...}" />
-            <marker date="1171219060220" expanded="true" signature="2783:3202" placeholder="{...}" />
-            <marker date="1171219060220" expanded="true" signature="3606:3873" placeholder="{...}" />
-            <marker date="1171219060220" expanded="true" signature="4352:4565" placeholder="{...}" />
-            <marker date="1171219060220" expanded="true" signature="4988:5439" placeholder="{...}" />
-            <marker date="1171219060220" expanded="true" signature="5985:6382" placeholder="{...}" />
+            <marker date="1171221121334" expanded="true" signature="0:614" placeholder="/.../" />
+            <element signature="imports" expanded="true" />
+            <marker date="1171221121334" expanded="true" signature="751:833" placeholder="..." />
+            <marker date="1171221121334" expanded="true" signature="835:938" placeholder="/**...*/" />
+            <marker date="1171221121334" expanded="true" signature="1375:1625" placeholder="{...}" />
+            <marker date="1171221121334" expanded="true" signature="2107:2303" placeholder="{...}" />
+            <marker date="1171221121334" expanded="true" signature="2852:3271" placeholder="{...}" />
+            <marker date="1171221121334" expanded="true" signature="3675:3942" placeholder="{...}" />
+            <marker date="1171221121334" expanded="true" signature="4421:4634" placeholder="{...}" />
+            <marker date="1171221121334" expanded="true" signature="5057:5508" placeholder="{...}" />
+            <marker date="1171221121334" expanded="true" signature="6054:6451" placeholder="{...}" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/Module.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="98" selection-start="1083" selection-end="1083" vertical-scroll-proportion="0.43755957">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="7" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ModuleUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="3" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/TestListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="22" selection-start="745" selection-end="745" vertical-scroll-proportion="0.33555767">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/TestContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="22" selection-start="745" selection-end="745" vertical-scroll-proportion="0.36796948">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="22" selection-start="2784" selection-end="2827" vertical-scroll-proportion="0.55100095">
+          <folding />
         </state>
       </provider>
     </entry>

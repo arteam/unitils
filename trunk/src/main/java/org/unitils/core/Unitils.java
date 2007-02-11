@@ -22,7 +22,6 @@ import java.util.Properties;
 /**
  * todo javadoc
  * <p/>
- * todo implement module
  * todo remove test context
  */
 public class Unitils implements Module {

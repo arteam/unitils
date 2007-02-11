@@ -21,8 +21,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.util.List;
 
 /**
- * todo javadoc
- * Defines the contract for a factory of <code>ApplicationContext</code>s.
+ * Factory for creating Spring <code>ApplicationContext</code>s.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -38,7 +37,7 @@ public interface ApplicationContextFactory {
      * implicitly by invoking a constructor that also makes sure the configuration is processed by calling the <code>refresh</code>
      * method.
      *
-     * @param locations
+     * @param locations The configuration file locations, not null
      * @return A <code>ConfigurableApplicationContext</code>, on which the <code>refresh()</code> method hasn't been called yet
      */
     ConfigurableApplicationContext createApplicationContext(List<String> locations);
