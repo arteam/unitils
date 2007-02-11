@@ -85,7 +85,9 @@ public class ConfigurationLoader {
 
         Properties result = new Properties();
         result.putAll(defaultProperties);
-        result.putAll(customProperties);
+        if (customProperties != null) {
+            result.putAll(customProperties);
+        }
         if (localProperties != null) {
             result.putAll(localProperties);
         }

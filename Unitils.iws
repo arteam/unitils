@@ -18,16 +18,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/Unitils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/util/PropertyUtils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/util/PropertyUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ClassPathXmlApplicationContextFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/Module.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/Module.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestListener.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestContext.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestContext.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/util/PropertyUtilsTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/util/PropertyUtilsTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
@@ -199,10 +191,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SpringModule.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="SpringModule.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="60" column="22" selection-start="2784" selection-end="2827" vertical-scroll-proportion="0.55100095">
+            <state line="59" column="22" selection-start="2803" selection-end="2803" vertical-scroll-proportion="0.53479505">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConfigurationLoader.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="89" column="9" selection-start="3910" selection-end="3910" vertical-scroll-proportion="0.6968542">
               <folding />
             </state>
           </provider>
@@ -1431,13 +1432,6 @@
     <option name="myLastEditedConfigurable" value="Custom" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="63" selection-start="1726" selection-end="1726" vertical-scroll-proportion="0.01620591">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/../../../_apps/java/jdk1.5.0_06/src.zip!/java/lang/String.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="2096" column="20" selection-start="83067" selection-end="83067" vertical-scroll-proportion="0.01620591">
@@ -1543,7 +1537,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="22" selection-start="2784" selection-end="2827" vertical-scroll-proportion="0.55100095">
+        <state line="59" column="22" selection-start="2803" selection-end="2803" vertical-scroll-proportion="0.53479505">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="89" column="9" selection-start="3910" selection-end="3910" vertical-scroll-proportion="0.6968542">
           <folding />
         </state>
       </provider>
