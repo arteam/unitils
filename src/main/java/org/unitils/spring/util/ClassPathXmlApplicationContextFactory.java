@@ -21,7 +21,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.util.List;
 
 /**
- * {@link ApplicationContextFactory} that creates an instance of the type <code>ClassPathXmlApplicationContext</code>.
+ * An {@link ApplicationContextFactory} that creates an instance of
+ * the type <code>ClassPathXmlApplicationContext</code>.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -29,9 +30,14 @@ import java.util.List;
 public class ClassPathXmlApplicationContextFactory implements ApplicationContextFactory {
 
 
-    // todo javadoc
+    /**
+     * Create an <code>ClassPathXmlApplicationContext</code> for the given locations on which refresh has not
+     * yet been called
+     *
+     * @param locations The configuration file locations, not null
+     * @return A context, on which the <code>refresh()</code> method hasn't been called yet
+     */
     public ConfigurableApplicationContext createApplicationContext(List<String> locations) {
-        // create application context
         return new ClassPathXmlApplicationContext(locations.toArray(new String[locations.size()]), false);
     }
 }

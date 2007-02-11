@@ -18,14 +18,30 @@ package org.unitils.core;
 import java.util.Properties;
 
 /**
- * todo javadoc
+ * A type for modules that offer services to tests.
+ * Before a module is used, {@link #init} will be called so that it can initialize itself. After initialization,
+ * {@link #createTestListener()} will be called, so that the module can create a callback that can plug into
+ * the test exucution sequence. See {@link TestListener} javadoc for more info.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public interface Module {
 
 
+    /**
+     * Initializes the module with the given configuration settings.
+     *
+     * @param configuration The config, not null
+     */
     public void init(Properties configuration);
 
 
+    /**
+     * Creates the test listener for this module.
+     *
+     * @return The test listener, not null
+     */
     public TestListener createTestListener();
 
 

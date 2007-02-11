@@ -20,6 +20,7 @@ import org.unitils.core.UnitilsException;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.util.PropertyUtils.*;
 
+import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.List;
 import java.util.Properties;
@@ -48,6 +49,7 @@ public class PropertyUtilsTest extends TestCase {
         testProperties.setProperty("stringListProperty", "test1, test2, test3 , ,");
         testProperties.setProperty("booleanProperty", "true");
         testProperties.setProperty("longProperty", "5");
+        testProperties.setProperty("instanceProperty", "java.lang.StringBuffer");
     }
 
 
@@ -213,4 +215,71 @@ public class PropertyUtilsTest extends TestCase {
         long result = getLong("xxxx", 10, testProperties);
         assertEquals(10, result);
     }
+
+
+    /**
+     * Test for getting an object instance.
+     */
+    public void testGetInstance() {
+        Object result = getInstance("instanceProperty", testProperties);
+        assertTrue(result instanceof StringBuffer);
+    }
+
+
+    /**
+     * Test for getting an unknown object instance property
+     */
+    public void testGetInstance_notFound() {
+        try {
+            getInstance("xxxx", testProperties);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            //expected
+        }
+    }
+
+
+    /**
+     * Test for getting a object instance property that does not contain a class name
+     */
+    public void testGetInstance_couldNotCreate() {
+        try {
+            getInstance("stringProperty", testProperties);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            //expected
+        }
+    }
+
+
+    /**
+     * Test for getting a object instance property passing a default
+     */
+    public void testGetInstance_default() {
+        Object result = getInstance("instanceProperty", new ArrayList(), testProperties);
+        assertTrue(result instanceof StringBuffer);
+    }
+
+
+    /**
+     * Test for getting an unknown object instance property passing a default
+     */
+    public void testGetInstance_defaultNotFound() {
+        Object result = getInstance("xxxx", new ArrayList(), testProperties);
+        assertTrue(result instanceof ArrayList);
+    }
+
+
+    /**
+     * Test for getting a object instance property that does not contain a class name passing a default
+     */
+    public void testGetInstance_defaultCouldNotCreate() {
+        try {
+            getInstance("stringProperty", new ArrayList(), testProperties);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            //expected
+        }
+    }
+
 }

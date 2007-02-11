@@ -16,6 +16,7 @@
 package org.unitils.util;
 
 import org.unitils.core.UnitilsException;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,5 +167,39 @@ public class PropertyUtils {
         } catch (NumberFormatException e) {
             throw new UnitilsException("Value " + value + " for property " + propertyName + " is not a number.");
         }
+    }
+
+
+    /**
+     * Gets an instance of the type specified by the property with the given name. If no such property is found, the
+     * value is empty or the instance cannot be created, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param properties   The properties, not null
+     * @return The instance value, not null
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <T> T getInstance(String propertyName, Properties properties) {
+        String className = getString(propertyName, properties);
+        return (T) createInstanceOfType(className);
+    }
+
+
+    /**
+     * Gets an instance of the type specified by the property with the given name. If no such property is found, the
+     * value is empty, the given default value is returned. If the instance cannot be created an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param defaultValue The default value
+     * @param properties   The properties, not null
+     * @return The instance value, not null
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <T> T getInstance(String propertyName, T defaultValue, Properties properties) {
+        String className = getString(propertyName, null, properties);
+        if (className == null) {
+            return defaultValue;
+        }
+        return (T) createInstanceOfType(className);
     }
 }

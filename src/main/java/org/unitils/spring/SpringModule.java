@@ -23,10 +23,16 @@ import org.springframework.context.ApplicationContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.spring.annotation.*;
-import org.unitils.spring.util.*;
+import org.unitils.spring.annotation.SpringApplicationContext;
+import org.unitils.spring.annotation.SpringBean;
+import org.unitils.spring.annotation.SpringBeanByName;
+import org.unitils.spring.annotation.SpringBeanByType;
+import org.unitils.spring.util.ApplicationContextFactory;
+import org.unitils.spring.util.ApplicationContextManager;
+import org.unitils.spring.util.HibernateSupport;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.PropertyUtils.getInstance;
 import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.reflect.Field;
@@ -56,29 +62,33 @@ import java.util.Properties;
  */
 public class SpringModule implements Module {
 
+    /* Property key of the class name of the application context factory */
+    public static final String PROPKEY_APPLICATION_CONTEXT_FACTORY_CLASS_NAME = "SpringModule.applicationContextFactory.implClassName";
+
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(SpringModule.class);
 
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
 
-    //todo javadoc
+    /* The spring hibernate support, null if hibernate is not available */
     private HibernateSupport hibernateSupport;
 
+
     /**
-     * Initializes this module using the given <code>Configuration</code> object
+     * Initializes this module using the given configuration
      *
      * @param configuration The configuration, not null
      */
     public void init(Properties configuration) {
+        // create hibernate support and retrieve bean post processors for the application context
         hibernateSupport = createHibernateSupport();
-
         List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
         if (hibernateSupport != null) {
             beanPostProcessors.add(hibernateSupport.getSessionFactoryBeanPostProcessor());
         }
-        //todo make configureable
-        ApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
+        // create application context manager that stores and creates the application contexts
+        ApplicationContextFactory applicationContextFactory = getInstance(PROPKEY_APPLICATION_CONTEXT_FACTORY_CLASS_NAME, configuration);
         applicationContextManager = new ApplicationContextManager(applicationContextFactory, beanPostProcessors);
     }
 
@@ -310,7 +320,8 @@ public class SpringModule implements Module {
 
 
     /**
-     * todo javadoc
+     * Registers all hibernate session factories that are in the application context for the given test object.
+     * If Hibernate is not available or no application context exists, nothing happens.
      *
      * @param testObject The test instance, not null
      */
@@ -320,6 +331,21 @@ public class SpringModule implements Module {
             return;
         }
         hibernateSupport.registerHibernateSessionFactories(testObject);
+    }
+
+
+    /**
+     * Unregisters all hibernate session factories that are in the application context for the given test object.
+     * If Hibernate is not available or no application context exists, nothing happens.
+     *
+     * @param testObject The test instance, not null
+     */
+    public void unregisterHibernateSessionFactories(Object testObject) {
+        if (hibernateSupport == null || !applicationContextManager.hasApplicationContext(testObject)) {
+            // no hibernate or application context available, do nothing
+            return;
+        }
+        hibernateSupport.unregisterHibernateSessionFactories(testObject);
     }
 
 
@@ -361,6 +387,11 @@ public class SpringModule implements Module {
             assignSpringBeansByType(testObject);
             assignSpringBeansByName(testObject);
             registerHibernateSessionFactories(testObject);
+        }
+
+        @Override
+        public void afterTestTearDown(Object testObject) {
+            unregisterHibernateSessionFactories(testObject);
         }
     }
 }

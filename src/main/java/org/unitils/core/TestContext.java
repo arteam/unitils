@@ -19,6 +19,9 @@ import java.lang.reflect.Method;
 
 /**
  * todo javadoc
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class TestContext {
 
