@@ -120,5 +120,4 @@ public class SessionFactoryWrappingBeanPostProcessor implements BeanPostProcesso
         return new SessionInterceptingSessionFactory(sessionFactory);
     }
 
-
 }

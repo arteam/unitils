@@ -24,7 +24,6 @@ import org.hibernate.engine.FilterDefinition;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.metadata.CollectionMetadata;
 import org.hibernate.stat.Statistics;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.naming.NamingException;
 import javax.naming.Reference;
@@ -72,7 +71,6 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
     public Session openSession() throws HibernateException {
         Session session = wrappedSessionFactory.openSession();
         sessions.add(session);
-        simulateTransactionBegin();
         return session;
     }
 
@@ -86,7 +84,6 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
     public Session openSession(Connection connection) {
         Session session = wrappedSessionFactory.openSession(connection);
         sessions.add(session);
-        simulateTransactionBegin();
         return session;
     }
 
@@ -101,7 +98,6 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
     public Session openSession(Connection connection, Interceptor interceptor) {
         Session session = wrappedSessionFactory.openSession(connection, interceptor);
         sessions.add(session);
-        simulateTransactionBegin();
         return session;
     }
 
@@ -115,7 +111,6 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
     public Session openSession(Interceptor interceptor) throws HibernateException {
         Session session = wrappedSessionFactory.openSession(interceptor);
         sessions.add(session);
-        simulateTransactionBegin();
         return session;
     }
 
@@ -164,41 +159,6 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
                 session.flush();
             }
         }
-    }
-
-
-    private boolean transactionWasSimulated = false;
-    private boolean simulateTransactionEnabled = true;
-
-    //todo class dependency problem
-    //todo javadoc
-    protected void simulateTransactionBegin() {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            return;
-        }
-        if (!simulateTransactionEnabled) {
-            return;
-        }
-        transactionWasSimulated = true;
-
-        TransactionSynchronizationManager.setActualTransactionActive(true);
-        TransactionSynchronizationManager.setCurrentTransactionName("simulatedByUnitils");
-        TransactionSynchronizationManager.initSynchronization();
-    }
-
-
-    //todo class dependency problem
-    //todo use
-    //todo javadoc
-    protected void simulateTransactionEnd() {
-        if (!transactionWasSimulated) {
-            return;
-        }
-        transactionWasSimulated = false;
-
-        TransactionSynchronizationManager.clearSynchronization();
-        TransactionSynchronizationManager.setCurrentTransactionName(null);
-        TransactionSynchronizationManager.setActualTransactionActive(false);
     }
 
     //
