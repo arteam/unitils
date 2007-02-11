@@ -16,7 +16,6 @@
 package org.unitils.dbmaintainer.script;
 
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.unitils.core.ConfigurationLoader;
@@ -30,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Tests the FileScriptSource
@@ -87,7 +87,7 @@ public class FileScriptSourceTest extends TestCase {
         versionTimestampOld = new Version(1L, 0L);
 
         // Initialize FileScriptSourceObject
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_LOCATION, DBCHANGE_FILE_DIRECTORY);
         configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_FILEEXTENSION, "sql");
 

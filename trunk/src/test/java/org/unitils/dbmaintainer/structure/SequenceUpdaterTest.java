@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
@@ -29,6 +28,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Test class for the SequenceUpdater. Contains tests that can be implemented generally for all different database dialects.
@@ -54,7 +54,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
     private DbSupport dbSupport;
 
     /* Value that sequences should at least have after updating the sequences */
-    protected static final int LOWEST_ACCEPTACLE_SEQUENCE_VALUE = 1000;
+    protected static final long LOWEST_ACCEPTACLE_SEQUENCE_VALUE = 1000;
 
 
     /**
@@ -64,11 +64,11 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty(DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "" + LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
 
         StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        sequenceUpdater = (SequenceUpdater) getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
+        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
         dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         if (dbSupport.supportsSequences()) {

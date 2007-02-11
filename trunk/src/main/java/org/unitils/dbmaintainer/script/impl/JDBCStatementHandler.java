@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.dbmaintainer.script.StatementHandler;
 
@@ -23,6 +22,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Implementation of {@link StatementHandler} that will execute the SQL statements on a database using JDBC.
@@ -43,7 +43,7 @@ public class JDBCStatementHandler implements StatementHandler {
      * @param configuration The config, not null
      * @param dataSource    The database data source, not null
      */
-    public void init(Configuration configuration, DataSource dataSource) {
+    public void init(Properties configuration, DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

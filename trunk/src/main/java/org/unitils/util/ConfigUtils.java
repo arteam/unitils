@@ -15,11 +15,12 @@
  */
 package org.unitils.util;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+
+import java.util.Properties;
 
 /**
  * Class containing configuration related utilities
@@ -41,10 +42,10 @@ public class ConfigUtils {
      *         '.impl.className', and as value the fully qualified classname of the implementation type.
      */
     @SuppressWarnings({"unchecked"})
-    public static <T> T getConfiguredInstance(Class type, Configuration configuration) {
+    public static <T> T getConfiguredInstance(Class type, Properties configuration) {
         String propKey = type.getName() + ".implClassName";
         logger.debug("Creating instance of " + type + ". Concrete implementation class is defined by the property " + propKey);
-        return (T) createInstanceOfType(configuration.getString(propKey));
+        return (T) createInstanceOfType(PropertyUtils.getString(propKey, configuration));
     }
 
 
@@ -62,7 +63,7 @@ public class ConfigUtils {
      * @return The configured instance
      */
     @SuppressWarnings({"unchecked"})
-    public static <T> T getConfiguredInstance(Class type, Configuration configuration, String... implementationDiscriminatorValues) {
+    public static <T> T getConfiguredInstance(Class type, Properties configuration, String... implementationDiscriminatorValues) {
         String propKey = type.getName() + ".implClassName";
         String implementationSpecificPropKey = propKey;
         for (String implementationDiscriminatorValue : implementationDiscriminatorValues) {
@@ -71,12 +72,12 @@ public class ConfigUtils {
         logger.debug("Creating instance of " + type + ". Trying to retrieve concrete implementation class from the property " + implementationSpecificPropKey);
 
         if (configuration.containsKey(implementationSpecificPropKey)) {
-            return (T) createInstanceOfType(configuration.getString(implementationSpecificPropKey));
+            return (T) createInstanceOfType(PropertyUtils.getString(implementationSpecificPropKey, configuration));
 
         } else {
             logger.debug("Property " + implementationSpecificPropKey + " not specified. Trying to retrieve concrete " + "implementation class from the property " + propKey);
             if (configuration.containsKey(propKey)) {
-                return (T) createInstanceOfType(configuration.getString(propKey));
+                return (T) createInstanceOfType(PropertyUtils.getString(propKey, configuration));
             } else {
                 throw new UnitilsException("Missing configuration for " + propKey);
             }

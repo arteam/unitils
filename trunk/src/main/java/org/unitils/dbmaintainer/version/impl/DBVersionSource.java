@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.version.impl;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,8 +23,10 @@ import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionSource;
+import org.unitils.util.PropertyUtils;
 
 import java.sql.*;
+import java.util.Properties;
 
 /**
  * Implementation of <code>VersionSource</code> that stores the version in the database. The version is stored in the
@@ -80,17 +81,17 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
 
 
     /**
-     * Initializes the name of the version table and its columns using the given <code>Configuration</code> object
+     * Initializes the name of the version table and its columns using the given configuration.
      *
      * @param configuration the configuration, not null
      */
-    protected void doInit(Configuration configuration) {
-        this.versionTableName = configuration.getString(PROPKEY_VERSION_TABLE_NAME).toUpperCase();
-        this.versionIndexColumnName = configuration.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME).toUpperCase();
-        this.versionTimestampColumnName = configuration.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME).toUpperCase();
-        this.lastUpdateSucceededColumnName = configuration.getString(PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME).toUpperCase();
-        this.codeScriptsTimestampColumnName = configuration.getString(PROPKEY_CODESCRIPTS_TIMESTAMP_COLUMN_NAME).toUpperCase();
-        this.lastCodeUpdateSucceededColumnName = configuration.getString(PROPKEY_LAST_CODE_UPDATE_SUCCEEDED_COLUMN_NAME).toUpperCase();
+    protected void doInit(Properties configuration) {
+        this.versionTableName = PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration).toUpperCase();
+        this.versionIndexColumnName = PropertyUtils.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME, configuration).toUpperCase();
+        this.versionTimestampColumnName = PropertyUtils.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME, configuration).toUpperCase();
+        this.lastUpdateSucceededColumnName = PropertyUtils.getString(PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME, configuration).toUpperCase();
+        this.codeScriptsTimestampColumnName = PropertyUtils.getString(PROPKEY_CODESCRIPTS_TIMESTAMP_COLUMN_NAME, configuration).toUpperCase();
+        this.lastCodeUpdateSucceededColumnName = PropertyUtils.getString(PROPKEY_LAST_CODE_UPDATE_SUCCEEDED_COLUMN_NAME, configuration).toUpperCase();
     }
 
 

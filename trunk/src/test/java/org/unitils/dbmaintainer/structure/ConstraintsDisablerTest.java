@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
@@ -28,6 +27,7 @@ import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Test class for the ConstraintsDisabler. This test is independent of the dbms that is used. The database dialect that
@@ -57,10 +57,10 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
         dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
-        constraintsDisabler = (ConstraintsDisabler) getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
 
         dropTestTables();
         createTestTables();

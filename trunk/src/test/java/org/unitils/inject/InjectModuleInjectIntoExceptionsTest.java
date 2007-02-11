@@ -15,13 +15,14 @@
  */
 package org.unitils.inject;
 
-import org.unitils.inject.annotation.InjectInto;
-import org.unitils.UnitilsJUnit3;
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
+import org.unitils.inject.annotation.InjectInto;
+
+import java.util.Properties;
 
 /**
  * @author Filip Neven
@@ -42,8 +43,8 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration conf = Unitils.getInstance().getConfiguration();
-        injectModule.init(conf);
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        injectModule.init(configuration);
     }
 
     public void testInject_targetIsNull() {

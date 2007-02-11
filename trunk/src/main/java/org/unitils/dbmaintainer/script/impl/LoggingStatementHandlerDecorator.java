@@ -15,12 +15,12 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.script.StatementHandler;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Decorator for another implementation of {@link StatementHandler}. Statements are written to log4j log, and
@@ -51,9 +51,9 @@ public class LoggingStatementHandlerDecorator implements StatementHandler {
     /**
      * Initializes the decorated instance.
      *
-     * @see StatementHandler#init(Configuration,DataSource)
+     * @see StatementHandler#init(Properties,DataSource)
      */
-    public void init(Configuration configuration, DataSource dataSource) {
+    public void init(Properties configuration, DataSource dataSource) {
         decoratedStatementHandler.init(configuration, dataSource);
     }
 

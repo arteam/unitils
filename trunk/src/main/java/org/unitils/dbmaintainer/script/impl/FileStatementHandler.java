@@ -15,13 +15,14 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.script.StatementHandler;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 /**
  * Implementation of {@link StatementHandler} that writes each statement to a file. The fileName is specified
@@ -43,11 +44,10 @@ public class FileStatementHandler implements StatementHandler {
 
 
     /**
-     * @see StatementHandler#init(Configuration,DataSource)
+     * @see StatementHandler#init(Properties,DataSource)
      */
-    public void init(Configuration configuration, DataSource dataSource) {
-
-        fileName = configuration.getString(PROPKEY_FILENAME);
+    public void init(Properties configuration, DataSource dataSource) {
+        fileName = PropertyUtils.getString(PROPKEY_FILENAME, configuration);
     }
 
 

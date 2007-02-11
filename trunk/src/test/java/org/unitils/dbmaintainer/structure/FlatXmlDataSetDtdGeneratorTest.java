@@ -1,6 +1,5 @@
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -19,6 +18,7 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Test class for the FlatXmlDataSetDtdGenerator
@@ -49,13 +49,12 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
 
         dtdFile = File.createTempFile("testDTD", ".dtd");
 
-        ConfigurationLoader configurationLoader = new ConfigurationLoader();
-        Configuration configuration = configurationLoader.loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
         StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dtdGenerator = (DtdGenerator) getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
-        DBClearer dbClearer = (DBClearer) getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+        dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
+        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
 
         dbClearer.clearDatabase();
         createTestTables();

@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import org.apache.commons.configuration.Configuration;
 import static org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,15 +22,13 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.util.PropertyUtils;
+import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import static java.util.Arrays.asList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
@@ -74,11 +71,11 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      *
      * @param configuration The configuration, not null
      */
-    protected void doInit(Configuration configuration) {
+    protected void doInit(Properties configuration) {
         tablesToPreserve = new HashSet<String>();
-        tablesToPreserve.add(dbSupport.toCorrectCaseIdentifier(configuration.getString(PROPKEY_VERSION_TABLE_NAME)));
-        tablesToPreserve.addAll(toCorrectCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_TABLESTOPRESERVE))));
-        tablesToPreserve.addAll(toCorrectCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_DBCLEARER_ITEMSTOPRESERVE))));
+        tablesToPreserve.add(dbSupport.toCorrectCaseIdentifier(PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration)));
+        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_TABLESTOPRESERVE, configuration)));
+        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_DBCLEARER_ITEMSTOPRESERVE, configuration)));
     }
 
 

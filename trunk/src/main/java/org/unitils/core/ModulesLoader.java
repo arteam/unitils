@@ -15,10 +15,10 @@
  */
 package org.unitils.core;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.PropertyUtils.*;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.util.*;
 
@@ -81,20 +81,19 @@ public class ModulesLoader {
      * @param configuration the configuration, not null
      * @return the modules, not null
      */
-    public List<Module> loadModules(Configuration configuration) {
-
+    public List<Module> loadModules(Properties configuration) {
         // get all declared modules (filter doubles)
-        Set<String> moduleNames = new TreeSet<String>(Arrays.asList(configuration.getStringArray(PROPKEY_MODULES)));
+        Set<String> moduleNames = new TreeSet<String>(getStringList(PROPKEY_MODULES, configuration));
 
         // remove all disable modules
         removeDisabledModules(moduleNames, configuration);
 
         // get all core dependencies
-        Map<String, String[]> runAfters = new HashMap<String, String[]>();
+        Map<String, List<String>> runAfters = new HashMap<String, List<String>>();
         for (String moduleName : moduleNames) {
 
             // get dependencies for core
-            String[] runAfterModuleNames = configuration.getStringArray(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_RUN_AFTER);
+            List<String> runAfterModuleNames = getStringList(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_RUN_AFTER, configuration);
             runAfters.put(moduleName, runAfterModuleNames);
         }
 
@@ -131,17 +130,14 @@ public class ModulesLoader {
      * @param configuration  the configuration, not null
      * @return the modules, not null
      */
-    protected List<Module> createAndInitializeModules(List<String> moduleNameList, Configuration configuration) {
-
+    protected List<Module> createAndInitializeModules(List<String> moduleNameList, Properties configuration) {
         List<Module> result = new ArrayList<Module>();
         for (String moduleName : moduleNameList) {
-
             // get core class name
-            String className = configuration.getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME);
-
+            String className = getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME, configuration);
             try {
                 // create core instance
-                Object module = ReflectionUtils.createInstanceOfType(className);
+                Object module = createInstanceOfType(className);
                 if (!(module instanceof Module)) {
                     throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
                 }
@@ -179,8 +175,7 @@ public class ModulesLoader {
      * @return the count
      * @throws RuntimeException if an infinite loop (circular dependency) is found
      */
-    private int countRunAfters(String moduleName, Map<String, String[]> allRunAfters, Map<String, String> traversedModuleNames) {
-
+    private int countRunAfters(String moduleName, Map<String, List<String>> allRunAfters, Map<String, String> traversedModuleNames) {
         // Check for infinite loops
         if (traversedModuleNames.containsKey(moduleName)) {
             throw new UnitilsException("Unable to load modules. Circular dependency found for modules: " + traversedModuleNames.keySet());
@@ -188,11 +183,9 @@ public class ModulesLoader {
         traversedModuleNames.put(moduleName, moduleName);
 
         int count = 1;
-        String[] runAfters = allRunAfters.get(moduleName);
+        List<String> runAfters = allRunAfters.get(moduleName);
         if (runAfters != null) {
-
             for (String currentModuleName : runAfters) {
-
                 // recursively count all dependencies
                 count += countRunAfters(currentModuleName, allRunAfters, traversedModuleNames);
             }
@@ -209,13 +202,12 @@ public class ModulesLoader {
      * @param moduleNames   the module names, not null
      * @param configuration the configuration, not null
      */
-    protected void removeDisabledModules(Set<String> moduleNames, Configuration configuration) {
-
+    protected void removeDisabledModules(Set<String> moduleNames, Properties configuration) {
         Iterator<String> moduleNameIterator = moduleNames.iterator();
         while (moduleNameIterator.hasNext()) {
 
             String moduleName = moduleNameIterator.next();
-            boolean enabled = configuration.getBoolean(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_ENABLED, true);
+            boolean enabled = getBoolean(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_ENABLED, true, configuration);
             if (!enabled) {
                 moduleNameIterator.remove();
             }

@@ -32,11 +32,13 @@ import org.unitils.hibernate.util.SessionFactoryManager;
 import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import org.unitils.util.PropertyUtils;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -90,9 +92,9 @@ public class HibernateModule implements Module, Flushable {
      *
      * @param configuration The Unitils configuration, not null
      */
-    public void init(org.apache.commons.configuration.Configuration configuration) {
-        String configurationImplClassName = configuration.getString(PROPKEY_CONFIGURATION_CLASS_NAME);
-        boolean manageCurrentSessionContext = configuration.getBoolean(PROPKEY_MANAGECURRENTSESSIONCONTEXT_ENABLED);
+    public void init(Properties configuration) {
+        String configurationImplClassName = PropertyUtils.getString(PROPKEY_CONFIGURATION_CLASS_NAME, configuration);
+        boolean manageCurrentSessionContext = PropertyUtils.getBoolean(PROPKEY_MANAGECURRENTSESSIONCONTEXT_ENABLED, configuration);
         this.sessionFactoryManager = new SessionFactoryManager(configurationImplClassName, manageCurrentSessionContext);
     }
 

@@ -15,7 +15,6 @@
  */
 package org.unitils.easymock;
 
-import org.apache.commons.configuration.Configuration;
 import org.easymock.classextension.internal.MocksClassControl;
 import org.easymock.internal.MocksControl;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
@@ -44,6 +43,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Module for testing with mock objects using EasyMock.
@@ -77,7 +77,7 @@ public class EasyMockModule implements Module {
     /**
      * Initializes the module
      */
-    public void init(Configuration configuration) {
+    public void init(Properties configuration) {
         this.mocksControls = new ArrayList<MocksControl>();
         defaultEnumValues = getAnnotationEnumDefaults(EasyMockModule.class, configuration, RegularMock.class, Mock.class);
     }

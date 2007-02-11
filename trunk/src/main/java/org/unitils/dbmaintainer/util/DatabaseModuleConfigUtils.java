@@ -15,13 +15,14 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Class containing configuration utility methods specifically for the {@link org.unitils.database.DatabaseModule} and
@@ -53,8 +54,8 @@ public class DatabaseModuleConfigUtils {
      * @return The configured instance
      */
     @SuppressWarnings({"unchecked"})
-    public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
-        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+    public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, DataSource dataSource, StatementHandler statementHandler) {
+        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         DatabaseTask instance = getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
         DbSupport dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
         instance.init(configuration, dbSupport, dataSource, statementHandler);
@@ -70,10 +71,10 @@ public class DatabaseModuleConfigUtils {
      * @param statementHandler The statement handler, not null
      * @return The dbms specific instance of {@link DbSupport}
      */
-    public static DbSupport getConfiguredDbSupportInstance(Configuration configuration, DataSource dataSource, StatementHandler statementHandler) {
-        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+    public static DbSupport getConfiguredDbSupportInstance(Properties configuration, DataSource dataSource, StatementHandler statementHandler) {
+        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         DbSupport dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
-        String schemaName = configuration.getString(PROPKEY_DATABASE_SCHEMANAME).toUpperCase();
+        String schemaName = PropertyUtils.getString(PROPKEY_DATABASE_SCHEMANAME, configuration).toUpperCase();
         dbSupport.init(dataSource, schemaName, statementHandler);
         return dbSupport;
     }
@@ -86,7 +87,7 @@ public class DatabaseModuleConfigUtils {
      * @param dataSource    The data source, not null
      * @return Returns the configured instance of {@link StatementHandler}
      */
-    public static StatementHandler getConfiguredStatementHandlerInstance(Configuration configuration, DataSource dataSource) {
+    public static StatementHandler getConfiguredStatementHandlerInstance(Properties configuration, DataSource dataSource) {
         StatementHandler st = getConfiguredInstance(StatementHandler.class, configuration);
         st.init(configuration, dataSource);
         return st;

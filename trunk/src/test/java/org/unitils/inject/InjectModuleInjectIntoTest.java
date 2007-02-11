@@ -16,10 +16,11 @@
 package org.unitils.inject;
 
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.TestedObject;
+
+import java.util.Properties;
 
 /**
  * @author Filip Neven
@@ -35,7 +36,7 @@ public class InjectModuleInjectIntoTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
 
         injectModule = new InjectModule();
         injectModule.init(configuration);

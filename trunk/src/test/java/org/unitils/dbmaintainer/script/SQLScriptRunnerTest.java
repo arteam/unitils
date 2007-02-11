@@ -15,12 +15,13 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.RegularMock;
+
+import java.util.Properties;
 
 /**
  * Tests the SQL script runner
@@ -91,8 +92,8 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        sqlScriptRunner = (ScriptRunner) getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, null, mockStatementHandler);
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        sqlScriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, null, mockStatementHandler);
     }
 
 

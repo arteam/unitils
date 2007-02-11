@@ -15,12 +15,12 @@
  */
 package org.unitils.database;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Tests for the DatabaseModule
@@ -40,8 +40,8 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
     public void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(DatabaseModule.PROPKEY_UPDATEDATABASESCHEMA_ENABLED, true);
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty(DatabaseModule.PROPKEY_UPDATEDATABASESCHEMA_ENABLED, "true");
 
         databaseModule = new TestDatabaseModule();
         databaseModule.init(configuration);

@@ -20,6 +20,8 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 
+import java.util.Properties;
+
 /**
  * Test class for injection methods of the HibernateModule
  *
@@ -38,7 +40,7 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        org.apache.commons.configuration.Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         hibernateModule = new HibernateModule();
         hibernateModule.init(configuration);
     }

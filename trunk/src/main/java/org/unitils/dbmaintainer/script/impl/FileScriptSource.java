@@ -17,7 +17,6 @@ package org.unitils.dbmaintainer.script.impl;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -28,13 +27,12 @@ import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
+import static org.unitils.util.PropertyUtils.getString;
+import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem.
@@ -76,25 +74,17 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
 
 
     /**
-     * Uses the given <code>Configuration</code> to initialize the script files directory, and the file extension
+     * Uses the given configuration to initialize the script files directory, and the file extension
      * of the script files.
      */
     @SuppressWarnings("unchecked")
-    public void doInit(Configuration configuration) {
-
-        if (StringUtils.isNotEmpty(configuration.getString(PROPKEY_SCRIPTFILES_LOCATION))) {
-            scriptFilesLocation = configuration.getList(PROPKEY_SCRIPTFILES_LOCATION);
-        } else {
-            scriptFilesLocation = Collections.EMPTY_LIST;
-            logger.warn("No directory is specificied using the property " + PROPKEY_SCRIPTFILES_LOCATION + ". The Unitils" +
-                    " database maintainer won't do anyting");
+    public void doInit(Properties configuration) {
+        scriptFilesLocation = getStringList(PROPKEY_SCRIPTFILES_LOCATION, configuration);
+        if (scriptFilesLocation.isEmpty()) {
+            logger.warn("No directory is specificied using the property " + PROPKEY_SCRIPTFILES_LOCATION + ". The Unitils database maintainer won't do anyting");
         }
-        if (StringUtils.isNotEmpty(configuration.getString(PROPKEY_CODESCRIPTFILES_LOCATION))) {
-            codeScriptFilesLocation = configuration.getList(PROPKEY_CODESCRIPTFILES_LOCATION);
-        } else {
-            codeScriptFilesLocation = Collections.EMPTY_LIST;
-        }
-        fileExtension = configuration.getString(PROPKEY_SCRIPTFILES_FILEEXTENSION);
+        codeScriptFilesLocation = getStringList(PROPKEY_CODESCRIPTFILES_LOCATION, configuration);
+        fileExtension = getString(PROPKEY_SCRIPTFILES_FILEEXTENSION, configuration);
         if (fileExtension.startsWith(".")) {
             throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSION + " should not start with a '.'");
         }

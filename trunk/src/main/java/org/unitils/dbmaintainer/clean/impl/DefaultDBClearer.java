@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import org.apache.commons.configuration.Configuration;
 import static org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,14 +22,11 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import static java.util.Arrays.asList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementation of {@link DBClearer}. This implementation individually drops every table, view, constraint,
@@ -62,8 +58,8 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      *
      * @param configuration the config, not null
      */
-    protected void doInit(Configuration configuration) {
-        itemsToPreserve.addAll(toCorrectCaseIdentifiers(asList(configuration.getStringArray(PROPKEY_ITEMSTOPRESERVE))));
+    protected void doInit(Properties configuration) {
+        itemsToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_ITEMSTOPRESERVE, configuration)));
     }
 
 

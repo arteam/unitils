@@ -1,14 +1,14 @@
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.DBMaintainer;
-import org.unitils.dbmaintainer.clean.DBClearerTest;
+import static org.unitils.util.PropertyUtils.getString;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * DBClearer test for a hsqldb database
@@ -38,7 +38,7 @@ public class DB2DBClearerTest extends DBClearerTest {
      * @return True if the hsqldb dialect is activated, false otherwise
      */
     protected boolean isTestedDialectActivated() {
-        Configuration config = new ConfigurationLoader().loadConfiguration();
-        return "db2".equals(config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        return "db2".equals(getString(DBMaintainer.PROPKEY_DATABASE_DIALECT, configuration));
     }
 }

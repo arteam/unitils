@@ -16,7 +16,6 @@
 package org.unitils.spring;
 
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.spring.annotation.SpringApplicationContext;
@@ -26,6 +25,7 @@ import org.unitils.spring.annotation.SpringBeanByType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -46,7 +46,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         springModule = new SpringModule();
         springModule.init(configuration);
     }

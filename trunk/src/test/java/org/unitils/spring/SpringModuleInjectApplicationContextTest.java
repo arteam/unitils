@@ -16,11 +16,12 @@
 package org.unitils.spring;
 
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
 import org.springframework.context.ApplicationContext;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.spring.annotation.SpringApplicationContext;
+
+import java.util.Properties;
 
 /**
  * Test for the application context injection in the {@link SpringModule}.
@@ -40,7 +41,7 @@ public class SpringModuleInjectApplicationContextTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         springModule = new SpringModule();
         springModule.init(configuration);
     }

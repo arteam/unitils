@@ -16,12 +16,13 @@
 package org.unitils.inject;
 
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectIntoStaticByType;
 import static org.unitils.inject.util.PropertyAccess.FIELD;
 import static org.unitils.inject.util.PropertyAccess.SETTER;
 import org.unitils.inject.util.Restore;
+
+import java.util.Properties;
 
 /**
  * Test for restoring values that where replaced during the static auto injection of the {@link InjectModule} after
@@ -43,7 +44,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         injectModule = new InjectModule();
         injectModule.init(configuration);
 
