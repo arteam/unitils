@@ -30,7 +30,14 @@ import java.util.Properties;
 public class PropertyUtils {
 
 
-    //todo javadoc
+    /**
+     * Gets the string value for the property with the given name. If no such property is found or
+     * the value is empty, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param properties   The properties, not null
+     * @return The trimmed string value, not null
+     */
     public static String getString(String propertyName, Properties properties) {
         String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
@@ -40,7 +47,15 @@ public class PropertyUtils {
     }
 
 
-    //todo javadoc
+    /**
+     * Gets the string value for the property with the given name. If no such property is found or
+     * the value is empty, the given default value is returned.
+     *
+     * @param propertyName The name, not null
+     * @param defaultValue The default value
+     * @param properties   The properties, not null
+     * @return The trimmed string value, not null
+     */
     public static String getString(String propertyName, String defaultValue, Properties properties) {
         String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
@@ -50,7 +65,15 @@ public class PropertyUtils {
     }
 
 
-    //todo javadoc
+    /**
+     * Gets the list of comma separated string values for the property with the given name. If no such property is found or
+     * the value is empty, an empty list is returned. Empty elements (",,") will not be added. A space (", ,") is not
+     * empty, a "" will be added.
+     *
+     * @param propertyName The name, not null
+     * @param properties   The properties, not null
+     * @return The trimmed string list, empty if none found
+     */
     public static List<String> getStringList(String propertyName, Properties properties) {
         String values = properties.getProperty(propertyName);
         if (values == null || "".equals(values.trim())) {
@@ -65,7 +88,14 @@ public class PropertyUtils {
     }
 
 
-    //todo javadoc
+    /**
+     * Gets the boolean value for the property with the given name. If no such property is found or
+     * the value is empty, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param properties   The properties, not null
+     * @return The boolean value, not null
+     */
     public static boolean getBoolean(String propertyName, Properties properties) {
         String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
@@ -75,7 +105,15 @@ public class PropertyUtils {
     }
 
 
-    //todo javadoc
+    /**
+     * Gets the boolean value for the property with the given name. If no such property is found or
+     * the value is empty, the given default value is returned.
+     *
+     * @param propertyName The name, not null
+     * @param defaultValue The default value
+     * @param properties   The properties, not null
+     * @return The boolean value, not null
+     */
     public static boolean getBoolean(String propertyName, boolean defaultValue, Properties properties) {
         String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
@@ -85,7 +123,14 @@ public class PropertyUtils {
     }
 
 
-    //todo javadoc
+    /**
+     * Gets the long value for the property with the given name. If no such property is found, the value is empty
+     * or cannot be converted to a long, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param properties   The properties, not null
+     * @return The long value, not null
+     */
     public static long getLong(String propertyName, Properties properties) {
         String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
@@ -100,7 +145,16 @@ public class PropertyUtils {
     }
 
 
-    //todo javadoc
+    /**
+     * Gets the long value for the property with the given name. If no such property is found or
+     * the value is empty, the given default value is returned. If the value cannot be converted to a long,
+     * an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param defaultValue The default value
+     * @param properties   The properties, not null
+     * @return The string value, not null
+     */
     public static long getLong(String propertyName, long defaultValue, Properties properties) {
         String value = properties.getProperty(propertyName);
         if (value == null || "".equals(value.trim())) {
