@@ -15,12 +15,12 @@
  */
 package org.unitils.database.config;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.unitils.UnitilsJUnit3;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
+
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -34,8 +34,7 @@ public class PropertiesDataSourceFactoryTest extends UnitilsJUnit3 {
 
 
     public void setUp() throws Exception {
-
-        Configuration configuration = new PropertiesConfiguration();
+        Properties configuration = new Properties();
         configuration.setProperty("dataSource.driverClassName", "testdriver");
         configuration.setProperty("dataSource.url", "testurl");
         configuration.setProperty("dataSource.userName", "testusername");

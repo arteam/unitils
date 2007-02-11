@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.version;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
@@ -30,6 +29,7 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Test class for {@link org.unitils.dbmaintainer.version.impl.DBVersionSource}. The implementation is tested using
@@ -59,9 +59,9 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dbVersionSource = (VersionSource) getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
+        dbVersionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
         dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         dropVersionTable();

@@ -16,12 +16,12 @@
 package org.unitils.core;
 
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
 import org.unitils.database.DatabaseModule;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Test for {@link ModulesRepositoryTest}.
@@ -136,7 +136,7 @@ public class ModulesRepositoryTest extends TestCase {
      */
     private static class TestModule1 implements Module {
 
-        public void init(Configuration configuration) {
+        public void init(Properties configuration) {
         }
 
         public TestListener createTestListener() {

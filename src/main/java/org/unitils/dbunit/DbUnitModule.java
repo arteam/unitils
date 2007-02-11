@@ -15,7 +15,6 @@
  */
 package org.unitils.dbunit;
 
-import org.apache.commons.configuration.Configuration;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.dbunit.Assertion.assertEquals;
 import org.dbunit.DatabaseUnitException;
@@ -34,10 +33,12 @@ import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.TablePerRowXmlDataSet;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import org.unitils.util.PropertyUtils;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -97,9 +98,9 @@ public class DbUnitModule implements Module {
      *
      * @param configuration The config, not null
      */
-    public void init(Configuration configuration) {
-        schemaName = configuration.getString(PROPKEY_SCHEMA_NAME).toUpperCase();
-        String databaseDialect = configuration.getString(PROPKEY_DATABASE_DIALECT);
+    public void init(Properties configuration) {
+        schemaName = PropertyUtils.getString(PROPKEY_SCHEMA_NAME, configuration).toUpperCase();
+        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
     }
 

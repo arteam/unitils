@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -25,6 +24,7 @@ import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -50,7 +50,7 @@ public class OracleStyleConstraintsDisabler extends DatabaseTask implements Cons
      *
      * @param configuration the config, not null
      */
-    protected void doInit(Configuration configuration) {
+    protected void doInit(Properties configuration) {
     }
 
 

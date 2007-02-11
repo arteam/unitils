@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
@@ -31,6 +30,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Test class for the DBCleaner.
@@ -61,12 +61,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         // case sensitive and insensitive names
         String itemsToPreserve = "Test_table_Preserve, \"Test_CASE_Table_Preserve\"";
 
-        ConfigurationLoader configurationLoader = new ConfigurationLoader();
-        Configuration configuration = configurationLoader.loadConfiguration();
-        configuration.addProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, itemsToPreserve);
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, itemsToPreserve);
 
         StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dbCleaner = (DBCleaner) getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
+        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
         dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
 
         cleanupTestDatabase();

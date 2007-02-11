@@ -15,10 +15,10 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Defines the contract for classes that handle SQL statements. E.g. by logging these statements or by executing them
@@ -36,7 +36,7 @@ public interface StatementHandler {
      * @param configuration The config, not null
      * @param dataSource    The data source, not null
      */
-    void init(Configuration configuration, DataSource dataSource);
+    void init(Properties configuration, DataSource dataSource);
 
 
     /**

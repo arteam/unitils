@@ -15,10 +15,11 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.dbmaintainer.script.StatementHandler;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Base class for a task that can be performed on a database schema.
@@ -45,7 +46,7 @@ abstract public class DatabaseTask {
 
 
     /**
-     * Initializes the database operation class with the given {@link Configuration}, {@link DbSupport}, {@link DataSource}
+     * Initializes the database operation class with the given {@link Properties}, {@link DbSupport}, {@link DataSource}
      * and {@link StatementHandler}
      *
      * @param configuration    The configuration, not null
@@ -53,22 +54,21 @@ abstract public class DatabaseTask {
      * @param dataSource       The datasource, not null
      * @param statementHandler The statement executor, not null
      */
-    public void init(Configuration configuration, DbSupport dbSupport, DataSource dataSource, StatementHandler statementHandler) {
+    public void init(Properties configuration, DbSupport dbSupport, DataSource dataSource, StatementHandler statementHandler) {
         this.dbSupport = dbSupport;
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
 
-        schemaName = configuration.getString(PROPKEY_SCHEMANAME).toUpperCase();
-
+        schemaName = PropertyUtils.getString(PROPKEY_SCHEMANAME, configuration).toUpperCase();
         doInit(configuration);
     }
 
 
     /**
-     * Allows subclasses to perform some extra configuration using the given <code>Configuration</code> object
+     * Allows subclasses to perform some extra configuration using the given configuration.
      *
      * @param configuration The configuration, not null
      */
-    abstract protected void doInit(Configuration configuration);
+    abstract protected void doInit(Properties configuration);
 
 }

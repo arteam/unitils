@@ -15,15 +15,17 @@
  */
 package org.unitils.util;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.ClassUtils;
+import static org.apache.commons.lang.ClassUtils.getShortClassName;
 import org.unitils.core.Module;
 import org.unitils.core.UnitilsException;
+import static org.unitils.util.PropertyUtils.getString;
+import static org.unitils.util.ReflectionUtils.getEnumValue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -38,9 +40,10 @@ public class ModuleUtils {
      */
     public static final String DEFAULT_ENUM_VALUE_NAME = "DEFAULT";
 
-    //todo javadoc
-    public static Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> getAnnotationEnumDefaults(Class<? extends Module> moduleClass, Configuration configuration, Class<? extends Annotation>... annotationClasses) {
 
+    //todo javadoc
+    @SuppressWarnings({"unchecked"})
+    public static Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> getAnnotationEnumDefaults(Class<? extends Module> moduleClass, Properties configuration, Class<? extends Annotation>... annotationClasses) {
         Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> result = new HashMap<Class<? extends Annotation>, Map<Class<Enum>, Enum>>();
 
         if (annotationClasses == null) {
@@ -49,8 +52,8 @@ public class ModuleUtils {
 
         for (Class<? extends Annotation> annotationClass : annotationClasses) {
 
-            String moduleClassName = ClassUtils.getShortClassName(moduleClass);
-            String annotationClassName = ClassUtils.getShortClassName(annotationClass);
+            String moduleClassName = getShortClassName(moduleClass);
+            String annotationClassName = getShortClassName(annotationClass);
 
             Method[] methods = annotationClass.getDeclaredMethods();
             for (Method method : methods) {
@@ -58,17 +61,16 @@ public class ModuleUtils {
                 Class<?> returnType = method.getReturnType();
                 if (returnType.isEnum()) {
 
-                    //noinspection unchecked
                     Class<Enum> enumClass = (Class<Enum>) returnType;
-                    String enumClassName = ClassUtils.getShortClassName(enumClass);
+                    String enumClassName = getShortClassName(enumClass);
                     String propertyName = moduleClassName + "." + annotationClassName + "." + enumClassName + ".default";
 
                     if (!configuration.containsKey(propertyName)) {
                         continue;
                     }
-                    String defaultEnumValueName = configuration.getString(propertyName);
+                    String defaultEnumValueName = getString(propertyName, configuration);
 
-                    Enum defaultEnumValue = ReflectionUtils.getEnumValue(enumClass, defaultEnumValueName);
+                    Enum defaultEnumValue = getEnumValue(enumClass, defaultEnumValueName);
                     if (defaultEnumValue == null) {
                         continue;
                     }
@@ -82,7 +84,6 @@ public class ModuleUtils {
                     enumMap.put(enumClass, defaultEnumValue);
                 }
             }
-
         }
         return result;
     }
@@ -99,7 +100,6 @@ public class ModuleUtils {
      * @return the enumValue or the defaultValue in case of a default
      */
     public static <T extends Enum> T getValueReplaceDefault(Class<? extends Annotation> annotation, T enumValue, Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues) {
-
         return getValueReplaceDefault(annotation, enumValue, defaultEnumValues, DEFAULT_ENUM_VALUE_NAME);
     }
 
@@ -115,25 +115,20 @@ public class ModuleUtils {
      * @return the enumValue or the defaultValue in case of a default
      */
     public static <T extends Enum> T getValueReplaceDefault(Class<? extends Annotation> annotation, T enumValue, Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues, String defaultValueName) {
-
         if (!defaultValueName.equalsIgnoreCase(enumValue.name())) {
-
             // no replace needed
             return enumValue;
         }
 
         Map<Class<Enum>, Enum> defaultValues = defaultEnumValues.get(annotation);
         if (defaultValues != null) {
-
             //noinspection SuspiciousMethodCalls
             Enum defaultValue = defaultValues.get(enumValue.getClass());
             if (defaultValue != null) {
-
                 //noinspection unchecked
                 return (T) defaultValue;
             }
         }
-
         // nothing found raise exception
         throw new UnitilsException("Could not replace default value. No default value found for annotation: " + annotation + ", enum: " + enumValue.getClass() + ", defaultEnumValues: " + defaultEnumValues);
     }

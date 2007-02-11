@@ -16,11 +16,10 @@
 package org.unitils.core;
 
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import static org.unitils.core.ModulesLoader.*;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Test for {@link ModulesLoader}.
@@ -32,7 +31,7 @@ public class ModulesLoaderTest extends TestCase {
     private ModulesLoader modulesLoader;
 
     /* The unitils configuration settings that control the core loading */
-    private Configuration configuration;
+    private Properties configuration;
 
 
     /**
@@ -43,7 +42,7 @@ public class ModulesLoaderTest extends TestCase {
 
         modulesLoader = new ModulesLoader();
 
-        configuration = new PropertiesConfiguration();
+        configuration = new Properties();
         configuration.setProperty(PROPKEY_MODULES, "a, b, c, d");
         configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, TestModuleA.class.getName());
         configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_RUN_AFTER, "b, d");
@@ -59,7 +58,6 @@ public class ModulesLoaderTest extends TestCase {
      * Test the loading of a normal configuration.
      */
     public void testLoadModules() {
-
         List<Module> result = modulesLoader.loadModules(configuration);
 
         assertNotNull(result);
@@ -217,7 +215,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public static class TestModuleA implements Module {
 
-        public void init(Configuration configuration) {
+        public void init(Properties configuration) {
             // do nothing
         }
 
@@ -231,7 +229,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public static class TestModuleB implements Module {
 
-        public void init(Configuration configuration) {
+        public void init(Properties configuration) {
             // do nothing
         }
 
@@ -245,7 +243,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public static class TestModuleC implements Module {
 
-        public void init(Configuration configuration) {
+        public void init(Properties configuration) {
             // do nothing
         }
 
@@ -259,7 +257,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public static class TestModuleD implements Module {
 
-        public void init(Configuration configuration) {
+        public void init(Properties configuration) {
             // do nothing
         }
 
@@ -274,7 +272,7 @@ public class ModulesLoaderTest extends TestCase {
      */
     public static class TestModulePrivate implements Module {
 
-        public void init(Configuration configuration) {
+        public void init(Properties configuration) {
             // do nothing
         }
 

@@ -1,13 +1,14 @@
 package org.unitils.inject;
 
-import org.unitils.UnitilsJUnit3;
-import org.unitils.inject.annotation.InjectIntoStaticByType;
-import org.unitils.inject.util.PropertyAccess;
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.configuration.Configuration;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
+import org.unitils.inject.annotation.InjectIntoStaticByType;
+import org.unitils.inject.util.PropertyAccess;
+
+import java.util.Properties;
 
 /**
  * @author Filip Neven
@@ -28,8 +29,8 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration conf = Unitils.getInstance().getConfiguration();
-        injectModule.init(conf);
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        injectModule.init(configuration);
     }
 
     public void testInjectIntoStaticByType_noPropertyOfType() {

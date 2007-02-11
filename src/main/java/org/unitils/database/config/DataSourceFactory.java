@@ -15,9 +15,8 @@
  */
 package org.unitils.database.config;
 
-import org.apache.commons.configuration.Configuration;
-
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Interface for different sorts of Factories of a TestDataSource.
@@ -28,11 +27,11 @@ import javax.sql.DataSource;
 public interface DataSourceFactory {
 
     /**
-     * Initializes itself using the properties in the given <code>Configuration</code> object.
+     * Initializes itself using the properties in the given configuration.
      *
      * @param configuration The config, not null
      */
-    public void init(Configuration configuration);
+    public void init(Properties configuration);
 
 
     /**

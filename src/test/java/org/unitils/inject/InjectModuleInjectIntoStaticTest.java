@@ -16,9 +16,10 @@
 package org.unitils.inject;
 
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectIntoStatic;
+
+import java.util.Properties;
 
 /**
  * Test for the static injection behavior of the {@link InjectModule}
@@ -43,8 +44,7 @@ public class InjectModuleInjectIntoStaticTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
-
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         injectModule = new InjectModule();
         injectModule.init(configuration);
     }

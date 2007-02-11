@@ -1,13 +1,14 @@
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.dbmaintainer.DBMaintainer;
+import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.util.PropertyUtils.getString;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * DBClearer test for a hsqldb database
@@ -18,6 +19,7 @@ import java.sql.Statement;
 public class MySqlDBClearerTest extends DBClearerTest {
 
 
+    //todo javadoc
     protected void createTestTrigger(String tableName, String triggerName) throws SQLException {
         Connection conn = null;
         Statement st = null;
@@ -38,7 +40,7 @@ public class MySqlDBClearerTest extends DBClearerTest {
      * @return True if the hsqldb dialect is activated, false otherwise
      */
     protected boolean isTestedDialectActivated() {
-        Configuration config = new ConfigurationLoader().loadConfiguration();
-        return "mysql".equals(config.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT));
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        return "mysql".equals(getString(PROPKEY_DATABASE_DIALECT, configuration));
     }
 }

@@ -15,7 +15,6 @@
  */
 package org.unitils.spring;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -36,6 +35,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and
@@ -70,7 +70,7 @@ public class SpringModule implements Module {
      *
      * @param configuration The configuration, not null
      */
-    public void init(Configuration configuration) {
+    public void init(Properties configuration) {
         hibernateSupport = createHibernateSupport();
 
         List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();

@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
@@ -30,6 +29,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Base test class for the DBClearer. Contains tests that can be implemented generally for all different database dialects.
@@ -68,12 +68,12 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             // case sensitive names
             itemsToPreserve += "\"Test_CASE_Table_Preserve\", \"Test_CASE_View_Preserve\", \"Test_CASE_Sequence_Preserve\", \"Test_CASE_Trigger_Preserve\"";
 
-            Configuration configuration = new ConfigurationLoader().loadConfiguration();
-            configuration.addProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, itemsToPreserve);
+            Properties configuration = new ConfigurationLoader().loadConfiguration();
+            configuration.setProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, itemsToPreserve);
 
             StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
             dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
-            dbClearer = (DBClearer) getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+            dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
 
             cleanupTestDatabase();
             createTestDatabase();
@@ -173,6 +173,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     }
 
 
+    //todo javadoc
     abstract protected void createTestTrigger(String tableName, String triggerName) throws SQLException;
 
 

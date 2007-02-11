@@ -15,7 +15,6 @@
  */
 package org.unitils.inject;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,16 +29,15 @@ import org.unitils.inject.util.ValueToRestore;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
 import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
+import static org.unitils.util.PropertyUtils.getLong;
 import static org.unitils.util.ReflectionUtils.*;
+import org.unitils.util.PropertyUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Module for injecting annotated objects into other objects. The intended usage is to inject mock objects, but it can
@@ -76,14 +74,13 @@ public class InjectModule implements Module {
 
 
     /**
-     * Initializes this module using the given <code>Configuration</code> object
+     * Initializes this module using the given configuration.
      *
      * @param configuration The configuration, not null
      */
-    public void init(Configuration configuration) {
-
+    public void init(Properties configuration) {
         defaultEnumValues = getAnnotationEnumDefaults(InjectModule.class, configuration, InjectInto.class, InjectIntoStatic.class, InjectIntoByType.class, InjectIntoStaticByType.class);
-        createTestedObjectsIfNullEnabled = configuration.getBoolean(PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED);
+        createTestedObjectsIfNullEnabled = PropertyUtils.getBoolean(PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED, configuration);
     }
 
 

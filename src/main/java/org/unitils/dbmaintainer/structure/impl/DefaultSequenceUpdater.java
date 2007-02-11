@@ -15,13 +15,14 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
+import org.unitils.util.PropertyUtils;
 
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -45,8 +46,8 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
      *
      * @param configuration The config, not null
      */
-    protected void doInit(Configuration configuration) {
-        lowestAcceptableSequenceValue = configuration.getLong(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE);
+    protected void doInit(Properties configuration) {
+        lowestAcceptableSequenceValue = PropertyUtils.getLong(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, configuration);
     }
 
 

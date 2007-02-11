@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
@@ -24,6 +23,7 @@ import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -39,7 +39,7 @@ abstract public class BaseScriptRunner extends DatabaseTask {
      *
      * @param configuration The config, not null
      */
-    protected void doInit(Configuration configuration) {
+    protected void doInit(Properties configuration) {
     }
 
 

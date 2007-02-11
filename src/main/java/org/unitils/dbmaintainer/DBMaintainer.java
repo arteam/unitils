@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.clean.DBCleaner;
@@ -31,9 +30,12 @@ import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfigu
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
 import org.unitils.dbmaintainer.version.VersionSource;
+import static org.unitils.util.PropertyUtils.getLong;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * A class for performing automatic maintenance of a database.<br>
@@ -58,7 +60,7 @@ import java.util.List;
  * </ul>
  * <p/>
  * To obtain a properly configured <code>DBMaintainer</code>, invoke the contructor
- * {@link #DBMaintainer(Configuration,DataSource)} with a <code>TestDataSource</code> providing access
+ * {@link #DBMaintainer(Properties,DataSource)} with a <code>TestDataSource</code> providing access
  * to the database and a <code>Configuration</code> object containing all necessary properties.
  *
  * @author Filip Neven
@@ -144,38 +146,38 @@ public class DBMaintainer {
      * @param configuration the configuration, not null
      * @param dataSource    the data source, not null
      */
-    public DBMaintainer(Configuration configuration, DataSource dataSource) {
+    public DBMaintainer(Properties configuration, DataSource dataSource) {
         StatementHandler statementHandler = new LoggingStatementHandlerDecorator(DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
 
-        scriptRunner = (ScriptRunner) getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
-        codeScriptRunner = (CodeScriptRunner) getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, dataSource, statementHandler);
-        versionSource = (VersionSource) getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
-        scriptSource = (ScriptSource) getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
+        scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
+        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, dataSource, statementHandler);
+        versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
+        scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
 
-        boolean cleanDbEnabled = configuration.getBoolean(PROPKEY_DBCLEANER_ENABLED);
+        boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DBCLEANER_ENABLED, configuration);
         if (cleanDbEnabled) {
-            dbCleaner = (DBCleaner) getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
+            dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
         }
 
-        fromScratchEnabled = configuration.getBoolean(PROPKEY_FROMSCRATCH_ENABLED);
-        keepRetryingAfterError = configuration.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED);
+        fromScratchEnabled = PropertyUtils.getBoolean(PROPKEY_FROMSCRATCH_ENABLED, configuration);
+        keepRetryingAfterError = PropertyUtils.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, configuration);
         if (fromScratchEnabled) {
-            dbClearer = (DBClearer) getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+            dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
         }
 
-        boolean disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
+        boolean disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED, configuration);
         if (disableConstraints) {
-            constraintsDisabler = (ConstraintsDisabler) getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
         }
 
-        boolean updateSequences = configuration.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED);
+        boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED, configuration);
         if (updateSequences) {
-            sequenceUpdater = (SequenceUpdater) getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
+            sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
         }
 
-        boolean generateDtd = configuration.getBoolean(PROPKEY_GENERATEDTD_ENABLED);
+        boolean generateDtd = PropertyUtils.getBoolean(PROPKEY_GENERATEDTD_ENABLED, configuration);
         if (generateDtd) {
-            dtdGenerator = (DtdGenerator) getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
+            dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
         }
     }
 

@@ -15,7 +15,7 @@
  */
 package org.unitils.core;
 
-import org.apache.commons.configuration.Configuration;
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -23,7 +23,7 @@ import org.apache.commons.configuration.Configuration;
 public interface Module {
 
 
-    public void init(Configuration configuration);
+    public void init(Properties configuration);
 
 
     public TestListener createTestListener();

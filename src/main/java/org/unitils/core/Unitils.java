@@ -15,10 +15,9 @@
  */
 package org.unitils.core;
 
-import org.apache.commons.configuration.Configuration;
-
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -30,13 +29,9 @@ public class Unitils implements Module {
 
     private static Unitils unitils;
 
-    public static Unitils getInstance() {
+    public static synchronized Unitils getInstance() {
         if (unitils == null) {
-            synchronized(Unitils.class) {
-                if (unitils == null) {
-                    initSingletonInstance();
-                }
-            }
+            initSingletonInstance();
         }
         return unitils;
     }
@@ -47,7 +42,7 @@ public class Unitils implements Module {
 
     public static void initSingletonInstance() {
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
-        Configuration configuration = configurationLoader.loadConfiguration();
+        Properties configuration = configurationLoader.loadConfiguration();
 
         Unitils unitils = new Unitils();
         unitils.init(configuration);
@@ -59,7 +54,7 @@ public class Unitils implements Module {
     private ModulesRepository modulesRepository;
 
     //todo javadoc
-    private Configuration configuration;
+    private Properties configuration;
 
     private TestContext testContext;
 
@@ -71,7 +66,7 @@ public class Unitils implements Module {
     }
 
 
-    public void init(Configuration configuration) {
+    public void init(Properties configuration) {
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
     }
@@ -91,12 +86,12 @@ public class Unitils implements Module {
     }
 
 
-    public Configuration getConfiguration() {
+    public Properties getConfiguration() {
         return configuration;
     }
 
 
-    protected ModulesRepository createModulesRepository(Configuration configuration) {
+    protected ModulesRepository createModulesRepository(Properties configuration) {
         ModulesLoader modulesLoader = new ModulesLoader();
         List<Module> modules = modulesLoader.loadModules(configuration);
         return new ModulesRepository(modules);

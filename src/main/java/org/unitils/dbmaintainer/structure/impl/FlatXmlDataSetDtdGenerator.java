@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -26,12 +25,14 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.structure.DtdGenerator;
+import org.unitils.util.PropertyUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Connection;
+import java.util.Properties;
 
 /**
  * Implementation of {@link DtdGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format
@@ -55,8 +56,8 @@ public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGener
      *
      * @param configuration The config, not null
      */
-    protected void doInit(Configuration configuration) {
-        dtdFileName = configuration.getString(PROPKEY_DTD_FILENAME);
+    protected void doInit(Properties configuration) {
+        dtdFileName = PropertyUtils.getString(PROPKEY_DTD_FILENAME, configuration);
     }
 
 

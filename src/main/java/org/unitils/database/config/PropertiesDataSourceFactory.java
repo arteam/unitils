@@ -15,12 +15,11 @@
  */
 package org.unitils.database.config;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.lang.StringUtils;
-import org.unitils.core.UnitilsException;
+import static org.unitils.util.PropertyUtils.getString;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * A {@link DataSourceFactory} that loads the necessary information from a properties file.
@@ -60,18 +59,11 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
      *
      * @param configuration The config, not null
      */
-    public void init(Configuration configuration) {
-        driverClassName = configuration.getString(PROPKEY_DATASOURCE_DRIVERCLASSNAME);
-        databaseUrl = configuration.getString(PROPKEY_DATASOURCE_URL);
-        userName = configuration.getString(PROPKEY_DATASOURCE_USERNAME);
-        password = configuration.getString(PROPKEY_DATASOURCE_PASSWORD);
-
-        if (StringUtils.isEmpty(driverClassName)) {
-            throw new UnitilsException("Could not determine driver class name. Missing property " + PROPKEY_DATASOURCE_DRIVERCLASSNAME);
-        }
-        if (StringUtils.isEmpty(databaseUrl)) {
-            throw new UnitilsException("Could not determine database url. Missing property " + PROPKEY_DATASOURCE_URL);
-        }
+    public void init(Properties configuration) {
+        driverClassName = getString(PROPKEY_DATASOURCE_DRIVERCLASSNAME, configuration);
+        databaseUrl = getString(PROPKEY_DATASOURCE_URL, configuration);
+        userName = getString(PROPKEY_DATASOURCE_USERNAME, null, configuration);
+        password = getString(PROPKEY_DATASOURCE_PASSWORD, null, configuration);
     }
 
 

@@ -15,7 +15,6 @@
  */
 package org.unitils.dbunit;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
@@ -29,6 +28,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Test class for loading of data sets by the {@link DbUnitModule}.
@@ -52,7 +52,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         dbUnitModule = new DbUnitModule();
         dbUnitModule.init(configuration);
 

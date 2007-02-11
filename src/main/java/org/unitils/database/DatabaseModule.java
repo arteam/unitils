@@ -15,7 +15,6 @@
  */
 package org.unitils.database;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -35,14 +34,14 @@ import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfigu
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
+import org.unitils.util.PropertyUtils;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Module that provides basic support for database testing such as the creation of a datasource that connectes to the
@@ -77,8 +76,8 @@ public class DatabaseModule implements Module {
     /* The datasource instance */
     private DataSource dataSource;
 
-    /* The Configuration of Unitils */
-    private Configuration configuration;
+    /* The configuration of Unitils */
+    private Properties configuration;
 
     /* Indicates if database constraints should be disabled */
     private boolean disableConstraints;
@@ -92,11 +91,11 @@ public class DatabaseModule implements Module {
      *
      * @param configuration the config, not null
      */
-    public void init(Configuration configuration) {
+    public void init(Properties configuration) {
         this.configuration = configuration;
 
-        disableConstraints = configuration.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED);
-        updateDatabaseSchemaEnabled = configuration.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED);
+        disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED, configuration);
+        updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED, configuration);
     }
 
 
@@ -156,32 +155,12 @@ public class DatabaseModule implements Module {
      */
     public void injectDataSource(Object testObject) {
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
-        DataSource dataSource = getDataSource();
-        for (Field field : fields) {
-            try {
-                setFieldValue(testObject, field, dataSource);
-
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to assign the DataSource to field annotated with @" + TestDataSource.class.getSimpleName() +
-                        ". Ensure that this field is of type " + DataSource.class.getName(), e);
-            }
-        }
-
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
-        for (Method method : methods) {
-            try {
-                invokeMethod(testObject, method, getDataSource());
-
-            } catch (UnitilsException e) {
-                throw new UnitilsException("Unable to invoke method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() +
-                        " annotated with @" + TestDataSource.class.getSimpleName() + " Ensure that this method has following signature: void myMethod(" +
-                        DataSource.class.getName() + " dataSource)", e);
-
-            } catch (InvocationTargetException e) {
-                throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + methods.get(0).getName() + " annotated with "
-                        + TestDataSource.class.getSimpleName() + " has thrown an exception", e.getCause());
-            }
+        if (fields.isEmpty() && methods.isEmpty()) {
+            // nothing to do
+            return;
         }
+        setFieldAndSetterValue(testObject, fields, methods, getDataSource());
     }
 
 

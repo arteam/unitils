@@ -15,13 +15,14 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.apache.commons.configuration.Configuration;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.script.impl.LoggingStatementHandlerDecorator;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
+
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -92,9 +93,9 @@ public class DefaultCodeScriptRunnerTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new ConfigurationLoader().loadConfiguration();
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
         StatementHandler loggingStatementHandler = new LoggingStatementHandlerDecorator(mockStatementHandler);
-        codeScriptRunner = (CodeScriptRunner) getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, null, loggingStatementHandler);
+        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, null, loggingStatementHandler);
     }
 
 
