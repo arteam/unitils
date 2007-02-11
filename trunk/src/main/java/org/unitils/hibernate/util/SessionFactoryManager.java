@@ -58,20 +58,21 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     /* The class name to use when creating a hibernate configuration */
     private String configurationImplClassName;
 
-    /* True if the HibernateCurrentSessionContext should be registered */
-    private boolean manageCurrentSessionContext;
+    /* The class name of the CurrentSessionContext, null for no context */
+    private String currentSessionContextImplClassName;
 
 
     /**
      * Creates a config manager that will use the given class name to create new configs when needed.
      *
-     * @param configurationImplClassName  The class name, not null
-     * @param manageCurrentSessionContext True if the {@link HibernateCurrentSessionContext} should be registered
+     * @param configurationImplClassName The class name, not null
+     * @param currentSessionContextImplClassName
+     *                                   The class name of the CurrentSessionContext, null for no context
      */
-    public SessionFactoryManager(String configurationImplClassName, boolean manageCurrentSessionContext) {
+    public SessionFactoryManager(String configurationImplClassName, String currentSessionContextImplClassName) {
         super(Configuration.class, HibernateSessionFactory.class);
         this.configurationImplClassName = configurationImplClassName;
-        this.manageCurrentSessionContext = manageCurrentSessionContext;
+        this.currentSessionContextImplClassName = currentSessionContextImplClassName;
     }
 
 
@@ -111,7 +112,14 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     }
 
 
-    //todo javadoc
+    /**
+     * Manually register a session factory for the given test class.
+     *
+     * @param testClass     The class, not null
+     * @param sessionInterceptingSessionFactory
+     *                      The session factory, not null
+     * @param configuration The configuration for the session factory, not null
+     */
     public void registerSessionFactory(Class<?> testClass, SessionInterceptingSessionFactory sessionInterceptingSessionFactory, Configuration configuration) {
         registerInstance(testClass, configuration);
         sessionFactories.put(configuration, sessionInterceptingSessionFactory);
@@ -175,12 +183,12 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
         unitilsHibernateProperties.setProperty(CONNECTION_PROVIDER, HibernateConnectionProvider.class.getName());
 
         // if enabled, configure hibernate's current session management
-        if (manageCurrentSessionContext) {
+        if (currentSessionContextImplClassName != null) {
             if (configuration.getProperty(CURRENT_SESSION_CONTEXT_CLASS) != null) {
                 logger.warn("The property " + CURRENT_SESSION_CONTEXT_CLASS + " is present in your Hibernate " +
                         "configuration. This property will be overwritten with Unitils own CurrentSessionContext implementation!");
             }
-            unitilsHibernateProperties.setProperty(CURRENT_SESSION_CONTEXT_CLASS, HibernateCurrentSessionContext.class.getName());
+            unitilsHibernateProperties.setProperty(CURRENT_SESSION_CONTEXT_CLASS, currentSessionContextImplClassName);
         }
         configuration.addProperties(unitilsHibernateProperties);
         return configuration;

@@ -29,14 +29,14 @@ import org.hibernate.engine.SessionFactoryImplementor;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class HibernateCurrentSessionContext implements CurrentSessionContext {
+public class SimpleCurrentSessionContext implements CurrentSessionContext {
 
     protected SessionFactoryImplementor factory;
 
     private Session currentSession;
 
 
-    public HibernateCurrentSessionContext(SessionFactoryImplementor factory) {
+    public SimpleCurrentSessionContext(SessionFactoryImplementor factory) {
         this.factory = factory;
     }
 
