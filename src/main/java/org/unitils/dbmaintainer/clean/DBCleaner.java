@@ -28,8 +28,8 @@ public interface DBCleaner {
 
 
     /**
-     * Delete data from the database, that could cause problems when performing updates.
+     * Delete data from the database schema, that could cause problems when performing updates.
      */
-    void cleanDatabase() throws StatementHandlerException;
+    void cleanSchema() throws StatementHandlerException;
 
 }

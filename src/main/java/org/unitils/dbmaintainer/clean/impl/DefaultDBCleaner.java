@@ -83,7 +83,7 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      * Deletes all data from the database, except for the tables that have been
      * configured as <i>tablesToPreserve</i> , and the table in which the database version is stored
      */
-    public void cleanDatabase() throws StatementHandlerException {
+    public void cleanSchema() throws StatementHandlerException {
         try {
             logger.info("Cleaning database tables.");
 

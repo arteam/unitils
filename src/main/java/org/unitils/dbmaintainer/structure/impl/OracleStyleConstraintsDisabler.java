@@ -58,17 +58,13 @@ public class OracleStyleConstraintsDisabler extends DatabaseTask implements Cons
      * Permanently disable every foreign key or not-null constraint
      */
     public void disableConstraints() throws StatementHandlerException {
-        try {
-            logger.info("Disabling constraints");
-            Set<String> tableNames = dbSupport.getTableNames();
-            for (String tableName : tableNames) {
-                Set<String> constraintNames = dbSupport.getTableConstraintNames(tableName);
-                for (String constraintName : constraintNames) {
-                    dbSupport.disableConstraint(tableName, constraintName);
-                }
+        logger.info("Disabling constraints");
+        Set<String> tableNames = dbSupport.getTableNames();
+        for (String tableName : tableNames) {
+            Set<String> constraintNames = dbSupport.getTableConstraintNames(tableName);
+            for (String constraintName : constraintNames) {
+                dbSupport.disableConstraint(tableName, constraintName);
             }
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while disabling constraints", e);
         }
     }
 

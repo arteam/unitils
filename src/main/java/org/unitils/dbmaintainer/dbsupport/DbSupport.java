@@ -88,7 +88,7 @@ abstract public class DbSupport {
      *
      * @return The names of all tables in the database
      */
-    public Set<String> getTableNames() throws SQLException {
+    public Set<String> getTableNames() {
         return getIdentifiers("TABLE");
     }
 
@@ -98,7 +98,7 @@ abstract public class DbSupport {
      *
      * @return The names of all views in the database
      */
-    public Set<String> getViewNames() throws SQLException {
+    public Set<String> getViewNames() {
         return getIdentifiers("VIEW");
     }
 
@@ -108,7 +108,7 @@ abstract public class DbSupport {
      *
      * @return The names of all synonyms in the database
      */
-    abstract public Set<String> getSynonymNames() throws SQLException;
+    abstract public Set<String> getSynonymNames();
 
 
     /**
@@ -116,7 +116,7 @@ abstract public class DbSupport {
      *
      * @return The names of all sequences in the database
      */
-    abstract public Set<String> getSequenceNames() throws SQLException;
+    abstract public Set<String> getSequenceNames();
 
 
     /**
@@ -124,7 +124,7 @@ abstract public class DbSupport {
      *
      * @return The names of all triggers in the database
      */
-    abstract public Set<String> getTriggerNames() throws SQLException;
+    abstract public Set<String> getTriggerNames();
 
 
     /**
@@ -132,7 +132,7 @@ abstract public class DbSupport {
      *
      * @return The names of all types in the database
      */
-    abstract public Set<String> getTypeNames() throws SQLException;
+    abstract public Set<String> getTypeNames();
 
 
     /**
@@ -215,7 +215,7 @@ abstract public class DbSupport {
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
-    abstract public long getCurrentValueOfSequence(String sequenceName) throws SQLException;
+    abstract public long getCurrentValueOfSequence(String sequenceName);
 
 
     /**
@@ -224,7 +224,7 @@ abstract public class DbSupport {
      * @param sequenceName     The sequence, not null
      * @param newSequenceValue The value to set
      */
-    abstract public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException, SQLException;
+    abstract public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException;
 
 
     /**
@@ -273,7 +273,7 @@ abstract public class DbSupport {
      * @param tableName The table, not null
      * @return The names of the primary key columns of the table with the given name
      */
-    public Set<String> getPrimaryKeyColumnNames(String tableName) throws SQLException {
+    public Set<String> getPrimaryKeyColumnNames(String tableName) {
         Connection conn = null;
         Statement st = null;
         ResultSet rset = null;
@@ -286,6 +286,8 @@ abstract public class DbSupport {
                 primaryKeyColumnNames.add(rset.getString("COLUMN_NAME"));
             }
             return primaryKeyColumnNames;
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up primary key column names", e);
         } finally {
             closeQuietly(conn, st, rset);
         }
@@ -326,7 +328,7 @@ abstract public class DbSupport {
      * @param tableName The table, not null
      * @return The set of column names, not null
      */
-    public Set<String> getNotNullColummnNames(String tableName) throws SQLException {
+    public Set<String> getNotNullColummnNames(String tableName) {
         Connection conn = null;
         ResultSet rs = null;
         try {
@@ -345,6 +347,8 @@ abstract public class DbSupport {
             }
             return notNullColumnNames;
 
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up not null column names", e);
         } finally {
             closeQuietly(conn, null, rs);
         }
@@ -357,7 +361,7 @@ abstract public class DbSupport {
      * @param tableName The table, not null
      * @return The set of constraint names, not null
      */
-    abstract public Set<String> getTableConstraintNames(String tableName) throws SQLException;
+    abstract public Set<String> getTableConstraintNames(String tableName);
 
 
     /**
@@ -400,7 +404,15 @@ abstract public class DbSupport {
     }
 
 
-    // todo javadoc
+    /**
+     * Parses the given string containing database code into a list of individual souce code statement. The way in which
+     * individual pieces of code are recognized depends fully on the implementation. The resulting strings must be
+     * individually applyable to the database.
+     *
+     * @param script
+     * @return A <code>List</code> containing individual pieces of database code, each individually applyable to the
+     * database.
+     */
     public List<String> parseCodeStatements(String script) {
         SQLCodeScriptParser sqlCodeScriptParser = new SQLCodeScriptParser();
         return sqlCodeScriptParser.parseStatements(script);
@@ -413,7 +425,7 @@ abstract public class DbSupport {
      * @param type The type of identifier: TABLE, GLOBAL TEMPORARY, LOCAL TEMPORARY, ALIAS or SYNONYM
      * @return The names, not null
      */
-    protected Set<String> getIdentifiers(String type) throws SQLException {
+    protected Set<String> getIdentifiers(String type) {
         Connection connection = null;
         ResultSet resultSet = null;
         try {
@@ -427,6 +439,8 @@ abstract public class DbSupport {
             }
             return identifiers;
 
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up identifiers", e);
         } finally {
             closeQuietly(connection, null, resultSet);
         }

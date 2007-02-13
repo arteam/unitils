@@ -56,7 +56,7 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
         dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
         DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
 
-        dbClearer.clearDatabase();
+        dbClearer.clearSchema();
         createTestTables();
     }
 

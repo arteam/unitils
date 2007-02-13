@@ -56,15 +56,11 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
      * easily.
      */
     public void updateSequences() throws StatementHandlerException {
-        try {
-            if (dbSupport.supportsSequences()) {
-                incrementSequencesWithLowValue();
-            }
-            if (dbSupport.supportsIdentityColumns()) {
-                incrementIdentityColumnsWithLowValue();
-            }
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while updating sequences", e);
+        if (dbSupport.supportsSequences()) {
+            incrementSequencesWithLowValue();
+        }
+        if (dbSupport.supportsIdentityColumns()) {
+            incrementIdentityColumnsWithLowValue();
         }
     }
 
@@ -72,7 +68,7 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
     /**
      * Increments all sequences whose value is too low.
      */
-    private void incrementSequencesWithLowValue() throws SQLException, StatementHandlerException {
+    private void incrementSequencesWithLowValue() throws StatementHandlerException {
         Set<String> sequenceNames = dbSupport.getSequenceNames();
         for (String sequenceName : sequenceNames) {
             if (dbSupport.getCurrentValueOfSequence(sequenceName) < lowestAcceptableSequenceValue) {
@@ -85,7 +81,7 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
     /**
      * Increments the next value for identity columns whose next value is too low
      */
-    private void incrementIdentityColumnsWithLowValue() throws SQLException {
+    private void incrementIdentityColumnsWithLowValue() {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);

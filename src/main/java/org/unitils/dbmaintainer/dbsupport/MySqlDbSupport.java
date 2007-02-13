@@ -41,7 +41,7 @@ public class MySqlDbSupport extends DbSupport {
      *
      * @return The names of all tables in the database
      */
-    public Set<String> getTableNames() throws SQLException {
+    public Set<String> getTableNames() {
         Connection conn = null;
         ResultSet rset = null;
         Statement st = null;
@@ -55,6 +55,8 @@ public class MySqlDbSupport extends DbSupport {
             }
             return names;
 
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up table names", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }
@@ -66,7 +68,7 @@ public class MySqlDbSupport extends DbSupport {
      *
      * @return The names of all views in the database
      */
-    public Set<String> getViewNames() throws SQLException {
+    public Set<String> getViewNames() {
         Connection conn = null;
         ResultSet rset = null;
         Statement st = null;
@@ -80,6 +82,8 @@ public class MySqlDbSupport extends DbSupport {
             }
             return names;
 
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up view names", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }
@@ -87,11 +91,8 @@ public class MySqlDbSupport extends DbSupport {
 
     /**
      * todo implement
-     *
-     * @return
-     * @throws SQLException
      */
-    public Set<String> getSynonymNames() throws SQLException {
+    public Set<String> getSynonymNames() {
         throw new UnsupportedOperationException("Synonyms not yet implemented for mysql");
     }
 
@@ -101,7 +102,7 @@ public class MySqlDbSupport extends DbSupport {
      *
      * @return Nothing
      */
-    public Set<String> getSequenceNames() throws SQLException {
+    public Set<String> getSequenceNames() {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
 
@@ -111,7 +112,7 @@ public class MySqlDbSupport extends DbSupport {
      *
      * @return The names of all triggers in the database
      */
-    public Set<String> getTriggerNames() throws SQLException {
+    public Set<String> getTriggerNames() {
         Connection conn = null;
         ResultSet rset = null;
         Statement st = null;
@@ -125,6 +126,8 @@ public class MySqlDbSupport extends DbSupport {
             }
             return names;
 
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking trigger names", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }
@@ -154,7 +157,7 @@ public class MySqlDbSupport extends DbSupport {
      *
      * @return Nothing
      */
-    public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
+    public long getCurrentValueOfSequence(String sequenceName) {
         throw new UnsupportedOperationException("Sequences are not supported in MySQL");
     }
 
@@ -274,7 +277,7 @@ public class MySqlDbSupport extends DbSupport {
      * @param tableName The table, not null
      * @return Nothing
      */
-    public Set<String> getTableConstraintNames(String tableName) throws SQLException {
+    public Set<String> getTableConstraintNames(String tableName) {
         throw new UnsupportedOperationException("Retrieval of table constraint names is not supported in MySQL");
     }
 
