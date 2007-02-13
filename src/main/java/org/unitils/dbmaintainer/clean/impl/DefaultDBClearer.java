@@ -18,14 +18,11 @@ package org.unitils.dbmaintainer.clean.impl;
 import static org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import static org.unitils.util.PropertyUtils.getStringList;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -59,7 +56,10 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      * @param configuration the config, not null
      */
     protected void doInit(Properties configuration) {
-        itemsToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_ITEMSTOPRESERVE, configuration)));
+        List<String> itemsToPreserveOrigCase = getStringList(PROPKEY_ITEMSTOPRESERVE, configuration);
+        for (String itemToPreserve : itemsToPreserveOrigCase) {
+            itemsToPreserve.add(dbSupport.toCorrectCaseIdentifier(itemToPreserve));
+        }
     }
 
 
@@ -75,8 +75,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         // todo test dropping synonmys
         dropSynonyms();
         dropSequences();
-        dropTriggers();
-        dropTypes();
+
     }
 
 
@@ -145,81 +144,6 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
                 dbSupport.dropSequence(sequenceName);
             }
         }
-    }
-
-
-    /**
-     * Drops all triggers
-     */
-    protected void dropTriggers() throws StatementHandlerException {
-        if (dbSupport.supportsTriggers()) {
-            Set<String> triggerNames = dbSupport.getTriggerNames();
-            for (String triggerName : triggerNames) {
-                // check whether trigger needs to be preserved
-                if (itemsToPreserve.contains(triggerName)) {
-                    continue;
-                }
-                logger.debug("Dropping database trigger: " + triggerName);
-                dbSupport.dropTrigger(triggerName);
-            }
-        }
-    }
-
-
-    /**
-     * Drops all types.
-     */
-    protected void dropTypes() throws StatementHandlerException {
-        if (dbSupport.supportsTypes()) {
-            Set<String> typeNames = dbSupport.getTypeNames();
-            for (String typeName : typeNames) {
-                // check whether type needs to be preserved
-                if (itemsToPreserve.contains(typeName)) {
-                    continue;
-                }
-                logger.debug("Dropping database type: " + typeName);
-                dbSupport.dropType(typeName);
-            }
-        }
-    }
-
-
-    /**
-     * Converts the given list of identifiers to uppercase/lowercase depending on what the default
-     * for the database is. If a value is surrounded with double quotes (") it will not be converted and
-     * the double quotes will be stripped. These values are treated as case sensitive names.
-     *
-     * @param identifiers The identifiers, not null
-     * @return The names converted to correct case if needed, not null
-     */
-    protected List<String> toCorrectCaseIdentifiers(List<String> identifiers) {
-        Connection connection = null;
-        boolean toUpperCase;
-        boolean toLowerCase;
-        try {
-            connection = dataSource.getConnection();
-            toUpperCase = connection.getMetaData().storesUpperCaseIdentifiers();
-            toLowerCase = connection.getMetaData().storesLowerCaseIdentifiers();
-        } catch (SQLException e) {
-            throw new UnitilsException("Unable to convert identifiers to correct case.", e);
-        } finally {
-            closeQuietly(connection, null, null);
-        }
-
-        List<String> result = new ArrayList<String>();
-        for (String identifier : identifiers) {
-            identifier = identifier.trim();
-            if (identifier.startsWith("\"") && identifier.endsWith("\"")) {
-                result.add(identifier.substring(1, identifier.length() - 1));
-            } else if (toUpperCase) {
-                result.add(identifier.toUpperCase());
-            } else if (toLowerCase) {
-                result.add(identifier.toLowerCase());
-            } else {
-                result.add(identifier);
-            }
-        }
-        return result;
     }
 
 }
