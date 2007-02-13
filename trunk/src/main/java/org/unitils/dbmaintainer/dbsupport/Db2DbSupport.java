@@ -17,6 +17,7 @@ package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.core.UnitilsException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -40,10 +41,8 @@ public class Db2DbSupport extends DbSupport {
     /**
      * todo implement
      * 
-     * @return
-     * @throws SQLException
      */
-    public Set<String> getSynonymNames() throws SQLException {
+    public Set<String> getSynonymNames() {
         throw new UnsupportedOperationException("Synonyms not yet implemented for db2");
     }
 
@@ -52,7 +51,7 @@ public class Db2DbSupport extends DbSupport {
      *
      * @return The names of all sequences in the database
      */
-    public Set<String> getSequenceNames() throws SQLException {
+    public Set<String> getSequenceNames() {
         return getDb2DbIdentifiers("SEQNAME", "SYSSEQUENCES", "SEQSCHEMA");
     }
 
@@ -62,7 +61,7 @@ public class Db2DbSupport extends DbSupport {
      *
      * @return The names of all triggers in the database
      */
-    public Set<String> getTriggerNames() throws SQLException {
+    public Set<String> getTriggerNames() {
         return getDb2DbIdentifiers("NAME", "SYSTRIGGERS", "SCHEMA");
     }
 
@@ -89,7 +88,7 @@ public class Db2DbSupport extends DbSupport {
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
-    public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
+    public long getCurrentValueOfSequence(String sequenceName) {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -101,7 +100,7 @@ public class Db2DbSupport extends DbSupport {
             return rs.getLong("1");
 
         } catch (SQLException e) {
-            return 0;
+            throw new UnitilsException("Error while looking up primary key column names", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }
@@ -212,7 +211,7 @@ public class Db2DbSupport extends DbSupport {
      * @param tableName The table, not null
      * @return The set of constraint names, not null
      */
-    public Set<String> getTableConstraintNames(String tableName) throws SQLException {
+    public Set<String> getTableConstraintNames(String tableName) {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -225,6 +224,8 @@ public class Db2DbSupport extends DbSupport {
                 constraintNames.add(rs.getString("CONSTNAME"));
             }
             return constraintNames;
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up table constraint names", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }
@@ -260,7 +261,7 @@ public class Db2DbSupport extends DbSupport {
      * @param schemaColumnName        The column containing the schema name: SEQSCHEMA or SCHEMA
      * @return The names, not null
      */
-    protected Set<String> getDb2DbIdentifiers(String identifierName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
+    protected Set<String> getDb2DbIdentifiers(String identifierName, String systemMetadataTableName, String schemaColumnName) {
         Connection connection = null;
         ResultSet resultSet = null;
         Statement statement = null;
@@ -274,6 +275,8 @@ public class Db2DbSupport extends DbSupport {
             }
             return names;
 
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up db2 identifiers", e);
         } finally {
             DbUtils.closeQuietly(connection, statement, resultSet);
         }

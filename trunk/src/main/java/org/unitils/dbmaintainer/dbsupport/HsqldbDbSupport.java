@@ -41,10 +41,8 @@ public class HsqldbDbSupport extends DbSupport {
 
     /**
      * todo implement
-     * @return
-     * @throws SQLException
      */
-    public Set<String> getSynonymNames() throws SQLException {
+    public Set<String> getSynonymNames() {
         throw new UnsupportedOperationException("Synonyms not yet implemented for hsqldb");
     }
 
@@ -53,7 +51,7 @@ public class HsqldbDbSupport extends DbSupport {
      *
      * @return The names of all sequences in the database
      */
-    public Set<String> getSequenceNames() throws SQLException {
+    public Set<String> getSequenceNames() {
         return getHsqlDbIdentifiers("SEQUENCE_NAME", "SYSTEM_SEQUENCES", "SEQUENCE_SCHEMA");
     }
 
@@ -63,7 +61,7 @@ public class HsqldbDbSupport extends DbSupport {
      *
      * @return The names of all triggers in the database
      */
-    public Set<String> getTriggerNames() throws SQLException {
+    public Set<String> getTriggerNames() {
         return getHsqlDbIdentifiers("TRIGGER_NAME", "SYSTEM_TRIGGERS", "TRIGGER_SCHEM");
     }
 
@@ -89,7 +87,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
-    public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
+    public long getCurrentValueOfSequence(String sequenceName) {
         Connection conn = null;
         Statement st = null;
         ResultSet rset = null;
@@ -100,6 +98,8 @@ public class HsqldbDbSupport extends DbSupport {
                     schemaName + "' and SEQUENCE_NAME = '" + sequenceName + "'");
             rset.next();
             return rset.getLong(1);
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up current value of sequence", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rset);
         }
@@ -221,7 +221,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param tableName The table, not null
      * @return Nothing
      */
-    public Set<String> getTableConstraintNames(String tableName) throws SQLException {
+    public Set<String> getTableConstraintNames(String tableName) {
         throw new UnsupportedOperationException("Retrieval of table constraint names is not supported in HSQLDB");
     }
 
@@ -249,7 +249,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param schemaColumnName        The column containing the schema name: SEQUENCE_SCHEMA or TRIGGER_SCHEM
      * @return The names, not null
      */
-    protected Set<String> getHsqlDbIdentifiers(String identifierName, String systemMetadataTableName, String schemaColumnName) throws SQLException {
+    protected Set<String> getHsqlDbIdentifiers(String identifierName, String systemMetadataTableName, String schemaColumnName) {
         Connection connection = null;
         ResultSet resultSet = null;
         Statement statement = null;
@@ -264,6 +264,8 @@ public class HsqldbDbSupport extends DbSupport {
             }
             return names;
 
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up hsqldb identifiers", e);
         } finally {
             DbUtils.closeQuietly(connection, statement, resultSet);
         }

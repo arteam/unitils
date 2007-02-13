@@ -30,6 +30,6 @@ public interface DBClearer {
     /**
      * Clears the database schema.
      */
-    void clearDatabase() throws StatementHandlerException;
+    void clearSchema() throws StatementHandlerException;
 
 }

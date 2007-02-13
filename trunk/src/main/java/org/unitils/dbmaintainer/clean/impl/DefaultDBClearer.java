@@ -68,27 +68,22 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      * dropped, so that the database schema is empty. The database items that are configured as items to preserve, are
      * left untouched.
      */
-    public void clearDatabase() throws StatementHandlerException {
-        try {
-            logger.info("Clearing (dropping) the unit test database.");
-            dropViews();
-            dropTables();
-            // todo test dropping synonmys
-            dropSynonyms();
-            dropSequences();
-            dropTriggers();
-            dropTypes();
-
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while clearing database", e);
-        }
+    public void clearSchema() throws StatementHandlerException {
+        logger.info("Clearing (dropping) the unit test database.");
+        dropViews();
+        dropTables();
+        // todo test dropping synonmys
+        dropSynonyms();
+        dropSequences();
+        dropTriggers();
+        dropTypes();
     }
 
 
     /**
      * Drops all views.
      */
-    protected void dropViews() throws SQLException, StatementHandlerException {
+    protected void dropViews() throws StatementHandlerException {
         Set<String> viewNames = dbSupport.getViewNames();
         for (String viewName : viewNames) {
             // check whether view needs to be preserved
@@ -104,7 +99,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all tables.
      */
-    protected void dropTables() throws SQLException, StatementHandlerException {
+    protected void dropTables() throws StatementHandlerException {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             // check whether table needs to be preserved
@@ -120,7 +115,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all synonyms
      */
-    protected void dropSynonyms() throws SQLException, StatementHandlerException {
+    protected void dropSynonyms() throws StatementHandlerException {
         if (dbSupport.supportsSynonyms()) {
             Set<String> synonymNames = dbSupport.getSynonymNames();
             for (String synonymName : synonymNames) {
@@ -138,7 +133,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all sequences
      */
-    protected void dropSequences() throws StatementHandlerException, SQLException {
+    protected void dropSequences() throws StatementHandlerException {
         if (dbSupport.supportsSequences()) {
             Set<String> sequenceNames = dbSupport.getSequenceNames();
             for (String sequenceName : sequenceNames) {
@@ -156,7 +151,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all triggers
      */
-    protected void dropTriggers() throws StatementHandlerException, SQLException {
+    protected void dropTriggers() throws StatementHandlerException {
         if (dbSupport.supportsTriggers()) {
             Set<String> triggerNames = dbSupport.getTriggerNames();
             for (String triggerName : triggerNames) {
@@ -174,7 +169,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all types.
      */
-    protected void dropTypes() throws SQLException, StatementHandlerException {
+    protected void dropTypes() throws StatementHandlerException {
         if (dbSupport.supportsTypes()) {
             Set<String> typeNames = dbSupport.getTypeNames();
             for (String typeName : typeNames) {

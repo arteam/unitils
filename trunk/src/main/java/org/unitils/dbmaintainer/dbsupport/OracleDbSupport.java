@@ -17,6 +17,7 @@ package org.unitils.dbmaintainer.dbsupport;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.core.UnitilsException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -39,7 +40,7 @@ public class OracleDbSupport extends DbSupport {
      *
      * @return The names of all sequences in the database
      */
-    public Set<String> getSynonymNames() throws SQLException {
+    public Set<String> getSynonymNames() {
         return getOracleIdentifiers("SYNONYM_NAME", "USER_SYNONYMS");
     }
 
@@ -48,7 +49,7 @@ public class OracleDbSupport extends DbSupport {
      *
      * @return The names of all sequences in the database
      */
-    public Set<String> getSequenceNames() throws SQLException {
+    public Set<String> getSequenceNames() {
         return getOracleIdentifiers("SEQUENCE_NAME", "USER_SEQUENCES");
     }
 
@@ -58,7 +59,7 @@ public class OracleDbSupport extends DbSupport {
      *
      * @return The names of all triggers in the database
      */
-    public Set<String> getTriggerNames() throws SQLException {
+    public Set<String> getTriggerNames() {
         return getOracleIdentifiers("TRIGGER_NAME", "USER_TRIGGERS");
     }
 
@@ -68,7 +69,7 @@ public class OracleDbSupport extends DbSupport {
      *
      * @return The names of all types in the database
      */
-    public Set<String> getTypeNames() throws SQLException {
+    public Set<String> getTypeNames() {
         return getOracleIdentifiers("TYPE_NAME", "USER_TYPES");
     }
 
@@ -114,7 +115,7 @@ public class OracleDbSupport extends DbSupport {
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
-    public long getCurrentValueOfSequence(String sequenceName) throws SQLException {
+    public long getCurrentValueOfSequence(String sequenceName) {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -124,6 +125,8 @@ public class OracleDbSupport extends DbSupport {
             rs = st.executeQuery("select LAST_NUMBER from USER_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "'");
             rs.next();
             return rs.getLong("LAST_NUMBER");
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up current value of sequence", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }
@@ -136,7 +139,7 @@ public class OracleDbSupport extends DbSupport {
      * @param sequenceName     The sequence, not null
      * @param newSequenceValue The value to set
      */
-    public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException, SQLException {
+    public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         Connection conn = null;
         ResultSet rs = null;
         Statement st = null;
@@ -154,6 +157,8 @@ public class OracleDbSupport extends DbSupport {
                 String sqlResetIncrement = "alter sequence " + qualified(sequenceName) + " increment by " + incrementBy;
                 statementHandler.handle(sqlResetIncrement);
             }
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while incrementing sequence to value", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }
@@ -249,7 +254,7 @@ public class OracleDbSupport extends DbSupport {
      * @param tableName The table, not null
      * @return The set of constraint names, not null
      */
-    public Set<String> getTableConstraintNames(String tableName) throws SQLException {
+    public Set<String> getTableConstraintNames(String tableName) {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -263,6 +268,8 @@ public class OracleDbSupport extends DbSupport {
                 constraintNames.add(rs.getString("CONSTRAINT_NAME"));
             }
             return constraintNames;
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up table constraint names", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }
@@ -307,7 +314,7 @@ public class OracleDbSupport extends DbSupport {
      * @param systemMetadataTableName The meta data table to retrieve the identifiers from: USER_SEQUENCES or USER_TRIGGERS
      * @return The names, not null
      */
-    protected Set<String> getOracleIdentifiers(String identifierName, String systemMetadataTableName) throws SQLException {
+    protected Set<String> getOracleIdentifiers(String identifierName, String systemMetadataTableName) {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -320,6 +327,8 @@ public class OracleDbSupport extends DbSupport {
                 names.add(rs.getString(identifierName));
             }
             return names;
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up oracle identifiers", e);
         } finally {
             DbUtils.closeQuietly(conn, st, rs);
         }

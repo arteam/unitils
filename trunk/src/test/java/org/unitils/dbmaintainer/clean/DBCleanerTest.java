@@ -93,7 +93,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             assertFalse(isEmpty("TEST_TABLE"));
             assertFalse(isEmpty("TEST_TABLE"));
             assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table")));
-            dbCleaner.cleanDatabase();
+            dbCleaner.cleanSchema();
             assertTrue(isEmpty("TEST_TABLE"));
             assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table")));
         } finally {
@@ -110,7 +110,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         try {
             conn = dataSource.getConnection();
             assertFalse(isEmpty("DB_VERSION"));
-            dbCleaner.cleanDatabase();
+            dbCleaner.cleanSchema();
             assertFalse(isEmpty("DB_VERSION"));
         } finally {
             DbUtils.closeQuietly(conn);
@@ -127,7 +127,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
             assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
-            dbCleaner.cleanDatabase();
+            dbCleaner.cleanSchema();
             assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
             assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
         } finally {

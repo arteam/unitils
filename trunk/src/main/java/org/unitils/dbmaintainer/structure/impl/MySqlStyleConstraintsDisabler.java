@@ -59,19 +59,15 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
      * disableConstraintsOnConnection)
      */
     public void disableConstraints() throws StatementHandlerException {
-        try {
-            logger.info("Disabling contraints");
-            removeNotNullConstraints();
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while disabling constraints", e);
-        }
+        logger.info("Disabling contraints");
+        removeNotNullConstraints();
     }
 
 
     /**
      * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
      */
-    private void removeNotNullConstraints() throws SQLException, StatementHandlerException {
+    private void removeNotNullConstraints() throws StatementHandlerException {
         // Iterate of all table names
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
@@ -86,7 +82,7 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
      *
      * @param tableName The name of the table to remove constraints from, not null
      */
-    private void removeNotNullConstraints(String tableName) throws SQLException, StatementHandlerException {
+    private void removeNotNullConstraints(String tableName) throws StatementHandlerException {
         // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
         Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
         // Iterate over all column names

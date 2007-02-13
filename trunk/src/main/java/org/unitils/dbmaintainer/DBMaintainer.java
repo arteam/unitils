@@ -197,7 +197,7 @@ public class DBMaintainer {
         // Clear the database and retrieve scripts
         List<VersionScriptPair> versionScriptPairs;
         if (updateDatabaseFromScratch(currentVersion)) {
-            dbClearer.clearDatabase();
+            dbClearer.clearSchema();
             versionScriptPairs = scriptSource.getAllScripts();
         } else {
             versionScriptPairs = scriptSource.getNewScripts(currentVersion);
@@ -210,7 +210,7 @@ public class DBMaintainer {
             // Remove data from the database, that could cause errors when executing scripts. Such as for example
             // when added a not null column.
             if (dbCleaner != null) {
-                dbCleaner.cleanDatabase();
+                dbCleaner.cleanSchema();
             }
 
             // Excute all of the scripts

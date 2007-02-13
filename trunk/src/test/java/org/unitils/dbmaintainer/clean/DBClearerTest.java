@@ -100,7 +100,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
                 assertTrue(tableExists("Test_CASE_Table"));
                 assertTrue(tableExists("Test_CASE_Table_Preserve"));
             }
-            dbClearer.clearDatabase();
+            dbClearer.clearSchema();
             assertFalse(tableExists(dbSupport.toCorrectCaseIdentifier("TEST_TABLE")));
             assertTrue(tableExists(dbSupport.toCorrectCaseIdentifier("TEST_TABLE_PRESERVE")));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
@@ -122,7 +122,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
                 assertTrue(viewExists("Test_CASE_View"));
                 assertTrue(viewExists("Test_CASE_View_Preserve"));
             }
-            dbClearer.clearDatabase();
+            dbClearer.clearSchema();
             assertFalse(viewExists(dbSupport.toCorrectCaseIdentifier("TEST_VIEW")));
             assertTrue(viewExists(dbSupport.toCorrectCaseIdentifier("TEST_VIEW_PRESERVE")));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
@@ -144,7 +144,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
                 assertTrue(sequenceExists("Test_CASE_Sequence"));
                 assertTrue(sequenceExists("Test_CASE_Sequence_Preserve"));
             }
-            dbClearer.clearDatabase();
+            dbClearer.clearSchema();
             assertFalse(sequenceExists(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE")));
             assertTrue(sequenceExists(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE_PRESERVE")));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
@@ -164,7 +164,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             assertTrue(triggerExists("TEST_TRIGGER_PRESERVE"));
             assertTrue(triggerExists("Test_CASE_Trigger"));
             assertTrue(triggerExists("Test_CASE_Trigger_Preserve"));
-            dbClearer.clearDatabase();
+            dbClearer.clearSchema();
             assertFalse(triggerExists("TEST_TRIGGER"));
             assertTrue(triggerExists("TEST_TRIGGER_PRESERVE"));
             assertFalse(triggerExists("Test_CASE_Trigger"));
