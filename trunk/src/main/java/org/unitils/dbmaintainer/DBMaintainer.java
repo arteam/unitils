@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.clean.DBCodeClearer;
 import org.unitils.dbmaintainer.script.*;
 import org.unitils.dbmaintainer.script.impl.LoggingStatementHandlerDecorator;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
@@ -83,6 +84,10 @@ public class DBMaintainer {
     /* Property key indicating if updating the database from scratch is enabled */
     public static final String PROPKEY_FROMSCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
 
+    /* Property key indicating if database code should be cleared before installing a new version of the code or when
+     updating the database from scratch */
+    public static final String PROPKEY_CLEARDBCODE_ENABLED = "dbMaintainer.clearDbCode.enabled";
+
     /* Property key indicating if an retry of an update should only be performed when changes to script files were made */
     public static final String PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED = "dbMaintainer.keepRetryingAfterError.enabled";
 
@@ -110,6 +115,9 @@ public class DBMaintainer {
     /* Clearer of the database (removed all tables, sequences, ...) before updating */
     protected DBClearer dbClearer;
 
+    /* Clearer of all database source code (types, triggers, functions, procedures, ...) */
+    protected DBCodeClearer dbCodeClearer;
+
     /* Cleaner of the database (deletes all data from all tables before updating */
     protected DBCleaner dbCleaner;
 
@@ -125,6 +133,10 @@ public class DBMaintainer {
     /* Indicates whether updating the database from scratch is enabled. If true, the database is cleared before updating
       if an already executed script is modified */
     protected boolean fromScratchEnabled;
+
+    /* Indicates if database code should be cleared before installing a new version of the code or when
+      updating the database from scratch */
+    protected boolean clearDbCodeEnabled;
 
     /* Indicates whether a from scratch update should be performed when the previous update failed, but
       none of the scripts were modified since that last update. If true a new update will be tried only when
@@ -164,6 +176,9 @@ public class DBMaintainer {
         if (fromScratchEnabled) {
             dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
         }
+        if (clearDbCodeEnabled) {
+            dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource, statementHandler);
+        }
 
         boolean disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED, configuration);
         if (disableConstraints) {
@@ -197,7 +212,10 @@ public class DBMaintainer {
         // Clear the database and retrieve scripts
         List<VersionScriptPair> versionScriptPairs;
         if (updateDatabaseFromScratch(currentVersion)) {
-            dbClearer.clearSchema();
+                dbClearer.clearSchema();
+            if (clearDbCodeEnabled) {
+                dbCodeClearer.clearSchemaCode();
+            }
             versionScriptPairs = scriptSource.getAllScripts();
         } else {
             versionScriptPairs = scriptSource.getNewScripts(currentVersion);
@@ -233,6 +251,9 @@ public class DBMaintainer {
         if (!versionScriptPairs.isEmpty() // If the database structure was updated, also recreate the database code
                 || (!versionSource.isLastCodeUpdateSucceeded() && keepRetryingAfterError) // If the last code update failed, retry if configured to do so
                 || scriptSource.getCodeScriptsTimestamp() > versionSource.getCodeScriptsTimestamp()) { // If a code script was added of changed, recreate the database code
+            if (clearDbCodeEnabled) {
+                dbCodeClearer.clearSchemaCode();
+            }
             executeCodeScripts(scriptSource.getAllCodeScripts());
         }
     }
