@@ -16,13 +16,11 @@
 package org.unitils.dbunit;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
-import static org.dbunit.Assertion.assertEquals;
-import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConfig;
-import org.dbunit.dataset.*;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
-import org.dbunit.dataset.filter.DefaultColumnFilter;
-import org.dbunit.operation.DatabaseOperation;
+import static org.dbunit.operation.DatabaseOperation.CLEAN_INSERT;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
@@ -30,6 +28,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.TablePerRowXmlDataSet;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
@@ -134,7 +133,7 @@ public class DbUnitModule implements Module {
                 // no dataset specified
                 return;
             }
-            insertDataSet(dataSet);
+            CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
 
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
@@ -147,24 +146,18 @@ public class DbUnitModule implements Module {
     /**
      * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
      *
-     * @param testDataFile
+     * @param inputStream The stream containing the test data set, not null
      */
-    public void insertTestData(InputStream testDataFile) {
+    public void insertTestData(InputStream inputStream) {
         try {
-            IDataSet dataSet = getTestDataSet(testDataFile);
-            insertDataSet(dataSet);
+            IDataSet dataSet = createDataSet(inputStream);
+            CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
 
         } catch (Exception e) {
-            throw new UnitilsException("Error inserting test data from DbUnit dataset", e);
+            throw new UnitilsException("Error inserting test data from DbUnit dataset.", e);
         } finally {
             closeJdbcConnection();
         }
-    }
-
-
-    // todo javadoc
-    private void insertDataSet(IDataSet dataSet) throws DatabaseUnitException, SQLException {
-        DatabaseOperation.CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
     }
 
 
@@ -188,21 +181,9 @@ public class DbUnitModule implements Module {
             // first make sure every database update is flushed to the database
             getDatabaseModule().flushDatabaseUpdates();
 
-            // get the actual data set
-            IDataSet actualDataSet = getDbUnitDatabaseConnection().createDataSet(expectedDataSet.getTableNames());
-            ITableIterator tables = expectedDataSet.iterator();
+            //todo
+            DbUnitAssert.assertDbContentAsExpected(expectedDataSet, getDbUnitDatabaseConnection());
 
-            // compare expected and actual data set
-            while (tables.next()) {
-                ITable expectedTable = tables.getTable();
-                ITableMetaData metaData = expectedTable.getTableMetaData();
-                ITable actualTable = actualDataSet.getTable(expectedTable.getTableMetaData().getTableName());
-                ITable filteredActualTable = DefaultColumnFilter.includedColumnsTable(actualTable, metaData.getColumns());
-
-                assertEquals(new SortedTable(expectedTable), new SortedTable(filteredActualTable, expectedTable.getTableMetaData()));
-            }
-        } catch (Exception e) {
-            throw new UnitilsException("Error asserting db content as expected for test method " + testMethod, e);
         } finally {
             closeJdbcConnection();
         }
@@ -271,22 +252,6 @@ public class DbUnitModule implements Module {
 
 
     /**
-     * Creates a dbunit <code>IDataSet</code> object, in which the file coming from the given <code>InputStream</code>
-     * is loaded.
-     *
-     * @param testDataSetFile
-     * @return A DbUnit <code>IDataSet</code> object
-     */
-    public IDataSet getTestDataSet(InputStream testDataSetFile) {
-        IDataSet dataSet = createDataSet(testDataSetFile, null);
-        if (dataSet == null) {
-            throw new UnitilsException("Could not load DbUnit dataset");
-        }
-        return dataSet;
-    }
-
-
-    /**
      * Returns the DbUnit <code>IDataSet</code> that represents the state of a number of database tables after the given
      * <code>Method</code> has been executed.
      *
@@ -338,41 +303,28 @@ public class DbUnitModule implements Module {
      * @return The data set, null if the file does not exist
      */
     protected IDataSet createDataSet(Class testClass, String dataSetFilename) {
-        InputStream in = testClass.getResourceAsStream(dataSetFilename);
-        if (in == null) {
-            // file does not exist
-            return null;
+        try {
+            InputStream in = testClass.getResourceAsStream(dataSetFilename);
+            if (in == null) {
+                // file does not exist
+                return null;
+            }
+            return createDataSet(in);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to create DbUnit dataset for file " + dataSetFilename, e);
         }
-        return createDataSet(in, dataSetFilename);
     }
 
 
     /**
-     * Creates the dataset for the given file. Filenames that start with '/' are treated absolute. Filenames that
-     * do not start with '/', are relative to the current class.
+     * Create a dbunit <code>IDataSet</code> object, in which the file coming from the
+     * given <code>InputStream</code> is loaded.
      *
-     * @param dataSetFilename The name, (start with '/' for absolute names), not null
-     * @return The data set, null if the file does not exist
-     */
-    protected IDataSet createDataSet(String dataSetFilename) {
-        InputStream in = ClassLoader.getSystemResourceAsStream(dataSetFilename);
-        if (in == null) {
-            // file does not exist
-            return null;
-        }
-        return createDataSet(in, dataSetFilename);
-    }
-
-
-    /**
-     * Create a dbunit <code>IDataSet</code> object, in which the file coming from the given <code>InputStream</code>
-     * is loaded.
-     *
-     * @param in               the InputStream, not null
-     * @param dataSetFilename, the name of the file. Only used for extra info in case of an exception, may be null
+     * @param in the InputStream, not null
      * @return The DbUnit <code>IDataSet</code>
      */
-    private IDataSet createDataSet(InputStream in, String dataSetFilename) {
+    public IDataSet createDataSet(InputStream in) {
         try {
             IDataSet dataSet = new TablePerRowXmlDataSet(in);
             ReplacementDataSet replacementDataSet = new ReplacementDataSet(dataSet);
@@ -380,7 +332,7 @@ public class DbUnitModule implements Module {
             return replacementDataSet;
 
         } catch (Exception e) {
-            throw new UnitilsException("Unble to create DbUnit dataset for file " + (dataSetFilename == null ? "" : dataSetFilename), e);
+            throw new UnitilsException("Unable to create DbUnit dataset for input stream.", e);
         } finally {
             closeQuietly(in);
         }
