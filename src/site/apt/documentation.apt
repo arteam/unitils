@@ -31,7 +31,7 @@ Tutorial
     As with many projects, Unitils needs some configuration of its services. By default, there are 3 levels
     of configuration, each level overriding the settings of the previous one:
 
-    [[1]] <unitils-defaults.properties>: default configuration that is shipped within the distribution of Unitils
+    [[1]] <unitils-defaults.properties>: default configuration that is shipped with the distribution of Unitils
 
     [[2]] <unitils.properties>: can contain project-wide configuration
 
@@ -52,19 +52,19 @@ dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 +-----+
 
     The file is not required, but if you create one, it should be placed somewhere in the classpath of your project. To get you started, 
-    you can find a sample file that contains most commonly used configuration settings in following {{{unitils.properties}unitils.properties}} template.
+    you can find a sample file that contains most commonly used configuration settings in the following {{{unitils.properties}unitils.properties}} template.
 
     The last file, unitils-local.properties, is also optional. It can contain settings that override the project settings and is used for
     defining per-user settings. For example, if each user uses its own unit-test database schema, you can
-    create a unitils-local.properties for each user that contains the corresponding schema, username and password:
+    create a unitils-local.properties for each user that contains the corresponding username, password and database schema:
 
 +-----+
-dataSource.schemaName=test_john
 dataSource.userName=john
 dataSource.password=secret
+database.schemaName=test_john
 +-----+
 
-    Each of these unitils-local.properties files should be placed in the corresponding home folders of the user (<System.getProperty("user.home")>). 
+    Each of these unitils-local.properties files should be placed in the corresponding home folders of the user's (<System.getProperty("user.home")>). 
     A typical local configuration can be found in following sample {{{unitils-local.properties}unitils-local.properties}} template.
 
     The name of the local file, unitils-local.properties, is also defined by a property. This makes it possible to use different names for each
@@ -104,7 +104,7 @@ public class MyTest extends UnitilsJUnit3 {
     Typically you would create your own base test class containing some utility behavior common for all your tests, e.g. datasource injection, and
     then let this base class extend from one of the Unitils base classes.
 
-    For JUnit4 you can also add a @RunWith annotation instead of extending from the base class:
+    When you use JUnit4 you can also Unitils-enable a class by adding and @RunWith annotation instead of extending from the base class:
 
 +-----+
 import org.junit.runner.RunWith;
@@ -203,7 +203,7 @@ public void UserDAOTest extends UnitilsJUnit4 {
     
     []
     
-    When a method-specific dataset is found, this is used for the test otherwise Unitils will look for a class-level dataset.
+    When a method-specific dataset is found, this is used for the test. Otherwise, Unitils will look for a class-level dataset.
     
     Such a dataset file should be in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} file 
     format and should contain all data needed for the test. All existing content of tables in the dataset will first be deleted and 
@@ -238,8 +238,8 @@ public void UserDAOTest extends UnitilsJUnit4 {
     a dataset mainly means adding extra records, it's better to create a method specific one. Otherwise, this will result in a big incoherent dataset.
     
     By setting the <@DataSet> annotation on class level a dataset is loaded for every test in the class. If a dataset should
-    only be loaded for some of the tests, you can leave the class level annotation off and annotate the test methods instead. That way 
-    datasets will only be loaded for those tests. If needed, you can also specify the filename of the dataset explicitly by passing it as argument 
+    only be loaded for some of the tests, you should abandon the class level annotation and annotate the test methods instead. This way 
+    datasets will only be loaded for the annotated tests. If needed, you can also specify the filename of the dataset explicitly by passing it as argument 
     to the <@DataSet> annotation:
 
 +-----+
@@ -302,8 +302,8 @@ public void UserDAOTest extends UnitilsJUnit4 {
     In the above examples we left out 1 important thing: where is the DataSource for connecting to the test database coming from and how
     can we let our DAO classes make use of this <DataSource>? 
     
-    Before the first database test, Unitils creates a <Datasource> instance. If there is a field or method available annotated with <@TestDataSource>, Unitils 
-    will inject the DataSource into this field or call the method with the DataSource as parameter. This is done before the setup of each test. This way, you can 
+    Before the first database test, Unitils creates a <DataSource> instance. If there is a field or setter method available annotated with <@TestDataSource>, Unitils 
+    injects the DataSource into this field or calls the method with the DataSource as parameter. This is done before the setup of each test. This way, you can 
     easily make sure that your project data access code uses the correct DataSource. Typically all this is implemented once in a project-specific 
     superclass for all your database tests. A simple example of such a base class could be:
     
@@ -379,7 +379,7 @@ dbscripts/ 001_initial.sql
     executed on this up to date schema.
         
     The database maintainer will also notice if one of the existing database scripts was altered. For example suppose that the <002_tracking_updates.sql> 
-    was changed by a developer. In that case, the database maintainer will first clear the database, thereby removing all tables and then recreate it 
+    was changed. In that case, the database maintainer will first clear the database, thereby removing all tables and then recreate it 
     from scratch, starting again from the first script.
     
     For performance reasons, it's a good practice to work incrementally, each time adding new update files for small database updates. This makes sure updates 
@@ -423,7 +423,7 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
     
 +-----+
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE dataset SYSTEM "../dtds/schema.dtd">
+<!DOCTYPE dataset SYSTEM "../dtds/database.dtd">
 
 <dataset>
     <user userName="jack" active="true" />
@@ -431,8 +431,8 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
 </dataset>
 +-----+
         
-    The database maintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates... Look in 
-    the source code at the file unitils-default.properties for more information! 
+    The database maintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates... 
+    Look at the file unitils-default.properties for more information! 
     
     Some functionality of the database maintainer such as for disabling constraints uses DBMS specific functionality. This functionality will only run 
     properly when the correct dialect is configured. For example, suppose you want to use oracle, you should set following property:
