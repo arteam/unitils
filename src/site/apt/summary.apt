@@ -9,8 +9,9 @@ Summary
     Unitils builds further on existing libraries like {{{http://www.dbunit.org}DBUnit}} and {{{http://www.easymock.org}EasyMock}} and integrates 
     with {{{http://www.junit.org}JUnit}} and {{{http://testng.org}TestNG}}.
  
-    Unitils provides support for database testing, testing with mock objects and some general assertion utilities. It has been designed to offer 
-    these services to unit tests in a very configurable and loosely coupled way. As a result, services can be added and extended very easily.
+    Unitils provides general asserion utilities, support for database testing, support for testing with mock objects and offers integration with 
+    {{{http://www.springframework.org}Spring}} and {{{http://www.hibernate.org}Hibernate}}. It has been designed to offer these services to unit 
+    tests in a very configurable and loosely coupled way. As a result, services can be added and extended very easily.
     
     Currently Unitils offers following features:
 
@@ -45,6 +46,12 @@ Summary
         * EasyMock argument matching using reflection equality
 
     []
+    
+    * <Spring integration>
+    
+        * ApplicationContext configuration and easy injection of spring managed beans into a unit test
+        
+        * Support for using a Spring-configured Hibernate SessionFactory in unit tests.
 
 
     The project started begin 2006 from an {{{http://www.j-technologies.be}Ordina J-Technologies}} discussion group on unit testing. The result was a list of guidelines 
