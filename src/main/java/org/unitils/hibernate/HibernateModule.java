@@ -191,7 +191,7 @@ public class HibernateModule implements Module, Flushable {
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
         if (fields.isEmpty() && methods.isEmpty()) {
-            // nothing to do
+            // Nothing to do. Jump out to make sure that we don't try to instantiate the SessionFactory
             return;
         }
 
