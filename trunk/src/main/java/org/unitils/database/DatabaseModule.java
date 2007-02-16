@@ -157,7 +157,7 @@ public class DatabaseModule implements Module {
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         if (fields.isEmpty() && methods.isEmpty()) {
-            // nothing to do
+            // Nothing to do. Jump out to make sure that we don't try to instantiate the DataSource
             return;
         }
         setFieldAndSetterValue(testObject, fields, methods, getDataSource());

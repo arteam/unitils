@@ -101,9 +101,10 @@ public class ReflectionUtils {
             field.set(object, value);
 
         } catch (IllegalArgumentException e) {
-            throw new UnitilsException("Error while trying to access field " + field, e);
+            throw new UnitilsException("Unable to assign the value to field: " + field.getName() + ". Ensure that this field is of the correct type.", e);
 
         } catch (IllegalAccessException e) {
+            // Cannot occur, since field.accessible has been set to true
             throw new UnitilsException("Error while trying to access field " + field, e);
         }
     }
@@ -127,6 +128,9 @@ public class ReflectionUtils {
             }
         }
         for (Method method : setterMethods) {
+            if (!isSetter(method)) {
+                throw new UnitilsException("Method " + method.getName() + " is expected to be a setter method, but is not");
+            }
             try {
                 invokeMethod(object, method, value);
 
