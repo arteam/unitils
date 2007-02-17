@@ -353,14 +353,18 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
     The database maintainer works as follows: a project should have a directory that contains all database scripts of the application. These are typically 
     created incrementally, e.g. a first script contains the creation of a USERS table and a later script contains a statement for adding a 
     column to that table. The database maintainer will monitor this directory and makes sure that all changes to scripts and all new scripts 
-    are performed on all of the test database. 
+    are performed on all of the test database. The directory in which the scripts are located can be indicated using the following property:
     
-    This is especially powerful when you work with a SCM system such as Subversion. Suppose one developer creates a script that changes a certain 
++-----+
+dbMaintainer.fileScriptSource.scripts.location=/myproject/dbscripts
++-----+
+    
+    This system is very powerful when you work with a SCM system such as Subversion. Suppose some developer creates a script that changes a 
     table definition. The database maintainer will automatically make sure that the unit-test schema of this developer is updated with these 
-    new changes. He can then work on the DAOs and corresponding tests to incorporate these database changes. In the mean time other developers, since 
+    new changes. He can work on the DAOs and corresponding tests to incorporate these database changes. In the mean time, other developers, since 
     nothing was committed, did not yet receive any new scripts or modified code. They are still working on the old database structure, but this is fine
-    since they are also still using the old version of the code and corresponding tests. Eventually the developer will commit his changes and other 
-    developers will receive the new script together with the code changes. The database maintainer will then automatically update their unit-test 
+    since they are also still using the old version of the code and corresponding tests. Eventually the developer commits his changes and other 
+    developers receive the new script together with the code changes. The database maintainer will automatically update their unit-test 
     schemas and all new code and corresponding tests will run correctly. 
 
     For its versioning system, Unitils expects that all scripts follow a certain naming pattern: they start with a version number, followed by an 
@@ -451,8 +455,51 @@ database.dialect=oracle
 
     []
     
-    
+*** {Testing functions, stored procedures, ...}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    Enterprise applications typically contain application code that is stored and executed on the database, like functions and stored procedures. 
+    It can often be a good idea to always have these code definitions applied to your test databases, to unit-test their correct hehaviour or for 
+    integration testing.
+    It is in most cases not possible to simply mix them with the regular database DDL definitions, because the syntax of stored procedures is 
+    different: A ';' in a regular DDL statement indicates the end of a statement, while a stored procedure typically contains multiple SQL statements,
+    and a ';' doesn't mean the end of a stored procedure.
+    
+    The database maintainer will execute all scripts in the configured location whenever one of these files is changed, or after updating the database structure.
+    Before doing this, a service implementing the <DbCodeClearer> interface is called, doing some necessary cleanup first. For the moment, this service
+    only drops database triggers and oracle types. In most cases it is not needed that the stored procedure definitions are cleared first, since their
+    existing definition can be overwritten using <CREATE OR REPLACE>.
+    
+    The directory(ies) containing script files with triggers, functions and stored procedures can be configured as follows:
+    
++-----+
+dbMaintainer.fileScriptSource.code.location=/myproject/dbscripts/procedures
++-----+
+
+    
+    Multiple directories can be configured, separated by commas. Subdirectories are also scanned for script files. Since for database sources, the 
+    sequence in which they are executed is in most cases not important, adding sequence numbers to the files is not required. If you do add sequence
+    numbers, the scripts with numbers are executed first. For example, suppose we have following files:
+    
++----+
+databasecode/ 01_compileAll.sql
+              dropAllInactiveUsers.sql
+              collectivePayRaise.sql
+							
++----+
+
+    Unitils will first execute the non-indexed scripts. This will make sure the stored procedures in dropAllInactiveUsers.sql and collectivePayRaise.sql 
+    are created in the database. Next, the indexed files are executed in proper sequence, which in this case will make sure a script is executed that 
+    compiles all stored procedures in the database.
+    
+    Code script files can contain multiple function / stored procedure / ... definitions. The different definitions should be separated by a / sign
+    that is put on a new line, like follows:
+    
++-----+
+stored procedure definition 1
+/
+stored procedure definition 2
++-----+
 
 
 ** {Testing with Hibernate}
