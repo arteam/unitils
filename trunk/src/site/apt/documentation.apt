@@ -353,11 +353,7 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
     The database maintainer works as follows: a project should have a directory that contains all database scripts of the application. These are typically 
     created incrementally, e.g. a first script contains the creation of a USERS table and a later script contains a statement for adding a 
     column to that table. The database maintainer will monitor this directory and makes sure that all changes to scripts and all new scripts 
-    are performed on all of the test database. The directory in which the scripts are located can be indicated using the following property:
-    
-+-----+
-dbMaintainer.fileScriptSource.scripts.location=/myproject/dbscripts
-+-----+
+    are performed on all of the test database. 
     
     This system is very powerful when you work with a SCM system such as Subversion. Suppose some developer creates a script that changes a 
     table definition. The database maintainer will automatically make sure that the unit-test schema of this developer is updated with these 
@@ -365,9 +361,16 @@ dbMaintainer.fileScriptSource.scripts.location=/myproject/dbscripts
     nothing was committed, did not yet receive any new scripts or modified code. They are still working on the old database structure, but this is fine
     since they are also still using the old version of the code and corresponding tests. Eventually the developer commits his changes and other 
     developers receive the new script together with the code changes. The database maintainer will automatically update their unit-test 
-    schemas and all new code and corresponding tests will run correctly. 
+    schemas and all new code and corresponding tests will run correctly.
+    
+    The directory in which the scripts are located can be indicated using the following property:
+    
++-----+
+dbMaintainer.fileScriptSource.scripts.location=/myproject/dbscripts
++-----+
 
-    For its versioning system, Unitils expects that all scripts follow a certain naming pattern: they start with a version number, followed by an 
+    Multiple directories can be configured, separated by commas. Subdirectories are also scanned for script files.
+    Unitils expects that all scripts follow a certain naming pattern: they start with a version number, followed by an 
     underscore and end with '.sql' (this is configurable). The example below shows some typical names for scripts. Note that the leading zeroes in 
     the example are not required, they are only added to make sure the scripts are shown in proper sequence in a file explorer window.
 
@@ -489,11 +492,11 @@ databasecode/ 01_compileAll.sql
 +----+
 
     Unitils will first execute the non-indexed scripts. This will make sure the stored procedures in dropAllInactiveUsers.sql and collectivePayRaise.sql 
-    are created in the database. Next, the indexed files are executed in proper sequence, which in this case will make sure a script is executed that 
-    compiles all stored procedures in the database.
+    are created in the database. Next, the indexed files are executed in proper sequence, which in this case will make sure the script 01_compileAll.sql 
+    is executed that compiles all stored procedures in the database.
     
     Code script files can contain multiple function / stored procedure / ... definitions. The different definitions should be separated by a / sign
-    that is put on a new line, like follows:
+    that is put on a separates line, like follows:
     
 +-----+
 stored procedure definition 1
@@ -510,52 +513,78 @@ stored procedure definition 2
     easy and quick testing of HQL queries.
 
     A HQL method can be tested exactly the same way as described above in {{{#Loading test data with DbUnit} Managing test data with DbUnit}}. 
-    The <@ExpectedDataSet> annotation can also be used for result checking with a data file. 
+    The <@ExpectedDataSet> annotation can also be used for result checking with a data file. To make sure all database updates performed during the 
+    test are actually executed on the database, Unitils will ensure that the Hibernate Session is flushed before performing the check. 
     
     
 *** {Loading Hibernate configurations}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-    Unitils provides out-of-the box configuration support for Hibernate. When you annotate a Hibernate test class or the superclass with the 
-    <@HibernateConfiguration> annotation, Unitils will perform the loading and managing of the Hibernate configuration for you. 
+    Unitils provides out-of-the box configuration support for Hibernate. You can obtain a SessionFactory that connects to the unit test database simply by
+    annotating a field or method with the <@HibernateSessionFactory> annotation. This annotation can be parameterized with one or more Hibernate 
+    configuration files that you want to be loaded. The only thing you have to do more to start testing your DAO's is making sure that this SessionFactory is 
+    used by your tested code.
     
-    To make sure all database updates performed during the 
-    test are actually executed on the database, Unitils will ensure that the Hibernate Session is flushed before performing the check. 
-    
-    In the configuration
-    you can specify one or more hibernate configuration files that should be loaded in the tests:
-    
-    Extra programmatic configuration can also be performed by annotating a method with <@HibernateConfiguration> in your test (super)class. Unitils
-    will then call this method passing the hibernate configuration as an argument:
+    It is also possible (and recommended) to specify the Hibernate configuration using a
+    <@HibernateSessionFactory> annotation on the level of the test class, and have your SessionFactory injected using a parameterless <@HibernateSessionFactory> 
+    annotation on the field or method. This is demonstrated in the following example:
     
 +-----+
-@HibernateConfiguration
-Configuration configureHibernate(Configuration configuration) {
+@HibernateSessionFactory({"hibernate.cfg.xml", "mapped-classes.cfg.xml"})
+public class UserDaoTest extends UnitilsJUnit4 {
+    
+    @HibernateSessionFactory
+    private void setSessionFactory(SessionFactory sessionFactory) {
+         // Code that initializes tested code with this SessionFactory
+    }
+    
+}
++-----+
+
+    Any Hibernate configuration files that are specified at class level can be inherited by subclasses. For instance, you can specify a general Hibernate
+    configuration file in the superclass and a file loading module specific Hibernate mapped classes into the configuration in a subclass, like follows:
+    
++-----+
+@HibernateSessionFactory({"hibernate.cfg.xml"})
+public class BaseDaoTest extends UnitilsJUnit4 {
+    ...
+}
+
+@HibernateSessionFactory({user-mapped-classes.cfg.xml"})
+public class UserDaoTest extends BaseDaoTest {
+     ...
+}
++-----+
+    
+    Programmatic configuration can also be performed by annotating a method with <@HibernateSessionFactory> that takes a <Configuration> object
+    as first and only parameter and returns an object of type SessionFactory. Unitils will call this method passing the Hibernate configuration 
+    as an argument. Any Hibernate configuration files that were specified at the class level in the same class or a superclass, will already be added
+    to the <Configuration> object before it is passed into the method.
+    
++-----+
+@HibernateSessionFactory
+SessionFactory createSessionFactory(Configuration configuration) {
     ...
 }   
 +-----+
     
-    To obtain a Hibernate Session you can use the <@HibernateSession> annotation on a method or on a field of your test. You can then inject this session
-    in your own data access layer. Typically this is coded once in a superclass for all your hibernate tests. An simple example Hibernate test base class 
-    could look as follows:
 
-+-----+
-public abstract void BaseHibernateDAOTest extends UnitilsJUnit4 {
+*** {Hibernate Session management}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    @HibernateSession
-    private Session hibernateSession;
+    Typically, a project contains a base DAO class that contains a reference to the Hibernate <SessionFactory>, and opens <Session>s on it. It depends 
+    on the configuration of the project when these sessions are closed. It can be done explicitly at the end of every DAO method, automatically
+    behind the screens on transaction commit, or you could make use of sessions that span multiple transactions. You could use <SessionFactory.openSession()>
+    and <Session.close()> methods to open and close sessions, or you could make use of <SessionFactory.getCurrentSession()> and rely on an implementation
+    of Hibernate's <CurrentSessionContext> interface to handle session opening and closing for you.
     
-    @Before    
-    public void initializeDao() {
-        
-        BaseDAO dao = getDaoUnderTest();
-        dao.setHibernateSession(hibernateSession);
-    }
+    Whatever strategy you use, Unitils will make sure that after every unit test, any sessions that are still open are automatically closed, whether you use
+    <SessionFactory.openSession()> or <SessionFactory.getCurrentSession()> to obtain a <Session>.
     
-    protected abstract BaseDAO getDaoUnderTest();
-}
-+-----+ 
-
-
+    Unitils also provides an implementation of Hibernate's <CurrentSessionContext>, <SimpleCurrentSessionContext> and adds this to the Hibernate configuration. 
+    This enables you to use <SessionFactory.getCurrentSession()> in your tested code without having to do any configuration yourself. This implementation will
+    make sure that a new <Session> is created the first time you call <SessionFactory.getCurrentSession()> in a test. For the duration of the test, the same
+    instance of <Session> will be used. The <Session> is automatically closed after the test has finished.
+    
 
 *** {Testing the mapping}
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -564,25 +593,27 @@ public abstract void BaseHibernateDAOTest extends UnitilsJUnit4 {
     test is not automatically executed; you should write a unit test that looks like the following:
 
 +-----+
-@HibernateConfiguration(hibernate-general.cfg.xml, hibernate-unittest.cfg.xml)
+@HibernateSessionFactory(hibernate.cfg.xml)
 public class HibernateMappingTest extends UnitilsJUnit4 {
 
     @Test
     public void testMappingToDatabase() {
-        HibernateUnitils.assertMappingToDatabase();
+        HibernateUnitils.assertMappingWithDatabaseConsistent();
     }
 }
 +-----+
 
-    The method <HibernateUnitils.assertMappingToDatabase()> checks if any updates are required to the database to make it consistent with the Hibernate mapping. If yes,
-    the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown in the error message. E.g.
+    The method <HibernateUnitils.assertMappingWithDatabaseConsistent()> checks if any updates are required to the database to make it consistent with the 
+    Hibernate mapping. If yes, the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown 
+    in the error message. E.g.
     
 +-----+
+Found mismatches between Java objects and database tables. Applying following DDL statements to the database should resolve the problem:
 alter table PERSON add column lastName varchar(255);
 alter table PRODUCT add column barCode varchar(255);
 +-----+
 
-    
+
 
 * {Using reflection for assertion}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
