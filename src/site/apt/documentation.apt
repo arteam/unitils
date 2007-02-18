@@ -151,8 +151,6 @@ public class MyTest {
    
    * <SpringModule>: support for loading application contexts and retrieving and injecting Spring beans
 
-   * Planned: support for JPA.
-
 
 
 
@@ -323,6 +321,15 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 }
 +-----+    
 
+    Another way of making your code use the Unitils <DataSource> is by using an instance of <org.unitils.database.UnitilsDataSource>. Creating a new instance
+    using the default constricutor of this class is all it takes to be able to connect to the unit test database. This can be used in e.g. a datasource XML config file
+    or programmatically as follows:
+    
++-----+
+    DataSource ds = new UnitilsDataSource();
+    Connection conn = ds.getConnection();
+    ...
++-----+
 
 
 ** {Unit test database maintenance}
@@ -620,7 +627,7 @@ alter table PRODUCT add column barCode varchar(255);
 
 ** Reflection versus equals()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    A typical unit test contains a part in which it will compare test result values with expected values. Unitils offers some
+    A typical unit test contains a part in which it compares test result values with expected values. Unitils offers some
     assertion utilities to help you with this. 
     
     Let's start with an example of comparing 2 User instances having an id, a first and a last name:
@@ -1010,7 +1017,7 @@ private UserService userService;
   
 +-----+
 @AfterCreateMock
-protected final void injectMock(Object mock, String name, Class type) {
+void injectMock(Object mock, String name, Class type) {
     ServiceLocator.injectService(type, mock);
 }
 +----+
@@ -1018,3 +1025,108 @@ protected final void injectMock(Object mock, String name, Class type) {
     The method ServiceLocator.injectService make sure that when the ServiceLocator is requested for an implementation of UserDao, 
     the mock is returned. This allows for a very simple way of using mock object in combination with such a service locator.
 
+
+
+* Integration with Spring
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    Unitils also offers features for unit testing when working with {{{http://www.springframework.org}Spring}}. One of the basic principles 
+    of Spring is that your objects are designed in such way that they are easily testable without Spring or any other container. For integration 
+    testing however, it can be useful to work with object structures that are wired by the Spring container. 
+    
+    The features Unitils offers for Spring are:
+    
+    * Management of <ApplicationContext> configuration
+    
+    * Simple injection of Spring beans in unit tests
+    
+    * Enable testing DAO's that make use of a Hibernate <SessionFactory> configured in Spring
+    
+** ApplicationContext configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    In order to test Spring-wired beans, you need an <ApplicationContext> in your tests. Typically, your application is configured by multiple
+    Spring configuration files, and you need only one or a few for your test. Unitils offers a very simple but powerful way of specifying the
+    config files that need to be loaded. The mechanism is analoguous to the way in which you can configure your Hibernate <SessionFactory>.
+    
+    A <@SpringApplicationContext> annotation can be put at class level or on a field or setter method. You can specify config files to be loaded 
+    on either level. Superclasses will be scanned for the presence of class-level <@SpringApplicationContext> annotations. If present, the 
+    configuration files that are found are loaded before loading the config files specified on the annotations of the current class. 
+    For example:
+    
++-----+
+@SpringApplicationContext("spring-beans.xml","extra-spring-beans.xml")
+public class UserServiceTest extends UnitilsJUnit4 {
+
+     @SpringApplicationContext
+     private ApplicationContext applicationContext;
+
+}
++-----+
+
+     This example will create a new <ApplicationContext> containing the files <spring-beans.xml and extra-spring-beans.xml, and inject it into the 
+     annotated field. The same effect can be obtained with the following:
+     
++-----+
+@SpringApplicationContext("spring-beans.xml")
+public class BaseServiceTest extends UnitilsJUnit4 {
+
+}
+
+@SpringApplicationContext("extra-spring-beans.xml")
+public class UserServiceTest extends BaseServiceTest {
+
+     @SpringApplicationContext
+     private ApplicationContext applicationContext;     
+
+}
++-----+
+
+     If you have multiple tests making use of the same configuration, it is advisory to make them extend a common superclass on which this configuration
+     is specified at class level. This will make sure the <ApplicationContext> is only created once when running all of these tests in a suite.
+     
+     Programmatic configuration is also possible by annotating a method that takes a <List\<String\>> as parameter and returns an ApplicationContext.
+     The parameter consists of the names of all configuration files specified using a <@SpringApplicationContext> annotation on the level of the class
+     and/or its superclasses. The ApplicationContext that is returned should be a subclass of <ConfigurableApplicationContext>, and the refresh() method
+     should not be invoked yet. This can be achieved by invoking a constructor with the value <false> for the refresh boolean parameter. This reason for 
+     this is that Unitils needs to be able to add one or more BeanPostProcessors to the <ApplicationContext> before the <refresh()> method is called, which
+     processes the configuration files and instantiates the singleton beans. A valid implementation could be the following:
+     
++-----+
+@SpringApplicationContext
+public ConfigurableApplicationContext createApplicationContext(List<String> locations) {
+     return new ClassPathXmlApplicationContext(Arrays.asList("spring-beans.xml","extra-spring-beans.xml"), false);
+}
++-----+
+     
+** Injection of Spring beans
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     Once you've configured an ApplicationContext, you can in a very simple way make Unitils inject Spring beans in fields or setters of your test object. 
+     This can be achieved using one of the annotations <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>. When using <@SpringBean>, you have to 
+     explicitly specify the  name of the bean in the ApplicationContext. E.g.:
+     
++-----+
+@SpringBean("userService")
+private UserService userService;
++-----+
+
+     The same effect can be reached using <@SpringBeanByName>, provided that the property name of the target field or setter is the same as the name of the 
+     bean in the ApplicationContext:
+     
++-----+
+@SpringBeanByType
+public void setUserService(UserService userService) {
+	   this.userService = userService;
+}
++-----+
+
+     When using <@SpringBeanByType>, the ApplicationContext is queried for a bean having a type assignable to the type of the target field or setter. If 
+     no such bean exists or if more than one is found, a <UnitilsException> is thrown. In the following example, Unitils will look in the ApplicationContext 
+     for a bean of type UserService or a subtype.
+     
++------+
+@SpringBeanByType
+public void setUserService(UserService userService) {
+	   this.userService = userService;
+}
++-----+
+
+     
