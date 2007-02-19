@@ -5,7 +5,6 @@
 
 Tutorial
 ~~~~~~~~
-
     Unit testing should be easy and intuitively... at least in theory. Real-life projects
     typically span multiple layers, are data-driven and use middleware technologies such as EJB and Hibernate.
 
@@ -15,7 +14,8 @@ Tutorial
 
     This tutorial will show you, using examples, what Unitils can do for your projects. It is merely an introduction to Unitils, 
     more in-depth documentation can be found in the {{{apidocs/index.html}javadoc}} of the modules. The testing guidelines that are 
-    behind the features can be found on the {{{guidelines.html}guidelines page}}.
+    behind the features can be found on the {{{guidelines.html}guidelines page}}. If you want to learn how you can setup Unitils to 
+    get started quickly, read the {{{cookbook.html}cookbook}}.
 
 
 
@@ -24,10 +24,7 @@ Tutorial
 ~~~~~~~~~~~~~~~~~
 
 ** {Configuration}
-~~~~~~~~~~~~~~~~
-    This section explains how the configuration of Unitils works. If you want to learn how you can setup Unitils to get started 
-    quickly, read the {{{cookbook.html}cookbook}}.
-    
+~~~~~~~~~~~~~~~~        
     As with many projects, Unitils needs some configuration of its services. By default, there are 3 levels
     of configuration, each level overriding the settings of the previous one:
 
@@ -52,11 +49,11 @@ dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 +-----+
 
     The file is not required, but if you create one, it should be placed somewhere in the classpath of your project. To get you started, 
-    you can find a sample file that contains most commonly used configuration settings in the following {{{unitils.properties}unitils.properties}} template.
+    you can find a sample file that contains most commonly used configuration settings in following {{{unitils.properties}unitils.properties}} template.
 
     The last file, unitils-local.properties, is also optional. It can contain settings that override the project settings and is used for
-    defining per-user settings. For example, if each user uses its own unit-test database schema, you can
-    create a unitils-local.properties for each user that contains the corresponding username, password and database schema:
+    defining per-user settings. For example, if each user uses its own unit-test database schema, you can create a unitils-local.properties for 
+    each user that contains the corresponding username, password and database schema:
 
 +-----+
 dataSource.userName=john
@@ -168,7 +165,7 @@ public class MyTest {
     builds further on DBUnit for providing support for working with test data sets. 
 
 
-*** {Loading test datasets}
+*** {Loading test data sets}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Let's start with an example of a UserDAO with a simple findByName method for retrieving a user based on it's first and last 
     name. A typical unit test would look as follows:
@@ -193,22 +190,22 @@ public void UserDAOTest extends UnitilsJUnit4 {
 +-----+
 
     The <@DataSet> annotation in the test instructs Unitils to look for DBUnit datafiles that need to be loaded for the test. Unitils 
-    automatically looks for dataset files that are in the same directory as the test class and have following name pattern:
+    automatically looks for data set files that are in the same directory as the test class and have following name pattern:
 
-    * <className>.xml - for a dataset that is shared by all tests in the test class.
+    * <className>.xml - for a data set that is shared by all tests in the test class.
     
-    * <className>.<methodName>.xml - for a dataset that is specific for the test method with the same name 
+    * <className>.<methodName>.xml - for a data set that is specific for the test method with the same name 
     
     []
     
-    When a method-specific dataset is found, this is used for the test. Otherwise, Unitils will look for a class-level dataset.
+    When a method-specific data set is found, this is used for the test. Otherwise, Unitils will look for a class-level data set.
     
-    Such a dataset file should be in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} file 
-    format and should contain all data needed for the test. All existing content of tables in the dataset will first be deleted and 
-    then all data of the dataset will be inserted in the database. Tables that are not in the dataset will not be cleared. You can explicity 
+    Such a data set file should be in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} file 
+    format and should contain all data needed for the test. All existing content of tables in the data set will first be deleted and 
+    then all data of the data set will be inserted in the database. Tables that are not in the data set will not be cleared. You can explicity 
     clear a table by adding an empty table element, e.g, \<MY_TABLE /\>.    
         
-    For the UserDAOTest we could for example create a class level dataset file named <UserDAOTest.xml> and put it in the same directory as 
+    For the UserDAOTest we could for example create a class level data set file named <UserDAOTest.xml> and put it in the same directory as 
     the UserDAOTest class:
     
 +-----+
@@ -220,7 +217,7 @@ public void UserDAOTest extends UnitilsJUnit4 {
 
     This will clear the user table and insert a user record for John Doe. 
     
-    Suppose the <testFindByMinimalAge()> method needs a specific dataset instead of the class-level dataset. You could create a file named 
+    Suppose the <testFindByMinimalAge()> method needs a specific data set instead of the class-level data set. You could create a file named 
     <UserDAOTest.testFindByMinimalAge.xml> and put that file in the same directory as the test class:
 
 +-----+
@@ -231,14 +228,15 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    Method-level datasets should not be overused, since having more data files means you have to do more maintenance. You should first try 
-    to reuse the data in the class level dataset - in most cases a small set of test records can be reused for multiple tests. If reusing 
-    a dataset mainly means adding extra records, it's better to create a method specific one. Otherwise, this will result in a big incoherent dataset.
+    Method-level data sets should not be overused, since having more data files means you have to do more maintenance. You should first try 
+    to reuse the data in the class level data set - in most cases a small set of test records can be reused for multiple tests. If this would 
+    result in a a big and incoherent data set, maybe it's better to use a method specific one or to try to split the test in 2 separate tests, 
+    each having its own data set.
     
-    By setting the <@DataSet> annotation on class level a dataset is loaded for every test in the class. If a dataset should
-    only be loaded for some of the tests, you should abandon the class level annotation and annotate the test methods instead. This way 
-    datasets will only be loaded for the annotated tests. If needed, you can also specify the filename of the dataset explicitly by passing it as argument 
-    to the <@DataSet> annotation:
+    By setting the <@DataSet> annotation on class level a data set is loaded for every test in the class. If a data set should only be loaded for 
+    some of the tests, you should remove the class level annotation and annotate the test methods instead. Datasets will then only be loaded 
+    for the annotated tests. If your data set file does not comply to the naming conventions as described above, you can also specify a file name 
+    explicitly by passing the name as an argument to the <@DataSet> annotation:
 
 +-----+
 @DataSet("UserDAOTest_general.xml")
@@ -262,7 +260,7 @@ public void UserDAOTest extends UnitilsJUnit4 {
 
 *** {Asserting test results}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unitils also offers support for checking the contents of a database with a certain dataset after a test was run. This can be useful for example when you want
+    Unitils also offers support for checking the contents of a database with a certain data set after a test was run. This can be useful for example when you want
     to check the result of a bulk update method or stored procedures. 
 
     Following example tests a method that disables all user accounts that haven't been used for an entire year:
@@ -278,8 +276,8 @@ public void UserDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    Note that we have added the <@ExpectedDataSet> to the test method. This will instruct Unitils to look for a dataset file named 
-    <UserDAOTest.testInactivateOldAccounts-result.xml> and compare the contents of the database with the contents of the dataset:
+    Note that we have added the <@ExpectedDataSet> to the test method. This will instruct Unitils to look for a data set file named 
+    <UserDAOTest.testInactivateOldAccounts-result.xml> and compare the contents of the database with the contents of the data set:
 
 +-----+
 <?xml version='1.0' encoding='UTF-8'?>
@@ -289,21 +287,28 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    As with the <@DataSet> annotation, a file name can explicitly be specified. If no name is specified, following naming pattern will be used: <className>.<methodName>-result.xml
+    For this datas et, it will check whether there are 2 different user records with corresponding values in the User table in the 
+    database. Other records and other tables are not taken into account.
+
+    As with the <@DataSet> annotation, a file name can explicitly be specified. If no name is specified, following naming pattern 
+    will be used: <className>.<methodName>-result.xml
     
-    The use of result datasets should be kept minimal, since adding new datasets means more maintenance. As an alternative, you should try to 
-    perform the same check in the test code (e.g. by using a method <findActiveUsers()>).
+    The use of result data sets should be kept to a minimum. Adding new data sets means more maintenance. As an alternative, you should always 
+    try to perform the same check in the test code (e.g. by using a method <findActiveUsers()>).
 
 
 *** {Connecting to the test database}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    In the above examples we left out 1 important thing: where is the DataSource for connecting to the test database coming from and how
+    In the above examples we left out 1 important thing: where is the <DataSource> for connecting to the test database coming from and how
     can we let our DAO classes make use of this <DataSource>? 
     
-    Before the first database test, Unitils creates a <DataSource> instance. If there is a field or setter method available annotated with <@TestDataSource>, Unitils 
-    injects the DataSource into this field or calls the method with the DataSource as parameter. This is done before the setup of each test. This way, you can 
-    easily make sure that your project data access code uses the correct DataSource. Typically all this is implemented once in a project-specific 
-    superclass for all your database tests. A simple example of such a base class could be:
+    When the first database test in your test suite is run, Unitils will create a <DataSource> instance that will conect to your unit-test database
+    using the settings defined in the properties. Subsequent database tests will reuse this same datasource instance. Before a test is set up, this 
+    datasource instance is then injected into the test instance: if a field or setter method is annotated with <@TestDataSource>, Unitils will set 
+    the DataSource into this field or call the method with the <DataSource> as parameter. 
+    
+    You then only have to provide some project specific code, that configures your DAO code to use this datasource. Typically all this is implemented 
+    once in a project-specific superclass for all your database tests. A simple example of such a base class could be:
     
 +-----+
 public abstract void BaseDAOTest extends UnitilsJUnit4 {
@@ -321,8 +326,9 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 }
 +-----+    
 
-    Another way of making your code use the Unitils <DataSource> is by using an instance of <org.unitils.database.UnitilsDataSource>. Creating a new instance
-    using the default constricutor of this class is all it takes to be able to connect to the unit test database. This can be used in e.g. a datasource XML config file
+    The above example used annotations to get a reference to the datasource, another way of making your code use the Unitils <DataSource> is by using 
+    an instance of <org.unitils.database.UnitilsDataSource>. This is a wrapper that delegates to the test datasource. Just create an instance
+    using the default constructor and you are able to connect to the unit test database. This can be used in e.g. a datasource XML config file
     or programmatically as follows:
     
 +-----+
@@ -332,17 +338,23 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 +-----+
 
 
+
 ** {Unit test database maintenance}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     When writing database tests, keep in mind following guidelines:
 
-    * Use small sets of test data, containing as few data as possible. In your data files,
-      only specifiy columns that are used in join columns or the where clause of the tested query.
+    * Use small sets of test data, containing as few data as possible. In your data files, only specifiy columns 
+      that are used in join columns or the where clause of the tested query.
 
-    * Don't reuse data files too much. Make them test class and in some cases even test method specific.
-      Changing the data becomes very difficult when multiple test classes are using the same data files.
+    * Make data sets test class specific. Don't reuse data sets between different test classes, for example
+      do not use 1 big domain data set for all your test classes. Doing so will make it very difficult 
+      to make changes to your test data for 1 test without braking anything for another test. You are writing 
+      a unit test and such a test should be independent of other tests. 
+      
+    * Don't use too many data sets. The more data sets you use, the more maintenance is needed. Try to reuse the testclass
+      data set for all tests in that testclass. Only use method data sets if it makes your tests more understandable and clear.
 
-    * Limit the use of result data files. If you do use them, only include the tables and columns that are
+    * Limit the use of expected result data sets. If you do use them, only include the tables and columns that are
       important for the test and leave out the rest.
 
     * Use a database schema per developer. This allows developers to insert test data and run tests without interfering with each other.
@@ -360,15 +372,16 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
     The database maintainer works as follows: a project should have a directory that contains all database scripts of the application. These are typically 
     created incrementally, e.g. a first script contains the creation of a USERS table and a later script contains a statement for adding a 
     column to that table. The database maintainer will monitor this directory and makes sure that all changes to scripts and all new scripts 
-    are performed on all of the test database. 
+    are performed on each of the test database instances. 
     
-    This system is very powerful when you work with a SCM system such as Subversion. Suppose some developer creates a script that changes a 
-    table definition. The database maintainer will automatically make sure that the unit-test schema of this developer is updated with these 
-    new changes. He can work on the DAOs and corresponding tests to incorporate these database changes. In the mean time, other developers, since 
-    nothing was committed, did not yet receive any new scripts or modified code. They are still working on the old database structure, but this is fine
-    since they are also still using the old version of the code and corresponding tests. Eventually the developer commits his changes and other 
-    developers receive the new script together with the code changes. The database maintainer will automatically update their unit-test 
-    schemas and all new code and corresponding tests will run correctly.
+    This system is very powerful when you work with a SCM system such as Subversion. Suppose some developer creates a script that changes a table definition. 
+    The database maintainer will automatically make sure that the unit-test schema of this developer is updated with these new modifications. He can then work 
+    on the DAOs and other code to make sure they function correctly to incorporate these changes. In the mean while, other developers, since nothing was 
+    committed yet, did not receive any new scripts and are thus still working on the old database structure. At this moment the tests are still fine because 
+    they are still using the old version of the code and corresponding test code. Eventually the developer commits the new script and his changes to the code in 
+    Subversion. When another developer then performs an update, he will receive the new script together with the corresponding code changes. The next time a 
+    unit-test is run the database maintainer will then automatically update their unit-test schemas using this new database script. As a result the unit-tests
+    are run against an updated database schema and should all be successful.
     
     The directory in which the scripts are located can be indicated using the following property:
     
@@ -376,10 +389,10 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 dbMaintainer.fileScriptSource.scripts.location=/myproject/dbscripts
 +-----+
 
-    Multiple directories can be configured, separated by commas. Subdirectories are also scanned for script files.
-    Unitils expects that all scripts follow a certain naming pattern: they start with a version number, followed by an 
-    underscore and end with '.sql' (this is configurable). The example below shows some typical names for scripts. Note that the leading zeroes in 
-    the example are not required, they are only added to make sure the scripts are shown in proper sequence in a file explorer window.
+    Multiple directories can be configured, separated by commas. Subdirectories are also scanned for script files. Unitils expects that all scripts 
+    follow a certain naming pattern: they start with a version number, followed by an underscore and end with '.sql' (this is configurable). The example 
+    below shows some typical names for scripts. Note that the leading zeroes in the example are not required, they are only added to make sure the scripts 
+    are shown in proper sequence in a file explorer window.
 
 +-----+
 dbscripts/ 001_initial.sql
@@ -389,8 +402,7 @@ dbscripts/ 001_initial.sql
 
     Suppose you add a new script, this time with version number 4: <004_create_user_admin_tables.sql>. The next time you execute a database test, 
     the database maintainer will notice that the database structure is no longer up to date. It will update the database schema incrementally by 
-    executing all of the new scripts, in this case only <004_create_user_admin_tables.sql>. When the update succeeds, the database test is 
-    executed on this up to date schema.
+    executing all of the new scripts, in this case only <004_create_user_admin_tables.sql>. 
         
     The database maintainer will also notice if one of the existing database scripts was altered. For example suppose that the <002_tracking_updates.sql> 
     was changed. In that case, the database maintainer will first clear the database, thereby removing all tables and then recreate it 
@@ -424,16 +436,16 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
     []
     
     To be able to work with the smallest possible test data sets, all foreign key and not null constraints on the test database are disabled. This way
-    you only need to add data that is of real value for your test. Because less data is specified in the dataset, they are easier to write, indicate
-    more clearly what is acuatlly being tested and, most importantly, they become much easier to maintain.
+    you only need to add data that is of real value for your test. Because less data is specified in the data set, they are easier to write, indicate
+    more clearly what is acuatlly being tested and, more importantly, they become much easier to maintain.
     
     All sequences and identity columns are updated to a sufficiently high initial value (1000 by default). This way, you can use fixed primary key values 
-    when inserting test data and without having conflicts with id sequences.
+    when inserting test data, avoiding conflicts with id sequences.
     
-    If you're using an IDE like Eclipse or IntelliJ, the generated DTD can help you create datasets more quickly and with less chances of writing errors.
-    Just add a doctype declaration to your dataset pointing to the generated DTD file and the IDE will offer you auto-completion and validation while
+    If you're using an IDE like Eclipse or IntelliJ, the generated DTD can help you create data sets more quickly and with less chances of writing errors.
+    Just add a doctype declaration to your data set pointing to the generated DTD file and the IDE will offer you auto-completion and validation while
     you are editing the file. The generated DTD describes the structure of the database in DbUnit's 
-    {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} format.
+    {{{http://www.dbunit.org/apidocs/org/dbunit/data set/xml/FlatXmlDataSet.html} FlatXMLDataSet}} format.
     
 +-----+
 <?xml version='1.0' encoding='UTF-8'?>
@@ -448,8 +460,8 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
     The database maintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates... 
     Look at the file unitils-default.properties for more information! 
     
-    Some functionality of the database maintainer such as for disabling constraints uses DBMS specific functionality. This functionality will only run 
-    properly when the correct dialect is configured. For example, suppose you want to use oracle, you should set following property:
+    Some functionality of the database maintainer, e.g. constraint disabling, uses DBMS specific functionality. This functionality will only run 
+    properly when the correct dialect (oracle, mysql...) is configured. For example, suppose you want to use oracle, you should set following property:
     
 +-----+
 database.dialect=oracle
@@ -464,7 +476,8 @@ database.dialect=oracle
     * MySQL: Tested with version 5.0
 
     []
-    
+ 
+ 
 *** {Testing functions, stored procedures, ...}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -512,6 +525,7 @@ stored procedure definition 2
 +-----+
 
 
+
 ** {Testing with Hibernate}
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -520,20 +534,19 @@ stored procedure definition 2
     easy and quick testing of HQL queries.
 
     A HQL method can be tested exactly the same way as described above in {{{#Loading test data with DbUnit} Managing test data with DbUnit}}. 
-    The <@ExpectedDataSet> annotation can also be used for result checking with a data file. To make sure all database updates performed during the 
-    test are actually executed on the database, Unitils will ensure that the Hibernate Session is flushed before performing the check. 
-    
-    
+    The <@ExpectedDataSet> annotation can also be used for result checking with a data set. Unitils will ensure that the Hibernate Session is 
+    flushed to make sure all database updates performed during the test are actually executed on the database, 
+
+
 *** {Loading Hibernate configurations}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
     Unitils provides out-of-the box configuration support for Hibernate. You can obtain a SessionFactory that connects to the unit test database simply by
     annotating a field or method with the <@HibernateSessionFactory> annotation. This annotation can be parameterized with one or more Hibernate 
-    configuration files that you want to be loaded. The only thing you have to do more to start testing your DAO's is making sure that this SessionFactory is 
+    configuration files that you want to have loaded. The only thing you have to do more to start testing your DAO's is making sure that this SessionFactory is 
     used by your tested code.
     
-    It is also possible (and recommended) to specify the Hibernate configuration using a
-    <@HibernateSessionFactory> annotation on the level of the test class, and have your SessionFactory injected using a parameterless <@HibernateSessionFactory> 
-    annotation on the field or method. This is demonstrated in the following example:
+    It is also possible (and recommended) to specify the Hibernate configuration using a <@HibernateSessionFactory> annotation on the level of the test class, 
+    and have your SessionFactory injected using a parameterless <@HibernateSessionFactory> annotation on the field or method. This is demonstrated in the following example:
     
 +-----+
 @HibernateSessionFactory({"hibernate.cfg.xml", "mapped-classes.cfg.xml"})
@@ -577,7 +590,6 @@ SessionFactory createSessionFactory(Configuration configuration) {
 
 *** {Hibernate Session management}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     Typically, a project contains a base DAO class that contains a reference to the Hibernate <SessionFactory>, and opens <Session>s on it. It depends 
     on the configuration of the project when these sessions are closed. It can be done explicitly at the end of every DAO method, automatically
     behind the screens on transaction commit, or you could make use of sessions that span multiple transactions. You could use <SessionFactory.openSession()>
@@ -622,8 +634,10 @@ alter table PRODUCT add column barCode varchar(255);
 
 
 
+
 * {Using reflection for assertion}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 ** Reflection versus equals()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -655,7 +669,7 @@ assertEquals(user1, user2);
     You would expect that this assertion would be successful since both instances contain the same values. This is however 
     not the case, if User does not override the equals() method. Checking equals of 2 User instances is in that case the same
     as checking whether both instances are the same. In other words, the assertEquals actually results in user1 == user2 
-    being tested which causes the assertion to fail.
+    being tested causing the assertion to fail.
     
     Suppose you would implement the equals method as follows:
     
@@ -721,12 +735,11 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 
 ** Lenient assertions
 ~~~~~~~~~~~~~~~~~~~~~
-        
     If you want to create unit tests that are maintainable, care must be taken to only add assertions to your test that 
-    are of value for the test. Let me clarify this with an example: Suppose you have a test for a calulation of an account balance. 
+    are of value for the test. Let me clarify this with an example: suppose you have a test for a calulation of an account balance. 
     There is no need to add any assertions to this test that will check whether the name of the bank-customer is still correct.
     This will only add complexity to your test making it more difficult to understand and, more importantly, more brittle against changes 
-    to the code. If you want your code to easily survive refactorings and other code changes, make sure you limit your assertions and 
+    to the code. If you want your test code to easily survive refactorings and other code changes, make sure you limit your assertions and 
     test data setup to the scope of the test.
     
     To help you in writing assertions that only test what is important, we added some levels of leniency to the ReflectionAssert checks, which 
@@ -746,17 +759,6 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 List<Integer> myList = Arrays.asList(3, 2, 1);
 assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER); 
 +-----+
-
-    The <ReflectionAssert> class also offers an assertion for which two leniency levels, lenient order and 
-    ignore defaults (see below) are pre-set: <ReflectionAssert.assertLenEquals>. The above example can therefore be re-written as follows:
-    
-+-----+
-List<Integer> myList = Arrays.asList(3, 2, 1);
-assertLenEquals(Arrays.asList(1, 2, 3), myList); 
-+-----+
-    
-    This len/ref thing is a general naming convention: assert<<Ref>>... is the version that is strict by default and for which you can 
-    manually set the leniency levels, assert<<Len>>... is the version for which the lenient order and ignore defaults are pre-set. 
     
 
 *** Ignoring defaults
@@ -779,16 +781,16 @@ assertLenEquals(expectedUser, actualUser);
     Right-instance fields that have default values will still be compared.
     
 +-----+
-assertLenEquals(null, "any");  // Succeeds
-assertLenEquals("any", null);  // Fails
+assertRefEquals(null, "any", IGNORE_DEFAULTS);  // Succeeds
+assertRefEquals("any", null, IGNORE_DEFAULTS);  // Fails
 +-----+    
 
 
 *** Lenient dates
 ~~~~~~~~~~~~~~~~~
     A third and final type of leniency is <ReflectionComparatorMode.LENIENT_DATES>. This will assert that date field values in both instances 
-    are set or equal to null, actual value of the dates is ignored. E.g. a date from last year will equal the current date. This type of leniency
-    can be useful e.g. when you want to do a strict comparison of objects (without using the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode), but
+    are set or both equal to null, the actual values of the dates are ignored. E.g. a date from last year will equal the current date. This type 
+    of leniency can be useful e.g. when you want to do a strict comparison of objects (without using the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode), but
     when these objects have a createOn and lastModifiedOn fields that you want to ignore.
 
 +-----+
@@ -798,7 +800,23 @@ assertRefEquals(expectedDate, actualDate, LENIENT_DATES);
 +-----+
 
 
+*** assertLenEquals
+~~~~~~~~~~~~~~~~~~~
+    The <ReflectionAssert> class also offers an assertion for which two of the leniency levels, lenient order and 
+    ignore defaults are pre-set: <ReflectionAssert.assertLenEquals>. The above examples can therefore be re-written as follows:
+    
++-----+
+List<Integer> myList = Arrays.asList(3, 2, 1);
+assertLenEquals(Arrays.asList(1, 2, 3), myList); 
 
+assertLenEquals(null, "any");  // Succeeds
+assertLenEquals("any", null);  // Fails
++-----+
+    
+    This len/ref thing is a general naming convention: assert<<Ref>>... is the version that is strict by default and for which you can 
+    manually set the leniency levels, assert<<Len>>... is the version for which the lenient order and ignore defaults are pre-set. 
+    
+        
 
 ** Property assertions
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -1027,6 +1045,8 @@ void injectMock(Object mock, String name, Class type) {
 
 
 
+
+
 * Integration with Spring
 ~~~~~~~~~~~~~~~~~~~~~~~~~
     Unitils also offers features for unit testing when working with {{{http://www.springframework.org}Spring}}. One of the basic principles 
@@ -1040,7 +1060,10 @@ void injectMock(Object mock, String name, Class type) {
     * Simple injection of Spring beans in unit tests
     
     * Enable testing DAO's that make use of a Hibernate <SessionFactory> configured in Spring
-    
+
+
+
+
 ** ApplicationContext configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     In order to test Spring-wired beans, you need an <ApplicationContext> in your tests. Typically, your application is configured by multiple
@@ -1062,7 +1085,7 @@ public class UserServiceTest extends UnitilsJUnit4 {
 }
 +-----+
 
-     This example will create a new <ApplicationContext> containing the files <spring-beans.xml and extra-spring-beans.xml, and inject it into the 
+     This example will create a new <ApplicationContext> containing the files <spring-beans.xml> and <extra-spring-beans.xml>, and inject it into the 
      annotated field. The same effect can be obtained with the following:
      
 +-----+
@@ -1096,7 +1119,10 @@ public ConfigurableApplicationContext createApplicationContext(List<String> loca
      return new ClassPathXmlApplicationContext(Arrays.asList("spring-beans.xml","extra-spring-beans.xml"), false);
 }
 +-----+
-     
+    
+
+
+
 ** Injection of Spring beans
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      Once you've configured an ApplicationContext, you can in a very simple way make Unitils inject Spring beans in fields or setters of your test object. 
@@ -1128,5 +1154,3 @@ public void setUserService(UserService userService) {
 	   this.userService = userService;
 }
 +-----+
-
-     
