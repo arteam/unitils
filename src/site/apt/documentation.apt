@@ -479,8 +479,7 @@ database.dialect=oracle
  
  
 *** {Testing functions, stored procedures, ...}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Enterprise applications typically contain application code that is stored and executed on the database, like functions and stored procedures. 
     It can often be a good idea to always have these code definitions applied to your test databases, to unit-test their correct hehaviour or for 
     integration testing.
@@ -528,61 +527,62 @@ stored procedure definition 2
 
 ** {Testing with Hibernate}
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-
     An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Even when using such a O/R mapping tool, unit 
     tests remain valuable. They can ensure the mapping of the Hibernate mapped classes is always in sync with the database and can be used for 
     easy and quick testing of HQL queries.
 
-    A HQL method can be tested exactly the same way as described above in {{{#Loading test data with DbUnit} Managing test data with DbUnit}}. 
-    The <@ExpectedDataSet> annotation can also be used for result checking with a data set. Unitils will ensure that the Hibernate Session is 
-    flushed to make sure all database updates performed during the test are actually executed on the database, 
+    A HQL method can be tested in exactly the same way as described above in {{{#Loading test data with DbUnit} Managing test data with DbUnit}}. 
+    The <@ExpectedDataSet> annotation can also be used for checking the result of a test using a data set. To make sure that all database 
+    updates were actually executed on the database, Unitils will flush all Hibernate sessions before checking the database state. 
 
 
 *** {Loading Hibernate configurations}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-    Unitils provides out-of-the box configuration support for Hibernate. You can obtain a SessionFactory that connects to the unit test database simply by
+    Unitils provides out-of-the box configuration support for Hibernate. You can obtain a <SessionFactory> that connects to the unit test database simply by
     annotating a field or method with the <@HibernateSessionFactory> annotation. This annotation can be parameterized with one or more Hibernate 
-    configuration files that you want to have loaded. The only thing you have to do more to start testing your DAO's is making sure that this SessionFactory is 
-    used by your tested code.
-    
-    It is also possible (and recommended) to specify the Hibernate configuration using a <@HibernateSessionFactory> annotation on the level of the test class, 
-    and have your SessionFactory injected using a parameterless <@HibernateSessionFactory> annotation on the field or method. This is demonstrated in the following example:
+    configuration files that you want to have loaded. If you annotate a field or method with this annotation, the session factory will be 
+    injected in this field or method. This is demonstrated in the following example:
     
 +-----+
 @HibernateSessionFactory({"hibernate.cfg.xml", "mapped-classes.cfg.xml"})
 public class UserDaoTest extends UnitilsJUnit4 {
     
     @HibernateSessionFactory
+    private SessionFactory sessionFactory;
+    
+    @HibernateSessionFactory
     private void setSessionFactory(SessionFactory sessionFactory) {
-         // Code that initializes tested code with this SessionFactory
     }
-    
 }
 +-----+
 
-    Any Hibernate configuration files that are specified at class level can be inherited by subclasses. For instance, you can specify a general Hibernate
-    configuration file in the superclass and a file loading module specific Hibernate mapped classes into the configuration in a subclass, like follows:
+    This will create a Hibernate <Configuration> and load the <hibernate.cfg.xml> followed by the <mapped-class.cfg.xml> configuration files. The
+    <Configuration> instance is then used to create a <SessionFactory> which is injected into the annotated field and setter method of the test.
+    
+    Any Hibernate configuration files that are specified in superclasses are inherited by subclasses. For instance, you can specify a general Hibernate
+    configuration file in the superclass and a test specific configuration file in a subclass:
     
 +-----+
-@HibernateSessionFactory({"hibernate.cfg.xml"})
+@HibernateSessionFactory("hibernate.cfg.xml")
 public class BaseDaoTest extends UnitilsJUnit4 {
-    ...
 }
 
-@HibernateSessionFactory({user-mapped-classes.cfg.xml"})
+@HibernateSessionFactory("user-mapped-classes.cfg.xml")
 public class UserDaoTest extends BaseDaoTest {
-     ...
+     
+    @HibernateSessionFactory
+    private SessionFactory sessionFactory;
 }
 +-----+
     
-    Programmatic configuration can also be performed by annotating a method with <@HibernateSessionFactory> that takes a <Configuration> object
-    as first and only parameter and returns an object of type SessionFactory. Unitils will call this method passing the Hibernate configuration 
+    Programmatic configuration can also be performed by annotating a method with <@HibernateSessionFactory> that optionally takes a 
+    <Configuration> object as parameter and returns a <SessionFactory> instance. Unitils will call this method passing the Hibernate configuration 
     as an argument. Any Hibernate configuration files that were specified at the class level in the same class or a superclass, will already be added
     to the <Configuration> object before it is passed into the method.
     
 +-----+
 @HibernateSessionFactory
-SessionFactory createSessionFactory(Configuration configuration) {
+protected SessionFactory createSessionFactory(Configuration configuration) {
     ...
 }   
 +-----+
@@ -607,12 +607,11 @@ SessionFactory createSessionFactory(Configuration configuration) {
 
 *** {Testing the mapping}
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
     Unitils is shipped with a ready-to-use unit test that verifies whether the mapping of all your mapped classes is consistent with the database. This
     test is not automatically executed; you should write a unit test that looks like the following:
 
 +-----+
-@HibernateSessionFactory(hibernate.cfg.xml)
+@HibernateSessionFactory("hibernate.cfg.xml")
 public class HibernateMappingTest extends UnitilsJUnit4 {
 
     @Test
