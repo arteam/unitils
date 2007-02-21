@@ -73,12 +73,24 @@ public class Db2DbSupport extends DbSupport {
         throw new UnsupportedOperationException("DB2 doesn't support types");
     }
 
+    public Set<String> getDbLinkNames() {
+        throw new UnsupportedOperationException("DB links are not implemented for DB2");
+    }
+
 
     /**
      * Types are not supported: an UnsupportedOperationException will be raised.
      */
     public void dropType(String typeName) throws StatementHandlerException {
         throw new UnsupportedOperationException("DB2 doesn't support types");
+    }
+
+
+    /**
+     * Types are not supported yet: an UnsupportedOperationException will be raised.
+     */
+    public void dropDbLink(String dbLinkName) {
+        throw new UnsupportedOperationException("DB links are not implemented for DB2");
     }
 
 
@@ -164,6 +176,16 @@ public class Db2DbSupport extends DbSupport {
      * @return false
      */
     public boolean supportsTypes() {
+        return false;
+    }
+
+
+    /**
+     * Support for db links is currently not implemented for db2
+     *
+     * @return false
+     */
+    public boolean supportsDbLinks() {
         return false;
     }
 

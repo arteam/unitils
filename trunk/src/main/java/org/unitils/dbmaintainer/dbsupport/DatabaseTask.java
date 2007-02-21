@@ -30,7 +30,7 @@ import java.util.Properties;
 abstract public class DatabaseTask {
 
     /* Property key for the database schema name */
-    public static final String PROPKEY_SCHEMANAME = "dataSource.schemaName";
+    public static final String PROPKEY_SCHEMANAME = "database.schemaName";
 
     /* Implementation of DbSupport, for executing all sorts of database operations and queries */
     protected DbSupport dbSupport;

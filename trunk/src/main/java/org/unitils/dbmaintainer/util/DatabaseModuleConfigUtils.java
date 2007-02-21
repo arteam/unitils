@@ -37,7 +37,7 @@ public class DatabaseModuleConfigUtils {
     private static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /* Property keys of the database schema name */
-    private static final String PROPKEY_DATABASE_SCHEMANAME = "dataSource.schemaName";
+    private static final String PROPKEY_DATABASE_SCHEMANAME = "database.schemaName";
 
     /* Property key of the implementation of the DbSupport interface */
     public static final String PROPKEY_DBSUPPORT_CLASSNAME = "dbMaintainer.dbSupport.className";

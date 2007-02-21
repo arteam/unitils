@@ -15,13 +15,11 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.util.PropertyUtils;
 
-import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
 

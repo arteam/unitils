@@ -176,9 +176,7 @@ public class DBMaintainer {
         if (fromScratchEnabled) {
             dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
         }
-        if (clearDbCodeEnabled) {
-            dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource, statementHandler);
-        }
+        dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource, statementHandler);
 
         boolean disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED, configuration);
         if (disableConstraints) {
@@ -211,11 +209,10 @@ public class DBMaintainer {
 
         // Clear the database and retrieve scripts
         List<VersionScriptPair> versionScriptPairs;
-        if (updateDatabaseFromScratch(currentVersion)) {
-                dbClearer.clearSchema();
-            if (clearDbCodeEnabled) {
-                dbCodeClearer.clearSchemaCode();
-            }
+        boolean updateDatabaseFromScratch = updateDatabaseFromScratch(currentVersion);
+        if (updateDatabaseFromScratch) {
+            dbClearer.clearSchema();
+            dbCodeClearer.clearSchemaCode();
             versionScriptPairs = scriptSource.getAllScripts();
         } else {
             versionScriptPairs = scriptSource.getNewScripts(currentVersion);
@@ -248,13 +245,17 @@ public class DBMaintainer {
             }
         }
 
-        if (!versionScriptPairs.isEmpty() // If the database structure was updated, also recreate the database code
+        if (updateDatabaseFromScratch // If the database structure was recreated from scratch, also recreate the database code
                 || (!versionSource.isLastCodeUpdateSucceeded() && keepRetryingAfterError) // If the last code update failed, retry if configured to do so
                 || scriptSource.getCodeScriptsTimestamp() > versionSource.getCodeScriptsTimestamp()) { // If a code script was added of changed, recreate the database code
-            if (clearDbCodeEnabled) {
-                dbCodeClearer.clearSchemaCode();
+
+            List<Script> codeScripts = scriptSource.getAllCodeScripts();
+            if (!codeScripts.isEmpty()) {
+                if (clearDbCodeEnabled && !updateDatabaseFromScratch) { // If updateDatabaseFromScratch == true, the schema code has already been cleared.
+                    dbCodeClearer.clearSchemaCode();
+                }
+                executeCodeScripts(codeScripts);
             }
-            executeCodeScripts(scriptSource.getAllCodeScripts());
         }
     }
 
