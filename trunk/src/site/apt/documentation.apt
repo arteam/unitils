@@ -530,10 +530,9 @@ stored procedure definition 2
     An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Even when using such a O/R mapping tool, unit 
     tests remain valuable. They can ensure the mapping of the Hibernate mapped classes is always in sync with the database and can be used for 
     easy and quick testing of HQL queries.
-
     A HQL method can be tested in exactly the same way as described above in {{{#Loading test data with DbUnit} Managing test data with DbUnit}}. 
     The <@ExpectedDataSet> annotation can also be used for checking the result of a test using a data set. To make sure that all database 
-    updates were actually executed on the database, Unitils will flush all Hibernate sessions before checking the database state. 
+    updates were actually executed on the database, Unitils will flush all Hibernate sessions before checking the state of the database. 
 
 
 *** {Loading Hibernate configurations}
@@ -555,12 +554,27 @@ public class UserDaoTest extends UnitilsJUnit4 {
     }
 }
 +-----+
-
     This will create a Hibernate <Configuration> and load the <hibernate.cfg.xml> followed by the <mapped-class.cfg.xml> configuration files. The
     <Configuration> instance is then used to create a <SessionFactory> which is injected into the annotated field and setter method of the test.
     
-    Any Hibernate configuration files that are specified in superclasses are inherited by subclasses. For instance, you can specify a general Hibernate
-    configuration file in the superclass and a test specific configuration file in a subclass:
+    Any Hibernate configuration files that are specified in superclasses will be inherited by subclasses. When possible, created
+    session factories will be reused. For instance, you can specify your hibernate configuration in a superclass and let all 
+    your subclasses reuse the same <SessionFactory> instance:
+    
++-----+
+@HibernateSessionFactory("hibernate.cfg.xml")
+public class BaseDaoTest extends UnitilsJUnit4 {
+}
+
+public class UserDaoTest extends BaseDaoTest {
+     
+    @HibernateSessionFactory
+    private SessionFactory sessionFactory;
+}
++-----+
+
+    A test can add extra configuration or override configuration of the superclass by adding test specific configuration 
+    in the subclass. 
     
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
@@ -575,19 +589,38 @@ public class UserDaoTest extends BaseDaoTest {
 }
 +-----+
     
-    Programmatic configuration can also be performed by annotating a method with <@HibernateSessionFactory> that optionally takes a 
-    <Configuration> object as parameter and returns a <SessionFactory> instance. Unitils will call this method passing the Hibernate configuration 
-    as an argument. Any Hibernate configuration files that were specified at the class level in the same class or a superclass, will already be added
-    to the <Configuration> object before it is passed into the method.
+    This will create a new configuration for this test class, first loading the <hibernate.cfg.xml> followed by the <user-mapped-classes.cfg.xml>. 
+    The configuration is then used to create a <SessionFactory> instance. Note that by adding this new configuration file, a new session 
+    factory was created for this test. In the previous example, no extra configuration was added and the session factory was reused. Session factory
+    creation is a heavy operation, so try to reuse them as much as possible. This will greatly improve the performance of your tests.
+    
+    You can also peform programmatic configuration by annotating a custom create method with the <@HibernateSessionFactory> annotation. Such a method 
+    should have no parameters or a <Configuration> type object as parameter and should return an instance of type <SessionFactory>. Unitils will 
+    call this method passing the Hibernate configuration as an argument if requested. If configuration files were specified they will be loaded 
+    in the <Configuration> before it is passed to the method. Below are 3 examples of custom create methods:
     
 +-----+
 @HibernateSessionFactory
+protected SessionFactory createSessionFactory() {
+    AnnotationConfiguration configuration = new AnnotationConfiguration();
+    configuration.loadConfig("hibernate.cfg.xml");
+    return configuration.createSessionFactory();    
+}   
+
+@HibernateSessionFactory
 protected SessionFactory createSessionFactory(Configuration configuration) {
-    ...
+    configuration.addMappedClass(User.class);
+    return configuration.createSessionFactory();
+}   
+
+@HibernateSessionFactory
+protected SessionFactory createSessionFactory(AnnotationConfiguration configuration) {
+    configuration.addAnnotatedClass(User.class);
+    return configuration.createSessionFactory();
 }   
 +-----+
     
-
+    
 *** {Hibernate Session management}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Typically, a project contains a base DAO class that contains a reference to the Hibernate <SessionFactory>, and opens <Session>s on it. It depends 
@@ -604,16 +637,15 @@ protected SessionFactory createSessionFactory(Configuration configuration) {
     make sure that a new <Session> is created the first time you call <SessionFactory.getCurrentSession()> in a test. For the duration of the test, the same
     instance of <Session> will be used. The <Session> is automatically closed after the test has finished.
     
-
+    
 *** {Testing the mapping}
 ~~~~~~~~~~~~~~~~~~~~~~~~
     Unitils is shipped with a ready-to-use unit test that verifies whether the mapping of all your mapped classes is consistent with the database. This
     test is not automatically executed; you should write a unit test that looks like the following:
-
+    
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
 public class HibernateMappingTest extends UnitilsJUnit4 {
-
     @Test
     public void testMappingToDatabase() {
         HibernateUnitils.assertMappingWithDatabaseConsistent();
@@ -630,6 +662,7 @@ Found mismatches between Java objects and database tables. Applying following DD
 alter table PERSON add column lastName varchar(255);
 alter table PRODUCT add column barCode varchar(255);
 +-----+
+
 
 
 
