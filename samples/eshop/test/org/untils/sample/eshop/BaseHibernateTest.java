@@ -18,9 +18,4 @@ public class BaseHibernateTest extends UnitilsJUnit3 {
     @SpringApplicationContext
     ApplicationContext springApplicationContext;
 
-    @HibernateSessionFactory
-    private Configuration createHibernateConfiguration() {
-        LocalSessionFactoryBean sessionFactoryBean = (LocalSessionFactoryBean) springApplicationContext.getBean("&sessionFactoryBean");
-        return sessionFactoryBean.getConfiguration();
-    }
 }
