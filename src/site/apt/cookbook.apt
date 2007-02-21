@@ -43,13 +43,13 @@ dataSource.url=<my database connection url>
 database.dialect=<my databasa dialect>
 +------+
 
-    Next, create a file unitils-<myproject>-local.properties and put this file in your local user home directory. The file shoudl contain 
+    Next, create a file unitils-<myproject>-local.properties and put this file in your local user home directory. The file should contain 
     following properties:
 
 +------+
-dataSource.schemaName=<developers database schema name>
 dataSource.userName=<developers database login username>
 dataSource.password=<developers database login password>
+database.schemaName=<developers database schema name>
 +------+
 
 
@@ -66,7 +66,7 @@ dataSource.password=<developers database login password>
 updateDataBaseSchema.enabled=true
 
 # Directory in which the database update scripts are located.
-dbMaintainer.fileScriptSource.dir=<Path to your database update script files>
+dbMaintainer.fileScriptSource.scripts.location=<Path to your database update script files>
 
 # DbUnit database DTD file path
 dtdGenerator.dtd.filename=<Path to your database DTD>
@@ -89,83 +89,35 @@ dbMaintainer.cleardb.itemsToPreserve=<Optional list of database items that shoul
 
 * Enable Hibernate support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unitils provides out-of-the box configuration support for Hibernate. First make sure the database support is configured correctly as described above and 
-    then specify the hibernate configuration files by overriding the <HibernateModule.hibernate.configfiles> property in your unitils.properties. E.g.
+    Unitils provides out-of-the box configuration support for Hibernate. First make sure the database support is configured correctly as described above.
+    You should also make sure the property <HibernateModule.configuration.implClassName> is set to the subclass of org.hibernate.cfg.Configuration that 
+    you make use of. If you don't make use of annotations in Hibernate, you should change the value of this property to be the following:
 
 +-----+
-# Name of hibernate config files for testing purposes. Should be in classpath.
-HibernateModule.hibernate.configfiles= hibernate-general.cfg.xml,hibernate-unittest.cfg.xml
+HibernateModule.configuration.implClassName=org.hibernate.cfg.Configuration
 +-----+
 
-    It is a good practice to split your Hibernate configuration in two parts: One config files containing shared configuration, such as the database dialect
-    and the mapped classes. A second one contains configuration that is specifically for unit testing. 
-
-    We advise you to write a superclass that is used as base class for all Hibernate tests. This superclass looks like the following:
+    Typically, you will write a superclass that is used as base class for all Hibernate tests. This superclass looks like the following:
 
 +-----+
-@HibernateTest
+@HibernateSessionFactory("hibernate.cfg.xml")
 public abstract class BaseHibernateTest extends UnitilsJUnit3 {
 
-    @HibernateConfiguration
-    public void configureHibernate(Configuration config) {
-        HibernateConfigHelper.addMappedClasses(config);
+    @HibernateSessionFactory
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+        // ... (code that makes sure project code makes use of this SessionFactory)
     }
 
-    @HibernateSession
-    public void injectHibernateSession(Session session) {
-        HibernateSessionManager.injectSession(session);
-    }
 }
 +-----+
 
-    The method annotated with <@HibernateConfiguration> allows performing some extra, programmatic Hibernate configuration, like e.g. registering mapped
-    classes with Hibernate. This method can be left out if all configuration is performed in the Hibernate config files.
+    The code in this example will make sure a Hibernate <Configuration> or <AnnotationConfiguration> object is instantiated, and configured using the
+    config file <hibernate.cfg.xml>. Next, a <SessionFactory> is created and the method annotated with <@HibernateSessionFactory> is be invoked before 
+    each test, with the Hibernate <SessionFactory> as parameter. This method should make sure that the DAO code that is being tested uses this session. 
 
-    The method annotated with <@HibernateSession> will be invoked before each test, with a Hibernate session object as parameter. This method should make
-    sure that the DAO code that is being tested uses this session. In the example this is done by setting the session in a HibernateSessionManager. This
-    session manager is a project specific class. An example implementation could look like the following:
-
-+-----+
-public class HibernateSessionManager {
-
-    private static Session externallyProvidedSession;
-
-    private static SessionFactory sessionFactory;
-
-
-    public static Session getSession() {
-        if (externallyProvidedSession != null) {
-            return externallyProvidedSession;
-        } else {
-            return doGetSession();
-        }
-    }
-
-
-    private static Session doGetSession() {
-        if (sessionFactory == null) {
-            initSessionFactory();
-        }
-        return sessionFactory.openSession();
-    }
-
-
-    private static void initSessionFactory() {
-        Configuration configuration = new AnnotationConfiguration();
-        configuration.configure("hibernate.cfg.xml");
-        configuration.configure("hibernate-mappedClasses.cfg.xml");
-        sessionFactory = configuration.buildSessionFactory();
-    }
-
-
-    public static void injectSession(Session session) {
-        externallyProvidedSession = session;
-    }
-}
-+-----+
-
-  Unitils is shipped with a ready-to-use unit test that verifies if the mapping of all your mapped classes is consistent with the database. This
-  test is not automatically executed; you should write a unit test that looks like the following:
+    Unitils is shipped with a ready-to-use unit test that verifies if the mapping of all your mapped classes is consistent with the database. This 
+    test is not automatically executed; you should write a unit test that looks like the following:
 
 +-----+
 public class HibernateMappingTest extends BaseHibernateTest {
