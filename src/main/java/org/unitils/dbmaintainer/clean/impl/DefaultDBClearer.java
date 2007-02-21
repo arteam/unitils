@@ -75,7 +75,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
         // todo test dropping synonmys
         dropSynonyms();
         dropSequences();
-
+        dropDbLinks();
     }
 
 
@@ -142,6 +142,24 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
                 }
                 logger.debug("Dropping database sequence: " + sequenceName);
                 dbSupport.dropSequence(sequenceName);
+            }
+        }
+    }
+
+
+    /**
+     * Drops all db links
+     */
+    protected void dropDbLinks() throws StatementHandlerException {
+        if (dbSupport.supportsDbLinks()) {
+            Set<String> dbLinkNames = dbSupport.getDbLinkNames();
+            for (String dbLinkName : dbLinkNames) {
+                // check whether sequence needs to be preserved
+                if (itemsToPreserve.contains(dbLinkName)) {
+                    continue;
+                }
+                logger.debug("Dropping database link: " + dbLinkName);
+                dbSupport.dropDbLink(dbLinkName);
             }
         }
     }

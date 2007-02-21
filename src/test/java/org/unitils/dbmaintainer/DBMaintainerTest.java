@@ -19,6 +19,7 @@ import static org.easymock.classextension.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.expectLastCall;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.clean.DBCodeClearer;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.SQLScriptRunner;
@@ -60,6 +61,10 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
     @Mock
     @InjectIntoByType
     private DBClearer mockDbClearer = null;
+
+    @Mock
+    @InjectIntoByType
+    private DBCodeClearer mockDbCodeClearer = null;
 
     @Mock
     @InjectIntoByType
@@ -123,7 +128,9 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDtdGenerator.generateDtd();
-        expect(mockScriptSource.getAllCodeScripts()).andReturn(new ArrayList<Script>());
+        expect(mockVersionSource.isLastCodeUpdateSucceeded()).andReturn(true);
+        expect(mockScriptSource.getCodeScriptsTimestamp()).andReturn(0L);
+        expect(mockVersionSource.getCodeScriptsTimestamp()).andReturn(0L);
         replay();
 
         // Execute test
@@ -140,6 +147,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
         mockDbClearer.clearSchema();
+        mockDbCodeClearer.clearSchemaCode();
         expect(mockScriptSource.getAllScripts()).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);

@@ -73,7 +73,7 @@ import java.util.Properties;
 public class DbUnitModule implements Module {
 
     /* Property key of the name of the database schema */
-    public static final String PROPKEY_SCHEMA_NAME = "dataSource.schemaName";
+    public static final String PROPKEY_SCHEMA_NAME = "database.schemaName";
 
     /* Property key of the SQL dialect of the underlying DBMS implementation */
     public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";

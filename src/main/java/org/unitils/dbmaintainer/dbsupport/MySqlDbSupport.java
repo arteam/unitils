@@ -141,6 +141,10 @@ public class MySqlDbSupport extends DbSupport {
         throw new UnsupportedOperationException("Mysql doesn't support types");
     }
 
+    public Set<String> getDbLinkNames() {
+        throw new UnsupportedOperationException("Mysql doesn't support db links");
+    }
+
 
     /**
      * Types are not supported: an UnsupportedOperationException will be raised.
@@ -148,6 +152,16 @@ public class MySqlDbSupport extends DbSupport {
      * @param typeName The type to drop (case-sensitive), not null
      */
     public void dropType(String typeName) throws StatementHandlerException {
+        throw new UnsupportedOperationException("Mysql doesn't support types");
+    }
+
+
+    /**
+     * Types are not supported: an UnsupportedOperationException will be raised.
+     *
+     * @param dbLinkName The db link to drop (case-sensitive), not null
+     */
+    public void dropDbLink(String dbLinkName) {
         throw new UnsupportedOperationException("Mysql doesn't support types");
     }
 
@@ -218,6 +232,16 @@ public class MySqlDbSupport extends DbSupport {
      * @return false
      */
     public boolean supportsTypes() {
+        return false;
+    }
+
+
+    /**
+     * Support for db links is currently not implemented for mysql
+     *
+     * @return false
+     */
+    public boolean supportsDbLinks() {
         return false;
     }
 

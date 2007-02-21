@@ -75,6 +75,16 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
+     * Retrieves the names of all the db links in the database schema.
+     *
+     * @return The names of all db links in the database
+     */
+    public Set<String> getDbLinkNames() {
+        return getOracleIdentifiers("DB_LINK", "USER_DB_LINKS");
+    }
+
+
+    /**
      * Removes the table with the given name from the database.
      * Note: the table name is surrounded with quotes, making it case-sensitive.
      *
@@ -106,6 +116,17 @@ public class OracleDbSupport extends DbSupport {
      */
     public void dropType(String typeName) throws StatementHandlerException {
         statementHandler.handle("drop type " + qualified(typeName) + " force");
+    }
+
+
+    /**
+     * Drops the db link with the given name from the database
+     * Note: the db links name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param dbLinkName The db link to drop (case-sensitive), not null
+     */
+    public void dropDbLink(String dbLinkName) throws StatementHandlerException {
+        statementHandler.handle("drop database link " + qualified(dbLinkName));
     }
 
 
@@ -210,6 +231,16 @@ public class OracleDbSupport extends DbSupport {
      * @return true
      */
     public boolean supportsTypes() {
+        return true;
+    }
+
+
+    /**
+     * DbLinks are supported
+     *
+     * @return true
+     */
+    public boolean supportsDbLinks() {
         return true;
     }
 
