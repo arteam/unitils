@@ -515,7 +515,7 @@ databasecode/ 01_compileAll.sql
     is executed that compiles all stored procedures in the database.
     
     Code script files can contain multiple function / stored procedure / ... definitions. The different definitions should be separated by a / sign
-    that is put on a separates line, like follows:
+    that is put on a separate line, like follows:
     
 +-----+
 stored procedure definition 1
@@ -1117,8 +1117,8 @@ public class UserServiceTest extends UnitilsJUnit4 {
 }
 +-----+
 
-     This example will create a new <ApplicationContext> containing the files <spring-beans.xml> and <extra-spring-beans.xml>, and inject it into the 
-     annotated field. The same effect can be obtained with the following:
+    This example will create a new <ApplicationContext> containing the files <spring-beans.xml> and <extra-spring-beans.xml>, and inject it into the 
+    annotated field. The same effect can be obtained with the following:
      
 +-----+
 @SpringApplicationContext("spring-beans.xml")
@@ -1129,26 +1129,26 @@ public class BaseServiceTest extends UnitilsJUnit4 {
 @SpringApplicationContext("extra-spring-beans.xml")
 public class UserServiceTest extends BaseServiceTest {
 
-     @SpringApplicationContext
-     private ApplicationContext applicationContext;     
+    @SpringApplicationContext
+    private ApplicationContext applicationContext;     
 
 }
 +-----+
 
-     If you have multiple tests making use of the same configuration, it is advisory to make them extend a common superclass on which this configuration
-     is specified at class level. This will make sure the <ApplicationContext> is only created once when running all of these tests in a suite.
+    If you have multiple tests making use of the same configuration, it is advisory to make them extend a common superclass on which this configuration
+    is specified at class level. This will make sure the <ApplicationContext> is only created once when running all of these tests in a suite.
      
-     Programmatic configuration is also possible by annotating a method that takes a <List\<String\>> as parameter and returns an ApplicationContext.
-     The parameter consists of the names of all configuration files specified using a <@SpringApplicationContext> annotation on the level of the class
-     and/or its superclasses. The ApplicationContext that is returned should be a subclass of <ConfigurableApplicationContext>, and the refresh() method
-     should not be invoked yet. This can be achieved by invoking a constructor with the value <false> for the refresh boolean parameter. This reason for 
-     this is that Unitils needs to be able to add one or more BeanPostProcessors to the <ApplicationContext> before the <refresh()> method is called, which
-     processes the configuration files and instantiates the singleton beans. A valid implementation could be the following:
+    Programmatic configuration is also possible by annotating a method that takes a <List\<String\>> as parameter and returns an ApplicationContext.
+    The parameter consists of the names of all configuration files specified using a <@SpringApplicationContext> annotation on the level of the class
+    and/or its superclasses. The ApplicationContext that is returned should be a subclass of <ConfigurableApplicationContext>, and the refresh() method
+    should not be invoked yet. This can be achieved by invoking a constructor with the value <false> for the refresh boolean parameter. This reason for 
+    this is that Unitils needs to be able to add one or more BeanPostProcessors to the <ApplicationContext> before the <refresh()> method is called, which
+    processes the configuration files and instantiates the singleton beans. A valid implementation could be the following:
      
 +-----+
 @SpringApplicationContext
 public ConfigurableApplicationContext createApplicationContext(List<String> locations) {
-     return new ClassPathXmlApplicationContext(Arrays.asList("spring-beans.xml","extra-spring-beans.xml"), false);
+    return new ClassPathXmlApplicationContext(Arrays.asList("spring-beans.xml","extra-spring-beans.xml"), false);
 }
 +-----+
     
@@ -1157,32 +1157,32 @@ public ConfigurableApplicationContext createApplicationContext(List<String> loca
 
 ** Injection of Spring beans
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     Once you've configured an ApplicationContext, you can in a very simple way make Unitils inject Spring beans in fields or setters of your test object. 
-     This can be achieved using one of the annotations <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>. When using <@SpringBean>, you have to 
-     explicitly specify the  name of the bean in the ApplicationContext. E.g.:
-     
+    Once you've configured an ApplicationContext, you can in a very simple way make Unitils inject Spring beans in fields or setters of your test object. 
+    This can be achieved using one of the annotations <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>. When using <@SpringBean>, you have to 
+    explicitly specify the  name of the bean in the ApplicationContext. E.g.:
+    
 +-----+
 @SpringBean("userService")
 private UserService userService;
 +-----+
 
-     The same effect can be reached using <@SpringBeanByName>, provided that the property name of the target field or setter is the same as the name of the 
-     bean in the ApplicationContext:
+    The same effect can be reached using <@SpringBeanByName>, provided that the property name of the target field or setter is the same as the name of the 
+    bean in the ApplicationContext:
      
 +-----+
 @SpringBeanByType
 public void setUserService(UserService userService) {
-	   this.userService = userService;
+    this.userService = userService;
 }
 +-----+
 
-     When using <@SpringBeanByType>, the ApplicationContext is queried for a bean having a type assignable to the type of the target field or setter. If 
-     no such bean exists or if more than one is found, a <UnitilsException> is thrown. In the following example, Unitils will look in the ApplicationContext 
-     for a bean of type UserService or a subtype.
+    When using <@SpringBeanByType>, the ApplicationContext is queried for a bean having a type assignable to the type of the target field or setter. If 
+    no such bean exists or if more than one is found, a <UnitilsException> is thrown. In the following example, Unitils will look in the ApplicationContext 
+    for a bean of type UserService or a subtype.
      
 +------+
 @SpringBeanByType
 public void setUserService(UserService userService) {
-	   this.userService = userService;
+    this.userService = userService;
 }
 +-----+
