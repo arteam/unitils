@@ -20,6 +20,217 @@ Tutorial
 
 
 
+
+* {Using reflection for assertion}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    A typical unit test contains a part in which it compares test result values with expected values. Unitils offers some assertion utilities to help you with this. 
+
+
+** Reflection versus equals()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+    Let's start with an example of comparing 2 User instances having an id, a first and a last name:
+
++-----+    
+public class User {
+
+    private long id;
+    private String first;
+    private String last;
+
+
+    public User(long id, String first, String last) {
+        this.id = id;
+        this.first = first;
+        this.last = last;
+    }
+}
+
+User user1 = new User(1, "John", "Doe");
+User user2 = new User(1, "John", "Doe");
+assertEquals(user1, user2);
++-----+
+
+    You would expect that this assertion would be successful since both instances contain the same values. This is however 
+    not the case, if User does not override the equals() method. Checking equals of 2 User instances is in that case the same
+    as checking whether both instances are the same. In other words, the assertEquals actually results in user1 == user2 
+    being tested causing the assertion to fail.
+    
+    Suppose you would implement the equals method as follows:
+    
++-----+    
+public boolean equals(Object object) {
+    if (object instanceof User) {
+        return id == ((User) object).id;
+    }
+    return false;
+}
++-----+    
+
+    This is a totally reasonable implementation for your application logic, stating that 2 user instances are referring to 
+    the same user when they have the same id. However, this method is not useful in your unit tests. Testing whether 2 objects
+    are equal is now reduced to the test whether they have the same id:
+    
++-----+        
+User user1 = new User(1, "John", "Doe");
+User user2 = new User(1, "Jane", "Smith");
+assertEquals(user1, user2);
++-----+
+
+    This assertion will be successful, which is probably not what you want. Best is to avoid using equals() altogether 
+    when comparing objects (except of course for objects with value semantics such as java.lang.String, ...). 
+    One approach can be to do the comparison of each of the properties one by one:    
+    
++-----+        
+User user1 = new User(1, "John", "Doe");
+User user2 = new User(1, "John", "Doe");
+assertEquals(user1.getId(), user2.getId());
+assertEquals(user1.getFirst(), user2.getFirst());
+assertEquals(user1.getLast(), user2.getLast());
++-----+
+    
+    Unitils offers utilities that help you perform these checks more easily, through reflection. Using <ReflectionAssert.assertRefEquals>,
+    the above example could be re-written as follows:
+    
++-----+
+User user1 = new User(1, "John", "Doe");
+User user2 = new User(1, "John", "Doe");
+assertRefEquals(user1, user2);    
++-----+
+
+    This assertion loops over all fields in both objects and compares their values using reflection. For the above example, it will
+    first compare both <id> field values, next both <first> field values and finally both <last> fields values. 
+    
+    If a field value itself is also an object, it will recursively be compared field by field using reflection. The same is true for 
+    collections, maps and arrays. Their elements will be traversed and recusively be compared using reflection. If a value is a primitive 
+    type (int, long, ...) or one of the primitive wrapper types (Integer, Long, ...) it will be compared by value (using ==). 
+    As a result, following assertions, for example, will be successful:
+
++-----+
+assertRefEquals(1, 1L); 
+
+List<Double> myList = new ArrayList<Double>();
+myList.add(1.0);
+myList.add(2.0);
+assertRefEquals(Arrays.asList(1, 2), myList); 
++-----+
+
+
+
+
+** Lenient assertions
+~~~~~~~~~~~~~~~~~~~~~
+    If you want to create unit tests that are maintainable, care must be taken to only add assertions to your test that 
+    are of value for the test. Let me clarify this with an example: suppose you have a test for a calulation of an account balance. 
+    There is no need to add any assertions to this test that will check whether the name of the bank-customer is still correct.
+    This will only add complexity to your test making it more difficult to understand and, more importantly, more brittle against changes 
+    to the code. If you want your test code to easily survive refactorings and other code changes, make sure you limit your assertions and 
+    test data setup to the scope of the test.
+    
+    To help you in writing assertions that only test what is important, we added some levels of leniency to the ReflectionAssert checks, which 
+    we will cover more in-depth in the sections that follow.
+
+
+*** Lenient order
+~~~~~~~~~~~~~~~~~
+    A first type of leniency you can specify is ignoring the order of elements in a collection or an array. It is often the case that when working with 
+    lists, you are not interested in the order of the elements, only that they comply to certain criteria. For example, code for retrieving 
+    all bank-accounts with a negative balance will typically return them in a list in a certain order, which is unimportant for further processing.
+    
+    To implement this behavior, the <ReflectionAssert.assertRefEquals> method can be configured to ignore ordering by 
+    supplying it with the <ReflectionComparatorMode.LENIENT_ORDER> comparator mode:
+
++-----+
+List<Integer> myList = Arrays.asList(3, 2, 1);
+assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER); 
++-----+
+    
+
+*** Ignoring defaults
+~~~~~~~~~~~~~~~~~~~~~
+    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode. When this mode is set, fields in the 
+    left (expected) instance will only be compared with the corresponding fields in the right (actual) instance if they have a non 
+    java default value, i.e. <null> or <0>. In other words, if you leave the value of a left-instance field to <null> or <0> it will not 
+    be used in the comparison.
+    
+    As an example, suppose you have a user class with a first name, last name, street, ... field, but you only want to check that the 
+    resulting user instance has a certain first name and street value, the other fields can be ignored:
+
++-----+
+User actualUser   = new User("John", "Doe", new Address("First street", "12", "Brussels"));
+User expectedUser = new User("John",  null, new Address("First street", null,       null));
+assertLenEquals(expectedUser, actualUser);
++-----+
+
+    You specify that you want to ignore a field by setting this value to null in the left (=expected) instance. 
+    Right-instance fields that have default values will still be compared.
+    
++-----+
+assertRefEquals(null, "any", IGNORE_DEFAULTS);  // Succeeds
+assertRefEquals("any", null, IGNORE_DEFAULTS);  // Fails
++-----+    
+
+
+*** Lenient dates
+~~~~~~~~~~~~~~~~~
+    A third and final type of leniency is <ReflectionComparatorMode.LENIENT_DATES>. This will assert that date field values in both instances 
+    are set or both equal to null, the actual values of the dates are ignored. E.g. a date from last year will equal the current date. This type 
+    of leniency can be useful e.g. when you want to do a strict comparison of objects (without using the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode), but
+    when these objects have a createOn and lastModifiedOn fields that you want to ignore.
+
++-----+
+Date actualDate =   new Date(44444);
+Date expectedDate = new Date();
+assertRefEquals(expectedDate, actualDate, LENIENT_DATES); 
++-----+
+
+
+*** assertLenEquals
+~~~~~~~~~~~~~~~~~~~
+    The <ReflectionAssert> class also offers an assertion for which two of the leniency levels, lenient order and 
+    ignore defaults are pre-set: <ReflectionAssert.assertLenEquals>. The above examples can therefore be re-written as follows:
+    
++-----+
+List<Integer> myList = Arrays.asList(3, 2, 1);
+assertLenEquals(Arrays.asList(1, 2, 3), myList); 
+
+assertLenEquals(null, "any");  // Succeeds
+assertLenEquals("any", null);  // Fails
++-----+
+    
+    This len/ref thing is a general naming convention: assert<<Ref>>... is the version that is strict by default and for which you can 
+    manually set the leniency levels, assert<<Len>>... is the version for which the lenient order and ignore defaults are pre-set. 
+    
+        
+
+** Property assertions
+~~~~~~~~~~~~~~~~~~~~~~
+    The <assertLenEquals> and <assertRefEquals> methods compare objects as a whole. ReflectionAssert also contains methods to compare 
+    a specific property of two objects: <assertPropertyLenEquals> and <assertPropertyRefEquals>. The actual field that needs to be compared 
+    is specified using the {{{http://www.ognl.org/}OGNL}} notation, in which the typical bean property notation, e.g. 
+    field1.innerField, and more powerful notations can be used.
+    
+    Some examples of property comparisons are:
+
++-----+
+assertPropertyLenEquals("id", 1, user);
+assertPropertyLenEquals("address.street", "First street", user);
++-----+
+
+    You can also supply collections as arguments for this method. In that case the specified field will be compared on each element in the collection. This
+    provides an easy way to for example check whether all users in a retrieved list have certain id: 
+
++-----+
+assertPropertyLenEquals("id", Arrays.asList(1, 2, 3), users);
+assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second street", "Third street"), users);
++-----+
+
+    Again there are two versions of each method: an assertProperty<<Len>>Equals method and a assertProperty<<Ref>>Equals method. 
+    The ref version will have no leniency specified by default but provides the option to specify leniency modes, the len version
+    already has lenient order and ignore defaults set as fixed leniency modes.
+
+
+
+
 * Getting started
 ~~~~~~~~~~~~~~~~~
 
@@ -339,8 +550,8 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 
 
 
-** {Unit test database maintenance}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* {Unit test database maintenance}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     When writing database tests, keep in mind following guidelines:
 
     * Use small sets of test data, containing as few data as possible. In your data files, only specifiy columns 
@@ -478,54 +689,9 @@ database.dialect=oracle
     []
  
  
-*** {Testing functions, stored procedures, ...}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Enterprise applications typically contain application code that is stored and executed on the database, like functions and stored procedures. 
-    It can often be a good idea to always have these code definitions applied to your test databases, to unit-test their correct hehaviour or for 
-    integration testing.
-    It is in most cases not possible to simply mix them with the regular database DDL definitions, because the syntax of stored procedures is 
-    different: A ';' in a regular DDL statement indicates the end of a statement, while a stored procedure typically contains multiple SQL statements,
-    and a ';' doesn't mean the end of a stored procedure.
-    
-    The database maintainer will execute all scripts in the configured location whenever one of these files is changed, or after updating the database structure.
-    Before doing this, a service implementing the <DbCodeClearer> interface is called, doing some necessary cleanup first. For the moment, this service
-    only drops database triggers and oracle types. In most cases it is not needed that the stored procedure definitions are cleared first, since their
-    existing definition can be overwritten using <CREATE OR REPLACE>.
-    
-    The directory(ies) containing script files with triggers, functions and stored procedures can be configured as follows:
-    
-+-----+
-dbMaintainer.fileScriptSource.code.location=/myproject/dbscripts/procedures
-+-----+
-
-    
-    Multiple directories can be configured, separated by commas. Subdirectories are also scanned for script files. Since for database sources, the 
-    sequence in which they are executed is in most cases not important, adding sequence numbers to the files is not required. If you do add sequence
-    numbers, the scripts with numbers are executed first. For example, suppose we have following files:
-    
-+----+
-databasecode/ 01_compileAll.sql
-              dropAllInactiveUsers.sql
-              collectivePayRaise.sql
-							
-+----+
-
-    Unitils will first execute the non-indexed scripts. This will make sure the stored procedures in dropAllInactiveUsers.sql and collectivePayRaise.sql 
-    are created in the database. Next, the indexed files are executed in proper sequence, which in this case will make sure the script 01_compileAll.sql 
-    is executed that compiles all stored procedures in the database.
-    
-    Code script files can contain multiple function / stored procedure / ... definitions. The different definitions should be separated by a / sign
-    that is put on a separate line, like follows:
-    
-+-----+
-stored procedure definition 1
-/
-stored procedure definition 2
-+-----+
 
 
-
-** {Testing with Hibernate}
+* {Testing with Hibernate}
 ~~~~~~~~~~~~~~~~~~~~~~~~~
     An O/R mapping framework like Hibernate greatly simplifies the data access layer of an application. Even when using such a O/R mapping tool, unit 
     tests remain valuable. They can ensure the mapping of the Hibernate mapped classes is always in sync with the database and can be used for 
@@ -535,7 +701,7 @@ stored procedure definition 2
     updates were actually executed on the database, Unitils will flush all Hibernate sessions before checking the state of the database. 
 
 
-*** {Loading Hibernate configurations}
+** {Loading Hibernate configurations}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
     Unitils provides out-of-the box configuration support for Hibernate. You can obtain a <SessionFactory> that connects to the unit test database simply by
     annotating a field or method with the <@HibernateSessionFactory> annotation. This annotation can be parameterized with one or more Hibernate 
@@ -589,15 +755,20 @@ public class UserDaoTest extends BaseDaoTest {
 }
 +-----+
     
-    This will create a new configuration for this test class, first loading the <hibernate.cfg.xml> followed by the <user-mapped-classes.cfg.xml>. 
-    The configuration is then used to create a <SessionFactory> instance. Note that by adding this new configuration file, a new session 
-    factory was created for this test. In the previous example, no extra configuration was added and the session factory was reused. Session factory
-    creation is a heavy operation, so try to reuse them as much as possible. This will greatly improve the performance of your tests.
-    
-    You can also peform programmatic configuration by annotating a custom create method with the <@HibernateSessionFactory> annotation. Such a method 
-    should have no parameters or a <Configuration> type object as parameter and should return an instance of type <SessionFactory>. Unitils will 
-    call this method passing the Hibernate configuration as an argument if requested. If configuration files were specified they will be loaded 
-    in the <Configuration> before it is passed to the method. Below are 3 examples of custom create methods:
+    This will create a new configuration for UserDAOTest class, first loading the <hibernate.cfg.xml> followed by the <user-mapped-classes.cfg.xml>. 
+    The configuration is then used to create a <SessionFactory> instance. Note that there is a performance implication. By adding this new 
+    configuration file in the subclass, a new session factory had to be created. In the previous example, no extra configuration was added and 
+    the session factory could be reused. Session factory creation is a heavy operation, so try to reuse them as much as possible. This will 
+    greatly improve the performance of your tests.
+   
+   
+*** {Programmatic configuration}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Performing programmatic configuration is also supported. You can do this by annotating a custom create method with the <@HibernateSessionFactory> 
+    annotation. Such a method should either have no parameters or a <Configuration> type parameter and should return an instance of <SessionFactory>. 
+    If such a method is found, Unitils will call this method instead of creating a session factory itself. If requested, a Hibernate <Configuration> 
+    is passed as an argument. Configuration files that were specified as annotation parameters, will be preloaded in this configuration. 
+    Following are 3 examples of custom create methods:
     
 +-----+
 @HibernateSessionFactory
@@ -621,31 +792,50 @@ protected SessionFactory createSessionFactory(AnnotationConfiguration configurat
 +-----+
     
     
-*** {Hibernate Session management}
+** {Hibernate Session management}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Typically, a project contains a base DAO class that contains a reference to the Hibernate <SessionFactory>, and opens <Session>s on it. It depends 
-    on the configuration of the project when these sessions are closed. It can be done explicitly at the end of every DAO method, automatically
-    behind the screens on transaction commit, or you could make use of sessions that span multiple transactions. You could use <SessionFactory.openSession()>
-    and <Session.close()> methods to open and close sessions, or you could make use of <SessionFactory.getCurrentSession()> and rely on an implementation
-    of Hibernate's <CurrentSessionContext> interface to handle session opening and closing for you.
+    The previous section showed you how to get a reference to a <SessionFactory> instance. You then only have to provide some project specific code, that configures your 
+    DAO code to use this session factory. Typically all this is implemented once in a project-specific superclass for all your database tests. A simple example of such a base class could be:    
     
-    Whatever strategy you use, Unitils will make sure that after every unit test, any sessions that are still open are automatically closed, whether you use
-    <SessionFactory.openSession()> or <SessionFactory.getCurrentSession()> to obtain a <Session>.
++-----+
+public abstract void BaseDAOTest extends UnitilsJUnit4 {
+
+    @HibernateSessionFactory
+    private SessionFactory sessionFactory;
     
-    Unitils also provides an implementation of Hibernate's <CurrentSessionContext>, <SimpleCurrentSessionContext> and adds this to the Hibernate configuration. 
-    This enables you to use <SessionFactory.getCurrentSession()> in your tested code without having to do any configuration yourself. This implementation will
-    make sure that a new <Session> is created the first time you call <SessionFactory.getCurrentSession()> in a test. For the duration of the test, the same
-    instance of <Session> will be used. The <Session> is automatically closed after the test has finished.
+    @Before    
+    public void initializeDao() {
+        BaseDAO dao = getDaoUnderTest();
+        dao.setSessionFactory(sessionFactory);
+    }
+    
+    protected abstract BaseDAO getDaoUnderTest();
+}
++-----+
+
+    Unitils manages all sessions created by these session factories. It will for example flush sessions before checking the state of a databaste and 
+    closes sessions after a unit test was finished.
+    
+    An implementation of Hibernate's <CurrentSessionContext> is also provided. By default, the <SimpleCurrentSessionContext> will be added to the Hibernate 
+    configuration, enabling you to use <SessionFactory.getCurrentSession()> in your tested code without having to do any extra configuration. This implementation 
+    will create a new <Session> the first time <SessionFactory.getCurrentSession()> is called and returns this same session for the duration of the test.
+    After the test has finished the <Session> is automatically closed.
     
     
-*** {Testing the mapping}
+    
+    
+** {Testing the mapping}
 ~~~~~~~~~~~~~~~~~~~~~~~~
-    Unitils is shipped with a ready-to-use unit test that verifies whether the mapping of all your mapped classes is consistent with the database. This
-    test is not automatically executed; you should write a unit test that looks like the following:
+    Unitils is shipped with a ready-to-use unit test that verifies whether the mapping of all your mapped classes is consistent with the database 
+    structure. The method <HibernateUnitils.assertMappingWithDatabaseConsistent()> checks if any updates are required to the database to make it 
+    consistent with the Hibernate mapping. If yes, the test fails and the DDL statements that should be issued to the database that will make the 
+    mapping consistent are shown in the error message. This test is not automatically executed, you should write a unit test that looks like the 
+    following:
     
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
 public class HibernateMappingTest extends UnitilsJUnit4 {
+    
     @Test
     public void testMappingToDatabase() {
         HibernateUnitils.assertMappingWithDatabaseConsistent();
@@ -653,9 +843,12 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    The method <HibernateUnitils.assertMappingWithDatabaseConsistent()> checks if any updates are required to the database to make it consistent with the 
-    Hibernate mapping. If yes, the test fails and the DDL statements that should be issued to the database that will make the mapping consistent are shown 
-    in the error message. E.g.
+    This test will first load a hibernate configuration from the specified <hibernate.cfg.xml> and compare the hibernate setup with what the 
+    current state of the unit-test database. The test will fail if the state of the database is not consistent with the mapping and will
+    report the inconsistencies in the error message.
+    
+    As a simple example, suppose the Person class has a lastName field that does exist in the PERSON table and a barCode field that does not 
+    exist in the PRODUCT table you would get following error message:
     
 +-----+
 Found mismatches between Java objects and database tables. Applying following DDL statements to the database should resolve the problem:
@@ -666,215 +859,113 @@ alter table PRODUCT add column barCode varchar(255);
 
 
 
-
-* {Using reflection for assertion}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-** Reflection versus equals()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    A typical unit test contains a part in which it compares test result values with expected values. Unitils offers some
-    assertion utilities to help you with this. 
+* Testing with Spring
+~~~~~~~~~~~~~~~~~~~~~
+    Unitils also offers features for unit testing when working with {{{http://www.springframework.org}Spring}}. One of the basic principles 
+    of Spring is that your objects are designed in such way that they are easily testable without Spring or any other container. For integration 
+    testing however, it can be useful to work with object structures that are wired by the Spring container. 
     
-    Let's start with an example of comparing 2 User instances having an id, a first and a last name:
+    The features Unitils offers for Spring are:
+    
+    * Management of <ApplicationContext> configuration
+    
+    * Simple injection of Spring beans in unit tests
+    
+    * Enable testing DAO's that make use of a Hibernate <SessionFactory> configured in Spring
 
-+-----+    
-public class User {
-
-    private long id;
-    private String first;
-    private String last;
 
 
-    public User(long id, String first, String last) {
-        this.id = id;
-        this.first = first;
-        this.last = last;
-    }
+
+** ApplicationContext configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    In order to test Spring-wired beans, you need an <ApplicationContext> in your tests. Typically, your application is configured by multiple
+    Spring configuration files, and you need only one or a few for your test. Unitils offers a very simple but powerful way of specifying the
+    config files that need to be loaded. The mechanism is analoguous to the way in which you can configure your Hibernate <SessionFactory>.
+    
+    A <@SpringApplicationContext> annotation can be put at class level or on a field or setter method. You can specify config files to be loaded 
+    on either level. Superclasses will be scanned for the presence of class-level <@SpringApplicationContext> annotations. If present, the 
+    configuration files that are found are loaded before loading the config files specified on the annotations of the current class. 
+    For example:
+    
++-----+
+@SpringApplicationContext({"spring-beans.xml", "extra-spring-beans.xml"})
+public class UserServiceTest extends UnitilsJUnit4 {
+
+     @SpringApplicationContext
+     private ApplicationContext applicationContext;
+
+}
++-----+
+
+    This example will create a new <ApplicationContext> containing the files <spring-beans.xml> and <extra-spring-beans.xml>, and inject it into the 
+    annotated field. The same effect can be obtained with the following:
+     
++-----+
+@SpringApplicationContext("spring-beans.xml")
+public class BaseServiceTest extends UnitilsJUnit4 {
+
 }
 
-User user1 = new User(1, "John", "Doe");
-User user2 = new User(1, "John", "Doe");
-assertEquals(user1, user2);
-+-----+
+@SpringApplicationContext("extra-spring-beans.xml")
+public class UserServiceTest extends BaseServiceTest {
 
-    You would expect that this assertion would be successful since both instances contain the same values. This is however 
-    not the case, if User does not override the equals() method. Checking equals of 2 User instances is in that case the same
-    as checking whether both instances are the same. In other words, the assertEquals actually results in user1 == user2 
-    being tested causing the assertion to fail.
-    
-    Suppose you would implement the equals method as follows:
-    
-+-----+    
-public boolean equals(Object object) {
-    if (object instanceof User) {
-        return id == ((User) object).id;
-    }
-    return false;
+    @SpringApplicationContext
+    private ApplicationContext applicationContext;     
+
 }
-+-----+    
-
-    This is a totally reasonable implementation for your application logic, stating that 2 user instances are referring to 
-    the same user when they have the same id. However, this method is not useful in your unit tests. Testing whether 2 objects
-    are equal is now reduced to the test whether they have the same id:
-    
-+-----+        
-User user1 = new User(1, "John", "Doe");
-User user2 = new User(1, "Jane", "Smith");
-assertEquals(user1, user2);
 +-----+
 
-    This assertion will be successful, which is probably not what you want. Best is to avoid using equals() altogether 
-    when comparing objects (except of course for objects with value semantics such as java.lang.String, ...). 
-    One approach can be to do the comparison of each of the properties one by one:    
-    
-+-----+        
-User user1 = new User(1, "John", "Doe");
-User user2 = new User(1, "John", "Doe");
-assertEquals(user1.getId(), user2.getId());
-assertEquals(user1.getFirst(), user2.getFirst());
-assertEquals(user1.getLast(), user2.getLast());
+    If you have multiple tests making use of the same configuration, it is advisory to make them extend a common superclass on which this configuration
+    is specified at class level. This will make sure the <ApplicationContext> is only created once when running all of these tests in a suite.
+     
+    Programmatic configuration is also possible by annotating a method that takes a <List\<String\>> as parameter and returns an ApplicationContext.
+    The parameter consists of the names of all configuration files specified using a <@SpringApplicationContext> annotation on the level of the class
+    and/or its superclasses. The ApplicationContext that is returned should be a subclass of <ConfigurableApplicationContext>, and the refresh() method
+    should not be invoked yet. This can be achieved by invoking a constructor with the value <false> for the refresh boolean parameter. This reason for 
+    this is that Unitils needs to be able to add one or more BeanPostProcessors to the <ApplicationContext> before the <refresh()> method is called, which
+    processes the configuration files and instantiates the singleton beans. A valid implementation could be the following:
+     
 +-----+
-    
-    Unitils offers utilities that help you perform these checks more easily, through reflection. Using <ReflectionAssert.assertRefEquals>,
-    the above example could be re-written as follows:
-    
-+-----+
-User user1 = new User(1, "John", "Doe");
-User user2 = new User(1, "John", "Doe");
-assertRefEquals(user1, user2);    
-+-----+
-
-    This assertion loops over all fields in both objects and compares their values using reflection. For the above example, it will
-    first compare both <id> field values, next both <first> field values and finally both <last> fields values. 
-    
-    If a field value itself is also an object, it will recursively be compared field by field using reflection. The same is true for 
-    collections, maps and arrays. Their elements will be traversed and recusively be compared using reflection. If a value is a primitive 
-    type (int, long, ...) or one of the primitive wrapper types (Integer, Long, ...) it will be compared by value (using ==). 
-    As a result, following assertions, for example, will be successful:
-
-+-----+
-assertRefEquals(1, 1L); 
-
-List<Double> myList = new ArrayList<Double>();
-myList.add(1.0);
-myList.add(2.0);
-assertRefEquals(Arrays.asList(1, 2), myList); 
-+-----+
-
-
-
-
-** Lenient assertions
-~~~~~~~~~~~~~~~~~~~~~
-    If you want to create unit tests that are maintainable, care must be taken to only add assertions to your test that 
-    are of value for the test. Let me clarify this with an example: suppose you have a test for a calulation of an account balance. 
-    There is no need to add any assertions to this test that will check whether the name of the bank-customer is still correct.
-    This will only add complexity to your test making it more difficult to understand and, more importantly, more brittle against changes 
-    to the code. If you want your test code to easily survive refactorings and other code changes, make sure you limit your assertions and 
-    test data setup to the scope of the test.
-    
-    To help you in writing assertions that only test what is important, we added some levels of leniency to the ReflectionAssert checks, which 
-    we will cover more in-depth in the sections that follow.
-
-
-*** Lenient order
-~~~~~~~~~~~~~~~~~
-    A first type of leniency you can specify is ignoring the order of elements in a collection or an array. It is often the case that when working with 
-    lists, you are not interested in the order of the elements, only that they comply to certain criteria. For example, code for retrieving 
-    all bank-accounts with a negative balance will typically return them in a list in a certain order, which is unimportant for further processing.
-    
-    To implement this behavior, the <ReflectionAssert.assertRefEquals> method can be configured to ignore ordering by 
-    supplying it with the <ReflectionComparatorMode.LENIENT_ORDER> comparator mode:
-
-+-----+
-List<Integer> myList = Arrays.asList(3, 2, 1);
-assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER); 
+@SpringApplicationContext
+public ConfigurableApplicationContext createApplicationContext(List<String> locations) {
+    return new ClassPathXmlApplicationContext(Arrays.asList("spring-beans.xml","extra-spring-beans.xml"), false);
+}
 +-----+
     
 
-*** Ignoring defaults
-~~~~~~~~~~~~~~~~~~~~~
-    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode. When this mode is set, fields in the 
-    left (expected) instance will only be compared with the corresponding fields in the right (actual) instance if they have a non 
-    java default value, i.e. <null> or <0>. In other words, if you leave the value of a left-instance field to <null> or <0> it will not 
-    be used in the comparison.
-    
-    As an example, suppose you have a user class with a first name, last name, street, ... field, but you only want to check that the 
-    resulting user instance has a certain first name and street value, the other fields can be ignored:
 
-+-----+
-User actualUser   = new User("John", "Doe", new Address("First street", "12", "Brussels"));
-User expectedUser = new User("John",  null, new Address("First street", null,       null));
-assertLenEquals(expectedUser, actualUser);
-+-----+
 
-    You specify that you want to ignore a field by setting this value to null in the left (=expected) instance. 
-    Right-instance fields that have default values will still be compared.
+** Injection of Spring beans
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Once you've configured an ApplicationContext, you can in a very simple way make Unitils inject Spring beans in fields or setters of your test object. 
+    This can be achieved using one of the annotations <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>. When using <@SpringBean>, you have to 
+    explicitly specify the  name of the bean in the ApplicationContext. E.g.:
     
 +-----+
-assertRefEquals(null, "any", IGNORE_DEFAULTS);  // Succeeds
-assertRefEquals("any", null, IGNORE_DEFAULTS);  // Fails
-+-----+    
-
-
-*** Lenient dates
-~~~~~~~~~~~~~~~~~
-    A third and final type of leniency is <ReflectionComparatorMode.LENIENT_DATES>. This will assert that date field values in both instances 
-    are set or both equal to null, the actual values of the dates are ignored. E.g. a date from last year will equal the current date. This type 
-    of leniency can be useful e.g. when you want to do a strict comparison of objects (without using the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode), but
-    when these objects have a createOn and lastModifiedOn fields that you want to ignore.
-
-+-----+
-Date actualDate =   new Date(44444);
-Date expectedDate = new Date();
-assertRefEquals(expectedDate, actualDate, LENIENT_DATES); 
+@SpringBean("userService")
+private UserService userService;
 +-----+
 
-
-*** assertLenEquals
-~~~~~~~~~~~~~~~~~~~
-    The <ReflectionAssert> class also offers an assertion for which two of the leniency levels, lenient order and 
-    ignore defaults are pre-set: <ReflectionAssert.assertLenEquals>. The above examples can therefore be re-written as follows:
-    
+    The same effect can be reached using <@SpringBeanByName>, provided that the property name of the target field or setter is the same as the name of the 
+    bean in the ApplicationContext:
+     
 +-----+
-List<Integer> myList = Arrays.asList(3, 2, 1);
-assertLenEquals(Arrays.asList(1, 2, 3), myList); 
-
-assertLenEquals(null, "any");  // Succeeds
-assertLenEquals("any", null);  // Fails
-+-----+
-    
-    This len/ref thing is a general naming convention: assert<<Ref>>... is the version that is strict by default and for which you can 
-    manually set the leniency levels, assert<<Len>>... is the version for which the lenient order and ignore defaults are pre-set. 
-    
-        
-
-** Property assertions
-~~~~~~~~~~~~~~~~~~~~~~
-    The <assertLenEquals> and <assertRefEquals> methods compare objects as a whole. ReflectionAssert also contains methods to compare 
-    a specific property of two objects: <assertPropertyLenEquals> and <assertPropertyRefEquals>. The actual field that needs to be compared 
-    is specified using the {{{http://www.ognl.org/}OGNL}} notation, in which the typical bean property notation, e.g. 
-    field1.innerField, and more powerful notations can be used.
-    
-    Some examples of property comparisons are:
-
-+-----+
-assertPropertyLenEquals("id", 1, user);
-assertPropertyLenEquals("address.street", "First street", user);
+@SpringBeanByType
+public void setUserService(UserService userService) {
+    this.userService = userService;
+}
 +-----+
 
-    You can also supply collections as arguments for this method. In that case the specified field will be compared on each element in the collection. This
-    provides an easy way to for example check whether all users in a retrieved list have certain id: 
-
+    When using <@SpringBeanByType>, the ApplicationContext is queried for a bean having a type assignable to the type of the target field or setter. If 
+    no such bean exists or if more than one is found, a <UnitilsException> is thrown. In the following example, Unitils will look in the ApplicationContext 
+    for a bean of type UserService or a subtype.
+     
++------+
+@SpringBeanByType
+public void setUserService(UserService userService) {
+    this.userService = userService;
+}
 +-----+
-assertPropertyLenEquals("id", Arrays.asList(1, 2, 3), users);
-assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second street", "Third street"), users);
-+-----+
-
-    Again there are two versions of each method: an assertProperty<<Len>>Equals method and a assertProperty<<Ref>>Equals method. 
-    The ref version will have no leniency specified by default but provides the option to specify leniency modes, the len version
-    already has lenient order and ignore defaults set as fixed leniency modes.
 
 
 
@@ -887,10 +978,7 @@ assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second 
     support. Unitils provides convenience functionality that  reduces the plumbing code that needs to be written when working with 
     mocks. This involves simplification of mock creation, argument matching and injection of mocks.
     
-    If you don't have experience with EasyMock, first read {{{http://www.easymock.org/EasyMock2_2_Documentation.html}EasyMock 2.2's documentation}}, 
-    before proceeding with this tutorial.
-
-
+    
 ** Mock creation
 ~~~~~~~~~~~~~~~~
     Unitils makes sure that mock objects are injected into a unit test class before the execution of each test. Following example 
@@ -942,7 +1030,6 @@ EasyMockModule.Mock.InvocationOrder.default=strict
    
 **   Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     The mocks that are supplied by Unitils are slightly different from mocks objects that you get when directly using EasyMock: a <LenientMocksControl> is used 
     for these mocks. If you want Unitils to create a normal EasyMock mock, the <@RegularMock> annotation can be used instead.
     
@@ -1078,111 +1165,52 @@ void injectMock(Object mock, String name, Class type) {
 
 
 
-
-* Integration with Spring
-~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unitils also offers features for unit testing when working with {{{http://www.springframework.org}Spring}}. One of the basic principles 
-    of Spring is that your objects are designed in such way that they are easily testable without Spring or any other container. For integration 
-    testing however, it can be useful to work with object structures that are wired by the Spring container. 
-    
-    The features Unitils offers for Spring are:
-    
-    * Management of <ApplicationContext> configuration
-    
-    * Simple injection of Spring beans in unit tests
-    
-    * Enable testing DAO's that make use of a Hibernate <SessionFactory> configured in Spring
+* Future directions
+~~~~~~~~~~~~~~~~~~~
 
 
-
-
-** ApplicationContext configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    In order to test Spring-wired beans, you need an <ApplicationContext> in your tests. Typically, your application is configured by multiple
-    Spring configuration files, and you need only one or a few for your test. Unitils offers a very simple but powerful way of specifying the
-    config files that need to be loaded. The mechanism is analoguous to the way in which you can configure your Hibernate <SessionFactory>.
+** {Testing functions, stored procedures, ...}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Enterprise applications typically contain application code that is stored and executed on the database, like functions and stored procedures. 
+    It can often be a good idea to always have these code definitions applied to your test databases, to unit-test their correct hehaviour or for 
+    integration testing.
+    It is in most cases not possible to simply mix them with the regular database DDL definitions, because the syntax of stored procedures is 
+    different: A ';' in a regular DDL statement indicates the end of a statement, while a stored procedure typically contains multiple SQL statements,
+    and a ';' doesn't mean the end of a stored procedure.
     
-    A <@SpringApplicationContext> annotation can be put at class level or on a field or setter method. You can specify config files to be loaded 
-    on either level. Superclasses will be scanned for the presence of class-level <@SpringApplicationContext> annotations. If present, the 
-    configuration files that are found are loaded before loading the config files specified on the annotations of the current class. 
-    For example:
+    The database maintainer will execute all scripts in the configured location whenever one of these files is changed, or after updating the database structure.
+    Before doing this, a service implementing the <DbCodeClearer> interface is called, doing some necessary cleanup first. For the moment, this service
+    only drops database triggers and oracle types. In most cases it is not needed that the stored procedure definitions are cleared first, since their
+    existing definition can be overwritten using <CREATE OR REPLACE>.
+    
+    The directory(ies) containing script files with triggers, functions and stored procedures can be configured as follows:
     
 +-----+
-@SpringApplicationContext("spring-beans.xml","extra-spring-beans.xml")
-public class UserServiceTest extends UnitilsJUnit4 {
-
-     @SpringApplicationContext
-     private ApplicationContext applicationContext;
-
-}
+dbMaintainer.fileScriptSource.code.location=/myproject/dbscripts/procedures
 +-----+
 
-    This example will create a new <ApplicationContext> containing the files <spring-beans.xml> and <extra-spring-beans.xml>, and inject it into the 
-    annotated field. The same effect can be obtained with the following:
-     
-+-----+
-@SpringApplicationContext("spring-beans.xml")
-public class BaseServiceTest extends UnitilsJUnit4 {
-
-}
-
-@SpringApplicationContext("extra-spring-beans.xml")
-public class UserServiceTest extends BaseServiceTest {
-
-    @SpringApplicationContext
-    private ApplicationContext applicationContext;     
-
-}
-+-----+
-
-    If you have multiple tests making use of the same configuration, it is advisory to make them extend a common superclass on which this configuration
-    is specified at class level. This will make sure the <ApplicationContext> is only created once when running all of these tests in a suite.
-     
-    Programmatic configuration is also possible by annotating a method that takes a <List\<String\>> as parameter and returns an ApplicationContext.
-    The parameter consists of the names of all configuration files specified using a <@SpringApplicationContext> annotation on the level of the class
-    and/or its superclasses. The ApplicationContext that is returned should be a subclass of <ConfigurableApplicationContext>, and the refresh() method
-    should not be invoked yet. This can be achieved by invoking a constructor with the value <false> for the refresh boolean parameter. This reason for 
-    this is that Unitils needs to be able to add one or more BeanPostProcessors to the <ApplicationContext> before the <refresh()> method is called, which
-    processes the configuration files and instantiates the singleton beans. A valid implementation could be the following:
-     
-+-----+
-@SpringApplicationContext
-public ConfigurableApplicationContext createApplicationContext(List<String> locations) {
-    return new ClassPathXmlApplicationContext(Arrays.asList("spring-beans.xml","extra-spring-beans.xml"), false);
-}
-+-----+
     
+    Multiple directories can be configured, separated by commas. Subdirectories are also scanned for script files. Since for database sources, the 
+    sequence in which they are executed is in most cases not important, adding sequence numbers to the files is not required. If you do add sequence
+    numbers, the scripts with numbers are executed first. For example, suppose we have following files:
+    
++----+
+databasecode/ 01_compileAll.sql
+              dropAllInactiveUsers.sql
+              collectivePayRaise.sql
+							
++----+
 
-
-
-** Injection of Spring beans
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Once you've configured an ApplicationContext, you can in a very simple way make Unitils inject Spring beans in fields or setters of your test object. 
-    This can be achieved using one of the annotations <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>. When using <@SpringBean>, you have to 
-    explicitly specify the  name of the bean in the ApplicationContext. E.g.:
+    Unitils will first execute the non-indexed scripts. This will make sure the stored procedures in dropAllInactiveUsers.sql and collectivePayRaise.sql 
+    are created in the database. Next, the indexed files are executed in proper sequence, which in this case will make sure the script 01_compileAll.sql 
+    is executed that compiles all stored procedures in the database.
+    
+    Code script files can contain multiple function / stored procedure / ... definitions. The different definitions should be separated by a / sign
+    that is put on a separate line, like follows:
     
 +-----+
-@SpringBean("userService")
-private UserService userService;
+stored procedure definition 1
+/
+stored procedure definition 2
 +-----+
 
-    The same effect can be reached using <@SpringBeanByName>, provided that the property name of the target field or setter is the same as the name of the 
-    bean in the ApplicationContext:
-     
-+-----+
-@SpringBeanByType
-public void setUserService(UserService userService) {
-    this.userService = userService;
-}
-+-----+
-
-    When using <@SpringBeanByType>, the ApplicationContext is queried for a bean having a type assignable to the type of the target field or setter. If 
-    no such bean exists or if more than one is found, a <UnitilsException> is thrown. In the following example, Unitils will look in the ApplicationContext 
-    for a bean of type UserService or a subtype.
-     
-+------+
-@SpringBeanByType
-public void setUserService(UserService userService) {
-    this.userService = userService;
-}
-+-----+
