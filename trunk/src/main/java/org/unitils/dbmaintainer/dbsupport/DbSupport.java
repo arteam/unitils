@@ -136,14 +136,6 @@ abstract public class DbSupport {
 
 
     /**
-     * Retrieves the names of all db links in the database schema.
-     *
-     * @return The names of all db links in the database
-     */
-    abstract public Set<String> getDbLinkNames();
-
-
-    /**
      * Removes the table with the given name from the database.
      * Note: the table name is surrounded with quotes, making it case-sensitive.
      *
@@ -218,15 +210,6 @@ abstract public class DbSupport {
 
 
     /**
-     * Drops the db link with the given name from the database
-     * Note: the db links name is surrounded with quotes, making it case-sensitive.
-     *
-     * @param dbLinkName The db link to drop (case-sensitive), not null
-     */
-    abstract public void dropDbLink(String dbLinkName) throws StatementHandlerException;
-
-
-    /**
      * Returns the value of the sequence with the given name
      *
      * @param sequenceName The sequence, not null
@@ -282,14 +265,6 @@ abstract public class DbSupport {
      * @return True if types are supported, false otherwise
      */
     abstract public boolean supportsTypes();
-
-
-    /**
-     * Indicates whether the underlying DBMS supports database links
-     *
-     * @return True if db links arre supported, false otherwise
-     */
-    abstract public boolean supportsDbLinks();
 
 
     /**
