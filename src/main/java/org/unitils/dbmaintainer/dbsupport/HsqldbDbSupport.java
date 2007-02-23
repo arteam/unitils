@@ -73,23 +73,11 @@ public class HsqldbDbSupport extends DbSupport {
         throw new UnsupportedOperationException("Hsqldb doesn't support types");
     }
 
-    public Set<String> getDbLinkNames() {
-        throw new UnsupportedOperationException("Hsqldb doesn't support db links");
-    }
-
     /**
      * Not supported
      */
     public void dropType(String typeName) throws StatementHandlerException {
         throw new UnsupportedOperationException("Hsqldb doesn't support types");
-    }
-
-
-    /**
-     * Not supported
-     */
-    public void dropDbLink(String dbLinkName) {
-        throw new UnsupportedOperationException("Hsqldb doesn't support db links");
     }
 
 
@@ -174,16 +162,6 @@ public class HsqldbDbSupport extends DbSupport {
      * @return false
      */
     public boolean supportsTypes() {
-        return false;
-    }
-
-
-    /**
-     * Support for db links is currently not implemented for hsqldb
-     *
-     * @return false
-     */
-    public boolean supportsDbLinks() {
         return false;
     }
 
