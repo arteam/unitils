@@ -1,34 +1,35 @@
- -----
+ --------
  Tutorial
- -----
- -----
+ --------
+ --------
 
 Tutorial
 ~~~~~~~~
-    Unit testing should be easy and intuitively... at least in theory. Real-life projects
-    typically span multiple layers, are data-driven and use middleware technologies such as EJB and Hibernate.
+    Unit testing should be easy and intuitively... at least in theory. Real-life projects typically span multiple layers, are data-driven and 
+    use middleware technologies such as EJB and Hibernate.
 
-    Unitils originated out of an attempt to get a more pragmatic view on unit testing that involves some
-    typical unit testing frameworks such as DbUnit and EasyMock. It started as a set of guidelines and
-    eventually resulted in an open source library containing utilities that facilitate the application of these guidelines.
+    Unitils originated out of an attempt to get a more pragmatic view on unit testing that involves some typical unit testing frameworks 
+    such as DbUnit and EasyMock. It started as a set of guidelines and eventually resulted in an open source library containing utilities that 
+    facilitate the application of these guidelines.
 
-    This tutorial will show you, using examples, what Unitils can do for your projects. It is merely an introduction to Unitils, 
-    more in-depth documentation can be found in the {{{apidocs/index.html}javadoc}} of the modules. The testing guidelines that are 
-    behind the features can be found on the {{{guidelines.html}guidelines page}}. If you want to learn how you can setup Unitils to 
-    get started quickly, read the {{{cookbook.html}cookbook}}.
-
-
+    This tutorial will show you, using examples, what Unitils can do for your projects. It is merely an introduction to Unitils, more in-depth 
+    documentation can be found in the {{{apidocs/index.html}javadoc}} of the modules. The testing guidelines that are behind the features can 
+    be found on the {{{guidelines.html}guidelines page}}. If you want to learn how you can setup Unitils to get started quickly, read 
+    the {{{cookbook.html}cookbook}}.
 
 
 
-* {Using reflection for assertion}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    A typical unit test contains a part in which it compares test result values with expected values. Unitils offers some assertion utilities to help you with this. 
 
+* {Assertion utilities}
+~~~~~~~~~~~~~~~~~~~~~~~
+    We'll begin this tutorial describing assertion utilities that can be used stand-alone, independently of the module system that will be described 
+    later-on in the tutorial. 
+    
 
-** Reflection versus equals()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-    Let's start with an example of comparing 2 User instances having an id, a first and a last name:
+** {Using reflection for assertion}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+    A typical unit test contains a part in which it compares test result values with expected values. Unitils offers assertion utilities to 
+    help you with this. Let's start with an example of comparing 2 <User> instances having an id, a first and a last name:
 
 +-----+    
 public class User {
@@ -36,7 +37,6 @@ public class User {
     private long id;
     private String first;
     private String last;
-
 
     public User(long id, String first, String last) {
         this.id = id;
@@ -50,10 +50,9 @@ User user2 = new User(1, "John", "Doe");
 assertEquals(user1, user2);
 +-----+
 
-    You would expect that this assertion would be successful since both instances contain the same values. This is however 
-    not the case, if User does not override the equals() method. Checking equals of 2 User instances is in that case the same
-    as checking whether both instances are the same. In other words, the assertEquals actually results in user1 == user2 
-    being tested causing the assertion to fail.
+    You would expect that this assertion would be successful since both instances contain the same values. This is however not the case, because <User> 
+    does not override the equals() method. Checking equals of 2 <User> instances is in that case the same as checking whether both instances are the same. 
+    In other words, the assertEquals actually results in user1 == user2 being tested causing the assertion to fail.
     
     Suppose you would implement the equals method as follows:
     
@@ -66,9 +65,9 @@ public boolean equals(Object object) {
 }
 +-----+    
 
-    This is a totally reasonable implementation for your application logic, stating that 2 user instances are referring to 
-    the same user when they have the same id. However, this method is not useful in your unit tests. Testing whether 2 objects
-    are equal is now reduced to the test whether they have the same id:
+    This is a totally reasonable implementation for your application logic, stating that 2 user instances are referring to the same user when they have the 
+    same id. However, this method is not useful in your unit tests. Testing whether 2 objects are equal is now reduced to the test whether they both have 
+    the same id:
     
 +-----+        
 User user1 = new User(1, "John", "Doe");
@@ -186,8 +185,8 @@ assertRefEquals(expectedDate, actualDate, LENIENT_DATES);
 
 *** assertLenEquals
 ~~~~~~~~~~~~~~~~~~~
-    The <ReflectionAssert> class also offers an assertion for which two of the leniency levels, lenient order and 
-    ignore defaults are pre-set: <ReflectionAssert.assertLenEquals>. The above examples can therefore be re-written as follows:
+    The <ReflectionAssert> class also offers an assertion for which two of the leniency levels, lenient order and ignore defaults are pre-set: 
+    <ReflectionAssert.assertLenEquals>. The above examples can be re-written as follows:
     
 +-----+
 List<Integer> myList = Arrays.asList(3, 2, 1);
@@ -231,8 +230,13 @@ assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second 
 
 
 
-* Getting started
-~~~~~~~~~~~~~~~~~
+* {Unitils Modules}
+~~~~~~~~~~~~~~~~~~~
+    We started with some utilities, the rest of this tutorial will describe the core of Unitils and the modules it consists of. We'll 
+    begin explaining how to setup you're environment to use Unitils and will then go deeper into the functionality of each of the 
+    modules.
+    
+
 
 ** {Configuration}
 ~~~~~~~~~~~~~~~~        
@@ -288,7 +292,7 @@ unitils.configuration.localFileName=projectTwo-local.properties
 
 
 ** {Making your test Unitils-enabled}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unitils offers services to test classes through a test listener system. To enable Unitils to provide services to your tests, you first have to Unitils-enable them.
     This can be done easily by (indirectly) extending from a Unitils base test-class. Currently there are base classes for the major test frameworks:
 
@@ -333,7 +337,7 @@ public class MyTest {
 
 
 ** {Module system}
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
     Before starting with the examples, let's first take a look at some of the concepts used in Unitils and how it functions under the hood.
 
     Unitils is structured as an easily extendible system of modules. Each of these modules offers some type of service to a test by listening to the
@@ -889,18 +893,16 @@ public class UserServiceTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    A <@SpringApplicationContext> annotation can be put at class level or on a field or setter method. You can specify config files to be loaded 
-    on either level. Superclasses will be scanned for the presence of class-level <@SpringApplicationContext> annotations. If present, the 
-    configuration files that are found are loaded before loading the config files specified on the annotations of the current class. 
-    For example:
+    This will create a new <ApplicationContext> loading the <spring-beans.xml> and <extra-spring-beans.xml> files and will inject it into the 
+    annotated field and setter method. 
     
-    This example will create a new <ApplicationContext> containing the files <spring-beans.xml> and <extra-spring-beans.xml> and inject it into the 
-    annotated field. The same effect can be obtained with the following:
-     
+    Superclasses will also be scanned for the presence of <@SpringApplicationContext> annotations. If found, these configuration files are loaded 
+    before the configuration files specified in subclasses. This makes it possible to override configuration settings or to add extra configuration 
+    specific for the test. For example:
+    
 +-----+
 @SpringApplicationContext("spring-beans.xml")
 public class BaseServiceTest extends UnitilsJUnit4 {
-
 }
 
 @SpringApplicationContext("extra-spring-beans.xml")
@@ -908,23 +910,57 @@ public class UserServiceTest extends BaseServiceTest {
 
     @SpringApplicationContext
     private ApplicationContext applicationContext;     
-
 }
 +-----+
 
-    If you have multiple tests making use of the same configuration, it is advisory to make them extend a common superclass on which this configuration
-    is specified at class level. This will make sure the <ApplicationContext> is only created once when running all of these tests in a suite.
-     
-    Programmatic configuration is also possible by annotating a method that takes a <List\<String\>> as parameter and returns an ApplicationContext.
-    The parameter consists of the names of all configuration files specified using a <@SpringApplicationContext> annotation on the level of the class
-    and/or its superclasses. The ApplicationContext that is returned should be a subclass of <ConfigurableApplicationContext>, and the refresh() method
-    should not be invoked yet. This can be achieved by invoking a constructor with the value <false> for the refresh boolean parameter. This reason for 
-    this is that Unitils needs to be able to add one or more BeanPostProcessors to the <ApplicationContext> before the <refresh()> method is called, which
-    processes the configuration files and instantiates the singleton beans. A valid implementation could be the following:
-     
+    As in the previous example, this will create a new ApplicationContext, first loading the <spring-beans.xml> followed by the <extra-spring-beans.xml> 
+    configuration files. The application context is then injected into the annotated field.
+    
+    Note that in this example, a new application context was created. This was needed because an extra configuration file was specified for the test.
+    Unitils will try to reuse the application context when possible. In the following example, no extra files need to be loaded, so the same instance will 
+    be reused:
+        
++-----+
+@SpringApplicationContext("spring-beans.xml")
+public class BaseServiceTest extends UnitilsJUnit4 {
+}
+
+public class UserServiceTest extends BaseServiceTest {
+
+    @SpringApplicationContext
+    private ApplicationContext applicationContext;     
+}
+
+public class UserGroupServiceTest extends BaseServiceTest {
+
+    @SpringApplicationContext
+    private ApplicationContext applicationContext;     
+}
++-----+
+
+    By specifying the configuration on a common superclass <BaseServiceTest>, the <ApplicationContext> will only be created once and then reused 
+    for the <UserServiceTest> and <UserGroupServiceTest>. Since loading an application context can be a heavy operation, reusing the context 
+    will greatly improve the performance of your tests.
+
+
+*** {Programmatic configuration}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Programmatic configuration is also possible. You can do this by annotating a method that takes no or a <List\<String\>> as parameter and returns an instance
+    of <ConfigurableApplicationContext>. If a <List\<String\>> parameter is specified, all locations of the <@SpringApplicationContext> annotations that would 
+    otherwise be used to create a new instance will be passed to the method. 
+    
+    The result of this method should be an instance of an application context for which the refresh() method was not yet invoked. This important, since it 
+    allows Unitils to perform extra configuration such as adding some BeanPostProcessors, which is no longer possible once refresh is invoked. In case of 
+    a <ClassPathXmlApplicationContext> this can easily be achieved by passing <false> as value for the refresh parameter of the constructor:
+         
 +-----+
 @SpringApplicationContext
 public ConfigurableApplicationContext createApplicationContext(List<String> locations) {
+    return new ClassPathXmlApplicationContext(Arrays.asList(locations), false);
+}
+
+@SpringApplicationContext
+public ConfigurableApplicationContext createApplicationContext() {
     return new ClassPathXmlApplicationContext(Arrays.asList("spring-beans.xml","extra-spring-beans.xml"), false);
 }
 +-----+
@@ -934,17 +970,29 @@ public ConfigurableApplicationContext createApplicationContext(List<String> loca
 
 ** Injection of Spring beans
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Once you've configured an ApplicationContext, you can in a very simple way make Unitils inject Spring beans in fields or setters of your test object. 
-    This can be achieved using one of the annotations <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>. When using <@SpringBean>, you have to 
-    explicitly specify the  name of the bean in the ApplicationContext. E.g.:
+    Once you've configured an ApplicationContext, you Spring beans can be obtained by using the <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>
+    annotation. The following example shows 3 ways to get a bean instance from the application context:
     
 +-----+
 @SpringBean("userService")
 private UserService userService;
+
+@SpringBeanByName
+private UserService userService;
+
+@SpringBeanByType
+private UserService userService;
 +-----+
 
-    The same effect can be reached using <@SpringBeanByName>, provided that the property name of the target field or setter is the same as the name of the 
-    bean in the ApplicationContext:
+    The first one, <@SpringBean>, allows you to get a Spring bean by explicitly specifying the name of the bean in the application context. In this case, 
+    this will look up the <userService> bean and inject it into the field. The second one, <@SpringBeanByName>, has the same effect. It uses the name of the 
+    field, again <userService>, as name for the bean to get from the application context
+    
+    When using the last one, <@SpringBeanByType>, the application context will be queried for a bean having a type that is assignable to the field, in this case,
+    a bean that is of type <UserService> or one of its sub-types. If no such bean exists or if there is more than one possible candidate, a <UnitilsException> 
+    will be thrown.     
+    
+    The above examples where for field injection, the same annotations can also be used on setter methods. For example:
      
 +-----+
 @SpringBeanByType
@@ -952,34 +1000,21 @@ public void setUserService(UserService userService) {
     this.userService = userService;
 }
 +-----+
-
-    When using <@SpringBeanByType>, the ApplicationContext is queried for a bean having a type assignable to the type of the target field or setter. If 
-    no such bean exists or if more than one is found, a <UnitilsException> is thrown. In the following example, Unitils will look in the ApplicationContext 
-    for a bean of type UserService or a subtype.
-     
-+------+
-@SpringBeanByType
-public void setUserService(UserService userService) {
-    this.userService = userService;
-}
-+-----+
-
 
 
 
 
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other 
-    parts or services that it depends on. Unitils builds further on {{{http://www.easymock.org}EasyMock}} for its mock object testing 
-    support. Unitils provides convenience functionality that  reduces the plumbing code that needs to be written when working with 
-    mocks. This involves simplification of mock creation, argument matching and injection of mocks.
+    Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other parts or services that it depends on. Unitils builds 
+    further on {{{http://www.easymock.org}EasyMock}} for its mock object testing support. It provides convenience functionality that reduces the plumbing code that needs to 
+    be written when working with mocks. This involves simplification of mock creation, argument matching and injection of mocks.
     
     
 ** Mock creation
 ~~~~~~~~~~~~~~~~
     Unitils makes sure that mock objects are injected into a unit test class before the execution of each test. Following example 
-    shows a unit test for a method on a UserService that disables all inactive user accounts:
+    shows a unit test for a method on a <UserService> that disables all inactive user accounts:
     
 +-----+
 public void UserServiceTest extends UnitilsJUnit4 { 
@@ -1002,21 +1037,20 @@ public void UserServiceTest extends UnitilsJUnit4 {
 } 
 +-----+
 
-    In the example all data access is delegated to a UserDao service, which is replaced by a mock object. This mock is created automatically by Unitils. If you 
+    In the example all data access is delegated to a <UserDao> service, which is replaced by a mock object. This mock is automatically created by Unitils. If you 
     annotate a field with the <@Mock> annotation, Unitils will create a mock of the same type as the field and inject the instance into that field. This mock creation 
-    and assignment is performed before executing the test fixture (this is the setUp method in JUnit3, or the @BeforeMethod methods in TestNG). This way
-    you can use the mock instance during the setup, for example, to make sure your code uses it during the test. Later-on we will show you
-    how Unitils can help you perform this mock injection.
+    and assignment is performed before the setup of your test. During the setup you can then do extra configuration and, for example, install the mock so that it is 
+    used by your code during the test. Later-on we will show you how Unitils can help you perform this mock injection more easily.
    
-    The mock objects created by Unitils by default use EasyMock's strict call expectations (i.e. the test fails when unexpected method calls occur) and lenient 
-    invocation order. You can change these default values by specifying attributes on the @Mock annotation, e.g.:
+    The created mock objects by default use EasyMock's strict call expectations (i.e. the test fails when unexpected method calls occur) and ignore the invocation order. 
+    You can change these settings by specifying attributes on the @Mock annotation, e.g.:
    
 +-----+
-@Mock(returns = Calls.LENIENT, invocationOrder = InvocationOrder.STRICT)
+@Mock(returns=Calls.LENIENT, invocationOrder=InvocationOrder.STRICT)
 private UserDao mockUserDao;
 +-----+
 
-    You can also change the default values for all <@Mock> annotations using following configuration settings:
+    You can also change the default values for all <@Mock> annotations in the configuration settings:
 
 +-----+
 EasyMockModule.Mock.Calls.default=lenient
@@ -1028,11 +1062,9 @@ EasyMockModule.Mock.InvocationOrder.default=strict
 **   Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     The mocks that are supplied by Unitils are slightly different from mocks objects that you get when directly using EasyMock: a <LenientMocksControl> is used 
-    for these mocks. If you want Unitils to create a normal EasyMock mock, the <@RegularMock> annotation can be used instead.
-    
-    The <LenientMocksControl> control will make sure that arguments specified in method calls are matched using reflection. The arguments of the
-    expected and actual method calls are compared in the same way as we saw in the {{{#Using reflection for assertion}Using reflection for assertion}} section. 
-    By default, it will use the ignore defaults and lenient order leniency levels. E.g., following expectation and actual method calls will match:
+    for these mocks. This control will make sure that arguments specified in method calls are matched using reflection. The arguments of the expected and actual 
+    method calls are compared in the same way we saw in the {{{#Assertion utilities}Assertion utilities}} section. By default, it will use 
+    the ignore defaults and lenient order leniency levels. E.g., following expectation and actual method calls will match:
     
 +-----+
 expected: dao.findById(0);
@@ -1049,7 +1081,8 @@ expected: dao.update(0,    new User(null,   "Doe"));
 actual:   dao.update(9999, new User("John", "Doe"));
 +-----+
 
-    As you can see, the leniency levels not only apply to objects and their fields but also apply to the argurments themselves. For example, take a look at following expectation:
+    As you can see, the leniency levels not only apply to objects and their fields but also apply to the argurments themselves. For example, take a 
+    look at following expectation:
     
 +-----+
 expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
@@ -1062,7 +1095,7 @@ expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
     on the <@Mock> annotation:
 
 +-----+
-@Mock(order = Order.STRICT, defaults = Defaults.STRICT, dates = Dates.LENIENT)
+@Mock(order=Order.STRICT, defaults=Defaults.STRICT, dates=Dates.LENIENT)
 private UserDao mockUserDao;
 +-----+
 
@@ -1075,7 +1108,8 @@ EasyMockModule.Mock.Dates.default=lenient
 EasyMockModule.Mock.Defaults.default=strict
 +-----+
 
-    If you don't want to use reflection for lenient argument matching, you can also make Unitils inject regular EasyMock mocks into your test, using the RegularMock annotation.
+    If you don't want to use reflection for lenient argument matching, you can also make Unitils inject regular EasyMock mocks into your test, 
+    using the <@RegularMock> annotation.
 
 +-----+
 @RegularMock
@@ -1087,30 +1121,29 @@ private UserDao mockUserDao;
 
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
-    Unitils provides services that simplify mock injection in various ways. Following example shows how a 
-    UserDao mock is created and injected in the the userService:
+    Unitils provides services that simplify mock injection in various ways. Following example shows how a <UserDao> mock is created and 
+    injected in the the <userService>:
 
 +-----+
-@Mock @InjectInto(property = "userDao")
+@Mock @InjectInto(property="userDao")
 private UserDao mockUserDao;
 
 @TestedObject
 private UserService userService;
 +-----+
 
-    Before executing a test method in the above example, but after the test fixture, the <@Inject> annotation will cause the 
-    mockUserDao to be injected into the userDao property of the userService. The value for the attribute property of @Inject can 
-    be an arbitrary {{{http://www.ognl.org/}OGNL}} expression. Getter / setter and field access may be mixed and private access 
-    is also supported.
+    Before executing a test method in the above example, but after the test fixture, the <@Inject> annotation will cause the mockUserDao to be 
+    injected into the userDao property of the userService. The value for the attribute property of @Inject can be an arbitrary {{{http://www.ognl.org/}OGNL}} 
+    expression. Getter / setter and field access may be mixed and private access is also supported.
   
-    The target object for injection is by default the field that is annotated as TestedObject. Multiple fields may be annotated as TestedObject, 
-    in this case the object will be injected into every annotated field. If injection is not possible (e.g. a property in the OGNL 
-    expression doens't exist), the test fails.
+    The target object for injection is by default the field that is annotated with <@TestedObject>. If multiple fields are annotated with <@TestedObject>
+    the object will be injected in each of them. If injection is not possible (e.g. a property in the OGNL expression doens't exist), 
+    an <UnitilsException> will be raised and the test fails.
   
     The target object can also specified explicitly, using the target attribute on the Inject annotation:
   
 +-----+
-@Mock @InjectInto(target = "userService", property = "userDao")
+@Mock @InjectInto(target="userService", property="userDao")
 private UserDao mockUserDao;
 
 private UserService userService;
@@ -1127,14 +1160,44 @@ private UserDao mockUserDao;
 private UserService userService;
 +-----+
 
-    The mockUserDao will be injected into a property of userService with the type UserDao or a superclass or interface of UserDao. 
+    The mockUserDao will be injected into a property of userService with the type <UserDao> or a superclass or interface of <UserDao>. 
     If more than one candidate target property exists, the most specific one is chosen. If no single most specific target property can 
-    be found, a UnitilsException is thrown and the test fails.
-  
-    There are also a variant of the <@Inject> and <@AutoInject> annotations provided, for injection into static fields or setter methods. 
-    These are called <@InjectStatic> and <@AutoInjectStatic>, respectively. A common use of these annotations is to inject a mock 
-    into a singleton class.
+    be found, a <UnitilsException> is thrown and the test fails.
 
+
+
+*** Static mock injection
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    There are variants of the <@InjectInto> and <@InjectIntoByType> annotations that can be used for injection into static fields or setter 
+    methods. These are called <@InjectIntoStatic> and <@InjectIntoStaticByType>, respectively. A common use of these annotations is to inject a mock 
+    into a singleton class. For example:    
+    
++-----+
+@Mock @InjectIntoStatic(target=UserService.class property="singleton")
+private UserDao mockUserDao;
++-----+
+
+    This will inject the created mock into the static <singleton> field of the <UserService> class. However, if this would be the only action 
+    performed, this test would leave the <UserService> in an invalid state. Other tests that access the same <singleton> field will now also
+    get the mock instead of the real user service. 
+    
+    To resolve this, Unitils will restore the old value of the field after the test was performed. In the above example, the <UserService> 
+    instance or null value contained in the <singleton> field will be put back after the test execution.
+    
+    The actual restore action can be configured by specifying it as an attribute of the annotation:
+    
++-----+
+@Mock @InjectIntoStaticByType(target=UserService.class restore=Restore.NULL_OR_0_VALUE)
+private UserDao mockUserDao;
++-----+
+        
+    You can choose to restore the old value (=default), set the field to a null or 0 value or to leave the value as it is.
+    
+    The restore action can also be set project-wide, for all mocks at once, by changing the defaults in the configuration settings:
+
++-----+
+InjectModule.InjectIntoStatic.Restore.default=old_value
++-----+
 
 
 
@@ -1145,9 +1208,9 @@ private UserService userService;
     way of providing a setter and a field for your services, and so there nothing to inject the mock into. 
     
     To resolve this, an <@AfterCreateMock> annotation is provided that allows intercepting a mock immediately after creation. The annotated method 
-    takes as parameters an Object (the mock), a String (the name of the field to which the mock is assigned) and a Class 
-    (the type of the mock object). The mock instance can then be used to for example register the mock in the service locator. 
-    For example, this method could be implemented as follows:
+    takes as parameters an Object (the mock), a String (the name of the field to which the mock is assigned) and a Class (the type of the mock object). 
+    The mock instance can then be used to register the mock in the service locator or perform some other task of configuration. Such a method could for 
+    example be implemented as follows:
   
 +-----+
 @AfterCreateMock
@@ -1156,15 +1219,18 @@ void injectMock(Object mock, String name, Class type) {
 }
 +----+
 
-    The method ServiceLocator.injectService make sure that when the ServiceLocator is requested for an implementation of UserDao, 
-    the mock is returned. This allows for a very simple way of using mock object in combination with such a service locator.
+    The <injectService> method installs the instance, so that the mock instance is returned when the <ServiceLocator> is asked for an instance of 
+    that type. This allows for a very simple way of using mock object in combination with such a service locator.
 
 
 
 
 * Future directions
 ~~~~~~~~~~~~~~~~~~~
-
+    We plan on adding many more features to Unitils, such as integration of JavaPersistence (EJB3) and the support for handling stored procedures and 
+    functions. At this moment we already include a first version of function and stored procedure support for Oracle. Try it out, and let us know 
+    what you think. 
+    
 
 ** {Testing functions, stored procedures, ...}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
