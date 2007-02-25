@@ -704,7 +704,7 @@ database.dialect=oracle
 ** {Loading Hibernate configurations}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
     Unitils provides out-of-the box configuration support for Hibernate. You can obtain a <SessionFactory> that connects to the unit test database simply by
-    annotating a field or method with the <@HibernateSessionFactory> annotation. This annotation can be parameterized with one or more Hibernate 
+    annotating a class, field or method with the <@HibernateSessionFactory> annotation. This annotation can be parameterized with one or more Hibernate 
     configuration files that you want to have loaded. If you annotate a field or method with this annotation, the session factory will be 
     injected in this field or method. This is demonstrated in the following example:
     
@@ -765,29 +765,23 @@ public class UserDaoTest extends BaseDaoTest {
 *** {Programmatic configuration}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Performing programmatic configuration is also supported. You can do this by annotating a custom create method with the <@HibernateSessionFactory> 
-    annotation. Such a method should either have no parameters or a <Configuration> type parameter and should return an instance of <SessionFactory>. 
-    If such a method is found, Unitils will call this method instead of creating a session factory itself. If requested, a Hibernate <Configuration> 
-    is passed as an argument. Configuration files that were specified as annotation parameters, will be preloaded in this configuration. 
-    Following are 3 examples of custom create methods:
+    annotation. Such a method should either have no parameters or a <List\<String\>> type parameter and should return an instance of <Configuration>. 
+    If such a method is found, Unitils will call this method instead of creating a configuration itself. The list of configuration files that were specified as 
+    annotation values, will optionally be passed as an argument. Following are 2 examples of custom create methods:
     
 +-----+
 @HibernateSessionFactory
-protected SessionFactory createSessionFactory() {
+protected Configuration createConfiguration() {
     AnnotationConfiguration configuration = new AnnotationConfiguration();
     configuration.loadConfig("hibernate.cfg.xml");
-    return configuration.createSessionFactory();    
+    return configuration;    
 }   
 
 @HibernateSessionFactory
-protected SessionFactory createSessionFactory(Configuration configuration) {
+protected Configuration createConfiguration(List<String> locations) {
+    AnnotationConfiguration configuration = new AnnotationConfiguration();
     configuration.addMappedClass(User.class);
-    return configuration.createSessionFactory();
-}   
-
-@HibernateSessionFactory
-protected SessionFactory createSessionFactory(AnnotationConfiguration configuration) {
-    configuration.addAnnotatedClass(User.class);
-    return configuration.createSessionFactory();
+    return configuration;
 }   
 +-----+
     
@@ -878,26 +872,29 @@ alter table PRODUCT add column barCode varchar(255);
 
 ** ApplicationContext configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    In order to test Spring-wired beans, you need an <ApplicationContext> in your tests. Typically, your application is configured by multiple
-    Spring configuration files, and you need only one or a few for your test. Unitils offers a very simple but powerful way of specifying the
-    config files that need to be loaded. The mechanism is analoguous to the way in which you can configure your Hibernate <SessionFactory>.
-    
-    A <@SpringApplicationContext> annotation can be put at class level or on a field or setter method. You can specify config files to be loaded 
-    on either level. Superclasses will be scanned for the presence of class-level <@SpringApplicationContext> annotations. If present, the 
-    configuration files that are found are loaded before loading the config files specified on the annotations of the current class. 
-    For example:
+    Loading application contexts can easily be achieved by annotating a class, method or field with a <@SpringApplicationContext> annotation and 
+    specifying the configuration files that need to be loaded. If you annotate a field or method with this annotation, the application context will
+    also be injected in this field or method. For example:
     
 +-----+
 @SpringApplicationContext({"spring-beans.xml", "extra-spring-beans.xml"})
 public class UserServiceTest extends UnitilsJUnit4 {
 
-     @SpringApplicationContext
-     private ApplicationContext applicationContext;
-
+    @SpringApplicationContext
+    private ApplicationContext applicationContext;
+    
+    @SpringApplicationContext
+    private void setApplicationContext(ApplicationContext applicationContext) {
+    }
 }
 +-----+
 
-    This example will create a new <ApplicationContext> containing the files <spring-beans.xml> and <extra-spring-beans.xml>, and inject it into the 
+    A <@SpringApplicationContext> annotation can be put at class level or on a field or setter method. You can specify config files to be loaded 
+    on either level. Superclasses will be scanned for the presence of class-level <@SpringApplicationContext> annotations. If present, the 
+    configuration files that are found are loaded before loading the config files specified on the annotations of the current class. 
+    For example:
+    
+    This example will create a new <ApplicationContext> containing the files <spring-beans.xml> and <extra-spring-beans.xml> and inject it into the 
     annotated field. The same effect can be obtained with the following:
      
 +-----+
