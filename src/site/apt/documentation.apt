@@ -21,9 +21,10 @@ Tutorial
 
 
 * {Assertion utilities}
-~~~~~~~~~~~~~~~~~~~~~~~
-    We'll begin this tutorial describing assertion utilities that can be used stand-alone, independently of the module system that will be described 
-    later-on in the tutorial. 
+~~~~~~~~~~~~~~~~~~~~~~~    
+    We'll begin this tutorial describing assertion utilities 
+    
+    These utilitiles can be used stand-alone, independently of the module system that will be described later-on in the tutorial. 
     
 
 ** {Using reflection for assertion}
@@ -100,7 +101,7 @@ assertRefEquals(user1, user2);
     first compare both <id> field values, next both <first> field values and finally both <last> fields values. 
     
     If a field value itself is also an object, it will recursively be compared field by field using reflection. The same is true for 
-    collections, maps and arrays. Their elements will be traversed and recusively be compared using reflection. If a value is a primitive 
+    collections, maps and arrays. Their elements will be traversed and recursively be compared using reflection. If a value is a primitive 
     type (int, long, ...) or one of the primitive wrapper types (Integer, Long, ...) it will be compared by value (using ==). 
     As a result, following assertions, for example, will be successful:
 
@@ -119,7 +120,7 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 ** Lenient assertions
 ~~~~~~~~~~~~~~~~~~~~~
     If you want to create unit tests that are maintainable, care must be taken to only add assertions to your test that 
-    are of value for the test. Let me clarify this with an example: suppose you have a test for a calulation of an account balance. 
+    are of value for the test. Let me clarify this with an example: suppose you have a test for a calculation of an account balance. 
     There is no need to add any assertions to this test that will check whether the name of the bank-customer is still correct.
     This will only add complexity to your test making it more difficult to understand and, more importantly, more brittle against changes 
     to the code. If you want your test code to easily survive refactorings and other code changes, make sure you limit your assertions and 
@@ -132,7 +133,7 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 *** Lenient order
 ~~~~~~~~~~~~~~~~~
     A first type of leniency you can specify is ignoring the order of elements in a collection or an array. It is often the case that when working with 
-    lists, you are not interested in the order of the elements, only that they comply to certain criteria. For example, code for retrieving 
+    lists, you are not interested in the order of the elements, only that they comply with certain criteria. For example, code for retrieving 
     all bank-accounts with a negative balance will typically return them in a list in a certain order, which is unimportant for further processing.
     
     To implement this behavior, the <ReflectionAssert.assertRefEquals> method can be configured to ignore ordering by 
@@ -151,21 +152,21 @@ assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER);
     java default value, i.e. <null> or <0>. In other words, if you leave the value of a left-instance field to <null> or <0> it will not 
     be used in the comparison.
     
-    As an example, suppose you have a user class with a first name, last name, street, ... field, but you only want to check that the 
+    As an example, suppose you have a user class with a first name, last name, street... field, but you only want to check that the 
     resulting user instance has a certain first name and street value, the other fields can be ignored:
 
 +-----+
 User actualUser   = new User("John", "Doe", new Address("First street", "12", "Brussels"));
 User expectedUser = new User("John",  null, new Address("First street", null,       null));
-assertLenEquals(expectedUser, actualUser);
+assertRefEquals(expectedUser, actualUser, IGNORE_DEFAULTS);
 +-----+
 
     You specify that you want to ignore a field by setting this value to null in the left (=expected) instance. 
     Right-instance fields that have default values will still be compared.
     
 +-----+
-assertRefEquals(null, "any", IGNORE_DEFAULTS);  // Succeeds
-assertRefEquals("any", null, IGNORE_DEFAULTS);  // Fails
+assertRefEquals(null, anyObject, IGNORE_DEFAULTS);  // Succeeds
+assertRefEquals(anyObject, null, IGNORE_DEFAULTS);  // Fails
 +-----+    
 
 
@@ -223,7 +224,7 @@ assertPropertyLenEquals("id", Arrays.asList(1, 2, 3), users);
 assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second street", "Third street"), users);
 +-----+
 
-    Again there are two versions of each method: an assertProperty<<Len>>Equals method and a assertProperty<<Ref>>Equals method. 
+    Again there are two versions of each method: an assertProperty<<Len>>Equals method and an assertProperty<<Ref>>Equals method. 
     The ref version will have no leniency specified by default but provides the option to specify leniency modes, the len version
     already has lenient order and ignore defaults set as fixed leniency modes.
 
@@ -382,29 +383,28 @@ public class MyTest {
 
 *** {Loading test data sets}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Let's start with an example of a UserDAO with a simple findByName method for retrieving a user based on it's first and last 
+    Let's start with an example of a UserDAO with a simple findByName method for retrieving a user based on its first and last 
     name. A typical unit test would look as follows:
 
 +-----+
 @DataSet
-public void UserDAOTest extends UnitilsJUnit4 {
+public class UserDAOTest extends UnitilsJUnit4 {
 
     @Test
-    public void testFindByName {
-        User johnDoe = userDao.findByName("doe", "john");
-        assertEquals("jdoe", johnDoe.getUserName());
+    public void testFindByName() {
+        User result = userDao.findByName("doe", "john");
+        assertPropertyLenEquals("userName", "jdoe", result);
     }
 
     @Test
-    public void testFindByMinimalAge {
-        List<User> min18 = userDao.findByMinimalAge(18);
-        assertEquals(1, min18.size());
-        assertEquals("jack", min18.get(0).getUserName());
+    public void testFindByMinimalAge() {
+        List<User> result = userDao.findByMinimalAge(18);        
+        assertPropertyLenEquals("firstName", Arrays.asList("jack"), result);
     }
 }
 +-----+
 
-    The <@DataSet> annotation in the test instructs Unitils to look for DBUnit datafiles that need to be loaded for the test. Unitils 
+    The <@DataSet> annotation in the test instructs Unitils to look for DBUnit data files that need to be loaded for the test. Unitils 
     automatically looks for data set files that are in the same directory as the test class and have following name pattern:
 
     * <className>.xml - for a data set that is shared by all tests in the test class.
@@ -417,11 +417,11 @@ public void UserDAOTest extends UnitilsJUnit4 {
     
     Such a data set file should be in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} file 
     format and should contain all data needed for the test. All existing content of tables in the data set will first be deleted and 
-    then all data of the data set will be inserted in the database. Tables that are not in the data set will not be cleared. You can explicity 
-    clear a table by adding an empty table element, e.g, \<MY_TABLE /\>.    
+    then all data of the data set will be inserted in the database. Tables that are not in the data set will not be cleared. You can explicitly 
+    clear a table by adding an empty table element, e.g. \<MY_TABLE /\>.    
         
-    For the UserDAOTest we could for example create a class level data set file named <UserDAOTest.xml> and put it in the same directory as 
-    the UserDAOTest class:
+    For the <UserDAOTest> we could for example create a class level data set file named <UserDAOTest.xml> and put it in the same directory as 
+    the <UserDAOTest> class:
     
 +-----+
 <?xml version='1.0' encoding='UTF-8'?>
@@ -445,29 +445,28 @@ public void UserDAOTest extends UnitilsJUnit4 {
 
     Method-level data sets should not be overused, since having more data files means you have to do more maintenance. You should first try 
     to reuse the data in the class level data set - in most cases a small set of test records can be reused for multiple tests. If this would 
-    result in a a big and incoherent data set, maybe it's better to use a method specific one or to try to split the test in 2 separate tests, 
+    result in a big and incoherent data set, maybe it's better to use a method specific one or to try to split the test in 2 separate tests, 
     each having its own data set.
     
     By setting the <@DataSet> annotation on class level a data set is loaded for every test in the class. If a data set should only be loaded for 
     some of the tests, you should remove the class level annotation and annotate the test methods instead. Datasets will then only be loaded 
-    for the annotated tests. If your data set file does not comply to the naming conventions as described above, you can also specify a file name 
+    for the annotated tests. If your data set file does not comply with the naming conventions as described above, you can also specify a file name 
     explicitly by passing the name as an argument to the <@DataSet> annotation:
 
 +-----+
 @DataSet("UserDAOTest_general.xml")
-public void UserDAOTest extends UnitilsJUnit4 {
+public class UserDAOTest extends UnitilsJUnit4 {
 
     @Test
-    public void testFindByName {
-        User johnDoe = userDao.findByName("doe", "john");
-        assertEquals("jdoe", johnDoe.getUserName());
+    public void testFindByName() {
+        User result = userDao.findByName("doe", "john");
+        assertPropertyLenEquals("userName", "jdoe", result);
     }
 
-    @DataSet("UserDAOTest_ages.xml")
-    public void testFindByMinimalAge {
-        List<User> min18 = userDao.findByMinimalAge(18);
-        assertEquals(1, min18.size());
-        assertEquals("jack", min18.get(0).getUserName());
+    @Test @DataSet("UserDAOTest_ages.xml")
+    public void testFindByMinimalAge() {
+        List<User> result = userDao.findByMinimalAge(18);
+        assertPropertyLenEquals("firstName", Arrays.asList("jack"), result);
     }
 }
 +-----+
@@ -481,11 +480,10 @@ public void UserDAOTest extends UnitilsJUnit4 {
     Following example tests a method that disables all user accounts that haven't been used for an entire year:
 
 +-----+
-public void UserDAOTest extends UnitilsJUnit4 {
+public class UserDAOTest extends UnitilsJUnit4 {
 
-    @Test
-    @ExpectedDataSet
-    public void testInactivateOldAccounts {
+    @Test @ExpectedDataSet
+    public void testInactivateOldAccounts() {
         userDao.inactivateOldAccounts();
     }
 }
@@ -502,7 +500,7 @@ public void UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    For this datas et, it will check whether there are 2 different user records with corresponding values in the User table in the 
+    For this data set, it will check whether there are 2 different user records with corresponding values in the User table in the 
     database. Other records and other tables are not taken into account.
 
     As with the <@DataSet> annotation, a file name can explicitly be specified. If no name is specified, following naming pattern 
@@ -517,16 +515,16 @@ public void UserDAOTest extends UnitilsJUnit4 {
     In the above examples we left out 1 important thing: where is the <DataSource> for connecting to the test database coming from and how
     can we let our DAO classes make use of this <DataSource>? 
     
-    When the first database test in your test suite is run, Unitils will create a <DataSource> instance that will conect to your unit-test database
+    When the first database test in your test suite is run, Unitils will create a <DataSource> instance that will connect to your unit-test database
     using the settings defined in the properties. Subsequent database tests will reuse this same datasource instance. Before a test is set up, this 
     datasource instance is then injected into the test instance: if a field or setter method is annotated with <@TestDataSource>, Unitils will set 
     the DataSource into this field or call the method with the <DataSource> as parameter. 
     
-    You then only have to provide some project specific code, that configures your DAO code to use this datasource. Typically all this is implemented 
+    You then only have to provide some project specific code that configures your DAO code to use this datasource. Typically all this is implemented 
     once in a project-specific superclass for all your database tests. A simple example of such a base class could be:
     
 +-----+
-public abstract void BaseDAOTest extends UnitilsJUnit4 {
+public abstract class BaseDAOTest extends UnitilsJUnit4 {
 
     @TestDataSource
     private DataSource dataSource;
@@ -547,8 +545,8 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
     or programmatically as follows:
     
 +-----+
-    DataSource ds = new UnitilsDataSource();
-    Connection conn = ds.getConnection();
+    DataSource dataSource = new UnitilsDataSource();
+    Connection connection = dataSource.getConnection();
     ...
 +-----+
 
@@ -558,7 +556,7 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     When writing database tests, keep in mind following guidelines:
 
-    * Use small sets of test data, containing as few data as possible. In your data files, only specifiy columns 
+    * Use small sets of test data, containing as few data as possible. In your data files, only specify columns 
       that are used in join columns or the where clause of the tested query.
 
     * Make data sets test class specific. Don't reuse data sets between different test classes, for example
@@ -652,7 +650,7 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
     
     To be able to work with the smallest possible test data sets, all foreign key and not null constraints on the test database are disabled. This way
     you only need to add data that is of real value for your test. Because less data is specified in the data set, they are easier to write, indicate
-    more clearly what is acuatlly being tested and, more importantly, they become much easier to maintain.
+    more clearly what is actually being tested and, more importantly, they become much easier to maintain.
     
     All sequences and identity columns are updated to a sufficiently high initial value (1000 by default). This way, you can use fixed primary key values 
     when inserting test data, avoiding conflicts with id sequences.
@@ -672,7 +670,7 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
 </dataset>
 +-----+
         
-    The database maintainer is highly configurable. You can swith on or off things like constraints disabling, disable from scratch updates... 
+    The database maintainer is highly configurable. You can switch on or off things like constraints disabling, disable from scratch updates... 
     Look at the file unitils-default.properties for more information! 
     
     Some functionality of the database maintainer, e.g. constraint disabling, uses DBMS specific functionality. This functionality will only run 
@@ -768,23 +766,37 @@ public class UserDaoTest extends BaseDaoTest {
    
 *** {Programmatic configuration}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Performing programmatic configuration is also supported. You can do this by annotating a custom create method with the <@HibernateSessionFactory> 
-    annotation. Such a method should either have no parameters or a <List\<String\>> type parameter and should return an instance of <Configuration>. 
-    If such a method is found, Unitils will call this method instead of creating a configuration itself. The list of configuration files that were specified as 
-    annotation values, will optionally be passed as an argument. Following are 2 examples of custom create methods:
+    Performing programmatic configuration is also supported. You can do this by annotating a custom initialization or custom create method with 
+    the <@HibernateSessionFactory> annotation. A custom initialization method has 1 parameter of a <Configuration> (sub-)type and a void return 
+    type. It can be used to further configure the <Configuration> instance that was created by Unitils. You could for example load extra 
+    configuration files or register mapped classes:    
     
 +-----+
 @HibernateSessionFactory
-protected Configuration createConfiguration() {
-    AnnotationConfiguration configuration = new AnnotationConfiguration();
-    configuration.loadConfig("hibernate.cfg.xml");
-    return configuration;    
+protected void initializeConfiguration(Configuration configuration) {    
+    configuration.loadConfig("hibernate.cfg.xml");    
 }   
 
 @HibernateSessionFactory
+protected void initializeConfiguration(AnnotationConfiguration configuration) {    
+    configuration.addMappedClass(User.class);    
+}   
++-----+
+
+    If you need full control over the creation of the <Configuration>, you can also annotate a custom create method with the the <@HibernateSessionFactory> 
+    annotation. This method has 1 <List\<String\>> type parameter and returns a <Configuration> instance. If such a method is found, Unitils will 
+    call this method for creating the configuration instead of creating it itself. The list of configuration files that were specified as values in
+    the annotations that would otherwise be used by Unitils to load the configuration, will be passed in the list parameter. Following is an example of a 
+    custom create method:
+
++-----+
+@HibernateSessionFactory
 protected Configuration createConfiguration(List<String> locations) {
     AnnotationConfiguration configuration = new AnnotationConfiguration();
-    configuration.addMappedClass(User.class);
+    for (String location : locations){
+        configuration.loadConfig(location);
+    }
+    configuration.loadConfig("hibernate.cfg.xml");
     return configuration;
 }   
 +-----+
@@ -811,7 +823,7 @@ public abstract void BaseDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    Unitils manages all sessions created by these session factories. It will for example flush sessions before checking the state of a databaste and 
+    Unitils manages all sessions created by these session factories. It will for example flush sessions before checking the state of a database and 
     closes sessions after a unit test was finished.
     
     An implementation of Hibernate's <CurrentSessionContext> is also provided. By default, the <SimpleCurrentSessionContext> will be added to the Hibernate 
@@ -1017,7 +1029,7 @@ public void setUserService(UserService userService) {
     shows a unit test for a method on a <UserService> that disables all inactive user accounts:
     
 +-----+
-public void UserServiceTest extends UnitilsJUnit4 { 
+public class UserServiceTest extends UnitilsJUnit4 { 
 
     @Mock
     private UserDao mockUserDao;
@@ -1032,7 +1044,7 @@ public void UserServiceTest extends UnitilsJUnit4 {
         mockUserDao.disableAccount(accounts.get(1));
         replay();
 
-        userService.disableInActiveAccounts();	
+        userService.disableInActiveAccounts(); 
     }
 } 
 +-----+
@@ -1081,7 +1093,7 @@ expected: dao.update(0,    new User(null,   "Doe"));
 actual:   dao.update(9999, new User("John", "Doe"));
 +-----+
 
-    As you can see, the leniency levels not only apply to objects and their fields but also apply to the argurments themselves. For example, take a 
+    As you can see, the leniency levels not only apply to objects and their fields but also apply to the arguments themselves. For example, take a 
     look at following expectation:
     
 +-----+
@@ -1091,7 +1103,7 @@ expect(mockUserDao.getAccountsNotAccessedAfter(null)).andReturn(accounts);
     The <null> parameter in this method call actually means that we don't care what argument is passed to this method. This provides a very convenient way of setting flexible 
     expectations! There is no need to specify <anyInt>, <notNull> ... argument matchers for each of the arguments anymore.
 
-    By default, lenient order and ignore defaults are used as leniency levels. If you want to change this, you can specify wich levels to use by setting attributes 
+    By default, lenient order and ignore defaults are used as leniency levels. If you want to change this, you can specify which levels to use by setting attributes 
     on the <@Mock> annotation:
 
 +-----+
@@ -1122,7 +1134,7 @@ private UserDao mockUserDao;
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
     Unitils provides services that simplify mock injection in various ways. Following example shows how a <UserDao> mock is created and 
-    injected in the the <userService>:
+    injected in the <userService>:
 
 +-----+
 @Mock @InjectInto(property="userDao")
@@ -1137,10 +1149,10 @@ private UserService userService;
     expression. Getter / setter and field access may be mixed and private access is also supported.
   
     The target object for injection is by default the field that is annotated with <@TestedObject>. If multiple fields are annotated with <@TestedObject>
-    the object will be injected in each of them. If injection is not possible (e.g. a property in the OGNL expression doens't exist), 
+    the object will be injected in each of them. If injection is not possible (e.g. a property in the OGNL expression doesn't exist), 
     an <UnitilsException> will be raised and the test fails.
   
-    The target object can also specified explicitly, using the target attribute on the Inject annotation:
+    The target object can also be specified explicitly, using the target attribute on the Inject annotation:
   
 +-----+
 @Mock @InjectInto(target="userService", property="userDao")
@@ -1235,7 +1247,7 @@ void injectMock(Object mock, String name, Class type) {
 ** {Testing functions, stored procedures, ...}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Enterprise applications typically contain application code that is stored and executed on the database, like functions and stored procedures. 
-    It can often be a good idea to always have these code definitions applied to your test databases, to unit-test their correct hehaviour or for 
+    It can often be a good idea to always have these code definitions applied to your test databases, to unit-test their correct behavior or for 
     integration testing.
     It is in most cases not possible to simply mix them with the regular database DDL definitions, because the syntax of stored procedures is 
     different: A ';' in a regular DDL statement indicates the end of a statement, while a stored procedure typically contains multiple SQL statements,
@@ -1261,7 +1273,7 @@ dbMaintainer.fileScriptSource.code.location=/myproject/dbscripts/procedures
 databasecode/ 01_compileAll.sql
               dropAllInactiveUsers.sql
               collectivePayRaise.sql
-							
+       
 +----+
 
     Unitils will first execute the non-indexed scripts. This will make sure the stored procedures in dropAllInactiveUsers.sql and collectivePayRaise.sql 
