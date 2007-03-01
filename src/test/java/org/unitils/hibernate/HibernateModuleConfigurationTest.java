@@ -138,11 +138,11 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
 
 
     /**
-     * Tests loading of a configuration annotation through a custom create method passing the current
-     * configuration as argument.
+     * Tests loading of a configuration annotation through a custom create method passing the
+     * locations as argument.
      */
-    public void testGetHibernateConfiguration_customCreateMethodWithConfigurationArgument() {
-        HibernateTestCustomCreateWithConfiguration hibernateTestCustomCreateWithConfiguration = new HibernateTestCustomCreateWithConfiguration();
+    public void testGetHibernateConfiguration_customCreateMethodWithLocationsArgument() {
+        HibernateTestCustomCreateWithLocations hibernateTestCustomCreateWithConfiguration = new HibernateTestCustomCreateWithLocations();
         Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestCustomCreateWithConfiguration);
 
         assertNotNull(hibernateConfiguration);
@@ -170,6 +170,31 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
         HibernateTestCustomCreateWrongSignature hibernateTestCustomCreateWrongSignature = new HibernateTestCustomCreateWrongSignature();
         try {
             sessionFactoryManager.getConfiguration(hibernateTestCustomCreateWrongSignature);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            // expected
+        }
+    }
+
+
+    /**
+     * Tests calling a custom initialization.
+     */
+    public void testGetHibernateConfiguration_customInitializationMethod() {
+        HibernateTestCustomInitialization hibernateTestCustomInitialization = new HibernateTestCustomInitialization();
+        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestCustomInitialization);
+
+        assertTrue(hibernateTestCustomInitialization.initCalled);
+    }
+
+
+    /**
+     * Tests calling a custom initialization having a wrong signature.
+     */
+    public void testGetHibernateConfiguration_customInitializationMethodWrongSignature() {
+        HibernateTestCustomInitializationWrongSignature hibernateTestCustomInitializationWrongSignature = new HibernateTestCustomInitializationWrongSignature();
+        try {
+            sessionFactoryManager.getConfiguration(hibernateTestCustomInitializationWrongSignature);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -316,9 +341,9 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     }
 
     /**
-     * Configuration with custom create with configuration argument.
+     * Configuration with custom create with locations argument.
      */
-    public class HibernateTestCustomCreateWithConfiguration {
+    public class HibernateTestCustomCreateWithLocations {
 
         @HibernateSessionFactory
         public Configuration createMethod(List<String> locations) {
@@ -347,6 +372,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Configuration with custom create with wrong signature.
      */
@@ -354,6 +380,33 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
 
         @HibernateSessionFactory
         public List createMethod(String a) {
+            return null;
+        }
+    }
+
+    /**
+     * Configuration with custom initialization with configuration argument.
+     */
+    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+    public class HibernateTestCustomInitialization {
+
+        public boolean initCalled = false;
+
+        @HibernateSessionFactory
+        public void initializationMethod(Configuration configuration) {
+            initCalled = true;
+        }
+    }
+
+
+    /**
+     * Configuration with custom initialization with wrong signature.
+     */
+    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+    public class HibernateTestCustomInitializationWrongSignature {
+
+        @HibernateSessionFactory
+        public List initializationMethod(String a) {
             return null;
         }
     }

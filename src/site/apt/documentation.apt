@@ -368,7 +368,7 @@ public class MyTest {
 
 
 * {Database testing}
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
     Unit tests for the database layer can be extremely valuable when building enterprise applications, but are often abandoned because of 
     their complexity. Unitils greatly reduces this complexity, making database testing easy and maintainable. The following sections 
     describe the support that the <DatabaseModule>, <DbUnitModule> and <HibernateModule> have to offer for your database tests.
@@ -955,8 +955,8 @@ public class UserGroupServiceTest extends BaseServiceTest {
     will greatly improve the performance of your tests.
 
 
-*** {Programmatic configuration}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** Programmatic configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Programmatic configuration is also possible. You can do this by annotating a method that takes no or a <List\<String\>> as parameter and returns an instance
     of <ConfigurableApplicationContext>. If a <List\<String\>> parameter is specified, all locations of the <@SpringApplicationContext> annotations that would 
     otherwise be used to create a new instance will be passed to the method. 
@@ -1016,6 +1016,50 @@ public void setUserService(UserService userService) {
 
 
 
+** Connecting to the test database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    In the {{{#Database testing}Database testing}} section we explained you how to obtain and install a datasource for your test. The 
+    {{{#Testing with Hibernate}Testing with Hibernate}} section described how to setup hibernate for your test. In Spring all this 
+    wiring is typically done in a Spring configuration file. Suppose, for example, that your application contains following 
+    configuration file:
+    
++-----+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+        <property name="url" value="jdbc:hsqldb:hsql://localhost/sample"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+    
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">   
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>org.unitils.sample.User</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <value>
+                hibernate.dialect=org.hibernate.dialect.HSQLDialect
+                hibernate.show_sql=true
+            </value>
+        </property>
+    </bean>
++-----+
+
+    The first bean defines the data source that will connect to the application database. The second bean configures hibernate
+    to make use of this data source and to add User class as mapped hibernate class.
+    
+    Database testing ofcourse requires a connection to the test database. A typical way to do this is to write a <test-ds-config.xml>
+    
++-----+
+    <bean id="dataSource" class="org.unitils.UnitilsDataSource" />
++-----+
+
+
+
+
+
 * Testing with mock objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other parts or services that it depends on. Unitils builds 
@@ -1071,7 +1115,7 @@ EasyMockModule.Mock.InvocationOrder.default=strict
    
    
    
-**   Reflection lenient argument matching
+** Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     The mocks that are supplied by Unitils are slightly different from mocks objects that you get when directly using EasyMock: a <LenientMocksControl> is used 
     for these mocks. This control will make sure that arguments specified in method calls are matched using reflection. The arguments of the expected and actual 
