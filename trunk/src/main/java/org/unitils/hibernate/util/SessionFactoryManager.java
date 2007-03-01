@@ -18,14 +18,19 @@ package org.unitils.hibernate.util;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import static org.hibernate.cfg.Environment.CURRENT_SESSION_CONTEXT_CLASS;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import static java.util.Arrays.asList;
 
@@ -175,6 +180,9 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
         // create instance
         Configuration configuration = super.createInstance(testObject, testClass);
 
+        // invoke custom initialization method 
+        invokeInitializationMethod(testObject, testClass, configuration);
+
         // configure hibernate to use unitils datasource
         Properties unitilsHibernateProperties = new Properties();
         if (configuration.getProperty(CONNECTION_PROVIDER) != null) {
@@ -241,6 +249,53 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
             return null;
         }
         return asList(locations);
+    }
+
+
+    /**
+     * todo javadoc
+     * <p/>
+     * Creates an instance by calling a custom create method (if there is one). Such a create method should have one of
+     * following exact signatures:
+     * <ul>
+     * <li>Configuration createMethodName() or</li>
+     * <li>Configuration createMethodName(List<String> locations)</li>
+     * </ul>
+     * The second version receives the given locations. They both should return an instance (not null)
+     * <p/>
+     * If no create method was found, null is returned. If there is more than 1 create method found, an exception is raised.
+     *
+     * @param testObject    The test object, not null
+     * @param testClass     The level in the hierarchy
+     * @param configuration The configuration to initialize, not null
+     */
+    @SuppressWarnings({"unchecked"})
+    protected void invokeInitializationMethod(Object testObject, Class<?> testClass, Configuration configuration) {
+        // get all annotated methods from the given test class, superclasses included
+        List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, true);
+        for (Method method : methods) {
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (method.getReturnType() != Void.TYPE) {
+                //do not invoke custom create methods
+                continue;
+            }
+            if (parameterTypes.length == 1 && SessionFactory.class.isAssignableFrom(parameterTypes[0])) {
+                // do not invoke session factory setter methods
+                continue;
+            }
+            if (parameterTypes.length != 1 || !Configuration.class.isAssignableFrom(parameterTypes[0])) {
+                throw new UnitilsException("Unable to invoke method annotated with @" + annotationClass.getSimpleName() +
+                        ". Ensure that this method has following signature: void myMethod( Configuration configuration )");
+            }
+            try {
+                // call method
+                invokeMethod(testObject, method, configuration);
+
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Method " + testClass.getSimpleName() + "." + methods.get(0).getName() +
+                        " (annotated with " + annotationClass.getSimpleName() + ") has thrown an exception", e.getCause());
+            }
+        }
     }
 }
                          
