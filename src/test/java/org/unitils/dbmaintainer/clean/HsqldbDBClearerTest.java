@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import static org.apache.commons.dbutils.DbUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.util.PropertyUtils.getString;

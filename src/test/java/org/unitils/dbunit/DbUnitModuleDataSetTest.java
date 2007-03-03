@@ -15,7 +15,7 @@
  */
 package org.unitils.dbunit;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
@@ -206,7 +206,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
             }
             return null;
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -222,7 +222,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
             st = conn.createStatement();
             st.execute("create table test (dataset varchar(100))");
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -242,7 +242,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
                 // Ignored
             }
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 

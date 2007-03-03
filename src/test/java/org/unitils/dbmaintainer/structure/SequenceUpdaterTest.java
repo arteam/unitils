@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
@@ -109,7 +109,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -128,7 +128,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -147,7 +147,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -166,7 +166,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -185,7 +185,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         } catch (SQLException e) {
             // No action is taken
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -215,7 +215,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
                 sequenceUpdater.updateSequences();
                 assertEquals(updatedSequenceValue, getCurrentTestSequenceValue());
             } finally {
-                DbUtils.closeQuietly(conn);
+                closeQuietly(conn);
             }
         }
     }

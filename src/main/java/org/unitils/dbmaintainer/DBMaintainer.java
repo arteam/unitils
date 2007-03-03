@@ -134,8 +134,7 @@ public class DBMaintainer {
       if an already executed script is modified */
     protected boolean fromScratchEnabled;
 
-    /* Indicates if database code should be cleared before installing a new version of the code or when
-      updating the database from scratch */
+    /* Indicates if database code should be cleared before installing a new version of the code  */
     protected boolean clearDbCodeEnabled;
 
     /* Indicates whether a from scratch update should be performed when the previous update failed, but
@@ -176,6 +175,7 @@ public class DBMaintainer {
         if (fromScratchEnabled) {
             dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
         }
+        clearDbCodeEnabled = PropertyUtils.getBoolean(PROPKEY_CLEARDBCODE_ENABLED, configuration);
         dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource, statementHandler);
 
         boolean disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED, configuration);

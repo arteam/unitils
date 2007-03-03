@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
@@ -91,7 +91,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
             st.execute("create table table1 (col1 varchar(10) not null primary key, col2 varchar(12) not null)");
             st.execute("create table table2 (col1 varchar(10), foreign key (col1) references table1(col1))");
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -116,7 +116,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
                 // Ignored
             }
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -140,7 +140,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
             // Should not throw exception anymore
             insertForeignKeyViolation(conn);
         } finally {
-            DbUtils.closeQuietly(conn);
+            closeQuietly(conn);
         }
     }
 
@@ -157,7 +157,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
             st = connection.createStatement();
             st.executeUpdate("insert into table2 values ('test')");
         } finally {
-            DbUtils.closeQuietly(st);
+            closeQuietly(st);
         }
     }
 
@@ -181,7 +181,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
             // Should not throw exception anymore
             insertNotNullViolation(conn);
         } finally {
-            DbUtils.closeQuietly(conn);
+            closeQuietly(conn);
         }
     }
 
@@ -198,7 +198,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
             st = connection.createStatement();
             st.execute("insert into table1 values ('test', null)");
         } finally {
-            DbUtils.closeQuietly(st);
+            closeQuietly(st);
         }
     }
 }

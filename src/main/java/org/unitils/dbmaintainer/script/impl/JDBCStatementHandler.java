@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import org.apache.commons.dbutils.DbUtils;
+import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.dbmaintainer.script.StatementHandler;
 
 import javax.sql.DataSource;

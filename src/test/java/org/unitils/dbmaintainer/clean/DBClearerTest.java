@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
@@ -264,7 +264,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
                 createTestTrigger(dbSupport.quoted("Test_CASE_Table_Preserve"), dbSupport.quoted("Test_CASE_Trigger_Preserve"));
             }
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 

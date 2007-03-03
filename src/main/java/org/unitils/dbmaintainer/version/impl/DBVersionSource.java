@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.version.impl;
 
-import org.apache.commons.dbutils.DbUtils;
+import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;

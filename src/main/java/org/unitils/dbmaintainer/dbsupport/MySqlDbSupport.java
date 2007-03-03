@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import org.apache.commons.dbutils.DbUtils;
+import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 

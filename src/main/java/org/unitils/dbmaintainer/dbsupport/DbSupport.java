@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import static org.apache.commons.dbutils.DbUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.SQLScriptParser;

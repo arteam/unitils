@@ -1,6 +1,6 @@
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.DBMaintainer;
 import static org.unitils.util.PropertyUtils.getString;
@@ -27,7 +27,7 @@ public class DB2DBClearerTest extends DBClearerTest {
             st = conn.createStatement();
             st.execute("create trigger " + triggerName + " before insert on " + tableName + " FOR EACH ROW begin atomic end");
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 

@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
@@ -97,7 +97,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             assertTrue(isEmpty("TEST_TABLE"));
             assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table")));
         } finally {
-            DbUtils.closeQuietly(conn);
+            closeQuietly(conn);
         }
     }
 
@@ -113,7 +113,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             dbCleaner.cleanSchema();
             assertFalse(isEmpty("DB_VERSION"));
         } finally {
-            DbUtils.closeQuietly(conn);
+            closeQuietly(conn);
         }
     }
 
@@ -131,7 +131,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
             assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
         } finally {
-            DbUtils.closeQuietly(conn);
+            closeQuietly(conn);
         }
     }
 
@@ -153,7 +153,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             // Also create a view, to see if the DBCleaner doesn't crash on views
             st.execute("create view TEST_VIEW as (select * from TEST_TABLE_PRESERVE)");
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -175,7 +175,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
                 // Ignored
             }
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -211,7 +211,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             st.execute("insert into " + dbSupport.quoted("Test_CASE_Table") + " values('test')");
             st.execute("insert into " + dbSupport.quoted("Test_CASE_Table_Preserve") + " values('test')");
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -232,7 +232,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
             rs = st.executeQuery("select * from " + tableName);
             return !rs.next();
         } finally {
-            DbUtils.closeQuietly(conn, st, rs);
+            closeQuietly(conn, st, rs);
         }
     }
 

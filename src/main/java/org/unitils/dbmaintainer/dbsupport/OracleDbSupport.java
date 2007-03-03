@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.core.UnitilsException;
 
@@ -128,7 +128,7 @@ public class OracleDbSupport extends DbSupport {
         } catch (SQLException e) {
             throw new UnitilsException("Error while looking up current value of sequence", e);
         } finally {
-            DbUtils.closeQuietly(conn, st, rs);
+            closeQuietly(conn, st, rs);
         }
     }
 
@@ -160,7 +160,7 @@ public class OracleDbSupport extends DbSupport {
         } catch (SQLException e) {
             throw new UnitilsException("Error while incrementing sequence to value", e);
         } finally {
-            DbUtils.closeQuietly(conn, st, rs);
+            closeQuietly(conn, st, rs);
         }
     }
 
@@ -271,7 +271,7 @@ public class OracleDbSupport extends DbSupport {
         } catch (SQLException e) {
             throw new UnitilsException("Error while looking up table constraint names", e);
         } finally {
-            DbUtils.closeQuietly(conn, st, rs);
+            closeQuietly(conn, st, rs);
         }
     }
 
@@ -330,7 +330,7 @@ public class OracleDbSupport extends DbSupport {
         } catch (SQLException e) {
             throw new UnitilsException("Error while looking up oracle identifiers", e);
         } finally {
-            DbUtils.closeQuietly(conn, st, rs);
+            closeQuietly(conn, st, rs);
         }
     }
 
