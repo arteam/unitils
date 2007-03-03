@@ -12,8 +12,8 @@ Cookbook
     uses configuration files, we refer to the {{{documentation.html} documentation}} page.
    
    
-* Enable Unitils' assertion utils (ReflectionAssert), EasyMock and injection support
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* {Dependencies}
+~~~~~~~~~~~~~~~~
     To be able to use these features, it is sufficient to add the unitils jar to your project's classpath.
   
   

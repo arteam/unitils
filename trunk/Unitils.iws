@@ -18,8 +18,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/site/resources/unitils-default.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/cookbook.apt" afterPath="$PROJECT_DIR$/src/site/apt/cookbook.apt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/documentation.apt" afterPath="$PROJECT_DIR$/src/site/apt/documentation.apt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
@@ -45,7 +45,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$ReflectionArgumentMatcherTest.es" NAME="ReflectionArgumentMatcherTest" MODIFIED="1161962484132">
       <FILTER>org.unitils.easymock.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1172777868098" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$All in Unitils.es" NAME="All in Unitils" MODIFIED="1172935146366" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -186,7 +186,7 @@
       <file leaf-file-name="SessionFactoryManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="285" column="47" selection-start="12583" selection-end="12583" vertical-scroll-proportion="1.4568807">
+            <state line="285" column="47" selection-start="12583" selection-end="12583" vertical-scroll-proportion="0.68255484">
               <folding />
             </state>
           </provider>
@@ -195,7 +195,7 @@
       <file leaf-file-name="AnnotatedInstanceManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="279" column="43" selection-start="11534" selection-end="11565" vertical-scroll-proportion="1.653211">
+            <state line="279" column="43" selection-start="11534" selection-end="11565" vertical-scroll-proportion="0.01620591">
               <folding />
             </state>
           </provider>
@@ -204,7 +204,7 @@
       <file leaf-file-name="HibernateModuleConfigurationTest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="384" column="74" selection-start="14806" selection-end="14806" vertical-scroll-proportion="0.6238532">
+            <state line="372" column="11" selection-start="14547" selection-end="14547" vertical-scroll-proportion="0.11534795">
               <folding />
             </state>
           </provider>
@@ -213,7 +213,7 @@
       <file leaf-file-name="HibernateModule.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="167" column="102" selection-start="7966" selection-end="7966" vertical-scroll-proportion="0.6862385">
+            <state line="167" column="102" selection-start="7966" selection-end="7966" vertical-scroll-proportion="0.01620591">
               <folding />
             </state>
           </provider>
@@ -849,7 +849,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure Scope="false" ProjectPane="false" PackagesPane="false" Favorites="false" />
+      <showStructure Favorites="false" ProjectPane="false" Scope="false" PackagesPane="false" />
       <autoscrollToSource ProjectPane="false" />
       <autoscrollFromSource ProjectPane="false" />
       <sortByType />
@@ -918,6 +918,45 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="" />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module name="" />
       <option name="MAIN_CLASS_NAME" />
@@ -949,45 +988,6 @@
       </option>
       <option name="PROPERTIES_FILE" />
       <properties />
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="" />
       <method>
         <option name="Make" value="true" />
       </method>
@@ -1422,30 +1422,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="167" column="102" selection-start="7966" selection-end="7966" vertical-scroll-proportion="0.6862385">
+        <state line="285" column="47" selection-start="12583" selection-end="12583" vertical-scroll-proportion="0.68255484">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="279" column="43" selection-start="11534" selection-end="11565" vertical-scroll-proportion="1.653211">
+        <state line="279" column="43" selection-start="11534" selection-end="11565" vertical-scroll-proportion="0.01620591">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="285" column="47" selection-start="12583" selection-end="12583" vertical-scroll-proportion="1.4568807">
+        <state line="167" column="102" selection-start="7966" selection-end="7966" vertical-scroll-proportion="0.01620591">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="384" column="74" selection-start="14806" selection-end="14806" vertical-scroll-proportion="0.6238532">
+        <state line="372" column="11" selection-start="14547" selection-end="14547" vertical-scroll-proportion="0.11534795">
           <folding />
         </state>
       </provider>
