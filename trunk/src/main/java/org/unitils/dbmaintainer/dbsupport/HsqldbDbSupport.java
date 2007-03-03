@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -101,7 +101,7 @@ public class HsqldbDbSupport extends DbSupport {
         } catch (SQLException e) {
             throw new UnitilsException("Error while looking up current value of sequence", e);
         } finally {
-            DbUtils.closeQuietly(conn, st, rset);
+            closeQuietly(conn, st, rset);
         }
     }
 
@@ -198,7 +198,7 @@ public class HsqldbDbSupport extends DbSupport {
         } catch (SQLException e) {
             throw new UnitilsException("Error while disabling constraints", e);
         } finally {
-            DbUtils.closeQuietly(st);
+            closeQuietly(st);
         }
     }
 
@@ -267,7 +267,7 @@ public class HsqldbDbSupport extends DbSupport {
         } catch (SQLException e) {
             throw new UnitilsException("Error while looking up hsqldb identifiers", e);
         } finally {
-            DbUtils.closeQuietly(connection, statement, resultSet);
+            closeQuietly(connection, statement, resultSet);
         }
     }
 

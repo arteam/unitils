@@ -1,6 +1,6 @@
 package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.util.PropertyUtils.getString;
@@ -29,7 +29,7 @@ public class MySqlDBClearerTest extends DBClearerTest {
             st.execute("create trigger " + triggerName + " before insert on " + tableName + " FOR EACH ROW begin end");
 
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 

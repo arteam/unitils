@@ -1,6 +1,5 @@
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.UnitilsJUnit3;
@@ -11,6 +10,7 @@ import org.unitils.dbmaintainer.script.StatementHandler;
 import static org.unitils.dbmaintainer.structure.impl.FlatXmlDataSetDtdGenerator.PROPKEY_DTD_FILENAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -108,7 +108,7 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
             st.execute("create table tableTwo(column1 varchar(1), column2 varchar(1))");
 
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -134,7 +134,7 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
                 // Ignored
             }
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 

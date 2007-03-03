@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import org.apache.commons.dbutils.DbUtils;
+import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.database.DatabaseConnection;

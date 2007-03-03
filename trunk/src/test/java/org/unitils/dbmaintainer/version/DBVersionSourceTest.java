@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.version;
 
-import org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
@@ -158,7 +158,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
                 // Ignored
             }
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 
@@ -178,7 +178,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
                 // Ignored
             }
         } finally {
-            DbUtils.closeQuietly(conn, st, null);
+            closeQuietly(conn, st, null);
         }
     }
 }

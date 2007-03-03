@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import static org.apache.commons.dbutils.DbUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.clean.DBClearer;
