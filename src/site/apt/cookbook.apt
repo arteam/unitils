@@ -7,10 +7,21 @@ Cookbook
 ~~~~~~~~
 
     This page will guide you step-by-step through the process of getting Unitils properly configured in your own software project. This 
-    cookbook contains only typical configuration. A complete documented reference of all configuration options can be found in the 
+    cookbook contains only typical configuration. A complete documented reference of all configuration options can be found in 
     {{{unitils-default.properties} unitils-default.properties}}. For more general information about Unitils and also information on the way Unitils 
     uses configuration files, we refer to the {{{documentation.html} documentation}} page.
    
+* Getting started
+~~~~~~~~~~~~~~~~~
+    To get started with Unitils' ReflectionAssert, EasyMock and injection utilities, you need following lib's to your classpath:
+    
+    - unitils-1.0-rc-1.jar
+    - commons-logging-1.1.jar
+    - commons-lang-2.2.jar
+    - commons-collections-3.2.jar
+    - ognl-2.6.9.jar
+    - junit-3.8.1 / junit-4.1 or testng-1.5-jdk5.1.jar
+    
    
 * {Dependencies}
 ~~~~~~~~~~~~~~~~
