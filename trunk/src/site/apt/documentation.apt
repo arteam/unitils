@@ -37,8 +37,9 @@ Tutorial
 
 * {Assertion utilities}
 ~~~~~~~~~~~~~~~~~~~~~~~    
-    We'll begin the tutorial describing some assertion utilities that can be used independently of the module system described in the rest tutorial. 
-    No extra configuration is needed, just add the {{{cookbook.html#Dependencies}required dependencies}} to your classpath and you are ready to use them in your tests.
+    We start this tutorial by describing some assertion utilities that can be used independently of the Unitils core module system, which is described in the remainder 
+    of this text. No configuration is needed, just add the {{{cookbook.html#Dependencies}required dependencies}} to your classpath, and they are ready to be used in 
+    your tests.
     
 
 ** {Using reflection for assertion}
@@ -65,11 +66,11 @@ User user2 = new User(1, "John", "Doe");
 assertEquals(user1, user2);
 +-----+
 
-    You would expect that this assertion would be successful since both instances contain the same values. This is however not the case, because <User> 
+    You could expect this assertion to be successful since both instances contain the same values. This is however not the case, because <User> 
     does not override the <equals()> method. Checking equals of 2 <User> instances is in that case the same as checking whether both instances are the same. 
     In other words, the assertEquals actually results in user1 == user2 being tested causing the assertion to fail.
     
-    Suppose you would implement the equals method as follows:
+    Suppose you implemented the equals method as follows:
     
 +-----+    
 public boolean equals(Object object) {
@@ -78,7 +79,7 @@ public boolean equals(Object object) {
     }
     return false;
 }
-+-----+    
++-----+
 
     This is a totally reasonable implementation for your application logic, stating that 2 user instances are referring to the same user when they have the 
     same id. However, this method is not useful in your unit tests. Testing whether 2 objects are equal is now reduced to the test whether they both have 
@@ -133,7 +134,7 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 
 ** Lenient assertions
 ~~~~~~~~~~~~~~~~~~~~~
-    If you want to create unit tests that are maintainable, it's important to only add assertions that are of value for the test. Let me clarify this with an 
+    For reasons of maintainability, it's important to only add assertions that are of value for the test. Let me clarify this with an 
     example: suppose you have a test for a calculation of an account balance. There is no need to add any assertions to this test that will check the value of the name of 
     the bank-customer. This will only add complexity to your test making it more difficult to understand and, more importantly, more brittle against changes 
     to the code. If you want your test code to easily survive refactorings and other code changes, make sure you limit your assertions and 
@@ -145,8 +146,8 @@ assertRefEquals(Arrays.asList(1, 2), myList);
 
 *** Lenient order
 ~~~~~~~~~~~~~~~~~
-    A first type of leniency you can specify is ignoring the order of elements in a collection or an array. It is often the case that when working with 
-    lists, you are not interested in the actual order of the elements. For example, code for retrieving all bank-accounts with a negative balance will typically 
+    A first type of leniency you can specify is ignoring the order of elements in a collection or array. When working with lists, you are often not interested in 
+    the actual order of the elements. For example, code for retrieving all bank-accounts with a negative balance will typically 
     return them in an order that is unimportant for the actual processing.
     
     To implement this behavior, the <ReflectionAssert.assertRefEquals> method can be configured to ignore ordering by supplying it the <ReflectionComparatorMode.LENIENT_ORDER> 
@@ -160,9 +161,8 @@ assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER);
 
 *** Ignoring defaults
 ~~~~~~~~~~~~~~~~~~~~~
-    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode. When this mode is set, fields in the left (expected) instance 
-    will only be compared with the corresponding fields in the right (actual) instance if they have a non java default value, i.e. <null> or <0>. In other words, 
-    if you leave the value of a left-instance field to <null> or <0> it will not be used in the comparison.
+    A second type of leniency is specified by the <ReflectionComparatorMode.IGNORE_DEFAULTS> mode. When this mode is set, java default values, like <null> for objects
+    and <0> or <false> for values are ignored. In other words, only the fields that you instantiate in your expected objects are used in the comparison.
     
     As an example, suppose you have a user class with a first name, last name, street... field, but you only want to check that the resulting user instance has 
     a certain first name and street value, ignoring the other field values:
@@ -184,8 +184,10 @@ assertRefEquals(anyObject, null, IGNORE_DEFAULTS);  // Fails
 
 *** Lenient dates
 ~~~~~~~~~~~~~~~~~
-    A third and final type of leniency is <ReflectionComparatorMode.LENIENT_DATES>. This will assert that date field values in both instances 
-    are set or both equal to null, the actual values of the dates are ignored. E.g. a date from last year will equal the current date. 
+    A third type of leniency is <ReflectionComparatorMode.LENIENT_DATES>. This will assert that the date field values in both instances 
+    are both set or both equal to null; the actual values of the dates are ignored. This can be useful if you want to do strict checking
+    on the fields of objects (without using <ReflectionComparatorMode.IGNORE_DEFAULTS>), but there are fields in your object set to the
+    current date or time that you want to ignore. 
 
 +-----+
 Date actualDate =   new Date(44444);
@@ -216,8 +218,8 @@ assertLenEquals("any", null);  // Fails
 ~~~~~~~~~~~~~~~~~~~~~~
     The <assertLenEquals> and <assertRefEquals> methods compare objects as a whole. ReflectionAssert also contains methods to compare 
     a specific property of two objects: <assertPropertyLenEquals> and <assertPropertyRefEquals>. The actual field that needs to be compared 
-    is specified using the {{{http://www.ognl.org/}OGNL}} notation, in which the typical bean property notation, e.g. 
-    field1.innerField, and more powerful notations can be used.
+    is specified using the {{{http://www.ognl.org/}OGNL}} notation. This language supports typical bean property expressions, like
+    field1.innerField, and a number of more powerful constructions.
     
     Some examples of property comparisons are:
 
@@ -234,18 +236,18 @@ assertPropertyLenEquals("id", Arrays.asList(1, 2, 3), users);
 assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second street", "Third street"), users);
 +-----+
 
-    Again there are two versions of each method: an assertProperty<<Len>>Equals method and an assertProperty<<Ref>>Equals method. 
-    The ref version will have no leniency specified by default but provides the option to specify leniency modes, the len version
-    already has lenient order and ignore defaults set as fixed leniency modes.
+    Again there are two versions of each method: assertProperty<<Ref>>Equals and assertProperty<<Len>>Equals . 
+    The ref version doesn't have leniency specified by default but provides the option to specify leniency modes, the len version
+    has lenient order and ignore defaults set as fixed leniency modes.
 
 
 
 
 * {Unitils Modules}
 ~~~~~~~~~~~~~~~~~~~
-    Unitils is more than just a set of assertion utilities. The rest of this tutorial will describe the real strenghts of Unitils and the modules it consists of. We'll begin 
-    explaining how to setup a test environment to let your tests make use of these modules. The subsequent chapters then will then dive deeper into the functionality of each of 
-    the modules.
+    The rest of this tutorial describes Unitils' module system and the modules that are provided. We start with explaining how to setup a 
+    test environment to let your tests make use of these modules. The subsequent chapters dive deeper into the functionality of each of 
+    these modules.
     
 
 
@@ -274,11 +276,11 @@ dataSource.driverClassName=oracle.jdbc.driver.OracleDriver
 dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 +-----+
 
-    The file is not required, but if you create one, it should be placed somewhere in the classpath of your project. To get you started, 
+    This file is not required, but if you create one, it should be placed somewhere in the classpath of your project. To get started, 
     you can find a sample file that contains most commonly used configuration settings in following {{{unitils.properties}unitils.properties}} template.
 
-    The last file, unitils-local.properties, is also optional. It can contain settings that override the project settings and is used for
-    defining per-user settings. For example, if each user uses its own unit-test database schema, you can create a unitils-local.properties for 
+    The last file, unitils-local.properties, is optional as well. It can contain settings that override the project settings and is used for
+    defining developer specific settings. For example, if each user uses its own unit-test database schema, you can create a unitils-local.properties for 
     each user that contains the corresponding username, password and database schema:
 
 +-----+
@@ -291,9 +293,9 @@ database.schemaName=test_john
     A typical local configuration can be found in following sample {{{unitils-local.properties}unitils-local.properties}} template.
 
     The name of the local file, unitils-local.properties, is also defined by a property. This makes it possible to use different names for each
-    of the projects you are working on. For example, suppose you are working on a project named projectOne and want to start a new project
-    named projectTwo. Adding following property to the unitils.properties of projetTwo will let Unitils use projectTwo-local.properties
-    as local properties file for the project:
+    of the projects you are working on. For example, suppose you're using Unitils on a project named projectOne and want to start using it on a new project
+    named projectTwo. Adding following property to the file unitils.properties of projectTwo will make Unitils use projectTwo-local.properties
+    as the local properties file for this project:
 
 +-----+
 unitils.configuration.localFileName=projectTwo-local.properties
@@ -327,7 +329,7 @@ public class MyTest extends UnitilsJUnit3 {
     Typically you would create your own base test class containing some utility behavior common for all your tests, e.g. datasource injection, and
     then let this base class extend from one of the Unitils base classes.
 
-    When you use JUnit4 you can also Unitils-enable a class by adding and @RunWith annotation instead of extending from the base class:
+    When you use JUnit4 you can also Unitils-enable a class by adding a @RunWith annotation instead of extending from the base class:
 
 +-----+
 import org.junit.runner.RunWith;
@@ -387,13 +389,13 @@ public class MyTest {
 
 ** {Managing test data with DbUnit}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Database tests should be run on a unit test database, having complete and fine grained control over the test data that is used. The <DbUnitModule> builds further 
+    Database tests should be run on a unit test database, giving you complete and fine grained control over the test data that is used. The <DbUnitModule> builds further 
     on {{{http://www.dbunit.org/}DbUnit}} to provide support for working with test data sets. 
 
 
 *** {Loading test data sets}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Let's start with an example of a UserDAO with a simple findByName method for retrieving a user based on its first and last name. A typical unit test would look as follows:
+    Let's start with an example of a UserDAO with a simple findByName method for retrieving a user based on its first and last name. A typical unit test looks as follows:
 
 +-----+
 @DataSet
