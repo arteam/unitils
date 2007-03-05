@@ -60,6 +60,12 @@ ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jan
 
 * EasyMock integration / mock injection
 ~~~~~~~~~~~~~~~~~~~   
+
+    For easymock, you need following extra dependencies:
+    
+    * easymock-2.2.jar
+    
+    * easymockclassextension-2.2.jar
     
     This example demonstrates the EasyMock and Injection modules. No configuration has to be made, but the test must extend one of Unitils base classes UnitilsJUnit3 / UnitilsJUnit4 / UnitilsTestNG.
     
@@ -95,6 +101,12 @@ public class UserServiceTest extends UnitilsJUnit4 {
     To enable database testing the Unitils way, you should start by setting up a unit test database for every developer in your 
     team. In our typical configuration shown below, we assume that for every developer, a separate test database schema was created on the 
     same database instance.
+    
+    Following additional dependencies are required:
+    
+    * commons-dbcp-1.2.1.jar
+    
+    * commons-pool-1.2.jar
   
     Create a file named unitils.properties and make it available in the root of your classpath. It should contain following properties:
   
@@ -201,8 +213,8 @@ test data file: UserDaoTest.xml:
 
 * Enable Hibernate support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    To make use of Unitils' Hibernate support, first make sure the database support is configured correctly as described above.
-    You should also make sure the property <HibernateModule.configuration.implClassName> is set to the subclass of org.hibernate.cfg.Configuration that 
+    To make use of Unitils' Hibernate support, first make sure the database support is configured correctly as described above and that you have hibernate
+    in your classpath. Also make sure the property <HibernateModule.configuration.implClassName> is set to the subclass of org.hibernate.cfg.Configuration that 
     you make use of. If you don't make use of Hibernate with annotations, change the value of this property to be the following:
 
 +-----+
