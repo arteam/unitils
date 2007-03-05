@@ -30,16 +30,16 @@ import java.util.Properties;
 public class PropertiesDataSourceFactory implements DataSourceFactory {
 
     /* Propery key of the database driver class name */
-    private static final String PROPKEY_DATASOURCE_DRIVERCLASSNAME = "dataSource.driverClassName";
+    private static final String PROPKEY_DATASOURCE_DRIVERCLASSNAME = "database.driverClassName";
 
     /* Property key of the datasource url */
-    private static final String PROPKEY_DATASOURCE_URL = "dataSource.url";
+    private static final String PROPKEY_DATASOURCE_URL = "database.url";
 
     /* Property key of the datasource connect username */
-    private static final String PROPKEY_DATASOURCE_USERNAME = "dataSource.userName";
+    private static final String PROPKEY_DATASOURCE_USERNAME = "database.userName";
 
     /* Property key of the datasource connect password */
-    private static final String PROPKEY_DATASOURCE_PASSWORD = "dataSource.password";
+    private static final String PROPKEY_DATASOURCE_PASSWORD = "database.password";
 
     /* The name of the <code>java.sql.Driver</code> class. */
     private String driverClassName;
