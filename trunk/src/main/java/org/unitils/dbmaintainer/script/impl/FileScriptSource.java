@@ -17,7 +17,6 @@ package org.unitils.dbmaintainer.script.impl;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,12 +26,17 @@ import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.readFileToString;
 import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem.
@@ -335,7 +339,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         for (File file : files) {
             try {
                 scripts.add(new VersionScriptPair(new Version(getIndex(file), timeStamp),
-                        new Script(file.getName(), FileUtils.readFileToString(file, System.getProperty("file.encoding")))));
+                        new Script(file.getName(), readFileToString(file, System.getProperty("file.encoding")))));
             } catch (IOException e) {
                 throw new UnitilsException("Error while trying to read file " + file);
             }
@@ -349,7 +353,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         List<Script> scripts = new ArrayList<Script>();
         for (File file : files) {
             try {
-                scripts.add(new Script(file.getName(), FileUtils.readFileToString(file, System.getProperty("file.encoding"))));
+                scripts.add(new Script(file.getName(), readFileToString(file, System.getProperty("file.encoding"))));
             } catch (IOException e) {
                 throw new UnitilsException("Error while trying to read file " + file);
             }

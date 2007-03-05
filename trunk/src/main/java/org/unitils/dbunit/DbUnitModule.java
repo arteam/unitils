@@ -15,7 +15,7 @@
  */
 package org.unitils.dbunit;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ReplacementDataSet;

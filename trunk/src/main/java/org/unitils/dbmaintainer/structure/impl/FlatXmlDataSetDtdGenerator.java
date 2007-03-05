@@ -16,7 +16,7 @@
 package org.unitils.dbmaintainer.structure.impl;
 
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.io.IOUtils;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.*;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -86,14 +86,14 @@ public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGener
 
             // write the content to the file
             writer = new FileWriter(dtdFile);
-            IOUtils.write(dtdContent, writer);
+            write(dtdContent, writer);
 
         } catch (UnitilsException e) {
             throw e;
         } catch (Exception e) {
             throw new UnitilsException("Error generating DTD file: " + dtdFileName, e);
         } finally {
-            IOUtils.closeQuietly(writer);
+            closeQuietly(writer);
         }
     }
 

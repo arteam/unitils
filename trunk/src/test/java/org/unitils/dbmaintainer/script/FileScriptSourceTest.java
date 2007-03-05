@@ -16,13 +16,13 @@
 package org.unitils.dbmaintainer.script;
 
 import junit.framework.TestCase;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.script.impl.FileScriptSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDeleteOnExit;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.copy;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -73,7 +73,7 @@ public class FileScriptSourceTest extends TestCase {
         // Create test directory
         File testDir = new File(DBCHANGE_FILE_DIRECTORY);
         testDir.mkdirs();
-        FileUtils.forceDeleteOnExit(testDir);
+        forceDeleteOnExit(testDir);
 
         // Copy test files
         copyFile(DBCHANGE_FILE1, DBCHANGE_FILE1_FILESYSTEM);
@@ -106,7 +106,7 @@ public class FileScriptSourceTest extends TestCase {
     private File copyFile(String fileInClassPath, String systemPath) throws Exception {
         InputStream is = getClass().getResourceAsStream(fileInClassPath);
         OutputStream os = new FileOutputStream(systemPath);
-        IOUtils.copy(is, os);
+        copy(is, os);
         is.close();
         os.close();
         return new File(systemPath);

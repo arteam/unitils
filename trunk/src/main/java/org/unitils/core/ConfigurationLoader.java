@@ -15,7 +15,7 @@
  */
 package org.unitils.core;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import static org.unitils.util.PropertyUtils.getString;

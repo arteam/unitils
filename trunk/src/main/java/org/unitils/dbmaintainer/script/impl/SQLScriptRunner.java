@@ -15,10 +15,12 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import org.apache.commons.io.IOUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.ScriptRunner;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.toInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +52,7 @@ public class SQLScriptRunner extends DatabaseTask implements ScriptRunner {
      * @param script The script as a string, not null
      */
     public void execute(String script) throws StatementHandlerException {
-        List<String> statements = loadStatements(IOUtils.toInputStream(script));
+        List<String> statements = loadStatements(toInputStream(script));
         for (String statement : statements) {
             statementHandler.handle(statement);
         }
@@ -72,7 +74,7 @@ public class SQLScriptRunner extends DatabaseTask implements ScriptRunner {
         } catch (IOException e) {
             throw new UnitilsException("Error while reading script", e);
         } finally {
-            IOUtils.closeQuietly(in);
+            closeQuietly(in);
         }
     }
 }
