@@ -15,10 +15,10 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.apache.commons.io.IOUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

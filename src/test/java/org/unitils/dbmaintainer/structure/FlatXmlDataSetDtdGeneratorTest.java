@@ -1,6 +1,6 @@
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.io.IOUtils;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;

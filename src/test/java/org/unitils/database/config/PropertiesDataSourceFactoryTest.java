@@ -35,10 +35,10 @@ public class PropertiesDataSourceFactoryTest extends UnitilsJUnit3 {
 
     public void setUp() throws Exception {
         Properties configuration = new Properties();
-        configuration.setProperty("dataSource.driverClassName", "testdriver");
-        configuration.setProperty("dataSource.url", "testurl");
-        configuration.setProperty("dataSource.userName", "testusername");
-        configuration.setProperty("dataSource.password", "testpassword");
+        configuration.setProperty("database.driverClassName", "testdriver");
+        configuration.setProperty("database.url", "testurl");
+        configuration.setProperty("database.userName", "testusername");
+        configuration.setProperty("database.password", "testpassword");
 
         propertiesFileDataSourceConfig = new PropertiesDataSourceFactory() {
             protected BasicDataSource getNewDataSource() {
