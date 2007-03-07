@@ -283,7 +283,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
             }
             if (!isCreateInstanceMethod(method)) {
                 throw new UnitilsException("Unable to invoke method annotated with @" + annotationClass.getSimpleName() +
-                        ". Ensure that this method has following signature: " + instanceClass.getName() + " myMethod( String[] locations ) or " +
+                        ". Ensure that this method has following signature: " + instanceClass.getName() + " myMethod( Lisr<String> locations ) or " +
                         instanceClass.getName() + " myMethod()");
             }
 

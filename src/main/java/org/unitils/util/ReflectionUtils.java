@@ -129,7 +129,7 @@ public class ReflectionUtils {
         }
         for (Method method : setterMethods) {
             if (!isSetter(method)) {
-                throw new UnitilsException("Method " + method.getName() + " is expected to be a setter method, but is not");
+                throw new UnitilsException("Method " + method.getName() + " is expected to be a setter method, but is not.");
             }
             try {
                 invokeMethod(object, method, value);

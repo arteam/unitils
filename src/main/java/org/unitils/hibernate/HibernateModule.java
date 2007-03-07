@@ -37,6 +37,7 @@ import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -190,6 +191,15 @@ public class HibernateModule implements Module, Flushable {
     public void injectSessionFactory(Object testObject) {
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
+
+        // filter out methods with session factory argument
+        Iterator<Method> iterator = methods.iterator();
+        while (iterator.hasNext()) {
+            Class<?>[] parameterTypes = iterator.next().getParameterTypes();
+            if (parameterTypes.length == 0 || !SessionFactory.class.isAssignableFrom(parameterTypes[0])) {
+                iterator.remove();
+            }
+        }
         if (fields.isEmpty() && methods.isEmpty()) {
             // Nothing to do. Jump out to make sure that we don't try to instantiate the SessionFactory
             return;
