@@ -93,7 +93,7 @@ public class DbUnitAssert {
         ITableIterator actualTables = filteredActualDataSet.iterator();
         while (actualTables.next()) {
             ITable actualTable = actualTables.getTable();
-            if (!expectedTableName.equals(actualTable.getTableMetaData().getTableName())) {
+            if (!expectedTableName.equalsIgnoreCase(actualTable.getTableMetaData().getTableName())) {
                 continue;
             }
             Column[] columns = expectedTable.getTableMetaData().getColumns();
