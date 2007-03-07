@@ -6,17 +6,59 @@
     <!-- The body of the document contains a number of sections -->
     <section name="Guidelines">        
     
-<p>Unitils started as a discussion group on unit testing. The result of this is the list of guidelines that you 
-can find on this page. These guidelines have emerged from the concrete experience of different people on various
-projects. Unitils is the result of these guidelines, it started in an attempt to write code to help implementing
-these guidelines on a project.</p>
+<p>Unitils started as a discussion group on unit testing. The result of these discussions is the list of guidelines found on this page.</p>
 
-<p>The guidelines are intended to be open source as well. We have a <a href="http://sourceforge.net/forum/forum.php?forum_id=642599">
-guidelines forum</a> on which you are free to ask questions or discuss certain guidelines, or to propose new guidelines yourself.
-The source code of this page is also available in our SVN repository. To be able to edit them, you may request developer access to 
-our SVN repository.</p>
+<p><a href="#1">1 Introduction</a></p>
+<p><a href="#2">2 General Guidelines</a></p>
+<ul>
+    <li><p><a href="#2.1">2.1 Structure of a unit test</a></p></li>
+    <li><p><a href="#2.2">2.2 Naming Conventions</a></p></li>    
+    <li><p><a href="#2.3">2.3 Put unit tests in same package but separate source folder</a></p></li>
+    <li><p><a href="#2.4">2.4 Create test data during setup</a></p></li>
+    <li><p><a href="#2.5">2.5 Keep your test fixture simple</a></p></li>
+    <li><p><a href="#2.6">2.6 Test boundary conditions</a></p></li>
+    <li><p><a href="#2.7">2.7 Test public interface, not internals</a></p></li>
+    <li><p><a href="#2.8">2.8 Keep test methods small</a></p></li>
+    <li><p><a href="#2.9">2.9 Create independent unit tests</a></p></li>
+    <li><p><a href="#2.10">2.10 Write tests while writing code</a></p></li>
+    <li><p><a href="#2.11">2.11 Use reflection for equality checking</a></p></li>
+    <li><p><a href="#2.12">2.12 Everyone tests or no one tests</a></p></li>
+    <li><p><a href="#2.13">2.13 Fix broken tests immediately</a></p></li>
+    <li><p><a href="#2.14">2.14 Use continuous integration</a></p></li>
+    <li><p><a href="#2.15">2.15 Use build tool or IDE to run suites of tests</a></p></li>
+    <li><p><a href="#2.16">2.16 Write test when fixing a bug</a></p></li>
+    <li><p><a href="#2.17">2.17 Test new project code, not library code</a></p></li>
+    <li><p><a href="#2.18">2.18 Test declared exceptions</a></p></li>
+</ul>
+<p><a href="#3">3 EIS tier testing guidelines</a></p>
+<ul>
+    <li><p><a href="#3.1">3.1 Test with unit test databases</a></p></li>
+    <li><p><a href="#3.2">3.2 Automate the maintenance of the test databases</a></p></li>
+    <li><p><a href="#3.3">3.3 Disable foreign key and not null constraints</a></p></li>
+    <li><p><a href="#3.4">3.4 Testing simple CRUD methods</a></p></li>
+    <li><p><a href="#3.5">3.5 Testing queries</a></p></li>
+    <li><p><a href="#3.6">3.6 Testing bulk data manipulation methods</a></p></li>
+    <li><p><a href="#3.7">3.7 Keep your test data files simple</a></p></li>
+    <li><p><a href="#3.8">3.8 Don't overly reuse test data between unit tests</a></p></li>
+    <li><p><a href="#3.9">3.9 Use a DTD in your test data files</a></p></li>
+    <li><p><a href="#3.10">3.10 Do not test auto-generated fields</a></p></li> 
+    <li><p><a href="#3.11">3.11 Modify database sequences</a></p></li>
+    <li><p><a href="#3.12">3.12 Don’t use transactions</a></p></li>
+</ul>
+<p><a href="#4">4 Hibernate testing guidelines</a></p>
+<ul>
+    <li><p><a href="#4.1">4.1 Test mapping with database</a></p></li>
+    <li><p><a href="#4.2">4.2 Test non-trivial queries</a></p></li>
+    <li><p><a href="#4.3">4.3 Test bulk data manipulation methods</a></p></li>
+</ul>
+
+
+<p>The guidelines are work in progress and are intended to be open source. We have a <a href="http://sourceforge.net/forum/forum.php?forum_id=642599">
+guidelines forum</a> on which guidelines can be discussed and new ones can be proposed. We hope to hear from you. Feel free to post your comments.</p>
+
+
     
-<h2>1 Introduction</h2>
+<h2><a name="1">1 Introduction</a></h2>
 
 <p>A unit test is a piece of code written by a developer that tests another piece of code. Usually a unit test 
 executes some particular method in a particular context, and it checks if the outcome matches the expected one. 
@@ -35,24 +77,25 @@ should be used and what boundary conditions it can handle.</p>
 
 <p>The number one argument against unit testing is that it takes too much time. This not true, it will save you time 
 instead, because of its immediate and constant feedback, and since it greatly reduces the debugging efforts you have 
-to spend afterwards. It will make sure you fix bugs early that you would have found late when following a none-unit 
+to spend afterwards. It will make sure you fix bugs early that you would have found late when following a no-unit 
 testing approach. This doesn’t mean we ignore the fact unit testing takes time. It does take longer to write both 
-code and unit  tests, but the complete, correctly functioning product will be delivered earlier, and it will be much 
+code and unit tests, but the complete, correctly functioning product will be delivered earlier, and it will be much 
 more maintainable afterwards.</p>
 
-<p>The unit testing strategy is part of your project methodology, and it should be discussed in advance, in 
+<p>The unit testing strategy is part of your project methodology and should be discussed in advance, in 
 cooperation  with the customer. The customer must be aware of and agree with the fact that you choose the unit 
 testing approach. He has to be aware of the fact that daily coding will take some more time, but that the eventual 
 stable product will be delivered sooner.</p>
 
-<p>Each of the unit-tests tests only a small part of the code and therefore there should also be other kinds of tests on 
+<p>Each of the unit-tests test only a small part of the code. There should also be other kinds of tests on 
 the project that test the code as whole. Examples are integration tests, user acceptance tests and performance tests.</p>
+
 
 
 
 <h4>Pragmatic unit testing</h4>
 
-<p>There are many possible levels of doing unit-testing. Some people want to reach 100% code coverage, that is, every 
+<p>There are many possible levels of doing unit-testing. Some people want to reach 100% code coverage: every 
 line of code is used in at least one test. Of course this requires you to write lots and lots of tests, probably spending 
 more time writing and maintaining tests than writing code.</p>
 
@@ -71,8 +114,8 @@ project code.</p>
 test should not hinder you when code is being altered and refactored.</p>
 
 <p>Deciding on a unit testing strategy means deciding which layers of the software system will be tested (GUI, business, 
-database), and what tools and libraries will be used. What is best highly depends on the project, but typically you would 
-at least test the business and database layers.</p>
+database), and what tools and libraries will be used. What is best chosen highly depends on the project, but typically you 
+would at least test the business and database layers.</p>
 
 
 
@@ -83,6 +126,7 @@ unit tests:</p>
 
 <ul>
     <li><p><a href="http://www.junit.org/">JUnit</a> - base test library</p></li>
+    <li><p><a href="http://testng.org/">TestNG</a> - base test library</p></li>
     <li><p><a href="http://dbunit.sourceforge.net/">DbUnit</a> - tests using a database</p></li>
     <li><p><a href="http://sourceforge.net/projects/junit-addons">JUnit Addons</a> - testing utilities</p></li>
     <li><p><a href="http://www.easymock.org/">EasyMock</a> - simulating behavior</p></li>
@@ -98,7 +142,7 @@ implementing many of the functionality described by the guidelines: <b>Unitils</
 
 <br />
 <br />
-<h2>2 General Guidelines</h2>
+<h2><a name="2">2 General Guidelines</a></h2>
 
 
 
@@ -187,7 +231,6 @@ public class UserAdminTest extends TestCase {
      * Test for method with …
      */
     public void testAddUser_oldEnough() {
-
         user.setAge(18);                                    <span class="code-comment">// Extra Test Setup</span>
 
         userAdmin.addUser(“jdoe”, user, adminRole);         <span class="code-comment">// Perform Test</span>
@@ -229,7 +272,7 @@ public class UserAdminTest extends TestCase {
 
 <p>Proper naming of unit tests is important: it enables other developers and tools to easily locate the test classes and methods.</p>
 
-<p>When creating a new test class name the new class after the class that is being tested and add the suffix <i>‘Test’</i>. 
+<p>When creating a new test class, name the new class after the class that is being tested and add the suffix <i>‘Test’</i>. 
 If there is more than 1 test class for a certain class (see <a href="#2.5">Keep your test fixture simple</a>) use the same 
 convention, but add an extra name in front of ‘Test’. This extra name is free to choose but should give an indication 
 of the kind of tests that are going to be in this class.</p>
@@ -1175,7 +1218,7 @@ public class UserTest extends TestCase {
 
 <br />
 <br />
-<h2>3 EIS tier testing guidelines</h2>
+<h2><a name="3">3 EIS tier testing guidelines</a></h2>
 
 <p>The database layer is a very important though brittle layer. Since the database layer is implemented at two different levels (DAO layer +
 database itself), bugs occur frequently because of mismatches between these two. To spot problems in the persistence layer instantly, unit tests 
@@ -1817,7 +1860,7 @@ transaction, so that the tests closely resemble the real situation.</p>
 
 <br />
 <br />
-<h2>4 Hibernate testing guidelines</h2>
+<h2><a name="4">4 Hibernate testing guidelines</a></h2>
 
 <p>The past few years, most projects use some form of Object-Relational mapping framework. Mostly this is Hibernate, or some implementation 
 of JPA / EJB3 Persistence. The use of Hibernate greatly simplifies the persistence layer in an application. Unit testing is still valuable, because 

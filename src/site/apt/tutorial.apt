@@ -38,7 +38,7 @@ Tutorial
 * {Assertion utilities}
 ~~~~~~~~~~~~~~~~~~~~~~~    
     We start this tutorial by describing some assertion utilities that can be used independently of the Unitils core module system, which is described in the remainder 
-    of this text. No configuration is needed, just add the {{{cookbook.html#Dependencies}required dependencies}} to your classpath, and they are ready to be used in 
+    of this text. No configuration is needed, just add the {{{cookbook.html#Libraries, dependencies}required dependencies}} to your classpath, and they are ready to be used in 
     your tests.
     
 

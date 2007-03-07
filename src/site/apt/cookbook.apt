@@ -11,8 +11,8 @@ Cookbook
     {{{unitils-default.properties} unitils-default.properties}}. For more elaborate information about Unitils and its configuration, 
     we refer to the {{{documentation.html} tutorial}}.
    
-* Libraries, dependencies
-~~~~~~~~~~~~~~~~~~~~~~~~~
+* {Libraries, dependencies}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
     To get started with Unitils' ReflectionAssert, you need following lib's to your classpath:
     
     * unitils-1.0-rc-1.jar
