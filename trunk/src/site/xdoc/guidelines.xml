@@ -8,8 +8,8 @@
     
 <p>Unitils started as a discussion group on unit testing. The result of these discussions is the list of guidelines found on this page.</p>
 
-<p><a href="#1">1 Introduction</a></p>
-<p><a href="#2">2 General Guidelines</a></p>
+<p><a href="#1">1. Introduction</a></p>
+<p><a href="#2">2. General Guidelines</a></p>
 <ul>
     <li><p><a href="#2.1">2.1 Structure of a unit test</a></p></li>
     <li><p><a href="#2.2">2.2 Naming Conventions</a></p></li>    
@@ -30,7 +30,7 @@
     <li><p><a href="#2.17">2.17 Test new project code, not library code</a></p></li>
     <li><p><a href="#2.18">2.18 Test declared exceptions</a></p></li>
 </ul>
-<p><a href="#3">3 EIS tier testing guidelines</a></p>
+<p><a href="#3">3. Database testing guidelines</a></p>
 <ul>
     <li><p><a href="#3.1">3.1 Test with unit test databases</a></p></li>
     <li><p><a href="#3.2">3.2 Automate the maintenance of the test databases</a></p></li>
@@ -45,7 +45,7 @@
     <li><p><a href="#3.11">3.11 Modify database sequences</a></p></li>
     <li><p><a href="#3.12">3.12 Don’t use transactions</a></p></li>
 </ul>
-<p><a href="#4">4 Hibernate testing guidelines</a></p>
+<p><a href="#4">4. O/R mapping testing guidelines</a></p>
 <ul>
     <li><p><a href="#4.1">4.1 Test mapping with database</a></p></li>
     <li><p><a href="#4.2">4.2 Test non-trivial queries</a></p></li>
@@ -57,8 +57,8 @@
 guidelines forum</a> on which guidelines can be discussed and new ones can be proposed. We hope to hear from you. Feel free to post your comments.</p>
 
 
-    
-<h2><a name="1">1 Introduction</a></h2>
+<br />    
+<h2><a name="1">1. Introduction</a></h2>
 
 <p>A unit test is a piece of code written by a developer that tests another piece of code. Usually a unit test 
 executes some particular method in a particular context, and it checks if the outcome matches the expected one. 
@@ -138,11 +138,8 @@ implementing many of the functionality described by the guidelines: <b>Unitils</
 
 
 
-
-
 <br />
-<br />
-<h2><a name="2">2 General Guidelines</a></h2>
+<h2><a name="2">2. General Guidelines</a></h2>
 
 
 
@@ -322,8 +319,10 @@ deliverables such as JARs and EARs that do not include any of the test classes.<
 <h4>Examples</h4>
 
 <p><code><pre>
-    <b>src/java</b>/org/unitils/util/StringUtils.java
-    <b>src/test</b>/org/unitils/util/StringUtilsTest.java
+    <b>src/main/java</b>      /org/unitils/util/StringUtils.java
+    <b>src/main/resources</b> /project.properties
+    <b>src/test/java</b>      /org/unitils/util/StringUtilsTest.java
+    <b>src/test/resources</b> /unitils.properties
 </pre></code></p>
 </div>
 
@@ -340,7 +339,7 @@ deliverables such as JARs and EARs that do not include any of the test classes.<
 <p><i>Test methods </i></p>
 
 <ul>
-    <li><p>should use objects that were created during the setup of the test class</p></li>
+    <li><p>can use objects that were created during the setup of the test class</p></li>
     <li><p>may perform additional configuration (not creation) of test data during its own setup</p></li>
 </ul>
 
@@ -348,15 +347,14 @@ deliverables such as JARs and EARs that do not include any of the test classes.<
 <h4>Description</h4>
 
 <p>If you need non-trivial test data in your test methods, put them in instance variables of the test class. Initialize the 
-instance variables during the setup phase of the test, that is, in the setUp() method of the test class. This set of test 
-data instances is called the fixture of the test. Trivial test data such as strings and integers should not be added to the 
-fixture and can be used directly as arguments in the test methods.</p>
+instance variables during the setup phase of the test. This set of test data instances is called the fixture of the test. Trivial 
+test data such as strings and integers should not be added to the fixture and can be used directly as arguments in the test methods.</p>
 
 <p>Putting test data in instance variables will promote reuse of test data and will keep test methods small and maintainable.</p>
 
 <p>If needed a test method can perform modifications to the test data. This extra setup should however be used 
-as an exception and be limited to changing a few values of the already created test data. JUnit creates a new
-Test class instance for each of the test methods so changing the test data will not cause problems for other test methods.</p>
+as an exception and be limited to changing a few values of the already created test data. JUnit and TestNG initialize the fixture 
+before each of the test methods so changing the test data will not cause problems for other test methods.</p>
 
 <p>If the set of test data becomes too large (too many instance variables) and is incoherent, split the 
 tests into multiple test classes (see <a href="#2.5">Keep your test fixture simple</a>). Because not all 
@@ -364,9 +362,6 @@ test data is used by every test, splitting up tests will also avoid creation of 
 
 <p>Note: do not forget to call super.setUp(). Some superclasses, e.g. DatabaseTestCase, perform there own setting up in the
 setUp() method.</p>
-
-<p>If there are data or resources that should not be setup before each test method, Unitils provides a setup method that will be executed
-only once during the execution of all tests. This can for example be used for creating files that are used (but not changed) during the tests.</p>
 
 
 <h4>Examples</h4>
@@ -400,7 +395,6 @@ public class UserAdminTest extends TestCase {
      * Test for method with …
      */
     public void testAddUser_oldEnough() {
-
         user.setAge(18);                                    <span class="code-comment">// Extra Test Setup</span>
 
         userAdmin.addUser(“jdoe”, user, adminRole);         <span class="code-comment">// Use Test Data</span>
@@ -563,18 +557,18 @@ should write a test.</p>
 
 <table>
     <tr><td><b><i>Argument</i></b></td>     <td><b><i>Boundary conditions</i></b></td></tr>
-    <tr><td>Object</td>                     <td><b>Null</b></td></tr>
+    <tr><td>Object</td>                     <td><b>null</b></td></tr>
     <tr><td></td>                           <td><b>boundary conditions of instance variables</b></td></tr>
     <tr><td>Numeric value</td>              <td><i>0</i></td></tr>
-    <tr><td></td>                           <td><i>negative value (optional)</i></td></tr>
-    <tr><td></td>                           <td><i>minimum and maximum(optional)</i></td></tr>
-    <tr><td>String</td>                     <td><b>Null</b></td></tr>
-    <tr><td></td>                           <td><i>empty string (optional)</i></td></tr>
+    <tr><td></td>                           <td><i>negative value</i></td></tr>
+    <tr><td></td>                           <td><i>minimum and maximum</i></td></tr>
+    <tr><td>String</td>                     <td><b>null</b></td></tr>
+    <tr><td></td>                           <td><i>empty string</i></td></tr>
     <tr><td></td>                           <td><i>length equal to maximum length (if maximum defined)</i></td></tr>
     <tr><td></td>                           <td><i>length greater than maximum length (if maximum defined)</i></td></tr>
-    <tr><td>Collections</td>                <td><b>Null</b></td></tr>
-    <tr><td></td>                           <td><i>empty collection (optional)</i></td></tr>
-    <tr><td></td>                           <td><i>collection with duplicate elements (optional)</i></td></tr>  
+    <tr><td>Collections</td>                <td><b>null</b></td></tr>
+    <tr><td></td>                           <td><i>empty collection</i></td></tr>
+    <tr><td></td>                           <td><i>collection with duplicate elements</i></td></tr>  
 </table>
 
 <p>The bold conditions are the minimal conditions for which a test needs to be written. Add extra boundary condition 
@@ -586,7 +580,7 @@ has some kind of restriction on the length of a string.</p>
 
 <h4>Examples</h4>
 
-<p>Suppose you have a class named UserAdmin that defines a method for adding a user. This method takes two arguments a user and a role.</p>
+<p>Suppose you have a class named UserAdmin that defines a method for adding a user. This method takes two arguments: a user and a role.</p>
 
 <div class="source"><pre>
 public class UserAdmin
@@ -646,7 +640,7 @@ public class UserAdminTest extends TestCase {
 </pre></div>
 
 <p>If you look at the implementation of the method, you see that this test will fail initially. You should fix the bug by implementing 
-the proper null handling in the method and then rerun the test until it is successful.</p>
+the proper null handling in the method and then rerun the test until it's successful.</p>
 
 </div>
 
@@ -739,8 +733,7 @@ be tested on its own. It will be tested during the addUser() test.</p>
 <div class="source"><pre>
 public class UserAdmin
 {      
-      private Map userMap = new HashMap();
-
+    private Map userMap = new HashMap();
 
     /**
      * Adds a new user.
@@ -763,8 +756,7 @@ public class UserAdmin
 }
 </pre></div>
 
-<p>UserAdmin is an example of a badly encapsulated class. It exposes its internal storage implementation. Suppose you would create a test for
-addUser() as follows:</p>
+<p>Suppose you would create a test for addUser() as follows:</p>
 
 <div class="source"><pre>
 public class UserAdminTest extends TestCase {
@@ -825,7 +817,6 @@ public class UserTest extends TestCase {
      * Test method for setting the age.
      */
     public void testSetAge() {
-    
         user.setName(“john”);                               <span class="code-comment">// Useless setup</span>
         
         user.setAge(50);
@@ -857,7 +848,7 @@ each of the tests on its own.</p>
 
 <h4>Description</h4>
 
-<p>JUnit does not guarantee a particular sequence in which the test methods will be called. The tests should therefore never rely on any execution
+<p>The particular sequence in which the test methods will be called is not guaranteed. The tests should therefore never rely on any execution
 sequence and should contain all setup that is needed to perform the test.</p>
 
 
@@ -869,18 +860,17 @@ public class UserTest extends TestCase {
     /**
      * Test method for adding a user.
      */
-    public void testAddUser() {
-        
+    public void testAddUser() {        
         userAdmin.addUser(user);
         
         assertEquals(user,userAdmin.getUser(“user”));
     }
     
+    
     /**
      * Test method for removing a user.
      */
-    public void testRemoveUser() {
-        
+    public void testRemoveUser() {        
         userAdmin.addUser(user);                            <span class="code-comment">// Extra setup</span>
         
         userAdmin.removeUser(user);
@@ -970,8 +960,7 @@ public class User {
     /**
      * Test whether the given object is the same user.
      */   
-    public boolean equals(Object object) {
-        
+    public boolean equals(Object object) {        
         if (!(object instanceof User)) {
             return false;
         }
@@ -1172,8 +1161,8 @@ functionality from your projects unit tests.</p>
 condition in a try-catch block and calling fail if the expected exception is not thrown (see below for an example).</p>
 
 <p>Test methods that are not actually testing this exceptional boundary condition should not add such a try-catch but just add a throws
-Exception clause to the test so that JUnit can handle the exception. Exceptional conditions that arise because of a bug in the code, e.g. NullPointerException, 
-or because of some unexpected problem, e.g. IOException, should not be handled in the unit test. Let JUnit handle these exceptions.</p>
+Exception clause to the test. Exceptional conditions that arise because of a bug in the code, e.g. NullPointerException, or because of some unexpected 
+problem, e.g. IOException, should not be handled in the unit test. Let JUnit or TestNG handle these exceptions.</p>
 
 
 <h4>Examples</h4>
@@ -1217,19 +1206,12 @@ public class UserTest extends TestCase {
 
 
 <br />
-<br />
-<h2><a name="3">3 EIS tier testing guidelines</a></h2>
+<h2><a name="3">3. Database testing guidelines</a></h2>
 
 <p>The database layer is a very important though brittle layer. Since the database layer is implemented at two different levels (DAO layer +
 database itself), bugs occur frequently because of mismatches between these two. To spot problems in the persistence layer instantly, unit tests 
-should be written for the persistence layer as a whole (DAO layer + database itself). As supporting technology, we will use 
-DBUnit (<a href="http://dbunit.sourceforge.net/">http://dbunit.sourceforge.net/</a>).</p>
-
-<p>The Unitils (<a href="http://sourceforge.net/projects/unitils">http://sourceforge.net/projects/unitils</a>) project provides a ready-to-start 
-baseline for starting with unit testing, while taking into practice the guidelines described in this document. The purpose of this text is not to 
-document the Unitils project; for detailed documentation of this project we refer to the <a href="documentation.html">documentation page.</a></p>
-
-
+should be written for the persistence layer as a whole (DAO layer + database itself). DBUnit (<a href="http://dbunit.sourceforge.net/">http://dbunit.sourceforge.net/</a>) 
+is used as supporting technology.</p>
 
 
 
@@ -1239,9 +1221,8 @@ document the Unitils project; for detailed documentation of this project we refe
 <h4>Short Description</h4>
 
 <ul>
-    <li><p>Write your database tests on a unit test database. A unit test database contains only database structure, and no data.</p></li>
-    <li><p>Give each developer a separate unit test database schema.</p></li>
-    <li><p>If your project environment allows it, deploy all test schemas on a shared database instance.</p></li>
+    <li><p>Write your database tests on a unit test database. A unit test database contains only database structure, no data.</p></li>
+    <li><p>Give each developer a separate unit test database instance or schema.</p></li>    
 </ul>
 
 
@@ -1857,10 +1838,8 @@ transaction, so that the tests closely resemble the real situation.</p>
 
 
 
-
 <br />
-<br />
-<h2><a name="4">4 Hibernate testing guidelines</a></h2>
+<h2><a name="4">4. O/R mapping testing guidelines</a></h2>
 
 <p>The past few years, most projects use some form of Object-Relational mapping framework. Mostly this is Hibernate, or some implementation 
 of JPA / EJB3 Persistence. The use of Hibernate greatly simplifies the persistence layer in an application. Unit testing is still valuable, because 

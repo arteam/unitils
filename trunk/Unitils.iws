@@ -17,7 +17,10 @@
     <option name="USER" value="" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" name="Default" comment="" />
+    <list default="true" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/xdoc/guidelines.xml" afterPath="$PROJECT_DIR$/src/site/xdoc/guidelines.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+    </list>
   </component>
   <component name="ChangeListSynchronizer" />
   <component name="ChangesViewManager" flattened_view="true" />
@@ -170,28 +173,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="HibernateModuleConfigurationTest.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="HibernateModuleConfigurationTest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="154" column="13" selection-start="6076" selection-end="6076" vertical-scroll-proportion="0.024355302">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HibernateModuleInjectionTest.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleInjectionTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="75" column="57" selection-start="2724" selection-end="2724" vertical-scroll-proportion="0.04067321">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HibernateModule.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="196" column="36" selection-start="9350" selection-end="9350" vertical-scroll-proportion="0.023842918">
+            <state line="154" column="13" selection-start="6076" selection-end="6076" vertical-scroll-proportion="0.016441006">
               <folding />
             </state>
           </provider>
@@ -200,7 +185,7 @@
       <file leaf-file-name="SessionFactoryManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="284" column="105" selection-start="12338" selection-end="12535" vertical-scroll-proportion="0.97707736">
+            <state line="284" column="105" selection-start="12338" selection-end="12535" vertical-scroll-proportion="0.6615087">
               <folding />
             </state>
           </provider>
@@ -209,7 +194,7 @@
       <file leaf-file-name="ReflectionUtils.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="131" column="122" selection-start="5134" selection-end="5134" vertical-scroll-proportion="0.024355302">
+            <state line="131" column="122" selection-start="5134" selection-end="5134" vertical-scroll-proportion="0.016441006">
               <folding />
             </state>
           </provider>
@@ -458,7 +443,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure Favorites="false" PackagesPane="false" Scope="false" ProjectPane="false" />
+      <showStructure ProjectPane="false" PackagesPane="false" Scope="false" Favorites="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -539,15 +524,12 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="" />
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
@@ -567,6 +549,16 @@
       <method>
         <option name="Make" value="true" />
       </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="" />
     </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
       <module name="" />
@@ -599,13 +591,6 @@
       <option name="VM_PARAMETERS" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
     </configuration>
     <configuration default="false" name="PropertiesDataSourceFactoryTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="Unitils" />
@@ -1014,37 +999,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="154" column="13" selection-start="6076" selection-end="6076" vertical-scroll-proportion="0.024355302">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="196" column="36" selection-start="9350" selection-end="9350" vertical-scroll-proportion="0.023842918">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="284" column="105" selection-start="12338" selection-end="12535" vertical-scroll-proportion="0.97707736">
+        <state line="284" column="105" selection-start="12338" selection-end="12535" vertical-scroll-proportion="0.6615087">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="131" column="122" selection-start="5134" selection-end="5134" vertical-scroll-proportion="0.024355302">
+        <state line="131" column="122" selection-start="5134" selection-end="5134" vertical-scroll-proportion="0.016441006">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="218" column="22" selection-start="10168" selection-end="10168" vertical-scroll-proportion="0.3326978">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleInjectionTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="75" column="57" selection-start="2724" selection-end="2724" vertical-scroll-proportion="0.04067321">
+        <state line="55" column="74" selection-start="1838" selection-end="1838" vertical-scroll-proportion="0.7454719">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="154" column="13" selection-start="6076" selection-end="6076" vertical-scroll-proportion="0.016441006">
           <folding />
         </state>
       </provider>
