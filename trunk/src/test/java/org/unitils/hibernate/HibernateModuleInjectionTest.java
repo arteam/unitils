@@ -16,6 +16,8 @@
 package org.unitils.hibernate;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
@@ -59,6 +61,20 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
 
 
     /**
+     * Tests mixing of hibernate session factory injection for a field and a setter method and the use of
+     * a custom initializer and a custom create method.
+     */
+    public void testInjectHibernateSessionFactory_mixingWithCustomCreateAndInitializer() {
+        HibernateTestSessionFactoryMixing hibernateTestSessionFactory = new HibernateTestSessionFactoryMixing();
+        hibernateModule.injectSessionFactory(hibernateTestSessionFactory);
+
+        assertNotNull(hibernateTestSessionFactory.sessionFactoryField);
+        assertTrue(hibernateTestSessionFactory.customInitializerCalled);
+        assertTrue(hibernateTestSessionFactory.createConfigurationCalled);
+    }
+
+
+    /**
      * Test hibernate test for session factory injection.
      */
     @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
@@ -74,5 +90,40 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
             this.sessionFactorySetter = sessionFactorySetter;
         }
     }
+
+
+    /**
+     * Test hibernate test for session factory injection. It also contains a custom initializer and custom
+     * create for testing the mixing of the HibernateSessionFactory annotation
+     */
+    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+    public class HibernateTestSessionFactoryMixing {
+
+        @HibernateSessionFactory
+        private SessionFactory sessionFactoryField = null;
+
+        private SessionFactory sessionFactorySetter;
+
+        private boolean customInitializerCalled = false;
+
+        private boolean createConfigurationCalled = false;
+
+        @HibernateSessionFactory
+        public void setSessionFactorySetter(SessionFactory sessionFactorySetter) {
+            this.sessionFactorySetter = sessionFactorySetter;
+        }
+
+        @HibernateSessionFactory
+        public void customInitializer(Configuration configuration) {
+            customInitializerCalled = true;
+        }
+
+        @HibernateSessionFactory
+        public Configuration createConfiguration() {
+            createConfigurationCalled = true;
+            return new AnnotationConfiguration();
+        }
+    }
+
 
 }
