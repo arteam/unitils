@@ -272,8 +272,8 @@ assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second 
     that overrides the driver class name and url properties as follows:
 
 +-----+
-dataSource.driverClassName=oracle.jdbc.driver.OracleDriver
-dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
+database.driverClassName=oracle.jdbc.driver.OracleDriver
+database.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 +-----+
 
     This file is not required, but if you create one, it should be placed somewhere in the classpath of your project. To get started, 
@@ -284,8 +284,8 @@ dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
     each user that contains the corresponding username, password and database schema:
 
 +-----+
-dataSource.userName=john
-dataSource.password=secret
+database.userName=john
+database.password=secret
 database.schemaName=test_john
 +-----+
 
@@ -539,10 +539,10 @@ public class UserDAOTest extends UnitilsJUnit4 {
     are specified by following properties:
     
 +-----+
-dataSource.driverClassName=oracle.jdbc.driver.OracleDriver
-dataSource.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
-dataSource.userName=john
-dataSource.password=secret
+database.driverClassName=oracle.jdbc.driver.OracleDriver
+database.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
+database.userName=john
+database.password=secret
 database.schemaName=test_john
 +-----+
 
@@ -1091,9 +1091,9 @@ public void setUserService(UserService userService) {
     You could for example create a <unitils-local.properties> that lets Unitils connect to the developers own unit-test database:
 
 +-----+
-dataSource.schemaName=UNIT_TEST_JOHN
-dataSource.userName=john
-dataSource.password=1234
+database.schemaName=UNIT_TEST_JOHN
+database.userName=john
+database.password=1234
 +-----+    
 
     Session factory configuration is automatically detected by Unitils. If you configure a <SessionFactory> in a Spring application context, you do not need to 
