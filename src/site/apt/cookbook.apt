@@ -31,7 +31,7 @@ ReflectionAssert.assertRefEquals(new Person("John", null, new Address("New stree
   
 // Ignore collection order
 ReflectionAssert.assertRefEquals(Arrays.asList(new Person("John"), new Person("Jane")), 
-                                 new Person[] {new Person("Jane", "Doe"), new Person("John", "Doe")}, 
+                                 new Person[] {new Person("Jane"), new Person("John")}, 
                                  ReflectionComparatorMode.LENIENT_ORDER);
   
 // Ignore null/0 values + collection order
@@ -63,7 +63,7 @@ public class UserServiceTest extends UnitilsJUnit4 {
 
     @Test
     public void testRaiseSalary() {        
-        expect(userDao.findAllUsers()).andReturn(asList(new User()));
+        expect(userDao.findAllUsers()).andReturn(Arrays.asList(new User()));
         expect(userDao.updateSalary(null, 100));     
         EasyMockUnitils.replay();
     
@@ -77,9 +77,9 @@ public class UserServiceTest extends UnitilsJUnit4 {
 
     * a lenient EasyMock mock object of type <UserDAO> is created and assigned to the <mockUserDao> field
     
-    * the <userService> was not set in the setup, so an instance of <UserService> is created using the default constructor and assigned to the field
+    * since the <userService> was not initialized in the setup, an instance of <UserService> is created using the default constructor and assigned to the field
     
-    * the mock is injected into the <userDao> property of the <userService> 
+    * the mock is injected into the <userDao> property of <userService> 
     
     * during the test, we first record the expected behavior. Arguments are matched using lenient reflection equals: ignoring null/0 defaults and the order of collections
     
@@ -99,7 +99,7 @@ public class UserServiceTest extends UnitilsJUnit4 {
     To enable database testing, you should start by setting up a unit test database for every developer in the team. In our typical 
     configuration shown below, we assume that these separate unit test schemas were created on the same database instance.
   
-    Start by creating a file named <unitils.properties> and make it available somewhere in your classpath. It should contain 
+    Start by creating a file named <unitils.properties> and make it available in your classpath. It should contain 
     following properties:
   
 +------+
@@ -114,8 +114,7 @@ dataSource.driverClassName=<my driver classname>
 database.url=<my database connection url>
 
 # This property specifies the underlying DBMS implementation. Supported values are 'oracle', 'db2', 'mysql' and 'hsqldb'.
-# The value of this property defines which vendor specific implementations of ConstraintsDisabler, SequenceUpdater and
-# DbClearer are chosen.
+# The value of this property defines which vendor specific implementations of DbSupport and ConstraintsDisabler are chosen.
 database.dialect=<my databasa dialect>
 +------+
 
@@ -168,10 +167,10 @@ public class UserDaoTest extends UnitilsJUnit4 {
 ** Description
 ~~~~~~~~~~~~~~
 
-    * a <DataSource> is created that provides access to unit test database as configured in <unitils.properties> and <unitils-\<myproject\>-local.properties>
+    * a <DataSource> is created that provides access to the unit test database configured in <unitils.properties> and <unitils-\<myproject\>-local.properties>
       and is injected in the <dataSource> field      
     
-    * in thet setUp method of the test a new instance of the <UserDao> is created and configured with the datasource instance
+    * in the setUp method, a new instance of <UserDao> is created and configured with the test DataSource
     
     * Unitils looks for a DbUnit dataset file named <UserDaoTest.xml> or <UserDaoTest.testFindUserByLastName.xml>
     
@@ -179,9 +178,9 @@ public class UserDaoTest extends UnitilsJUnit4 {
     
     * the test method is invoked
     
-    * using <ReflectionAssert> the first names of the users are compared with the expected names ignoring the actual order of the list
+    * using <ReflectionAssert>, the first names of the users are compared with the expected names ignoring the actual order of the list
     
-    * when the test is finished, all opened Hibernate sessions are automatically closed
+    * when the test is finished, any Hibernate sessions that are still open are automatically closed
     
     []
 
@@ -193,7 +192,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
   
 +------+
 # If set to true, the DBMaintainer will be used to update the unit test database schema. This is done once for each
-# test run, before the execution of the first class annotated with @DatabaseTest, if any.
+# test run, when creating the DataSource that provides access to the unit test database.
 updateDataBaseSchema.enabled=true
 
 # Directory in which the database update scripts are located.
