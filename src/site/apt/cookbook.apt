@@ -41,14 +41,13 @@ ReflectionAssert.assertLenEquals(Arrays.asList(new Person("John"), null),
 // Check only the firstName property 
 ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), 
                                          new Person[] {new Person("Jane", "Doe"), new Person("John", "Doe")});
-      
 +-----+
 
 
 
 
 * Mock creation and mock injection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
     This example demonstrates the EasyMock and Injection modules. The test must extend one of Unitils base classes: UnitilsJUnit3, UnitilsJUnit4 or UnitilsTestNG.
     No extra configuration is needed.
     
