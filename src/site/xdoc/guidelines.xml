@@ -1839,7 +1839,7 @@ XML mapping files as when using annotations. See the Unitils tutorial for more i
 public class HibernateMappingTest extends BaseHibernateDAOTest {
 
     public void testMappingToDatabase() {
-        HibernateUnitils.assertMappingToDatabase();
+        HibernateUnitils.assertMappingWithDatabaseConsistent();
     }
 }
 
