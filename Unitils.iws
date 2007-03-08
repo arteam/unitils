@@ -20,6 +20,7 @@
     <list default="true" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/xdoc/guidelines.xml" afterPath="$PROJECT_DIR$/src/site/xdoc/guidelines.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -172,35 +173,7 @@
     <option name="myCurrentFavoritesList" value="Unitils" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="HibernateModuleConfigurationTest.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="154" column="13" selection-start="6076" selection-end="6076" vertical-scroll-proportion="0.016441006">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SessionFactoryManager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="284" column="105" selection-start="12338" selection-end="12535" vertical-scroll-proportion="0.6615087">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReflectionUtils.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="131" column="122" selection-start="5134" selection-end="5134" vertical-scroll-proportion="0.016441006">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -443,7 +416,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure ProjectPane="false" PackagesPane="false" Scope="false" Favorites="false" />
+      <showStructure Scope="false" ProjectPane="false" PackagesPane="false" Favorites="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -826,7 +799,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2290981" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2332696" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24946696" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22314815" order="11" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38425925" order="11" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39866155" order="6" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="9" />
@@ -992,27 +965,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="285" column="24" selection-start="11858" selection-end="11858" vertical-scroll-proportion="0.2630561">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="284" column="105" selection-start="12338" selection-end="12535" vertical-scroll-proportion="0.6615087">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="131" column="122" selection-start="5134" selection-end="5134" vertical-scroll-proportion="0.016441006">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="218" column="22" selection-start="10168" selection-end="10168" vertical-scroll-proportion="0.3326978">
@@ -1027,9 +979,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="285" column="122" selection-start="11956" selection-end="11956" vertical-scroll-proportion="0.8220503">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/SessionFactoryManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="52" column="48" selection-start="2321" selection-end="2321" vertical-scroll-proportion="0.5754352">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/hibernate/HibernateModuleConfigurationTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="154" column="13" selection-start="6076" selection-end="6076" vertical-scroll-proportion="0.016441006">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="131" column="122" selection-start="5134" selection-end="5134" vertical-scroll-proportion="0.016441006">
           <folding />
         </state>
       </provider>
