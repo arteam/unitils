@@ -39,7 +39,7 @@
     <li><p><a href="#3.5">3.5 Testing queries</a></p></li>
     <li><p><a href="#3.6">3.6 Testing bulk data manipulation methods</a></p></li>
     <li><p><a href="#3.7">3.7 Keep your test data files simple</a></p></li>
-    <li><p><a href="#3.8">3.8 Don't overly reuse test data between unit tests</a></p></li>
+    <li><p><a href="#3.8">3.8 Make data sets test class specific</a></p></li>
     <li><p><a href="#3.9">3.9 Use a DTD in your test data files</a></p></li>
     <li><p><a href="#3.10">3.10 Do not test auto-generated fields</a></p></li> 
     <li><p><a href="#3.11">3.11 Modify database sequences</a></p></li>
@@ -1665,26 +1665,27 @@ properties in the tested method. This gives very little added value to your test
 
 </div>
 
-<div class="section"><h3><a name="3.8">3.8 Don't overly reuse test data between unit tests</a></h3>
+<div class="section"><h3><a name="3.8">3.8 Make data sets test class specific</a></h3>
 
 <h4>Short Description</h4>
 
-<p>Test data sets should only be reused between different unit tests on a limited scale. Reuse at small scale is good to limit the amount of data files, but too much reuse makes your data files brittle against change.</p>
-
+<p>Don't reuse data sets between different test classes, for example, do not use 1 big domain data set for all your test classes. Doing 
+so will make it very difficult to make changes to your test data for a test without braking anything for another test. You 
+are writing a unit test and such a test should be independent of other tests.</p>
+    
 <h4>Description</h4>
 
-<p>A common misconception when thinking out a database testing strategy on a project, is that time can be saved by creating one or a few general test data sets,
-that can be reused by a large group of unit tests. This is in most cases not a good idea. The more unit tests reuse the same data set, the more brittle it becomes against 
-changes. The test data sets will also become large and incoherent.</p>
+<p>A common misconception is that time can be saved by creating one or a few general test data sets that can be reused by a large group of unit 
+tests. This is in most cases not a good idea. The more unit tests reuse the same data set, the more brittle it becomes against changes.</p>
 
-<p>Image the situation that you want to add a value for a column or modify an existing one, for testing a certain boundary condition. 
-After doing the change, a number of existing tests appear to fail. As a reaction to this situation you will probably undo the change and try to find another way 
-to test this boundary condition (or not test it at all). Probably you can avoid impacting existing tests by simply adding your test data to the data set (but this 
-will also not always be the case!), which will eventually result in a very large and incoherent dataset.</p>
+<p>Image the situation that you want to add a value for a column for testing a certain boundary condition. After doing the change, a number of existing tests 
+appear to fail. As a reaction to this situation you will probably undo the change and try to find another way 
+to test this boundary condition (or not test it at all). Probably you can avoid impacting existing tests by simply adding your test data to the data set. This will 
+eventually result in a very large and incoherent dataset.</p>
 
 <p>This doesn't mean you cannot share data among tests, because having more test data sets also brings along more maintenance. When changing the name of a database
-column for example, you will probably have to update multiple datasets to make all tests pass. These changes however are mostly simple and can be performed quickly.
-A good practice is to use a test data set per test class, and in some exceptional cases a specific data set for a method.</p>
+column, for example, you will probably have to update multiple datasets to make all tests pass. These changes however are mostly simple and can be performed quickly.
+A good practice is to use a test data set per test class and in some exceptional cases a specific data set for a method.</p>
 
 </div>
 
