@@ -5,9 +5,11 @@
 
 Cookbook
 ~~~~~~~~
-    This page helps you to configure Unitils and to get started quickly, using a few simple examples. This cookbook contains only typical 
-    configuration. A complete documented reference of all configuration options can be found in {{{unitils-default.properties} unitils-default.properties}}. 
-    For more elaborate information about Unitils and its configuration, we refer to the {{{documentation.html} tutorial}}.
+    This page helps you to get started quickly with Unitils. Code and configuration are explained using a few simple examples.  
+    
+    This cookbook contains only typical configuration. More elaborate information about Unitils and its configuration can be found 
+    in the {{{documentation.html} tutorial}}. A complete documented reference of all configuration options can be found in 
+    {{{unitils-default.properties} unitils-default.properties}}. 
    
     The third party libraries required by Unitils can be found on the {{{dependencies.html}dependencies}} page.
     
@@ -71,7 +73,7 @@ public class UserServiceTest extends UnitilsJUnit4 {
 }
 +-----+
 
-** Description    
+** Description
 ~~~~~~~~~~~~~~
 
     * a lenient EasyMock mock object of type <UserDAO> is created and assigned to the <mockUserDao> field
@@ -91,13 +93,15 @@ public class UserServiceTest extends UnitilsJUnit4 {
     []
     
     
+    
+    
 * Database testing
 ~~~~~~~~~~~~~~~~~~
-    To enable database testing the Unitils way, you should start by setting up a unit test database for every developer in your 
-    team. In our typical configuration shown below, we assume that for every developer, a separate test database schema was created on the 
-    same database instance.    
+    To enable database testing, you should start by setting up a unit test database for every developer in the team. In our typical 
+    configuration shown below, we assume that these separate unit test schemas were created on the same database instance.
   
-    Create a file named unitils.properties and make it available in the root of your classpath. It should contain following properties:
+    Start by creating a file named <unitils.properties> and make it available somewhere in your classpath. It should contain 
+    following properties:
   
 +------+
 # Name or path of the user specific properties file. This file should contain the necessary parameters to connect to the
@@ -116,8 +120,8 @@ database.url=<my database connection url>
 database.dialect=<my databasa dialect>
 +------+
 
-    Next, create a file unitils-<myproject>-local.properties and put this file in your local user home directory. The file should contain 
-    following properties:
+    Next, create a file <unitils-\<myproject\>-local.properties> and put this file in the local user home directory. The file 
+    should contain following properties:
 
 +------+
 database.userName=<developers database login username>
@@ -125,15 +129,68 @@ database.password=<developers database login password>
 database.schemaName=<developers database schema name>
 +------+
 
+    Following is an example of a database test:
+    
++-----+
+public class UserDaoTest extends UnitilsJUnit4 {
+    
+    @TestDataSource
+    private DataSource dataSource;
+    
+    private UserDao userDao;
+        
+    @Before
+    public void setUp() {
+        userDao = new UserDao();
+        userDao.setDataSource(dataSource);
+    }
+    
+    @DataSet
+    @Test
+    public void testFindUserByLastName() {
+        List<User> users = userDao.findByLastName("Doe");
+        ReflectionAssert.assertLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+    }
+}
++-----+
+
+    This is the test data file: <UserDaoTest.xml>
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE dataset SYSTEM "<path to database dtd>">
+<dataset>
+    <user firstname="John" lastname="Doe"/>
+    <user firstname="Jane" lastname="Doe"/>
+    <user firstname="Jack" lastname="Smith"/>
+</dataset>
++-----+
+
+** Description
+~~~~~~~~~~~~~~
+
+    * a <DataSource> is created that provides access to unit test database as configured in <unitils.properties> and <unitils-\<myproject\>-local.properties>
+      and is injected in the <dataSource> field      
+    
+    * in thet setUp method of the test a new instance of the <UserDao> is created and configured with the datasource instance
+    
+    * Unitils looks for a DbUnit dataset file named <UserDaoTest.xml> or <UserDaoTest.testFindUserByLastName.xml>
+    
+    * <UserDaoTest.xml> is found and loaded in the database
+    
+    * the test method is invoked
+    
+    * using <ReflectionAssert> the first names of the users are compared with the expected names ignoring the actual order of the list
+    
+    * when the test is finished, all opened Hibernate sessions are automatically closed
+    
+    []
 
 
-
-* Enable automatic developers' database maintenance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    To enable automatic maintenance of the developers' test databases, start with adding a database scripts folder to your source control system, 
-    in which you will add all your database schema update scripts.
-  
-    Next, add following properties to unitils.properties:
+* Automatic maintenance of unit test databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    To enable automatic maintenance of the developers' unit test databases, start with creating a database scripts folder. Add this folder 
+    to your source control system. Next, add following properties to <unitils.properties>:
   
 +------+
 # If set to true, the DBMaintainer will be used to update the unit test database schema. This is done once for each
@@ -162,94 +219,87 @@ dbMaintainer.cleanDb.tablesToPreserve=<Optional list of tables from which the da
 dbMaintainer.clearDb.itemsToPreserve=<Optional list of database items that shouldn't be dropped>
 +------+
 
-    After this, place one or more scripts in the folder configured by dbMaintainer.fileScriptSource.scripts.location that 
-    create you database tables. E.g.:
+    Every time an update DDL script is created, add it to the database scripts folder. The name of this script should
+    comply with following naming convention: <\<version\>_\<some name\>.sql>. For example:
     
 +-----+
 dbscripts / 001_user_table.sql
             002_company_table.sql
-
 +-----+
 
-    Following is an example of a database test:
+    Unitils detects that a script was added and will invoke it on the database. If one of the existing scripts is altered, the
+    database is dropped and created from scratch, re-invoking all of the scripts. When the database is updated a DTD is generated 
+    that can be used for writing DBUnit data sets. 
     
-+-----+
-public class UserDaoTest extends UnitilsJUnit4 {
-
-    // DataSource that provides access to unit test database is injected
-    @TestDataSource
-    public void setDataSource(DataSource dataSource) {
-        // ... (code that makes sure projects makes use of this DataSource)
-    }
-
-    // DbUnit dataset file with name UserDaoTest.xml or UserDaoTest.testFindUserByLastName.xml is loaded
-    @DataSet
-    @Test
-    public void testFindUserByLastName() {
-        List<User> users = userDao.findByLastName("Doe");
-        assertLenEquals("firstName", Arrays.asList("John", "Jane"), users);
-    }
-}
-+-----+
-
-    Test data file UserDaoTest.xml:
-
-+-----+
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE dataset SYSTEM "<path to database dtd>">
-<dataset>
-    <user firstname="John" lastname="Doe"/>
-    <user firstname="Jane" lastname="Doe"/>
-    <user firstname="Jack" lastname="Smith"/>
-</dataset>
-+-----+
-
-
+    
 
 
 * Enable Hibernate support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
     To make use of Unitils' Hibernate support, first make sure the database support is configured correctly as described above and that you have hibernate
-    in your classpath. Also make sure the property <HibernateModule.configuration.implClassName> is set to the subclass of org.hibernate.cfg.Configuration that 
-    you make use of. If you don't make use of Hibernate with annotations, change the value of this property to be the following:
+    in your classpath. Note: if you use Spring, the Hibernate configuration can also be performed from an application context (See next section).
+    
+    Set the property <HibernateModule.configuration.implClassName> to the subclass of <org.hibernate.cfg.Configuration> that you want to use. By default
+    an instance of <org.hibernate.cfg.AnnotationConfiguration> will be created. If you don't make use of Hibernate with annotations, change the value of 
+    this property to the following:
 
 +-----+
 HibernateModule.configuration.implClassName=org.hibernate.cfg.Configuration
 +-----+
 
-    Now you're ready to start writing tests with Hibernate, e.g.:
+    Following is an example of a tests with Hibernate:
 
 +-----+
-// A Hibernate <Configuration> or <AnnotationConfiguration> object is instantiated, and configured using the
-// config file <hibernate.cfg.xml>
 @HibernateSessionFactory("hibernate.cfg.xml")
-public class BaseHibernateTest extends UnitilsJUnit3 {
+public class UserDaoTest extends UnitilsJUnit4 {
 
-    // A <SessionFactory> is created and this method is called before each test with the 
-    // SessionFactory as parameter
     @HibernateSessionFactory
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        // ... (code that makes sure project code makes use of this SessionFactory)
+    private SessionFactory sessionFactory;
+    
+    private UserDao userDao;
+    
+    @Before
+    public void setUp() {
+        userDao = new UserDao();
+        userDao.setSessionFactory(sessionFactory);
     }
   
     @Test
     public void testFindUserByLastName() {
-        List<User> users = hibernateUserDao.findByLastName("Doe");
+        List<User> users = userDao.findByLastName("Doe");
         ReflectionAssert.assertLenEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
-
 }
 +-----+
 
-    Unitils is shipped with a ready-to-use unit test that verifies if the mapping of all your mapped classes is consistent with the database. This 
+** Description
+~~~~~~~~~~~~~~
+
+    * a Hibernate <Configuration> or <AnnotationConfiguration> object is instantiated, and configured using the <hibernate.cfg.xml> config file 
+
+    * a <SessionFactory> is created and injected in the <sessionFactory> field
+    
+    * in thet setUp method of the test a new instance of the <UserDao> is created and configured with the session factory instance
+    
+    * the test method is invoked
+    
+    * using <ReflectionAssert> the first names of the users are compared with the expected names ignoring the actual order of the list
+    
+    []
+
+
+** Testing the mapping
+~~~~~~~~~~~~~~~~~~~~~~
+    Unitils is shipped with a ready-to-use unit test that verifies if the mapping of all your mapped classes is consistent with the database structure. This 
     test is not automatically executed; you should write a unit test that looks like the following:
 
-+-----+
-public class HibernateMappingTest extends BaseHibernateTest {
 
-    public void testMappingToDatabase() {
-        // Verify the mapping of all hiberate mapped objects with the database
-        HibernateUnitils.assertMappingToDatabase();
++-----+
+@HibernateSessionFactory("hibernate.cfg.xml")
+public class HibernateMappingTest extends UnitilsJUnit4 {
+
+    public void testMappingToDatabase() {        
+        HibernateUnitils.assertMappingWithDatabaseConsistent();
     }
 }
 +-----+
@@ -259,32 +309,32 @@ public class HibernateMappingTest extends BaseHibernateTest {
   
 * Spring integration
 ~~~~~~~~~~~~~~~~~~~~
-    Aside from ApplicationContext management and injection of Spring beans in your test, Unitils' Spring integration allows testing using a
-    Hibernate SessionFactory that is configured in Spring:
+    To make use of Unitils' Spring support, first make sure the database support is configured correctly as described above and that you have spring
+    in your classpath. 
+    
+    Following is an example of a tests with Spring:
     
 +-----+
-// Create a Spring ApplicationContext object and intialized with the file services-config.xml
-@ApplicationContext("services-config.xml")
+@SpringApplicationContext("services-config.xml")
 public class UserDaoTest extends UnitilsJUnit4 {
-
-    // The userDao bean, which is wired with an SessionFactory that is connected to the UnitilsDataSource, 
-    // is injected into the userDao field
+    
     @SpringBean("userDao")
     protected UserDao userDao;
   
+    @Test
     public void testFindUserByLastName() {
-        List<User> users = hibernateUserDao.findByLastName("Doe");
-        assertLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        List<User> users = userDao.findByLastName("Doe");
+        ReflectionAssert.assertLenEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
   
-    public void testMappingToDatabase() {
-        // Verify the mapping of all hiberate mapped objects with the database
+    @Test
+    public void testMappingToDatabase() {        
         HibernateAssert.assertMappingWithDatabaseConsistent();
     }
 }
 +-----+
 
-    services-config.xml:
+    This is the configuration file: <services-config.xml>
 
 +-----+
 <?xml version="1.0" encoding="UTF-8"?>
@@ -312,3 +362,24 @@ public class UserDaoTest extends UnitilsJUnit4 {
   
 </beans>
 +-----+
+
+
+** Description
+~~~~~~~~~~~~~~
+
+    * a Spring <ApplicationContext> instance is created and intialized with the <services-config.xml> file
+    
+    * the configured <UnitilsDataSource> will connect to the unit test database as configured in <unitils.properties> and <unitils-\<myproject\>-local.properties>
+    
+    * Spring wires the <userDao> Spring bean with a <SessionFactory> that uses the <UnitilsDataSource> 
+    
+    * the Spring bean named <userDao> is retrieved from the application context and injected in the <userDao> field    
+    
+    * the first test method, <testFindUserByLastName>, is invoked
+    
+    * using <ReflectionAssert> the first names of the users are compared with the expected names ignoring the actual order of the list
+    
+    * the second test method, <testMappingToDatabase>, is invoked. This test checks whether the Hibernate mapping is consistent with the database. This test uses
+      the Hibernate configuration as defined in the application context. 
+    
+    []
