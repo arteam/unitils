@@ -1460,87 +1460,81 @@ for complex queries. Following the rules in the description helps you in writing
 
 <h4>Description</h4>
 
-<p>Complex queries are a big problem in unit testing. Because of changing database structure and changing requirements, these queries and
-their tests require a lot of maintenance. Because of this, developers often refrain from writing tests for them. This is a pity, because unit tests are the
-most effective way for guaranteeing the correctness.</p>
+<p>Unit tests can be most effective for guaranteeing the correctness of a query, expecially for complex queries. It can also prove invaluable 
+for making sure that changes to the database did not brake any of the other queries.</p>
 
-<p>Following steps can be performed for testing a query:</p>
+<p>Following steps can be performed when writing a unit test for a query:</p>
 
 <ul>
-    <li><p>Create a test data file, with one or a few records that should be included in the result of the query.</p></li>
+    <li><p>Create a test data set with one or a few records that should be included in the result of the query.</p></li>
     <li><p>Add one or a few records to these file that should not be included in the result of the query.</p></li>
-    <li><p>For each of the above mentioned records, only add the ID columns and the columns involved in join conditions or the where clause.</p></li>
-    <li><p>Write a test that invokes the query. Use CollectionAssert.assertMatches for comparing the ID fields of the result
-           with an array containing the IDs of the records that you expect to be returned.</p></li>
+    <li><p>For each of these records only add the key columns and the columns involved in join conditions and where clauses.</p></li>
+    <li><p>Write a test that invokes the query method.</p></li>
+    <li><p>Assert that the result is correct by comparing the returned key fields of the result with the expected record keys.</p></li>
 </ul>
+
+<p>We create a dataset so that we're able to test the expected query results. In this data set we also add records to test whether the query does 
+not return more than is expected, for example, because of a missing where clause. We make sure to only add data that is actually required for testing 
+the query, i.e. the join conditions and where clauses. This will keep your datasets as small and maintainable as possible 
+(See <a href="#3.7">3.7 Keep your test data files simple</a>). The same is true for checking the result: we only use ids to check whether the 
+correct results are returned (See <a href="#2.8">2.8 Keep test methods small</a>).</p>
+
 
 
 <h4>Examples</h4>
 
-<p>The following example shows a unit test for a somewhat more complex query. We try to limit the amount of data in the test file as much as possible.</p>
-
-<p>Let’s say that we have following tables in our database. Every user belongs to exactly one company. Companies can have a number of
-partnerships with other companies.</p>
+<p>The example shows a unit test for a query on a database that has following structure:</p>
 
 <div class="image-left"><img src="images/tables2.png" /></div>
 
-<p>Following DAO method returns a List of all users that belong to a company that have some kind of partnership with the given company (for
-example, to send them some kind of commercial mail).</p>
+<p>Every user belongs to exactly one company. Companies can have a number of partnerships with other companies. The DAO method under 
+test, findPartnershipUsers, returns a List of all users that belong to a company that have some kind of partnership with the given company.</p>
 
 <div class="source"><pre>
-public List findPartnershipUsers(Company comp) {
-
+public List&lt;User&gt; findPartnershipUsers(Company comp) {
     String query = &quot;select u.id, u.username, u.name, u.fname, u.roleid, u.company &quot;  
                    &quot;from user u, company c1, company c2, partnership p &quot; +
                    &quot;where u.companyid = c1.id &quot; +
-                   &quot; and p.company1id = c1.id &quot; +
-                   &quot; and p.company2id = c2.id &quot; +
-                   &quot; and c2.name = ?&quot;;
-    
-    // Code that executes query and returns result
+                   &quot;  and p.company1id = c1.id &quot; +
+                   &quot;  and p.company2id = c2.id &quot; +
+                   &quot;  and c2.name = ?&quot;;    
+    return invokeQuery(query);
 }
 </pre></div>
 
-<p>And we’ve written following unit test:</p>
+<p>We’ve written following unit test:</p>
 
 <div class="source"><pre>
-    protected void setUp() {
-    
-        company1 = new Company(1, &quot;Ordina&quot;);
-    }
-
-
-    public void testFindPartnershipUsers() {
-    
-        List foundUsers = userDao.findPartnershipUsers(company1);
-        CollectionAssert.assertMatches(new String[] {“2”}, foundUsers, “id”);      
-    }
+public void testFindPartnershipUsers() {
+    List&lt;User&gt; foundUsers = userDao.findPartnershipUsers("MyCompany");
+    ReflectionAssert.assertPropertyLenEquals("id", Arrays.asList(2), foundUsers);      
+}
 </pre></div>
 
-<p>With this data file:</p>
+<p>with this data file:</p>
 
 <div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
-
 &lt;dataset&gt;
+    
+    &lt;company id=&quot;1&quot; name=&quot;MyCompany&quot; /&gt;
+    &lt;user id=&quot;1&quot; companyid=&quot;1&quot; /&gt;
 
-      &lt;user id=&quot;1&quot; companyid=&quot;1&quot; /&gt;
-      &lt;company id=&quot;1&quot; name=&quot;Ordina&quot; /&gt;
-
-      &lt;user id=&quot;2&quot; companyid=&quot;2&quot; /&gt;
-      &lt;company id=&quot;2&quot; /&gt;
-      &lt;partnership company1id=&quot;1&quot; company2id=&quot;2&quot; /&gt;
-
-      &lt;user id=&quot;3&quot; companyid=&quot;3&quot; /&gt;
-      &lt;company id=&quot;3&quot; /&gt;
-      &lt;partnership company1id=&quot;2&quot; company2id=&quot;3&quot; /&gt;
+    &lt;company id=&quot;2&quot; /&gt;    
+    &lt;user id=&quot;2&quot; companyid=&quot;2&quot; /&gt;
+    
+    &lt;company id=&quot;3&quot; /&gt;
+    &lt;user id=&quot;3&quot; companyid=&quot;3&quot; /&gt;
+    
+    &lt;partnership company1id=&quot;1&quot; company2id=&quot;2&quot; /&gt;
+    &lt;partnership company1id=&quot;2&quot; company2id=&quot;3&quot; /&gt;
 
 &lt;/dataset&gt;
 </pre></div>
 
-<p>The data file defines 3 users, the first one being member of Ordina, the second is member of a second company, which is involved in a
-partnership with Ordina. The third user is member of company 3, which is a partner of company 2, but not a partner of Ordina. The second user is the only
-one that should be returned by the tested method.</p>
+<p>The data file defines 3 users, the first one being member of MyCompany, the second is member of a second company, which has a
+partnership with MyCompany. The third user is member of company 3, which is a partner of company 2, but not a partner of MyCompany. 
+Only the second user should be returned by the tested method, we therefore check whether the id of the returned user is equal to 2.</p>
 
 </div>
 
