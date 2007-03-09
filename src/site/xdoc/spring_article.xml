@@ -1,0 +1,264 @@
+<document>
+    <properties>    
+        <title>Unit testing with Unitils</title>
+    </properties>  
+    <body>    
+        <section name="Unit testing with Unitils">        
+
+<p>This article explains a brand new open source library for unit testing, called Unitils. Unitils helps you in writing simple and maintainable 
+unit tests with JUnit or TestNG. It glues together some widely used test libraries like DbUnit and EasyMock and offers integration with Spring and 
+Hibernate. Unitils helps applying good practices and unit testing guidelines. The idea's behind the code are based on the authors' concrete 
+experience on enterprise projects.</p>
+
+<br />    
+<h3>Unitils features</h3>
+
+<p><b>Unitils offers following features</b></p>
+<ul>
+    <li><p>Equality assertion through reflection, with options like ignoring Java default/null values and ignoring order of collections</p></li>
+    <li><p>Support for database testing involving test data management with DbUnit, automatic maintenance of unit test databases and automatic constraints disabling</p></li>
+    <li><p>Hibernate integration features such as session management and testing the mapping with the database</p></li>
+    <li><p>Integration with Spring, involving ApplicationContext management and easy injection of spring managed beans</p></li>
+    <li><p>Integration with EasyMock and injection of mocks into other objects</p></li>
+</ul>
+
+<p>In what follows, we demonstrate some of Unitils' most powerful features with a simple example: a test for a DAO method that uses Hibernate to 
+connect to a relational database.</p>
+
+<h3>Example</h3>
+
+<p>Suppose we have a Phonebook interface for which we've written an implementation using Hibernate and Spring's HibernateDaoSupport. The Phonebook 
+interface has a method searchByLastName. An implementation could be:</p>
+
+<div class="source"><pre>
+public class HibernatePhonebook extends HibernateDaoSupport implements Phonebook {
+
+    public List&lt;Person&gt; searchByLastName(String lastName) {
+        return (List&lt;Person&gt;) getHibernateTemplate().executeFind(new HibernateCallback() {
+                public Object doInHibernate(Session session) throws HibernateException, SQLException {
+                    Criteria personCriteria = session.createCriteria(Person.class);
+                    personCriteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+                    personCriteria.add(Restrictions.like("lastName", criteria.getLastName(), MatchMode.ANYWHERE));
+                    return personCriteria.list();
+                }
+        });
+    }
+}
+</pre></div>
+
+<p>We've written following test for this method:</p>
+
+<div class="source"><pre>
+@ApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
+public class UnitilsHibernatePhonebookTest extends UnitilsJUnit3 {
+    
+    @SpringBeanByType
+    private Phonebook phonebook;
+
+    @DataSet
+    public void testSearchByLastName() {
+        List&lt;Person&gt; result = phonebook.searchByLastName("Doe"));        
+        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), result);    
+    }
+}
+</pre></div>
+
+<p>This test method example seems to be a plain old JUnit test. But when it's executed, a lot of magic happens behind the scenes. This 'magic' is in fact the 
+Unitils framework that hooks in to the execution of the test, and inspects the test for annotations that ask for extra behavior to be executed.</p>
+
+<p>Let's take a look at the lines of code and annotations of interest and explain their effect.</p>
+
+<p>First of all, the class definition states:</p>
+
+<div class="source"><pre>
+public class UnitilsHibernatePhonebookTest extends UnitilsJUnit3 {
+</pre></div>
+
+<p>Extending from UnitilsJUnit3 is the simplest way to make a test Unitils-enabled. It not only makes this class a JUnit3 test (in fact, 
+<i>UnitilsJunit3</i> is a subclass of <i>junit.framework.TestCase</i>), but it also contains logic that enables Unitils to hook up into the execution of a 
+unit test. For JUnit4 and TestNG, Unitils offers similar base classes called <i>UnitilsJUnit4</i> and <i>UnitilsTestNG</i>, respectively.</p>
+
+<p>The UnitilsHibernatePhonebookTest class is annotated like this:</p>
+
+<div class="source"><pre>
+@ApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
+</pre></div>
+
+<p>The <i>@ApplicationContext</i> annotation instructs Unitils to load a Spring <i>ApplicationContext</i>, in which the files <i>services-config.xml</i> and 
+<i>test-ds-config.xml</i> are loaded. This enables us to make Spring wired beans available for testing in a simple way:</p>
+
+<div class="source"><pre>
+@SpringBeanByType
+private Phonebook phonebook;
+</pre></div>
+
+<p>By annotating the phonebook field with @SpringBeanByType, we tell the system to find a bean of type PhoneBook in the ApplicationContext and inject it 
+into the annotated field. Setter injection is also supported: simply move the annotation to a setter with the matching type. If you prefer injection by name, you 
+can use either @SpringBean or @SpringBeanByName. When using @SpringBean, you have to specify the bean's name explicitly; in case of @SpringBeanByName, the 
+name of the target setter or field is used.</p>
+
+<p>We haven't shown you anything new yet, since these features are also offered by Spring's own <i>AbstractDependencyInjectionSpringContextTests</i>. But with 
+Unitils, you're not bound to a specific superclass or test framework to be able to use this functionality. Anyway, we got a lot more to offer than Spring 
+integration: read on to find out.</p>
+
+<p>Let's take a look at services-config.xml and test-ds-config.xml:</p>
+
+<p>services-config.xml:</p>
+
+<div class="source"><pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans&gt;
+
+    &lt;bean id="phonebook" class="org.unitils.sample.phonebook.impl.HibernatePhoneBook"&gt;
+        &lt;property name="sessionFactory" ref="sessionFactoryBean"/&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id="sessionFactoryBean" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"&gt;
+        &lt;property name="dataSource" ref="dataSource"/&gt;
+        &lt;property name="annotatedClasses"&gt;
+            &lt;list&gt;
+                &lt;value&gt;org.unitils.sample.phonebook.domain.Person&lt;/value&gt;
+            &lt;/list&gt;
+        &lt;/property&gt;
+        &lt;property name="hibernateProperties"&gt;
+            &lt;value&gt;
+                hibernate.dialect=org.hibernate.dialect.HSQLDialect
+                hibernate.show_sql=true
+            &lt;/value&gt;
+        &lt;/property&gt;
+    &lt;/bean&gt;
+    
+&lt;/beans&gt;
+</pre></div>
+
+<p>test-ds-config.xml:</p>
+
+<div class="source"><pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans&gt;
+    &lt;bean id="dataSource" class="org.unitils.database.UnitilsDataSource" /&gt;
+&lt;/beans&gt;
+</pre></div>
+
+<p><i>services-config.xml</i> is a general spring configuration file for our application, the bean definitions in this file don't need to be modified for 
+testing purposes. test-ds-config.xml defines the test datasource for the phonebook service; this file exists for testing purposes only. Another 
+spring configuration file exists that defines the DataSource for normal application use.</p>
+
+<p>The <i>DataSource</i> is an instance of <i>UnitilsDataSource</i>. It is a connection pooled data source, providing access to the unit-test database. 
+The configuration of this data source is specified in a Unitils configuration file. We won't explain how to configure Unitils in this article, for this 
+we refer to our cookbook and tutorial pages.</p>
+
+<p>Now let's return to the test. To make sure test data is loaded, we can use the <i>@DataSet</i> annotation either on class level (load test data for every 
+method) or on method level (load test data for this method only). In our example, the method is annotated:</p>
+
+<div class="source"><pre>
+@DataSet
+public void testSearch() {
+</pre></div>
+
+<p>This will make sure that before running the test, our test database is populated with data from a dataset file. The system searches for a DbUnit 
+file either named <i>UnitilsHibernatePhonebookTest.testSearch.xml</i> or <i>UnitilsHibernatePhonebookTest.xml</i>. The former can be used if you want to create a 
+dataset for one method specifically, the latter is the default one for all the tests in this test class. The dataset is formatted as a DbUnit 
+<i>FlatXmlDataSet</i> as follows:</p>
+
+<div class="source"><pre>
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;dataset&gt;
+    &lt;PERSON FIRSTNAME="John" LASTNAME="Doe" /&gt;
+    &lt;PERSON FIRSTNAME="Jane" LASTNAME="Doe" /&gt;
+    &lt;PERSON FIRSTNAME="Jim"  LASTNAME="Smith" /&gt;
+&lt;/dataset&gt;
+</pre></div>
+
+<p>After this, the unit test is executed. To express assert statements, we use Unitils' reflection assert utility. This utility uses java reflection to 
+compare all fields of the expected and actual object and all objects that are referenced by the expected or actual ones. You can also check whether a 
+certain property of every object in a collection matches a collection of expected values. E.g. you can specify the following:</p>
+
+<div class="source"><pre>
+ReflectionAssert.assertRefEquals(new Person("John", "Doe"), result.get(0));
+ReflectionAssert.assertPropertyRefEquals("firstName", Arrays.asList("John", "Jane"), result);    
+</pre></div>
+
+<p>The first assertion checks whether all field values of the Person object, in this case the first and last name, match those of the expected object. 
+The second one checks whether the first names of the objects in the result list are "John" and "Jane".</p>
+
+<p>A number of leniency levels is offered too, such as ignoring fields set to null or a Java default value in the expected object and ignoring the order 
+of collections. These leniency levels are offered by default by the method <i>assertLenEquals</i> (instead of <i>assertRefEquals</i>). E.g. in the following 
+assert statements:</p>
+
+<div class="source"><pre>
+ReflectionAssert.assertLenEquals(new Person("John", null), result.get(0));
+ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), result);    
+</pre></div>
+
+<p>The first statement verifies if the firstName field in the result object equals "John", but it ignores the other fields. The second one checks whether 
+the firstName field of the objects in the result list are "John" and "Jane", and the order of these values is ignored.</p>
+
+
+
+<h3>Hibernate mapping test</h3>
+
+<p>Unitils contains a very simple but powerful mapping test. This test checks whether the mapping of all Hibernate mapped objects is consistent with the 
+database. To activate it, just add following test to your test suite:</p>
+
+<div class="source"><pre>
+@ApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
+public class HibernateMappingTest extends UnitilsJUnit3 {
+
+    public void testMappingToDatabase() {
+        HibernateUnitils.assertMappingWithDatabaseConsistent();
+    }
+}
+</pre></div>
+
+<p>Suppose that the column PERSON.FIRSTNAME is missing in the test database. This will make the test fail with a message indicating that this column 
+should be added:</p>
+
+<div class="source"><pre>
+AssertionFailedError: Found mismatches between Java objects and database tables. Applying following DDL statements to the database should resolve the problem: 
+alter table PERSON add column firstName varchar(255);
+</pre></div>
+
+<p>You may have noticed that the @ApplicationContext annotation reappears in the test. To avoid this duplication, you can create a common superclass for 
+all database tests that contains the configuration.</p>
+
+
+
+<h3>Unit test database maintenance</h3>
+
+<p>To keep database tests maintainable, test data files have to be as small as possible. (Referential) constraints however don't help you to achieve this. 
+We advise to disable all foreign key and not null constraints. Doing so makes it possible to specify only the data that matters for your test. Also, to make 
+sure tests can be run without being affected by others, every developer must have its own test database or test database schema.</p>
+
+<p>To help you with this, Unitils provides a powerful database maintainer offering features such as automatic maintainance of your unit test schemas, 
+disabling of the foreign key and not-null constraints and generating a DTD for DbUnit dataset files.</p>
+
+<p>Using a simple example, we'll try to give you an impression of how this works. The database maintainer monitors a directory on the filesystem that contains 
+the DDL scripts that create the structure of the test database. E.g.:</p>
+
+<div class="source"><pre>
+dbscripts/ 001_create_person_table.sql
+           002_create_car_table.sql
+</pre></div>
+
+<p>Each test database contains a table in which it stores its current version number (in this case, the version number is 2). Suppose we add a file named 
+003_add_phonenumber.sql to this directory. The next time we execute a database test, this new script is executed and the version number is increased. If we 
+change the file 001_create_person_table.sql, Unitils will notice that an existing file has changed, drop all tables in the test database and recreate it from scratch.</p>
+
+
+
+<h3>Conclusion</h3>
+
+<p>In this article we've demonstrated how Unitils can improve your tests using a simple example. But Unitils offers more than this. If you're curious to learn 
+about it, check out the tutorial and our unit testing guidelines, and post your comments on our forum.</p>
+
+About the authors:
+...
+
+
+<br />
+<br />
+
+    </section>
+  </body>
+</document>
