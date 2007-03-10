@@ -15,7 +15,7 @@ experience on enterprise projects.</p>
     <li><p>Equality assertion through reflection, with options like ignoring Java default/null values and ignoring order of collections</p></li>
     <li><p>Support for database testing involving test data management with DbUnit, automatic maintenance of unit test databases and automatic constraints disabling</p></li>
     <li><p>Hibernate integration features such as session management and testing the mapping with the database</p></li>
-    <li><p>Integration with Spring, involving ApplicationContext management and easy injection of spring managed beans</p></li>
+    <li><p>Integration with Spring, involving ApplicationContext management and injection of spring managed beans</p></li>
     <li><p>Integration with EasyMock and injection of mocks into other objects</p></li>
 </ul>
 
@@ -106,7 +106,7 @@ can use either <i>@SpringBean</i> or <i>@SpringBeanByName</i>. When using <i>@Sp
 <i>@SpringBeanByName</i>, the name of the target setter or field is used.</p>
 
 <p>A similar functionality can by achieved by extending Spring's own <i>AbstractDependencyInjectionSpringContextTests</i>. But the strength of Unitils is that 
-it goes further, integrating with other testing tools such as DbUnit and enabling you to do the same with other test frameworks.  Read on and find out.</p>
+it goes further, integrating with other testing tools such as DbUnit and enabling you to do the same with other test frameworks.</p>
 
 
 
@@ -202,7 +202,7 @@ ReflectionAssert.assertPropertyRefEquals("firstName", Arrays.asList("John", "Jan
 <p>The first assertion checks whether all field values of the Person object, in this case the first and last name, match those of the expected object. 
 The second one checks whether the first names of the objects in the result list are "John" and "Jane".</p>
 
-<p>A number of leniency levels are offered too. You can for example ignore fields that have a null/0 Java default value in the expected object or ignore 
+<p>A number of leniency levels is offered too. You can for example ignore fields that have a null/0 Java default value in the expected object or ignore 
 the order of elements in a collection. These leniency levels are offered by default by the <i>assert<b>Len</b>Equals</i> 
 (instead of <i>assert<b>Ref</b>Equals</i>) methods. For example:</p>
 
@@ -237,7 +237,8 @@ public class HibernateMappingTest extends UnitilsJUnit3 {
 should be added:</p>
 
 <div class="source"><pre>
-AssertionFailedError: Found mismatches between Java objects and database tables. Applying following DDL statements to the database should resolve the problem: 
+AssertionFailedError: Found mismatches between Java objects and database tables. 
+Applying following DDL statements to the database should resolve the problem: 
 alter table PERSON add column firstName varchar(255);
 </pre></div>
 
@@ -280,8 +281,8 @@ and recreates it from scratch, starting again from the first script.</p>
 <br />
 <h3>Conclusion</h3>
 
-<p>In this article, using a few examples, we've tried to demonstrate how Unitils can improve your tests. If you're curious to learn more about Unitils, check out the 
-<a href="tutorial.html">tutorial</a>, <a href="cookbook.html">cookbook</a> and  our <a href="guidelines.html">unit testing guidelines</a>.</p>
+<p>In this article we've tried to demonstrate how Unitils can improve your tests, using a few simple examples. If you're curious to learn more about Unitils, check out the 
+<a href="tutorial.html">tutorial</a>, <a href="cookbook.html">cookbook</a> and our <a href="guidelines.html">unit testing guidelines</a>.</p>
 
 <p>We value your opinion. Let us know what you think. If you have any comments, tips or questions please post them on the user forum or contact us directly by sending 
 a mail to filip_neven at users.sourceforge.net or tim_ducheyne at users.sourceforge.net.</p>
@@ -289,7 +290,8 @@ a mail to filip_neven at users.sourceforge.net or tim_ducheyne at users.sourcefo
 
 <br />
 <h3>About the authors</h3>
-...
+<p>Tim Ducheyne...</p>
+<p>Filip Neven is a senior software enigneer at Ordina Belgium. He 's been doing enterprise projects at different companies as a Java developer, technical lead and as responsible for quality and unit testing. Together with Tim, he's co-lead developer of Unitils and he gave a Quicky presentation on Unitils on the latest Javapolis conference.</p>
 
 
 <br />
