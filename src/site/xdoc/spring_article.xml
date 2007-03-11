@@ -1,13 +1,13 @@
 <document>
     <properties>    
-        <title>Unit testing with Unitils</title>
+        <title>Testing Hibernate - Spring applications with Unitils</title>
     </properties>  
     <body>    
-        <section name="Unit testing with Unitils">        
+        <section name="Testing Hibernate - Spring applications with Unitils">        
 
-<p>This article explains a brand new open source library for unit testing, called Unitils. Unitils helps you in writing simple and maintainable 
+<p>This article demonstrates a brand new open source library for unit testing, called Unitils. Unitils helps you in writing simple and maintainable 
 unit tests with JUnit or TestNG. It glues together some widely used test libraries like DbUnit and EasyMock and offers integration with Spring and 
-Hibernate. Unitils helps applying good practices and unit testing guidelines. The idea's behind the code are based on the authors' concrete 
+Hibernate. Unitils encourages applying good practices and unit testing guidelines. The idea's behind the code are based on the authors' concrete 
 experience on enterprise projects.</p>
 
 <p><b>Unitils offers following features</b></p>
@@ -285,13 +285,16 @@ and recreates it from scratch, starting again from the first script.</p>
 <a href="tutorial.html">tutorial</a>, <a href="cookbook.html">cookbook</a> and our <a href="guidelines.html">unit testing guidelines</a>.</p>
 
 <p>We value your opinion. Let us know what you think. If you have any comments, tips or questions please post them on the user forum or contact us directly by sending 
-a mail to filip_neven at users.sourceforge.net or tim_ducheyne at users.sourceforge.net.</p>
+a mail to <i>filip_neven at users.sourceforge.net</i> or <i>tim_ducheyne at users.sourceforge.net</i>.</p>
 
 
 <br />
 <h3>About the authors</h3>
-<p>Tim Ducheyne...</p>
-<p>Filip Neven is a senior software enigneer at Ordina Belgium. He 's been doing enterprise projects at different companies as a Java developer, technical lead and as responsible for quality and unit testing. Together with Tim, he's co-lead developer of Unitils and he gave a Quicky presentation on Unitils on the latest Javapolis conference.</p>
+<p><b>Filip Neven</b> and <b>Tim Ducheyne</b> are senior software enigneers at <a href="http://www.j-technologies.be/">Ordina Belgium</a>. They both have more 
+than 6 years experience in designing and developing Java enterprise applications. They were the leaders of an expert group on unit testing within Ordina. 
+Later, they founded the Unitils open source project in which they worked out a number of their ideas. Today they are still actively working on 
+Unitils as the project's lead developers. Recently, Filip Neven gave a Quicky presentation on Unitils at the Javapolis conference.</p>
+
 
 
 <br />
