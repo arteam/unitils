@@ -1,9 +1,9 @@
 <document>
     <properties>    
-        <title>Testing Hibernate - Spring applications with Unitils</title>
+        <title>Testing Spring - Hibernate applications with Unitils</title>
     </properties>  
     <body>    
-        <section name="Testing Hibernate - Spring applications with Unitils">        
+        <section name="Testing Spring - Hibernate applications with Unitils">        
 
 <p>This article demonstrates a brand new open source library for unit testing, called Unitils. Unitils helps you in writing simple and maintainable 
 unit tests with JUnit or TestNG. It glues together some widely used test libraries like DbUnit and EasyMock and offers integration with Spring and 
