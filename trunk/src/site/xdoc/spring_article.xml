@@ -6,9 +6,10 @@
         <section name="Testing Spring - Hibernate applications with Unitils">        
 
 <p>This article demonstrates a brand new open source library for unit testing, called Unitils. Unitils helps you in writing simple and maintainable 
-unit tests with JUnit or TestNG. It glues together some widely used test libraries like DbUnit and EasyMock and offers integration with Spring and 
-Hibernate. Unitils encourages applying good practices and unit testing guidelines. The idea's behind the code are based on the authors' concrete 
-experience on enterprise projects.</p>
+unit tests with <a href="http://www.junit.org/">JUnit</a> or <a href="http://testng.org/">TestNG</a>. It glues together some widely used test libraries 
+like <a href="http://www.dbunit.org/">DbUnit</a> and <a href="http://www.easymock.org">EasyMock</a> and offers integration with 
+<a href="http://www.springframework.org">Spring</a> and <a href="http://www.hibernate.org/">Hibernate</a>. Unitils encourages applying good practices and 
+unit testing guidelines. The ideas behind the code are based on the authors' concrete experience on enterprise projects.</p>
 
 <p><b>Unitils offers following features</b></p>
 <ul>
@@ -243,7 +244,7 @@ alter table PERSON add column firstName varchar(255);
 </pre></div>
 
 <p>You may have noticed that the <i>@ApplicationContext</i> annotation reappears in the test. To avoid this duplication, you can create a common superclass for 
-all database tests that contains the configuration.</p>
+all database tests that contain the configuration.</p>
 
 
 
@@ -272,8 +273,8 @@ dbscripts/ 001_create_person_table.sql
 
 <p>Suppose we add a file named <i>003_add_phonenumber.sql</i> to this directory. The next time a database test is executed, the database maintainer will notice that the
 structure of the unit test database is no longer up to date and executes the new script on the database. It then increases the version of the database. Changes to 
-existing files, e.g. <i>001_create_person_table.sql</i> will also be detected by the database maintainer. In that case, it will drop all all tables in the test database 
-and recreates it from scratch, starting again from the first script.</p>
+existing files, e.g. <i>001_create_person_table.sql</i> will also be detected by the database maintainer. In that case, it will drop all tables in the test database 
+and recreate it from scratch, starting again from the first script.</p>
 
 
 
@@ -290,10 +291,10 @@ a mail to <i>filip_neven at users.sourceforge.net</i> or <i>tim_ducheyne at user
 
 <br />
 <h3>About the authors</h3>
-<p><b>Filip Neven</b> and <b>Tim Ducheyne</b> are senior software enigneers at <a href="http://www.j-technologies.be/">Ordina Belgium</a>. They both have more 
+<p><b>Filip Neven</b> and <b>Tim Ducheyne</b> are senior software enigneers at <a href="http://www.j-technologies.be/">Ordina Belgium</a>. They each have more 
 than 6 years experience in designing and developing Java enterprise applications. They were the leaders of an expert group on unit testing within Ordina. 
 Later, they founded the Unitils open source project in which they worked out a number of their ideas. Today they are still actively working on 
-Unitils as the project's lead developers. Recently, Filip Neven gave a Quicky presentation on Unitils at the Javapolis conference.</p>
+Unitils as the project's lead developers. Recently, Filip gave a Quicky presentation on Unitils at the Javapolis conference.</p>
 
 
 

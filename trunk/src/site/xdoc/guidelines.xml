@@ -993,7 +993,7 @@ public class User {
         if (ssn == null &amp;&amp; user.ssn == null) {              <span class="code-comment">//</span>
             return true;                                    <span class="code-comment">// Business logic</span>
         }                                                   <span class="code-comment">//</span>
-        return (ssn != null &amp;&amp; ssn.equals(user.ssn))        <span class="code-comment">//</span>
+        return (ssn != null &amp;&amp; ssn.equals(user.ssn))        <span class="code-comment">//</span>
     }
 
 
