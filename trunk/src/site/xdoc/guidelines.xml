@@ -742,14 +742,14 @@ public class AuthenticatedUserRepository
     }
 
 
-		/**
-		 * Verifies if the user is autenticated
-		 *
-		 * @return true if the user is authenticated, false otherwise
-		 */
-		public boolean isAuthenticated(User user) {
-				return authenticatedUserMap.get(user.getSsn()) != null;
-		}
+    /**
+     * Verifies if the user is autenticated
+     *
+     * @return true if the user is authenticated, false otherwise
+     */
+    public boolean isAuthenticated(User user) {
+        return authenticatedUserMap.get(user.getSsn()) != null;
+    }
 
 
     /** 
@@ -1310,7 +1310,7 @@ performed incrementally or by recreating the database from scratch.</p>
 maintenance. This can be done:</p>
 <ul>
     <li><p><i><u>From scratch</u></i>: By dropping and recreating the test database each time a structure update occurs</p></li>
-		<li><p><i><u>Incrementally</u></i>: By individually applying every update to the database structure</p></li>
+    <li><p><i><u>Incrementally</u></i>: By individually applying every update to the database structure</p></li>
 </ul>
 
 <p>The advantage of the from-scratch approach is the simplicity: You only have to maintain a script containing the complete database
@@ -1330,10 +1330,9 @@ schemas from scratch.</p>
 
 <p>For distributing the changes to the unit test databases, you can use either a push or a pull strategy:</p>
 <ul>
-		<li><p><i><u>Push strategy</u></i>: The developer performing the database structure change, applies the change to all unit-test databases, 
-		using some tool or script.</p></li>
-		<li><p><i><u>Pull strategy</u></i>: Database changes are made available as scripts in a shared directory or in the version control system. 
-		Newly created or updated scripts are applied to the test database before executing a database test.</p></li>
+    <li><p><i><u>Push strategy</u></i>: The developer performing the database structure change, applies the change to all unit-test databases, using some tool or script.</p></li>
+    <li><p><i><u>Pull strategy</u></i>: Database changes are made available as scripts in a shared directory or in the version control system. 
+        Newly created or updated scripts are applied to the test database before executing a database test.</p></li>
 </ul>
 
 <p>In absence of supporting tools, choosing a push strategy is the most obvious decision for a project, because it is simple to set up. You only 
@@ -1894,7 +1893,6 @@ but forget to add this column in the database. The <i>HibernateMappingTest</i> n
 AssertionFailedError: Found mismatches between Java objects and database tables. 
 Applying following DDL statements to the database should resolve the problem: 
 alter table PERSON add column firstName varchar(255);
-g
 </pre></div>
 
 </div>
