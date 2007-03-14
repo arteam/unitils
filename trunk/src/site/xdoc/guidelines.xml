@@ -99,7 +99,7 @@ the project that test the code as whole. Examples are integration tests, user ac
 line of code is used in at least one test. Of course this requires you to write lots and lots of tests, probably spending 
 more time writing and maintaining tests than writing code.</p>
 
-<p>The other extreme is writing no tests at all. We think the ideal lies somewhere in the middle. Adding a few unit tests 
+<p>The other extreme is writing no tests at all. We think the ideal lies somewhere in between. Adding a few unit tests 
 for some piece of code already catches most of the bugs in that code while staying maintainable and keeping focus on the 
 project code.</p>
 
@@ -110,7 +110,7 @@ project code.</p>
     <li><p>tests for boundary conditions (such as null arguments)</p></li>
 </ul>
 
-<p>The main focus of the guidelines is to make unit-testing easy and maintainable. Writing a test should be quick and a 
+<p>The main focus of the guidelines is to make unit-testing easy and maintainable. Writing a test shouldn't take much time and a 
 test should not hinder you when code is being altered and refactored.</p>
 
 <p>Deciding on a unit testing strategy means deciding which layers of the software system will be tested (GUI, business, 
@@ -128,12 +128,11 @@ unit tests:</p>
     <li><p><a href="http://www.junit.org/">JUnit</a> - base test library</p></li>
     <li><p><a href="http://testng.org/">TestNG</a> - base test library</p></li>
     <li><p><a href="http://dbunit.sourceforge.net/">DbUnit</a> - tests using a database</p></li>
-    <li><p><a href="http://sourceforge.net/projects/junit-addons">JUnit Addons</a> - testing utilities</p></li>
     <li><p><a href="http://www.easymock.org/">EasyMock</a> - simulating behavior</p></li>
 </ul>
 
-<p>Aside from these libraries there is also a library that we created our own, that already implements or helps 
-implementing many of the functionality described by the guidelines: <b>Unitils</b></p>
+<p>Aside from these libraries there is also a library that we created our own, that helps 
+implementing much of the functionality described in these guidelines: <b>Unitils</b></p>
 
 
 
@@ -171,19 +170,19 @@ implementing many of the functionality described by the guidelines: <b>Unitils</
 <p>Test classes typically contain a data setup part and a test part. The setup part is performed in 
 the setUp() method and contains the instantiation of the class under test instance and all objects that 
 will be used as data during the test (See  <a href="#2.4">Create test data during setup</a>). 
-The class under test instance is the object on which methods will be called to perform the actual tests. 
-There should only be one such instance per test class and it should be created in the setUp() method.</p>
+The class under test instance is the object on which the tested methods are called. 
+Typically there is only one such instance per test class and it should be created in the setUp() method.</p>
 
 <p>Verification of results is performed by using assert statements. You should only add asserts if they are of value 
 for the test (See <a href="#2.8">Keep test methods small</a>). If objects need to be compared, use Unitils’ ReflectionAssert 
 instead of a regular assertEquals() (See <a href="#2.11">Use reflection for equality checking</a>). Assert statements can have 
 messages as arguments that will be used when the assertion fails. These messages do not have much added-value and can therefore 
-be left out. E.g. both assertions below deliver the same result, but it's less work to use the second version:</p>
+be left out. E.g. both assert statements in the example below give the same result, but it's less work to use the second version:</p>
  
 <p><pre><code>  assertEquals(“Name is not equal”, “John”, result.getFirstName());
   assertEquals(“John”, result.getFirstName());</code></pre></p>
 
-<p>All bad smells that you can have for regular code you can also have in your test code. Test classes can for 
+<p>All bad smells that you can have for regular code are also applicable to test code. Test classes can for 
 example contain duplicate code or become too big because too many tests were added to them. You should
 react to these smells as you would with normal code: refactor the code.</p>
 
@@ -273,7 +272,7 @@ public class UserAdminTest extends TestCase {
 If there is more than 1 test class for a certain class (see <a href="#2.5">Keep your test fixture simple</a>) use the same 
 convention, but add an extra name in front of ‘Test’. This extra name should give an indication of the kind of tests in this class.</p>
 
-<p>The naming of test methods is similar, but instead of using a suffix, we use a prefix <i>‘test’</i>, followed by the name of 
+<p>The naming of test methods is similar, but instead of using a suffix, we use the prefix <i>‘test’</i>, followed by the name of 
 the method under test (capitalize the first letter as with other method names). If there is more than 1 test for a certain method 
 name all special cases by adding an underscore (‘_’) and an extra name. This extra name should again give an indication of the subject 
 of the test.</p>
@@ -339,7 +338,7 @@ deliverables such as JARs and EARs that do not include any of the test classes.<
 
 <ul>
     <li><p>can use objects that were created during the setup of the test class</p></li>
-    <li><p>may perform additional configuration (not creation) of test data during their own setup</p></li>
+    <li><p>may perform some additional configuration of test data during their own setup</p></li>
 </ul>
 
 
@@ -347,7 +346,7 @@ deliverables such as JARs and EARs that do not include any of the test classes.<
 
 <p>If you need non-trivial test data in your test methods, put them in instance variables of the test class. Initialize the 
 instance variables during the setup phase of the test. This set of test data objects is called the fixture of the test. Trivial 
-test data such as strings and integers should not be added to the fixture and can be used directly as arguments in the test methods.</p>
+test data such as strings and integers are typically not added to the fixture and used directly as arguments in the test methods.</p>
 
 <p>Putting test data in instance variables will promote reuse of test data and will keep test methods small and maintainable.</p>
 
@@ -359,7 +358,7 @@ before each of the test methods so changing the test data will not cause problem
 tests into multiple test classes (see <a href="#2.5">Keep your test fixture simple</a>). Because not all 
 test data is used by every test, splitting up tests will also avoid creation of too much unused test data.</p>
 
-<p>Note: When using JUnit 3, do not forget to call super.setUp(). Some superclasses, like UnitilsJUnit3, perform their own setting up in the
+<p>Note: When using JUnit 3, do not forget to call super.setUp(), since superclasses can setting up in the
 setUp() method.</p>
 
 
@@ -421,13 +420,13 @@ names for these extra test classes, use &lt;class name&gt; + &lt;description of 
 
 <h4>Description</h4>
 
-<p>Grouping too many (incoherent) tests in the same test class can cause a test fixture to become too large and incoherent. If this 
+<p>Grouping too many (incoherent) tests in the same test class can cause a test fixture to become large and incoherent. If this 
 is the case, split up the test fixture by dividing the test methods over multiple test classes. Because test data is put in instance 
 variables (See <a href="#2.4">Create test data during setup</a>) you can easily spot incoherent test classes: they contain lots of instance 
 variables that are only used by some of the test methods.</p>
 
 <p>Try to find a logical group of test methods and move them to a new test class. Name this new test class as follows: the original 
-test class name, followed by some word that characterizes this new group, followed by ‘Test’.</p>
+test class name, followed by a name that characterizes this new group, followed by ‘Test’.</p>
 
 
 <h4>Examples</h4>
@@ -658,10 +657,11 @@ they are meant to be called directly by subclasses, for example utility methods 
 
 <p>The public interface of a class defines the behavior of the class. How a certain behavior is implemented is not important. 
 Your tests should therefore not depend on how a class is implemented. Only testing the interface will make your tests less 
-sensitive to change and refactorings. It will minimize the changes needed to your tests when changes to the implementation are made.</p>
+susceptible to change and refactorings. It will minimize the changes needed to your tests when changes to the implementation are made.</p>
 
-<p>Tests should be written for methods that contain non-trivial logic. Trivial methods that contain no logic, such as simple getters
-and setters, should not be tested. These tests don't provide added-value and only increase the effort needed to maintain all tests.</p>
+<p>Tests should be written for methods that contain non-trivial logic. Trivial methods that contain no logic, such as getters
+and setters or methods that do pure delegation to objects of other classes, should not be tested. These tests don't provide added-value 
+and only increase the effort needed to maintain all tests.</p>
 
 
 <h4>Examples</h4>
@@ -722,15 +722,15 @@ public class User {
 </pre></div>
 
 <p>In this example you should only write tests for the addRole() and getAge() method since these contain real logic. Testing the trivial
-setBirthDate() method would have no added-value. The createRole() method is used for the internal implementation and should therefore not 
-be tested on its own. It will be tested during the addUser() test.</p>
+setBirthDate() method wouldn't give added-value. The createRole() method is used for the internal implementation and should therefore not 
+be tested separately. It will implicitly be tested during the addUser() test.</p>
 
 <p>Following code snippets show an example of a test that uses knowledge of a class's internal structure:</p>
 
 <div class="source"><pre>
 public class AuthenticatedUserRepository
 {      
-    private Map userMap = new HashMap();
+    private Map authenticatedUserMap = new HashMap();
 
     /**
      * Adds a new user.
@@ -738,7 +738,7 @@ public class AuthenticatedUserRepository
      * @param user the user to add, not null
      */
     public void addAuthenticatedUser(User user) {
-        userMap.add(user.getSsn(), user);
+        authenticatedUserMap.add(user.getSsn(), user);
     }
 
 
@@ -748,7 +748,7 @@ public class AuthenticatedUserRepository
 		 * @return true if the user is authenticated, false otherwise
 		 */
 		public boolean isAuthenticated(User user) {
-				return userMap.get(user.getSsn()) != null;
+				return authenticatedUserMap.get(user.getSsn()) != null;
 		}
 
 
@@ -775,8 +775,8 @@ public class UserAdminTest extends TestCase {
         userAdmin.addAuthenticatedUser(user);
         
         //validate result
-        Map userMap = userAdmin.getAuthenticatedUserMap();               
-        User result = userMap.get(user.getSsn());                <span class="code-comment">// Implementation detail</span>
+        Map authenticatedUserMap = userAdmin.getAuthenticatedUserMap();               
+        User result = authenticatedUserMap.get(user.getSsn());                <span class="code-comment">// Implementation detail</span>
         ReflectionAssert.assertLenEquals(user, result);
     }
 }
@@ -846,7 +846,7 @@ public class UserTest extends TestCase {
 </pre></div>
 
 <p>There is no reason for verifying the name of the User object in this test. The code in this test should be limited
-to testing the age only. On the one hand, it improves the readability of this test. On the other hand, it makes the test more 
+to testing the age only. On the one hand, this improves the readability of this test. On the other hand, it makes the test more 
 maintainable because it is no longer dependent on the fact that the tested object was intialized with "john" as its name.</p>
 
 </div>
@@ -860,14 +860,14 @@ maintainable because it is no longer dependent on the fact that the tested objec
 
 <h4>Short Description</h4>
 
-<p>A unit test should not depend on the outcome of another unit test. All tests should be independent of each other. One should be able to run
+<p>A unit test should not depend on the prior execution of another unit test. All tests should be independent of each other. One should be able to run
 each of the tests on its own.</p>
 
 
 <h4>Description</h4>
 
 <p>The sequence in which test methods are called is not guaranteed. Unit tests should therefore never rely on any execution
-sequence. The test fixture must be initialized in the setup and test methods.</p>
+sequence. The test fixture must be completely (re-)initialized in the setup and test methods.</p>
 
 
 <h4>Examples</h4>
@@ -927,13 +927,13 @@ data is often not available or certain boundary conditions are difficult to simu
 and write a test for the new functionality (that of course fails at that moment). Then they implement the code that makes these tests succeed. 
 Afterwards, tests are added for special cases and boundary conditions and the implementation is updated to make these tests pass. Although this 
 approach is very viable, this way of coding doesn't work for everyone. We only advise you to write your test code at least while you are writing 
-the code. In other words, the implementation is not completely finished if there is no unit test.</p>
+the code. In other words, the implementation is not completely finished if there are no unit tests.</p>
 
-<p>Following approach is a mix between test-after and test-first, that appears to work for a lot of developers: 
-You start in with writing the interface and a first implementation of a method. Then you write a test for the main execution paths of this method and 
+<p>Following approach is a mix between test-after and test-first, that appears to work for a many of developers: 
+You start with writing the interface and a first implementation of a method. Then you write a test for the main execution paths of this method and 
 fix the implementation if necessary. After this, tests for extra boundary conditions and alternative flows are added <i>before</i> they are implemented.
-To fix a bug, you start with adding a failing test that reveals the cause of the bug, and then you make the change that makes
-this test pass.</p>
+For bug fixing the test-first approach also works very well: You start with writing a failing test that reveals the cause of the bug, then you make 
+the change that makes this test pass.</p>
 
 </div>
 
@@ -958,14 +958,14 @@ basic types or value objects such as String, Integer etc.</p>
  may be implemented to return true when they have the same social security number. If you use assertEquals() on 2 user instances you therefore only test 
  the equality of the social security number and not the equality of any of the other fields. Instead of using the equals() method, you should compare 
  each of the field values one by one. This can be done by accessing the field values through their getter methods (if the field has one) and then comparing 
- the values directly. Doing this manually however requires lots of coding and is very error-prone. It’s better to do this automatically by using reflection.</p>
+ the values directly. Doing this manually however requires lots of coding and is error-prone. It’s better to do this automatically by using reflection.</p>
 
 <p>Unitils provides a utility class that does this for you: <i>ReflectionAssert</i>.</p>
 
 <p><i>ReflectionAssert</i> runs through the fields of the instances using reflection and compares each of the field values one by one. If
 a field value is again an object instance, all its fields are recursively compared the same way. The ReflectionAssert class also offers functionality 
 for non-strict comparison of fields. You can for example ignore field values for which the expected object contains a Java default value (null or 0), or test 
-whether a collection contains some expected values but not necessarily in the same order. This makes it possible to only compare what is realy important for the 
+whether a collection contains some expected values, but not necessarily in the same order. This makes it possible to only compare what is realy important for the 
 test (See <a href="#2.8">Keep test methods small</a>).</p>
 
 
@@ -1045,16 +1045,18 @@ the unit test strategy on a project level.</p>
 
 <h4>Short Description</h4>
 
-<p>When a test is broken, fix it as soon as possible. </p>
+<p>When a test is broken, fix it as soon as possible.</p>
 
 
 <h4>Description</h4>
 
-<p>The goal should be to keep the test bar green as much as possible. This motivates people to write descent and working tests. When you notice
-that you've broken a test, fix the test immediately.</p>
+<p>The goal should be to keep the bar green as much as possible. This motivates people to write descent and working tests. If you don't
+start with a green bar, then it is less likely that you notice additional failing tests. If there are too many broken tests, the motivation
+to decreases to fix or to write any additional unit tests.</p>
 
-<p>If a test cannot be fixed immediately, disable the test. You can do this by commenting out the test implementation and
-putting some logging statements in place for JUnit3, by using JUnit4's @Ignore annotation or by adding the test to an ignored group for TestNG.</p>
+<p>When you notice that you've broken a test, fix it at once. If this is not immediately possible, disable the test. 
+This can be done by commenting out the test implementation and adding a logging statement for JUnit 3, by using the 
+<i>@Ignore</i> annotation for JUnit 4, or by adding the test to an ignored group for TestNG.</p>
 
 </div>
 
@@ -1066,17 +1068,17 @@ putting some logging statements in place for JUnit3, by using JUnit4's @Ignore a
 
 <h4>Short Description</h4>
 
-<p>Only run the tests of the code that you’re working on. Let a continuous build system perform the other tests.</p>
+<p>Only run the tests of the code that you’re working on. Rely on a continuous build system to perform the full regression suite.</p>
 
 
 <h4>Description</h4>
 
-<p>Manually running all of the tests over after each code change is a time-consuming task. Only run the tests that could be impacted by the code that you 
+<p>Manually running all of the tests over after each code change is time-consuming. Only run the tests that could be impacted by the code that you 
 are have changed and let an automatic build system run the other tests. Typically, you only run the tests that verify the behavior of the class 
 that you are changing. E.g. if you changed something in the User class, perform all tests on the User*Test classes.</p>
 
 <p>The continuous build server should be configured to run all unit-tests after every commit to the version control system and immediately give feedback 
-when somebody broke a test. Impose your developers to immediately fix the build when it is broken. (See <a href="#2.13">Fix broken tests immediately</a>)</p>
+when somebody broke a test. Developers should immediately react by fixing the broken test. (See <a href="#2.13">Fix broken tests immediately</a>)</p>
 
 </div>
 
@@ -1088,8 +1090,9 @@ when somebody broke a test. Impose your developers to immediately fix the build 
 
 <h4>Short Description</h4>
 
-<p>Do not use JUnit’s TestSuite class to group all of your tests in a manual way. Use a build tool such as Ant or an IDE to make sure all tests available 
-in your source directory are executed.</p>
+<p>Do not use a static definition of the test classes in a test suite, like for example JUnit’s TestSuite class, for executing all the unit tests in
+you project. Tools exist that can dynamically generate a list of all unit tests that can be found in a source folder. You can use for example a build 
+tool such as Ant or an IDE for this purpose.</p>
 
 
 <h4>Description</h4>
@@ -1097,9 +1100,9 @@ in your source directory are executed.</p>
 <p>JUnit offers the possibility to create a group of tests by adding them to a test suite. You could for example add every test in a package
 to a suite so that they can all be performed in a single run. Manually maintaining such suites however is asking for trouble. Each time you created a 
 new test-class, you would have to manually add it to the test-suite. If you forget this, the tests will not be performed when the suite is run. 
-After a while, these 'hidden' tests will probably contain a lot of failing tests.</p>
+After a while, a lot of 'hidden' tests will probably fail.</p>
 
-<p>Build tools like ant and IDEs like Eclipse and IntelliJ can automatically create test suites for you, so that you are sure that 
+<p>Build tools like ant and IDEs like Eclipse and IntelliJ can automatically create these test suites for you, so that you are sure that 
 every test is being performed.</p>
 
 
@@ -1143,10 +1146,10 @@ every test is being performed.</p>
 <p>Although unit tests help improving the quality of your code dramatically, it is always possible that you code contains bugs. These bugs 
 are typically intercepted in a later test-stage, such as during functional or acceptance testing.</p>
 
-<p>When a bug is found and the code is altered to fix it, also write a unit test for this fix. You have to test it anyway, so why not writing
-a unit test. Furthermore this will make sure that the bug will not be re-introduced in the code at a later time (regression test). A good verification
-for the correctness of both the test and the fix is to write the test that reveals the bug first, then fix your code to make the test pass. (see also
-<a href="#2.10">Write tests while writing code</a></p>
+<p>When a bug is found and the code is modified to fix it, also write a unit test for this fix. You have to test it anyway, so why not simply 
+writing a unit test. This also makes sure that the bug is not re-introduced at a later time (regression test). 
+A typical way of handling bugs is to write a failing test that reveals the bug first, and then fix your code to make your test pass. 
+(see <a href="#2.10">Write tests while writing code</a>)</p>
 
 </div>
 
@@ -1159,14 +1162,20 @@ for the correctness of both the test and the fix is to write the test that revea
 
 <h4>Short Description</h4>
 
-<p>Only test code that is being written or changed. Do not write tests for libraries or non-project code.</p>
+<p>Only test code that is being written or changed. Do not write unit tests for a project's legacy code unless you're modifying it. 
+Do not write tests for libraries or non-project code.</p>
 
 
 <h4>Description</h4>
 
-<p>Unit tests should test code that is written on the project, not the code of libraries or external packages. These libraries should have
-their own test suite. If you doubt whether a certain library functions correctly, write a separate test specifically for this library. Do not test the
-functionality from your projects unit tests.</p>
+<p>Unit tests should test code that is written on the project. A common situation is that your project contains legacy code with little or no unit tests, 
+and that you want to adopt a more agile approach for future development. A good practice is to write unit tests for new code and for 
+existing code that you modify or rewrite. Writing tests for existing code is often difficult because such code is usually not written in a 
+test-friendly way. Most likely, this software is used in production, so it has already been tested and debugged thoroughly in other ways.</p>
+
+<p>Unit tests should not test code of libraries, external services or other projects that you depend on. These libraries and external projects 
+should have their own test suites.</p>
+
 
 </div>
 
@@ -1174,22 +1183,24 @@ functionality from your projects unit tests.</p>
 
 
 
-<div class="section"><h3><a name="2.18">2.18 Test declared exceptions</a></h3>
+<div class="section"><h3><a name="2.18">2.18 Test functional exceptions</a></h3>
 
 
 <h4>Short Description</h4>
 
-<p>Write tests for exceptional conditions that are declared in the interface.</p>
+<p>Write tests for exceptional conditions of functional nature, that are typically declared in the interface.</p>
 
 
 <h4>Description</h4>
 
-<p>Functional exceptional conditions are boundary conditions that should be tested in a unit-test. This can be done by triggering the exceptional
-condition in a try-catch block and calling fail if the expected exception is not thrown (see below for an example).</p>
+<p>Functional exceptions are boundary conditions that should be tested in a unit-test. Such exceptions are typically declared in a method's javadoc. 
+If you use JUnit 3, you can do this by triggering the exceptional condition in a try-catch block and calling the <i>fail()</i> method if the 
+expected exception was not thrown (see below for an example). When using JUnit 4 or TestNG, you can specify the expected exception in the <i>@Test</i>
+annotation.</p>
 
-<p>Test methods that are not actually testing this exceptional boundary condition should not add such a try-catch but just add a throws
-Exception clause to the test. Exceptional conditions that arise because of a bug in the code, e.g. NullPointerException, or because of some unexpected 
-problem, e.g. IOException, should not be handled in the unit test. Let JUnit or TestNG handle these exceptions.</p>
+<p>If a test method contains checked exceptions, and we're not dealing with a test for this specific exception, don't surround the method call with a try-catch 
+but simply add a throws clause to the test method. Exceptional conditions that arise because of a bug in the code, e.g. <i>NullPointerException</i>s, should not be 
+caught in a unit test. Let JUnit or TestNG handle these exceptions.</p>
 
 
 <h4>Examples</h4>
@@ -1256,7 +1267,7 @@ is used as supporting technology.</p>
 <h4>Description</h4>
 
 <p>Unit tests should not require a database filled with test data. If they depend on existing data, it becomes very difficult to make changes to 
-this data without causing other tests to break. Developers will therefore rather add new data than changing existing records. As more data is added to
+this data without breaking other tests. Developers will therefore rather add new data than changing existing records. As more data is added to
 the database, this situation becomes more and more difficult to maintain.</p> 
 
 <p>We need to have complete control over the database structure and test data for each test individually. This can be realized by using a unit 
@@ -1264,14 +1275,14 @@ test database containing only the database structure and no data. Every unit tes
 (See <a href="#3.7">Keep your test data files simple</a>).</p>
 
 <p>To avoid that different developers interfere with each other when executing unit tests, each developer should be given a separate database instance 
-or schema (See <a href="#3.2">Automate the maintenance of test databases</a>). These instances or schemas will contain little or no data and can 
-therefore easily be installed on a shared server or could also be created as an extra schema on the existing development database.</p>
+or schema (See <a href="#3.2">Automate the maintenance of test databases</a>). These instances or schemas contain little or no data and can 
+therefore easily be installed on a shared server or created as an extra schema on the existing development database.</p>
 
 
 <h4>Examples</h4>
 
-<p>The following schema represents a team with 3 developers. Every developer has an own unit test database schema. The continuous build server, in this 
-case Cruise Control, is also configured to run on a separate UNIT_CRCO schema.</p>
+<p>The following schema represents a team with 3 developers. Every developer has it's own unit test database schema. The continuous build server, in this 
+case Cruise Control, is also configured to run on a separate schema (UNIT_CRCO).</p>
 
 <p>All the test databases are extra schemas that have been added to the development database.</p>
 
@@ -1290,7 +1301,7 @@ case Cruise Control, is also configured to run on a separate UNIT_CRCO schema.</
 <h4>Short Description</h4>
 
 <p>The maintenance of test databases should be automated as much as possible. The recommended way is to use a pull strategy, where database
-updates are made available as scripts in version control and applied to the test database before running a test. Database updates can be 
+updates are made available as scripts in the source control system and applied to the test database before running a test. Database updates can be 
 performed incrementally or by recreating the database from scratch.</p>
 
 <h4>Description</h4>
@@ -1305,7 +1316,7 @@ maintenance. This can be done:</p>
 <p>The advantage of the from-scratch approach is the simplicity: You only have to maintain a script containing the complete database
 definition in the form of DDL statements. If the script contains an error, you simply fix it. The script can either be maintained 
 manually or exported from some modeling tool. A major drawback is that, when the database size grows, recreating a database from scratch 
-takes a considerable amount of time. This is especially annoying when using a pull strategy for change distribution (see below).</p>
+takes a considerable amount of time.</p>
 
 <p>To keep your developers motivated to write and run tests, wait times should be avoided whenever possible. Unless your database is small,
 an incremental approach to database maintenance should be considered. Incremental updates to the database structure are performed almost 
@@ -1313,16 +1324,16 @@ without noticable delays. Also, since incremental updates are data-preserving, t
 test or production databases. A drawback of this approach is the increased complexity: If a DDL statement that contains an error was applied 
 to a number of unit test database, you will have to make sure new script is executed that contains the fix for this error.</p>
 
-<p>You can have the advantages of both approaches by combining an incremental and from-scratch approach as follows: Make sure the largest
-part of database updates is applied incrementally. To clean up your scripts or to fix an error difficult to fix incrementally, you make 
-sure the database schema's are recreated from scratch from time to time.</p>
+<p>You can have the advantages of both approaches by combining an incremental and from-scratch approach as follows: Make sure the greater
+part of database updates is applied incrementally. To clean up your scripts from time to time or to fix an error, you can recreate the database 
+schemas from scratch.</p>
 
 <p>For distributing the changes to the unit test databases, you can use either a push or a pull strategy:</p>
 <ul>
 		<li><p><i><u>Push strategy</u></i>: The developer performing the database structure change, applies the change to all unit-test databases, 
 		using some tool or script.</p></li>
-		<li><p><i><u>Pull strategy</u></i>: Database changes are made available in AS scripts in a shared directory or in the version control system. 
-		If scripts have been updated or if there are new ones, they are applied to the test database before executing a test.</p></li>
+		<li><p><i><u>Pull strategy</u></i>: Database changes are made available as scripts in a shared directory or in the version control system. 
+		Newly created or updated scripts are applied to the test database before executing a database test.</p></li>
 </ul>
 
 <p>In absence of supporting tools, choosing a push strategy is the most obvious decision for a project, because it is simple to set up. You only 
@@ -1332,7 +1343,7 @@ corresponding code changes. Before a test is run, these new scripts are be execu
 in synch. Another advantage is that maintenance is performed in a decentralized way. This allows developers to use a local test database, for 
 example, when working on separate locations or at home.</p>
 
-<p>Unitils' database maintainer service keeps can keep your test databases up-to-date using a pull strategy, supporting both the incremental and 
+<p>Unitils' database maintainer can keep your test databases up-to-date using a pull strategy, supporting both the incremental and 
 from-sratch ways. For more information, we refer to the <a href="tutorial.html#Unit test database maintenance">tutorial</a>.</p>
 </div>
 
@@ -1349,11 +1360,12 @@ for the test. Automate the disabling process to reduce the burden of manual main
 
 <h4>Description</h4>
 
-<p>Database unit tests have to be written with as few test data as possible. In this context, database constraints do more harm than good. Disabling 
+<p>Database tests have to be written with as few test data as possible. In this context, database constraints do more harm than good. Disabling 
 foreign key and not null constraints makes sure we only have to insert the data that we need for the test, nothing more.</p>
 
-<p>To reduce the burden and avoid forgetting it, the disabling of constraints should be automated. Unitils’ DBMaintainer will automatically disable 
-all constraints after it performs an update to the database.</p>
+<p>To reduce the burden and avoid forgetting it, the disabling of constraints should be automated.
+<a href="tutorial.html#Unit test database maintenance">Unitils’ DBMaintainer</a> will automatically disable 
+all constraints after having performed an update to the database.</p>
 
 
 <h4>Examples</h4>
@@ -1377,7 +1389,7 @@ all constraints after it performs an update to the database.</p>
 </pre></div>
 
 <p>This data file contains all data we need for our unit test. If we would work with a unit test database with all constraints 
-enabled, some extra records that are not relevant for the test need to be added to the data set:</p>
+enabled, extra records and columns that are not relevant for the test need to be added to the data set:</p>
 
 <div class="source"><pre>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
@@ -1408,8 +1420,8 @@ For example, if a new NOT NULL column is added to one of the tables, the data fi
 
 <h4>Short Description</h4>
 
-<p>Unit tests for CRUD methods are very simple and all follow a similar structure. When using Hibernate or JPA (EJB3 Persistence), testing
-simple CRUD methods is not useful.</p>
+<p>Unit tests for CRUD methods are very simple and all follow a similar structure. This guideline is intended for testing traditional DAO methods 
+using a technology like JDBC. When using an O/R mapping tool like Hibernate, testing simple CRUD methods is not useful.</p>
 
 
 <h4>Description</h4>
@@ -1420,8 +1432,8 @@ simple CRUD methods is not useful.</p>
 a create, update or delete method behaves as expected. This can be done very simply by using the interface of the DAO and the ReflectionAssert 
 class. The examples show how these methods can be tested in a simple way.</p>
 
-<p>When persistance is handled by a O/R mapping framework like Hibernate or JPA, CRUD operations are implemented by the framework, and writing
-unit tests is not useful. Read <a href="#4.1">Test mapping with database</a> for more information on this topic.</p>
+<p>When persistance is handled by a O/R mapping framework like Hibernate or JPA (EJB3 persistence), CRUD operations are implemented by the framework, 
+and writing unit tests is not useful. Read <a href="#4.1">Test mapping with database</a> for more information on this topic.</p>
 
 <h4>Examples</h4>
 
@@ -1490,12 +1502,12 @@ public class UserDaoTest extends BaseDAOTest {
 <h4>Short Description</h4>
 
 <p>SQL or HQL queries are often complex and difficult to maintain. Unit tests are therefore very important, especially
-for complex queries. Following the rules in the description helps you in writing simple but effective tests.</p>
+for complex queries. Test data for testing queries should be very concise and only include columns on which query conditions are expressed.</p>
 
 
 <h4>Description</h4>
 
-<p>Unit tests can be very effective for guaranteeing the correctness of a query, especially for complex queries. They can also be invaluable 
+<p>Unit tests can be very effective for guaranteeing the correctness of a query, especially for complex queries. They are invaluable 
 for making sure that changes to the database didn't break any queries.</p>
 
 <p>Following steps can be performed when writing a unit test for a query:</p>
@@ -1505,14 +1517,14 @@ for making sure that changes to the database didn't break any queries.</p>
     <li><p>Add one or a few records that should not be included in the result of the query.</p></li>
     <li><p>For each of these records, only add the primary key columns and the columns involved in join conditions and where clauses.</p></li>
     <li><p>Write a test that invokes the query method.</p></li>
-    <li><p>Assert that the result is correct by comparing the result's key fields with the expected record keys.</p></li>
+    <li><p>Assert that the result is correct by verifying the values of the ID (primary key) field of the resulting objects.</p></li>
 </ul>
 
 <p><i><u>Explanation of these steps</u></i>: The complexity of a database query lies in the combination of join- and other conditions that make 
-up the where clause. To verify correctness of a where clause, different test data records should be defined that are included in the result of the 
-query, because of different reasons. You should also include records that are not expected to appear in the result of the query. Make sure you add 
-only the data that is actually required for testing the query, i.e. the columns used in join conditions and where clauses. This will keep your 
-datasets as small and maintainable as possible (See <a href="#3.7">3.7 Keep your test data files simple</a>).</p>
+up the <i>WHERE</i> clause. To verify correctness of this <i>WHERE</i> clause, different test data records should be defined that are included in 
+the result of the query, because of different reasons. A good test dataset also includes records that are not expected to appear in the result of 
+the query. Make sure you only specify the data that is actually required for testing the query, i.e. the columns used in join and condition clauses. 
+This will keep your datasets as small and maintainable as possible (See <a href="#3.7">3.7 Keep your test data files simple</a>).</p>
 
 
 
@@ -1523,7 +1535,8 @@ datasets as small and maintainable as possible (See <a href="#3.7">3.7 Keep your
 <div class="image-left"><img src="images/tables2.png" /></div>
 
 <p>Every user belongs to exactly one company. Companies can have a number of partnerships with other companies. The DAO method under 
-test, findPartnershipUsers, returns a List of all users that belong to a company that have some kind of partnership with the given company.</p>
+test, <i>findPartnershipUsers</i>, returns a <i>List</i> of all users that belong to a company that have some kind of partnership with 
+the given company.</p>
 
 <div class="source"><pre>
 public List&lt;User&gt; findPartnershipUsers(Company comp) {
@@ -1560,7 +1573,7 @@ public void testFindPartnershipUsers() {
     
     &lt;company id=&quot;3&quot; /&gt;
     &lt;user id=&quot;3&quot; companyid=&quot;3&quot; /&gt;
-    
+   
     &lt;partnership company1id=&quot;1&quot; company2id=&quot;2&quot; /&gt;
     &lt;partnership company1id=&quot;2&quot; company2id=&quot;3&quot; /&gt;
 
@@ -1583,38 +1596,37 @@ the id field equal to <i>2</i>.</p>
 <h4>Short Description</h4>
 
 <p>For testing bulk insert, update or delete methods, which are cumbersome to test through the API of your DAOs, check the updated DB contents
-with a DBUnit result data file.</p>
+with a DBUnit result data file at the end of your test.</p>
 
 
 <h4>Description</h4>
 
-<p>Database methods that do collective updates or deletes are often difficult to test. These methods are in most cases written as calls to
-stored procedures in the database or as SQL or HQL statements with a complex ‘where’-clause. Verifying correctness of these methods through the interface of
-a DAO and with regular assert methods, could be cumbersome.</p>
+<p>Database methods that perform bulk updates or deletes are often difficult to test. Verifying correctness of these methods through the interface of
+a DAO and with regular assert methods, is sometimes cumbersome.</p>
 
 <p>Unitils' <i>@ExpectedDataSet</i> annotation can be used to check the result of a test by comparing the contents of the database with a result data file. 
 Only the tables and columns that you actually want to check should be included in the data file.</p>
 
-<p>Result data files are very powerful: you can check almost anything with a simple XML file. They should however not be overused. When doing
-database updates, a number of data files will also have to be updated. The more data files you have, the more impact database refactorings will have.
-When possible, try to test the result through the interface of a DAO class.</p>
+<p>Result data files are very powerful: you can check almost anything with a simple XML file. However, using them should be avoided whenever possible. You
+should first consider using methods of an existing DAO and assert statements to verify the results. When changing database structure, a number of data 
+files will also have to be updated. The more data files you have, the more impact database refactorings will have.</p>
 
 
 <h4>Examples</h4>
 
 <p>Suppose you have a system in which users can place orders. A weekly batch job moves all orders that are older than a year to a history table. 
-This history table cannot be queried by the application, but we keep the information for statistical reporting purposes. The batch job is
+This history table cannot be queried by the application; we store the information for reporting purposes only. The batch job is
 implemented using a call to a stored procedure. We have following table structure:</p>
 
 <div class="image-left"><img src="images/tables3.png" /></div>
 
-<p>In our application, nothing is foreseen for querying the archive tables. It is therefore a good idea to use a result data file to verify
+<p>In our application, nothing is foreseen to querying the archive tables. It is therefore a good idea to use a result data file to verify
 the correct behavior of this stored procedure. Our unit test looks like the following:</p>
 
 <div class="source"><pre>
 @ExpectedDataSet
 public void testArchiveOrders() {
-    orderDao.archiveOrdersOlderThan(DateUtils.parseDate(&quot;21-05-2005&quot;);
+    orderDao.archiveOrdersOlderThan(DateUtils.parseDate(&quot;21-05-2006&quot;);
 }
 </pre></div>
 
@@ -1624,11 +1636,11 @@ public void testArchiveOrders() {
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 &lt;dataset&gt;
 
-    &lt;order id=&quot;1&quot; date=&quot;20-05-2005&quot; /&gt;
+    &lt;order id=&quot;1&quot; date=&quot;20-05-2006&quot; /&gt;
     &lt;orderline id=&quot;11&quot; orderid=&quot;1&quot; /&gt;
     &lt;orderline id=&quot;12&quot; orderid=&quot;1&quot; /&gt;
 
-    &lt;order id=&quot;2&quot; date=&quot;21-05-2005&quot; /&gt;
+    &lt;order id=&quot;2&quot; date=&quot;21-05-2006&quot; /&gt;
     &lt;orderline id=&quot;21&quot; orderid=&quot;2&quot; /&gt;
     &lt;orderline id=&quot;22&quot; orderid=&quot;2&quot; /&gt;
 
@@ -1645,7 +1657,7 @@ public void testArchiveOrders() {
     &lt;orderline id=&quot;21&quot; /&gt;
     &lt;orderline id=&quot;22&quot; /&gt;
 
-    &lt;arch_order id= &quot;1&quot; date=&quot;20-05-2005&quot; /&gt;
+    &lt;arch_order id= &quot;1&quot; date=&quot;20-05-2006&quot; /&gt;
     &lt;arch_orderline id=&quot;11&quot; arch_orderid=&quot;1&quot; /&gt;
     &lt;arch_orderline id=&quot;12&quot; arch_orderid=&quot;1&quot; /&gt;
 
@@ -1703,7 +1715,7 @@ greatly increases the maintenance cost.</p>
 
 <h4>Short Description</h4>
 
-<p>Don't reuse data sets between different test classes. Doing so will make it very difficult to make changes to your test data without breaking 
+<p>Don't share data sets between different test classes. Doing so will make it very difficult to make changes to test data without breaking 
 other tests. A good practice is to have a test data set per test class and in some cases a specific data set for a test method.</p>
     
 <h4>Description</h4>
@@ -1716,8 +1728,7 @@ existing tests appear to fail. As a reaction to this situation you will probably
 (or not test it at all). The simplest approach to avoid impacting other tests probably consists in adding new test records to the data set (although
 this may also break existing tests). After a while, this will result in very large and incoherent datasets.</p>
 
-<p>This doesn't mean you cannot share data among tests, because having more test data sets also brings along more maintenance. When changing the name of a database
-column, for example, you will probably have to update multiple datasets to make all tests pass. These changes however are mostly simple and can be performed quickly.
+<p>This doesn't mean you cannot share data among tests at all, because having more test data sets also brings along more maintenance. 
 A good practice is to use a test data set per test class and in some cases a specific data set for a method.</p>
 
 </div>
@@ -1727,7 +1738,7 @@ A good practice is to use a test data set per test class and in some cases a spe
 
 <h4>Short Description</h4>
 
-<p>Refer to a DTD that represents your database in your DBUnit test data files, to enable code completion while editing them.</p>
+<p>Refer to a DTD that represents your database in DBUnit test data files, to enable code completion while editing them.</p>
 
 
 <h4>Description</h4>
@@ -1785,15 +1796,15 @@ superclass methods. It is therefore not necessary to test it over and over again
 
 <h4>Short Description</h4>
 
-<p>When using identity or auto-increment columns and sequences, make sure they have a high enough value for running the tests. This way they
+<p>When using identity / auto-increment columns or sequences, make sure their values are high enough value before running tests. This way they
 don’t interfere with the test data.</p>
 
 
 <h4>Description</h4>
 
-<p>When a new sequence is created, it should be initialized to a sufficiently high value, so that auto generated ids and values don’t clash
+<p>When a new sequence is created, it should be initialized to a sufficiently high value, to make sure auto generated ids and values don’t clash
 with the ids and values of the test data files. When using Unitils' database maintainer for managing test database schema's, sequences and identity 
-columns are automatically set to a configurable value after creation.</p>
+columns are automatically set to a configurable value.</p>
 
 </div>
 
@@ -1812,7 +1823,7 @@ columns are automatically set to a configurable value after creation.</p>
 <h4>Description</h4>
 
 <p>In production code, DAO methods are always executed in a transaction. Some argue that DAO methods need also to be executed in a
-transaction, so that the tests closely resemble the real situation. Running them in a transaction also has disadvantages:</p>
+transaction, so that the tests closely resemble the real situation. Running them in a transaction however also has disadvantages:</p>
 
 <ul>
     <li><p>When debugging tests using the IDE’s debugger, the data updates executed so far are not visible in a database query console like Toad or SqlPlus.</p></li>
@@ -1858,7 +1869,7 @@ of simple CRUD depends mainly on the correct mapping of the domain model objects
 
 <p>Of course, these problems are usually easy to trace and to fix, but adding a unit test that verifies the complete mapping with the database at once, 
 makes sure these problems are discovered very soon. This is a very cheap solution, since you only have to define this unit test once. Experience on projects 
-has learnt us that this test ends up to be the most valuable test in the test suite.</p>
+has learnt us that this test ends up to be one of the most valuable tests in the test suite.</p>
 
 <p>The Unitils project provides a test that checks the mapping of domain and database for Hibernate. The test works for both a configuration with Hibernate 
 XML mapping files as when using annotations. For more information we refer to the <a href="tutorial.html#Testing with Hibernate">tutorial</a>.</p>
@@ -1876,8 +1887,17 @@ public class HibernateMappingTest extends BaseHibernateDAOTest {
 
 </pre></div>
 
-</div>
+<p>Suppose the Person class is mapped with the PERSON column in the database using Hibernate. We add a phoneNumber property to the Person class, 
+but forget to add this column in the database. The <i>HibernateMappingTest</i> now fails with the following message:</p>
 
+<div class="source"><pre>
+AssertionFailedError: Found mismatches between Java objects and database tables. 
+Applying following DDL statements to the database should resolve the problem: 
+alter table PERSON add column firstName varchar(255);
+g
+</pre></div>
+
+</div>
 
 
 
@@ -1892,7 +1912,8 @@ public class HibernateMappingTest extends BaseHibernateDAOTest {
 
 <h4>Description</h4>
 
-<p>The guideline <a href="#3.5">Testing queries</a> explains how maintainable unit tests can be written for queries. The same rules apply for testing with HQL queries.</p>
+<p>The guideline <a href="#3.5">Testing queries</a> explains how maintainable unit tests can be written for queries. The same rules 
+apply for testing with HQL queries. The example included in this guideline is also applicable in an O/R mapping context.</p>
 
 </div>
 
@@ -1907,13 +1928,13 @@ public class HibernateMappingTest extends BaseHibernateDAOTest {
 <h4>Short Description</h4>
 
 <p>Add unit tests for methods that implement bulk data manipulation. The same rules apply as for testing such methods written in plain old JDBC. Make sure 
-the Hibernate Session is flushed before you access the test database trough plain old JDBC, without the intervenience of Hibernate</p>
+the Hibernate Session is flushed before you access the test database trough plain old JDBC, without the intervenience of Hibernate.</p>
 
 
 <h4>Description</h4>
 
-<p>The guideline <a href="#3.6">Testing bulk data manipulation methods</a> explains how unit tests can be written for bulk data manipulation methods. The same rules apply for 
-testing with such methods written in HQL.</p>
+<p>The guideline <a href="#3.6">Testing bulk data manipulation methods</a> explains how unit tests can be written for bulk data manipulation methods. 
+The same rules apply for testing with such methods written in HQL.</p>
 
 <p>Make sure that, when comparing the database contents with a result data file, the Hibernate session is flushed. Otherwise, the update that you 
 want to test will most probably not be executed on the database yet when you perform the check. When making use of Unitils, the Hibernate session is automatically 
