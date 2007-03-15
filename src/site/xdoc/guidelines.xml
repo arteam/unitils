@@ -919,21 +919,21 @@ independent of any other tests.</p>
 <h4>Description</h4>
 
 <p>When you are writing code, you have to test it in one way or another. So why not write a unit test directly? Writing unit tests immediately
-makes sure all individual pieces work individually before trying out the whole. Bugs are more difficult to spot when testing your application 
-through its end user interface, and the application has to be rebuilt and deployed each time after you've done a fix. Also, the necessary test 
+makes sure all individual pieces work before trying out the whole. Bugs are more difficult to spot when testing your application 
+through its end user interface, and the application has to be rebuilt and deployed each time you've done a fix. Also, the necessary test 
 data is often not available or certain boundary conditions are difficult to simulate in integration testing mode.</p>
 
-<p>Some people prefer writing tests <i>before</i> writing the actual code (test-first development). They start with writing the method's interfaces 
-and write a test for the new functionality (that of course fails at that moment). Then they implement the code that makes these tests succeed. 
+<p>Some people prefer writing tests <i>before</i> writing the actual code (test-first development). They start with writing the method's signature 
+and write a test for the new functionality (which of course fails at that moment). Then they implement the code that makes this test succeed. 
 Afterwards, tests are added for special cases and boundary conditions and the implementation is updated to make these tests pass. Although this 
 approach is very viable, this way of coding doesn't work for everyone. We only advise you to write your test code at least while you are writing 
 the code. In other words, the implementation is not completely finished if there are no unit tests.</p>
 
-<p>Following approach is a mix between test-after and test-first, that appears to work for a many of developers: 
-You start with writing the interface and a first implementation of a method. Then you write a test for the main execution paths of this method and 
-fix the implementation if necessary. After this, tests for extra boundary conditions and alternative flows are added <i>before</i> they are implemented.
-For bug fixing the test-first approach also works very well: You start with writing a failing test that reveals the cause of the bug, then you make 
-the change that makes this test pass.</p>
+<p>Following approach is a mix between test-afterwards and test-first, that appears to work for many developers: 
+You start with writing the signature and a first implementation of a method. Then you write a test for the main execution path and 
+fix the implementation if necessary. After this, tests for extra boundary conditions and alternative flows are added <i>before</i> 
+these alternative flows are implemented. For bug fixing the test-first approach also works very well: You start with writing a failing test that 
+reveals the cause of the bug, then you make the change that makes this test pass.</p>
 
 </div>
 

@@ -213,7 +213,7 @@ ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jan
 </pre></div>
 
 <p>The first statement verifies that the <i>firstName</i> field in the result object equals to "John", it ignores the other fields. The second one 
-checks whether the values of the <i>firstName</i> fields in the result person list are "John" and "Jane", ignoring the actual order of these values.</p>
+checks whether the values of the <i>firstName</i> field in the result person list are "John" and "Jane", ignoring the actual order of these values.</p>
 
 
 
@@ -292,7 +292,7 @@ a mail to <i>filip_neven at users.sourceforge.net</i> or <i>tim_ducheyne at user
 <br />
 <h3>About the authors</h3>
 <p><b>Filip Neven</b> and <b>Tim Ducheyne</b> are senior software enigneers at <a href="http://www.j-technologies.be/">Ordina Belgium</a>. They each have more 
-than 6 years experience in designing and developing Java enterprise applications. They were the leaders of an expert group on unit testing within Ordina. 
+than 6 years of experience in designing and developing Java enterprise applications. They were the leaders of an expert group on unit testing within Ordina. 
 Later, they founded the Unitils open source project in which they worked out a number of their ideas. Today they are still actively working on 
 Unitils as the project's lead developers. Recently, Filip gave a Quicky presentation on Unitils at the Javapolis conference.</p>
 
