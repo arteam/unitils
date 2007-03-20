@@ -166,9 +166,32 @@ public class LenientMocksControlTest extends TestCase {
 
 
     /**
+     * Test for a invoking a mocked method call with a enum argument.
+     */
+    public void testLenientMocksControl_equalsEnumArgument() {
+
+        MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
+        expect(mock.someBehavior(MockedClass.TestEnum.TEST1)).andStubReturn("Result1");
+        expect(mock.someBehavior(MockedClass.TestEnum.TEST2)).andStubReturn("Result2");
+        replay(mock);
+
+        String result1 = mock.someBehavior(MockedClass.TestEnum.TEST1);
+        String result2 = mock.someBehavior(MockedClass.TestEnum.TEST2);
+
+        verify(mock);
+        assertEquals("Result1", result1);
+        assertEquals("Result2", result2);
+    }
+
+
+    /**
      * The test class that is going to be mocked.
      */
     private static class MockedClass {
+
+        public enum TestEnum {
+            TEST1, TEST2
+        }
 
         public void someBehavior() {
         }
@@ -176,5 +199,10 @@ public class LenientMocksControlTest extends TestCase {
         public String someBehavior(boolean b, int i, Object object, List list) {
             return null;
         }
+
+        public String someBehavior(TestEnum testEnum) {
+            return null;
+        }
     }
+
 }

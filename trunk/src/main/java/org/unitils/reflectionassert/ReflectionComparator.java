@@ -373,11 +373,18 @@ public class ReflectionComparator {
     private Difference compareObjects(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
         // check same primitive values
         if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
-
             if (getDoubleValue(left) == getDoubleValue(right)) {
                 return null;
             }
             return new Difference("Different primitive values.", left, right, fieldStack);
+        }
+
+        // check same enum values
+        if ((left instanceof Enum) && (right instanceof Enum)) {
+            if (left.equals(right)) {
+                return null;
+            }
+            return new Difference("Different enum values.", left, right, fieldStack);
         }
 
         // check different class type
