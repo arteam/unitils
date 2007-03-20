@@ -43,6 +43,8 @@ public class HibernateSupportImpl implements HibernateSupport {
      * Creates a new support instance.
      */
     public HibernateSupportImpl() {
+        // use configuration to be sure hibernate is in the classpath
+        Configuration.class.getName();
         sessionFactoryWrappingBeanPostProcessor = new SessionFactoryWrappingBeanPostProcessor();
     }
 
