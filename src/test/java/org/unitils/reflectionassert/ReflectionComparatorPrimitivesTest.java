@@ -166,7 +166,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test class with failing equals.
      */
-    private class Primitives {
+    private static class Primitives {
 
         /* A fist int value */
         private int intValue1;
@@ -189,33 +189,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
             this.intValue1 = intValue1;
             this.intValue2 = intValue2;
             this.inner = inner;
-        }
-
-        /**
-         * Gets the first int value
-         *
-         * @return the value
-         */
-        public int getIntValue1() {
-            return intValue1;
-        }
-
-        /**
-         * Gets the second int value
-         *
-         * @return the value
-         */
-        public int getIntValue2() {
-            return intValue2;
-        }
-
-        /**
-         * Gets the inner object
-         *
-         * @return the object
-         */
-        public Primitives getInner() {
-            return inner;
         }
 
         /**
