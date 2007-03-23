@@ -25,6 +25,9 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
 
 /**
  * Utility facade for handling EasyMock things such as replay or manually creating a mock.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class EasyMockUnitils {
 
@@ -40,7 +43,6 @@ public class EasyMockUnitils {
      * @return null
      */
     public static <T> T lenEq(T object) {
-
         return refEq(object, IGNORE_DEFAULTS, LENIENT_ORDER);
     }
 
@@ -54,7 +56,6 @@ public class EasyMockUnitils {
      * @return null
      */
     public static <T> T refEq(T object, ReflectionComparatorMode... modes) {
-
         ReflectionArgumentMatcher<T> reflectionArgumentMatcher = new ReflectionArgumentMatcher<T>(object, modes);
         reportMatcher(reflectionArgumentMatcher);
         return object;
@@ -74,7 +75,6 @@ public class EasyMockUnitils {
      * @return a mock for the given class or interface, not null
      */
     public static <T> T createRegularMock(Class<T> mockType) {
-
         return createRegularMock(mockType, InvocationOrder.DEFAULT, Calls.DEFAULT);
     }
 
@@ -91,7 +91,6 @@ public class EasyMockUnitils {
      * @return a mock for the given class or interface, not null
      */
     public static <T> T createRegularMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls) {
-
         return getEasyMockModule().createRegularMock(mockType, invocationOrder, calls);
     }
 
@@ -111,7 +110,6 @@ public class EasyMockUnitils {
      * @return a mock for the given class or interface, not null
      */
     public static <T> T createMock(Class<T> mockType) {
-
         return createMock(mockType, InvocationOrder.DEFAULT, Calls.DEFAULT, Order.DEFAULT, Dates.DEFAULT, Defaults.DEFAULT);
     }
 
@@ -135,59 +133,54 @@ public class EasyMockUnitils {
      * @return a mock for the given class or interface, not null
      */
     public static <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls, Order order, Dates dates, Defaults defaults) {
-
         return getEasyMockModule().createMock(mockType, invocationOrder, calls, order, dates, defaults);
     }
 
     /**
      * Unit tests should call this method after having set their recorded expected behavior on the mock objects.
      * <p/>
-     * This method will make sure EasyMock's replay method is called on every mock object that was supplied to the
+     * This method makes sure EasyMock's replay method is called on every mock object that was supplied to the
      * fields annotated with {@link @Mock}, or directly created by the
      * {@link #createRegularMock(Class,InvocationOrder,Calls)} and
      * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} methods.
      * <p/>
-     * After each test, the expected behavior will be verified automatically. Verification can also be performed
-     * explicitly by calling the {@link #verify()} method.
+     * After each test, the expected behavior is verified automatically, or explicitly by calling {@link #verify()}.
      */
     public static void replay() {
-
         getEasyMockModule().replay();
     }
 
 
     /**
-     * Unit tests should call this method to check whether all recorded expected behavior was actually observed during
+     * Unit tests can call this method to check whether all recorded expected behavior was actually observed during
      * the test.
      * <p/>
-     * This method will make sure EasyMock's verify method is called on every mock mock object that was supplied to the
-     * fields annotated with {@link @Mock}, or directly created by the
-     * {@link #createRegularMock(Class,InvocationOrder,Calls)} and
+     * This method makes sure {@link org.easymock.internal.MocksControl#verify method is called for every mock mock object
+     * that was injected to a field annotated with {@link @Mock}, or directly created by the
+     * {@link #createRegularMock(Class,InvocationOrder,Calls)} or
      * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} methods.
      * <p/>
-     * After each test, the expected behavior will be verified automatically. Verification can also be performed
-     * explicitly by calling this method.
+     * By default, the expected behavior is verified automatically. This can be disabled however by setting the property
+     * EasyMockModule.autoVerifyAfterTest.enabled to false. In that case, verification can also be performed explicitly
+     * by calling this method.
      */
     public static void verify() {
-
         getEasyMockModule().verify();
     }
 
 
     /**
-     * Gets the first instance of an EasyMockModule that is stored in the modules repository.
-     * This instance implements the actual behavior of the static methods, such as {@link #replay()}.
+     * Gets the instance EasyMockModule that is registered in the modules repository.
+     * This instance implements the actual behavior of the static methods in this class, such as {@link #replay()}.
      * This way, other implementations can be plugged in, while keeping the simplicity of using static methods.
      *
      * @return the instance, not null
      * @throws UnitilsException when no such module could be found
      */
     private static EasyMockModule getEasyMockModule() {
-
         Unitils unitils = Unitils.getInstance();
         EasyMockModule module = unitils.getModulesRepository().getModuleOfType(EasyMockModule.class);
         if (module == null) {
-
             throw new UnitilsException("Unable to find an instance of an EasyMockModule in the modules repository.");
         }
         return module;
