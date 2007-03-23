@@ -35,6 +35,8 @@ import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
 import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
+import org.unitils.util.ConfigUtils;
+import org.unitils.util.PropertyUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -67,19 +69,25 @@ import java.util.Properties;
  */
 public class EasyMockModule implements Module {
 
+    /* Property key for configuring whether verify() is automatically called on every mock object after each test method execution */
+    public static final String PROPKEY_AUTO_VERIFY_AFTER_TEST_ENABLED = "EasyMockModule.autoVerifyAfterTest.enabled";
+
     /* All created mocks controls */
     private List<MocksControl> mocksControls;
 
     /* Map holding the default configuration of the mock annotations */
     private Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues;
 
+    /* Indicates whether verify() is automatically called on every mock object after each test method execution */
+    private boolean autoVerifyAfterTestEnabled;
 
     /**
      * Initializes the module
      */
     public void init(Properties configuration) {
-        this.mocksControls = new ArrayList<MocksControl>();
+        mocksControls = new ArrayList<MocksControl>();
         defaultEnumValues = getAnnotationEnumDefaults(EasyMockModule.class, configuration, RegularMock.class, Mock.class);
+        autoVerifyAfterTestEnabled = PropertyUtils.getBoolean(PROPKEY_AUTO_VERIFY_AFTER_TEST_ENABLED, configuration);
     }
 
 
@@ -179,8 +187,7 @@ public class EasyMockModule implements Module {
 
 
     /**
-     * Implements the setting of the recorded behavior.
-     * todo javadoc
+     *
      */
     public void replay() {
         for (MocksControl mocksControl : mocksControls) {
@@ -190,8 +197,13 @@ public class EasyMockModule implements Module {
 
 
     /**
-     * Implements the verification of the recorded behavior.
-     * todo javadoc
+     * This method makes sure {@link org.easymock.internal.MocksControl#verify method is called for every mock mock object
+     * that was injected to a field annotated with {@link @Mock}, or directly created by calling
+     * {@link #createRegularMock(Class,InvocationOrder,Calls)} or
+     * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)}.
+     * <p/>
+     * If there are mocks that weren't already switched to the replay state using {@link MocksControl#replay()}} or by
+     * calling {@link org.unitils.easymock.EasyMockUnitils#replay()}, this method is called first.
      */
     public void verify() {
         for (MocksControl mocksControl : mocksControls) {
@@ -293,7 +305,9 @@ public class EasyMockModule implements Module {
          */
         @Override
         public void afterTestMethod(Object testObject, Method testMethod) {
-            verify();
+            if (autoVerifyAfterTestEnabled) {
+                verify();
+            }
         }
     }
 
