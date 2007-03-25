@@ -147,7 +147,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Test
     public void testFindUserByLastName() {
         List<User> users = userDao.findByLastName("Doe");
-        ReflectionAssert.assertLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
 }
 +-----+
@@ -265,7 +265,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Test
     public void testFindUserByLastName() {
         List<User> users = userDao.findByLastName("Doe");
-        ReflectionAssert.assertLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
 }
 +-----+
@@ -322,7 +322,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Test
     public void testFindUserByLastName() {
         List<User> users = userDao.findByLastName("Doe");
-        ReflectionAssert.assertLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
   
     @Test
