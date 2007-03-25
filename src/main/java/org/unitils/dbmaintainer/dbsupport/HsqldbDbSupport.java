@@ -15,11 +15,11 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -39,18 +39,21 @@ public class HsqldbDbSupport extends DbSupport {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(HsqldbDbSupport.class);
 
+
     /**
-     * todo implement
+     * Creates support for HsqlDb databases.
      */
-    public Set<String> getSynonymNames() {
-        throw new UnsupportedOperationException("Synonyms not yet implemented for hsqldb");
+    public HsqldbDbSupport() {
+        super("hsqldb");
     }
+
 
     /**
      * Retrieves the names of all the sequences in the database schema.
      *
      * @return The names of all sequences in the database
      */
+    @Override
     public Set<String> getSequenceNames() {
         return getHsqlDbIdentifiers("SEQUENCE_NAME", "SYSTEM_SEQUENCES", "SEQUENCE_SCHEMA");
     }
@@ -61,23 +64,9 @@ public class HsqldbDbSupport extends DbSupport {
      *
      * @return The names of all triggers in the database
      */
+    @Override
     public Set<String> getTriggerNames() {
         return getHsqlDbIdentifiers("TRIGGER_NAME", "SYSTEM_TRIGGERS", "TRIGGER_SCHEM");
-    }
-
-
-    /**
-     * Types are not supported: an UnsupportedOperationException will be raised.
-     */
-    public Set<String> getTypeNames() {
-        throw new UnsupportedOperationException("Hsqldb doesn't support types");
-    }
-
-    /**
-     * Not supported
-     */
-    public void dropType(String typeName) throws StatementHandlerException {
-        throw new UnsupportedOperationException("Hsqldb doesn't support types");
     }
 
 
@@ -87,6 +76,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
+    @Override
     public long getCurrentValueOfSequence(String sequenceName) {
         Connection conn = null;
         Statement st = null;
@@ -112,6 +102,7 @@ public class HsqldbDbSupport extends DbSupport {
      * @param sequenceName     The sequence, not null
      * @param newSequenceValue The value to set
      */
+    @Override
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         statementHandler.handle("alter sequence " + qualified(sequenceName) + " restart with " + newSequenceValue);
     }
@@ -122,15 +113,18 @@ public class HsqldbDbSupport extends DbSupport {
      *
      * @return false
      */
+    @Override
     public boolean supportsSynonyms() {
         return false;
     }
+
 
     /**
      * Sequences are supported.
      *
      * @return True
      */
+    @Override
     public boolean supportsSequences() {
         return true;
     }
@@ -141,6 +135,7 @@ public class HsqldbDbSupport extends DbSupport {
      *
      * @return True
      */
+    @Override
     public boolean supportsTriggers() {
         return true;
     }
@@ -151,18 +146,9 @@ public class HsqldbDbSupport extends DbSupport {
      *
      * @return True
      */
+    @Override
     public boolean supportsIdentityColumns() {
         return true;
-    }
-
-
-    /**
-     * Types are not supported
-     *
-     * @return false
-     */
-    public boolean supportsTypes() {
-        return false;
     }
 
 
@@ -174,10 +160,11 @@ public class HsqldbDbSupport extends DbSupport {
      * @param primaryKeyColumnName The column, not null
      * @param identityValue        The new value
      */
+    @Override
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
-            statementHandler.handle("alter table " + qualified(tableName) + " alter column " +
-                    primaryKeyColumnName + " RESTART WITH " + identityValue);
+            statementHandler.handle("alter table " + qualified(tableName) + " alter column " + primaryKeyColumnName + " RESTART WITH " + identityValue);
+
         } catch (StatementHandlerException e) {
             logger.info("Column " + primaryKeyColumnName + " on table " + tableName + " is " + "not an identity column");
         }
@@ -189,6 +176,7 @@ public class HsqldbDbSupport extends DbSupport {
      *
      * @param connection The database connection, not null
      */
+    @Override
     public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
         Statement st = null;
         try {
@@ -209,35 +197,10 @@ public class HsqldbDbSupport extends DbSupport {
      * @param tableName  The table with the column, not null
      * @param columnName The column to remove constraints from, not null
      */
+    @Override
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         String makeNullableSql = "alter table " + qualified(tableName) + " alter column " + columnName + " set null";
         statementHandler.handle(makeNullableSql);
-    }
-
-
-    /**
-     * Retrieval of table constraint names is not supported : an UnsupportedOperationException will be raised.
-     *
-     * @param tableName The table, not null
-     * @return Nothing
-     */
-    public Set<String> getTableConstraintNames(String tableName) {
-        throw new UnsupportedOperationException("Retrieval of table constraint names is not supported in HSQLDB");
-    }
-
-
-    /**
-     * Disabling of individual constraints is not supported: an UnsupportedOperationException will be raised.
-     *
-     * @param tableName      The table with the constraint, not null
-     * @param constraintName The constraint, not null
-     */
-    public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
-        throw new UnsupportedOperationException("Disabling of individual constraints is not supported in HSQLDB");
-    }
-
-    public String getDbmsName() {
-        return "hsqldb";
     }
 
 

@@ -15,13 +15,13 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.SQLScriptParser;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.util.SQLCodeScriptParser;
-import org.unitils.core.UnitilsException;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -55,17 +55,24 @@ abstract public class DbSupport {
      */
     protected DataSource dataSource;
 
+    /* The name of the DBMS implementation that is supported by this implementation */
+    private String dbmsName;
+
     /* Indicates whether database object names are stored in uppercase in system metadata tables */
     private Boolean storesUpperCaseIdentifiers;
 
     /* Indicates whether database object names are stored in lowercase in system metadata tables */
     private Boolean storesLowerCaseIdentifiers;
 
+
     /**
      * Creates a new, unconfigured instance. To have a instance that can be used, the {@link #init} method must be
      * called first.
+     *
+     * @param dbmsName The name of the DBMS implementation that is supported by this implementation, not null
      */
-    protected DbSupport() {
+    protected DbSupport(String dbmsName) {
+        this.dbmsName = dbmsName;
     }
 
 
@@ -108,7 +115,9 @@ abstract public class DbSupport {
      *
      * @return The names of all synonyms in the database
      */
-    abstract public Set<String> getSynonymNames();
+    public Set<String> getSynonymNames() {
+        throw new UnsupportedOperationException("Synonyms not supported.");
+    }
 
 
     /**
@@ -116,7 +125,9 @@ abstract public class DbSupport {
      *
      * @return The names of all sequences in the database
      */
-    abstract public Set<String> getSequenceNames();
+    public Set<String> getSequenceNames() {
+        throw new UnsupportedOperationException("Sequences not supported.");
+    }
 
 
     /**
@@ -124,7 +135,9 @@ abstract public class DbSupport {
      *
      * @return The names of all triggers in the database
      */
-    abstract public Set<String> getTriggerNames();
+    public Set<String> getTriggerNames() {
+        throw new UnsupportedOperationException("Triggers not supported.");
+    }
 
 
     /**
@@ -132,7 +145,9 @@ abstract public class DbSupport {
      *
      * @return The names of all types in the database
      */
-    abstract public Set<String> getTypeNames();
+    public Set<String> getTypeNames() {
+        throw new UnsupportedOperationException("Types not supported.");
+    }
 
 
     /**
@@ -180,7 +195,7 @@ abstract public class DbSupport {
         if (supportsSequences()) {
             statementHandler.handle("drop sequence " + qualified(sequenceName));
         } else {
-            throw new UnsupportedOperationException("Triggers are not supported for " + getDbmsName());
+            throw new UnsupportedOperationException("Triggers are not supported for " + dbmsName);
         }
     }
 
@@ -195,7 +210,7 @@ abstract public class DbSupport {
         if (supportsTriggers()) {
             statementHandler.handle("drop trigger " + qualified(triggerName));
         } else {
-            throw new UnsupportedOperationException("Triggers are not supported for " + getDbmsName());
+            throw new UnsupportedOperationException("Triggers are not supported for " + dbmsName);
         }
     }
 
@@ -206,7 +221,9 @@ abstract public class DbSupport {
      *
      * @param typeName The type to drop (case-sensitive), not null
      */
-    abstract public void dropType(String typeName) throws StatementHandlerException;
+    public void dropType(String typeName) throws StatementHandlerException {
+        throw new UnsupportedOperationException("Types are not supported for " + dbmsName);
+    }
 
 
     /**
@@ -215,7 +232,9 @@ abstract public class DbSupport {
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
-    abstract public long getCurrentValueOfSequence(String sequenceName);
+    public long getCurrentValueOfSequence(String sequenceName) {
+        throw new UnsupportedOperationException("Sequences not supported for " + dbmsName);
+    }
 
 
     /**
@@ -224,7 +243,9 @@ abstract public class DbSupport {
      * @param sequenceName     The sequence, not null
      * @param newSequenceValue The value to set
      */
-    abstract public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException;
+    public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
+        throw new UnsupportedOperationException("Sequences not supported for " + dbmsName);
+    }
 
 
     /**
@@ -232,7 +253,9 @@ abstract public class DbSupport {
      *
      * @return True if synonyms are supported, false otherwise
      */
-    abstract public boolean supportsSynonyms();
+    public boolean supportsSynonyms() {
+        return false;
+    }
 
 
     /**
@@ -240,7 +263,9 @@ abstract public class DbSupport {
      *
      * @return True if sequences are supported, false otherwise
      */
-    abstract public boolean supportsSequences();
+    public boolean supportsSequences() {
+        return false;
+    }
 
 
     /**
@@ -248,7 +273,9 @@ abstract public class DbSupport {
      *
      * @return True if triggers are supported, false otherwise
      */
-    abstract public boolean supportsTriggers();
+    public boolean supportsTriggers() {
+        return false;
+    }
 
 
     /**
@@ -256,7 +283,9 @@ abstract public class DbSupport {
      *
      * @return True if identity is supported, false otherwise
      */
-    abstract public boolean supportsIdentityColumns();
+    public boolean supportsIdentityColumns() {
+        return false;
+    }
 
 
     /**
@@ -264,7 +293,9 @@ abstract public class DbSupport {
      *
      * @return True if types are supported, false otherwise
      */
-    abstract public boolean supportsTypes();
+    public boolean supportsTypes() {
+        return false;
+    }
 
 
     /**
@@ -302,7 +333,9 @@ abstract public class DbSupport {
      * @param primaryKeyColumnName The column, not null
      * @param identityValue        The new value
      */
-    abstract public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue);
+    public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
+        throw new UnsupportedOperationException("Identity columns not supported for " + dbmsName);
+    }
 
 
     /**
@@ -310,7 +343,9 @@ abstract public class DbSupport {
      *
      * @param connection The database connection, not null
      */
-    abstract public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection);
+    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
+        throw new UnsupportedOperationException("Disabling foreign key contstraints on connection not supported for " + dbmsName);
+    }
 
 
     /**
@@ -319,7 +354,9 @@ abstract public class DbSupport {
      * @param tableName  The table with the column, not null
      * @param columnName The column to remove constraints from, not null
      */
-    abstract public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException;
+    public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
+        throw new UnsupportedOperationException("Remove not null constraints not supported for " + dbmsName);
+    }
 
 
     /**
@@ -361,7 +398,9 @@ abstract public class DbSupport {
      * @param tableName The table, not null
      * @return The set of constraint names, not null
      */
-    abstract public Set<String> getTableConstraintNames(String tableName);
+    public Set<String> getTableConstraintNames(String tableName) {
+        throw new UnsupportedOperationException("Retrieval of table constraints not supported for " + dbmsName);
+    }
 
 
     /**
@@ -370,7 +409,9 @@ abstract public class DbSupport {
      * @param tableName      The table with the constraint, not null
      * @param constraintName The constraint, not null
      */
-    abstract public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException;
+    public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
+        throw new UnsupportedOperationException("Disabling of constraints not supported for " + dbmsName);
+    }
 
 
     /**
@@ -409,9 +450,9 @@ abstract public class DbSupport {
      * individual pieces of code are recognized depends fully on the implementation. The resulting strings must be
      * individually applyable to the database.
      *
-     * @param script
+     * @param script The script content, not null
      * @return A <code>List</code> containing individual pieces of database code, each individually applyable to the
-     * database.
+     *         database.
      */
     public List<String> parseCodeStatements(String script) {
         SQLCodeScriptParser sqlCodeScriptParser = new SQLCodeScriptParser();
@@ -448,11 +489,6 @@ abstract public class DbSupport {
 
 
     /**
-     * @return The name of the DBMS implementation that is supported by this implementation of {@link DbSupport}
-     */
-    public abstract String getDbmsName();
-
-    /**
      * Qualifies the given database object name with the name of the database schema. Quotes are put around both
      * schemaname and object name. If the schemaName is not supplied, the database object is returned surrounded with
      * quotes. If the DBMS doesn't support quoted database object names, no quotes are put around neither schema name
@@ -462,14 +498,15 @@ abstract public class DbSupport {
      * @return The qualified database object name
      */
     public String qualified(String databaseObjectName) {
-        return ((supportsSchemaQualification() && StringUtils.isNotEmpty(schemaName)) ? quoted(schemaName) : "") + "." + quoted(databaseObjectName);
+        return ((supportsSchemaQualification() && isNotEmpty(schemaName)) ? quoted(schemaName) : "") + "." + quoted(databaseObjectName);
     }
+
 
     /**
      * Put quotes around the given databaseObjectName, if the underlying DBMS supports quoted database object names.
      * If not, the databaseObjectName is returned unchanged.
      *
-     * @param databaseObjectName
+     * @param databaseObjectName The name, not null
      * @return Quoted version of the given databaseObjectName, if supported by the underlying DBMS
      */
     public String quoted(String databaseObjectName) {
@@ -480,25 +517,28 @@ abstract public class DbSupport {
         }
     }
 
+
     /**
      * Indicates whether the underlying DBMS supports database object names that are qualified by the schema name.
      *
      * @return true by default. If the underlying DBMS doesn't support qualified database object names,
-     * this method should be overwritten
+     *         this method should be overwritten
      */
     public boolean supportsSchemaQualification() {
         return true;
     }
 
+
     /**
      * Indicates whether the underlying DBMS supports quoted database object names.
      *
      * @return true by default. If the underlying DBMS doesn't support quoted database object names,
-     * this method should be overwritten
+     *         this method should be overwritten
      */
     public boolean supportsQuotedDatabaseObjectNames() {
         return true;
     }
+
 
     /**
      * Converts the given identifier to uppercase/lowercase depending on the DBMS. If a value is surrounded with double
@@ -525,6 +565,7 @@ abstract public class DbSupport {
         }
     }
 
+
     /**
      * @return True if database object names are stored in uppercase in database metadata tables, false otherwise.
      */
@@ -542,6 +583,7 @@ abstract public class DbSupport {
         }
         return storesUpperCaseIdentifiers;
     }
+
 
     /**
      * @return True if database object names are stored in uppercase in database metadata tables, false otherwise.

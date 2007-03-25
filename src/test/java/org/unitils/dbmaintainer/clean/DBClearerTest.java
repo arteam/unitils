@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
@@ -24,6 +23,7 @@ import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -94,18 +94,18 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_tables() throws Exception {
         if (isTestedDialectActivated()) {
-            assertTrue(tableExists(dbSupport.toCorrectCaseIdentifier("TEST_TABLE")));
-            assertTrue(tableExists(dbSupport.toCorrectCaseIdentifier("TEST_TABLE_PRESERVE")));
+            assertTrue(tableExists("TEST_TABLE"));
+            assertTrue(tableExists("TEST_TABLE_PRESERVE"));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
-                assertTrue(tableExists("Test_CASE_Table"));
-                assertTrue(tableExists("Test_CASE_Table_Preserve"));
+                assertTrue(tableExists(dbSupport.quoted("Test_CASE_Table")));
+                assertTrue(tableExists(dbSupport.quoted("Test_CASE_Table_Preserve")));
             }
             dbClearer.clearSchema();
-            assertFalse(tableExists(dbSupport.toCorrectCaseIdentifier("TEST_TABLE")));
-            assertTrue(tableExists(dbSupport.toCorrectCaseIdentifier("TEST_TABLE_PRESERVE")));
+            assertFalse(tableExists("TEST_TABLE"));
+            assertTrue(tableExists("TEST_TABLE_PRESERVE"));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
-                assertFalse(tableExists("Test_CASE_Table"));
-                assertTrue(tableExists("Test_CASE_Table_Preserve"));
+                assertFalse(tableExists(dbSupport.quoted("Test_CASE_Table")));
+                assertTrue(tableExists(dbSupport.quoted("Test_CASE_Table_Preserve")));
             }
         }
     }
@@ -116,18 +116,18 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_views() throws Exception {
         if (isTestedDialectActivated()) {
-            assertTrue(viewExists(dbSupport.toCorrectCaseIdentifier("TEST_VIEW")));
-            assertTrue(viewExists(dbSupport.toCorrectCaseIdentifier("TEST_VIEW_PRESERVE")));
+            assertTrue(viewExists("TEST_VIEW"));
+            assertTrue(viewExists("TEST_VIEW_PRESERVE"));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
-                assertTrue(viewExists("Test_CASE_View"));
-                assertTrue(viewExists("Test_CASE_View_Preserve"));
+                assertTrue(viewExists(dbSupport.quoted("Test_CASE_View")));
+                assertTrue(viewExists(dbSupport.quoted("Test_CASE_View_Preserve")));
             }
             dbClearer.clearSchema();
-            assertFalse(viewExists(dbSupport.toCorrectCaseIdentifier("TEST_VIEW")));
-            assertTrue(viewExists(dbSupport.toCorrectCaseIdentifier("TEST_VIEW_PRESERVE")));
+            assertFalse(viewExists("TEST_VIEW"));
+            assertTrue(viewExists("TEST_VIEW_PRESERVE"));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
-                assertFalse(viewExists("Test_CASE_View"));
-                assertTrue(viewExists("Test_CASE_View_Preserve"));
+                assertFalse(viewExists(dbSupport.quoted("Test_CASE_View")));
+                assertTrue(viewExists(dbSupport.quoted("Test_CASE_View_Preserve")));
             }
         }
     }
@@ -138,18 +138,18 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      */
     public void testClearDatabase_sequences() throws Exception {
         if (isTestedDialectActivated() && dbSupport.supportsSequences()) {
-            assertTrue(sequenceExists(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE")));
-            assertTrue(sequenceExists(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE_PRESERVE")));
+            assertTrue(sequenceExists("TEST_SEQUENCE"));
+            assertTrue(sequenceExists("TEST_SEQUENCE_PRESERVE"));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
-                assertTrue(sequenceExists("Test_CASE_Sequence"));
-                assertTrue(sequenceExists("Test_CASE_Sequence_Preserve"));
+                assertTrue(sequenceExists(dbSupport.quoted("Test_CASE_Sequence")));
+                assertTrue(sequenceExists(dbSupport.quoted("Test_CASE_Sequence_Preserve")));
             }
             dbClearer.clearSchema();
-            assertFalse(sequenceExists(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE")));
-            assertTrue(sequenceExists(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE_PRESERVE")));
+            assertFalse(sequenceExists("TEST_SEQUENCE"));
+            assertTrue(sequenceExists("TEST_SEQUENCE_PRESERVE"));
             if (dbSupport.supportsQuotedDatabaseObjectNames()) {
-                assertFalse(sequenceExists("Test_CASE_Sequence"));
-                assertTrue(sequenceExists("Test_CASE_Sequence_Preserve"));
+                assertFalse(sequenceExists(dbSupport.quoted("Test_CASE_Sequence")));
+                assertTrue(sequenceExists(dbSupport.quoted("Test_CASE_Sequence_Preserve")));
             }
         }
     }
@@ -162,18 +162,23 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         if (isTestedDialectActivated() && dbSupport.supportsTriggers()) {
             assertTrue(triggerExists("TEST_TRIGGER"));
             assertTrue(triggerExists("TEST_TRIGGER_PRESERVE"));
-            assertTrue(triggerExists("Test_CASE_Trigger"));
-            assertTrue(triggerExists("Test_CASE_Trigger_Preserve"));
+            assertTrue(triggerExists(dbSupport.quoted("Test_CASE_Trigger")));
+            assertTrue(triggerExists(dbSupport.quoted("Test_CASE_Trigger_Preserve")));
             dbClearer.clearSchema();
             assertFalse(triggerExists("TEST_TRIGGER"));
             assertTrue(triggerExists("TEST_TRIGGER_PRESERVE"));
-            assertFalse(triggerExists("Test_CASE_Trigger"));
-            assertTrue(triggerExists("Test_CASE_Trigger_Preserve"));
+            assertFalse(triggerExists(dbSupport.quoted("Test_CASE_Trigger")));
+            assertTrue(triggerExists(dbSupport.quoted("Test_CASE_Trigger_Preserve")));
         }
     }
 
 
-    //todo javadoc
+    /**
+     * Creates a trigger for the test.
+     *
+     * @param tableName   The table for the trigger, not null
+     * @param triggerName The name of the trigger, not null
+     */
     abstract protected void createTestTrigger(String tableName, String triggerName) throws SQLException;
 
 
@@ -193,7 +198,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * @return True if the table with the given name exists, false otherwise
      */
     public boolean tableExists(String tableName) throws SQLException {
-        return dbSupport.getTableNames().contains(tableName);
+        String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
+        return dbSupport.getTableNames().contains(correctCaseTableName);
     }
 
 
@@ -204,7 +210,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * @return True if the view with the given name exists, false otherwise
      */
     public boolean viewExists(String viewName) throws SQLException {
-        return dbSupport.getViewNames().contains(viewName);
+        String correctCaseViewName = dbSupport.toCorrectCaseIdentifier(viewName);
+        return dbSupport.getViewNames().contains(correctCaseViewName);
     }
 
 
@@ -215,7 +222,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * @return True if the trigger with the given name exists, false otherwise
      */
     public boolean triggerExists(String triggerName) throws SQLException {
-        return dbSupport.getTriggerNames().contains(triggerName);
+        String correctCaseTriggerName = dbSupport.toCorrectCaseIdentifier(triggerName);
+        return dbSupport.getTriggerNames().contains(correctCaseTriggerName);
     }
 
 
@@ -226,7 +234,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * @return True if the sequence with the given name exists, false otherwise
      */
     public boolean sequenceExists(String sequenceName) throws SQLException {
-        return dbSupport.getSequenceNames().contains(sequenceName);
+        String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier(sequenceName);
+        return dbSupport.getSequenceNames().contains(correctCaseSequenceName);
     }
 
 
@@ -273,10 +282,10 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
      * Drops all created test database structures (views, tables...)
      */
     protected void cleanupTestDatabase() throws Exception {
-        dropTestTables("TEST_TABLE", "TEST_TABLE_PRESERVE", "Test_CASE_Table", "Test_CASE_Table_Preserve");
-        dropTestViews("TEST_VIEW", "TEST_VIEW_PRESERVE", "Test_CASE_View", "Test_CASE_View_Preserve");
-        dropTestSequences("TEST_SEQUENCE", "TEST_SEQUENCE_PRESERVE", "Test_CASE_Sequence", "Test_CASE_Sequence_Preserve");
-        dropTestTriggers("TEST_TRIGGER", "TEST_TRIGGER_PRESERVE", "Test_CASE_Trigger", "Test_CASE_Trigger_Preserve");
+        dropTestTables("TEST_TABLE", "TEST_TABLE_PRESERVE", dbSupport.quoted("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Table_Preserve"));
+        dropTestViews("TEST_VIEW", "TEST_VIEW_PRESERVE", dbSupport.quoted("Test_CASE_View"), dbSupport.quoted("Test_CASE_View_Preserve"));
+        dropTestSequences("TEST_SEQUENCE", "TEST_SEQUENCE_PRESERVE", dbSupport.quoted("Test_CASE_Sequence"), dbSupport.quoted("Test_CASE_Sequence_Preserve"));
+        dropTestTriggers("TEST_TRIGGER", "TEST_TRIGGER_PRESERVE", dbSupport.quoted("Test_CASE_Trigger"), dbSupport.quoted("Test_CASE_Trigger_Preserve"));
     }
 
 
@@ -288,7 +297,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     private void dropTestTables(String... tableNames) {
         for (String tableName : tableNames) {
             try {
-                dbSupport.dropTable(tableName);
+                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
+                dbSupport.dropTable(correctCaseTableName);
             } catch (StatementHandlerException e) {
                 // Ignored
             }
@@ -304,7 +314,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
     private void dropTestViews(String... viewNames) {
         for (String viewName : viewNames) {
             try {
-                dbSupport.dropView(viewName);
+                String correctCaseViewName = dbSupport.toCorrectCaseIdentifier(viewName);
+                dbSupport.dropView(correctCaseViewName);
             } catch (StatementHandlerException e) {
                 // Ignored
             }
@@ -323,7 +334,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
         for (String sequenceName : sequenceNames) {
             try {
-                dbSupport.dropSequence(sequenceName);
+                String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier(sequenceName);
+                dbSupport.dropSequence(correctCaseSequenceName);
             } catch (StatementHandlerException e) {
                 // Ignored
             }
@@ -342,7 +354,8 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
         }
         for (String triggerName : triggerNames) {
             try {
-                dbSupport.dropTrigger(triggerName);
+                String correctCaseTriggerName = dbSupport.toCorrectCaseIdentifier(triggerName);
+                dbSupport.dropTrigger(correctCaseTriggerName);
             } catch (StatementHandlerException e) {
                 // Ignored
             }

@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
@@ -23,6 +22,7 @@ import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -106,12 +106,14 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             try {
-                dbSupport.dropTable("TABLE2");
+                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier("TABLE2");
+                dbSupport.dropTable(correctCaseTableName);
             } catch (StatementHandlerException e) {
                 // Ignored
             }
             try {
-                dbSupport.dropTable("TABLE1");
+                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier("TABLE1");
+                dbSupport.dropTable(correctCaseTableName);
             } catch (StatementHandlerException e) {
                 // Ignored
             }

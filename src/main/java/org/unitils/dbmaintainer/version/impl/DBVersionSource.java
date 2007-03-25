@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.version.impl;
 
-import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -23,6 +22,7 @@ import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionSource;
+import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
 
 import java.sql.*;
@@ -86,12 +86,20 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
      * @param configuration the configuration, not null
      */
     protected void doInit(Properties configuration) {
-        this.versionTableName = PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration).toUpperCase();
-        this.versionIndexColumnName = PropertyUtils.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME, configuration).toUpperCase();
-        this.versionTimestampColumnName = PropertyUtils.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME, configuration).toUpperCase();
-        this.lastUpdateSucceededColumnName = PropertyUtils.getString(PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME, configuration).toUpperCase();
-        this.codeScriptsTimestampColumnName = PropertyUtils.getString(PROPKEY_CODESCRIPTS_TIMESTAMP_COLUMN_NAME, configuration).toUpperCase();
-        this.lastCodeUpdateSucceededColumnName = PropertyUtils.getString(PROPKEY_LAST_CODE_UPDATE_SUCCEEDED_COLUMN_NAME, configuration).toUpperCase();
+        this.versionTableName = PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration);
+        this.versionIndexColumnName = PropertyUtils.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME, configuration);
+        this.versionTimestampColumnName = PropertyUtils.getString(PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME, configuration);
+        this.lastUpdateSucceededColumnName = PropertyUtils.getString(PROPKEY_LAST_UPDATE_SUCCEEDED_COLUMN_NAME, configuration);
+        this.codeScriptsTimestampColumnName = PropertyUtils.getString(PROPKEY_CODESCRIPTS_TIMESTAMP_COLUMN_NAME, configuration);
+        this.lastCodeUpdateSucceededColumnName = PropertyUtils.getString(PROPKEY_LAST_CODE_UPDATE_SUCCEEDED_COLUMN_NAME, configuration);
+
+        // convert to correct case
+        versionTableName = dbSupport.toCorrectCaseIdentifier(versionTableName);
+        versionIndexColumnName = dbSupport.toCorrectCaseIdentifier(versionIndexColumnName);
+        versionTimestampColumnName = dbSupport.toCorrectCaseIdentifier(versionTimestampColumnName);
+        lastUpdateSucceededColumnName = dbSupport.toCorrectCaseIdentifier(lastUpdateSucceededColumnName);
+        codeScriptsTimestampColumnName = dbSupport.toCorrectCaseIdentifier(codeScriptsTimestampColumnName);
+        lastCodeUpdateSucceededColumnName = dbSupport.toCorrectCaseIdentifier(lastCodeUpdateSucceededColumnName);
     }
 
 
@@ -257,8 +265,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
         try {
             conn = dataSource.getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " +
-                    dbSupport.qualified(versionTableName));
+            rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " + dbSupport.qualified(versionTableName));
             rs.next();
             return new Version(rs.getLong(versionIndexColumnName), rs.getLong(versionTimestampColumnName));
 

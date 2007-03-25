@@ -74,7 +74,7 @@ public class DatabaseModuleConfigUtils {
     public static DbSupport getConfiguredDbSupportInstance(Properties configuration, DataSource dataSource, StatementHandler statementHandler) {
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         DbSupport dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
-        String schemaName = PropertyUtils.getString(PROPKEY_DATABASE_SCHEMANAME, configuration).toUpperCase();
+        String schemaName = PropertyUtils.getString(PROPKEY_DATABASE_SCHEMANAME, configuration);
         dbSupport.init(dataSource, schemaName, statementHandler);
         return dbSupport;
     }

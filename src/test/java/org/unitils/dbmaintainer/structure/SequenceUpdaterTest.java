@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
@@ -23,6 +22,7 @@ import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -227,7 +227,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      * @return the sequence
      */
     private long getCurrentTestSequenceValue() throws SQLException {
-        return dbSupport.getCurrentValueOfSequence("TESTSEQUENCE");
+        String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier("TESTSEQUENCE");
+        return dbSupport.getCurrentValueOfSequence(correctCaseSequenceName);
     }
 
 }
