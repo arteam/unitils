@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.version;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
@@ -25,6 +24,7 @@ import org.unitils.dbmaintainer.script.StatementHandler;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
 import org.unitils.dbunit.annotation.DataSet;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -101,7 +101,8 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
     @DataSet("DBVersionSourceTest.versionTableFilled.xml")
     public void testGetDBVersion() throws Exception {
         Version expectedVersion = new Version(3L, DateUtils.parseDate("2006-10-08 12:00", new String[]{"yyyy-MM-dd hh:mm"}).getTime());
-        assertRefEquals(expectedVersion, dbVersionSource.getDbVersion());
+        Version result = dbVersionSource.getDbVersion();
+        assertRefEquals(expectedVersion, result);
     }
 
 
@@ -152,9 +153,11 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
             st = conn.createStatement();
             try {
                 String longDataType = dbSupport.getLongDataType();
-                st.execute("create table db_version (version_index " + longDataType + ", last_updated_on " +
+                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier("db_version");
+                st.execute("create table " + dbSupport.qualified(correctCaseTableName) + " (version_index " + longDataType + ", last_updated_on " +
                         longDataType + ", last_update_succeeded " + longDataType + ")");
             } catch (SQLException e) {
+                e.printStackTrace();
                 // Ignored
             }
         } finally {
@@ -173,7 +176,8 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
             conn = dataSource.getConnection();
             st = conn.createStatement();
             try {
-                st.execute("drop table db_version");
+                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier("db_version");
+                st.execute("drop table " + dbSupport.qualified(correctCaseTableName));
             } catch (SQLException e) {
                 // Ignored
             }

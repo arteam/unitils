@@ -15,9 +15,9 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -37,10 +37,19 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
+     * Creates support for MySql databases.
+     */
+    public MySqlDbSupport() {
+        super("mysql");
+    }
+
+
+    /**
      * Returns the names of all tables in the database.
      *
      * @return The names of all tables in the database
      */
+    @Override
     public Set<String> getTableNames() {
         Connection conn = null;
         ResultSet rset = null;
@@ -68,6 +77,7 @@ public class MySqlDbSupport extends DbSupport {
      *
      * @return The names of all views in the database
      */
+    @Override
     public Set<String> getViewNames() {
         Connection conn = null;
         ResultSet rset = null;
@@ -89,29 +99,13 @@ public class MySqlDbSupport extends DbSupport {
         }
     }
 
-    /**
-     * todo implement
-     */
-    public Set<String> getSynonymNames() {
-        throw new UnsupportedOperationException("Synonyms not yet implemented for mysql");
-    }
-
-
-    /**
-     * Sequences are not supported, an UnsupportedOperationException will be raised.
-     *
-     * @return Nothing
-     */
-    public Set<String> getSequenceNames() {
-        throw new UnsupportedOperationException("Sequences are not supported in MySQL");
-    }
-
 
     /**
      * Retrieves the names of all the triggers in the database schema.
      *
      * @return The names of all triggers in the database
      */
+    @Override
     public Set<String> getTriggerNames() {
         Connection conn = null;
         ResultSet rset = null;
@@ -135,67 +129,11 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
-     * Types are not supported: an UnsupportedOperationException will be raised.
-     */
-    public Set<String> getTypeNames() {
-        throw new UnsupportedOperationException("Mysql doesn't support types");
-    }
-
-    /**
-     * Types are not supported: an UnsupportedOperationException will be raised.
-     *
-     * @param typeName The type to drop (case-sensitive), not null
-     */
-    public void dropType(String typeName) throws StatementHandlerException {
-        throw new UnsupportedOperationException("Mysql doesn't support types");
-    }
-
-
-    /**
-     * Sequences are not supported, an UnsupportedOperationException will be raised.
-     *
-     * @return Nothing
-     */
-    public long getCurrentValueOfSequence(String sequenceName) {
-        throw new UnsupportedOperationException("Sequences are not supported in MySQL");
-    }
-
-
-    /**
-     * Sequences are not supported, an UnsupportedOperationException will be raised.
-     *
-     * @param sequenceName     The sequence, not null
-     * @param newSequenceValue The value to set
-     */
-    public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
-        throw new UnsupportedOperationException("Sequences are not supported in MySQL");
-    }
-
-    /**
-     * Synonyms are not supported
-     *
-     * @return False
-     */
-    public boolean supportsSynonyms() {
-        return false;
-    }
-
-
-    /**
-     * Sequences are not supported.
-     *
-     * @return False
-     */
-    public boolean supportsSequences() {
-        return false;
-    }
-
-
-    /**
      * Triggers are supported.
      *
      * @return True
      */
+    @Override
     public boolean supportsTriggers() {
         return true;
     }
@@ -206,18 +144,9 @@ public class MySqlDbSupport extends DbSupport {
      *
      * @return True
      */
+    @Override
     public boolean supportsIdentityColumns() {
         return true;
-    }
-
-
-    /**
-     * Types are not supported
-     *
-     * @return false
-     */
-    public boolean supportsTypes() {
-        return false;
     }
 
 
@@ -229,6 +158,7 @@ public class MySqlDbSupport extends DbSupport {
      * @param primaryKeyColumnName The column, not null
      * @param identityValue        The new value
      */
+    @Override
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         try {
             statementHandler.handle("alter table " + qualified(tableName) + " AUTO_INCREMENT = " + identityValue);
@@ -244,6 +174,7 @@ public class MySqlDbSupport extends DbSupport {
      *
      * @param connection The database connection, not null
      */
+    @Override
     public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
         Statement statement = null;
         try {
@@ -264,20 +195,10 @@ public class MySqlDbSupport extends DbSupport {
      * @param tableName  The table with the column, not null
      * @param columnName The column to remove constraints from, not null
      */
+    @Override
     public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
         String type = getColumnType(tableName, columnName);
         statementHandler.handle("alter table " + qualified(tableName) + " change column " + columnName + " " + columnName + " " + type + " NULL ");
-    }
-
-
-    /**
-     * Retrieval of table constraint names is not supported: an UnsupportedOperationException will be raised.
-     *
-     * @param tableName The table, not null
-     * @return Nothing
-     */
-    public Set<String> getTableConstraintNames(String tableName) {
-        throw new UnsupportedOperationException("Retrieval of table constraint names is not supported in MySQL");
     }
 
 
@@ -287,29 +208,37 @@ public class MySqlDbSupport extends DbSupport {
      * @param tableName      The table with the constraint, not null
      * @param constraintName The constraint, not null
      */
+    @Override
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         statementHandler.handle("alter table " + qualified(tableName) + " disable constraint " + constraintName);
     }
 
-    public String getDbmsName() {
-        return "mysql";
-    }
 
     /**
+     * todo is this correct?
+     * <p/>
      * This method is overwritten, since Mysql doesn't support quoted database object names
+     *
      * @return false
      */
+    @Override
     public boolean supportsQuotedDatabaseObjectNames() {
         return false;
     }
 
+
     /**
+     * todo is this correct?
+     * <p/>
      * This method is overwritten, since Mysql doesn't support schema qualification
+     *
      * @return false
      */
+    @Override
     public boolean supportsSchemaQualification() {
         return false;
     }
+
 
     /**
      * Gets the type of the column with the given name in the given table. An exception is thrown if

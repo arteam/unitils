@@ -29,18 +29,21 @@ import java.util.Set;
  * Implementation of {@link ConstraintsDisabler} for a DBMS with following properties:
  * <ul>
  * <li>Constraints can be disabled permanently and individually</li>
+ * <li>Not null constraints are treated differently from foreign key constraints</li>
  * <li>Foreign key constraints checking cannot be disabled on a JDBC connection<li>
  * </ul>
- * Examples of such a DBMS are Oracle and DB2.
+ * Examples of such a DBMS are PostgreSql.
+ * <p/>
+ * todo merge MySql, Oracle and PostfreSql styles into 1 disabler
  *
- * @author Filip Neven
- * @author Bart Vermeiren
+ * @author Sunteya
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
-public class OracleStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
+public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(OracleStyleConstraintsDisabler.class);
+    private static Log logger = LogFactory.getLog(PostgreSqlStyleConstraintsDisabler.class);
 
 
     /**
@@ -57,11 +60,51 @@ public class OracleStyleConstraintsDisabler extends DatabaseTask implements Cons
      */
     public void disableConstraints() throws StatementHandlerException {
         logger.info("Disabling constraints");
+        removeForeignKeyConstraints();
+        removeNotNullConstraints();
+    }
+
+
+    /**
+     * Removes all foreign key constraints.
+     */
+    protected void removeForeignKeyConstraints() throws StatementHandlerException {
+        logger.info("Disabling constraints");
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             Set<String> constraintNames = dbSupport.getTableConstraintNames(tableName);
             for (String constraintName : constraintNames) {
                 dbSupport.disableConstraint(tableName, constraintName);
+            }
+        }
+    }
+
+
+    /**
+     * Removes all not-null constraints are disabled.
+     */
+    protected void removeNotNullConstraints() throws StatementHandlerException {
+        Set<String> tableNames = dbSupport.getTableNames();
+        for (String tableName : tableNames) {
+            removeNotNullConstraints(tableName);
+        }
+    }
+
+
+    /**
+     * Removes all not-null constraints for the table with the given name.
+     *
+     * @param tableName The name of the table to remove constraints from, not null
+     */
+    protected void removeNotNullConstraints(String tableName) throws StatementHandlerException {
+        // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
+        Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
+        // Iterate over all column names
+        Set<String> notNullColumnNames = dbSupport.getNotNullColummnNames(tableName);
+        for (String notNullColumnName : notNullColumnNames) {
+            if (!primaryKeyColumnNames.contains(notNullColumnName)) {
+                // Remove the not-null constraint. Disabling is not possible in Hsqldb
+                dbSupport.removeNotNullConstraint(tableName, notNullColumnName);
             }
         }
     }

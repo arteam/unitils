@@ -15,7 +15,6 @@
  */
 package org.unitils.dbunit;
 
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ReplacementDataSet;
@@ -31,6 +30,7 @@ import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.TablePerRowXmlDataSet;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import org.unitils.util.PropertyUtils;
 
@@ -98,7 +98,7 @@ public class DbUnitModule implements Module {
      * @param configuration The config, not null
      */
     public void init(Properties configuration) {
-        schemaName = PropertyUtils.getString(PROPKEY_SCHEMA_NAME, configuration).toUpperCase();
+        schemaName = PropertyUtils.getString(PROPKEY_SCHEMA_NAME, configuration);
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
     }

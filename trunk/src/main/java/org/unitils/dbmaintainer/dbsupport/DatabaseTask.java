@@ -59,7 +59,7 @@ abstract public class DatabaseTask {
         this.dataSource = dataSource;
         this.statementHandler = statementHandler;
 
-        schemaName = PropertyUtils.getString(PROPKEY_SCHEMANAME, configuration).toUpperCase();
+        schemaName = PropertyUtils.getString(PROPKEY_SCHEMANAME, configuration);
         doInit(configuration);
     }
 

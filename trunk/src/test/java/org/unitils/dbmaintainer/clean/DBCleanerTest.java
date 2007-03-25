@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
@@ -24,6 +23,7 @@ import org.unitils.dbmaintainer.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -47,8 +47,14 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     /* Tested object */
     private DBCleaner dbCleaner;
 
+    /* The sql statement handler */
+    private StatementHandler statementHandler;
+
     /* The DbSupport object */
     private DbSupport dbSupport;
+
+    /* The name of the version tabel */
+    private String versionTableName;
 
 
     /**
@@ -64,9 +70,10 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE, itemsToPreserve);
 
-        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
+        statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
         dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
         dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+        versionTableName = dbSupport.qualified(dbSupport.toCorrectCaseIdentifier("db_version"));
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -87,18 +94,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables that are not configured as tables to preserve are correctly cleaned
      */
     public void testCleanDatabase() throws Exception {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            assertFalse(isEmpty("TEST_TABLE"));
-            assertFalse(isEmpty("TEST_TABLE"));
-            assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table")));
-            dbCleaner.cleanSchema();
-            assertTrue(isEmpty("TEST_TABLE"));
-            assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table")));
-        } finally {
-            closeQuietly(conn);
-        }
+        assertFalse(isEmpty("TEST_TABLE"));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table")));
+        dbCleaner.cleanSchema();
+        assertTrue(isEmpty("TEST_TABLE"));
+        assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table")));
     }
 
 
@@ -106,15 +106,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables that are configured as tables to preserve are left untouched
      */
     public void testCleanDatabase_preserveDbVersionTable() throws Exception {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            assertFalse(isEmpty("DB_VERSION"));
-            dbCleaner.cleanSchema();
-            assertFalse(isEmpty("DB_VERSION"));
-        } finally {
-            closeQuietly(conn);
-        }
+        assertFalse(isEmpty(versionTableName));
+        dbCleaner.cleanSchema();
+        assertFalse(isEmpty(versionTableName));
     }
 
 
@@ -122,39 +116,25 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables to preserve are left untouched
      */
     public void testCleanDatabase_preserveTablesToPreserve() throws Exception {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
-            assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
-            dbCleaner.cleanSchema();
-            assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
-            assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
-        } finally {
-            closeQuietly(conn);
-        }
+        assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
+        dbCleaner.cleanSchema();
+        assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
     }
 
 
     /**
      * Creates the test tables
      */
-    private void createTestDatabase() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create table DB_VERSION(testcolumn varchar(10))");
-            st.execute("create table TEST_TABLE(testcolumn varchar(10))");
-            st.execute("create table TEST_TABLE_PRESERVE(testcolumn varchar(10))");
-            st.execute("create table " + dbSupport.quoted("Test_CASE_Table") + " (col1 varchar(10))");
-            st.execute("create table " + dbSupport.quoted("Test_CASE_Table_Preserve") + " (col1 varchar(10))");
-            // Also create a view, to see if the DBCleaner doesn't crash on views
-            st.execute("create view TEST_VIEW as (select * from TEST_TABLE_PRESERVE)");
-        } finally {
-            closeQuietly(conn, st, null);
-        }
+    private void createTestDatabase() throws Exception {
+        statementHandler.handle("create table " + versionTableName + "(testcolumn varchar(10))");
+        statementHandler.handle("create table TEST_TABLE(testcolumn varchar(10))");
+        statementHandler.handle("create table TEST_TABLE_PRESERVE(testcolumn varchar(10))");
+        statementHandler.handle("create table " + dbSupport.quoted("Test_CASE_Table") + " (col1 varchar(10))");
+        statementHandler.handle("create table " + dbSupport.quoted("Test_CASE_Table_Preserve") + " (col1 varchar(10))");
+        // Also create a view, to see if the DBCleaner doesn't crash on views
+        statementHandler.handle("create view TEST_VIEW as (select * from TEST_TABLE_PRESERVE)");
     }
 
 
@@ -162,20 +142,17 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Removes the test database tables
      */
     private void cleanupTestDatabase() throws SQLException {
-        dropTestTables("TEST_TABLE", "TEST_TABLE_PRESERVE", "Test_CASE_Table", "Test_CASE_Table_Preserve", "DB_VERSION");
+        dropTestTables("TEST_TABLE", "TEST_TABLE_PRESERVE", dbSupport.quoted("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Table_Preserve"));
 
-        Connection conn = null;
-        Statement st = null;
         try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            try {
-                dbSupport.dropView("TEST_VIEW");
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-        } finally {
-            closeQuietly(conn, st, null);
+            statementHandler.handle("drop table " + versionTableName);
+        } catch (StatementHandlerException e) {
+            // Ignored
+        }
+        try {
+            dbSupport.dropView("TEST_VIEW");
+        } catch (StatementHandlerException e) {
+            // Ignored
         }
     }
 
@@ -188,7 +165,8 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     private void dropTestTables(String... tableNames) {
         for (String tableName : tableNames) {
             try {
-                dbSupport.dropTable(tableName);
+                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
+                dbSupport.dropTable(correctCaseTableName);
             } catch (StatementHandlerException e) {
                 // Ignored
             }
@@ -199,20 +177,12 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     /**
      * Inserts a test record in each test table
      */
-    private void insertTestData() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("insert into DB_VERSION values('test')");
-            st.execute("insert into TEST_TABLE values('test')");
-            st.execute("insert into TEST_TABLE_PRESERVE values('test')");
-            st.execute("insert into " + dbSupport.quoted("Test_CASE_Table") + " values('test')");
-            st.execute("insert into " + dbSupport.quoted("Test_CASE_Table_Preserve") + " values('test')");
-        } finally {
-            closeQuietly(conn, st, null);
-        }
+    private void insertTestData() throws Exception {
+        statementHandler.handle("insert into " + versionTableName + " values('test')");
+        statementHandler.handle("insert into TEST_TABLE values('test')");
+        statementHandler.handle("insert into TEST_TABLE_PRESERVE values('test')");
+        statementHandler.handle("insert into " + dbSupport.quoted("Test_CASE_Table") + " values('test')");
+        statementHandler.handle("insert into " + dbSupport.quoted("Test_CASE_Table_Preserve") + " values('test')");
     }
 
 

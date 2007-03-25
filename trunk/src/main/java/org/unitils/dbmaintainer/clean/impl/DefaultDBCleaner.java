@@ -15,13 +15,13 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 import static org.unitils.util.PropertyUtils.getStringList;
 

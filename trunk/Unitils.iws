@@ -18,11 +18,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorEnumsTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/resources/unitils.properties" afterPath="$PROJECT_DIR$/src/test/resources/unitils.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/HsqldbDbSupport.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/PostgreSqlDBClearerTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.versionTableEmpty.xml" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.versionTableEmpty.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/OracleDbSupport.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/dbsupport/PostgreSqlDbSupportTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DB2DBClearerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DB2DBClearerTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/OracleStyleConstraintsDisabler.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/OracleStyleConstraintsDisabler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iml" afterPath="$PROJECT_DIR$/Unitils.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/unitils.properties" afterPath="$PROJECT_DIR$/src/site/resources/unitils.properties" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/dbsupport" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.versionTableFilled.xml" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.versionTableFilled.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/Db2DbSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/impl/DBVersionSource.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/impl/DBVersionSource.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseModuleConfigUtils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseModuleConfigUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DatabaseTask.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DatabaseTask.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/PostgreSqlStyleConstraintsDisabler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/MySqlDbSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsDisablerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/ConstraintsDisablerTest.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -95,19 +118,6 @@
   </component>
   <component name="DebuggerManager">
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" line="130" class="org.unitils.dbmaintainer.clean.DBCleanerTest" package="org.unitils.dbmaintainer.clean">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
       <breakpoint url="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java" line="109" class="org.unitils.reflectionassert.ReflectionComparator" package="org.unitils.reflectionassert">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
@@ -189,33 +199,92 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="EasyMockModuleTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/easymock/EasyMockModuleTest.java">
+      <file leaf-file-name="DefaultDBCleaner.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="67" column="0" selection-start="1822" selection-end="1822" vertical-scroll-proportion="1.8902196">
+            <state line="75" column="0" selection-start="2919" selection-end="2919" vertical-scroll-proportion="0.84750736">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LenientMocksControlTest.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java">
+      <file leaf-file-name="PostgreSqlDbSupport.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/PostgreSqlDbSupport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="174" column="71" selection-start="5462" selection-end="5462" vertical-scroll-proportion="0.73652697">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="104" column="12" selection-start="3213" selection-end="3213" vertical-scroll-proportion="0.37103173">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ReflectionComparatorEnumsTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorEnumsTest.java">
+      <file leaf-file-name="PostgreSqlDbSupportTest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/dbsupport/PostgreSqlDbSupportTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="74" column="41" selection-start="2239" selection-end="2239" vertical-scroll-proportion="0.83832335">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="0" column="30" selection-start="30" selection-end="30" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DbUnitModuleExpectedDataSetTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="304" column="39" selection-start="9458" selection-end="9458" vertical-scroll-proportion="0.90029323">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PostgreSqlDBClearerTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/PostgreSqlDBClearerTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="33" column="48" selection-start="1139" selection-end="1139" vertical-scroll-proportion="0.2521994">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DBClearerTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="280" column="22" selection-start="11916" selection-end="11916" vertical-scroll-proportion="0.33730158">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DbSupport.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="499" column="18" selection-start="17790" selection-end="17790" vertical-scroll-proportion="0.016617792">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="unitils.properties" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/resources/unitils.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="123" selection-start="1130" selection-end="1130" vertical-scroll-proportion="0.076246336">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="unitils-default.properties" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="70" column="37" selection-start="3831" selection-end="3831" vertical-scroll-proportion="0.01686508">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DBCleanerTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="165" column="68" selection-start="5996" selection-end="5996" vertical-scroll-proportion="0.20332356">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -345,34 +414,8 @@
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
-      </PATH>
-      <PATH>
         <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils" />
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\resources" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -403,44 +446,6 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\reflectionassert" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\hibernate" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -474,7 +479,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\easymock" />
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\util" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -508,11 +513,121 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\easymock" />
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\easymock\util" />
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\version" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\dbsupport" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clean" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -555,6 +670,180 @@
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\structure" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\database" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\core" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
       </PATH>
     </subPane>
   </component>
@@ -569,7 +858,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure ProjectPane="false" PackagesPane="false" Scope="false" Favorites="false" />
+      <showStructure Favorites="false" PackagesPane="false" Scope="false" ProjectPane="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -613,9 +902,11 @@
       <recent name="be.ordina.util.ReflectionUtils" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.unitils.dbmaintainer.dbsupport" />
+      <recent name="org.unitils.dbmaintainer.structure.impl" />
+      <recent name="org.unitils.dbmaintainer.clean" />
       <recent name="org.unitils.reflectionassert" />
       <recent name="org.unitils.easymock" />
-      <recent name="be.ordina.unitils.db.maintainer.version" />
     </key>
     <key name="IntroduceConstantDialog.RECENTS_KEY">
       <recent name="" />
@@ -630,13 +921,13 @@
   </component>
   <component name="RestoreUpdateTree" />
   <component name="RunManager" selected="JUnit.org.unitils">
-    <tempConfiguration default="false" name="LenientMocksControlTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="org.unitils.easymock.util.*" />
+    <tempConfiguration default="false" name="PostgreSqlDbSupportTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="org.unitils.dbmaintainer.dbsupport.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.unitils.easymock.util" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.easymock.util.LenientMocksControlTest" />
+      <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.dbsupport" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.dbsupport.PostgreSqlDbSupportTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -652,6 +943,13 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -670,6 +968,16 @@
       <method>
         <option name="Make" value="true" />
       </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="" />
     </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
       <module name="" />
@@ -691,13 +999,6 @@
       <option name="PROPERTIES_FILE" />
       <properties />
     </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module name="" />
       <option name="MAIN_CLASS_NAME" />
@@ -709,16 +1010,6 @@
       <option name="VM_PARAMETERS" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="" />
     </configuration>
     <configuration default="false" name="PropertiesDataSourceFactoryTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="Unitils" />
@@ -944,27 +1235,27 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="30" y="-4" width="1574" height="1208" extended-state="0" />
+    <frame x="34" y="0" width="1566" height="1200" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3291506" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26596445" order="0" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2332696" order="1" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2673726" order="0" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2324074" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24946696" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38425925" order="11" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38339552" order="11" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39866155" order="6" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="9" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14392324" order="1" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5009259" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2496" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="4" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36944443" order="4" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36847016" order="4" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32791588" order="10" />
@@ -1051,120 +1342,114 @@
   </component>
   <component name="com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectRootMasterDetailsConfigurable" proportions="0.2854744" version="1">
     <option name="myPlainMode" value="false" />
-    <option name="myLastEditedConfigurable" value="commons-lang-2.2.jar" />
+    <option name="myLastEditedConfigurable" value="postgresql-8.2-504.jdbc3.jar" />
   </component>
   <component name="com.intellij.profile.ui.ErrorOptionsConfigurable" proportions="" version="1">
     <option name="myLastEditedConfigurable" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionAssertTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/impl/DBVersionSource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="96" column="79" selection-start="5195" selection-end="5301" vertical-scroll-proportion="0.08928572">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/DBCleaner.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="95" column="0" selection-start="3445" selection-end="3445" vertical-scroll-proportion="0.016441006">
+        <state line="32" column="0" selection-start="1139" selection-end="1139" vertical-scroll-proportion="0.5225744">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="359" column="88" selection-start="17114" selection-end="17114" vertical-scroll-proportion="0.29787233">
+        <state line="61" column="0" selection-start="2164" selection-end="2164" vertical-scroll-proportion="0.77875245">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/internal/ExpectedInvocation.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="83" column="0" selection-start="2892" selection-end="2892" vertical-scroll-proportion="0.34044617">
+        <state line="165" column="68" selection-start="5996" selection-end="5996" vertical-scroll-proportion="0.20332356">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/ReflectionArgumentMatcher.java">
+    <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="70" column="0" selection-start="2694" selection-end="2694" vertical-scroll-proportion="0.8186227">
+        <state line="70" column="37" selection-start="3831" selection-end="3831" vertical-scroll-proportion="0.01686508">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/easymock/EasyMockModuleTest.java">
+    <entry file="file://$PROJECT_DIR$/src/test/resources/unitils.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="0" selection-start="1822" selection-end="1822" vertical-scroll-proportion="1.8902196">
+        <state line="17" column="123" selection-start="1130" selection-end="1130" vertical-scroll-proportion="0.076246336">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://D:/_apps/java/easymock2.2/src.zip!/org/easymock/IExpectationSetters.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/DbSupport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="9" selection-start="1497" selection-end="1497" vertical-scroll-proportion="0.3385063">
+        <state line="499" column="18" selection-start="17790" selection-end="17790" vertical-scroll-proportion="0.016617792">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/easymock/util/LenientMocksControl.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="178" column="70" selection-start="7591" selection-end="7591" vertical-scroll-proportion="0.47678918">
+        <state line="75" column="0" selection-start="2919" selection-end="2919" vertical-scroll-proportion="0.84750736">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="13" selection-start="1101" selection-end="1101" vertical-scroll-proportion="0.3326886">
+        <state line="171" column="16" selection-start="7394" selection-end="7394" vertical-scroll-proportion="0.33333334">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Comparable.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/util/DbUnitAssert.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="120" column="15" selection-start="5710" selection-end="5710" vertical-scroll-proportion="0.86808926">
+        <state line="94" column="0" selection-start="3849" selection-end="3849" vertical-scroll-proportion="0.15376984">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorEnumsTest.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleExpectedDataSetTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="41" selection-start="2239" selection-end="2239" vertical-scroll-proportion="0.83832335">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="72" column="12" selection-start="2335" selection-end="2335" vertical-scroll-proportion="0.6966068">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Enum.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="141" column="22" selection-start="4662" selection-end="4662" vertical-scroll-proportion="0.6447106">
+        <state line="304" column="39" selection-start="9458" selection-end="9458" vertical-scroll-proportion="0.90029323">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparator.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/PostgreSqlDBClearerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="382" column="64" selection-start="17131" selection-end="17131" vertical-scroll-proportion="0.49709865">
+        <state line="33" column="48" selection-start="1139" selection-end="1139" vertical-scroll-proportion="0.2521994">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/easymock/util/LenientMocksControlTest.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="174" column="71" selection-start="5462" selection-end="5462" vertical-scroll-proportion="0.73652697">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="280" column="22" selection-start="11916" selection-end="11916" vertical-scroll-proportion="0.33730158">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/dbsupport/PostgreSqlDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="104" column="12" selection-start="3213" selection-end="3213" vertical-scroll-proportion="0.37103173">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/dbsupport/PostgreSqlDbSupportTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="30" selection-start="30" selection-end="30" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>

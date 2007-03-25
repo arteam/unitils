@@ -15,9 +15,9 @@
  */
 package org.unitils.dbmaintainer.dbsupport;
 
-import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -39,18 +39,19 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
-     * todo implement
-     * 
+     * Creates support for Db2 databases.
      */
-    public Set<String> getSynonymNames() {
-        throw new UnsupportedOperationException("Synonyms not yet implemented for db2");
+    public Db2DbSupport() {
+        super("db2");
     }
+
 
     /**
      * Retrieves the names of all the sequences in the database schema.
      *
      * @return The names of all sequences in the database
      */
+    @Override
     public Set<String> getSequenceNames() {
         return getDb2DbIdentifiers("SEQNAME", "SYSSEQUENCES", "SEQSCHEMA");
     }
@@ -61,23 +62,9 @@ public class Db2DbSupport extends DbSupport {
      *
      * @return The names of all triggers in the database
      */
+    @Override
     public Set<String> getTriggerNames() {
         return getDb2DbIdentifiers("NAME", "SYSTRIGGERS", "SCHEMA");
-    }
-
-
-    /**
-     * Types are not supported: an UnsupportedOperationException will be raised.
-     */
-    public Set<String> getTypeNames() {
-        throw new UnsupportedOperationException("DB2 doesn't support types");
-    }
-
-    /**
-     * Types are not supported: an UnsupportedOperationException will be raised.
-     */
-    public void dropType(String typeName) throws StatementHandlerException {
-        throw new UnsupportedOperationException("DB2 doesn't support types");
     }
 
 
@@ -87,6 +74,7 @@ public class Db2DbSupport extends DbSupport {
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
+    @Override
     public long getCurrentValueOfSequence(String sequenceName) {
         Connection conn = null;
         Statement st = null;
@@ -105,25 +93,17 @@ public class Db2DbSupport extends DbSupport {
         }
     }
 
+
     /**
      * Sets the next value of the sequence with the given sequence name to the given sequence value.
      *
      * @param sequenceName     The sequence, not null
      * @param newSequenceValue The value to set
      */
+    @Override
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) throws StatementHandlerException {
         statementHandler.handle("ALTER SEQUENCE " + qualified(sequenceName) + " RESTART WITH " + newSequenceValue);
         statementHandler.handle("VALUES NEXTVAL FOR " + qualified(sequenceName));
-    }
-
-
-    /**
-     * Synonyms are not supported
-     *
-     * @return False
-     */
-    public boolean supportsSynonyms() {
-        return false;
     }
 
 
@@ -132,6 +112,7 @@ public class Db2DbSupport extends DbSupport {
      *
      * @return True
      */
+    @Override
     public boolean supportsSequences() {
         return true;
     }
@@ -142,6 +123,7 @@ public class Db2DbSupport extends DbSupport {
      *
      * @return True
      */
+    @Override
     public boolean supportsTriggers() {
         return true;
     }
@@ -152,54 +134,9 @@ public class Db2DbSupport extends DbSupport {
      *
      * @return True
      */
+    @Override
     public boolean supportsIdentityColumns() {
         return true;
-    }
-
-
-    /**
-     * Types are not supported
-     *
-     * @return false
-     */
-    public boolean supportsTypes() {
-        return false;
-    }
-
-
-    /**
-     * Setting of identity column values is currently not supported: an UnsupportedOperationException will be raised.
-     *
-     * @param tableName            The table with the identity column, not null
-     * @param primaryKeyColumnName The column, not null
-     * @param identityValue        The new value
-     */
-    public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
-        // Not possible to manually set the identity column to a specific value in DB2
-        // todo implement
-        throw new UnsupportedOperationException("Current implementation of Db2DbSupport does not support the setting of an indentiy column value.");
-    }
-
-
-    /**
-     * Simple disabling of constraints checking on a connection is not supported: an
-     * UnsupportedOperationException will be raised.
-     *
-     * @param connection The database connection, not null
-     */
-    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
-        throw new UnsupportedOperationException("DB2 doesn't support simple disabling of constraints checking on a connection");
-    }
-
-
-    /**
-     * Removal of not null constraints is not supported: an UnsupportedOperationException will be raised.
-     *
-     * @param tableName  The table with the column, not null
-     * @param columnName The column to remove constraints from, not null
-     */
-    public void removeNotNullConstraint(String tableName, String columnName) throws StatementHandlerException {
-        throw new UnsupportedOperationException("Removal of not null constraints is not supported for DB2");
     }
 
 
@@ -210,6 +147,7 @@ public class Db2DbSupport extends DbSupport {
      * @param tableName The table, not null
      * @return The set of constraint names, not null
      */
+    @Override
     public Set<String> getTableConstraintNames(String tableName) {
         Connection conn = null;
         Statement st = null;
@@ -237,18 +175,9 @@ public class Db2DbSupport extends DbSupport {
      * @param tableName      The table with the constraint, not null
      * @param constraintName The constraint, not null
      */
+    @Override
     public void disableConstraint(String tableName, String constraintName) throws StatementHandlerException {
         statementHandler.handle("alter table " + qualified(tableName) + " drop constraint " + constraintName);
-    }
-
-
-    /**
-     * The name of the DBMS implementation that is supported by this implementation of {@link DbSupport}
-     *
-     * @return db2
-     */
-    public String getDbmsName() {
-        return "db2";
     }
 
 

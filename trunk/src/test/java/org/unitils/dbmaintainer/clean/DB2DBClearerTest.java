@@ -1,8 +1,8 @@
 package org.unitils.dbmaintainer.clean;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.dbmaintainer.DBMaintainer;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import static org.unitils.util.PropertyUtils.getString;
 
 import java.sql.Connection;
@@ -33,9 +33,9 @@ public class DB2DBClearerTest extends DBClearerTest {
 
 
     /**
-     * Verifies wether the hsqldb dialect is activated
+     * Verifies wether the db2 dialect is activated
      *
-     * @return True if the hsqldb dialect is activated, false otherwise
+     * @return True if the db2 dialect is activated, false otherwise
      */
     protected boolean isTestedDialectActivated() {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
