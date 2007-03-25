@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.clean.DBClearer;
@@ -23,7 +22,10 @@ import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import static org.unitils.util.PropertyUtils.getStringList;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Implementation of {@link DBClearer}. This implementation individually drops every table, view, constraint,
