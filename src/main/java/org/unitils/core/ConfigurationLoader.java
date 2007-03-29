@@ -147,8 +147,7 @@ public class ConfigurationLoader {
             return properties;
 
         } catch (Exception e) {
-            logger.warn("Unable to load custom configuration file: " + customConfigurationFileName);
-            return null;
+            throw new UnitilsException("Unable to load custom configuration file: " + customConfigurationFileName, e);
         } finally {
             closeQuietly(inputStream);
         }
@@ -203,8 +202,7 @@ public class ConfigurationLoader {
             return properties;
 
         } catch (Exception e) {
-            logger.debug("Unable to load local configuration file: " + localPropertiesFileName);
-            return null;
+            throw new UnitilsException("Unable to load local configuration file: " + localPropertiesFileName, e);
         } finally {
             closeQuietly(inputStream);
         }

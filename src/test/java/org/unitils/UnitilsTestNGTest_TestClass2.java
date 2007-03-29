@@ -97,7 +97,7 @@ public class UnitilsTestNGTest_TestClass2 extends UnitilsTestNG {
      * @return the unitils instance, not null
      */
     @Override
-    protected Unitils createUnitils() {
+    protected Unitils getUnitils() {
         if (tracingTestListener != null) {
             return new Unitils() {
 
@@ -106,6 +106,6 @@ public class UnitilsTestNGTest_TestClass2 extends UnitilsTestNG {
                 }
             };
         }
-        return super.createUnitils();
+        return super.getUnitils();
     }
 }
