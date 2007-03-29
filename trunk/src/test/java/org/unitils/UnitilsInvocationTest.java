@@ -278,7 +278,7 @@ public class UnitilsInvocationTest {
             super(testClass);
         }
 
-        protected Unitils createUnitils() {
+        protected Unitils getUnitils() {
 
             return new Unitils() {
 
@@ -303,7 +303,7 @@ public class UnitilsInvocationTest {
 
 
         @Override
-        protected Unitils createUnitils() {
+        protected Unitils getUnitils() {
             if (tracingTestListener != null) {
                 return new Unitils() {
 
@@ -312,7 +312,7 @@ public class UnitilsInvocationTest {
                     }
                 };
             }
-            return super.createUnitils();
+            return super.getUnitils();
         }
     }
 

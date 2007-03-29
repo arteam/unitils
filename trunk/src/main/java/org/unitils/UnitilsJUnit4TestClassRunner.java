@@ -55,7 +55,7 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
         super(testClass, new CustomTestClassMethodsRunner(testClass));
 
         if (testListener == null) {
-            testListener = createUnitils().createTestListener();
+            testListener = getUnitils().createTestListener();
             createShutdownHook();
         }
     }
@@ -241,8 +241,6 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
 
 
     /**
-     * Creates and initializes a unitils core instance.
-     * <p/>
      * This will return the default singleton instance by calling {@link Unitils#getInstance()}.
      * <p/>
      * You can override this method to let it create and set your own singleton instance. For example, you
@@ -250,7 +248,7 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
      *
      * @return the unitils core instance, not null
      */
-    protected Unitils createUnitils() {
+    protected Unitils getUnitils() {
         return Unitils.getInstance();
     }
 

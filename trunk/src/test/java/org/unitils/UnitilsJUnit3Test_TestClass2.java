@@ -83,7 +83,7 @@ public class UnitilsJUnit3Test_TestClass2 extends UnitilsJUnit3 {
      * @return the unitils instance, not null
      */
     @Override
-    protected Unitils createUnitils() {
+    protected Unitils getUnitils() {
         if (tracingTestListener != null) {
             return new Unitils() {
 
@@ -92,7 +92,7 @@ public class UnitilsJUnit3Test_TestClass2 extends UnitilsJUnit3 {
                 }
             };
         }
-        return super.createUnitils();
+        return super.getUnitils();
     }
 }
 

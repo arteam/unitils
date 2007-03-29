@@ -1321,7 +1321,7 @@ public class UnitilsInvocationExceptionTest {
             super(testClass);
         }
 
-        protected Unitils createUnitils() {
+        protected Unitils getUnitils() {
 
             return new Unitils() {
 

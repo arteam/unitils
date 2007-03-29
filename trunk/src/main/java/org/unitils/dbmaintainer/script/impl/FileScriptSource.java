@@ -41,7 +41,7 @@ import java.util.Properties;
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem.
  * <p/>
- * Script files should be located in the directory configured by {@link #PROPKEY_SCRIPTFILES_LOCATION}. Valid script files
+ * Script files should be located in the directory configured by {@link #PROPKEY_SCRIPTFILES_LOCATIONS}. Valid script files
  * start with a version number followed by an underscore, and end with the extension configured by
  * {@link #PROPKEY_SCRIPTFILES_FILEEXTENSION}.
  *
@@ -55,12 +55,12 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
     /**
      * Property key for the directory in which the script files are located
      */
-    public static final String PROPKEY_SCRIPTFILES_LOCATION = "dbMaintainer.fileScriptSource.scripts.location";
+    public static final String PROPKEY_SCRIPTFILES_LOCATIONS = "dbMaintainer.fileScriptSource.scripts.location";
 
     /**
      * Property key for the directory in which the code script files are located
      */
-    public static final String PROPKEY_CODESCRIPTFILES_LOCATION = "dbMaintainer.fileScriptSource.code.location";
+    public static final String PROPKEY_CODESCRIPTFILES_LOCATIONS = "dbMaintainer.fileScriptSource.code.location";
 
     /**
      * Property key for the extension of the script files
@@ -68,10 +68,10 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
     public static final String PROPKEY_SCRIPTFILES_FILEEXTENSION = "dbMaintainer.fileScriptSource.fileExtension";
 
     /* The directory in which the script files are located */
-    private List<String> scriptFilesLocation;
+    private List<String> scriptFileLocations;
 
     /* The directory in which the code script files are located */
-    private List<String> codeScriptFilesLocation;
+    private List<String> codeScriptFileLocations;
 
     /* The extension of the script files */
     private String fileExtension;
@@ -83,14 +83,33 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      */
     @SuppressWarnings("unchecked")
     public void doInit(Properties configuration) {
-        scriptFilesLocation = getStringList(PROPKEY_SCRIPTFILES_LOCATION, configuration);
-        if (scriptFilesLocation.isEmpty()) {
-            logger.warn("No directory is specificied using the property " + PROPKEY_SCRIPTFILES_LOCATION + ". The Unitils database maintainer won't do anyting");
-        }
-        codeScriptFilesLocation = getStringList(PROPKEY_CODESCRIPTFILES_LOCATION, configuration);
+        scriptFileLocations = getStringList(PROPKEY_SCRIPTFILES_LOCATIONS, configuration);
+        verifyExistence(scriptFileLocations, PROPKEY_SCRIPTFILES_LOCATIONS);
+        if (scriptFileLocations.isEmpty()) {
+            logger.warn("No directories or files are specificied using the property " + PROPKEY_SCRIPTFILES_LOCATIONS + ". The Unitils database maintainer won't do anyting");
+        }                                                                                                                                
+        codeScriptFileLocations = getStringList(PROPKEY_CODESCRIPTFILES_LOCATIONS, configuration);
+        verifyExistence(codeScriptFileLocations, PROPKEY_CODESCRIPTFILES_LOCATIONS);
         fileExtension = getString(PROPKEY_SCRIPTFILES_FILEEXTENSION, configuration);
         if (fileExtension.startsWith(".")) {
             throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSION + " should not start with a '.'");
+        }
+    }
+
+    /**
+     * Verfies that directories and files in the given list of fileLocations exist on the file system. If one of them
+     * doesn't exist, an exception is thrown (the given propertyName is shown in the exception message for clarity)
+     *
+     * @param fileLocations
+     * @param propertyName
+     */
+    private void verifyExistence(List<String> fileLocations, String propertyName) {
+        for (String fileLocation : fileLocations) {
+            File file = new File(fileLocation);
+            if (!file.exists()) {
+                throw new UnitilsException("File location " + fileLocation + " defined in property " + propertyName +
+                        " doesn't exist");
+            }
         }
     }
 
@@ -127,7 +146,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      * @return All available scripts
      */
     public List<VersionScriptPair> getAllScripts() {
-        return getVersionScriptPairsFromFiles(getScriptFilesSorted(true, scriptFilesLocation));
+        return getVersionScriptPairsFromFiles(getScriptFilesSorted(true, scriptFileLocations));
     }
 
 
@@ -135,7 +154,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      * @return The highest timestamp of all the code scripts that are currently available
      */
     public long getCodeScriptsTimestamp() {
-        return getHighestScriptTimestamp(getScriptFiles(false, codeScriptFilesLocation));
+        return getHighestScriptTimestamp(getScriptFiles(false, codeScriptFileLocations));
     }
 
 
@@ -143,7 +162,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      * @return All the code scripts that are currently available
      */
     public List<Script> getAllCodeScripts() {
-        return getScriptsFromFiles(getScriptFilesSorted(false, codeScriptFilesLocation));
+        return getScriptsFromFiles(getScriptFilesSorted(false, codeScriptFileLocations));
     }
 
 
@@ -152,7 +171,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      * @return The highest timestamp of all the scripts that were already executed
      */
     private Long getTimestampOfAlreadyExecutedScripts(final Version currentVersion) {
-        List<File> scriptFilesAlreadyExecuted = getScriptFiles(true, scriptFilesLocation);
+        List<File> scriptFilesAlreadyExecuted = getScriptFiles(true, scriptFileLocations);
 
         // filter out scripts that are not executed yet
         CollectionUtils.filter(scriptFilesAlreadyExecuted, new Predicate() {
@@ -316,7 +335,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
      * @return all script files having a newer version than the given one
      */
     private List<File> getScriptFilesWithHigherIndex(long currentVersion) {
-        List<File> filesSorted = getScriptFilesSorted(true, scriptFilesLocation);
+        List<File> filesSorted = getScriptFilesSorted(true, scriptFileLocations);
         List<File> filesWithNewerVersion = new ArrayList<File>();
         for (File file : filesSorted) {
             if (getIndex(file) > currentVersion) {
