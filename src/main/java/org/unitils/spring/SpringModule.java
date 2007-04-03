@@ -135,6 +135,17 @@ public class SpringModule implements Module {
 
 
     /**
+     * Makes sure the application context for this test is loaded. See {@link #getApplicationContext(Object)} for more
+     * information on how the application context is configured.
+     *
+     * @param testObject The test instance, not null
+     */
+    public void loadApplicationContext(Object testObject) {
+        getApplicationContext(testObject);
+    }
+
+
+    /**
      * Gets the application context for this test. A new one will be created if it does not exist yet. If a superclass
      * has also declared the creation of an application context, this one will be retrieved (or created if it was not
      * created yet) and used as parent context for this classes context.
@@ -382,6 +393,7 @@ public class SpringModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject) {
+            loadApplicationContext(testObject);
             injectApplicationContext(testObject);
             assignSpringBeans(testObject);
             assignSpringBeansByType(testObject);
