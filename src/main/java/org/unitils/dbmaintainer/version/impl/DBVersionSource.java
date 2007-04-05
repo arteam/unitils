@@ -474,7 +474,7 @@ public class DBVersionSource extends DatabaseTask implements VersionSource {
                         lastUpdateSucceededColumnName + " " + longDataType + ", " + codeScriptsTimestampColumnName + " " +
                         longDataType + ", " + lastCodeUpdateSucceededColumnName + " " + longDataType + " )");
             } else {
-                // Check if the version table has the expected column
+                // Check if the version table has the expected columns
                 rs.close();
                 rs = metadata.getColumns(null, schemaName, versionTableName, versionIndexColumnName);
                 if (!rs.next()) {

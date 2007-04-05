@@ -141,7 +141,9 @@ public class SpringModule implements Module {
      * @param testObject The test instance, not null
      */
     public void loadApplicationContext(Object testObject) {
-        getApplicationContext(testObject);
+        if (applicationContextManager.hasApplicationContext(testObject)) {
+            getApplicationContext(testObject);
+        }
     }
 
 
