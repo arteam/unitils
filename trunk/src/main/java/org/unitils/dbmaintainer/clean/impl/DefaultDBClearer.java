@@ -18,8 +18,7 @@ package org.unitils.dbmaintainer.clean.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.dbmaintainer.util.DatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.HashSet;
@@ -70,11 +69,10 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
      * dropped, so that the database schema is empty. The database items that are configured as items to preserve, are
      * left untouched.
      */
-    public void clearSchema() throws StatementHandlerException {
+    public void clearSchema() {
         logger.info("Clearing (dropping) the unit test database.");
         dropViews();
         dropTables();
-        // todo test dropping synonmys
         dropSynonyms();
         dropSequences();
     }
@@ -83,7 +81,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all views.
      */
-    protected void dropViews() throws StatementHandlerException {
+    protected void dropViews() {
         Set<String> viewNames = dbSupport.getViewNames();
         for (String viewName : viewNames) {
             // check whether view needs to be preserved
@@ -99,7 +97,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all tables.
      */
-    protected void dropTables() throws StatementHandlerException {
+    protected void dropTables() {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             // check whether table needs to be preserved
@@ -115,17 +113,18 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all synonyms
      */
-    protected void dropSynonyms() throws StatementHandlerException {
-        if (dbSupport.supportsSynonyms()) {
-            Set<String> synonymNames = dbSupport.getSynonymNames();
-            for (String synonymName : synonymNames) {
-                // check whether table needs to be preserved
-                if (itemsToPreserve.contains(synonymName)) {
-                    continue;
-                }
-                logger.debug("Dropping database table: " + synonymName);
-                dbSupport.dropSynonym(synonymName);
+    protected void dropSynonyms() {
+        if (!dbSupport.supportsSynonyms()) {
+            return;
+        }
+        Set<String> synonymNames = dbSupport.getSynonymNames();
+        for (String synonymName : synonymNames) {
+            // check whether table needs to be preserved
+            if (itemsToPreserve.contains(synonymName)) {
+                continue;
             }
+            logger.debug("Dropping database table: " + synonymName);
+            dbSupport.dropSynonym(synonymName);
         }
     }
 
@@ -133,17 +132,18 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     /**
      * Drops all sequences
      */
-    protected void dropSequences() throws StatementHandlerException {
-        if (dbSupport.supportsSequences()) {
-            Set<String> sequenceNames = dbSupport.getSequenceNames();
-            for (String sequenceName : sequenceNames) {
-                // check whether sequence needs to be preserved
-                if (itemsToPreserve.contains(sequenceName)) {
-                    continue;
-                }
-                logger.debug("Dropping database sequence: " + sequenceName);
-                dbSupport.dropSequence(sequenceName);
+    protected void dropSequences() {
+        if (!dbSupport.supportsSequences()) {
+            return;
+        }
+        Set<String> sequenceNames = dbSupport.getSequenceNames();
+        for (String sequenceName : sequenceNames) {
+            // check whether sequence needs to be preserved
+            if (itemsToPreserve.contains(sequenceName)) {
+                continue;
             }
+            logger.debug("Dropping database sequence: " + sequenceName);
+            dbSupport.dropSequence(sequenceName);
         }
     }
 

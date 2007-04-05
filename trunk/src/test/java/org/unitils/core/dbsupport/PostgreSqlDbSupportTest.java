@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.clean;
+package org.unitils.core.dbsupport;
 
 import static org.unitils.core.dbsupport.TestSQLUtils.*;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 
 /**
- * DbClearer test for an PostgreSql database
+ * Tests for the PostgreSql database support.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PostgreSqlDBClearerTest extends DBClearerTest {
-
+public class PostgreSqlDbSupportTest extends DbSupportTest {
 
     /**
-     * Creates a new clearer test
+     * Creates a new test for the PostgreSqlDbSupport
      */
-    public PostgreSqlDBClearerTest() {
-        super("postgresql");
+    public PostgreSqlDbSupportTest() {
+        super(new PostgreSqlDbSupport());
     }
 
 

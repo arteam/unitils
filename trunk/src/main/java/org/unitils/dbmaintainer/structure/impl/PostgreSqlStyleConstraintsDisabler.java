@@ -17,9 +17,8 @@ package org.unitils.dbmaintainer.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
+import org.unitils.dbmaintainer.util.DatabaseTask;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -58,7 +57,7 @@ public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements 
     /**
      * Permanently disable every foreign key or not-null constraint
      */
-    public void disableConstraints() throws StatementHandlerException {
+    public void disableConstraints() {
         logger.info("Disabling constraints");
         removeForeignKeyConstraints();
         removeNotNullConstraints();
@@ -68,7 +67,7 @@ public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements 
     /**
      * Removes all foreign key constraints.
      */
-    protected void removeForeignKeyConstraints() throws StatementHandlerException {
+    protected void removeForeignKeyConstraints() {
         logger.info("Disabling constraints");
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
@@ -83,7 +82,7 @@ public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements 
     /**
      * Removes all not-null constraints are disabled.
      */
-    protected void removeNotNullConstraints() throws StatementHandlerException {
+    protected void removeNotNullConstraints() {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             removeNotNullConstraints(tableName);
@@ -96,7 +95,7 @@ public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements 
      *
      * @param tableName The name of the table to remove constraints from, not null
      */
-    protected void removeNotNullConstraints(String tableName) throws StatementHandlerException {
+    protected void removeNotNullConstraints(String tableName) {
         // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
         Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
         // Iterate over all column names

@@ -15,15 +15,9 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-import org.unitils.core.ConfigurationLoader;
-import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.util.PropertyUtils.getString;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
+import org.hsqldb.Trigger;
+import static org.unitils.core.dbsupport.TestSQLUtils.*;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
 
 /**
  * DBClearer test for a hsqldb database
@@ -34,28 +28,57 @@ import java.util.Properties;
 public class HsqldbDBClearerTest extends DBClearerTest {
 
 
-    //todo javadoc
-    protected void createTestTrigger(String tableName, String triggerName) throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create trigger " + triggerName + " before insert on " + tableName + " call "
-                    + "\"org.unitils.dbmaintainer.clear.HsqldbTestTrigger\"");
-        } finally {
-            closeQuietly(conn, st, null);
-        }
+    /**
+     * Creates a new clearer test
+     */
+    public HsqldbDBClearerTest() {
+        super("hsqldb");
+    }
+
+    /**
+     * Creates all test database structures (view, tables...)
+     */
+    @Override
+    protected void createTestDatabase() throws Exception {
+        // create tables
+        executeUpdate("create table test_table (col1 int not null identity, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        // create views
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create sequences
+        executeUpdate("create sequence test_sequence", dataSource);
+        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        // create triggers
+        // todo move to code clearer test
+        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
+        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
     }
 
 
     /**
-     * Verifies wether the hsqldb dialect is activated
-     *
-     * @return True if the hsqldb dialect is activated, false otherwise
+     * Drops all created test database structures (views, tables...)
      */
-    protected boolean isTestedDialectActivated() {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        return "hsqldb".equals(getString(PROPKEY_DATABASE_DIALECT, configuration));
+    @Override
+    protected void cleanupTestDatabase() throws Exception {
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
     }
+
+
+    /**
+     * Test trigger for hypersonic.
+     *
+     * @author Filip Neven
+     * @author Tim Ducheyne
+     */
+    public static class TestTrigger implements Trigger {
+
+        public void fire(int i, String string, String string1, Object[] objects, Object[] objects1) {
+        }
+
+    }
+
 }

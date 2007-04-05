@@ -17,21 +17,21 @@ package org.unitils.dbmaintainer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.clean.DBCodeClearer;
-import org.unitils.dbmaintainer.script.*;
-import org.unitils.dbmaintainer.script.impl.LoggingStatementHandlerDecorator;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.dbmaintainer.script.CodeScriptRunner;
+import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptRunner;
+import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DtdGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
 import org.unitils.dbmaintainer.version.VersionSource;
-import static org.unitils.util.PropertyUtils.getLong;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -49,7 +49,7 @@ import java.util.Properties;
  * If no existing scripts have been modified, but new scripts were added, only the new scripts are executed.
  * Before executing an update, data from the database is removed, to avoid problems when e.g. adding a not null column.
  * <p/>
- * If a database update causes an error, a {@link StatementHandlerException} is thrown. After a failing update, the
+ * If a database update causes an error, a {@link UnitilsException} is thrown. After a failing update, the
  * database is always completely recreated from scratch.
  * <p/>
  * After updating the database, following steps are optionally executed on the database (depending on the configuration):
@@ -158,39 +158,37 @@ public class DBMaintainer {
      * @param dataSource    the data source, not null
      */
     public DBMaintainer(Properties configuration, DataSource dataSource) {
-        StatementHandler statementHandler = new LoggingStatementHandlerDecorator(DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance(configuration, dataSource));
-
-        scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource, statementHandler);
-        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, dataSource, statementHandler);
-        versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
-        scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource, statementHandler);
+        scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource);
+        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, dataSource);
+        versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource);
+        scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource);
 
         boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DBCLEANER_ENABLED, configuration);
         if (cleanDbEnabled) {
-            dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource, statementHandler);
+            dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
         }
 
         fromScratchEnabled = PropertyUtils.getBoolean(PROPKEY_FROMSCRATCH_ENABLED, configuration);
         keepRetryingAfterError = PropertyUtils.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, configuration);
         if (fromScratchEnabled) {
-            dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+            dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
         }
         clearDbCodeEnabled = PropertyUtils.getBoolean(PROPKEY_CLEARDBCODE_ENABLED, configuration);
-        dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource, statementHandler);
+        dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource);
 
         boolean disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED, configuration);
         if (disableConstraints) {
-            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
         }
 
         boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED, configuration);
         if (updateSequences) {
-            sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
+            sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource);
         }
 
         boolean generateDtd = PropertyUtils.getBoolean(PROPKEY_GENERATEDTD_ENABLED, configuration);
         if (generateDtd) {
-            dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
+            dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource);
         }
     }
 
@@ -199,11 +197,9 @@ public class DBMaintainer {
      * Checks if the new scripts are available to update the version of the database. If yes, these scripts are
      * executed and the version number is increased. If an existing script has been modified, the database is
      * cleared and completely rebuilt from scratch. If an error occurs with one of the scripts, a
-     * {@link StatementHandlerException} is thrown.
-     *
-     * @throws StatementHandlerException If an error occurs with one of the scripts
+     * {@link UnitilsException} is thrown.
      */
-    public void updateDatabase() throws StatementHandlerException {
+    public void updateDatabase() {
         // Get current version
         Version currentVersion = versionSource.getDbVersion();
 
@@ -307,14 +303,13 @@ public class DBMaintainer {
      * that way, the next time an update is tried, the execution restarts from the last unsuccessful script.
      *
      * @param versionScriptPairs The scripts to execute, not null
-     * @throws StatementHandlerException If a script execution failed.
      */
-    protected void executeScripts(List<VersionScriptPair> versionScriptPairs) throws StatementHandlerException {
+    protected void executeScripts(List<VersionScriptPair> versionScriptPairs) {
         for (VersionScriptPair versionScriptPair : versionScriptPairs) {
             try {
                 scriptRunner.execute(versionScriptPair.getScript().getScriptContent());
 
-            } catch (StatementHandlerException e) {
+            } catch (UnitilsException e) {
                 logger.error("Error while executing script " + versionScriptPair.getScript().getFileName(), e);
                 if (fromScratchEnabled) {
                     // If rebuilding from scratch is disabled, the version is not incremented, to give the chance
@@ -345,9 +340,8 @@ public class DBMaintainer {
      * the timestamp of the scripts is registered in the database.
      *
      * @param codeScripts The code scripts to execute, not null
-     * @throws StatementHandlerException If the script execution failed
      */
-    protected void executeCodeScripts(List<Script> codeScripts) throws StatementHandlerException {
+    protected void executeCodeScripts(List<Script> codeScripts) {
         if (codeScripts.isEmpty()) {
             // nothing to do
             return;
@@ -357,7 +351,7 @@ public class DBMaintainer {
             try {
                 codeScriptRunner.execute(codeScript.getScriptContent());
 
-            } catch (StatementHandlerException e) {
+            } catch (UnitilsException e) {
 
                 logger.error("Error while executing code script " + codeScript.getFileName(), e);
                 versionSource.registerCodeUpdateSucceeded(false);

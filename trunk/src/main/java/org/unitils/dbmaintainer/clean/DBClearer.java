@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 /**
  * Defines the contract for implementations that clear a database schema, so that it can be recreated from scratch by
@@ -30,6 +29,6 @@ public interface DBClearer {
     /**
      * Clears the database schema.
      */
-    void clearSchema() throws StatementHandlerException;
+    void clearSchema();
 
 }

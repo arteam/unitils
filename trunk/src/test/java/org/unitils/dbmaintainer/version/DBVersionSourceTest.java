@@ -18,10 +18,10 @@ package org.unitils.dbmaintainer.version;
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.script.StatementHandler;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDbSupportInstance;
 import org.unitils.dbunit.annotation.DataSet;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
@@ -60,9 +60,8 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dbVersionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource, statementHandler);
-        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+        dbVersionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource);
+        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource);
 
         dropVersionTable();
         createVersionTable();

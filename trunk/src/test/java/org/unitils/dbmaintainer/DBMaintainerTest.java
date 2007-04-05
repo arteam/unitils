@@ -18,12 +18,12 @@ package org.unitils.dbmaintainer;
 import static org.easymock.classextension.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.expectLastCall;
 import org.unitils.UnitilsJUnit3;
+import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.clean.DBCodeClearer;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.SQLScriptRunner;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DtdGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
@@ -176,7 +176,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
-        expectLastCall().andThrow(new StatementHandlerException("Test exception"));
+        expectLastCall().andThrow(new UnitilsException("Test exception"));
         mockVersionSource.setDbVersion(version1);
         mockVersionSource.registerUpdateSucceeded(false);
         replay();
@@ -184,7 +184,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         try {
             dbMaintainer.updateDatabase();
             fail("A StatementHandlerException should have been thrown");
-        } catch (StatementHandlerException e) {
+        } catch (UnitilsException e) {
             // Expected
         }
     }

@@ -15,8 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
-
 /**
  * Defines the contract for implementation classes that update all sequences and identity columns of a database to
  * a sufficiently high value, so that test data be inserted easily.
@@ -31,6 +29,6 @@ public interface SequenceUpdater {
      * Updates all database sequences and identity columns to a sufficiently high value, so that test data be inserted
      * easily.
      */
-    void updateSequences() throws StatementHandlerException;
+    void updateSequences();
 
 }

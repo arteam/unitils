@@ -17,16 +17,18 @@ package org.unitils.dbmaintainer.structure;
 
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.dbsupport.TestSQLUtils.dropTestTables;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.script.StatementHandler;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDbSupportInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
 /**
@@ -42,11 +44,11 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     private ConstraintsDisabler constraintsDisabler;
 
     /* Database support class instance */
-    private DbSupport dbSupport;
+    protected DbSupport dbSupport;
 
     /* DataSource for the test database, is injected */
     @TestDataSource
-    private javax.sql.DataSource dataSource = null;
+    protected DataSource dataSource = null;
 
 
     /**
@@ -58,11 +60,10 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
-        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource);
+        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
 
-        dropTestTables();
+        cleanupTestDatabase();
         createTestTables();
     }
 
@@ -72,54 +73,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      */
     @Override
     protected void tearDown() throws Exception {
-        dropTestTables();
-
         super.tearDown();
-    }
-
-
-    /**
-     * Creates the test tables
-     */
-    private void createTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            dropTestTables();
-            st.execute("create table table1 (col1 varchar(10) not null primary key, col2 varchar(12) not null)");
-            st.execute("create table table2 (col1 varchar(10), foreign key (col1) references table1(col1))");
-        } finally {
-            closeQuietly(conn, st, null);
-        }
-    }
-
-
-    /**
-     * Drops the test tables
-     */
-    private void dropTestTables() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            try {
-                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier("TABLE2");
-                dbSupport.dropTable(correctCaseTableName);
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-            try {
-                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier("TABLE1");
-                dbSupport.dropTable(correctCaseTableName);
-            } catch (StatementHandlerException e) {
-                // Ignored
-            }
-        } finally {
-            closeQuietly(conn, st, null);
-        }
+        cleanupTestDatabase();
     }
 
 
@@ -127,39 +82,15 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      * Tests whether foreign key constraints are correctly disabled
      */
     public void testDisableConstraints_foreignKey() throws Exception {
-        Connection conn = null;
+        Connection connection = null;
         try {
-            try {
-                conn = dataSource.getConnection();
-                insertForeignKeyViolation(conn);
-                fail("SQLException should have been thrown");
-            } catch (SQLException e) {
-                // Foreign key violation, should throw SQLException
-            }
-
+            connection = dataSource.getConnection();
             constraintsDisabler.disableConstraints();
-            constraintsDisabler.disableConstraintsOnConnection(conn);
+            constraintsDisabler.disableConstraintsOnConnection(connection);
             // Should not throw exception anymore
-            insertForeignKeyViolation(conn);
+            executeUpdate("insert into table2 (col1) values ('test')", dataSource);
         } finally {
-            closeQuietly(conn);
-        }
-    }
-
-
-    /**
-     * Performs an insert that violates the foreign key constraint that table2.col1 has on table1
-     *
-     * @param connection The database connection, not null
-     * @throws SQLException Is thrown when the foreign key constraint is enabled
-     */
-    private void insertForeignKeyViolation(Connection connection) throws SQLException {
-        Statement st = null;
-        try {
-            st = connection.createStatement();
-            st.executeUpdate("insert into table2 values ('test')");
-        } finally {
-            closeQuietly(st);
+            closeQuietly(connection);
         }
     }
 
@@ -168,39 +99,40 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      * Tests whether not-null constraints are correctly disabled
      */
     public void testDisableConstraints_notNull() throws Exception {
-        Connection conn = null;
         try {
-            try {
-                conn = dataSource.getConnection();
-                insertNotNullViolation(conn);
-                fail("SQLException should have been thrown");
-            } catch (SQLException e) {
-                // Foreign key violation, should throw SQLException
-            }
+            executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);
+            fail("SQLException should have been thrown");
+        } catch (UnitilsException e) {
+            // Foreign key violation, should throw SQLException
+        }
 
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
             constraintsDisabler.disableConstraints();
-            constraintsDisabler.disableConstraintsOnConnection(conn);
+            constraintsDisabler.disableConstraintsOnConnection(connection);
             // Should not throw exception anymore
-            insertNotNullViolation(conn);
+            executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);
         } finally {
-            closeQuietly(conn);
+            closeQuietly(connection);
         }
     }
 
 
     /**
-     * Performs an insert on table1 that violates the not-null constraint on col2
-     *
-     * @param connection The database connection, not null
-     * @throws SQLException Is thrown when the not null constraint is enabled
+     * Creates the test tables
      */
-    private void insertNotNullViolation(Connection connection) throws SQLException {
-        Statement st = null;
-        try {
-            st = connection.createStatement();
-            st.execute("insert into table1 values ('test', null)");
-        } finally {
-            closeQuietly(st);
-        }
+    protected void createTestTables() throws SQLException {
+        executeUpdate("create table table1 (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table table2 (col1 varchar(10), foreign key (col1) references table1(col1))", dataSource);
     }
+
+
+    /**
+     * Drops the test tables
+     */
+    protected void cleanupTestDatabase() throws SQLException {
+        dropTestTables(dbSupport, "table2", "table1");
+    }
+
 }

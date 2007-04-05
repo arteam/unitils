@@ -25,12 +25,9 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.util.Flushable;
 import org.unitils.dbmaintainer.DBMaintainer;
-import org.unitils.dbmaintainer.script.StatementHandler;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsCheckDisablingDataSource;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
@@ -141,7 +138,7 @@ public class DatabaseModule implements Module {
             DBMaintainer dbMaintainer = new DBMaintainer(configuration, getDataSource());
             dbMaintainer.updateDatabase();
 
-        } catch (StatementHandlerException e) {
+        } catch (UnitilsException e) {
             throw new UnitilsException("Error while updating database", e);
         }
     }
@@ -178,8 +175,7 @@ public class DatabaseModule implements Module {
         // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is
         // returned that wrappes the TestDataSource object
         if (disableConstraints) {
-            StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-            ConstraintsDisabler constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource, statementHandler);
+            ConstraintsDisabler constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
             dataSource = new ConstraintsCheckDisablingDataSource(dataSource, constraintsDisabler);
         }
         return dataSource;

@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.version;
 
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 /**
  * Interface that gives access to the version of a database, and a means to increment this version. The version of
@@ -31,7 +30,7 @@ public interface VersionSource {
     /**
      * @return The current version of the database
      */
-    Version getDbVersion() throws StatementHandlerException;
+    Version getDbVersion();
 
 
     /**
@@ -39,7 +38,7 @@ public interface VersionSource {
      *
      * @param version The new version that the database should be updated to
      */
-    void setDbVersion(Version version) throws StatementHandlerException;
+    void setDbVersion(Version version);
 
 
     /**
@@ -55,7 +54,7 @@ public interface VersionSource {
      *
      * @param succeeded True for success
      */
-    void registerUpdateSucceeded(boolean succeeded) throws StatementHandlerException;
+    void registerUpdateSucceeded(boolean succeeded);
 
 
     /**
@@ -71,7 +70,7 @@ public interface VersionSource {
      *
      * @param succeeded True for success
      */
-    void registerCodeUpdateSucceeded(boolean succeeded) throws StatementHandlerException;
+    void registerCodeUpdateSucceeded(boolean succeeded);
 
 
     /**

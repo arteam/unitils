@@ -15,15 +15,8 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-import org.unitils.core.ConfigurationLoader;
-import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.util.PropertyUtils.getString;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
+import static org.unitils.core.dbsupport.TestSQLUtils.*;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
 
 /**
  * DbClearer test for an Oracle database
@@ -34,25 +27,49 @@ import java.util.Properties;
 public class OracleDBClearerTest extends DBClearerTest {
 
 
-    //todo javadoc
-    protected void createTestTrigger(String tableName, String triggerName) throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create or replace trigger " + triggerName + " before insert on " + tableName + " begin " +
-                    "select 1 from dual end " + triggerName);
-
-        } finally {
-            closeQuietly(conn, st, null);
-        }
+    /**
+     * Creates a new clearer test
+     */
+    public OracleDBClearerTest() {
+        super("oracle");
     }
 
 
-    //todo javadoc
-    protected boolean isTestedDialectActivated() {
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        return "oracle".equals(getString(PROPKEY_DATABASE_DIALECT, configuration));
+    /**
+     * Creates all test database structures (view, tables...)
+     */
+    protected void createTestDatabase() throws Exception {
+        // create tables
+        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
+        // create views
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create synonyms
+        executeUpdate("create synonym test_synonym for test_table", dataSource);
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        // create sequences
+        executeUpdate("create sequence test_sequence", dataSource);
+        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        // create triggers
+        executeUpdate("create or replace trigger test_trigger before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end test_trigger", dataSource);
+        executeUpdate("create or replace trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end \"Test_CASE_Trigger\"", dataSource);
+        // create types
+        executeUpdate("create type test_type AS (col1 int)", dataSource);
+        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
     }
+
+
+    /**
+     * Drops all created test database structures (views, tables...)
+     */
+    protected void cleanupTestDatabase() throws Exception {
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
+    }
+
 }

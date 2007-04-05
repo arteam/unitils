@@ -16,12 +16,11 @@
 package org.unitils.dbmaintainer.script;
 
 import org.unitils.UnitilsJUnit3;
-import org.unitils.core.ConfigurationLoader;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.easymock.EasyMockUnitils.replay;
-import org.unitils.easymock.annotation.RegularMock;
+import org.unitils.dbmaintainer.script.impl.SQLScriptRunner;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
-import java.util.Properties;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Tests the SQL script runner
@@ -31,11 +30,9 @@ import java.util.Properties;
  */
 public class SQLScriptRunnerTest extends UnitilsJUnit3 {
 
-    @RegularMock
-    private StatementHandler mockStatementHandler = null;
 
     /* Tested instance  */
-    private ScriptRunner sqlScriptRunner;
+    private SQLScriptRunner sqlScriptRunner;
 
     /* Normal script, containing 2 statements and a blank line */
     private static final String NORMAL_SCRIPT =
@@ -91,100 +88,79 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
      */
     protected void setUp() throws Exception {
         super.setUp();
-
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        sqlScriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, null, mockStatementHandler);
+        sqlScriptRunner = new SQLScriptRunner();
     }
 
 
     /**
      * Test a normal script, containing 2 statements and a blank line
      */
-    public void testExecute() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))");
-        mockStatementHandler.handle("CREATE TABLE ROLE (ID INTEGER PRIMARY KEY, ROLENAME VARCHAR2(20))");
-        replay();
-
-        sqlScriptRunner.execute(NORMAL_SCRIPT);
+    public void testParseStatements() throws Exception {
+        List<String> result = sqlScriptRunner.parseStatements(NORMAL_SCRIPT);
+        assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))", "CREATE TABLE ROLE (ID INTEGER PRIMARY KEY, ROLENAME VARCHAR2(20))"), result);
     }
 
 
     /**
      * Test a script that contains new lines and cariage returns, these should have been converted to spaces
      */
-    public void testExecute_multiline() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))");
-        mockStatementHandler.handle("CREATE TABLE ROLE (ID INTEGER PRIMARY KEY, ROLENAME VARCHAR2(20))");
-        mockStatementHandler.handle("INSERT INTO USERS(NAME) VALUES ('This is\na multiline\rvalue')");
-        replay();
-
-        sqlScriptRunner.execute(SCRIPT_MULTILINE);
+    public void testParseStatements_multiline() throws Exception {
+        List<String> result = sqlScriptRunner.parseStatements(SCRIPT_MULTILINE);
+        assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))", "CREATE TABLE ROLE (ID INTEGER PRIMARY KEY, ROLENAME VARCHAR2(20))", "INSERT INTO USERS(NAME) VALUES ('This is\na multiline\rvalue')"), result);
     }
 
 
     /**
      * Test a script that contains line comments (these should have been ignored)
      */
-    public void testExecute_lineComments() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))");
-        replay();
-
-        sqlScriptRunner.execute(SCRIPT_LINE_COMMENTS);
+    public void testParseStatements_lineComments() throws Exception {
+        List<String> result = sqlScriptRunner.parseStatements(SCRIPT_LINE_COMMENTS);
+        assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))"), result);
     }
 
 
     /**
      * Test with block comment on a single line
      */
-    public void testExecute_blockCommentsSameLine() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,   NAME VARCHAR2(50))");
-        replay();
-
-        sqlScriptRunner.execute(SCRIPT_BLOCK_COMMENTS);
+    public void testParseStatements_blockCommentsSameLine() throws Exception {
+        List<String> result = sqlScriptRunner.parseStatements(SCRIPT_BLOCK_COMMENTS);
+        assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,   NAME VARCHAR2(50))"), result);
     }
 
 
     /**
      * Test with a block comment that spans multiple lines
      */
-    public void testExecute_blockCommentsMultipleLines() throws Exception {
-        mockStatementHandler.handle("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,  NAME VARCHAR2(50))");
-        replay();
-
-        sqlScriptRunner.execute(SCRIPT_BLOCK_COMMENT_MULTIPLE_LINES);
+    public void testParseStatements_blockCommentsMultipleLines() throws Exception {
+        List<String> result = sqlScriptRunner.parseStatements(SCRIPT_BLOCK_COMMENT_MULTIPLE_LINES);
+        assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,  NAME VARCHAR2(50))"), result);
     }
 
 
     /**
      * Test with a statement that contains a ; within a ''
      */
-    public void testExecute_semiColonInQuotes() throws Exception {
-        mockStatementHandler.handle("COMMENT ON TABLE PERSON IS 'This ; comment ; contains ; a semi-colon'");
-        replay();
-
-        sqlScriptRunner.execute(SCRIPT_SEMI_COLON_IN_QUOTES);
+    public void testParseStatements_semiColonInQuotes() throws Exception {
+        List<String> result = sqlScriptRunner.parseStatements(SCRIPT_SEMI_COLON_IN_QUOTES);
+        assertLenEquals(Arrays.asList("COMMENT ON TABLE PERSON IS 'This ; comment ; contains ; a semi-colon'"), result);
     }
 
 
     /**
      * Test with a statement that contains escaped single and double quotes in quotes
      */
-    public void testExecute_quotesInQuotes() throws Exception {
-        mockStatementHandler.handle("COMMENT ON TABLE PERSON IS 'This \"comment\" '' contains quotes and double quotes'");
-        replay();
-
-        sqlScriptRunner.execute(SCRIPT_QUOTES_IN_QUOTES);
+    public void testParseStatements_quotesInQuotes() throws Exception {
+        List<String> result = sqlScriptRunner.parseStatements(SCRIPT_QUOTES_IN_QUOTES);
+        assertLenEquals(Arrays.asList("COMMENT ON TABLE PERSON IS 'This \"comment\" '' contains quotes and double quotes'"), result);
     }
 
 
     /**
      * Test with a statement that contains single and double quotes
      */
-    public void testExecute_commentsInQuotes() throws Exception {
-        mockStatementHandler.handle("COMMENT ON TABLE PERSON IS 'This /* comment */ contains a block and -- line comment'");
-        replay();
-
-        sqlScriptRunner.execute(SCRIPT_COMMENT_IN_QUOTES);
+    public void testParseStatements_commentsInQuotes() throws Exception {
+        List<String> result = sqlScriptRunner.parseStatements(SCRIPT_COMMENT_IN_QUOTES);
+        assertLenEquals(Arrays.asList("COMMENT ON TABLE PERSON IS 'This /* comment */ contains a block and -- line comment'"), result);
     }
 
 }
