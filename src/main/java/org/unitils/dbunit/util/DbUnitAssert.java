@@ -46,7 +46,7 @@ public class DbUnitAssert {
             // get the actual data set
             IDataSet actualDataSet = dbUnitDatabaseConnection.createDataSet();
             IDataSet filteredActualDataSet = new FilteredDataSet(new IncludeTableFilter(expectedDataSet.getTableNames()), actualDataSet);
-            assertEqualsDataSet(expectedDataSet, actualDataSet);
+            assertEqualsDataSet(expectedDataSet, filteredActualDataSet);
 
         } catch (SQLException e) {
             throw new UnitilsException("Unable to assert whether db content is as expected.", e);

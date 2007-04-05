@@ -16,13 +16,11 @@
 package org.unitils.dbmaintainer.script;
 
 import org.unitils.UnitilsJUnit3;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.dbmaintainer.script.impl.LoggingStatementHandlerDecorator;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.easymock.EasyMockUnitils.replay;
-import org.unitils.easymock.annotation.Mock;
+import org.unitils.dbmaintainer.script.impl.SQLCodeScriptRunner;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
-import java.util.Properties;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * todo javadoc
@@ -32,11 +30,8 @@ import java.util.Properties;
  */
 public class DefaultCodeScriptRunnerTest extends UnitilsJUnit3 {
 
-    @Mock
-    private StatementHandler mockStatementHandler = null;
-
     /* Tested instance  */
-    private CodeScriptRunner codeScriptRunner;
+    private SQLCodeScriptRunner sqlCodeScriptRunner;
 
     /* Normal script, containing 2 statements and a blank line */
     private static final String NORMAL_SCRIPT =
@@ -92,71 +87,31 @@ public class DefaultCodeScriptRunnerTest extends UnitilsJUnit3 {
      */
     protected void setUp() throws Exception {
         super.setUp();
-
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
-        StatementHandler loggingStatementHandler = new LoggingStatementHandlerDecorator(mockStatementHandler);
-        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, null, loggingStatementHandler);
+        sqlCodeScriptRunner = new SQLCodeScriptRunner();
     }
 
 
     public void testExecute() throws Exception {
-        mockStatementHandler.handle("PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\n" +
-                "BEGIN\n" +
-                "statement1;\n" +
-                "statement2;\n" +
-                "END");
-        mockStatementHandler.handle("PROCEDURE TEST2 (param1 VARCHAR, param2 BLOB) IS\n" +
-                "BEGIN\n" +
-                "statement1;\n" +
-                "statement2;\n" +
-                "END;");
-        replay();
-
-        codeScriptRunner.execute(NORMAL_SCRIPT);
+        List<String> result = sqlCodeScriptRunner.parseStatements(NORMAL_SCRIPT);
+        assertLenEquals(Arrays.asList("PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\nstatement1;\nstatement2;\nEND", "PROCEDURE TEST2 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\nstatement1;\nstatement2;\nEND;"), result);
     }
 
 
     public void testExecute_multilineComment() throws Exception {
-        mockStatementHandler.handle("/* multiline\n" +
-                " comment */" +
-                "PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\n" +
-                "BEGIN\n" +
-                "statement1;\n" +
-                "statement2;\n" +
-                "END;");
-
-        replay();
-        codeScriptRunner.execute(SCRIPT_WITH_MULTILINE_COMMENT);
+        List<String> result = sqlCodeScriptRunner.parseStatements(SCRIPT_WITH_MULTILINE_COMMENT);
+        assertLenEquals(Arrays.asList("/* multiline\n comment */PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\nstatement1;\nstatement2;\nEND;"), result);
     }
 
 
     public void testExecute_lineComment() throws Exception {
-        mockStatementHandler.handle("-- line comment /\n" +
-                "PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\n" +
-                "BEGIN\n" +
-                "statement1;\n" +
-                "statement2;\n" +
-                "END;");
-
-        replay();
-        codeScriptRunner.execute(SCRIPT_WITH_LINE_COMMENT);
+        List<String> result = sqlCodeScriptRunner.parseStatements(SCRIPT_WITH_LINE_COMMENT);
+        assertLenEquals(Arrays.asList("-- line comment /\nPROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\nstatement1;\nstatement2;\nEND;"), result);
     }
 
 
     public void testExecute_scriptWithSlashInCode() throws Exception {
-        mockStatementHandler.handle("PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\n" +
-                "BEGIN\n" +
-                "/statement1/;\n" +
-                "statement2;\n" +
-                "END;");
-        mockStatementHandler.handle("PROCEDURE TEST2 (param1 VARCHAR, param2 BLOB) IS\n" +
-                "BEGIN\n" +
-                "/statement1/\n" +
-                "statement2;\n" +
-                "END");
-
-        replay();
-        codeScriptRunner.execute(SCRIPT_WITH_SLASH_IN_CODE);
+        List<String> result = sqlCodeScriptRunner.parseStatements(SCRIPT_WITH_SLASH_IN_CODE);
+        assertLenEquals(Arrays.asList("PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\n/statement1/;\nstatement2;\nEND;", "PROCEDURE TEST2 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\n/statement1/\nstatement2;\nEND"), result);
     }
 
 }

@@ -17,13 +17,10 @@ package org.unitils.dbmaintainer.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
+import org.unitils.dbmaintainer.util.DatabaseTask;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
 
@@ -58,7 +55,7 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
      * Remove all not-null constraints. Foreign key constraints are disabled directly on the connection (see method
      * disableConstraintsOnConnection)
      */
-    public void disableConstraints() throws StatementHandlerException {
+    public void disableConstraints() {
         logger.info("Disabling contraints");
         removeNotNullConstraints();
     }
@@ -67,7 +64,7 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
     /**
      * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
      */
-    private void removeNotNullConstraints() throws StatementHandlerException {
+    private void removeNotNullConstraints() {
         // Iterate of all table names
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
@@ -82,7 +79,7 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
      *
      * @param tableName The name of the table to remove constraints from, not null
      */
-    private void removeNotNullConstraints(String tableName) throws StatementHandlerException {
+    private void removeNotNullConstraints(String tableName) {
         // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
         Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
         // Iterate over all column names

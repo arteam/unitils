@@ -21,7 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
+import org.unitils.dbmaintainer.util.DatabaseTask;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.version.Version;

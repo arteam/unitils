@@ -16,19 +16,20 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import static org.unitils.core.util.SQLUtils.executeUpdate;
-import org.unitils.dbmaintainer.script.ScriptRunner;
+import org.unitils.dbmaintainer.script.CodeScriptRunner;
 import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.SQLCodeScriptParser;
 
 import java.util.List;
 import java.util.Properties;
 
 /**
- * Implementation of {@link ScriptRunner} that runs an SQL script.
+ * todo javadoc
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SQLScriptRunner extends DatabaseTask implements ScriptRunner {
+public class SQLCodeScriptRunner extends DatabaseTask implements CodeScriptRunner {
 
 
     /**
@@ -54,23 +55,18 @@ public class SQLScriptRunner extends DatabaseTask implements ScriptRunner {
 
 
     /**
-     * Parses all statements out of the given sql script.
-     * <p/>
-     * All statements should be separated with a semicolon (;). The last statement will be
-     * added even if it does not end with a semicolon. The semicolons will not be included in the returned statements.
-     * <p/>
-     * All comments in-line (--comment) and block (/ * comment * /) are removed from the statements.
-     * This parser also takes quotedOrEmpty literals and double quotedOrEmpty text into account when parsing the statements and treating
-     * the comments.
-     * <p/>
-     * New line charactars in the statements will be replaced by spaces.
+     * Parses the given string containing database code into a list of individual souce code statement. The way in which
+     * individual pieces of code are recognized depends fully on the implementation. The resulting strings must be
+     * individually applyable to the database.
      *
-     * @param script The sql script, not null
-     * @return The statements, not null
+     * @param script The script content, not null
+     * @return A <code>List</code> containing individual pieces of database code, each individually applyable to the
+     *         database.
      */
     public List<String> parseStatements(String script) {
-        SQLScriptParser sqlScriptParser = new SQLScriptParser();
-        return sqlScriptParser.parseStatements(script);
+        SQLCodeScriptParser sqlCodeScriptParser = new SQLCodeScriptParser();
+        return sqlCodeScriptParser.parseStatements(script);
     }
+
 
 }

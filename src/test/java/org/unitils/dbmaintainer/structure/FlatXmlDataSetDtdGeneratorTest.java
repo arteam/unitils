@@ -1,16 +1,14 @@
 package org.unitils.dbmaintainer.structure;
 
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.script.StatementHandler;
 import static org.unitils.dbmaintainer.structure.impl.FlatXmlDataSetDtdGenerator.PROPKEY_DTD_FILENAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredStatementHandlerInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -52,9 +50,8 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource, statementHandler);
-        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource, statementHandler);
+        dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource);
+        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
 
         dbClearer.clearSchema();
         createTestTables();

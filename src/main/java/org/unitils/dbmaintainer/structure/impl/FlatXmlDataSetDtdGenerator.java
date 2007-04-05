@@ -15,16 +15,20 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.*;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.FilteredDataSet;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.dbunit.dataset.xml.FlatDtdWriter;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
 import org.unitils.dbmaintainer.structure.DtdGenerator;
+import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
 import org.unitils.util.PropertyUtils;
 
 import java.io.File;
@@ -33,6 +37,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Implementation of {@link DtdGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format
@@ -107,17 +112,24 @@ public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGener
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            IDatabaseConnection dbUnitConn = new DatabaseConnection(conn, schemaName);
+            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, schemaName);
 
             StringWriter stringWriter = new StringWriter();
 
             FlatDtdWriter datasetWriter = new FlatDtdWriter(stringWriter);
             datasetWriter.setContentModel(FlatDtdWriter.CHOICE);
-            datasetWriter.write(dbUnitConn.createDataSet());
+
+            // create a dataset for the database content
+            // filter out all system table names
+            Set<String> tableNames = dbSupport.getTableNames();
+            IDataSet actualDataSet = dbUnitDatabaseConnection.createDataSet();
+            IDataSet filteredActualDataSet = new FilteredDataSet(new IncludeTableFilter(tableNames.toArray(new String[0])), actualDataSet);
+
+            datasetWriter.write(filteredActualDataSet);
             return stringWriter.toString();
 
         } catch (Exception e) {
-            throw new UnitilsException("Error generating DTD file", e);
+            throw new UnitilsException("Error generating content for DTD file.", e);
         } finally {
             DbUtils.closeQuietly(conn);
         }

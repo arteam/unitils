@@ -13,35 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.clean;
+package org.unitils.core.dbsupport;
 
+import org.hsqldb.Trigger;
 import static org.unitils.core.dbsupport.TestSQLUtils.*;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 
 /**
- * DbClearer test for an PostgreSql database
+ * Tests for the Hypersonic database support.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PostgreSqlDBClearerTest extends DBClearerTest {
+public class HsqldbDbSupportTest extends DbSupportTest {
 
 
     /**
-     * Creates a new clearer test
+     * Creates a new test for the HsqldbDbSupport
      */
-    public PostgreSqlDBClearerTest() {
-        super("postgresql");
+    public HsqldbDbSupportTest() {
+        super(new HsqldbDbSupport());
     }
 
 
     /**
      * Creates all test database structures (view, tables...)
      */
+    @Override
     protected void createTestDatabase() throws Exception {
         // create tables
-        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 int not null identity, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
         // create views
         executeUpdate("create view test_view as select col1 from test_table", dataSource);
         executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
@@ -49,29 +51,34 @@ public class PostgreSqlDBClearerTest extends DBClearerTest {
         executeUpdate("create sequence test_sequence", dataSource);
         executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
         // create triggers
-        try {
-            executeUpdate("create language plpgsql", dataSource);
-        } catch (Exception e) {
-            // ignore language already exists
-        }
-        executeUpdate("create or replace function test() returns trigger as $$ declare begin end; $$ language plpgsql", dataSource);
-        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
-        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
-        // create types
-        executeUpdate("create type test_type AS (col1 int)", dataSource);
-        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
+        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
+        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
     }
 
 
     /**
      * Drops all created test database structures (views, tables...)
      */
+    @Override
     protected void cleanupTestDatabase() throws Exception {
         dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
+    }
+
+
+    /**
+     * Test trigger for hypersonic.
+     *
+     * @author Filip Neven
+     * @author Tim Ducheyne
+     */
+    public static class TestTrigger implements Trigger {
+
+        public void fire(int i, String string, String string1, Object[] objects, Object[] objects1) {
+        }
+
     }
 
 }

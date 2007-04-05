@@ -19,8 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBCleaner;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
+import org.unitils.dbmaintainer.util.DatabaseTask;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 import static org.unitils.util.PropertyUtils.getStringList;
@@ -83,7 +82,7 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      * Deletes all data from the database, except for the tables that have been
      * configured as <i>tablesToPreserve</i> , and the table in which the database version is stored
      */
-    public void cleanSchema() throws StatementHandlerException {
+    public void cleanSchema() {
         try {
             logger.info("Cleaning database tables.");
 

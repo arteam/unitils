@@ -15,8 +15,6 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
-
 /**
  * todo javadoc
  *
@@ -31,6 +29,6 @@ public interface CodeScriptRunner {
      *
      * @param script The script as a string, not null
      */
-    void execute(String script) throws StatementHandlerException;
+    void execute(String script);
 
 }

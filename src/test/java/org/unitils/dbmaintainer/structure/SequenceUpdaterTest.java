@@ -17,11 +17,11 @@ package org.unitils.dbmaintainer.structure;
 
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.script.StatementHandler;
 import org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.*;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDbSupportInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
@@ -67,9 +67,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "" + LOWEST_ACCEPTACLE_SEQUENCE_VALUE);
 
-        StatementHandler statementHandler = getConfiguredStatementHandlerInstance(configuration, dataSource);
-        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource, statementHandler);
-        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource, statementHandler);
+        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource);
+        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource);
 
         if (dbSupport.supportsSequences()) {
             dropTestSequence();

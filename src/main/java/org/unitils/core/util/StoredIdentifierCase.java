@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.script;
-
-import java.util.List;
+package org.unitils.core.util;
 
 /**
- * todo javadoc
+ * Possible values for the stored identifier case.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
-public class DefaultCodeScriptRunner extends BaseScriptRunner implements CodeScriptRunner {
+public enum StoredIdentifierCase {
 
+    /**
+     * The database stores unquoted identifiers as lower case
+     */
+    LOWER_CASE,
 
-    // todo javadoc
-    protected List<String> parseStatements(String script) {
-        return dbSupport.parseCodeStatements(script);
-    }
+    /**
+     * The database stores unquoted identifiers as upper case
+     */
+    UPPER_CASE,
 
+    /**
+     * The database stores unquoted identifiers as case sensitive
+     */
+    MIXED_CASE
 }

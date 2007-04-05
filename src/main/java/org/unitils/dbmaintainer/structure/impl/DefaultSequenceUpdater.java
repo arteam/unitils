@@ -15,9 +15,8 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
+import org.unitils.dbmaintainer.util.DatabaseTask;
 import org.unitils.util.PropertyUtils;
 
 import java.util.Properties;
@@ -53,7 +52,7 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
      * Updates all database sequences and identity columns to a sufficiently high value, so that test data be inserted
      * easily.
      */
-    public void updateSequences() throws StatementHandlerException {
+    public void updateSequences() {
         if (dbSupport.supportsSequences()) {
             incrementSequencesWithLowValue();
         }
@@ -66,7 +65,7 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
     /**
      * Increments all sequences whose value is too low.
      */
-    private void incrementSequencesWithLowValue() throws StatementHandlerException {
+    private void incrementSequencesWithLowValue() {
         Set<String> sequenceNames = dbSupport.getSequenceNames();
         for (String sequenceName : sequenceNames) {
             if (dbSupport.getCurrentValueOfSequence(sequenceName) < lowestAcceptableSequenceValue) {

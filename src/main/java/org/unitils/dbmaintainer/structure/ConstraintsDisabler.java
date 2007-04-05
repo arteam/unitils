@@ -15,8 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.unitils.dbmaintainer.script.StatementHandler;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 
 import java.sql.Connection;
 
@@ -34,11 +32,10 @@ public interface ConstraintsDisabler {
 
 
     /**
-     * Generates statements to disable the constraints of the associated database, and passes them to the
-     * associated {@link StatementHandler}. This method does only guarantee that constraints are fully disabled after the
-     * method enableConstraintsOnConnection has been called on the <code>Connection</code> object that is used.
+     * Generates statements to disable the constraints of the associated database. This method does only guarantee that
+     * constraints are fully disabled after the method enableConstraintsOnConnection has been called on the <code>Connection</code> object that is used.
      */
-    void disableConstraints() throws StatementHandlerException;
+    void disableConstraints();
 
 
     /**

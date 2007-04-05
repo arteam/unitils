@@ -17,9 +17,8 @@ package org.unitils.dbmaintainer.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.dbmaintainer.dbsupport.DatabaseTask;
-import org.unitils.dbmaintainer.script.impl.StatementHandlerException;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
+import org.unitils.dbmaintainer.util.DatabaseTask;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -55,7 +54,7 @@ public class OracleStyleConstraintsDisabler extends DatabaseTask implements Cons
     /**
      * Permanently disable every foreign key or not-null constraint
      */
-    public void disableConstraints() throws StatementHandlerException {
+    public void disableConstraints() {
         logger.info("Disabling constraints");
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {

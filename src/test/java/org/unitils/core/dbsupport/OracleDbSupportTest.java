@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.clean;
+package org.unitils.core.dbsupport;
 
 import static org.unitils.core.dbsupport.TestSQLUtils.*;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 
 /**
- * DbClearer test for an PostgreSql database
+ * Tests for the Oracle database support.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PostgreSqlDBClearerTest extends DBClearerTest {
+public class OracleDbSupportTest extends DbSupportTest {
 
 
     /**
-     * Creates a new clearer test
+     * Creates a new test for the MySqlDbSupport
      */
-    public PostgreSqlDBClearerTest() {
-        super("postgresql");
+    public OracleDbSupportTest() {
+        super(new OracleDbSupport());
     }
 
 
@@ -45,18 +45,15 @@ public class PostgreSqlDBClearerTest extends DBClearerTest {
         // create views
         executeUpdate("create view test_view as select col1 from test_table", dataSource);
         executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create synonyms
+        executeUpdate("create synonym test_synonym for test_table", dataSource);
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
         // create sequences
         executeUpdate("create sequence test_sequence", dataSource);
         executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
-        // create triggers
-        try {
-            executeUpdate("create language plpgsql", dataSource);
-        } catch (Exception e) {
-            // ignore language already exists
-        }
-        executeUpdate("create or replace function test() returns trigger as $$ declare begin end; $$ language plpgsql", dataSource);
-        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
-        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
+        // create triggers        
+        executeUpdate("create or replace trigger test_trigger before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end test_trigger", dataSource);
+        executeUpdate("create or replace trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end \"Test_CASE_Trigger\"", dataSource);
         // create types
         executeUpdate("create type test_type AS (col1 int)", dataSource);
         executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
@@ -69,6 +66,7 @@ public class PostgreSqlDBClearerTest extends DBClearerTest {
     protected void cleanupTestDatabase() throws Exception {
         dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
         dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");

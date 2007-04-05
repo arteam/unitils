@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.dbsupport;
+package org.unitils.dbmaintainer.util;
 
-import org.unitils.dbmaintainer.script.StatementHandler;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -41,23 +41,17 @@ abstract public class DatabaseTask {
     /* Name of the unit test database schema */
     protected String schemaName;
 
-    /* Handles update statements that are issued to the database */
-    protected StatementHandler statementHandler;
-
 
     /**
-     * Initializes the database operation class with the given {@link Properties}, {@link DbSupport}, {@link DataSource}
-     * and {@link StatementHandler}
+     * Initializes the database operation class with the given {@link Properties}, {@link DbSupport}, {@link DataSource}.
      *
-     * @param configuration    The configuration, not null
-     * @param dbSupport        The database type specific support instance, not null
-     * @param dataSource       The datasource, not null
-     * @param statementHandler The statement executor, not null
+     * @param configuration The configuration, not null
+     * @param dbSupport     The database type specific support instance, not null
+     * @param dataSource    The datasource, not null
      */
-    public void init(Properties configuration, DbSupport dbSupport, DataSource dataSource, StatementHandler statementHandler) {
+    public void init(Properties configuration, DbSupport dbSupport, DataSource dataSource) {
         this.dbSupport = dbSupport;
         this.dataSource = dataSource;
-        this.statementHandler = statementHandler;
 
         schemaName = PropertyUtils.getString(PROPKEY_SCHEMANAME, configuration);
         doInit(configuration);
