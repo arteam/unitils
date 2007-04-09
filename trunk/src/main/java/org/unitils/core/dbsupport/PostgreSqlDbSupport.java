@@ -66,7 +66,11 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getSequenceNames() {
-        return getItemsAsStringSet("select sequence_name from information_schema.sequences where sequence_schema = '" + getSchemaName() + "'", getDataSource());
+        // Patch from Dan Carleton submitted in forum post http://sourceforge.net/forum/forum.php?thread_id=1708520&forum_id=570578
+        // Should be replaced by the original query on information_schema.sequences in future, since this is a more elegant solution
+        // This is the original query:
+        // getItemsAsStringSet("select sequence_name from information_schema.sequences where sequence_schema = '" + getSchemaName() + "'", getDataSource());
+        return getItemsAsStringSet("select c.relname from pg_class c join pg_namespace n on (c.relnamespace = n.oid) where c.relkind = 'S' and n.nspname = '" + getSchemaName() + "'", getDataSource());
     }
 
 
