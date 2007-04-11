@@ -21,10 +21,12 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.ConfigurationLoader;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.hibernate.util.SessionFactoryManager;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Test class for the loading of the configuration in the HibernateModule
@@ -35,7 +37,7 @@ import java.util.List;
 public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
 
     /* Tested object */
-    private SessionFactoryManager sessionFactoryManager;
+    private HibernateModule hibernateModule;
 
 
     /**
@@ -43,7 +45,10 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        sessionFactoryManager = new SessionFactoryManager(AnnotationConfiguration.class.getName(), "org.unitils.hibernate.util.SimpleCurrentSessionContext");
+
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        hibernateModule = new HibernateModule();
+        hibernateModule.init(configuration);
     }
 
 
@@ -52,7 +57,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_classLevel() {
         HibernateTestClassLevel hibernateTestClassLevel = new HibernateTestClassLevel();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestClassLevel);
+        Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(hibernateTestClassLevel);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
@@ -65,7 +70,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     public void testGetHibernateConfiguration_classLevelNoLocation() {
         HibernateTestClassLevelNoLocation hibernateTestClassLevelNoLocation = new HibernateTestClassLevelNoLocation();
         try {
-            sessionFactoryManager.getConfiguration(hibernateTestClassLevelNoLocation);
+            hibernateModule.getHibernateConfiguration(hibernateTestClassLevelNoLocation);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -78,7 +83,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_fieldLevel() {
         HibernateTestFieldLevel hibernateTestFieldLevel = new HibernateTestFieldLevel();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestFieldLevel);
+        Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(hibernateTestFieldLevel);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
@@ -91,7 +96,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     public void testGetHibernateConfiguration_fieldLevelNoLocation() {
         HibernateTestFieldLevelNoLocation hibernateTestFieldLevelNoLocation = new HibernateTestFieldLevelNoLocation();
         try {
-            sessionFactoryManager.getConfiguration(hibernateTestFieldLevelNoLocation);
+            hibernateModule.getHibernateConfiguration(hibernateTestFieldLevelNoLocation);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -104,7 +109,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_setterLevel() {
         HibernateTestSetterLevel hibernateTestSetterLevel = new HibernateTestSetterLevel();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestSetterLevel);
+        Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(hibernateTestSetterLevel);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
@@ -117,7 +122,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     public void testGetHibernateConfiguration_setterLevelNoLocation() {
         HibernateTestSetterLevelNoLocation hibernateTestSetterLevelNoLocation = new HibernateTestSetterLevelNoLocation();
         try {
-            sessionFactoryManager.getConfiguration(hibernateTestSetterLevelNoLocation);
+            hibernateModule.getHibernateConfiguration(hibernateTestSetterLevelNoLocation);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -130,7 +135,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_customCreateMethod() {
         HibernateTestCustomCreate hibernateTestCustomCreate = new HibernateTestCustomCreate();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestCustomCreate);
+        Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(hibernateTestCustomCreate);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("resources/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
@@ -143,7 +148,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_customCreateMethodWithLocationsArgument() {
         HibernateTestCustomCreateWithLocations hibernateTestCustomCreateWithConfiguration = new HibernateTestCustomCreateWithLocations();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestCustomCreateWithConfiguration);
+        Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(hibernateTestCustomCreateWithConfiguration);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("resources/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
@@ -156,7 +161,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_customCreateMethodOverridingConfiguration() {
         HibernateTestCustomCreateOverridingCurrentConfiguration testCustomCreateOverridingCurrentConfiguration = new HibernateTestCustomCreateOverridingCurrentConfiguration();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(testCustomCreateOverridingCurrentConfiguration);
+        Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(testCustomCreateOverridingCurrentConfiguration);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("resources/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
@@ -169,7 +174,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     public void testGetHibernateConfiguration_customCreateWrongSignature() {
         HibernateTestCustomCreateWrongSignature hibernateTestCustomCreateWrongSignature = new HibernateTestCustomCreateWrongSignature();
         try {
-            sessionFactoryManager.getConfiguration(hibernateTestCustomCreateWrongSignature);
+            hibernateModule.getHibernateConfiguration(hibernateTestCustomCreateWrongSignature);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -182,7 +187,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_customInitializationMethod() {
         HibernateTestCustomInitialization hibernateTestCustomInitialization = new HibernateTestCustomInitialization();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestCustomInitialization);
+        Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(hibernateTestCustomInitialization);
 
         assertTrue(hibernateTestCustomInitialization.initCalled);
     }
@@ -194,7 +199,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     public void testGetHibernateConfiguration_customInitializationMethodWrongSignature() {
         HibernateTestCustomInitializationWrongSignature hibernateTestCustomInitializationWrongSignature = new HibernateTestCustomInitializationWrongSignature();
         try {
-            sessionFactoryManager.getConfiguration(hibernateTestCustomInitializationWrongSignature);
+            hibernateModule.getHibernateConfiguration(hibernateTestCustomInitializationWrongSignature);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -208,7 +213,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     public void testGetHibernateConfiguration_wrongLocation() {
         HibernateTestWrongLocation hibernateTestWrongLocation = new HibernateTestWrongLocation();
         try {
-            sessionFactoryManager.getConfiguration(hibernateTestWrongLocation);
+            hibernateModule.getHibernateConfiguration(hibernateTestWrongLocation);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -220,8 +225,8 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      * Test reusing a configuration for the same class.
      */
     public void testGetHibernateConfiguration_twice() {
-        Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
-        Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
 
         assertNotNull(hibernateConfiguration1);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
@@ -233,9 +238,9 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      * Test invalidating a cached configuration.
      */
     public void testInvalidateHibernateConfiguration() {
-        Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
-        sessionFactoryManager.invalidateSessionFactory();
-        Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+        hibernateModule.invalidateConfiguration();
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
 
         assertNotNull(hibernateConfiguration1);
         assertNotNull(hibernateConfiguration2);
@@ -249,9 +254,9 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      * Test invalidating a cached configuration using the class name.
      */
     public void testInvalidateHibernateConfiguration_classSpecified() {
-        Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
-        sessionFactoryManager.invalidateSessionFactory(HibernateTestClassLevel.class);
-        Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+        hibernateModule.invalidateConfiguration(HibernateTestClassLevel.class);
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
 
         assertNotNull(hibernateConfiguration1);
         assertNotNull(hibernateConfiguration2);
@@ -265,9 +270,9 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      * Test invalidating a cached configuration using a wrong class name.
      */
     public void testInvalidateHibernateConfiguration_otherClassSpecified() {
-        Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
-        sessionFactoryManager.invalidateSessionFactory(String.class, List.class);
-        Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestClassLevel());
+        Configuration hibernateConfiguration1 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
+        hibernateModule.invalidateConfiguration(String.class, List.class);
+        Configuration hibernateConfiguration2 = hibernateModule.getHibernateConfiguration(new HibernateTestClassLevel());
 
         assertNotNull(hibernateConfiguration1);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));

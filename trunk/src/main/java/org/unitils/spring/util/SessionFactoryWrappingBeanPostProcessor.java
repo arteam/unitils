@@ -23,6 +23,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
+import org.unitils.core.UnitilsException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.Map;
 /**
  * A <code>BeanPostProcessor</code> that checks wether beans are created in spring's <code>ApplicationContext</code>
  * of type <code>SessionFactory</code>. If such a bean is created, it is wrapped in a {@link SessionInterceptingSessionFactory},
- * to make sure all hibernate <code>Session</code>s that are created are intercepted, to be able to implement features
+ * to make sure all hibernate <code>Session</code>s that are created are intercepted and to be able to implement features
  * like flushing and closing these <code>Session</code>s.
  *
  * @author Filip Neven
@@ -42,14 +43,19 @@ public class SessionFactoryWrappingBeanPostProcessor implements BeanPostProcesso
     private static Log logger = LogFactory.getLog(SessionFactoryWrappingBeanPostProcessor.class);
 
     /**
-     * All intercepted session factories with the bean name as key
+     * The wrapped SessionFactory that was intercepted by this BeanPostProcessor, if any
      */
-    protected Map<String, SessionInterceptingSessionFactory> sessionFactories = new HashMap<String, SessionInterceptingSessionFactory>();
+    protected SessionInterceptingSessionFactory sessionFactory;
 
     /**
-     * All intercepted configurations with the bean name as key
+     * The hibernate Configuration that was intercepted by this BeanPostProcessor, if any
      */
-    protected Map<String, Configuration> configurations = new HashMap<String, Configuration>();
+    protected Configuration configuration;
+
+    /**
+     * The name of the last bean processed, that was either a SessionFactory or a Configuration
+     */
+    protected String processedBeanName;
 
 
     /**
@@ -76,37 +82,40 @@ public class SessionFactoryWrappingBeanPostProcessor implements BeanPostProcesso
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         // if it's a session factory bean, wrap the session factory and store it
         if (bean instanceof SessionFactory && !(bean instanceof SessionInterceptingSessionFactory)) {
-            SessionInterceptingSessionFactory wrappedSessionFactory = wrapSessionFactory((SessionFactory) bean);
-            sessionFactories.put(beanName, wrappedSessionFactory);
-            return wrappedSessionFactory;
+            if (processedBeanName != null && !processedBeanName.equals(beanName)) {
+                throw new UnitilsException("More than one SessionFactory is configured in the spring configuration. This " +
+                        "is not supported in Unitils");
+            }
+            processedBeanName = beanName;
+
+            sessionFactory = wrapSessionFactory((SessionFactory) bean);
+            return sessionFactory;
         }
         // if it's a session factory factory bean, get and store configuration
         if (bean instanceof LocalSessionFactoryBean) {
-            Configuration configuration = ((LocalSessionFactoryBean) bean).getConfiguration();
-            configurations.put(beanName, configuration);
+            if (processedBeanName != null && !processedBeanName.equals(beanName)) {
+                throw new UnitilsException("More than one SessionFactory is configured in the spring configuration. This " +
+                        "is not supported in Unitils");
+            }
+            processedBeanName = beanName;
+            configuration = ((LocalSessionFactoryBean) bean).getConfiguration();
         }
         return bean;
     }
 
+    /**
+     * @return The <code>SessionFactory</code> that was intercepted by this <code>BeanPostProcessor</code>, wrapped in a
+     * {@link SessionFactoryWrappingBeanPostProcessor}, if any
+     */
+    public SessionInterceptingSessionFactory getInterceptedSessionFactory() {
+        return sessionFactory;
+    }
 
     /**
-     * Gets all intercepted session factories and corresponding configurations.
-     *
-     * @return the sessionfactories and configurations, not null
+     * @return The <code>Configuration</code> that was intercepted by this <code>BeanPostProcessor</code>, if any
      */
-    public Map<SessionInterceptingSessionFactory, Configuration> getSessionFactories() {
-        Map<SessionInterceptingSessionFactory, Configuration> result = new HashMap<SessionInterceptingSessionFactory, Configuration>();
-        for (String beanName : sessionFactories.keySet()) {
-            SessionInterceptingSessionFactory sessionFactory = sessionFactories.get(beanName);
-            Configuration configuration = configurations.get(beanName);
-            if (configuration == null) {
-                logger.warn("Application context contained a session factory with bean name " + beanName + " for which no session factory bean " +
-                        "could be found. This session factory will not be managed during the test.");
-                continue;
-            }
-            result.put(sessionFactory, configuration);
-        }
-        return result;
+    public Configuration getInterceptedHibernateConfiguration() {
+        return configuration;
     }
 
 

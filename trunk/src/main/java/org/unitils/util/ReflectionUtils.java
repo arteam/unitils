@@ -42,12 +42,12 @@ public class ReflectionUtils {
     @SuppressWarnings({"unchecked"})
     public static <T> T createInstanceOfType(String className) {
         try {
-            Class<?> clazz = Class.forName(className);
-            Constructor<?> constructor = clazz.getConstructor();
-            return (T) constructor.newInstance();
+            Class<?> type = Class.forName(className);
+            T instance = (T) createInstanceOfType(type);
+            return instance;
 
         } catch (ClassCastException e) {
-            throw new UnitilsException("Class " + className + " is not of expeted type.", e);
+            throw new UnitilsException("Class " + className + " is not of expected type.", e);
 
         } catch (NoClassDefFoundError e) {
             throw new UnitilsException("Unable to load class " + className, e);
@@ -55,11 +55,26 @@ public class ReflectionUtils {
         } catch (ClassNotFoundException e) {
             throw new UnitilsException("Class " + className + " not found", e);
 
-        } catch (NoSuchMethodException e) {
-            throw new UnitilsException("Class " + className + " does not contain no-argument constructor", e);
+        } catch (Exception e) {
+            throw new UnitilsException("Error while instantiating class " + className, e);
+        }
+    }
+
+
+    /**
+     * Creates an instance of the given type
+     * @param type The type
+     * @return An instance of this type
+     * @throws UnitilsException If an instance could not be created
+     */
+    public static <T> T createInstanceOfType(Class<T> type) {
+        try {
+            Constructor<T> constructor = type.getConstructor();
+            constructor.setAccessible(true);
+            return (T) constructor.newInstance();
 
         } catch (Exception e) {
-            throw new UnitilsException("Error while trying to create object of class " + className, e);
+            throw new UnitilsException("Error while trying to create object of class " + type.getName(), e);
         }
     }
 

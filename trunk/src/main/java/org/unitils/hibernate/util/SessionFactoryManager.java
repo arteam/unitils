@@ -89,8 +89,14 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @return The Hibernate session factory, not null
      */
     public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
-        // check whether it already exists
+
+        // Check if a SessionFactory has been configured
         Configuration configuration = getConfiguration(testObject);
+        if (configuration == null) {
+            return null;
+        }
+
+        // check whether a SessionFactory was already created before based on this hibernate Configuration
         SessionInterceptingSessionFactory sessionFactory = sessionFactories.get(configuration);
         if (sessionFactory != null) {
             return sessionFactory;
@@ -114,20 +120,6 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      */
     public Configuration getConfiguration(Object testObject) {
         return getInstance(testObject);
-    }
-
-
-    /**
-     * Manually register a session factory for the given test class.
-     *
-     * @param testClass     The class, not null
-     * @param sessionInterceptingSessionFactory
-     *                      The session factory, not null
-     * @param configuration The configuration for the session factory, not null
-     */
-    public void registerSessionFactory(Class<?> testClass, SessionInterceptingSessionFactory sessionInterceptingSessionFactory, Configuration configuration) {
-        registerInstance(testClass, configuration);
-        sessionFactories.put(configuration, sessionInterceptingSessionFactory);
     }
 
 
