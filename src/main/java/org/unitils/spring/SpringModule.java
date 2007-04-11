@@ -29,16 +29,17 @@ import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 import org.unitils.spring.util.ApplicationContextFactory;
 import org.unitils.spring.util.ApplicationContextManager;
-import org.unitils.spring.util.HibernateSupport;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getInstance;
-import static org.unitils.util.ReflectionUtils.*;
+import static org.unitils.util.ReflectionUtils.getFieldName;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.isSetter;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -49,7 +50,7 @@ import java.util.Properties;
  * <p/>
  * The application context loading can be achieved by using the {@link SpringApplicationContext} annotation. These
  * contexts are cached, so a context will be reused when possible. For example suppose a superclass loads a context and
- * a test-subclass wants to use this context, it will not create a new one. {@link #invalidateApplicationContext(Class[])} }
+ * a test-subclass wants to use this context, it will not create a new one. {@link #invalidateApplicationContext(Class<?>...)} }
  * can be used to force a reloading of a context if needed.
  * <p/>
  * Spring bean retrieval can be done by annotating the corresponding fields in the test with following
@@ -71,9 +72,6 @@ public class SpringModule implements Module {
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
 
-    /* The spring hibernate support, null if hibernate is not available */
-    private HibernateSupport hibernateSupport;
-
 
     /**
      * Initializes this module using the given configuration
@@ -81,15 +79,9 @@ public class SpringModule implements Module {
      * @param configuration The configuration, not null
      */
     public void init(Properties configuration) {
-        // create hibernate support and retrieve bean post processors for the application context
-        hibernateSupport = createHibernateSupport();
-        List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
-        if (hibernateSupport != null) {
-            beanPostProcessors.add(hibernateSupport.getSessionFactoryBeanPostProcessor());
-        }
         // create application context manager that stores and creates the application contexts
         ApplicationContextFactory applicationContextFactory = getInstance(PROPKEY_APPLICATION_CONTEXT_FACTORY_CLASS_NAME, configuration);
-        applicationContextManager = new ApplicationContextManager(applicationContextFactory, beanPostProcessors);
+        applicationContextManager = new ApplicationContextManager(applicationContextFactory);
     }
 
 
@@ -131,19 +123,6 @@ public class SpringModule implements Module {
             throw new UnitilsException("Unable to get Spring bean by type. More than one possible Spring bean for type " + type.getSimpleName() + ". Possible beans; " + beans);
         }
         return beans.values().iterator().next();
-    }
-
-
-    /**
-     * Makes sure the application context for this test is loaded. See {@link #getApplicationContext(Object)} for more
-     * information on how the application context is configured.
-     *
-     * @param testObject The test instance, not null
-     */
-    public void loadApplicationContext(Object testObject) {
-        if (applicationContextManager.hasApplicationContext(testObject)) {
-            getApplicationContext(testObject);
-        }
     }
 
 
@@ -332,49 +311,15 @@ public class SpringModule implements Module {
     }
 
 
-    /**
-     * Registers all hibernate session factories that are in the application context for the given test object.
-     * If Hibernate is not available or no application context exists, nothing happens.
-     *
-     * @param testObject The test instance, not null
-     */
-    public void registerHibernateSessionFactories(Object testObject) {
-        if (hibernateSupport == null || !applicationContextManager.hasApplicationContext(testObject)) {
-            // no hibernate or application context available, do nothing
-            return;
-        }
-        hibernateSupport.registerHibernateSessionFactories(testObject);
+    public void registerBeanPostProcessorType(Class<? extends BeanPostProcessor> beanPostProcessorType) {
+        applicationContextManager.addBeanPostProcessorType(beanPostProcessorType);
     }
 
 
-    /**
-     * Unregisters all hibernate session factories that are in the application context for the given test object.
-     * If Hibernate is not available or no application context exists, nothing happens.
-     *
-     * @param testObject The test instance, not null
-     */
-    public void unregisterHibernateSessionFactories(Object testObject) {
-        if (hibernateSupport == null || !applicationContextManager.hasApplicationContext(testObject)) {
-            // no hibernate or application context available, do nothing
-            return;
-        }
-        hibernateSupport.unregisterHibernateSessionFactories(testObject);
-    }
-
-
-    /**
-     * Creates the spring hibernate support using reflection. This way the class dependency to Hibernate is
-     * eliminated. If Hibernate is not in the classpath, the support will not be loaded and null
-     * will be returned.
-     *
-     * @return The support, null if it could not be loaded
-     */
-    protected HibernateSupport createHibernateSupport() {
-        try {
-            return createInstanceOfType("org.unitils.spring.util.HibernateSupportImpl");
-
-        } catch (UnitilsException e) {
-            logger.debug("Hibernate will not be supported. Unable to load hibernate support. This could be because Hibernate is not in the classpath.", e);
+    public BeanPostProcessor getBeanPostProcessor(Object testObject, Class<? extends BeanPostProcessor> beanPostProcessorType) {
+        if (applicationContextManager.hasApplicationContext(testObject)) {
+            return applicationContextManager.getBeanPostProcessor(getApplicationContext(testObject), beanPostProcessorType);
+        } else {
             return null;
         }
     }
@@ -395,17 +340,11 @@ public class SpringModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject) {
-            loadApplicationContext(testObject);
             injectApplicationContext(testObject);
             assignSpringBeans(testObject);
             assignSpringBeansByType(testObject);
             assignSpringBeansByName(testObject);
-            registerHibernateSessionFactories(testObject);
         }
 
-        @Override
-        public void afterTestTearDown(Object testObject) {
-            unregisterHibernateSessionFactories(testObject);
-        }
     }
 }

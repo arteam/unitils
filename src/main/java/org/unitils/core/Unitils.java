@@ -71,9 +71,8 @@ public class Unitils implements Module {
         ConfigurationLoader configurationLoader = new ConfigurationLoader();
         Properties configuration = configurationLoader.loadConfiguration();
 
-        Unitils unitils = new Unitils();
+        unitils = new Unitils();
         unitils.init(configuration);
-        setInstance(unitils);
     }
 
 

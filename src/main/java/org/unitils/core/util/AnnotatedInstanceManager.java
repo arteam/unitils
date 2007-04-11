@@ -122,8 +122,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         // find class level for which a new instance should be created
         Class<?> testClass = findClassLevelForCreateInstance(testObject.getClass());
         if (testClass == null) {
-            throw new UnitilsException("No configuration found for creating an instance for test " + testObject.getClass() + ". Make sure that you either specify a value " +
-                    "for an @" + annotationClass.getSimpleName() + " annotation somewhere in the testclass or a superclass or that you specify a custom create method in the test class itself.");
+            return null;
         }
 
         // check whether it already exists
