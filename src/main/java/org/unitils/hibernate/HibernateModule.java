@@ -315,7 +315,7 @@ public class HibernateModule implements Module, Flushable {
         }
 
         @Override
-        public void beforeTestMethod(Object testObject, Method testMethod) {
+        public void beforeTestSetUp(Object testObject) {
             injectSessionFactory(testObject);
         }
 
