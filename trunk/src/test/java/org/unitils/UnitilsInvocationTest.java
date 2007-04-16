@@ -31,7 +31,7 @@ import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.inject.util.InjectionUtils;
+import static org.unitils.inject.util.InjectionUtils.injectStatic;
 import org.unitils.util.ReflectionUtils;
 
 import java.util.Iterator;
@@ -79,8 +79,8 @@ public class UnitilsInvocationTest {
         oldTestListenerUnitilsJUnit3 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit3.class, "testListener", true));
         oldTestListenerUnitilsJUnit4 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit4TestClassRunner.class, "testListener", true));
 
-        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "testListener");
-        InjectionUtils.injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
+        injectStatic(null, UnitilsJUnit3.class, "testListener");
+        injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
 
         tracingTestListener = new TracingTestListener();
 
@@ -94,6 +94,7 @@ public class UnitilsInvocationTest {
         UnitilsTestNGTest_TestClass1.setTracingTestListener(tracingTestListener);
         UnitilsTestNGTest_TestClass2.setTracingTestListener(tracingTestListener);
         UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(tracingTestListener);
+        UnitilsTestNGTest_GroupsTest.setTracingTestListener(tracingTestListener);
     }
 
 
@@ -102,9 +103,8 @@ public class UnitilsInvocationTest {
      */
     @AfterClass
     public static void classTearDown() {
-
-        InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit3, UnitilsJUnit3.class, "testListener");
-        InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
+        injectStatic(oldTestListenerUnitilsJUnit3, UnitilsJUnit3.class, "testListener");
+        injectStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
     }
 
 
@@ -114,13 +114,12 @@ public class UnitilsInvocationTest {
      */
     @Before
     public void setUp() throws Exception {
-
         tracingTestListener.getCallList().clear();
 
         // clear state so that beforeAll is called
-        InjectionUtils.injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
-        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
-        InjectionUtils.injectStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
+        injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
+        injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
+        injectStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
 
     }
 
@@ -130,7 +129,6 @@ public class UnitilsInvocationTest {
      */
     @Test
     public void testUnitilsJUnit3() {
-
         TestSuite suite = new TestSuite();
         suite.addTestSuite(UnitilsJUnit3Test_TestClass1.class);
         suite.addTestSuite(UnitilsJUnit3Test_TestClass2.class);
@@ -176,7 +174,6 @@ public class UnitilsInvocationTest {
      */
     @Test
     public void testUnitilsTestNG() {
-
         TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
 
         TestNG testng = new TestNG();
@@ -185,6 +182,57 @@ public class UnitilsInvocationTest {
         testng.run();
 
         assertInvocationOrder("TestNG", tracingTestListener);
+        assertEquals(0, testListenerAdapter.getFailedTests().size());
+    }
+
+
+    /**
+     * Tests the correct invocation sequence of listener methods for a TestNG test that defines a test group.
+     */
+    @Test
+    public void testUnitilsTestNG_group() {
+        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
+
+        TestNG testng = new TestNG();
+        testng.setTestClasses(new Class[]{UnitilsTestNGTest_GroupsTest.class});
+        testng.setGroups("testGroup");
+        testng.addListener(testListenerAdapter);
+        testng.run();
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+        assertEquals("[Unitils] beforeAll", iterator.next());
+        assertEquals("[Unitils] beforeTestClass   - GroupsTest", iterator.next());
+        assertEquals("[Test]    testBeforeClass   - GroupsTest", iterator.next());
+        assertEquals("[Unitils] beforeTestSetUp   - GroupsTest", iterator.next());
+        assertEquals("[Test]    testSetUp         - GroupsTest", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - GroupsTest - test1", iterator.next());
+        assertEquals("[Test]    testMethod        - GroupsTest - test1", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - GroupsTest - test1", iterator.next());
+        assertEquals("[Test]    testTearDown      - GroupsTest", iterator.next());
+        assertEquals("[Unitils] afterTestTearDown - GroupsTest", iterator.next());
+        assertEquals("[Test]    testAfterClass    - GroupsTest", iterator.next());
+        assertEquals("[Unitils] afterTestClass    - GroupsTest", iterator.next());
+        assertEquals("[Unitils] afterAll", iterator.next());
+        assertEquals(0, testListenerAdapter.getFailedTests().size());
+    }
+
+
+    /**
+     * Tests the correct invocation sequence of listener methods for a TestNG test that defines an unknown test group.
+     */
+    @Test
+    public void testUnitilsTestNG_unknownGroup() {
+        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
+
+        TestNG testng = new TestNG();
+        testng.setTestClasses(new Class[]{UnitilsTestNGTest_GroupsTest.class});
+        testng.setGroups("xxxx");
+        testng.addListener(testListenerAdapter);
+        testng.run();
+
+        Iterator iterator = tracingTestListener.getCallList().iterator();
+        assertEquals("[Unitils] beforeAll", iterator.next());
+        assertEquals("[Unitils] afterAll", iterator.next());
         assertEquals(0, testListenerAdapter.getFailedTests().size());
     }
 
@@ -291,9 +339,9 @@ public class UnitilsInvocationTest {
 
 
     /**
-     * JUnit 3 test class without any tests.
+     * JUnit 3 test class without any tests. Inner class to avoid a failing test.
      */
-    private static class UnitilsJUnit3Test_EmptyTestClass extends UnitilsJUnit3 {
+    protected static class UnitilsJUnit3Test_EmptyTestClass extends UnitilsJUnit3 {
 
         private static TracingTestListener tracingTestListener;
 
@@ -315,5 +363,4 @@ public class UnitilsInvocationTest {
             return super.getUnitils();
         }
     }
-
 }

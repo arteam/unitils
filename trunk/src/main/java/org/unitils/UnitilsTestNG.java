@@ -28,6 +28,7 @@ import org.unitils.core.Unitils;
  * more information on the listener invocation order.
  *
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public abstract class UnitilsTestNG implements IHookable {
 
@@ -45,9 +46,8 @@ public abstract class UnitilsTestNG implements IHookable {
      * Called at the beginning of the test run. This will initialize unitils and the test listener
      * and call {@link TestListener#beforeAll}.
      */
-    @BeforeSuite
+    @BeforeSuite(alwaysRun = true)
     protected void unitilsBeforeSuite() {
-
         testListener = getUnitils().createTestListener();
         testListener.beforeAll();
     }
@@ -65,7 +65,7 @@ public abstract class UnitilsTestNG implements IHookable {
     /**
      * Called before a test of a test class is run. This is where {@link TestListener#beforeTestClass} is called.
      */
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     protected void unitilsBeforeClass() {
         beforeTestClassCalled = true;
         testListener.beforeTestClass(getClass());
@@ -91,7 +91,7 @@ public abstract class UnitilsTestNG implements IHookable {
     /**
      * Called before all test setup. This is where {@link TestListener#beforeTestSetUp} is called.
      */
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     protected void unitilsBeforeTestSetUp() {
         beforeTestSetUpCalled = true;
         testListener.beforeTestSetUp(this);
@@ -122,7 +122,6 @@ public abstract class UnitilsTestNG implements IHookable {
      * @param testResult the TestNG test result, not null
      */
     public void run(IHookCallBack callBack, ITestResult testResult) {
-
         RuntimeException firstRuntimeException = null;
         try {
             testListener.beforeTestMethod(this, testResult.getMethod().getMethod());
