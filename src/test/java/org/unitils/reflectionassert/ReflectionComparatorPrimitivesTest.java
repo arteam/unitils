@@ -164,6 +164,15 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
 
 
     /**
+     * Tests for equality of two NaN values
+     */
+    public void testNaN() {
+        Difference result = reflectionComparator.getDifference(Double.NaN, Float.NaN);
+        assertNull(result);
+    }
+
+
+    /**
      * Test class with failing equals.
      */
     private static class Primitives {

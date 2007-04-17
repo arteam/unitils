@@ -42,7 +42,9 @@ public class LenientNumberComparator extends ReflectionComparator {
      * @return
      */
     protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
-        if (getDoubleValue(left) == getDoubleValue(right)) {
+        Double leftDouble = getDoubleValue(left);
+        Double rightDouble = getDoubleValue(right);
+        if (leftDouble.equals(rightDouble)) {
             return null;
         }
         return new Difference("Different primitive values.", left, right, fieldStack);
