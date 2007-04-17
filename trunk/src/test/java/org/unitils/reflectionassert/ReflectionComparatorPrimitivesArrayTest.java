@@ -84,8 +84,8 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
         arrayInnerDifferentValue = new Element(arrayDifferentValue);
         arrayInnerDifferentSize = new Element(arrayDifferentSize);
 
-        reflectionComparator = new ReflectionComparator();
-        reflectionComparatorLenientOrder = new ReflectionComparator(LENIENT_ORDER);
+        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        reflectionComparatorLenientOrder = ReflectionComparatorChainFactory.LENIENTORDER_COMPARATOR;
     }
 
 

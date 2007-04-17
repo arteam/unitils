@@ -52,6 +52,9 @@ import java.util.Collection;
  *
  * @see ReflectionComparator
  * @see ReflectionComparatorMode
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionAssert {
 
@@ -118,7 +121,7 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertRefEquals(String message, Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
-        ReflectionComparator reflectionComparator = new ReflectionComparator(modes);
+        ReflectionComparator reflectionComparator = ReflectionComparatorChainFactory.getComparatorChainForModes(modes);
         Difference difference = reflectionComparator.getDifference(expected, actual);
         if (difference != null) {
             Assert.fail(formatMessage(message, difference));

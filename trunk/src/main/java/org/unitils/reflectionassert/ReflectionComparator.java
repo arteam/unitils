@@ -16,6 +16,7 @@
 package org.unitils.reflectionassert;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -55,61 +56,54 @@ import java.util.*;
  * </ul>
  * If the check indicates that both objects are not equal, the first (and only the first!) found difference is returned.
  * The actual difference can then be retrieved by the fieldStack, leftValue and rightValue properties.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
-public class ReflectionComparator {
-
-
-    /* True if fields should not be compared if the left value is a java default (0, null)
-       LenientDates overrides ignoreDefaults for fields of type Date */
-    private boolean ignoreDefaults = false;
-
-    /* True if Date fields should not be checked on value. The values will be considered equal when they are
-       both null or both not null */
-    private boolean lenientDates = false;
-
-    /* True if the order of arrays or collections should not be taken into account. Collections or arrays are
-       considered equal when they both contain the same elements. */
-    private boolean lenientOrder = false;
-
+abstract public class ReflectionComparator {
 
     /**
-     * Creates a comparator using the given modes.
-     * If no modes are given, a srict comparison will be performed.
-     *
-     * @param modes the comparator modes
+     * todo javadoc
      */
-    public ReflectionComparator(ReflectionComparatorMode... modes) {
-        if (modes == null) {
-            return;
-        }
+    protected ReflectionComparator rootComparator;
 
-        for (ReflectionComparatorMode mode : modes) {
+    /**
+     * todo javadoc
+     */
+    protected ReflectionComparator chainedComparator;
 
-            if (mode == ReflectionComparatorMode.IGNORE_DEFAULTS) {
-                ignoreDefaults = true;
+    /**
+     * todo javadoc
+     *
+     * @param chainedComparator
+     */
+    public ReflectionComparator(ReflectionComparator chainedComparator) {
+        this.chainedComparator = chainedComparator;
+        setRootComparator(this);
+    }
 
-            } else if (mode == ReflectionComparatorMode.LENIENT_DATES) {
-                lenientDates = true;
-
-            } else if (mode == ReflectionComparatorMode.LENIENT_ORDER) {
-                lenientOrder = true;
-            }
+    /**
+     * todo javadoc
+     *
+     * @param rootComparator
+     */
+    protected void setRootComparator(ReflectionComparator rootComparator) {
+        this.rootComparator = rootComparator;
+        if (chainedComparator != null) {
+            chainedComparator.setRootComparator(rootComparator);
         }
     }
 
-
     /**
-     * Checks whether there is no difference between the left and right objects. The meaning of no difference is
-     * determined by the set comparator modes. See class javadoc for more info.
+     * Indicates whether this ReflectionComparator is able to check whether their is a difference in the given left
+     * and right objects or not.
      *
-     * @param left  the left instance
-     * @param right the right instance
-     * @return true if there is no difference, false otherwise
+     * @param left The left object
+     * @param right The right object
+     * @return true if this ReflectionComparator is able to check whether their is a difference in the given left
+     * and right objects, false otherwise
      */
-    public boolean isEqual(Object left, Object right) {
-        Difference difference = getDifference(left, right);
-        return difference == null;
-    }
+    abstract public boolean canHandle(Object left, Object right);
 
 
     /**
@@ -121,441 +115,86 @@ public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     public Difference getDifference(Object left, Object right) {
-        return getDifferenceImpl(left, right, new Stack<String>(), new HashMap<Object, Object>());
+        return getDifference(left, right, new Stack<String>(), new HashSet<TraversedInstancePair>());
     }
 
 
     /**
-     * Implements {@link #getDifference(Object,Object)}.
+     * If this ReflectionComparator is able to check whether their is a difference in the given left
+     * and right objects (i.e. {@link #canHandle(Object, Object)} returns true), the objects are compared.
+     * todo javadoc
      *
-     * @param left                 the left instance for the comparison
-     * @param right                the right instance for the comparison
-     * @param fieldStack           the current field names
-     * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
-     * @return the difference, null if there is no difference
+     * @param left
+     * @param right
+     * @param fieldStack
+     * @param traversedInstancePairs
+     * @return
      */
-    private Difference getDifferenceImpl(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-        // check same instances or both null
-        if (left == right) {
-            return null;
-        }
-
-        // check (lenient) dates
-        // lenient dates overrides ignore defaults
-        if ((left == null || left instanceof Date) && (right == null || right instanceof Date)) {
-            return compareDates((Date) left, (Date) right, fieldStack);
-        }
-
-        // ignore default values if needed
-        if (isIgnoredDefault(left)) {
-            return null;
-        }
-
-        // check left or right is null
-        if (left == null) {
-            return new Difference("Left value null.", left, right, fieldStack);
-        }
-        if (right == null) {
-            return new Difference("Right value null.", left, right, fieldStack);
-        }
-
-        // Ignore traversed instance to avoid infinite loops
-        if (traversedInstanceMap.get(left) != null) {
-            return null;
-        }
-        traversedInstanceMap.put(left, left);
-
-        // check collections, primitive and object arrays
-        if ((left.getClass().isArray() || left instanceof Collection) && (right.getClass().isArray() || right instanceof Collection)) {
-            return compareArraysOrCollections(left, right, fieldStack, traversedInstanceMap);
-        }
-
-        // check maps
-        if (left instanceof Map && right instanceof Map) {
-            return compareMaps((Map<?, ?>) left, (Map<?, ?>) right, fieldStack, traversedInstanceMap);
-        }
-
-        // check objects
-        return compareObjects(left, right, fieldStack, traversedInstanceMap);
-    }
-
-
-    /**
-     * Checks equality of two dates.
-     * If lenientDates is set both dates will be considered equals if they are both null or both not null.
-     *
-     * @param left       the left date for the comparison
-     * @param right      the right date for the comparison
-     * @param fieldStack the current field names
-     * @return the difference, null if there is no difference
-     */
-    private Difference compareDates(Date left, Date right, Stack<String> fieldStack) {
-        if (!lenientDates) {
-            // check ignored default
-            if (ignoreDefaults && left == null) {
-                return null;
-            }
-
-            // check date values
-            if (left != null) {
-                if (left.equals(right)) {
-                    return null;
-                }
-            } else if (right == null || right.equals(left)) {
-                return null;
-            }
-            return new Difference("Different date values.", left, right, fieldStack);
-        }
-
-        if ((right == null && left != null) || (right != null && left == null)) {
-            return new Difference("Lenient dates, but not both value or both null.", left, right, fieldStack);
-        }
-        return null;
-    }
-
-
-    /**
-     * Checks equality of two arrays or collections or mixed, an array and a collection.
-     *
-     * @param left                 the left array or collection for the comparison, not null and same type as right
-     * @param right                the right array or collection for the comparison, not null and same type as right
-     * @param fieldStack           the current field names
-     * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
-     * @return the difference, null if there is no difference
-     */
-    private Difference compareArraysOrCollections(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-        // Convert to list and compare as collection
-        Collection<?> leftCollection = convertToCollection(left);
-        Collection<?> rightCollection = convertToCollection(right);
-
-        Difference difference = compareCollections(leftCollection, rightCollection, fieldStack, traversedInstanceMap);
-
-        // If needed switch back array in place of list
-        if (difference != null) {
-            if (difference.leftValue == leftCollection) {
-                difference.leftValue = left;
-            }
-            if (difference.rightValue == rightCollection) {
-                difference.rightValue = right;
-            }
-        }
-        return difference;
-    }
-
-
-    /**
-     * Checks equality of two collections.
-     *
-     * @param left                 the left collection for the comparison, not null
-     * @param right                the right collection for the comparison, not null
-     * @param fieldStack           the current field names
-     * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
-     * @return the difference, null if there is no difference
-     */
-    private Difference compareCollections(Collection<?> left, Collection<?> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-        if (left.size() != right.size()) {
-            return new Difference("Different array/collection sizes. Left size: " + left.size() + ", right size: " + right.size(), left, right, fieldStack);
-        }
-
-        if (lenientOrder) {
-            return compareCollectionsLenientOrder(left, right, fieldStack);
-        }
-        return compareCollectionsStrictOrder(left, right, fieldStack, traversedInstanceMap);
-    }
-
-
-    /**
-     * Checks equality of two collections taking the order of the elements into account. The order used is the order
-     * defined by the iterators of the collections.
-     *
-     * @param left                 the left collection for the comparison, not null
-     * @param right                the right collection for the comparison, not null
-     * @param fieldStack           the current field names
-     * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
-     * @return the difference, null if there is no difference
-     */
-    private Difference compareCollectionsStrictOrder(Collection<?> left, Collection<?> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-        int i = 0;
-        Iterator lhsIterator = left.iterator();
-        Iterator rhsIterator = right.iterator();
-        while (lhsIterator.hasNext() && rhsIterator.hasNext()) {
-            fieldStack.push("" + i++);
-            Object lhsValue = lhsIterator.next();
-            Object rhsValue = rhsIterator.next();
-            Difference difference = getDifferenceImpl(lhsValue, rhsValue, fieldStack, traversedInstanceMap);
-            if (difference != null) {
-                return difference;
-            }
-            fieldStack.pop();
-        }
-        return null;
-    }
-
-
-    /**
-     * Checks equality of two collections but does not look at the order of the list.
-     * This will look at all elements in the left collection and try to find a match in the rigth collecction.
-     * The first match that is found will be considered to be the correct match. A later element in the left
-     * collection can no longer be matched to this element.
-     *
-     * @param left       the left collection for the comparison, not null
-     * @param right      the right collection for the comparison, not null
-     * @param fieldStack the current field names
-     * @return the difference, null if there is no difference
-     */
-    private Difference compareCollectionsLenientOrder(Collection<?> left, Collection<?> right, Stack<String> fieldStack) {
-        // Create copy from which we can remove elements.
-        ArrayList rightCopy = new ArrayList<Object>(right);
-
-        for (Object lhsValue : left) {
-
-            boolean found = false;
-            Iterator rhsIterator = rightCopy.iterator();
-            while (rhsIterator.hasNext()) {
-                Object rhsValue = rhsIterator.next();
-
-                // Compare values using reflection
-                boolean equal = isEqual(lhsValue, rhsValue);
-                if (equal) {
-                    rhsIterator.remove();
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                return new Difference("Left value not found in right collection/array. Left value: " + lhsValue, left, right, fieldStack);
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * Checks equality of two maps.
-     *
-     * @param left                 the left map for the comparison, not null
-     * @param right                the right map for the comparison, not null
-     * @param fieldStack           the current field names
-     * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
-     * @return the difference, null if there is no difference
-     */
-    private Difference compareMaps(Map<?, ?> left, Map<?, ?> right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-        if (left.size() != right.size()) {
-            return new Difference("Different map sizes.", left, right, fieldStack);
-        }
-
-        for (Map.Entry<?, ?> lhsEntry : left.entrySet()) {
-            Object lhsKey = lhsEntry.getKey();
-
-            fieldStack.push("" + lhsKey);
-            Object lhsValue = lhsEntry.getValue();
-            Object rhsValue = right.get(lhsKey);
-            Difference difference = getDifferenceImpl(lhsValue, rhsValue, fieldStack, traversedInstanceMap);
-            if (difference != null) {
-                return difference;
-            }
-            fieldStack.pop();
-        }
-        return null;
-    }
-
-
-    /**
-     * Checks equality of two objects.
-     *
-     * @param left                 the left instance for the comparison, not null
-     * @param right                the right instance for the comparison, not null
-     * @param fieldStack           the current field names
-     * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
-     * @return the difference, null if there is no difference
-     */
-    private Difference compareObjects(Object left, Object right, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-        // check same primitive values
-        if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
-            if (getDoubleValue(left) == getDoubleValue(right)) {
-                return null;
-            }
-            return new Difference("Different primitive values.", left, right, fieldStack);
-        }
-
-        // check same enum values
-        if ((left instanceof Enum) && (right instanceof Enum)) {
-            if (left.equals(right)) {
-                return null;
-            }
-            return new Difference("Different enum values.", left, right, fieldStack);
-        }
-
-        // check different class type
-        Class clazz = left.getClass();
-        if (!clazz.equals(right.getClass())) {
-            return new Difference("Different class types. Left: " + clazz + ", right: " + right.getClass(), left, right, fieldStack);
-        }
-
-        // compare java.lang.* objects with equals()
-        if (clazz.getName().startsWith("java.lang")) {
-            if (left.equals(right)) {
-                return null;
-            }
-            return new Difference("Different object values.", left, right, fieldStack);
-        }
-
-        // compare all fields of the object using reflection
-        return compareFields(left, right, clazz, fieldStack, traversedInstanceMap);
-    }
-
-
-    /**
-     * Compares the values of all fields in the given objects by use of reflection.
-     *
-     * @param left                 the left object for the comparison, not null
-     * @param right                the right object for the comparison, not null
-     * @param clazz                the type of both objects
-     * @param fieldStack           the current field names
-     * @param traversedInstanceMap used for holding all traversed objects to avoid infinite loops with circular references
-     * @return the difference, null if there is no difference
-     */
-    private Difference compareFields(Object left, Object right, Class clazz, Stack<String> fieldStack, Map<Object, Object> traversedInstanceMap) {
-        Field[] fields = clazz.getDeclaredFields();
-        AccessibleObject.setAccessible(fields, true);
-
-        for (Field f : fields) {
-            fieldStack.push(f.getName());
-
-            // skip transient and static fields
-            if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers())) {
-                fieldStack.pop();
-                continue;
-            }
-            try {
-                Object leftValue = f.get(left);
-                // do not evaluate right value if left is ignored default values
-                // this avoids lazy loading of right value (eg in hibernate)
-                if (!(Date.class.isAssignableFrom(f.getType())) && isIgnoredDefault(leftValue)) {
-                    fieldStack.pop();
-                    continue;
-                }
-                Object rightValue = f.get(right);
-
-                // recursively check the value of the fields
-                Difference difference = getDifferenceImpl(leftValue, rightValue, fieldStack, traversedInstanceMap);
-                if (difference != null) {
-                    return difference;
-                }
-
-            } catch (IllegalAccessException e) {
-                // this can't happen. Would get a Security exception instead
-                // throw a runtime exception in case the impossible happens.
-                throw new InternalError("Unexpected IllegalAccessException");
-            }
-            fieldStack.pop();
-        }
-
-        // check superclass
-        Class superclazz = clazz.getSuperclass();
-        while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
-            Difference difference = compareFields(left, right, superclazz, fieldStack, traversedInstanceMap);
-            if (difference != null) {
-                return difference;
-            }
-            superclazz = superclazz.getSuperclass();
-        }
-        return null;
-    }
-
-
-    /**
-     * Checks whether the given right value should be ignored. <br>
-     * True will be returned when ignoreDefaults is true and the value is the java default value for the given type. <br>
-     * Dates will be ignored if lenientDates is true.
-     *
-     * @param value the value to check
-     * @return true if the value should be ignored
-     */
-    private boolean isIgnoredDefault(Object value) {
-        if (!ignoreDefaults) {
-            return false;
-        }
-
-        // object types
-        if (value == null) {
-            return true;
-        }
-
-        // primitive types
-        return (value instanceof Boolean && !(Boolean) value) ||
-                (value instanceof Character && (Character) value == 0) ||
-                (value instanceof Number && ((Number) value).doubleValue() == 0);
-    }
-
-
-    /**
-     * Gets the double value for the given left Character or Number instance.
-     *
-     * @param object the Character or Number, not null
-     * @return the value as a double
-     */
-    private double getDoubleValue(Object object) {
-        if (object instanceof Number) {
-            return ((Number) object).doubleValue();
-        }
-        return (double) ((Character) object).charValue();
-    }
-
-
-    /**
-     * Converts the given array or collection object (possibly primitive array) to type Collection
-     *
-     * @param object the array or collection
-     * @return the object collection
-     */
-    private Collection<?> convertToCollection(Object object) {
-        if (object instanceof Collection<?>) {
-            return (Collection<?>) object;
-        }
-
-        // If needed convert primitive array to object array
-        Object[] objectArray = convertToObjectArray(object);
-
-        // Convert array to collection
-        return Arrays.asList(objectArray);
-    }
-
-
-    /**
-     * Converts the given array object (possibly primitive array) to type Object[]
-     *
-     * @param object the array
-     * @return the object array
-     */
-    private Object[] convertToObjectArray(Object object) {
-        if (object instanceof byte[]) {
-            return ArrayUtils.toObject((byte[]) object);
-
-        } else if (object instanceof short[]) {
-            return ArrayUtils.toObject((short[]) object);
-
-        } else if (object instanceof int[]) {
-            return ArrayUtils.toObject((int[]) object);
-
-        } else if (object instanceof long[]) {
-            return ArrayUtils.toObject((long[]) object);
-
-        } else if (object instanceof char[]) {
-            return ArrayUtils.toObject((char[]) object);
-
-        } else if (object instanceof float[]) {
-            return ArrayUtils.toObject((float[]) object);
-
-        } else if (object instanceof double[]) {
-            return ArrayUtils.toObject((double[]) object);
-
-        } else if (object instanceof boolean[]) {
-            return ArrayUtils.toObject((boolean[]) object);
-
+    protected Difference getDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
+        if (isAlreadyTraversedInstancePair(traversedInstancePairs, left, right)) return null;
+        if (canHandle(left, right)) {
+            registerTraversedInstancePair(left, right, traversedInstancePairs);
+            return doGetDifference(left, right, fieldStack, traversedInstancePairs);
         } else {
-            return (Object[]) object;
+            if (chainedComparator == null) {
+                throw new UnitilsException("No ReflectionComparator found for objects " + left + " and" + right + " at " + fieldStack.toString());
+            } else {
+                return chainedComparator.getDifference(left, right, fieldStack, traversedInstancePairs);
+            }
+        }
+    }
+
+    /**
+     * todo javadoc
+     *
+     * @param left
+     * @param right
+     * @param fieldStack
+     * @param traversedInstancePairs
+     * @return
+     */
+    abstract protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs);
+
+
+    /**
+     * Checks whether there is no difference between the left and right objects. The meaning of no difference is
+     * determined by the set comparator modes. See class javadoc for more info.
+     *
+     * @param left  the left instance
+     * @param right the right instance
+     * @return true if there is no difference, false otherwise
+     */
+    public boolean isEqual(Object left, Object right) {
+        Difference difference = rootComparator.getDifference(left, right);
+        return difference == null;
+    }
+
+    /**
+     * todo javadoc
+     *
+     * @param left
+     * @param right
+     * @param traversedInstancePairs
+     */
+    private void registerTraversedInstancePair(Object left, Object right, Set<TraversedInstancePair> traversedInstancePairs) {
+        if (left != null && right != null) {
+            traversedInstancePairs.add(new TraversedInstancePair(left, right));
+        }
+    }
+
+    /**
+     * todo javadoc
+     *
+     * @param traversedInstancePairs
+     * @param left
+     * @param right
+     * @return
+     */
+    private boolean isAlreadyTraversedInstancePair(Set<TraversedInstancePair> traversedInstancePairs, Object left, Object right) {
+        if (left == null || right == null) {
+            return false;
+        } else {
+            return traversedInstancePairs.contains(new TraversedInstancePair(left, right));
         }
     }
 
@@ -587,7 +226,7 @@ public class ReflectionComparator {
          * @param rightValue the right instance
          * @param fieldStack the current field names
          */
-        private Difference(String message, Object leftValue, Object rightValue, Stack fieldStack) {
+        protected Difference(String message, Object leftValue, Object rightValue, Stack fieldStack) {
             this.message = message;
             this.leftValue = leftValue;
             this.rightValue = rightValue;
@@ -653,6 +292,48 @@ public class ReflectionComparator {
          */
         public Object getRightValue() {
             return rightValue;
+        }
+    }
+
+    /**
+     * todo javadoc
+     */
+    protected static class TraversedInstancePair {
+
+        private Object leftObject;
+
+        private Object rightObject;
+
+        public TraversedInstancePair(Object leftObject, Object rightObject) {
+            this.leftObject = leftObject;
+            this.rightObject = rightObject;
+        }
+
+        public Object getLeftObject() {
+            return leftObject;
+        }
+
+        public Object getRightObject() {
+            return rightObject;
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            TraversedInstancePair that = (TraversedInstancePair) o;
+
+            if (!(leftObject == that.leftObject)) return false;
+            if (!(rightObject == that.rightObject)) return false;
+
+            return true;
+        }
+
+        public int hashCode() {
+            int result;
+            result = leftObject.hashCode();
+            result = 31 * result + rightObject.hashCode();
+            return result;
         }
     }
 }

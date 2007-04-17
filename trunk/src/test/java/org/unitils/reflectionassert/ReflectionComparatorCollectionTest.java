@@ -73,7 +73,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
         collectionInnerB = createCollection(null, collectionB);
         collectionInnerDifferentValue = createCollection(null, collectionDifferentValue);
 
-        reflectionComparator = new ReflectionComparator();
+        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
     }
 
 

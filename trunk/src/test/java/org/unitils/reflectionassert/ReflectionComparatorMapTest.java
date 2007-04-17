@@ -72,7 +72,7 @@ public class ReflectionComparatorMapTest extends TestCase {
         mapInnerB = createMap("key 2", null, mapB);
         mapInnerDifferentValue = createMap("key 2", null, mapDifferentValue);
 
-        reflectionComparator = new ReflectionComparator();
+        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
     }
 
 
