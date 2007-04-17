@@ -38,7 +38,7 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        reflectionComparator = new ReflectionComparator();
+        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
 
         // Create circular reference
         circularReferenced.setRef2(circularReferenced);
@@ -62,7 +62,7 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
     public void testNestedDoubleReferenced_notEqual() {
         Difference diff = reflectionComparator.getDifference(nestedDoubleReferenced, notEqualToNestedDoubleReferenced1);
         // todo failing test, failing statement commented out
-        //assertNotNull(diff);
+        assertNotNull(diff);
     }
 
     public void testCircularReferenced_equal() {
@@ -73,7 +73,7 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
     public void testCircularReferenced_notEqual() {
         Difference diff = reflectionComparator.getDifference(circularReferenced, nestedDoubleReferenced);
         // todo failing test, failing statement commented out
-        //assertNotNull(diff);
+        assertNotNull(diff);
     }
 
     private static class References {

@@ -68,7 +68,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
         primitivesInnerB = new Primitives(0, 0, primitivesB);
         primitivesInnerDifferentValue = new Primitives(0, 0, primitiveDifferentValue);
 
-        reflectionComparator = new ReflectionComparator();
+        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
     }
 
 

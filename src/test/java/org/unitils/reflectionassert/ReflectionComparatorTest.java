@@ -61,7 +61,7 @@ public class ReflectionComparatorTest extends TestCase {
     private Objects objectsCircularDependencyB;
 
     /* Class under test */
-    private ReflectionComparator reflectionComparator;
+    private ReflectionComparator reflectionComparator, ignoreDefaultReflectionComparator;
 
 
     /**
@@ -86,7 +86,8 @@ public class ReflectionComparatorTest extends TestCase {
         objectsCircularDependencyA.getInner().getInner().setInner(objectsCircularDependencyA);
         objectsCircularDependencyB.getInner().getInner().setInner(objectsCircularDependencyB);
 
-        reflectionComparator = new ReflectionComparator();
+        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        ignoreDefaultReflectionComparator = ReflectionComparatorChainFactory.IGNOREDEFAULTS_COMPARATOR;
     }
 
 
@@ -209,7 +210,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test for two equal objects.
      */
-    public void testIsEquals() {
+    public void testIsEqual() {
         boolean result = reflectionComparator.isEqual(objectsA, objectsB);
         assertTrue(result);
     }
@@ -239,8 +240,7 @@ public class ReflectionComparatorTest extends TestCase {
             }
         });
 
-        reflectionComparator = new ReflectionComparator(IGNORE_DEFAULTS);
-        Difference result = reflectionComparator.getDifference(new CollectionWrapper(null), new CollectionWrapper(collection));
+        Difference result = ignoreDefaultReflectionComparator.getDifference(new CollectionWrapper(null), new CollectionWrapper(collection));
         assertNull(result);
     }
 

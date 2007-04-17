@@ -46,7 +46,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        reflectionComparator = new ReflectionComparator();
+        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
 
         enumsA = new Enums(Enums.TestEnum.TEST1);
         enumsB = new Enums(Enums.TestEnum.TEST1);

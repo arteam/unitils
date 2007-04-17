@@ -63,7 +63,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     private Element[] arrayInnerDifferentSize;
 
     /* Class under test */
-    private ReflectionComparator reflectionComparator;
+    private ReflectionComparator reflectionComparator, lenientOrderComparator;
 
 
     /**
@@ -84,7 +84,8 @@ public class ReflectionComparatorArrayTest extends TestCase {
         arrayInnerDifferentValue = createArray(null, arrayDifferentValue, true);
         arrayInnerDifferentSize = createArray(null, arrayDifferentSize, true);
 
-        reflectionComparator = new ReflectionComparator();
+        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        lenientOrderComparator = ReflectionComparatorChainFactory.LENIENTORDER_COMPARATOR;
     }
 
 
@@ -176,7 +177,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
     public void testGetDifference_equalsDifferentOrderLenient() {
-        Difference result = new ReflectionComparator(LENIENT_ORDER).getDifference(arrayA, arrayDifferentOrder);
+        Difference result = lenientOrderComparator.getDifference(arrayA, arrayDifferentOrder);
         assertNull(result);
     }
 
@@ -185,7 +186,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
     public void testGetDifference_notEqualsDifferentOrderLenientDifferentValues() {
-        Difference result = new ReflectionComparator(LENIENT_ORDER).getDifference(arrayA, arrayDifferentOrderDifferentValue);
+        Difference result = lenientOrderComparator.getDifference(arrayA, arrayDifferentOrderDifferentValue);
 
         assertNotNull(result);
         assertTrue(result.getFieldStack().isEmpty());
