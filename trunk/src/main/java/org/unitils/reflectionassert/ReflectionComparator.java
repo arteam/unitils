@@ -15,12 +15,8 @@
  */
 package org.unitils.reflectionassert;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.unitils.core.UnitilsException;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 
@@ -131,7 +127,9 @@ abstract public class ReflectionComparator {
      * @return
      */
     protected Difference getDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
-        if (isAlreadyTraversedInstancePair(traversedInstancePairs, left, right)) return null;
+        if (isAlreadyTraversedInstancePair(left, right, traversedInstancePairs)) {
+            return null;
+        }
         if (canHandle(left, right)) {
             registerTraversedInstancePair(left, right, traversedInstancePairs);
             return doGetDifference(left, right, fieldStack, traversedInstancePairs);
@@ -185,12 +183,12 @@ abstract public class ReflectionComparator {
     /**
      * todo javadoc
      *
-     * @param traversedInstancePairs
      * @param left
      * @param right
+     * @param traversedInstancePairs
      * @return
      */
-    private boolean isAlreadyTraversedInstancePair(Set<TraversedInstancePair> traversedInstancePairs, Object left, Object right) {
+    private boolean isAlreadyTraversedInstancePair(Object left, Object right, Set<TraversedInstancePair> traversedInstancePairs) {
         if (left == null || right == null) {
             return false;
         } else {
