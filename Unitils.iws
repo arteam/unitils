@@ -18,14 +18,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/resources/unitils.properties" afterPath="$PROJECT_DIR$/src/test/resources/unitils.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseTask.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseTask.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/site/resources/unitils-default.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/unitils.properties" afterPath="$PROJECT_DIR$/src/site/resources/unitils.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/unitils-local.properties" afterPath="$PROJECT_DIR$/src/site/resources/unitils-local.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
@@ -55,7 +48,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$PostgreSqlDbSupportTest.es" NAME="PostgreSqlDbSupportTest" MODIFIED="1175623605669">
       <FILTER>org.unitils.core.dbsupport.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$org.unitils.es" NAME="org.unitils" MODIFIED="1177005439697" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$org.unitils.es" NAME="org.unitils" MODIFIED="1177006168325" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -179,7 +172,7 @@
       <file leaf-file-name="DbSupport.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="101" column="63" selection-start="4135" selection-end="4135" vertical-scroll-proportion="0.59342915">
+            <state line="101" column="63" selection-start="4135" selection-end="4135" vertical-scroll-proportion="0.034907598">
               <folding />
             </state>
           </provider>
@@ -188,7 +181,7 @@
       <file leaf-file-name="DatabaseModuleConfigUtils.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseModuleConfigUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="77" column="38" selection-start="3076" selection-end="3076" vertical-scroll-proportion="2.0219123">
+            <state line="77" column="38" selection-start="3076" selection-end="3076" vertical-scroll-proportion="1.8904382">
               <folding />
             </state>
           </provider>
@@ -197,19 +190,28 @@
       <file leaf-file-name="DatabaseTask.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseTask.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="36" selection-start="923" selection-end="923" vertical-scroll-proportion="0.6673307">
+            <state line="28" column="36" selection-start="923" selection-end="923" vertical-scroll-proportion="0.6713147">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DbUnitModule.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="DbUnitModule.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="76" column="0" selection-start="3714" selection-end="3714" vertical-scroll-proportion="0.523614">
+            <state line="76" column="0" selection-start="3714" selection-end="3714" vertical-scroll-proportion="0.034907598">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConfigurationLoader.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="143" column="0" selection-start="6189" selection-end="6189" vertical-scroll-proportion="1.625498">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -491,6 +493,40 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\main\java\org\unitils\core" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
     </subPane>
   </component>
   <component name="ProjectReloadState">
@@ -504,7 +540,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure PackagesPane="false" ProjectPane="false" Scope="false" Favorites="false" />
+      <showStructure Favorites="false" PackagesPane="false" Scope="false" ProjectPane="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -589,6 +625,18 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -618,6 +666,13 @@
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
       <module name="" />
     </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -640,25 +695,6 @@
       <method>
         <option name="Make" value="true" />
       </method>
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
     </configuration>
     <configuration default="false" name="DuplicateFileSearch" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="util.DuplicateFileSearch" />
@@ -1020,13 +1056,6 @@
     <option name="myLastEditedConfigurable" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/reflectionassert/ReflectionComparatorPrimitivesTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="181" column="22" selection-start="5812" selection-end="5812" vertical-scroll-proportion="1.357438">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/reflectionassert/ReflectionComparatorChainFactory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="38" column="12" selection-start="1962" selection-end="1962" vertical-scroll-proportion="0.7412731">
@@ -1090,13 +1119,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="101" column="63" selection-start="4135" selection-end="4135" vertical-scroll-proportion="0.59342915">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/resources/unitils.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state line="24" column="0" selection-start="1468" selection-end="1468" vertical-scroll-proportion="0.19351764">
@@ -1104,26 +1126,40 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="101" column="63" selection-start="4135" selection-end="4135" vertical-scroll-proportion="0.034907598">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseModuleConfigUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="77" column="38" selection-start="3076" selection-end="3076" vertical-scroll-proportion="2.0219123">
+        <state line="77" column="38" selection-start="3076" selection-end="3076" vertical-scroll-proportion="1.8904382">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseTask.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="36" selection-start="923" selection-end="923" vertical-scroll-proportion="0.6673307">
+        <state line="28" column="36" selection-start="923" selection-end="923" vertical-scroll-proportion="0.6713147">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="76" column="0" selection-start="3714" selection-end="3714" vertical-scroll-proportion="0.523614">
+        <state line="76" column="0" selection-start="3714" selection-end="3714" vertical-scroll-proportion="0.034907598">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ConfigurationLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="143" column="0" selection-start="6189" selection-end="6189" vertical-scroll-proportion="1.625498">
+          <folding />
         </state>
       </provider>
     </entry>

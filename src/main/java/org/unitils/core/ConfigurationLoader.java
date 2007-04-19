@@ -140,6 +140,7 @@ public class ConfigurationLoader {
             Properties properties = new Properties();
             inputStream = getClass().getClassLoader().getResourceAsStream(customConfigurationFileName);
             if (inputStream == null) {
+                logger.info("No custom configuration file " + customConfigurationFileName + " found.");
                 return null;
             }
             properties.load(inputStream);
