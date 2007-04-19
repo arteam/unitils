@@ -45,7 +45,7 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        list = Arrays.asList(new TestObject(1, "el1"), new TestObject(2, "el2"));
+        list = Arrays.asList(new TestObject(1L, "el1"), new TestObject(2L, "el2"));
     }
 
 
@@ -61,7 +61,7 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      * Test for equal property values but of different types (int versus long).
      */
     public void testAssertPropertyRefEquals_differentTypes() {
-        assertPropertyRefEquals("primitiveProperty", Arrays.asList(1, 2), list);
+        assertPropertyRefEquals("primitiveProperty", Arrays.asList(1L, 2L), list);
     }
 
 
@@ -110,19 +110,19 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
 
 
     /**
-     * Test for equal primitive property values.
+     * Test for equal primitive property values. Using ints instead of longs.
      */
     public void testAssertPropertyRefEquals_equalsPrimitivesList() {
-        assertPropertyLenEquals("primitiveProperty", Arrays.asList(2L, 1L), list);
+        assertPropertyLenEquals("primitiveProperty", Arrays.asList(2, 1), list);
     }
 
 
     /**
-     * Test for different primitive property values.
+     * Test for different primitive property values. Using ints instead of longs.
      */
     public void testAssertPropertyRefEquals_notEqualsPrimitivesList() {
         try {
-            assertPropertyLenEquals("primitiveProperty", Arrays.asList(999L, 1L), list);
+            assertPropertyLenEquals("primitiveProperty", Arrays.asList(999, 1), list);
             Assert.fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError e) {

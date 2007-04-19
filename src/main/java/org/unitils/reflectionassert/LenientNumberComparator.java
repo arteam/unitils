@@ -1,7 +1,7 @@
 package org.unitils.reflectionassert;
 
-import java.util.Stack;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * todo javadoc
@@ -42,6 +42,7 @@ public class LenientNumberComparator extends ReflectionComparator {
      * @return
      */
     protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
+        // check if right and left have same number value (including NaN and Infinity)
         Double leftDouble = getDoubleValue(left);
         Double rightDouble = getDoubleValue(right);
         if (leftDouble.equals(rightDouble)) {
@@ -54,9 +55,9 @@ public class LenientNumberComparator extends ReflectionComparator {
      * Gets the double value for the given left Character or Number instance.
      *
      * @param object the Character or Number, not null
-     * @return the value as a double
+     * @return the value as a Double (this way NaN and infinity can be compared)
      */
-    private double getDoubleValue(Object object) {
+    private Double getDoubleValue(Object object) {
         if (object instanceof Number) {
             return ((Number) object).doubleValue();
         }

@@ -32,10 +32,7 @@ import org.unitils.spring.util.ApplicationContextManager;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getInstance;
-import static org.unitils.util.ReflectionUtils.getFieldName;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.isSetter;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
+import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -50,7 +47,7 @@ import java.util.Properties;
  * <p/>
  * The application context loading can be achieved by using the {@link SpringApplicationContext} annotation. These
  * contexts are cached, so a context will be reused when possible. For example suppose a superclass loads a context and
- * a test-subclass wants to use this context, it will not create a new one. {@link #invalidateApplicationContext(Class<?>...)} }
+ * a test-subclass wants to use this context, it will not create a new one. {@link #invalidateApplicationContext} }
  * can be used to force a reloading of a context if needed.
  * <p/>
  * Spring bean retrieval can be done by annotating the corresponding fields in the test with following

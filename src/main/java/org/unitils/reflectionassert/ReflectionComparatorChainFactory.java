@@ -1,17 +1,17 @@
 package org.unitils.reflectionassert;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.util.CollectionUtils;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
+import static org.unitils.util.CollectionUtils.asSet;
 
-
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * todo javadoc
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -36,7 +36,7 @@ public class ReflectionComparatorChainFactory {
             MapComparator.class, ObjectComparator.class);
 
     public static final ReflectionComparator IGNOREDEFAULTS_LENIENTORDER_COMPARATOR = createComparatorChain(IgnoreDefaultsComparator.class,
-            SimpleCasesComparator.class, LenientNumberComparator.class, SimpleCasesComparator.class, LenientOrderCollectionComparator.class,
+            LenientNumberComparator.class, SimpleCasesComparator.class, LenientOrderCollectionComparator.class,
             MapComparator.class, ObjectComparator.class);
 
     public static final ReflectionComparator LENIENTDATES_LENIENTORDER_COMPARATOR = createComparatorChain(LenientDatesComparator.class,
@@ -51,14 +51,13 @@ public class ReflectionComparatorChainFactory {
 
     static {
         COMPARATORMODES_COMPARATOR_MAP.put(new HashSet<ReflectionComparatorMode>(), STRICT_COMPARATOR);
-        COMPARATORMODES_COMPARATOR_MAP.put(CollectionUtils.asSet(ReflectionComparatorMode.IGNORE_DEFAULTS), IGNOREDEFAULTS_COMPARATOR);
-        COMPARATORMODES_COMPARATOR_MAP.put(CollectionUtils.asSet(ReflectionComparatorMode.LENIENT_DATES), LENIENTDATES_COMPARATOR);
-        COMPARATORMODES_COMPARATOR_MAP.put(CollectionUtils.asSet(ReflectionComparatorMode.LENIENT_ORDER), LENIENTORDER_COMPARATOR);
-        COMPARATORMODES_COMPARATOR_MAP.put(CollectionUtils.asSet(ReflectionComparatorMode.IGNORE_DEFAULTS, ReflectionComparatorMode.LENIENT_DATES), IGNOREDEFAULTS_LENIENTDATES_COMPARATOR);
-        COMPARATORMODES_COMPARATOR_MAP.put(CollectionUtils.asSet(ReflectionComparatorMode.IGNORE_DEFAULTS, ReflectionComparatorMode.LENIENT_ORDER), IGNOREDEFAULTS_LENIENTORDER_COMPARATOR);
-        COMPARATORMODES_COMPARATOR_MAP.put(CollectionUtils.asSet(ReflectionComparatorMode.LENIENT_DATES, ReflectionComparatorMode.LENIENT_ORDER), LENIENTDATES_LENIENTORDER_COMPARATOR);
-        COMPARATORMODES_COMPARATOR_MAP.put(CollectionUtils.asSet(ReflectionComparatorMode.IGNORE_DEFAULTS, ReflectionComparatorMode.LENIENT_DATES, ReflectionComparatorMode.LENIENT_ORDER),
-                IGNOREDEFAULTS_LENIENTDATES_LENIENTORDER_COMPARATOR);
+        COMPARATORMODES_COMPARATOR_MAP.put(asSet(IGNORE_DEFAULTS), IGNOREDEFAULTS_COMPARATOR);
+        COMPARATORMODES_COMPARATOR_MAP.put(asSet(LENIENT_DATES), LENIENTDATES_COMPARATOR);
+        COMPARATORMODES_COMPARATOR_MAP.put(asSet(LENIENT_ORDER), LENIENTORDER_COMPARATOR);
+        COMPARATORMODES_COMPARATOR_MAP.put(asSet(IGNORE_DEFAULTS, LENIENT_DATES), IGNOREDEFAULTS_LENIENTDATES_COMPARATOR);
+        COMPARATORMODES_COMPARATOR_MAP.put(asSet(IGNORE_DEFAULTS, LENIENT_ORDER), IGNOREDEFAULTS_LENIENTORDER_COMPARATOR);
+        COMPARATORMODES_COMPARATOR_MAP.put(asSet(LENIENT_DATES, LENIENT_ORDER), LENIENTDATES_LENIENTORDER_COMPARATOR);
+        COMPARATORMODES_COMPARATOR_MAP.put(asSet(IGNORE_DEFAULTS, LENIENT_DATES, LENIENT_ORDER), IGNOREDEFAULTS_LENIENTDATES_LENIENTORDER_COMPARATOR);
     }
 
 
@@ -79,7 +78,7 @@ public class ReflectionComparatorChainFactory {
 
 
     public static ReflectionComparator getComparatorChainForModes(ReflectionComparatorMode... modes) {
-        return COMPARATORMODES_COMPARATOR_MAP.get(CollectionUtils.asSet(modes));
+        return COMPARATORMODES_COMPARATOR_MAP.get(asSet(modes));
     }
 
 }
