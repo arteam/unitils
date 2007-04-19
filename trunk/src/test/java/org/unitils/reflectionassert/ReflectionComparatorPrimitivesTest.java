@@ -173,6 +173,37 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
 
 
     /**
+     * Tests for equality of a NaN with a 0 value
+     */
+    public void testNaN_notEqual() {
+        Difference result = reflectionComparator.getDifference(Double.NaN, 0);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertEquals(Double.NaN, result.getLeftValue());
+        assertEquals(0, result.getRightValue());
+    }
+
+
+    /**
+     * Tests for equality of two NEGATIVE_INFINITY values
+     */
+    public void testInfinity() {
+        Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+        assertNull(result);
+    }
+
+
+    /**
+     * Tests for equality of a NEGATIVE_INFINITY with a POSITIVE_INFINITY value
+     */
+    public void testInfinity_notEqual() {
+        Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        assertTrue(result.getFieldStack().isEmpty());
+        assertEquals(Double.NEGATIVE_INFINITY, result.getLeftValue());
+        assertEquals(Double.POSITIVE_INFINITY, result.getRightValue());
+    }
+
+
+    /**
      * Test class with failing equals.
      */
     private static class Primitives {

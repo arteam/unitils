@@ -18,7 +18,31 @@ package org.unitils.core;
 import java.lang.reflect.Method;
 
 /**
- * todo javadoc
+ * Listener for test events. The events must follow following ordering:
+ * <ul>
+ * <li>[Unitils] beforeAll</li>
+ * <li>[Unitils] beforeTestClass   - TestClass1</li>
+ * <li>[Test]    testBeforeClass   - TestClass1  (not for JUnit3)</li>
+ * <li>[Unitils] beforeTestSetUp   - TestClass1</li>
+ * <li>[Test]    testSetUp         - TestClass1</li>
+ * <li>[Unitils] beforeTestMethod  - TestClass1 - test1</li>
+ * <li>[Test]    testMethod        - TestClass1 - test1</li>
+ * <li>[Unitils] afterTestMethod   - TestClass1 - test1</li>
+ * <li>[Test]    testTearDown      - TestClass1</li>
+ * <li>[Unitils] afterTestTearDown - TestClass1</li>
+ * <li>[Unitils] beforeTestSetUp   - TestClass1</li>
+ * <li>[Test]    testSetUp         - TestClass1</li>
+ * <li>[Unitils] beforeTestMethod  - TestClass1 - test2</li>
+ * <li>[Test]    testMethod        - TestClass1 - test2</li>
+ * <li>[Unitils] afterTestMethod   - TestClass1 - test2</li>
+ * <li>[Test]    testTearDown      - TestClass1</li>
+ * <li>[Unitils] afterTestTearDown - TestClass1</li>
+ * <li>[Test]    testAfterClass    - TestClass1 (not for JUnit3)</li>
+ * <li>[Unitils] afterTestClass    - TestClass1</li>
+ * <li>[Unitils] afterAll</li>
+ * </ul>
+ * <p/>
+ * todo exception behavior javadoc
  *
  * @author Tim Ducheyne
  * @author Filip Neven
