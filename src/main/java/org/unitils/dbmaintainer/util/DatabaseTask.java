@@ -16,7 +16,6 @@
 package org.unitils.dbmaintainer.util;
 
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -28,9 +27,6 @@ import java.util.Properties;
  * @author Tim Ducheyne
  */
 abstract public class DatabaseTask {
-
-    /* Property key for the database schema name */
-    public static final String PROPKEY_SCHEMANAME = "database.schemaName";
 
     /* Implementation of DbSupport, for executing all sorts of database operations and queries */
     protected DbSupport dbSupport;
@@ -53,7 +49,7 @@ abstract public class DatabaseTask {
         this.dbSupport = dbSupport;
         this.dataSource = dataSource;
 
-        schemaName = PropertyUtils.getString(PROPKEY_SCHEMANAME, configuration);
+        schemaName = dbSupport.getSchemaName();
         doInit(configuration);
     }
 
