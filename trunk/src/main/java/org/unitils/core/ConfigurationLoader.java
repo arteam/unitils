@@ -15,9 +15,9 @@
  */
 package org.unitils.core;
 
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.PropertyUtils.getString;
 
 import java.io.File;
@@ -140,7 +140,7 @@ public class ConfigurationLoader {
             Properties properties = new Properties();
             inputStream = getClass().getClassLoader().getResourceAsStream(customConfigurationFileName);
             if (inputStream == null) {
-                throw new UnitilsException("Custom configuration file: " + customConfigurationFileName + " not found.");
+                return null;
             }
             properties.load(inputStream);
             logger.info("Loaded custom configuration file " + customConfigurationFileName + " from classpath.");
