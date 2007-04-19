@@ -24,7 +24,9 @@ import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.database.DatabaseModule;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDbSupportInstance;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.util.DbUnitAssert;
@@ -32,8 +34,8 @@ import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.TablePerRowXmlDataSet;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import org.unitils.util.PropertyUtils;
 
+import javax.sql.DataSource;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -72,11 +74,6 @@ import java.util.Properties;
  */
 public class DbUnitModule implements Module {
 
-    /* Property key of the name of the database schema */
-    public static final String PROPKEY_SCHEMA_NAME = "database.schemaName";
-
-    /* Property key of the SQL dialect of the underlying DBMS implementation */
-    public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /*
      * Object that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
@@ -85,11 +82,8 @@ public class DbUnitModule implements Module {
      */
     private DbUnitDatabaseConnection dbUnitDatabaseConnection;
 
-    /* Name of the database schema, needed to configure DBUnit */
-    private String schemaName;
-
-    /* Instance of DbUnits IDataTypeFactory, that handles dbms specific data type issues */
-    private IDataTypeFactory dataTypeFactory;
+    /* The unitils configuration */
+    private Properties configuration;
 
 
     /**
@@ -98,9 +92,7 @@ public class DbUnitModule implements Module {
      * @param configuration The config, not null
      */
     public void init(Properties configuration) {
-        schemaName = PropertyUtils.getString(PROPKEY_SCHEMA_NAME, configuration);
-        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-        dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, databaseDialect);
+        this.configuration = configuration;
     }
 
 
@@ -345,8 +337,15 @@ public class DbUnitModule implements Module {
      * @return A new instance of dbUnit's <code>IDatabaseConnection</code>
      */
     protected DbUnitDatabaseConnection createDbUnitConnection() {
+        // A db support instance is created to get the schema name in correct casing 
+        DataSource dataSource = getDatabaseModule().getDataSource();
+        DbSupport dbSupport = getConfiguredDbSupportInstance(configuration, dataSource);
+
         // Create connection
-        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(getDatabaseModule().getDataSource(), schemaName);
+        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
+
+        /* Create DbUnits IDataTypeFactory, that handles dbms specific data type issues */
+        IDataTypeFactory dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
 
         // Make sure correct dbms specific data types are used
         DatabaseConfig config = connection.getConfig();

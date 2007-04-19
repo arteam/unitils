@@ -92,13 +92,14 @@ abstract public class DbSupport {
      */
     public void init(Properties configuration, DataSource dataSource) {
         this.dataSource = dataSource;
-        this.schemaName = PropertyUtils.getString(PROPKEY_DATABASE_SCHEMANAME, configuration);
 
         String identifierQuoteString = PropertyUtils.getString(PROPKEY_IDENTIFIER_QUOTE_STRING + "." + getDatabaseDialect(), configuration);
         String storedIdentifierCaseValue = PropertyUtils.getString(PROPKEY_STORED_IDENTIFIER_CASE + "." + getDatabaseDialect(), configuration);
 
         this.identifierQuoteString = determineIdentifierQuoteString(identifierQuoteString);
         this.storedIdentifierCase = determineStoredIdentifierCase(storedIdentifierCaseValue);
+
+        this.schemaName = toCorrectCaseIdentifier(PropertyUtils.getString(PROPKEY_DATABASE_SCHEMANAME, configuration));
     }
 
 
