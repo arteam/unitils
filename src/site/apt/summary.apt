@@ -73,6 +73,11 @@ Summary
 
 * News
 ~~~~~~
+    <<2007-04-22 - Release of Unitils 1.0 rc 2>>
+  
+    Release candidate 2 for Unitils is available. It contains fixes for reported issues and support for extra databases such as PostgreSql and 
+    Oracle 10. Thanks for the valuable feedback!
+    
     <<2007-03-08 - Release of Unitils 1.0 rc 1>>
   
     A release candidate for Unitils is available. This version adds Spring integration and simplifies some of the existing functionality, 
