@@ -11,8 +11,8 @@
     <name>Unitils</name>
     <url>http://unitils.sourceforge.net/</url>
     <description>
-        Unitils provides utilities to further simplify unit-testing with JUnit, DBUnit, EasyMock 
-        Hibernate and Spring. The goal is to make unit-testing easy and maintainable by offering 
+        Unitils provides utilities to further simplify unit-testing with JUnit, DBUnit, EasyMock
+        Hibernate and Spring. The goal is to make unit-testing easy and maintainable by offering
         utilities such as automatic DB-schema maintainance and equality assertion through reflection.
     </description>
     <licenses>
@@ -116,7 +116,7 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2</version>
             <scope>compile</scope>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
@@ -131,14 +131,12 @@
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.1</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -146,28 +144,24 @@
             <version>5.1</version>
             <classifier>jdk15</classifier>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
             <version>2.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
             <version>2.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
             <version>2.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -180,56 +174,48 @@
                     <artifactId>jta</artifactId>
                 </exclusion>
             </exclusions>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-annotations</artifactId>
             <version>3.2.0.ga</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>1.8.0.7</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>2.0.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>2.0.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <version>2.0.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-dao</artifactId>
             <version>2.0.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-hibernate3</artifactId>
             <version>2.0.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <!-- Test dependencies -->
@@ -266,7 +252,7 @@
                 <reportSets>
                     <reportSet>
                         <reports>
-                            <report>license</report>                        
+                            <report>license</report>
                             <report>scm</report>
                             <report>issue-tracking</report>
                         </reports>
