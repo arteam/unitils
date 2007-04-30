@@ -33,10 +33,9 @@ import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
 import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
+import org.unitils.util.PropertyUtils;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
-import org.unitils.util.ConfigUtils;
-import org.unitils.util.PropertyUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -284,7 +283,7 @@ public class EasyMockModule implements Module {
     /**
      * Test listener that handles the mock creation and injection.
      */
-    private class EasyMockTestListener extends TestListener {
+    protected class EasyMockTestListener extends TestListener {
 
         /**
          * Before the test is executed this calls {@link EasyMockModule#createAndInjectRegularMocksIntoTest(Object)} to

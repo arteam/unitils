@@ -24,8 +24,8 @@ import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.dbunit.dataset.xml.FlatDtdWriter;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.structure.DtdGenerator;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
@@ -40,14 +40,14 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Implementation of {@link DtdGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format
+ * Implementation of {@link DataSetStructureGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format
  * <p/>
  * todo test and fix for hsqldb (see sample project)
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGenerator {
+public class DtdDataSetStructureGenerator extends BaseDatabaseTask implements DataSetStructureGenerator {
 
     /* Property key of the filename of the generated DTD  */
     public static final String PROPKEY_DTD_FILENAME = "dtdGenerator.dtd.filename";
@@ -70,10 +70,8 @@ public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGener
      * Generates the DTD, and writes it to the file specified by the property {@link #PROPKEY_DTD_FILENAME}.
      * The DTD will contain the structure of the dataabase. All tables will be written as optional elements and
      * all columns will be optional attributes.
-     *
-     * @see DtdGenerator#generateDtd()
      */
-    public void generateDtd() {
+    public void generateDataSetStructure() {
         Writer writer = null;
         try {
             // creates the DTD file
@@ -112,7 +110,7 @@ public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGener
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, schemaName);
+            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, defaultDbSupport.getSchemaName());
 
             StringWriter stringWriter = new StringWriter();
 
@@ -121,7 +119,7 @@ public class FlatXmlDataSetDtdGenerator extends DatabaseTask implements DtdGener
 
             // create a dataset for the database content
             // filter out all system table names
-            Set<String> tableNames = dbSupport.getTableNames();
+            Set<String> tableNames = defaultDbSupport.getTableNames();
             IDataSet actualDataSet = dbUnitDatabaseConnection.createDataSet();
             IDataSet filteredActualDataSet = new FilteredDataSet(new IncludeTableFilter(tableNames.toArray(new String[0])), actualDataSet);
 

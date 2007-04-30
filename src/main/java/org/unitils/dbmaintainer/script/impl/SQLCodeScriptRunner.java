@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.script.impl;
 
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.dbmaintainer.script.CodeScriptRunner;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.dbmaintainer.util.SQLCodeScriptParser;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SQLCodeScriptRunner extends DatabaseTask implements CodeScriptRunner {
+public class SQLCodeScriptRunner extends BaseDatabaseTask implements CodeScriptRunner {
 
 
     /**

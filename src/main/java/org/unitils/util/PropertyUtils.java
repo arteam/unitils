@@ -76,6 +76,22 @@ public class PropertyUtils {
      * @return The trimmed string list, empty if none found
      */
     public static List<String> getStringList(String propertyName, Properties properties) {
+        return getStringList(propertyName, properties, false);
+
+    }
+
+
+    /**
+     * Gets the list of comma separated string values for the property with the given name. If no such property is found or
+     * the value is empty, an empty list is returned if not required, else an exception is raised. Empty elements (",,")
+     * will not be added. A space (", ,") is not empty, a "" will be added.
+     *
+     * @param propertyName The name, not null
+     * @param properties   The properties, not null
+     * @param required     If true an exception will be raised when the property is not found or empty
+     * @return The trimmed string list, empty or exception if none found
+     */
+    public static List<String> getStringList(String propertyName, Properties properties, boolean required) {
         String values = properties.getProperty(propertyName);
         if (values == null || "".equals(values.trim())) {
             return new ArrayList<String>(0);
@@ -84,6 +100,10 @@ public class PropertyUtils {
         List<String> result = new ArrayList<String>(splitValues.length);
         for (String value : splitValues) {
             result.add(value.trim());
+        }
+
+        if (required && result.isEmpty()) {
+            throw new UnitilsException("No value found for property " + propertyName);
         }
         return result;
     }

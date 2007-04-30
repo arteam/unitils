@@ -17,8 +17,9 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.HashSet;
@@ -34,7 +35,7 @@ import java.util.Set;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultDBClearer extends DatabaseTask implements DBClearer {
+public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
     /**
      * The key of the property that specifies which database items should not be deleted when clearing the database
@@ -59,36 +60,41 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
     protected void doInit(Properties configuration) {
         List<String> itemsToPreserveOrigCase = getStringList(PROPKEY_ITEMSTOPRESERVE, configuration);
         for (String itemToPreserve : itemsToPreserveOrigCase) {
-            itemsToPreserve.add(dbSupport.toCorrectCaseIdentifier(itemToPreserve));
+            // todo support all schemas
+            itemsToPreserve.add(defaultDbSupport.toCorrectCaseIdentifier(itemToPreserve));
         }
     }
 
 
     /**
-     * Clears the database schema. This means, all the tables, views, constraints, triggers and sequences are
+     * Clears the database schemas. This means, all the tables, views, constraints, triggers and sequences are
      * dropped, so that the database schema is empty. The database items that are configured as items to preserve, are
      * left untouched.
      */
-    public void clearSchema() {
-        logger.info("Clearing (dropping) the unit test database.");
-        dropViews();
-        dropTables();
-        dropSynonyms();
-        dropSequences();
+    public void clearSchemas() {
+        for (DbSupport dbSupport : dbSupports) {
+            logger.info("Clearing (dropping) database schema " + dbSupport.getSchemaName());
+            dropViews(dbSupport);
+            dropTables(dbSupport);
+            dropSynonyms(dbSupport);
+            dropSequences(dbSupport);
+        }
     }
 
 
     /**
      * Drops all views.
+     *
+     * @param dbSupport The database support, not null
      */
-    protected void dropViews() {
+    protected void dropViews(DbSupport dbSupport) {
         Set<String> viewNames = dbSupport.getViewNames();
         for (String viewName : viewNames) {
             // check whether view needs to be preserved
             if (itemsToPreserve.contains(viewName)) {
                 continue;
             }
-            logger.debug("Dropping database view: " + viewName);
+            logger.debug("Dropping view " + viewName + " in database schema " + dbSupport.getSchemaName());
             dbSupport.dropView(viewName);
         }
     }
@@ -96,15 +102,17 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
 
     /**
      * Drops all tables.
+     *
+     * @param dbSupport The database support, not null
      */
-    protected void dropTables() {
+    protected void dropTables(DbSupport dbSupport) {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             // check whether table needs to be preserved
             if (itemsToPreserve.contains(tableName)) {
                 continue;
             }
-            logger.debug("Dropping database table: " + tableName);
+            logger.debug("Dropping table " + tableName + " in database schema " + dbSupport.getSchemaName());
             dbSupport.dropTable(tableName);
         }
     }
@@ -112,8 +120,10 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
 
     /**
      * Drops all synonyms
+     *
+     * @param dbSupport The database support, not null
      */
-    protected void dropSynonyms() {
+    protected void dropSynonyms(DbSupport dbSupport) {
         if (!dbSupport.supportsSynonyms()) {
             return;
         }
@@ -123,7 +133,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
             if (itemsToPreserve.contains(synonymName)) {
                 continue;
             }
-            logger.debug("Dropping database table: " + synonymName);
+            logger.debug("Dropping synonym " + synonymName + " in database schema " + dbSupport.getSchemaName());
             dbSupport.dropSynonym(synonymName);
         }
     }
@@ -131,8 +141,10 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
 
     /**
      * Drops all sequences
+     *
+     * @param dbSupport The database support, not null
      */
-    protected void dropSequences() {
+    protected void dropSequences(DbSupport dbSupport) {
         if (!dbSupport.supportsSequences()) {
             return;
         }
@@ -142,7 +154,7 @@ public class DefaultDBClearer extends DatabaseTask implements DBClearer {
             if (itemsToPreserve.contains(sequenceName)) {
                 continue;
             }
-            logger.debug("Dropping database sequence: " + sequenceName);
+            logger.debug("Dropping sequence " + sequenceName + " in database schema " + dbSupport.getSchemaName());
             dbSupport.dropSequence(sequenceName);
         }
     }

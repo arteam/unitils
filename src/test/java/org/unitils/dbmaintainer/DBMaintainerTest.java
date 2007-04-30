@@ -25,7 +25,7 @@ import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.SQLScriptRunner;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
-import org.unitils.dbmaintainer.structure.DtdGenerator;
+import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
@@ -76,7 +76,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
 
     @Mock
     @InjectIntoByType
-    private DtdGenerator mockDtdGenerator = null;
+    private DataSetStructureGenerator mockDataSetStructureGenerator = null;
 
     @TestedObject
     private DBMaintainer dbMaintainer;
@@ -127,7 +127,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockVersionSource.registerUpdateSucceeded(true);
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
-        mockDtdGenerator.generateDtd();
+        mockDataSetStructureGenerator.generateDataSetStructure();
         expect(mockVersionSource.isLastCodeUpdateSucceeded()).andReturn(true);
         expect(mockScriptSource.getCodeScriptsTimestamp()).andReturn(0L);
         expect(mockVersionSource.getCodeScriptsTimestamp()).andReturn(0L);
@@ -146,8 +146,8 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
-        mockDbClearer.clearSchema();
-        mockDbCodeClearer.clearSchemaCode();
+        mockDbClearer.clearSchemas();
+        mockDbCodeClearer.clearSchemasCode();
         expect(mockScriptSource.getAllScripts()).andReturn(versionScriptPairs);
         mockScriptRunner.execute("Script 1");
         mockVersionSource.setDbVersion(version1);
@@ -157,7 +157,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockVersionSource.registerUpdateSucceeded(true);
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
-        mockDtdGenerator.generateDtd();
+        mockDataSetStructureGenerator.generateDataSetStructure();
         expect(mockScriptSource.getAllCodeScripts()).andReturn(new ArrayList<Script>());
         replay();
 

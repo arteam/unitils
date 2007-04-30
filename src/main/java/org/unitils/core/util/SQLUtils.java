@@ -48,7 +48,7 @@ public class SQLUtils {
      * @return The nr of updates
      */
     public static int executeUpdate(String sql, DataSource dataSource) {
-        logger.info(sql);
+        logger.debug(sql);
 
         Connection connection = null;
         Statement statement = null;
@@ -74,7 +74,7 @@ public class SQLUtils {
      * @return The long item value
      */
     public static long getItemAsLong(String sql, DataSource dataSource) {
-        logger.info(sql);
+        logger.debug(sql);
 
         Connection connection = null;
         Statement statement = null;
@@ -106,7 +106,7 @@ public class SQLUtils {
      * @return The string item value
      */
     public static String getItemAsString(String sql, DataSource dataSource) {
-        logger.info(sql);
+        logger.debug(sql);
 
         Connection connection = null;
         Statement statement = null;
@@ -137,7 +137,7 @@ public class SQLUtils {
      * @return The items, not null
      */
     public static Set<String> getItemsAsStringSet(String sql, DataSource dataSource) {
-        logger.info(sql);
+        logger.debug(sql);
 
         Connection connection = null;
         Statement statement = null;

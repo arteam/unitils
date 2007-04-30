@@ -15,13 +15,15 @@
  */
 package org.unitils.dbmaintainer.script;
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 /**
  * todo javadoc
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface CodeScriptRunner {
+public interface CodeScriptRunner extends DatabaseTask {
 
 
     /**

@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer.clean;
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 /**
  * Defines the contract for implementations that delete data from the database, that could cause problems when performing
  * updates to the database, such as adding not null columns or foreign key constraints.
@@ -22,12 +24,12 @@ package org.unitils.dbmaintainer.clean;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DBCleaner {
+public interface DBCleaner extends DatabaseTask {
 
 
     /**
      * Delete data from the database schema, that could cause problems when performing updates.
      */
-    void cleanSchema();
+    void cleanSchemas();
 
 }

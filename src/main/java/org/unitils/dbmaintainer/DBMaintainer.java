@@ -26,7 +26,7 @@ import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
-import org.unitils.dbmaintainer.structure.DtdGenerator;
+import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.dbmaintainer.version.Version;
@@ -42,7 +42,7 @@ import java.util.Properties;
  * A class for performing automatic maintenance of a database.<br>
  * This class must be configured with implementations of a {@link VersionSource}, {@link ScriptSource}, a
  * {@link ScriptRunner}, {@link DBClearer}, {@link DBCleaner}, {@link ConstraintsDisabler}, {@link SequenceUpdater} and
- * a {@link DtdGenerator}
+ * a {@link DataSetStructureGenerator}
  * <p/>
  * The {@link #updateDatabase()} method check what is the current version of the database, and see if existing scripts
  * have been modified. If yes, the database is cleared and all available database scripts, are executed on the database.
@@ -72,33 +72,27 @@ public class DBMaintainer {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DBMaintainer.class);
 
-    /* Property key of the database dialect */
-    public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
-
-    /* Property key of the implementation of the DbSupport interface */
-    public static final String PROPKEY_DBSUPPORT_CLASSNAME = "dbMaintainer.dbSupport.className";
-
     /* Property indicating if deleting all data from all tables before updating is enabled */
-    public static final String PROPKEY_DBCLEANER_ENABLED = "dbMaintainer.cleanDb.enabled";
+    public static final String PROPKEY_DB_CLEANER_ENABLED = "dbMaintainer.cleanDb.enabled";
 
     /* Property key indicating if updating the database from scratch is enabled */
-    public static final String PROPKEY_FROMSCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
+    public static final String PROPKEY_FROM_SCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
 
     /* Property key indicating if database code should be cleared before installing a new version of the code or when
      updating the database from scratch */
-    public static final String PROPKEY_CLEARDBCODE_ENABLED = "dbMaintainer.clearDbCode.enabled";
+    public static final String PROPKEY_CLEAR_DB_CODE_ENABLED = "dbMaintainer.clearDbCode.enabled";
 
     /* Property key indicating if an retry of an update should only be performed when changes to script files were made */
     public static final String PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED = "dbMaintainer.keepRetryingAfterError.enabled";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
-    public static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
+    public static final String PROPKEY_DISABLE_CONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
 
     /* Property key indicating if the database constraints should org disabled after updating the database */
-    public static final String PROPKEY_UPDATESEQUENCES_ENABLED = "dbMaintainer.updateSequences.enabled";
+    public static final String PROPKEY_UPDATE_SEQUENCES_ENABLED = "dbMaintainer.updateSequences.enabled";
 
-    /* Property key that indicates if a DTD is to be generated or not */
-    public static final String PROPKEY_GENERATEDTD_ENABLED = "dbMaintainer.generateDTD.enabled";
+    /* Property key that indicates if a data set DTD or XSD is to be generated or not */
+    public static final String PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED = "dbMaintainer.generateDataSetStructure.enabled";
 
     /* Provider of the current version of the database, and means to increment it */
     protected VersionSource versionSource;
@@ -128,7 +122,7 @@ public class DBMaintainer {
     protected SequenceUpdater sequenceUpdater;
 
     /* Database DTD generator */
-    protected DtdGenerator dtdGenerator;
+    protected DataSetStructureGenerator dataSetStructureGenerator;
 
     /* Indicates whether updating the database from scratch is enabled. If true, the database is cleared before updating
       if an already executed script is modified */
@@ -163,32 +157,32 @@ public class DBMaintainer {
         versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource);
         scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource);
 
-        boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DBCLEANER_ENABLED, configuration);
+        boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DB_CLEANER_ENABLED, configuration);
         if (cleanDbEnabled) {
             dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
         }
 
-        fromScratchEnabled = PropertyUtils.getBoolean(PROPKEY_FROMSCRATCH_ENABLED, configuration);
+        fromScratchEnabled = PropertyUtils.getBoolean(PROPKEY_FROM_SCRATCH_ENABLED, configuration);
         keepRetryingAfterError = PropertyUtils.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, configuration);
         if (fromScratchEnabled) {
             dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
         }
-        clearDbCodeEnabled = PropertyUtils.getBoolean(PROPKEY_CLEARDBCODE_ENABLED, configuration);
+        clearDbCodeEnabled = PropertyUtils.getBoolean(PROPKEY_CLEAR_DB_CODE_ENABLED, configuration);
         dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource);
 
-        boolean disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED, configuration);
+        boolean disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLE_CONSTRAINTS_ENABLED, configuration);
         if (disableConstraints) {
             constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
         }
 
-        boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATESEQUENCES_ENABLED, configuration);
+        boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATE_SEQUENCES_ENABLED, configuration);
         if (updateSequences) {
             sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource);
         }
 
-        boolean generateDtd = PropertyUtils.getBoolean(PROPKEY_GENERATEDTD_ENABLED, configuration);
+        boolean generateDtd = PropertyUtils.getBoolean(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, configuration);
         if (generateDtd) {
-            dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource);
+            dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, dataSource);
         }
     }
 
@@ -207,8 +201,8 @@ public class DBMaintainer {
         List<VersionScriptPair> versionScriptPairs;
         boolean updateDatabaseFromScratch = updateDatabaseFromScratch(currentVersion);
         if (updateDatabaseFromScratch) {
-            dbClearer.clearSchema();
-            dbCodeClearer.clearSchemaCode();
+            dbClearer.clearSchemas();
+            dbCodeClearer.clearSchemasCode();
             versionScriptPairs = scriptSource.getAllScripts();
         } else {
             versionScriptPairs = scriptSource.getNewScripts(currentVersion);
@@ -221,7 +215,7 @@ public class DBMaintainer {
             // Remove data from the database, that could cause errors when executing scripts. Such as for example
             // when added a not null column.
             if (dbCleaner != null) {
-                dbCleaner.cleanSchema();
+                dbCleaner.cleanSchemas();
             }
 
             // Excute all of the scripts
@@ -236,8 +230,8 @@ public class DBMaintainer {
                 sequenceUpdater.updateSequences();
             }
             // Generate a DTD to enable validation and completion in data xml files, if enabled
-            if (dtdGenerator != null) {
-                dtdGenerator.generateDtd();
+            if (dataSetStructureGenerator != null) {
+                dataSetStructureGenerator.generateDataSetStructure();
             }
         }
 
@@ -248,7 +242,7 @@ public class DBMaintainer {
             List<Script> codeScripts = scriptSource.getAllCodeScripts();
             if (!codeScripts.isEmpty()) {
                 if (clearDbCodeEnabled && !updateDatabaseFromScratch) { // If updateDatabaseFromScratch == true, the schema code has already been cleared.
-                    dbCodeClearer.clearSchemaCode();
+                    dbCodeClearer.clearSchemasCode();
                 }
                 executeCodeScripts(codeScripts);
             }
@@ -262,7 +256,7 @@ public class DBMaintainer {
      * <li>Some existing scripts were modified.</li>
      * <li>The last update of the database was unsuccessful.</li>
      * </ul>
-     * The database will only be rebuilt from scratch if {@link #PROPKEY_FROMSCRATCH_ENABLED} is set to true.
+     * The database will only be rebuilt from scratch if {@link #PROPKEY_FROM_SCRATCH_ENABLED} is set to true.
      * If the {@link #PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED} is set to false, the database
      * will only be rebuilt again after an unsuccessful build when changes were made to the script files.
      *

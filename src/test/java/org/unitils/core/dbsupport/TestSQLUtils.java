@@ -16,6 +16,9 @@
 package org.unitils.core.dbsupport;
 
 import org.unitils.core.UnitilsException;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+
+import javax.sql.DataSource;
 
 /**
  * Some utility methods for the unit tests.
@@ -127,6 +130,23 @@ public class TestSQLUtils {
             } catch (UnitilsException e) {
                 // Ignored
             }
+        }
+    }
+
+
+    /**
+     * Executes the given statement ignoring all exceptions.
+     *
+     * @param sql        The sql string for retrieving the items
+     * @param dataSource The data source, not null
+     * @return The nr of updates, -1 if not succesful
+     */
+    public static int executeUpdateQuietly(String sql, DataSource dataSource) {
+        try {
+            return executeUpdate(sql, dataSource);
+        } catch (UnitilsException e) {
+            // Ignored
+            return -1;
         }
     }
 }

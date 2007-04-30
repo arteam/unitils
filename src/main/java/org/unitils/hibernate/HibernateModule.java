@@ -8,17 +8,6 @@
  */
 package org.unitils.hibernate;
 
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.PropertyUtils.getString;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,13 +22,19 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.util.Flushable;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.hibernate.util.HibernateAssert;
-import org.unitils.hibernate.util.HibernateConnectionProvider;
-import org.unitils.hibernate.util.HibernateSpringSupport;
-import org.unitils.hibernate.util.SessionFactoryManager;
-import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
+import org.unitils.hibernate.util.*;
 import org.unitils.spring.SpringModule;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.PropertyUtils.getString;
 import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * todo javadoc <p/> Module providing support for unit tests for code that uses Hibernate. It offers
@@ -70,7 +65,7 @@ import org.unitils.util.ReflectionUtils;
  * that verifies whether the mapping of all your Hibernate mapped objects still corresponds to the
  * actual state of the database. <p/> This module depends on the {@link DatabaseModule}, for
  * managing connections to a unit test database.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -92,9 +87,8 @@ public class HibernateModule implements Module, Flushable {
 
     /**
      * Initializes the module.
-     * 
-     * @param configuration
-     *        The Unitils configuration, not null
+     *
+     * @param configuration The Unitils configuration, not null
      */
     public void init(Properties configuration) {
         String configurationImplClassName = getString(PROPKEY_CONFIGURATION_CLASS_NAME,
@@ -108,9 +102,8 @@ public class HibernateModule implements Module, Flushable {
 
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct.
-     * 
-     * @param testObject
-     *        The test instance, not null
+     *
+     * @param testObject The test instance, not null
      */
     public void assertMappingWithDatabaseConsistent(Object testObject) {
         Configuration configuration = getHibernateConfiguration(testObject);
@@ -127,9 +120,8 @@ public class HibernateModule implements Module, Flushable {
      * <code>ApplicationContext</code> or using {@link HibernateSessionFactory} annotations. An
      * exception is thrown if no <code>SessionFactory</code> could be returned. If possible, a
      * cached instance is returned that was created during a previous test.
-     * 
-     * @param testObject
-     *        The test instance, not null
+     *
+     * @param testObject The test instance, not null
      * @return The Hibernate <code>SessionFactory</code>, not null
      */
     public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
@@ -199,7 +191,7 @@ public class HibernateModule implements Module, Flushable {
 
     /**
      * Gets the manager for session factories and hibernate configurations.
-     * 
+     *
      * @return The manager, not null
      */
     public SessionFactoryManager getSessionFactoryManager() {
@@ -208,9 +200,8 @@ public class HibernateModule implements Module, Flushable {
 
     /**
      * Closes all open Hibernate session.
-     * 
-     * @param testObject
-     *        The test instance, not null
+     *
+     * @param testObject The test instance, not null
      */
     public void closeSessions(Object testObject) {
         if (isSessionFactoryConfiguredFor(testObject)) {
@@ -224,9 +215,8 @@ public class HibernateModule implements Module, Flushable {
      * Forces the reloading of the hibernate configurations the next time that it is requested. If
      * classes are given only hibernate configurations that are linked to those classes will be
      * reset. If no classes are given, all cached hibernate configurations will be reset.
-     * 
-     * @param classes
-     *        The classes for which to reset the configs
+     *
+     * @param classes The classes for which to reset the configs
      */
     public void invalidateConfiguration(Class<?>... classes) {
         getSessionFactoryManager().invalidateSessionFactory(classes);
@@ -251,9 +241,8 @@ public class HibernateModule implements Module, Flushable {
     /**
      * Injects the Hibernate <code>SessionFactory</code> into all fields and methods that are
      * annotated with {@link HibernateSessionFactory}
-     * 
-     * @param testObject
-     *        The test object, not null
+     *
+     * @param testObject The test object, not null
      */
     public void injectSessionFactory(Object testObject) {
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(),
@@ -334,10 +323,11 @@ public class HibernateModule implements Module, Flushable {
         return new HibernateTestListener();
     }
 
+
     /**
      * The {@link TestListener} for this module
      */
-    private class HibernateTestListener extends TestListener {
+    protected class HibernateTestListener extends TestListener {
 
         public void beforeAll() {
             enableSpringHibernateConfiguration();
@@ -352,6 +342,5 @@ public class HibernateModule implements Module, Flushable {
         public void afterTestMethod(Object testObject, Method testMethod) {
             closeSessions(testObject);
         }
-
     }
 }

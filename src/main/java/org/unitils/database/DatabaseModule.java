@@ -193,7 +193,7 @@ public class DatabaseModule implements Module {
     /**
      * The {@link TestListener} for this module
      */
-    private class DatabaseTestListener extends TestListener {
+    protected class DatabaseTestListener extends TestListener {
 
         @Override
         public void beforeTestSetUp(Object testObject) {

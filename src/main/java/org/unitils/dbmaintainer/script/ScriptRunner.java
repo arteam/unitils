@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer.script;
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 
 /**
  * Defines the contract for an executer of a database update script.
@@ -22,7 +24,7 @@ package org.unitils.dbmaintainer.script;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface ScriptRunner {
+public interface ScriptRunner extends DatabaseTask {
 
 
     /**

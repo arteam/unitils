@@ -16,6 +16,8 @@
 package org.unitils.dbmaintainer.structure;
 
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 import java.sql.Connection;
 
 /**
@@ -28,7 +30,7 @@ import java.sql.Connection;
  * @author Bart Vermeiren
  * @author Tim Ducheyne
  */
-public interface ConstraintsDisabler {
+public interface ConstraintsDisabler extends DatabaseTask {
 
 
     /**
