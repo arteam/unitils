@@ -1,10 +1,6 @@
 package org.unitils.reflectionassert;
 
-import java.util.Collection;
-import java.util.Stack;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * todo javadoc
@@ -16,6 +12,7 @@ public class LenientOrderCollectionComparator extends CollectionComparator {
 
     /**
      * todo javadoc
+     *
      * @param chainedComparator
      */
     public LenientOrderCollectionComparator(ReflectionComparator chainedComparator) {
@@ -53,8 +50,8 @@ public class LenientOrderCollectionComparator extends CollectionComparator {
                 Object rhsValue = rhsIterator.next();
 
                 // Compare values using reflection
-                boolean equal = isEqual(lhsValue, rhsValue);
-                if (equal) {
+                Difference difference = rootComparator.getDifference(lhsValue, rhsValue, new Stack<String>(), traversedInstancePairs);
+                if (difference == null) {
                     rhsIterator.remove();
                     found = true;
                     break;

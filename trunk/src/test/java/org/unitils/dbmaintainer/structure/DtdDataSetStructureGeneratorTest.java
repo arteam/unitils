@@ -5,7 +5,8 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import static org.unitils.dbmaintainer.structure.impl.FlatXmlDataSetDtdGenerator.PROPKEY_DTD_FILENAME;
+import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
+import static org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
@@ -24,10 +25,10 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
+public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
 
     /* Tested object */
-    private DtdGenerator dtdGenerator;
+    private DataSetStructureGenerator dataSetStructureGenerator;
 
     /* The file to which to write the DTD */
     private File dtdFile;
@@ -48,12 +49,13 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
         dtdFile = File.createTempFile("testDTD", ".dtd");
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", DtdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        dtdGenerator = getConfiguredDatabaseTaskInstance(DtdGenerator.class, configuration, dataSource);
+        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, dataSource);
         DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
 
-        dbClearer.clearSchema();
+        dbClearer.clearSchemas();
         createTestTables();
     }
 
@@ -71,7 +73,6 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
      * Tests the generation of the DTD file.
      */
     public void testGenerateDtd() throws Exception {
-
         String expectedContent = "<!ELEMENT DATASET ( (TABLEONE | TABLETWO)*)> " +
                 "<!ELEMENT TABLEONE EMPTY>" +
                 "<!ATTLIST TABLEONE" +
@@ -84,7 +85,7 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
                 "   COLUMN2 CDATA #IMPLIED>";
 
 
-        dtdGenerator.generateDtd();
+        dataSetStructureGenerator.generateDataSetStructure();
 
         assertTrue(dtdFile.exists());
         String content = IOUtils.toString(new FileReader(dtdFile)).toUpperCase();
@@ -95,7 +96,6 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
      * Creates the test tables
      */
     private void createTestTables() throws SQLException {
-
         Connection conn = null;
         Statement st = null;
         try {
@@ -114,7 +114,6 @@ public class FlatXmlDataSetDtdGeneratorTest extends UnitilsJUnit3 {
      * Removes the test database tables
      */
     private void dropTestTables() throws SQLException {
-
         Connection conn = null;
         Statement st = null;
         try {

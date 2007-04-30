@@ -17,16 +17,13 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.dbmaintainer.clean.DBCleaner;
-import org.unitils.dbmaintainer.util.DatabaseTask;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.util.PropertyUtils;
 import static org.unitils.util.PropertyUtils.getStringList;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 
 /**
@@ -38,7 +35,7 @@ import java.util.*;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
+public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
 
     /**
      * Property key for the tables that should not be cleaned
@@ -72,9 +69,10 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      */
     protected void doInit(Properties configuration) {
         tablesToPreserve = new HashSet<String>();
-        tablesToPreserve.add(dbSupport.toCorrectCaseIdentifier(PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration)));
-        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_TABLESTOPRESERVE, configuration)));
-        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_DBCLEARER_ITEMSTOPRESERVE, configuration)));
+        // todo make other schemas also possible
+        tablesToPreserve.add(defaultDbSupport.toCorrectCaseIdentifier(PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration)));
+        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_TABLESTOPRESERVE, configuration), defaultDbSupport));
+        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_DBCLEARER_ITEMSTOPRESERVE, configuration), defaultDbSupport));
     }
 
 
@@ -82,9 +80,9 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      * Deletes all data from the database, except for the tables that have been
      * configured as <i>tablesToPreserve</i> , and the table in which the database version is stored
      */
-    public void cleanSchema() {
-        try {
-            logger.info("Cleaning database tables.");
+    public void cleanSchemas() {
+        for (DbSupport dbSupport : dbSupports) {
+            logger.info("Cleaning database schema " + dbSupport.getSchemaName());
 
             Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {
@@ -92,10 +90,8 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
                 if (tablesToPreserve.contains(tableName)) {
                     continue;
                 }
-                cleanTable(tableName);
+                cleanTable(tableName, dbSupport);
             }
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while cleaning database", e);
         }
     }
 
@@ -106,19 +102,11 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      * case-sensitive table names are also deleted correctly.
      *
      * @param tableName The name of the table that need to be cleared, not null
+     * @param dbSupport The database support, not null
      */
-    protected void cleanTable(String tableName) throws SQLException {
-        logger.debug("Cleaning database table: " + tableName);
-        Connection connection = null;
-        Statement statement = null;
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.createStatement();
-            statement.executeUpdate("delete from " + dbSupport.quoted(tableName));
-
-        } finally {
-            closeQuietly(connection, statement, null);
-        }
+    protected void cleanTable(String tableName, DbSupport dbSupport) {
+        logger.debug("Deleting all records from table " + tableName + " in database schema " + dbSupport.getSchemaName());
+        executeUpdate("delete from " + dbSupport.quoted(tableName), dataSource);
     }
 
 
@@ -128,9 +116,10 @@ public class DefaultDBCleaner extends DatabaseTask implements DBCleaner {
      * the double quotes will be stripped. These values are treated as case sensitive names.
      *
      * @param identifiers The identifiers, not null
+     * @param dbSupport   The database support, not null
      * @return The names converted to correct case if needed, not null
      */
-    protected List<String> toCorrectCaseIdentifiers(List<String> identifiers) {
+    protected List<String> toCorrectCaseIdentifiers(List<String> identifiers, DbSupport dbSupport) {
         List<String> result = new ArrayList<String>();
         for (String identifier : identifiers) {
             result.add(dbSupport.toCorrectCaseIdentifier(identifier));

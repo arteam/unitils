@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.script;
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
 
@@ -30,7 +31,7 @@ import java.util.List;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface ScriptSource {
+public interface ScriptSource extends DatabaseTask {
 
 
     /**

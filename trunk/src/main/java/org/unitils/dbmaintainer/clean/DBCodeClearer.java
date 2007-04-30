@@ -1,5 +1,7 @@
 package org.unitils.dbmaintainer.clean;
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 
 /**
  * Defines the contract for implementations that clear all database source code from a database schema, to avoid problems
@@ -8,11 +10,11 @@ package org.unitils.dbmaintainer.clean;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DBCodeClearer {
+public interface DBCodeClearer extends DatabaseTask {
 
     /**
      * Clears all code from the database schema.
      */
-    void clearSchemaCode();
+    void clearSchemasCode();
 
 }

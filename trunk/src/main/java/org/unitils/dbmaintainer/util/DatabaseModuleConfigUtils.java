@@ -15,7 +15,6 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import org.unitils.util.PropertyUtils;
 
@@ -47,31 +46,12 @@ public class DatabaseModuleConfigUtils {
      * @return The configured instance
      */
     @SuppressWarnings({"unchecked"})
-    public static <T> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, DataSource dataSource) {
+    public static <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, DataSource dataSource) {
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-
-        // get db support instance
-        DbSupport dbSupport = getConfiguredDbSupportInstance(configuration, dataSource);
-
-        // get database task instance
         DatabaseTask instance = getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
-        instance.init(configuration, dbSupport, dataSource);
+        instance.init(configuration, dataSource);
         return (T) instance;
     }
 
-
-    /**
-     * Returns the concrete, dbms specific instance of {@link DbSupport} which is configured by the given <code>Configuration</code>.
-     *
-     * @param configuration The config, not null
-     * @param dataSource    The data source, not null
-     * @return The dbms specific instance of {@link DbSupport}
-     */
-    public static DbSupport getConfiguredDbSupportInstance(Properties configuration, DataSource dataSource) {
-        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-        DbSupport dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
-        dbSupport.init(configuration, dataSource);
-        return dbSupport;
-    }
 
 }

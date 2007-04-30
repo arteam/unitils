@@ -15,19 +15,20 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 /**
- * Defines the contract for implementations that create a DTD that describes a database. This DTD can
- * be used in XML files containing test data for a unit test database
+ * Generator for structure files, such as dtd or xml schema, for a DbUnit flat-xml data set file.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DtdGenerator {
+public interface DataSetStructureGenerator extends DatabaseTask {
 
 
     /**
-     * Generates the DTD
+     * Generates the data set structure files, eg DTD or XSD
      */
-    void generateDtd();
+    void generateDataSetStructure();
 
 }

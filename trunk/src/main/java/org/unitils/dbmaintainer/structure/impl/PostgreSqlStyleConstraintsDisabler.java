@@ -17,8 +17,9 @@ package org.unitils.dbmaintainer.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -34,12 +35,12 @@ import java.util.Set;
  * Examples of such a DBMS are PostgreSql.
  * <p/>
  * todo merge MySql, Oracle and PostfreSql styles into 1 disabler
+ * Contributed by Sunteya
  *
- * @author Sunteya
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
+public class PostgreSqlStyleConstraintsDisabler extends BaseDatabaseTask implements ConstraintsDisabler {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(PostgreSqlStyleConstraintsDisabler.class);
@@ -58,17 +59,29 @@ public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements 
      * Permanently disable every foreign key or not-null constraint
      */
     public void disableConstraints() {
-        logger.info("Disabling constraints");
-        removeForeignKeyConstraints();
-        removeNotNullConstraints();
+        for (DbSupport dbSupport : dbSupports) {
+            logger.info("Disabling contraints in database schema " + dbSupport.getSchemaName());
+            removeForeignKeyConstraints(dbSupport);
+            removeNotNullConstraints(dbSupport);
+        }
+    }
+
+
+    /**
+     * Not supported for postgresql style.
+     *
+     * @param connection The db connection to use, not null
+     */
+    public void disableConstraintsOnConnection(Connection connection) {
     }
 
 
     /**
      * Removes all foreign key constraints.
+     *
+     * @param dbSupport The database support, not null
      */
-    protected void removeForeignKeyConstraints() {
-        logger.info("Disabling constraints");
+    protected void removeForeignKeyConstraints(DbSupport dbSupport) {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             Set<String> constraintNames = dbSupport.getTableConstraintNames(tableName);
@@ -81,11 +94,13 @@ public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements 
 
     /**
      * Removes all not-null constraints are disabled.
+     *
+     * @param dbSupport The database support, not null
      */
-    protected void removeNotNullConstraints() {
+    protected void removeNotNullConstraints(DbSupport dbSupport) {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
-            removeNotNullConstraints(tableName);
+            removeNotNullConstraints(tableName, dbSupport);
         }
     }
 
@@ -94,8 +109,9 @@ public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements 
      * Removes all not-null constraints for the table with the given name.
      *
      * @param tableName The name of the table to remove constraints from, not null
+     * @param dbSupport The database support, not null
      */
-    protected void removeNotNullConstraints(String tableName) {
+    protected void removeNotNullConstraints(String tableName, DbSupport dbSupport) {
         // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
         Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
         // Iterate over all column names
@@ -106,13 +122,6 @@ public class PostgreSqlStyleConstraintsDisabler extends DatabaseTask implements 
                 dbSupport.removeNotNullConstraint(tableName, notNullColumnName);
             }
         }
-    }
-
-
-    /**
-     * @see ConstraintsDisabler#disableConstraintsOnConnection(Connection)
-     */
-    public void disableConstraintsOnConnection(Connection connection) {
     }
 
 }

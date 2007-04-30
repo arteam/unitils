@@ -17,8 +17,9 @@ package org.unitils.dbmaintainer.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -36,7 +37,7 @@ import java.util.Set;
  * @author Bart Vermeiren
  * @author Tim Ducheyne
  */
-public class OracleStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
+public class OracleStyleConstraintsDisabler extends BaseDatabaseTask implements ConstraintsDisabler {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(OracleStyleConstraintsDisabler.class);
@@ -55,7 +56,28 @@ public class OracleStyleConstraintsDisabler extends DatabaseTask implements Cons
      * Permanently disable every foreign key or not-null constraint
      */
     public void disableConstraints() {
-        logger.info("Disabling constraints");
+        for (DbSupport dbSupport : dbSupports) {
+            logger.info("Disabling contraints in database schema " + dbSupport.getSchemaName());
+            removeNotNullConstraints(dbSupport);
+        }
+    }
+
+
+    /**
+     * Not supported for oracle style.
+     *
+     * @param connection The db connection to use, not null
+     */
+    public void disableConstraintsOnConnection(Connection connection) {
+    }
+
+
+    /**
+     * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
+     *
+     * @param dbSupport The database support, not null
+     */
+    protected void removeNotNullConstraints(DbSupport dbSupport) {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             Set<String> constraintNames = dbSupport.getTableConstraintNames(tableName);
@@ -63,13 +85,6 @@ public class OracleStyleConstraintsDisabler extends DatabaseTask implements Cons
                 dbSupport.disableConstraint(tableName, constraintName);
             }
         }
-    }
-
-
-    /**
-     * @see ConstraintsDisabler#disableConstraintsOnConnection(Connection)
-     */
-    public void disableConstraintsOnConnection(Connection connection) {
     }
 
 }

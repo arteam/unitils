@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 /**
  * Defines the contract for implementation classes that update all sequences and identity columns of a database to
  * a sufficiently high value, so that test data be inserted easily.
@@ -22,7 +24,7 @@ package org.unitils.dbmaintainer.structure;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface SequenceUpdater {
+public interface SequenceUpdater extends DatabaseTask {
 
 
     /**

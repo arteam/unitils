@@ -17,7 +17,7 @@ package org.unitils.dbmaintainer.script.impl;
 
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.dbmaintainer.script.ScriptRunner;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 import java.util.List;
 import java.util.Properties;
@@ -28,7 +28,7 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SQLScriptRunner extends DatabaseTask implements ScriptRunner {
+public class SQLScriptRunner extends BaseDatabaseTask implements ScriptRunner {
 
 
     /**

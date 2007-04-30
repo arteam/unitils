@@ -17,7 +17,6 @@ package org.unitils.dbunit;
 
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import static org.dbunit.operation.DatabaseOperation.CLEAN_INSERT;
 import org.unitils.core.Module;
@@ -25,13 +24,14 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.database.DatabaseModule;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDbSupportInstance;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.dbunit.util.DataSetXmlReader;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
-import org.unitils.dbunit.util.TablePerRowXmlDataSet;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 
@@ -39,6 +39,8 @@ import javax.sql.DataSource;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -74,13 +76,14 @@ import java.util.Properties;
  */
 public class DbUnitModule implements Module {
 
-
     /*
      * Object that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
      * caching is time-consuming, this object is created only once and used througout the entire test run. The
      * underlying JDBC Connection however is 'closed' (returned to the pool) after every database operation.
+     *
+     * todo javadoc
      */
-    private DbUnitDatabaseConnection dbUnitDatabaseConnection;
+    private Map<String, DbUnitDatabaseConnection> dbUnitDatabaseConnections = new HashMap<String, DbUnitDatabaseConnection>();
 
     /* The unitils configuration */
     private Properties configuration;
@@ -99,11 +102,14 @@ public class DbUnitModule implements Module {
     /**
      * Gets the DbUnit connection or creates one if it does not exist yet.
      *
+     * @param schemaName The schema name, not null
      * @return The DbUnit connection, not null
      */
-    public DbUnitDatabaseConnection getDbUnitDatabaseConnection() {
+    public DbUnitDatabaseConnection getDbUnitDatabaseConnection(String schemaName) {
+        DbUnitDatabaseConnection dbUnitDatabaseConnection = dbUnitDatabaseConnections.get(schemaName);
         if (dbUnitDatabaseConnection == null) {
-            dbUnitDatabaseConnection = createDbUnitConnection();
+            dbUnitDatabaseConnection = createDbUnitConnection(schemaName);
+            dbUnitDatabaseConnections.put(schemaName, dbUnitDatabaseConnection);
         }
         return dbUnitDatabaseConnection;
     }
@@ -120,13 +126,15 @@ public class DbUnitModule implements Module {
      */
     public void insertTestData(Method testMethod) {
         try {
-            IDataSet dataSet = getTestDataSet(testMethod);
-            if (dataSet == null) {
+            Map<String, IDataSet> dataSets = getTestDataSets(testMethod);
+            if (dataSets == null) {
                 // no dataset specified
                 return;
             }
-            CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
-
+            for (String schemaName : dataSets.keySet()) {
+                IDataSet dataSet = dataSets.get(schemaName);
+                CLEAN_INSERT.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
+            }
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
         } finally {
@@ -142,9 +150,11 @@ public class DbUnitModule implements Module {
      */
     public void insertTestData(InputStream inputStream) {
         try {
-            IDataSet dataSet = createDataSet(inputStream);
-            CLEAN_INSERT.execute(getDbUnitDatabaseConnection(), dataSet);
-
+            Map<String, IDataSet> dataSets = createDataSet(inputStream);
+            for (String schemaName : dataSets.keySet()) {
+                IDataSet dataSet = dataSets.get(schemaName);
+                CLEAN_INSERT.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
+            }
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset.", e);
         } finally {
@@ -164,18 +174,19 @@ public class DbUnitModule implements Module {
     public void assertDbContentAsExpected(Method testMethod) {
         try {
             // get the expected dataset
-            IDataSet expectedDataSet = getExpectedTestDataSet(testMethod);
-            if (expectedDataSet == null) {
+            Map<String, IDataSet> expectedDataSets = getExpectedTestDataSets(testMethod);
+            if (expectedDataSets == null) {
                 // no data set should be compared
                 return;
             }
+            for (String schemaName : expectedDataSets.keySet()) {
+                IDataSet expectedDataSet = expectedDataSets.get(schemaName);
 
-            // first make sure every database update is flushed to the database
-            getDatabaseModule().flushDatabaseUpdates();
+                // first make sure every database update is flushed to the database
+                getDatabaseModule().flushDatabaseUpdates();
 
-            //todo
-            DbUnitAssert.assertDbContentAsExpected(expectedDataSet, getDbUnitDatabaseConnection());
-
+                DbUnitAssert.assertDbContentAsExpected(expectedDataSet, getDbUnitDatabaseConnection(schemaName));
+            }
         } finally {
             closeJdbcConnection();
         }
@@ -200,7 +211,7 @@ public class DbUnitModule implements Module {
      * @param testMethod The test method, not null
      * @return The dataset, null if there is no data set
      */
-    public IDataSet getTestDataSet(Method testMethod) {
+    public Map<String, IDataSet> getTestDataSets(Method testMethod) {
         Class<?> testClass = testMethod.getDeclaringClass();
 
         // get the value of the method-level annotation
@@ -226,20 +237,20 @@ public class DbUnitModule implements Module {
         if ("".equals(dataSetFileName)) {
             // first try method specific default file name
             dataSetFileName = getMethodLevelDefaultTestDataSetFileName(testClass, testMethod);
-            IDataSet dataSet = createDataSet(testClass, dataSetFileName);
-            if (dataSet != null) {
+            Map<String, IDataSet> dataSets = createDataSets(testClass, dataSetFileName);
+            if (dataSets != null) {
                 // found file, so return
-                return dataSet;
+                return dataSets;
             }
             // not found, try class default file name
             dataSetFileName = getClassLevelDefaultTestDataSetFileName(testClass);
         }
 
-        IDataSet dataSet = createDataSet(testClass, dataSetFileName);
-        if (dataSet == null) {
+        Map<String, IDataSet> dataSets = createDataSets(testClass, dataSetFileName);
+        if (dataSets == null) {
             throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetFileName);
         }
-        return dataSet;
+        return dataSets;
     }
 
 
@@ -250,7 +261,7 @@ public class DbUnitModule implements Module {
      * @param testMethod The test method, not null
      * @return The dataset, null if there is no data set
      */
-    public IDataSet getExpectedTestDataSet(Method testMethod) {
+    public Map<String, IDataSet> getExpectedTestDataSets(Method testMethod) {
         Class<?> testClass = testMethod.getDeclaringClass();
 
         // get the value of the method-level annotation
@@ -278,11 +289,11 @@ public class DbUnitModule implements Module {
             dataSetFileName = getDefaultExpectedDataSetFileName(testClass, testMethod);
         }
 
-        IDataSet dataSet = createDataSet(testClass, dataSetFileName);
-        if (dataSet == null) {
+        Map<String, IDataSet> dataSets = createDataSets(testClass, dataSetFileName);
+        if (dataSets == null) {
             throw new UnitilsException("Could not find expected DbUnit dataset with name " + dataSetFileName);
         }
-        return dataSet;
+        return dataSets;
     }
 
 
@@ -294,7 +305,7 @@ public class DbUnitModule implements Module {
      * @param dataSetFilename The name, (start with '/' for absolute names), not null
      * @return The data set, null if the file does not exist
      */
-    protected IDataSet createDataSet(Class testClass, String dataSetFilename) {
+    protected Map<String, IDataSet> createDataSets(Class testClass, String dataSetFilename) {
         try {
             InputStream in = testClass.getResourceAsStream(dataSetFilename);
             if (in == null) {
@@ -310,18 +321,22 @@ public class DbUnitModule implements Module {
 
 
     /**
+     * todo javadoc
+     * <p/>
      * Create a dbunit <code>IDataSet</code> object, in which the file coming from the
      * given <code>InputStream</code> is loaded.
      *
      * @param in the InputStream, not null
      * @return The DbUnit <code>IDataSet</code>
      */
-    public IDataSet createDataSet(InputStream in) {
+    public Map<String, IDataSet> createDataSet(InputStream in) {
         try {
-            IDataSet dataSet = new TablePerRowXmlDataSet(in);
-            ReplacementDataSet replacementDataSet = new ReplacementDataSet(dataSet);
-            replacementDataSet.addReplacementObject("[null]", null);
-            return replacementDataSet;
+            // A db support instance is created to get the default schema name in correct casing
+            DataSource dataSource = getDatabaseModule().getDataSource();
+            DbSupport defaultDbSupport = getDefaultDbSupport(configuration, dataSource);
+
+            DataSetXmlReader dataSetXmlReader = new DataSetXmlReader(defaultDbSupport.getSchemaName());
+            return dataSetXmlReader.readDataSetXml(in);
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to create DbUnit dataset for input stream.", e);
@@ -334,12 +349,13 @@ public class DbUnitModule implements Module {
     /**
      * Creates a new instance of dbUnit's <code>IDatabaseConnection</code>
      *
+     * @param schemaName The schema name, not null
      * @return A new instance of dbUnit's <code>IDatabaseConnection</code>
      */
-    protected DbUnitDatabaseConnection createDbUnitConnection() {
-        // A db support instance is created to get the schema name in correct casing 
+    protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
+        // A db support instance is created to get the schema name in correct casing
         DataSource dataSource = getDatabaseModule().getDataSource();
-        DbSupport dbSupport = getConfiguredDbSupportInstance(configuration, dataSource);
+        DbSupport dbSupport = getDbSupport(configuration, dataSource, schemaName);
 
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
@@ -359,11 +375,11 @@ public class DbUnitModule implements Module {
      */
     protected void closeJdbcConnection() {
         try {
-            if (dbUnitDatabaseConnection != null) {
+            for (DbUnitDatabaseConnection dbUnitDatabaseConnection : dbUnitDatabaseConnections.values()) {
                 dbUnitDatabaseConnection.closeJdbcConnection();
             }
         } catch (SQLException e) {
-            throw new UnitilsException("Error while closing connection", e);
+            throw new UnitilsException("Error while closing connection.", e);
         }
     }
 
@@ -428,7 +444,7 @@ public class DbUnitModule implements Module {
     /**
      * Test listener that is called while the test framework is running tests
      */
-    private class DbUnitListener extends TestListener {
+    protected class DbUnitListener extends TestListener {
 
         @Override
         public void beforeAll() {

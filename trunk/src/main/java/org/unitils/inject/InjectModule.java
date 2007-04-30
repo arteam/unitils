@@ -21,11 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.inject.annotation.InjectInto;
-import org.unitils.inject.annotation.InjectIntoByType;
-import org.unitils.inject.annotation.InjectIntoStatic;
-import org.unitils.inject.annotation.InjectIntoStaticByType;
-import org.unitils.inject.annotation.TestedObject;
+import org.unitils.inject.annotation.*;
 import org.unitils.inject.util.InjectionUtils;
 import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
@@ -34,20 +30,13 @@ import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
 import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
-import static org.unitils.util.ReflectionUtils.getFieldWithName;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
+import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Module for injecting annotated objects into other objects. The intended usage is to inject mock objects, but it can
@@ -444,7 +433,7 @@ public class InjectModule implements Module {
     /**
      * The {@link TestListener} for this module
      */
-    private class InjectTestListener extends TestListener {
+    protected class InjectTestListener extends TestListener {
 
         /**
          * Before executing a test method (i.e. after the fixture methods), the injection is performed, since

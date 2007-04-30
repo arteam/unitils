@@ -15,23 +15,22 @@
  */
 package org.unitils.dbunit;
 
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
+import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
+import java.util.Set;
 
 /**
- * Test class for loading of data sets by the {@link DbUnitModule}.
+ * Test class for loading of data sets using the {@link DbUnitModule}.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -142,11 +141,13 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
 
 
     /**
-     * Test for custom annotation on method-level and no annotation on class-level
+     * Test for no annotation on method-level and no annotation on class-level.
+     * No data set should have been loaded.
      */
     public void testInsertTestData_noClassAndMethodDataSet() throws Exception {
         dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod3"));
-        assertLoadedDataSet(null);
+        Set<String> datasets = getItemsAsStringSet("select dataset from test", dataSource);
+        assertTrue(datasets.isEmpty()); // nothing loaded
     }
 
 
@@ -184,66 +185,24 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * @param expectedDataSetName the name of the data set, not null
      */
     private void assertLoadedDataSet(String expectedDataSetName) throws SQLException {
-        String dataSet = getTestTableDateSetValue();
+        String dataSet = getItemAsString("select dataset from test", dataSource);
         assertEquals(expectedDataSetName, dataSet);
-    }
-
-
-    /**
-     * Utility method to get the dataset value from the test table.
-     *
-     * @return the value, null if not found
-     */
-    private String getTestTableDateSetValue() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            ResultSet resultSet = st.executeQuery("select dataset from test");
-            if (resultSet.next()) {
-                return resultSet.getString(1);
-            }
-            return null;
-        } finally {
-            closeQuietly(conn, st, null);
-        }
     }
 
 
     /**
      * Utility method to create the test table.
      */
-    private void createTestTable() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create table test (dataset varchar(100))");
-        } finally {
-            closeQuietly(conn, st, null);
-        }
+    private void createTestTable() {
+        executeUpdate("create table test (dataset varchar(100))", dataSource);
     }
 
 
     /**
      * Removes the test database table
      */
-    private void dropTestTable() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            try {
-                st.executeUpdate("drop table test");
-            } catch (SQLException e) {
-                // Ignored
-            }
-        } finally {
-            closeQuietly(conn, st, null);
-        }
+    private void dropTestTable() {
+        executeUpdateQuietly("drop table test", dataSource);
     }
 
 

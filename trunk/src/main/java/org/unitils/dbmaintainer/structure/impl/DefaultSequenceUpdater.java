@@ -15,8 +15,11 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.util.PropertyUtils;
 
 import java.util.Properties;
@@ -29,10 +32,13 @@ import java.util.Set;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpdater {
+public class DefaultSequenceUpdater extends BaseDatabaseTask implements SequenceUpdater {
 
     /* Property key for the lowest acceptacle sequence value */
     public static final String PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE = "sequenceUpdater.sequencevalue.lowestacceptable";
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DefaultSequenceUpdater.class);
 
     /* The lowest acceptable sequence value */
     protected long lowestAcceptableSequenceValue;
@@ -53,22 +59,27 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
      * easily.
      */
     public void updateSequences() {
-        if (dbSupport.supportsSequences()) {
-            incrementSequencesWithLowValue();
-        }
-        if (dbSupport.supportsIdentityColumns()) {
-            incrementIdentityColumnsWithLowValue();
+        for (DbSupport dbSupport : dbSupports) {
+            logger.info("Updating sequences and identity columns in database schema " + dbSupport.getSchemaName());
+            incrementSequencesWithLowValue(dbSupport);
+            incrementIdentityColumnsWithLowValue(dbSupport);
         }
     }
 
 
     /**
      * Increments all sequences whose value is too low.
+     *
+     * @param dbSupport The database support, not null
      */
-    private void incrementSequencesWithLowValue() {
+    private void incrementSequencesWithLowValue(DbSupport dbSupport) {
+        if (!dbSupport.supportsSequences()) {
+            return;
+        }
         Set<String> sequenceNames = dbSupport.getSequenceNames();
         for (String sequenceName : sequenceNames) {
             if (dbSupport.getCurrentValueOfSequence(sequenceName) < lowestAcceptableSequenceValue) {
+                logger.debug("Incrementing value for sequence " + sequenceName + " in database schema " + dbSupport.getSchemaName());
                 dbSupport.incrementSequenceToValue(sequenceName, lowestAcceptableSequenceValue);
             }
         }
@@ -77,13 +88,19 @@ public class DefaultSequenceUpdater extends DatabaseTask implements SequenceUpda
 
     /**
      * Increments the next value for identity columns whose next value is too low
+     *
+     * @param dbSupport The database support, not null
      */
-    private void incrementIdentityColumnsWithLowValue() {
+    private void incrementIdentityColumnsWithLowValue(DbSupport dbSupport) {
+        if (!dbSupport.supportsIdentityColumns()) {
+            return;
+        }
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
             if (primaryKeyColumnNames.size() == 1) {
                 String primaryKeyColumnName = primaryKeyColumnNames.iterator().next();
+                logger.debug("Incrementing value for identity column " + primaryKeyColumnName + " in database schema " + dbSupport.getSchemaName());
                 dbSupport.incrementIdentityColumnToValue(tableName, primaryKeyColumnName, lowestAcceptableSequenceValue);
             }
         }

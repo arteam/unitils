@@ -333,7 +333,7 @@ public class SpringModule implements Module {
     /**
      * The {@link TestListener} for this module
      */
-    private class SpringTestListener extends TestListener {
+    protected class SpringTestListener extends TestListener {
 
         @Override
         public void beforeTestSetUp(Object testObject) {
@@ -342,6 +342,5 @@ public class SpringModule implements Module {
             assignSpringBeansByType(testObject);
             assignSpringBeansByName(testObject);
         }
-
     }
 }

@@ -21,9 +21,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.util.DatabaseTask;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.readFileToString;
@@ -32,11 +32,7 @@ import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem.
@@ -48,7 +44,7 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class FileScriptSource extends DatabaseTask implements ScriptSource {
+public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     private static final Log logger = LogFactory.getLog(FileScriptSource.class);
 
@@ -80,6 +76,8 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
     /**
      * Uses the given configuration to initialize the script files directory, and the file extension
      * of the script files.
+     *
+     * @param configuration The configuration, not null
      */
     @SuppressWarnings("unchecked")
     public void doInit(Properties configuration) {
@@ -87,7 +85,7 @@ public class FileScriptSource extends DatabaseTask implements ScriptSource {
         verifyExistence(scriptFileLocations, PROPKEY_SCRIPTFILES_LOCATIONS);
         if (scriptFileLocations.isEmpty()) {
             logger.warn("No directories or files are specificied using the property " + PROPKEY_SCRIPTFILES_LOCATIONS + ". The Unitils database maintainer won't do anyting");
-        }                                                                                                                                
+        }
         codeScriptFileLocations = getStringList(PROPKEY_CODESCRIPTFILES_LOCATIONS, configuration);
         verifyExistence(codeScriptFileLocations, PROPKEY_CODESCRIPTFILES_LOCATIONS);
         fileExtension = getString(PROPKEY_SCRIPTFILES_FILEEXTENSION, configuration);

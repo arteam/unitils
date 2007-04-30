@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer.version;
 
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 
 /**
  * Interface that gives access to the version of a database, and a means to increment this version. The version of
@@ -24,7 +26,7 @@ package org.unitils.dbmaintainer.version;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface VersionSource {
+public interface VersionSource extends DatabaseTask {
 
 
     /**

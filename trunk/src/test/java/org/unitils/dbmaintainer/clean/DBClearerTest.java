@@ -20,11 +20,11 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_DATABASE_DIALECT;
-import org.unitils.dbmaintainer.clean.impl.DefaultDBClearer;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDbSupportInstance;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -86,13 +86,13 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             return;
         }
 
-        dbSupport = getConfiguredDbSupportInstance(configuration, dataSource);
+        dbSupport = getDefaultDbSupport(configuration, dataSource);
 
         // case insensitive names
         String itemsToPreserve = "Test_table_Preserve, Test_view_Preserve, Test_sequence_Preserve, Test_trigger_Preserve, ";
         // case sensitive names
         itemsToPreserve += dbSupport.quoted("Test_CASE_Table_Preserve") + ", " + dbSupport.quoted("Test_CASE_View_Preserve") + ", " + dbSupport.quoted("Test_CASE_Sequence_Preserve") + ", " + dbSupport.quoted("Test_CASE_Trigger_Preserve");
-        configuration.setProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, itemsToPreserve);
+        configuration.setProperty(PROPKEY_ITEMSTOPRESERVE, itemsToPreserve);
         // create clearer instance
         dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
 
@@ -123,7 +123,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             return;
         }
         assertFalse(dbSupport.getTableNames().isEmpty());
-        dbClearer.clearSchema();
+        dbClearer.clearSchemas();
         assertTrue(dbSupport.getTableNames().isEmpty());
     }
 
@@ -137,7 +137,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             return;
         }
         assertFalse(dbSupport.getViewNames().isEmpty());
-        dbClearer.clearSchema();
+        dbClearer.clearSchemas();
         assertTrue(dbSupport.getViewNames().isEmpty());
     }
 
@@ -150,7 +150,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             return;
         }
         assertFalse(dbSupport.getSynonymNames().isEmpty());
-        dbClearer.clearSchema();
+        dbClearer.clearSchemas();
         assertTrue(dbSupport.getSynonymNames().isEmpty());
     }
 
@@ -164,7 +164,7 @@ abstract public class DBClearerTest extends UnitilsJUnit3 {
             return;
         }
         assertFalse(dbSupport.getSequenceNames().isEmpty());
-        dbClearer.clearSchema();
+        dbClearer.clearSchemas();
         assertTrue(dbSupport.getSequenceNames().isEmpty());
     }
 

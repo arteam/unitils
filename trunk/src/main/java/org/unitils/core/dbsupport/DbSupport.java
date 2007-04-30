@@ -40,11 +40,6 @@ import java.util.Set;
 abstract public class DbSupport {
 
     /**
-     * Property keys of the database schema name
-     */
-    public static final String PROPKEY_DATABASE_SCHEMANAME = "database.schemaName";
-
-    /**
      * Property key for the default identifier casing (lower_case, upper_case, mixed_case, auto)
      */
     public static final String PROPKEY_STORED_IDENTIFIER_CASE = "database.storedIndentifierCase";
@@ -89,8 +84,9 @@ abstract public class DbSupport {
      *
      * @param configuration The config, not null
      * @param dataSource    The data source, not null
+     * @param schemaName    The name of the database schema
      */
-    public void init(Properties configuration, DataSource dataSource) {
+    public void init(Properties configuration, DataSource dataSource, String schemaName) {
         this.dataSource = dataSource;
 
         String identifierQuoteString = PropertyUtils.getString(PROPKEY_IDENTIFIER_QUOTE_STRING + "." + getDatabaseDialect(), configuration);
@@ -99,7 +95,7 @@ abstract public class DbSupport {
         this.identifierQuoteString = determineIdentifierQuoteString(identifierQuoteString);
         this.storedIdentifierCase = determineStoredIdentifierCase(storedIdentifierCaseValue);
 
-        this.schemaName = toCorrectCaseIdentifier(PropertyUtils.getString(PROPKEY_DATABASE_SCHEMANAME, configuration));
+        this.schemaName = toCorrectCaseIdentifier(schemaName);
     }
 
 
@@ -317,6 +313,33 @@ abstract public class DbSupport {
             return primaryKeyColumnNames;
         } catch (SQLException e) {
             throw new UnitilsException("Error while looking up primary key column names", e);
+        } finally {
+            closeQuietly(conn, st, rset);
+        }
+    }
+
+
+    /**
+     * Gets the names of all columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the columns of the table with the given name
+     */
+    public Set<String> getColumnNames(String tableName) {
+        Connection conn = null;
+        Statement st = null;
+        ResultSet rset = null;
+        try {
+            conn = dataSource.getConnection();
+            DatabaseMetaData metaData = conn.getMetaData();
+            rset = metaData.getColumns(null, schemaName, tableName, null);
+            Set<String> columnNames = new HashSet<String>();
+            while (rset.next()) {
+                columnNames.add(rset.getString("COLUMN_NAME"));
+            }
+            return columnNames;
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while looking up column names", e);
         } finally {
             closeQuietly(conn, st, rset);
         }

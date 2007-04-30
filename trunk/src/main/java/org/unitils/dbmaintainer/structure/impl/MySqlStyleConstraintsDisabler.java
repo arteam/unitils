@@ -17,8 +17,9 @@ package org.unitils.dbmaintainer.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -36,7 +37,7 @@ import java.util.Set;
  * @author Bart Vermeiren
  * @author Tim Ducheyne
  */
-public class MySqlStyleConstraintsDisabler extends DatabaseTask implements ConstraintsDisabler {
+public class MySqlStyleConstraintsDisabler extends BaseDatabaseTask implements ConstraintsDisabler {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(MySqlStyleConstraintsDisabler.class);
@@ -56,30 +57,44 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
      * disableConstraintsOnConnection)
      */
     public void disableConstraints() {
-        logger.info("Disabling contraints");
-        removeNotNullConstraints();
-    }
-
-
-    /**
-     * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
-     */
-    private void removeNotNullConstraints() {
-        // Iterate of all table names
-        Set<String> tableNames = dbSupport.getTableNames();
-        for (String tableName : tableNames) {
-            removeNotNullConstraints(tableName);
+        for (DbSupport dbSupport : dbSupports) {
+            logger.info("Disabling contraints in database schema " + dbSupport.getSchemaName());
+            removeNotNullConstraints(dbSupport);
         }
     }
 
 
     /**
-     * Sends statements to the StatementHandler that make sure all not-null constraints for the table with the given
-     * name are disabled.
+     * Makes sure foreign key checking is disabled
+     *
+     * @param connection The db connection to use, not null
+     */
+    public void disableConstraintsOnConnection(Connection connection) {
+        // todo refactor
+        defaultDbSupport.disableForeignKeyConstraintsCheckingOnConnection(connection);
+    }
+
+
+    /**
+     * Sends statements to the StatementHandler that make sure all not-null constraints are disabled.
+     *
+     * @param dbSupport The database support, not null
+     */
+    protected void removeNotNullConstraints(DbSupport dbSupport) {
+        Set<String> tableNames = dbSupport.getTableNames();
+        for (String tableName : tableNames) {
+            removeNotNullConstraints(tableName, dbSupport);
+        }
+    }
+
+
+    /**
+     * Removes all not-null constraints for the table with the given name.
      *
      * @param tableName The name of the table to remove constraints from, not null
+     * @param dbSupport The database support, not null
      */
-    private void removeNotNullConstraints(String tableName) {
+    protected void removeNotNullConstraints(String tableName, DbSupport dbSupport) {
         // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
         Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
         // Iterate over all column names
@@ -92,14 +107,5 @@ public class MySqlStyleConstraintsDisabler extends DatabaseTask implements Const
         }
     }
 
-
-    /**
-     * Makes sure foreign key checking is disabled
-     *
-     * @param connection The db connection to use, not null
-     */
-    public void disableConstraintsOnConnection(Connection connection) {
-        dbSupport.disableForeignKeyConstraintsCheckingOnConnection(connection);
-    }
 
 }

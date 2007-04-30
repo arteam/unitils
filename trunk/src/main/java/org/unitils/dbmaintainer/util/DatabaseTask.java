@@ -15,50 +15,23 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import org.unitils.core.dbsupport.DbSupport;
-
 import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
- * Base class for a task that can be performed on a database schema.
+ * Task that can be performed on a database.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-abstract public class DatabaseTask {
-
-    /* Implementation of DbSupport, for executing all sorts of database operations and queries */
-    protected DbSupport dbSupport;
-
-    /* Provides connections to the unit test database*/
-    protected DataSource dataSource;
-
-    /* Name of the unit test database schema */
-    protected String schemaName;
-
+public interface DatabaseTask {
 
     /**
-     * Initializes the database operation class with the given {@link Properties}, {@link DbSupport}, {@link DataSource}.
+     * Initializes the database operation class with the given {@link Properties}, {@link DataSource}.
      *
      * @param configuration The configuration, not null
-     * @param dbSupport     The database type specific support instance, not null
      * @param dataSource    The datasource, not null
      */
-    public void init(Properties configuration, DbSupport dbSupport, DataSource dataSource) {
-        this.dbSupport = dbSupport;
-        this.dataSource = dataSource;
-
-        schemaName = dbSupport.getSchemaName();
-        doInit(configuration);
-    }
-
-
-    /**
-     * Allows subclasses to perform some extra configuration using the given configuration.
-     *
-     * @param configuration The configuration, not null
-     */
-    abstract protected void doInit(Properties configuration);
+    public void init(Properties configuration, DataSource dataSource);
 
 }

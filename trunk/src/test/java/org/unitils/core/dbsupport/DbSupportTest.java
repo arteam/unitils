@@ -20,9 +20,10 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import org.unitils.core.util.SQLUtils;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.DBMaintainer;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
@@ -75,12 +76,14 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         String testDatabaseDialect = dbSupport.getDatabaseDialect();
-        String databaseDialect = PropertyUtils.getString(DBMaintainer.PROPKEY_DATABASE_DIALECT, configuration);
+        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
+        // todo multiple schema names
+        String schemaName = PropertyUtils.getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
         disabled = !testDatabaseDialect.equals(databaseDialect);
         if (disabled) {
             return;
         }
-        dbSupport.init(configuration, dataSource);
+        dbSupport.init(configuration, dataSource, schemaName);
 
         cleanupTestDatabase();
         createTestDatabase();
