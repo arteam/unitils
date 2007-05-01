@@ -20,28 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clean\MySqlDBClearerTest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\structure\DatasetStructureGenerator2.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\lib\commons-dbcp-1.2.1.jar" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaTest.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/XsdDataSetStructureGenerator.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iml" afterPath="$PROJECT_DIR$/Unitils.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/TestSQLUtils.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/TestSQLUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetMultiSchemaTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetMultiSchemaTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateSpringSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateSpringSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateSpringSupportImpl.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateSpringSupportImpl.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clean\PostgreSqlDBClearerTest.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clean\DB2DBClearerTest.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/DataSetStructureGenerator.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clean\OracleDBClearerTest.java" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/commons-dbcp-1.2.2.jar" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\dbmaintainer\structure\impl\XsdDataSetStructureGenerator2.java" afterPath="" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\dbmaintainer\clean\HsqldbDBClearerTest.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/XsdDataSetStructureGeneratorMultiSchemaTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/XsdDataSetStructureGeneratorMultiSchemaTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -206,57 +189,64 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DBClearerMultiSchemaTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaTest.java">
+      <file leaf-file-name="UnitilsJUnit3.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/UnitilsJUnit3.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="100" column="55" selection-start="4058" selection-end="4058" vertical-scroll-proportion="0.3996063">
+            <state line="15" column="0" selection-start="0" selection-end="615" vertical-scroll-proportion="0.25098425">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="unitils-default.properties" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="HibernateModule.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="63" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="unitils-default.properties" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="228" column="67" selection-start="15617" selection-end="15617" vertical-scroll-proportion="0.85334647">
+            <state line="0" column="15" selection-start="15" selection-end="15" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HsqldbDbSupport.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/HsqldbDbSupport.java">
+      <file leaf-file-name="HibernateSpringSupport.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateSpringSupport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="182" column="13" selection-start="5784" selection-end="5784" vertical-scroll-proportion="0.9173228">
+            <state line="30" column="52" selection-start="1032" selection-end="1077" vertical-scroll-proportion="0.49466538">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DbSupportFactory.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupportFactory.java">
+      <file leaf-file-name="HibernateSpringSupportImpl.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateSpringSupportImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="66" column="28" selection-start="2386" selection-end="2386" vertical-scroll-proportion="0.50630456">
+            <state line="0" column="115" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DBClearerTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
+      <file leaf-file-name="SpringModule.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="66" column="11" selection-start="2293" selection-end="2293" vertical-scroll-proportion="0.7903543">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="311" column="48" selection-start="15001" selection-end="15001" vertical-scroll-proportion="0.31397638">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DBCleanerMultiSchemaTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaTest.java">
+      <file leaf-file-name="ApplicationContextManager.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="136" column="65" selection-start="4844" selection-end="5168" vertical-scroll-proportion="0.83608145">
+            <state line="203" column="19" selection-start="9105" selection-end="9105" vertical-scroll-proportion="0.8996063">
               <folding />
             </state>
           </provider>
@@ -1423,7 +1413,7 @@
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287037" order="7" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287037" order="7" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.35549703" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4138889" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24946696" order="1" />
@@ -1529,50 +1519,6 @@
     <option name="myLastEditedConfigurable" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/util/DatabaseModuleConfigUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="45" selection-start="2010" selection-end="2010" vertical-scroll-proportion="0.75628626">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/DBCleaner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="0" selection-start="1140" selection-end="1140" vertical-scroll-proportion="0.5276431">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="83" column="0" selection-start="3445" selection-end="3445" vertical-scroll-proportion="0.14665355">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/SQLUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="0" selection-start="1617" selection-end="1617" vertical-scroll-proportion="0.16301239">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="112" column="61" selection-start="4112" selection-end="4112" vertical-scroll-proportion="0.7007874">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/DBMaintainer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="154" column="34" selection-start="7440" selection-end="7440" vertical-scroll-proportion="0.23425196">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="232" column="19" selection-start="7703" selection-end="7703" vertical-scroll-proportion="0.33267716">
@@ -1594,46 +1540,88 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="11" selection-start="2293" selection-end="2293" vertical-scroll-proportion="0.7903543">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupportFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="28" selection-start="2386" selection-end="2386" vertical-scroll-proportion="0.50630456">
+        <state line="100" column="55" selection-start="4058" selection-end="4058" vertical-scroll-proportion="0.3926499">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/HsqldbDbSupport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="182" column="13" selection-start="5784" selection-end="5784" vertical-scroll-proportion="0.9173228">
+        <state line="182" column="13" selection-start="5784" selection-end="5784" vertical-scroll-proportion="0.90135396">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupportFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="28" selection-start="2386" selection-end="2386" vertical-scroll-proportion="0.49761677">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="11" selection-start="2293" selection-end="2293" vertical-scroll-proportion="0.7765958">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="136" column="65" selection-start="4844" selection-end="5168" vertical-scroll-proportion="0.83608145">
+        <state line="136" column="65" selection-start="4844" selection-end="5168" vertical-scroll-proportion="0.82173496">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/UnitilsJUnit3.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="100" column="55" selection-start="4058" selection-end="4058" vertical-scroll-proportion="0.3996063">
+        <state line="15" column="0" selection-start="0" selection-end="615" vertical-scroll-proportion="0.25098425">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="228" column="67" selection-start="15617" selection-end="15617" vertical-scroll-proportion="0.85334647">
+        <state line="0" column="15" selection-start="15" selection-end="15" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="63" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateSpringSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="52" selection-start="1032" selection-end="1077" vertical-scroll-proportion="0.49466538">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="311" column="48" selection-start="15001" selection-end="15001" vertical-scroll-proportion="0.31397638">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/hibernate/util/HibernateSpringSupportImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="115" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="203" column="19" selection-start="9105" selection-end="9105" vertical-scroll-proportion="0.8996063">
           <folding />
         </state>
       </provider>
