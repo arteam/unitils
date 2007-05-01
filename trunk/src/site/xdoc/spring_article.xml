@@ -48,7 +48,7 @@ public class HibernatePhonebook extends HibernateDaoSupport implements Phonebook
 <p>We've written following test for this method:</p>
 
 <div class="source"><pre>
-@ApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
+@SpringApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
 public class UnitilsHibernatePhonebookTest extends UnitilsJUnit3 {
     
     @SpringBeanByType
@@ -90,10 +90,10 @@ unit test. For JUnit4 and TestNG, Unitils offers similar base classes called <i>
 <p>The <i>UnitilsHibernatePhonebookTest</i> class is annotated like this:</p>
 
 <div class="source"><pre>
-@ApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
+@SpringApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
 </pre></div>
 
-<p>The <i>@ApplicationContext</i> annotation instructs Unitils to create a Spring <i>ApplicationContext</i>, in which the <i>services-config.xml</i> and 
+<p>The <i>@SpringApplicationContext</i> annotation instructs Unitils to create a Spring <i>ApplicationContext</i>, in which the <i>services-config.xml</i> and 
 <i>test-ds-config.xml</i> files are loaded. This enables us to make Spring wired beans available for testing in a simple way:</p>
 
 <div class="source"><pre>
@@ -225,7 +225,7 @@ checks whether the values of the <i>firstName</i> field in the result person lis
 database. To activate it, just add following test to your test suite:</p>
 
 <div class="source"><pre>
-@ApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
+@SpringApplicationContext({"classpath:services-config.xml", "classpath:test-ds-config.xml"})
 public class HibernateMappingTest extends UnitilsJUnit3 {
 
     public void testMappingToDatabase() {
@@ -243,7 +243,7 @@ Applying following DDL statements to the database should resolve the problem:
 alter table PERSON add column firstName varchar(255);
 </pre></div>
 
-<p>You may have noticed that the <i>@ApplicationContext</i> annotation reappears in the test. To avoid this duplication, you can create a common superclass for 
+<p>You may have noticed that the <i>@SpringApplicationContext</i> annotation reappears in the test. To avoid this duplication, you can create a common superclass for 
 all database tests that contain the configuration.</p>
 
 
