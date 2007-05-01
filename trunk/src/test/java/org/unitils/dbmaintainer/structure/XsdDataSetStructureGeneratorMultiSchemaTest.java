@@ -1,13 +1,29 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbmaintainer.structure;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
 import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
@@ -31,17 +47,11 @@ import java.util.Properties;
  */
 public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
 
-    /* Tested object */
-    private DataSetStructureGenerator dataSetStructureGenerator;
-
-    /* The target directory for the test xsd files */
-    private File xsdDirectory;
-
-    /* DataSource for the test database. */
-    @TestDataSource
-    private DataSource dataSource = null;
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorMultiSchemaTest.class);
 
 
+    /* Expected content of dataset.xsd */
     private static final String DATASET_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
                     "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns:dflt=\"PUBLIC \">\n" +
@@ -58,6 +68,8 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
                     "   </xsd:element>\n" +
                     "</xsd:schema>";
 
+
+    /* Expected content of PUBLIC.xsd */
     private static final String PUBLIC_SCHEMA_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
                     "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"PUBLIC \">\n" +
@@ -74,6 +86,8 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
                     "   </xsd:complexType>\n" +
                     "</xsd:schema>";
 
+
+    /* Expected content of SCHEMA_A.xsd */
     private static final String SCHEMA_A_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
                     "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"SCHEMA_A \">\n" +
@@ -96,29 +110,43 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
                     "   </xsd:complexType>\n" +
                     "</xsd:schema>";
 
+
+    /* Tested object */
+    private DataSetStructureGenerator dataSetStructureGenerator;
+
+    /* The target directory for the test xsd files */
+    private File xsdDirectory;
+
+    /* DataSource for the test database. */
+    @TestDataSource
+    private DataSource dataSource = null;
+
+    /* True if current test is not for the current dialect */
+    private boolean disabled;
+
+
     /**
-     * Initializes the test by creating following tables in the test database:
-     * tableOne(columnA not null, columnB not null, columnC) and
-     * tableTwo(column1, column2)
+     * Initializes the test fixture.
      */
     protected void setUp() throws Exception {
         super.setUp();
 
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        if (disabled) {
+            return;
+        }
         xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XsdDataSetStructureGeneratorMultiSchemaTest");
         if (xsdDirectory.exists()) {
             deleteDirectory(xsdDirectory);
         }
         xsdDirectory.mkdirs();
 
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
-
         dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, dataSource);
-        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
 
-        dbClearer.clearSchemas();
+        dropTestTables();
         createTestTables();
     }
 
@@ -136,10 +164,15 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
         }
     }
 
+
     /**
      * Tests the generation of the xsd files for 2 database schemas.
      */
-    public void testGenerateDtd() throws Exception {
+    public void testGenerateDataSetStructure() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         dataSetStructureGenerator.generateDataSetStructure();
 
         assertFileContent(DATASET_XSD_CONTENT, new File(xsdDirectory, "dataset.xsd"));
@@ -155,7 +188,6 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
         // PUBLIC SCHEMA
         executeUpdate("create table TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
         executeUpdate("create table TABLE_2(column1 varchar(1), column2 varchar(1))", dataSource);
-
         // SCHEMA_A
         executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
         executeUpdate("create table SCHEMA_A.TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
@@ -175,6 +207,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
         executeUpdateQuietly("drop table SCHEMA_A.TABLE_4", dataSource);
         executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
     }
+
 
     /**
      * Asserts that the contents of the given file equals the given string.

@@ -17,8 +17,10 @@ package org.unitils.core.dbsupport;
 
 import org.unitils.core.UnitilsException;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.getItemsAsStringSet;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 /**
  * Some utility methods for the unit tests.
@@ -149,4 +151,17 @@ public class TestSQLUtils {
             return -1;
         }
     }
+
+
+    /**
+     * Utility method to check whether the given table is empty.
+     *
+     * @param tableName  The table, not null
+     * @param dataSource The data source, not null
+     * @return True if empty
+     */
+    public static boolean isEmpty(String tableName, DataSource dataSource) throws SQLException {
+        return getItemsAsStringSet("select * from " + tableName, dataSource).isEmpty();
+    }
+
 }

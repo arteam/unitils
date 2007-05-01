@@ -106,7 +106,7 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      */
     protected void cleanTable(String tableName, DbSupport dbSupport) {
         logger.debug("Deleting all records from table " + tableName + " in database schema " + dbSupport.getSchemaName());
-        executeUpdate("delete from " + dbSupport.quoted(tableName), dataSource);
+        executeUpdate("delete from " + dbSupport.qualified(tableName), dataSource);
     }
 
 
