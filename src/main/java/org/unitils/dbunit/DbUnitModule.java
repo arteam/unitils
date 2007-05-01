@@ -44,32 +44,24 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * todo javadoc
- * <p/>
  * Module that provides support for managing database test data using DBUnit.
  * <p/>
- * This module depends on the {@link DatabaseModule} for database connection management and identificatiof database test
- * classes.
+ * Loading of DbUnit data sets can be done by annotating a class or method with the {@link DataSet} annotation. The name
+ * data set file can be specified explicitly as an argument of the annotation. If no file name is specified, it looks
+ * for following files in the same directory as the test class:
+ * <ol>
+ * <li>'classname without packagename'.'test method name'.xml</li>
+ * <li>'classname without packagename'.xml</li>
  * <p/>
- * This module only provides services to unit test classes that are annotated with an annotation that identifies it as
- * a database test (see {@link DatabaseModule} for more information)
+ * If the method specific data set file is found, this will be used, otherwise it will look for the class-level data set
+ * file. See the {@link DataSet} javadoc for more info.
  * <p/>
- * For each database test method, this module will try to find a test dataset file in the classpath and, if found, insert
- * this dataset into the test database. DbUnits <code>DatabaseTask.CLEAN_INSERT</code> is used for inserting this
- * dataset. This means that the tables specified in the dataset are cleared before inserting the test records. As dataset
- * file format, DbUnit's <code>FlatXmlDataSet</code> is used.
+ * By annotating a method with the {@link @ExpectedDataSet} annotation or by calling the {@link #assertDbContentAsExpected}
+ * method, the contents of the database can be compared with the contents of a dataset. The expected dataset can be
+ * passed as an argument of the annotation. If no file name is specified it looks for a file in the same directory
+ * as the test class that has following name: 'classname without packagename'.'test method name'-result.xml.
  * <p/>
- * For each database test method, the dataset file is found as follows:
- * <ol><li>If the test method is annotated with {@link DataSet}, the file with the specified name is used</li>
- * <li>If a file can be found in the classpath in the same package as the testclass, with the name
- * 'classname without packagename'.'test method name'.xml, this file is used</li>
- * <li>If the test class is annotated with {@link DataSet}, the file with the specified name is used</li>
- * <li>If a file can be found in the classpath in the same package as the testclass, with the name
- * 'classname without packagename'.xml, this file is used</li>
- * <p/>
- * Using the method {@link #assertDbContentAsExpected}, the contents of the database can be compared with
- * the contents of a dataset. The expected dataset file should be located in the classpath in the same package as the
- * testclass, with the name 'classname without packagename'.'test method name'-result.xml.
+ * This module depends on the {@link DatabaseModule} for database connection management.
  *
  * @author Filip Neven
  * @author Tim Ducheyne

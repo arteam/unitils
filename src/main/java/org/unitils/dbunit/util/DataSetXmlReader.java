@@ -43,10 +43,21 @@ import java.util.Map;
  * Elements for a table may occur more than once and anywhere in the data set. If multiple elements
  * exist, they may specify different attributes (columns). Missing attributes (columns) will be treated as null values.
  * <p/>
- * todo correct multi-schema javadoc
+ * Namespaces can be used to specify tables from different database schemas. The namespace URI should contain the name
+ * of the database schema:
+ * <code><pre>
+ * &lt;dataset xmlns="SCHEMA_A" xmlns:b="SCHEMA_B"&gt;
+ *      &lt;first_table  myColumn1="value1" myColumn2="value2" /&gt;
+ *      &lt;b:second_table myColumnA="A" /&gt;
+ *      &lt;first_table  myColumn2="other value2" /&gt;
+ *      &lt;empty_table /&gt;
+ * &lt;/dataset&gt;
+ * </pre></code>
  * <p/>
- * Table names may be prefixed with a schema name. Eg  &lt;mySchema.my_table /&gt;. If a schema name is not
- * specified, the given default schema name is used. Different data sets will be created for tables in different schemas.
+ * This example defines 2 schemas: SCHEMA_A and SCHEMA_B. The first schema is set as default schema (=default namespace).
+ * The 'first_table' table has no namespce and is therefore linked to SCHEMA_A. The 'second_table' table is prefixed
+ * with namespace b which is linked to SCHEMA_B. If no default namespace is defined, the schema that is
+ * passed as constructor argument is taken as default schema.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -58,7 +69,7 @@ public class DataSetXmlReader {
 
 
     /**
-     * Creates a data set.
+     * Creates a data set reader.
      *
      * @param defaultSchemaName The schema name to use when none is specified, not null
      */
@@ -68,7 +79,8 @@ public class DataSetXmlReader {
 
 
     /**
-     * todo javadoc
+     * Parses the datasets from the given input stream.
+     * Each schema is given its own dataset.
      *
      * @param in the xml content stream, not null
      * @return The data sets (schema name, data set), not null
@@ -76,7 +88,9 @@ public class DataSetXmlReader {
     public Map<String, IDataSet> readDataSetXml(InputStream in) {
         try {
             DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
-            XMLReader xmlReader = createXMLReader(dataSetContentHandler, dataSetContentHandler);
+            XMLReader xmlReader = createXMLReader();
+            xmlReader.setContentHandler(dataSetContentHandler);
+            xmlReader.setErrorHandler(dataSetContentHandler);
             xmlReader.parse(new InputSource(in));
 
             return dataSetContentHandler.getDataSets();
@@ -87,15 +101,16 @@ public class DataSetXmlReader {
     }
 
 
-    protected XMLReader createXMLReader(ContentHandler contentHandler, ErrorHandler errorHandler) {
+    /**
+     * Factory method for creating the SAX xml reader.
+     *
+     * @return the XML reader, not null
+     */
+    protected XMLReader createXMLReader() {
         try {
             SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
             saxParserFactory.setNamespaceAware(true);
-            XMLReader xmlReader = saxParserFactory.newSAXParser().getXMLReader();
-
-            xmlReader.setContentHandler(contentHandler);
-            xmlReader.setErrorHandler(errorHandler);
-            return xmlReader;
+            return saxParserFactory.newSAXParser().getXMLReader();
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to create SAX parser to read data set xml.", e);
@@ -104,14 +119,14 @@ public class DataSetXmlReader {
 
 
     /**
-     * The xml content handler that is going to fill the dataset.
+     * The xml content handler that is going to create the data sets.
      */
     protected static class DataSetContentHandler extends DefaultHandler {
 
         /* The schema name to use when none is specified */
         private String defaultSchemaName;
 
-        /* All created datasets per schema, empty string is the default schema */
+        /* All created datasets per schema */
         private Map<String, CachedDataSet> dataSets = new HashMap<String, CachedDataSet>();
 
 
@@ -148,14 +163,14 @@ public class DataSetXmlReader {
         /**
          * Processes an xml element. A new table is started for each element.
          *
-         * @param uri        the xml namespace uri
+         * @param uri        the xml namespace uri (= schema name)
          * @param localName  the local xml name
          * @param qName      the element name (should be table name for table rows)
          * @param attributes the attributes (should be table columns for table rows)
          */
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             try {
-                // begin element of data set, if schema attribute present it will override the default schema
+                // begin element of data set, if default namespace set, it will override the default schema
                 if ("dataset".equals(localName)) {
                     if (!isEmpty(uri)) {
                         defaultSchemaName = uri;
@@ -194,6 +209,13 @@ public class DataSetXmlReader {
         }
 
 
+        /**
+         * Processes an end element.
+         *
+         * @param uri       the xml namespace uri (= schema name)
+         * @param localName the local xml name
+         * @param qName     the element name
+         */
         public void endElement(String uri, String localName, String qName) throws SAXException {
             try {
                 // end element of data set
