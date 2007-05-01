@@ -25,13 +25,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.spring.annotation.SpringApplicationContext;
-import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
-import static java.util.Arrays.asList;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+import static java.util.Arrays.asList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A class for managing and creating Spring application contexts.
@@ -54,7 +54,7 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
      */
     protected List<Class<? extends BeanPostProcessor>> beanPostProcessorTypes;
 
-
+    // todo javadoc
     protected Map<ApplicationContext, Map<Class<? extends BeanPostProcessor>, BeanPostProcessor>> beanPostProcessors;
 
 
@@ -115,6 +115,7 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
     }
 
 
+    // todo javadoc
     public void addBeanPostProcessorType(Class<? extends BeanPostProcessor> beanPostProcessorType) {
         beanPostProcessorTypes.add(beanPostProcessorType);
     }
@@ -142,7 +143,7 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
                 applicationContext.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
                     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
                         for (Class<? extends BeanPostProcessor> beanPostProcessorType : beanPostProcessorTypes) {
-                            BeanPostProcessor beanPostProcessor = ReflectionUtils.createInstanceOfType(beanPostProcessorType);
+                            BeanPostProcessor beanPostProcessor = createInstanceOfType(beanPostProcessorType);
                             registerBeanPostProcessor(applicationContext, beanPostProcessorType, beanPostProcessor);
                             beanFactory.addBeanPostProcessor(beanPostProcessor);
                         }
@@ -159,9 +160,8 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
     }
 
 
-    protected void registerBeanPostProcessor(ConfigurableApplicationContext applicationContext,
-                                             Class<? extends BeanPostProcessor> beanPostProcessorType, BeanPostProcessor beanPostProcessor) {
-
+    // todo javadoc
+    protected void registerBeanPostProcessor(ConfigurableApplicationContext applicationContext, Class<? extends BeanPostProcessor> beanPostProcessorType, BeanPostProcessor beanPostProcessor) {
         Map<Class<? extends BeanPostProcessor>, BeanPostProcessor> beanPostProcessorMap = beanPostProcessors.get(applicationContext);
         if (beanPostProcessorMap == null) {
             beanPostProcessorMap = new HashMap<Class<? extends BeanPostProcessor>, BeanPostProcessor>();
@@ -170,8 +170,9 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
         beanPostProcessorMap.put(beanPostProcessorType, beanPostProcessor);
     }
 
-    public BeanPostProcessor getBeanPostProcessor(ApplicationContext applicationContext, Class<? extends BeanPostProcessor> beanPostProcessorType) {
 
+    // todo javadoc
+    public BeanPostProcessor getBeanPostProcessor(ApplicationContext applicationContext, Class<? extends BeanPostProcessor> beanPostProcessorType) {
         Map<Class<? extends BeanPostProcessor>, BeanPostProcessor> beanPostProcessorMap = beanPostProcessors.get(applicationContext);
         if (beanPostProcessorMap == null) {
             return null;

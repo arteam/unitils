@@ -16,11 +16,10 @@
 package org.unitils.hibernate.util;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.unitils.core.Unitils;
 import org.unitils.hibernate.HibernateModule;
-import org.unitils.hibernate.util.HibernateSpringSupport;
 import org.unitils.spring.SpringModule;
 import org.unitils.spring.util.SessionFactoryWrappingBeanPostProcessor;
 
@@ -47,40 +46,56 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
         getSpringModule().registerBeanPostProcessorType(SessionFactoryWrappingBeanPostProcessor.class);
     }
 
+
     /**
      * Returns the hibernate <code>SessionFactory</code> that was configured in spring for the given testObject, if any
-     * @param testObject
+     *
+     * @param testObject The test instance, not null
      * @return The <code>SessionFactory</code> configured in spring for the given testObject, null if no such
-     * <code>SessionFactory</code> was configured.
+     *         <code>SessionFactory</code> was configured.
      */
     public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
-
-        SessionFactoryWrappingBeanPostProcessor beanPostProcessor = (SessionFactoryWrappingBeanPostProcessor)
-                getSpringModule().getBeanPostProcessor(testObject, SessionFactoryWrappingBeanPostProcessor.class);
+        SessionFactoryWrappingBeanPostProcessor beanPostProcessor = getSessionFactoryWrappingBeanPostProcessor(testObject);
         if (beanPostProcessor == null) {
             return null;
-        } else {
-            return beanPostProcessor.getInterceptedSessionFactory();
         }
+        return beanPostProcessor.getInterceptedSessionFactory();
     }
+
 
     /**
      * Returns the hibernate <code>Configuration</code> that was configured in spring for the given testObject, if any
-     * @param testObject
+     *
+     * @param testObject The test instance, not null
      * @return The <code>Configuration</code> configured in spring for the given testObject, null if no such
-     * <code>Configuration</code> was configured.
+     *         <code>Configuration</code> was configured.
      */
     public Configuration getConfiguration(Object testObject) {
-        SessionFactoryWrappingBeanPostProcessor beanPostProcessor = (SessionFactoryWrappingBeanPostProcessor)
-                getSpringModule().getBeanPostProcessor(testObject, SessionFactoryWrappingBeanPostProcessor.class);
+        SessionFactoryWrappingBeanPostProcessor beanPostProcessor = getSessionFactoryWrappingBeanPostProcessor(testObject);
         if (beanPostProcessor == null) {
             return null;
-        } else {
-            return beanPostProcessor.getInterceptedHibernateConfiguration();
         }
+        return beanPostProcessor.getInterceptedHibernateConfiguration();
     }
 
 
+    /**
+     * Gets the registered SessionFactoryWrappingBeanPostProcessor.
+     *
+     * @param testObject The test instance, not null
+     * @return The session factory bean post processor, null if not found
+     */
+    protected SessionFactoryWrappingBeanPostProcessor getSessionFactoryWrappingBeanPostProcessor(Object testObject) {
+        BeanPostProcessor beanPostProcessor = getSpringModule().getBeanPostProcessor(testObject, SessionFactoryWrappingBeanPostProcessor.class);
+        return (SessionFactoryWrappingBeanPostProcessor) beanPostProcessor;
+    }
+
+
+    /**
+     * Looks up the Spring module instance.
+     *
+     * @return The Spring module, not null
+     */
     protected SpringModule getSpringModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
     }
