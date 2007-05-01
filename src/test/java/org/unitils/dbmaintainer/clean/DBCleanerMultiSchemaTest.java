@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit;
+package org.unitils.dbmaintainer.clean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DbSupportFactory;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
+import static org.unitils.core.dbsupport.TestSQLUtils.isEmpty;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.getItemAsString;
 import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -32,22 +34,24 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Test class for loading of data sets in mutliple database schemas.
+ * Test class for the DBCleaner with multiple schemas.
+ * <p/>
+ * Currently this is only implemented for HsqlDb.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
+public class DBCleanerMultiSchemaTest extends UnitilsJUnit3 {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(DbUnitModuleDataSetMultiSchemaTest.class);
-
-    /* Tested object */
-    private DbUnitModule dbUnitModule;
-
-    /* The dataSource */
+    /* DataSource for the test database, is injected */
     @TestDataSource
     private DataSource dataSource = null;
+
+    /* Tested object */
+    private DBCleaner dbCleaner;
+
+    /* The DbSupport object */
+    private DbSupport dbSupport;
 
     /* True if current test is not for the current dialect */
     private boolean disabled;
@@ -64,8 +68,17 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
         if (disabled) {
             return;
         }
-        dbUnitModule = new DbUnitModule();
-        dbUnitModule.init(configuration);
+
+        // configure 3 schemas
+        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
+        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, dataSource);
+
+        //todo implement
+        // case sensitive and insensitive names
+        String itemsToPreserve = "Test_table_Preserve, " + dbSupport.quoted("Test_CASE_Table_Preserve");
+        configuration.setProperty(PROPKEY_TABLESTOPRESERVE, itemsToPreserve);
+        // create cleaner instance
+        dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
 
         dropTestTables();
         createTestTables();
@@ -73,56 +86,25 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
 
 
     /**
-     * Clean-up test database.
+     * Removes the test database tables from the test database, to avoid inference with other tests
      */
     protected void tearDown() throws Exception {
         super.tearDown();
-        if (disabled) {
-            return;
-        }
         dropTestTables();
     }
 
 
     /**
-     * Test for a data set containing multiple namespaces.
+     * Tests if the tables in all schemas are correctly cleaned.
      */
-    public void testDataSet_multiSchema() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("multiSchema"));
-
-        assertLoadedDataSet("PUBLIC");
-        assertLoadedDataSet("SCHEMA_A");
-        assertLoadedDataSet("SCHEMA_B");
-    }
-
-    /**
-     * Test for a data set containing multiple namespaces.
-     */
-    public void testDataSet_multiSchemaNoDefault() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("multiSchemaNoDefault"));
-
-        assertLoadedDataSet("PUBLIC");
-        assertLoadedDataSet("SCHEMA_A");
-        assertLoadedDataSet("SCHEMA_B");
-    }
-
-
-    /**
-     * Utility method to assert that the data set for the schema was loaded.
-     *
-     * @param schemaName the name of the schema, not null
-     */
-    private void assertLoadedDataSet(String schemaName) throws SQLException {
-        String dataSet = getItemAsString("select dataset from " + schemaName + ".test", dataSource);
-        assertEquals(schemaName, dataSet);
+    public void testCleanDatabase() throws Exception {
+        assertFalse(isEmpty("TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_B.TEST", dataSource));
+        dbCleaner.cleanSchemas();
+        assertTrue(isEmpty("TEST", dataSource));
+        assertTrue(isEmpty("SCHEMA_A.TEST", dataSource));
+        assertTrue(isEmpty("SCHEMA_B.TEST", dataSource));
     }
 
 
@@ -131,13 +113,16 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
      */
     private void createTestTables() throws SQLException {
         // PUBLIC SCHEMA
-        executeUpdate("create table TEST(dataset varchar(100))", dataSource);
+        executeUpdate("create table TEST (dataset varchar(100))", dataSource);
+        executeUpdate("insert into TEST values('test')", dataSource);
         // SCHEMA_A
         executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
-        executeUpdate("create table SCHEMA_A.TEST(dataset varchar(100))", dataSource);
+        executeUpdate("create table SCHEMA_A.TEST (dataset varchar(100))", dataSource);
+        executeUpdate("insert into SCHEMA_A.TEST values('test')", dataSource);
         // SCHEMA_B
         executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
-        executeUpdate("create table SCHEMA_B.TEST(dataset varchar(100))", dataSource);
+        executeUpdate("create table SCHEMA_B.TEST (dataset varchar(100))", dataSource);
+        executeUpdate("insert into SCHEMA_B.TEST values('test')", dataSource);
     }
 
 
@@ -152,18 +137,5 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
         executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
     }
 
-
-    /**
-     * Test class with a class level dataset
-     */
-    @DataSet
-    public class DataSetTest {
-
-        public void multiSchema() {
-        }
-
-        public void multiSchemaNoDefault() {
-        }
-    }
 
 }

@@ -19,10 +19,8 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.core.dbsupport.TestSQLUtils.dropTestTables;
-import static org.unitils.core.dbsupport.TestSQLUtils.dropTestViews;
+import static org.unitils.core.dbsupport.TestSQLUtils.*;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.getItemsAsStringSet;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_TABLESTOPRESERVE;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_VERSION_TABLE_NAME;
@@ -90,11 +88,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables that are not configured as tables to preserve are correctly cleaned
      */
     public void testCleanDatabase() throws Exception {
-        assertFalse(isEmpty("TEST_TABLE"));
-        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table")));
+        assertFalse(isEmpty("TEST_TABLE", dataSource));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table"), dataSource));
         dbCleaner.cleanSchemas();
-        assertTrue(isEmpty("TEST_TABLE"));
-        assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table")));
+        assertTrue(isEmpty("TEST_TABLE", dataSource));
+        assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table"), dataSource));
     }
 
 
@@ -102,9 +100,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables that are configured as tables to preserve are left untouched
      */
     public void testCleanDatabase_preserveDbVersionTable() throws Exception {
-        assertFalse(isEmpty(versionTableName));
+        assertFalse(isEmpty(versionTableName, dataSource));
         dbCleaner.cleanSchemas();
-        assertFalse(isEmpty(versionTableName));
+        assertFalse(isEmpty(versionTableName, dataSource));
     }
 
 
@@ -112,11 +110,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables to preserve are left untouched
      */
     public void testCleanDatabase_preserveTablesToPreserve() throws Exception {
-        assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
-        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
+        assertFalse(isEmpty("TEST_TABLE_PRESERVE", dataSource));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve"), dataSource));
         dbCleaner.cleanSchemas();
-        assertFalse(isEmpty("TEST_TABLE_PRESERVE"));
-        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve")));
+        assertFalse(isEmpty("TEST_TABLE_PRESERVE", dataSource));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve"), dataSource));
     }
 
 
@@ -152,17 +150,6 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         executeUpdate("insert into TEST_TABLE_PRESERVE values('test')", dataSource);
         executeUpdate("insert into " + dbSupport.quoted("Test_CASE_Table") + " values('test')", dataSource);
         executeUpdate("insert into " + dbSupport.quoted("Test_CASE_Table_Preserve") + " values('test')", dataSource);
-    }
-
-
-    /**
-     * Utility method to check whether the given table is empty.
-     *
-     * @param tableName the table, not null
-     * @return true if empty
-     */
-    private boolean isEmpty(String tableName) throws SQLException {
-        return getItemsAsStringSet("select * from " + tableName, dataSource).isEmpty();
     }
 
 }
