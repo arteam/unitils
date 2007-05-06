@@ -1,1 +1,0 @@
-java -cp ../../../lib/hsqldb.jar org.hsqldb.Server -database.0 eshop -dbname.0 eshop

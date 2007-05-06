@@ -15,9 +15,7 @@
  */
 package org.unitils.sample.eshop.model;
 
-import org.unitils.sample.eshop.dao.UserDao;
-import org.unitils.sample.eshop.dao.DiscountDao;
-import org.unitils.sample.eshop.exception.EShopException;
+import org.unitils.sample.eshop.exception.NotOldEnoughException;
 
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -37,7 +35,7 @@ import java.util.ArrayList;
 @Entity
 @Table(name = "PURCHASE")
 @SequenceGenerator(name = "SEQUENCE", sequenceName = "PURCHASE_ID_SEQ")
-public class ShoppingBasket {
+public class Purchase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
@@ -49,59 +47,56 @@ public class ShoppingBasket {
 
     @OneToMany
     @JoinColumn(name = "PURCHASE_ID")
-    private List<ShoppingBasketItem> items = new ArrayList<ShoppingBasketItem>();
+    private List<PurchaseItem> items = new ArrayList<PurchaseItem>();
 
-    public ShoppingBasket() {}
+    protected Purchase() {}
+
+    public Purchase(User user) {
+        this.user = user;
+    }
 
     public User getUser() {
         return user;
     }
 
-    public List<ShoppingBasketItem> getItems() {
+    public List<PurchaseItem> getItems() {
         return items;
+    }
+
+    /**
+     * Adds amount items of the given Product to this Purchase.
+     * @param product
+     * @param amount
+     */
+    public void addItem(Product product, int amount) {
+        if (product.getMinimumAge() > user.getAge()) {
+            throw new NotOldEnoughException();
+        }
+        PurchaseItem currentItemForProduct = getItemForProduct(product);
+        if (currentItemForProduct != null) {
+            currentItemForProduct.setAmount(currentItemForProduct.getAmount() + amount);
+            return;
+        }
+        if (amount > 0) {
+            items.add(new PurchaseItem(product, amount));
+        }
+    }
+
+    public PurchaseItem getItemForProduct(Product product) {
+        for (PurchaseItem item : items) {
+            if (item.getProduct().equals(product)) {
+                return item;
+            }
+        }
+        return null;
     }
 
     public double getTotalPrice() {
         double totalPrice = 0d;
-        for (ShoppingBasketItem item : items) {
+        for (PurchaseItem item : items) {
             totalPrice += item.getPrice();
         }
         return totalPrice;
     }
-
-    public void checkout(Long userId) {
-        User user = getUserDao().findById(userId);
-        if (!isOldEnough(user)) {
-            throw new EShopException("User not old enough");
-        }
-        double price = getTotalPrice();
-        double discount = getLoyalUserDiscount(user);
-        price -= price * discount;
-    }
-
-    private double getLoyalUserDiscount(User user) {
-        double totalPurchaseAmount = getDiscountDao().calculateTotalPurchaseAmount(user);
-        if (totalPurchaseAmount > 1000) {
-            return .05;
-        } else {
-            return 0;
-        }
-    }
-
-    private boolean isOldEnough(User user) {
-        for (ShoppingBasketItem item : items) {
-            /*if (user.getAge() < item.getProduct().getMinimumAge()) {
-                return false;
-            }*/
-        }
-        return true;
-    }
-
-    private UserDao getUserDao() {
-        return new UserDao();
-    }
-
-    private DiscountDao getDiscountDao() {
-        return new DiscountDao();
-    }
+    
 }

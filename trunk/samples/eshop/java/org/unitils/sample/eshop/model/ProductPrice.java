@@ -16,6 +16,7 @@
 package org.unitils.sample.eshop.model;
 
 
+import static java.util.Arrays.asList;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import javax.persistence.JoinColumn;
@@ -28,6 +29,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * 
@@ -37,19 +39,24 @@ public class ProductPrice {
 
     @OneToMany
     @JoinColumn(name = "PRODUCT_ID")
-    private List<PriceTableItem> staffle = new ArrayList<PriceTableItem>();
+    private List<PriceTableItem> priceTable = new ArrayList<PriceTableItem>();
 
-    public ProductPrice() {}
+    protected ProductPrice() {}
+
+    public ProductPrice(double price) {
+        this();
+        this.priceTable = asList(new PriceTableItem(0, price));
+    }
 
     public ProductPrice(List<PriceTableItem> staffle) {
         this();
-        this.staffle = staffle;
+        this.priceTable = staffle;
     }
 
     public double getPriceFor(int amount) {
         PriceTableItem applicablePriceTableItem = null;
-        for (PriceTableItem priceTableItem : staffle) {
-            if (priceTableItem.getAmount() <= amount) {
+        for (PriceTableItem priceTableItem : priceTable) {
+            if (priceTableItem.getMinimalAmount() <= amount) {
                 applicablePriceTableItem = priceTableItem;
             }
         }
@@ -65,8 +72,8 @@ public class ProductPrice {
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="SEQUENCE")
         private Long id;
 
-        @Column
-        private int amount;
+        @Column(name = "AMOUNT")
+        private int minimalAmount;
 
         @Column
         private double price;
@@ -75,12 +82,12 @@ public class ProductPrice {
 
         public PriceTableItem(int amount, double price) {
             this();
-            this.amount = amount;
+            this.minimalAmount = amount;
             this.price = price;
         }
 
-        public int getAmount() {
-            return amount;
+        public int getMinimalAmount() {
+            return minimalAmount;
         }
 
         public double getPrice() {

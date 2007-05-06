@@ -5,8 +5,8 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.inject.annotation.TestedObject;
 import org.unitils.sample.eshop.dao.UserDao;
-import org.unitils.sample.eshop.model.ShoppingBasket;
-import org.unitils.sample.eshop.model.ShoppingBasketItem;
+import org.unitils.sample.eshop.model.Purchase;
+import org.unitils.sample.eshop.model.PurchaseItem;
 import org.unitils.sample.eshop.model.User;
 
 /**
@@ -16,12 +16,12 @@ public class ShoppingBasketTest extends UnitilsJUnit3 {
 
     @Mock private UserDao mockUserDao;
 
-    @Mock private ShoppingBasketItem item1;
+    @Mock private PurchaseItem item1;
 
-    @Mock private ShoppingBasketItem item2;
+    @Mock private PurchaseItem item2;
 
     @TestedObject
-    private ShoppingBasket shoppingBasket;
+    private Purchase purchase;
 
     private User user;
 
@@ -30,9 +30,9 @@ public class ShoppingBasketTest extends UnitilsJUnit3 {
 
         user = new User(0L, null, 18);
 
-        shoppingBasket = new ShoppingBasket();
-        shoppingBasket.getItems().add(item1);
-        shoppingBasket.getItems().add(item2);
+        purchase = new Purchase(user);
+        purchase.getItems().add(item1);
+        purchase.getItems().add(item2);
     }
 
     public void testCheckout() {
