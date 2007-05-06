@@ -1,1 +1,1 @@
-java -cp ../../../lib/hsqldb.jar org.hsqldb.util.DatabaseManagerSwing
+java -cp hsqldb.jar org.hsqldb.util.DatabaseManagerSwing

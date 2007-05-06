@@ -32,9 +32,9 @@
         <mapping class="org.unitils.sample.eshop.model.Product"/>
         <mapping class="org.unitils.sample.eshop.model.ProductPrice"/>
         <mapping class="org.unitils.sample.eshop.model.ProductPrice$PriceTableItem"/>
-        <mapping class="org.unitils.sample.eshop.model.ShoppingBasket"/>
-        <mapping class="org.unitils.sample.eshop.model.ShoppingBasketItem"/>
-        <mapping class="org.unitils.sample.eshop.model.ShoppingBasketItem"/>
+        <mapping class="org.unitils.sample.eshop.model.Purchase"/>
+        <mapping class="org.unitils.sample.eshop.model.PurchaseItem"/>
+        <mapping class="org.unitils.sample.eshop.model.PurchaseItem"/>
 
 
     </session-factory>

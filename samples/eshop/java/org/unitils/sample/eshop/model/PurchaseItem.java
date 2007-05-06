@@ -31,17 +31,25 @@ import javax.persistence.SequenceGenerator;
 @Entity
 @Table(name = "PURCHASE_ITEM")
 @SequenceGenerator(name = "SEQUENCE1", sequenceName = "PURCHASE_ITEM_ID_SEQ")
-public class ShoppingBasketItem {
+public class PurchaseItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE1")
     private Long id;
 
-
     @Column
     private int amount;
 
-    public ShoppingBasketItem() {}
+    @ManyToOne
+    @JoinColumn(name = "PRODUCT_ID")
+    private Product product;
+
+    protected PurchaseItem() {}
+
+    public PurchaseItem(Product product, int amount) {
+        this.product = product;
+        this.amount = amount;
+    }
 
     public int getAmount() {
         return amount;
@@ -52,8 +60,10 @@ public class ShoppingBasketItem {
     }
 
     public double getPrice() {
-        //return amount * product.getPriceFor(amount);
-        return 0d;
+        return amount * product.getPriceFor(amount);
     }
 
+    public Product getProduct() {
+        return product;
+    }
 }

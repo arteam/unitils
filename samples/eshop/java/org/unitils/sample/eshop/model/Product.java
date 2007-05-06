@@ -24,10 +24,10 @@ import javax.persistence.Embedded;
 import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import java.util.Arrays;
 
 /**
- * todo Write test for price calculation
- * Boundary conditions: amount 0, negative amount
+ * Represents an eshop Product
  */
 @Entity
 @Table(name = "PRODUCT")
@@ -47,11 +47,36 @@ public class Product {
     @Column
     private int minimumAge;
 
-    public Product() {}
+    /**
+     * Empty constructor. Exists only to enable proxying.
+     */
+    protected Product() {}
 
-    public Product(ProductPrice price, String name, int minimumAge) {
+    /**
+     * Constructor that initializes a product with a given ProductPrice, name and minimumAge
+     * @param price
+     * @param name
+     * @param minimumAge
+     */
+    public Product(long id, ProductPrice price, String name, int minimumAge) {
         this();
+        this.id = id;
         this.price = price;
+        this.name = name;
+        this.minimumAge = minimumAge;
+    }
+
+    /**
+     * Convience constructor for products having a single price
+     *
+     * @param price
+     * @param name
+     * @param minimumAge
+     */
+    public Product(long id, double price, String name, int minimumAge) {
+        this();
+        this.id = id;
+        this.price = new ProductPrice(price);
         this.name = name;
         this.minimumAge = minimumAge;
     }
@@ -60,7 +85,7 @@ public class Product {
         return id;
     }
 
-    public ProductPrice getPriceStaffle() {
+    public ProductPrice getPrice() {
         return price;
     }
 
@@ -76,4 +101,19 @@ public class Product {
         return minimumAge;
     }
 
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Product product = (Product) o;
+
+        if (!id.equals(product.id)) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        return id.hashCode();
+    }
 }
