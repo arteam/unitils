@@ -132,13 +132,13 @@ public class HibernateModule implements Module, Flushable {
      *        The test instance, not null
      * @return The Hibernate <code>SessionFactory</code>, not null
      */
-    public SessionFactory getSessionFactory(Object testObject) {
+    public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
 
-        SessionFactory springModuleConfigured = null;
+        SessionInterceptingSessionFactory springModuleConfigured = null;
         if (hibernateSpringSupport != null) {
             springModuleConfigured = hibernateSpringSupport.getSessionFactory(testObject);
         }
-        SessionFactory hibernateModuleConfigured = getSessionFactoryManager().getSessionFactory(
+        SessionInterceptingSessionFactory hibernateModuleConfigured = getSessionFactoryManager().getSessionFactory(
                 testObject);
         if (springModuleConfigured != null && hibernateModuleConfigured != null) {
             throw new UnitilsException(
@@ -182,6 +182,22 @@ public class HibernateModule implements Module, Flushable {
     }
 
     /**
+     * Indicates whether a hibernate <code>SessionFactory</code> has been configured in some way for the given testObject
+     * 
+     * @param testObject
+     * @return true if a <code>SessionFactory</code> has been configured, false otherwise
+     */
+    public boolean isSessionFactoryConfiguredFor(Object testObject) {
+
+        SessionInterceptingSessionFactory springModuleConfigured = null;
+        if (hibernateSpringSupport != null) {
+            springModuleConfigured = hibernateSpringSupport.getSessionFactory(testObject);
+        }
+        return springModuleConfigured != null || getSessionFactoryManager().getSessionFactory(testObject) != null;
+
+    }
+
+    /**
      * Gets the manager for session factories and hibernate configurations.
      * 
      * @return The manager, not null
@@ -197,10 +213,8 @@ public class HibernateModule implements Module, Flushable {
      *        The test instance, not null
      */
     public void closeSessions(Object testObject) {
-        // get all open session factories
-        List<SessionInterceptingSessionFactory> sessionFactories = getSessionFactoryManager()
-                .getSessionFactories();
-        for (SessionInterceptingSessionFactory sessionFactory : sessionFactories) {
+        if (isSessionFactoryConfiguredFor(testObject)) {
+            SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
             // close all open sessions
             sessionFactory.closeOpenSessions();
         }

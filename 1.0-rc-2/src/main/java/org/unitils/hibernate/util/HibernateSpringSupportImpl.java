@@ -53,7 +53,7 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
      * @return The <code>SessionFactory</code> configured in spring for the given testObject, null if no such
      * <code>SessionFactory</code> was configured.
      */
-    public SessionFactory getSessionFactory(Object testObject) {
+    public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
 
         SessionFactoryWrappingBeanPostProcessor beanPostProcessor = (SessionFactoryWrappingBeanPostProcessor)
                 getSpringModule().getBeanPostProcessor(testObject, SessionFactoryWrappingBeanPostProcessor.class);
