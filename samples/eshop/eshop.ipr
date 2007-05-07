@@ -252,7 +252,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/unitils-labs.iml" filepath="$PROJECT_DIR$/unitils-labs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eshop.iml" filepath="$PROJECT_DIR$/eshop.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" project-jdk-type="JavaSDK">
@@ -312,9 +312,7 @@
         <root url="jar://$PROJECT_DIR$/lib/unitils-1.0-rc-3-20070426-1.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="file://$PROJECT_DIR$/unitils-src/main/java" />
-      </SOURCES>
+      <SOURCES />
     </library>
   </component>
   <component name="uidesigner-configuration">
