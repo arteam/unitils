@@ -38,7 +38,7 @@ public class PurchaseDaoTest extends DBTestCase {
 
     public void testCalculateTotalPurchaseAmount() {
         long totalAmount = purchaseDao.calculateTotalPurchaseAmount(new User(1L, null, 0));
-        assertEquals(30, totalAmount);
+        assertEquals(30, totalAmount); 
     }
 
     protected IDataSet getDataSet() throws Exception {
