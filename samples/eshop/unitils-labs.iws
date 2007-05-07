@@ -128,42 +128,22 @@
   <component name="FavoritesManager">
     <favorites_list name="unitils-labs" />
   </component>
-  <component name="FavoritesProjectViewPane" />
+  <component name="FavoritesProjectViewPane">
+    <subPane subId="unitils-labs">
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" />
+          <option name="myItemType" value="com.intellij.ide.favoritesTreeView.FavoritesTreeNodeDescriptor" />
+        </PATH_ELEMENT>
+      </PATH>
+    </subPane>
+  </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="PurchaseDao.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/dao/PurchaseDao.java">
+      <file leaf-file-name="eshop-config.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/eshop-config.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="38" selection-start="281" selection-end="281" vertical-scroll-proportion="0.25641027">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HibernateCrudDao.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/dao/HibernateCrudDao.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="47" selection-start="785" selection-end="785" vertical-scroll-proportion="0.20512821">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PurchaseDaoTest.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/dao/PurchaseDaoTest.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="4" selection-start="97" selection-end="97" vertical-scroll-proportion="0.102564104">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PurchaseDaoTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/dao/PurchaseDaoTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="35" column="78" selection-start="1375" selection-end="1549" vertical-scroll-proportion="0.53846157">
+            <state line="42" column="29" selection-start="2083" selection-end="2083" vertical-scroll-proportion="0.87631977">
               <folding />
             </state>
           </provider>
@@ -172,34 +152,79 @@
       <file leaf-file-name="unitils.properties" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/unitils.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="49" selection-start="109" selection-end="143" vertical-scroll-proportion="0.051282052">
+            <state line="2" column="47" selection-start="109" selection-end="143" vertical-scroll-proportion="0.051282052">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BaseHibernateTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/BaseHibernateTest.java">
+      <file leaf-file-name="PropertiesDataSourceFactory.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/unitils-src/main/java/org/unitils/database/config/PropertiesDataSourceFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="13" selection-start="559" selection-end="559" vertical-scroll-proportion="0.23076923">
+            <state line="74" column="12" selection-start="2609" selection-end="2609" vertical-scroll-proportion="0.35897437">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ProductTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/model/ProductTest.java">
+      <file leaf-file-name="BasicDataSource.class" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/lib/commons-dbcp-1.2.2.jar!/org/apache/commons/dbcp/BasicDataSource.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="5" selection-start="847" selection-end="847" vertical-scroll-proportion="0.51282054">
+            <state line="3" column="31" selection-start="122" selection-end="145" vertical-scroll-proportion="0.051282052">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="eshop-config.xml" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/resources/eshop-config.xml">
+      <file leaf-file-name="Purchase.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/model/Purchase.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="4" selection-start="1755" selection-end="1755" vertical-scroll-proportion="0.7948718">
+            <state line="75" column="0" selection-start="2412" selection-end="2412" vertical-scroll-proportion="1.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PurchaseTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/model/PurchaseTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="30" column="4" selection-start="772" selection-end="772" vertical-scroll-proportion="0.3514329">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PurchaseService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/service/PurchaseService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="29" column="9" selection-start="959" selection-end="959" vertical-scroll-proportion="0.6923077">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PurchaseDao.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/dao/PurchaseDao.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="10" column="13" selection-start="256" selection-end="256" vertical-scroll-proportion="0.20512821">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PurchaseDaoTest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/dao/PurchaseDaoTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="45" column="5" selection-start="1898" selection-end="1898" vertical-scroll-proportion="0.7948718">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="StockService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/service/StockService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="12" column="15" selection-start="298" selection-end="298" vertical-scroll-proportion="0.2820513">
               <folding />
             </state>
           </provider>
@@ -600,7 +625,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure ProjectPane="false" Scope="false" />
+      <showStructure ProjectPane="false" Scope="false" Favorites="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -626,7 +651,7 @@
     </key>
   </component>
   <component name="RestoreUpdateTree" />
-  <component name="RunManager" selected="JUnit.PurchaseDaoTest.testCalculateTotalPurchaseAmount">
+  <component name="RunManager" selected="JUnit.PurchaseDaoTest">
     <tempConfiguration default="false" name="PurchaseDaoTest.testCalculateTotalPurchaseAmount" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <pattern value="org.untils.sample.eshop.dao.*" />
       <module name="unitils-labs" />
@@ -649,6 +674,23 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="" />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -667,23 +709,6 @@
       <method>
         <option name="Make" value="true" />
       </method>
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="" />
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module name="" />
@@ -715,6 +740,9 @@
       </option>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
+      <method>
+        <option name="Make" value="true" />
+      </method>
     </configuration>
   </component>
   <component name="ScopeViewComponent">
@@ -792,31 +820,31 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1928" height="1174" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
+      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24986653" order="0" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24986653" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298279" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298279" order="-1" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298279" order="8" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="6" />
-      <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
+      <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298279" order="2" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3298279" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="2" />
-      <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
+      <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39961758" order="4" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="-1" />
-      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="2" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="0" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="2" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="3" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="5" />
     </layout>
@@ -901,111 +929,107 @@
     <option name="myLastEditedConfigurable" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/service/PaymentService.java">
+    <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/model/ProductTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="4" selection-start="229" selection-end="229" vertical-scroll-proportion="0.28992248">
+        <state line="27" column="5" selection-start="847" selection-end="847" vertical-scroll-proportion="0.33497536">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/exception/InsufficientCreditException.java">
+    <entry file="jar://C:/java/jdk1.5.0_05/src.zip!/java/util/Collections.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="4" selection-start="171" selection-end="171" vertical-scroll-proportion="0.20512821">
+        <state line="1135" column="28" selection-start="47225" selection-end="47225" vertical-scroll-proportion="0.38325122">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/model/ProductPrice.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="61" column="22" selection-start="2019" selection-end="2019" vertical-scroll-proportion="0.8717949">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/model/Product.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="0" selection-start="1114" selection-end="1114" vertical-scroll-proportion="0.30769232">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/model/PurchaseItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="12" selection-start="1406" selection-end="1406" vertical-scroll-proportion="0.5534884">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/model/Purchase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="75" column="0" selection-start="2412" selection-end="2412" vertical-scroll-proportion="1.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/service/StockService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="15" selection-start="298" selection-end="298" vertical-scroll-proportion="0.2820513">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/model/PurchaseTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="4" selection-start="772" selection-end="772" vertical-scroll-proportion="0.3514329">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/service/PurchaseService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="26" selection-start="775" selection-end="775" vertical-scroll-proportion="0.5897436">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/dao/UserDao.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="13" selection-start="723" selection-end="723" vertical-scroll-proportion="0.20512821">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/HibernateMappingTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="47" selection-start="756" selection-end="756" vertical-scroll-proportion="0.21085271">
+        <state line="29" column="9" selection-start="959" selection-end="959" vertical-scroll-proportion="0.6923077">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/dao/PurchaseDao.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="38" selection-start="281" selection-end="281" vertical-scroll-proportion="0.25641027">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/dbunit-2.2.jar!/org/dbunit/operation/DeleteAllOperation.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="0" selection-start="577" selection-end="577" vertical-scroll-proportion="0.2968254">
+        <state line="10" column="13" selection-start="256" selection-end="256" vertical-scroll-proportion="0.20512821">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/BaseHibernateTest.java">
+    <entry file="jar://$PROJECT_DIR$/lib/commons-dbcp-1.2.2.jar!/org/apache/commons/dbcp/BasicDataSource.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="13" selection-start="559" selection-end="559" vertical-scroll-proportion="0.23076923">
+        <state line="3" column="31" selection-start="122" selection-end="145" vertical-scroll-proportion="0.051282052">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/unitils.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="49" selection-start="109" selection-end="143" vertical-scroll-proportion="0.051282052">
+        <state line="2" column="47" selection-start="109" selection-end="143" vertical-scroll-proportion="0.051282052">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/dao/PurchaseDaoTest.xml">
+    <entry file="file://$PROJECT_DIR$/unitils-src/main/java/org/unitils/database/config/PropertiesDataSourceFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="4" selection-start="97" selection-end="97" vertical-scroll-proportion="0.102564104">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/spring-2.0.1.jar!/org/springframework/orm/hibernate3/support/HibernateDaoSupport.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="22" selection-start="189" selection-end="189" vertical-scroll-proportion="0.102564104">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java/org/unitils/sample/eshop/dao/HibernateCrudDao.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="47" selection-start="785" selection-end="785" vertical-scroll-proportion="0.20512821">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/model/ProductTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="5" selection-start="847" selection-end="847" vertical-scroll-proportion="0.51282054">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/dao/PurchaseDaoTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="78" selection-start="1375" selection-end="1549" vertical-scroll-proportion="0.53846157">
+        <state line="74" column="12" selection-start="2609" selection-end="2609" vertical-scroll-proportion="0.35897437">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/eshop-config.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="4" selection-start="1755" selection-end="1755" vertical-scroll-proportion="0.7948718">
+        <state line="42" column="29" selection-start="2083" selection-end="2083" vertical-scroll-proportion="0.87631977">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/org/untils/sample/eshop/dao/PurchaseDaoTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="5" selection-start="1898" selection-end="1898" vertical-scroll-proportion="0.7948718">
           <folding />
         </state>
       </provider>

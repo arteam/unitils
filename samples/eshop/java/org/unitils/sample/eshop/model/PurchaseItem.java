@@ -26,7 +26,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.SequenceGenerator;
 
 /**
- *
+ * Represents an amount of items of a certain Product that is contained in a certain Purchase
  */
 @Entity
 @Table(name = "PURCHASE_ITEM")
@@ -59,6 +59,9 @@ public class PurchaseItem {
         this.amount = amount;
     }
 
+    /**
+     * @return The total price to pay for this PurchaseItem
+     */
     public double getPrice() {
         return amount * product.getPriceFor(amount);
     }
