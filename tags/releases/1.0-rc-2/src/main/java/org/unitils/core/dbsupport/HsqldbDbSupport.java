@@ -18,6 +18,7 @@ package org.unitils.core.dbsupport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import static org.unitils.core.util.SQLUtils.*;
+import org.unitils.core.UnitilsException;
 
 import java.sql.Connection;
 import java.util.Set;
@@ -120,7 +121,12 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
-        executeUpdate("alter table " + qualified(tableName) + " alter column " + primaryKeyColumnName + " RESTART WITH " + identityValue, getDataSource());
+        try {
+            executeUpdate("alter table " + qualified(tableName) + " alter column " + primaryKeyColumnName + " RESTART WITH " + identityValue, getDataSource());
+        } catch (UnitilsException e) {
+            // Exception is ignored. Todo: clean this up, make sure we are sure that we're dealing with an identity
+            // column before invoking this method
+        }
     }
 
 
