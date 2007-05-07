@@ -18,7 +18,7 @@ package org.unitils.sample.eshop.dao;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * 
+ * Base class for DAO's that use hibernate. Offers basic CRUD operations.
  */
 public class HibernateCrudDao<T> extends HibernateDaoSupport {
 

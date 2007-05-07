@@ -41,10 +41,8 @@ public class Product {
     @Embedded
     private ProductPrice price;
 
-    @Column
     private String name;
 
-    @Column
     private int minimumAge;
 
     /**

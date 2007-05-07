@@ -4,8 +4,7 @@ import org.unitils.sample.eshop.model.Product;
 import org.unitils.sample.eshop.exception.EShopException;
 
 /**
- * @author Filip Neven
- * @author Tim Ducheyne
+ * Exception indicating that there aren't enough items of a certain product in stock
  */
 public class NotEnoughItemsInStockException extends EShopException {
 

@@ -1,8 +1,7 @@
 package org.unitils.sample.eshop.exception;
 
 /**
- * @author Filip Neven
- * @author Tim Ducheyne
+ * Exception that is thrown when a user is not old enough to buy a certain Product
  */
 public class NotOldEnoughException extends EShopException {
 

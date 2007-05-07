@@ -18,7 +18,7 @@ package org.unitils.sample.eshop.dao;
 import org.unitils.sample.eshop.model.Product;
 
 /**
- *
+ * DAO for the Product class
  */
 public class ProductDao extends HibernateCrudDao<Product> {
 

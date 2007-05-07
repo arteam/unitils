@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Arrays;
 
 /**
- * 
+ * Composite object that represents the price of a Product. Can be a simple price, or can consist of a price table
+ * where lower prices are used for higher amounts of items ordered.
  */
 @Embeddable
 public class ProductPrice {
@@ -43,17 +44,28 @@ public class ProductPrice {
 
     protected ProductPrice() {}
 
+    /**
+     * Constructs a simple ProductPrice object, in which a single price is used whatever amount of products is bought
+     *
+     * @param price The price that is used for the product.
+     */
     public ProductPrice(double price) {
         this.priceTable = asList(new PriceTableItem(0, price));
     }
 
+    /**
+     * Constructs a ProductPrice object, in which the given priceTable is used to defer the price. Typically, lower
+     * prices are used when ordering a larger amount of products
+     * 
+     * @param priceTable The priceTable that will be used for defering the price of a Product.
+     */
     public ProductPrice(List<PriceTableItem> priceTable) {
         this.priceTable = priceTable;
     }
 
     /**
      * @param amount The amount of items for which the concrete price is retrieved
-     * @return The concrete price, given the number of items of the substance to which this price applies.
+     * @return The concrete price, given the number of items of the product to which this price applies.
      */
     public double getPriceFor(int amount) {
         PriceTableItem applicablePriceTableItem = null;
@@ -65,6 +77,9 @@ public class ProductPrice {
         return applicablePriceTableItem.getPrice();
     }
 
+    /**
+     * Represents a single line in a price table.
+     */
     @Entity
     @Table(name = "PRODUCT_PRICE_TABLE")
     @SequenceGenerator(name = "SEQUENCE", sequenceName = "PRICE_TABLE_ITEM_SEQ")
@@ -80,7 +95,7 @@ public class ProductPrice {
         @Column
         private double price;
 
-        private PriceTableItem() {}
+        protected PriceTableItem() {}
 
         public PriceTableItem(int amount, double price) {
             this();
