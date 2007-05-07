@@ -9,11 +9,6 @@ import org.unitils.sample.eshop.model.Product;
  */
 public class StockService {
 
-    public boolean registerPurchase(Product product, int amount) {
-        return true;
-    }
-
     public void registerPurchasedItems(Product product, int amount) {
-        
     }
 }

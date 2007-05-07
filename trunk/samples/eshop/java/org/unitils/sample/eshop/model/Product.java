@@ -54,12 +54,13 @@ public class Product {
 
     /**
      * Constructor that initializes a product with a given ProductPrice, name and minimumAge
+
+     * @param id
      * @param price
      * @param name
      * @param minimumAge
      */
     public Product(long id, ProductPrice price, String name, int minimumAge) {
-        this();
         this.id = id;
         this.price = price;
         this.name = name;
@@ -69,16 +70,13 @@ public class Product {
     /**
      * Convience constructor for products having a single price
      *
+     * @param id
      * @param price
      * @param name
      * @param minimumAge
      */
     public Product(long id, double price, String name, int minimumAge) {
-        this();
-        this.id = id;
-        this.price = new ProductPrice(price);
-        this.name = name;
-        this.minimumAge = minimumAge;
+        this(id, new ProductPrice(price), name, minimumAge);
     }
 
     public Long getId() {
@@ -93,6 +91,11 @@ public class Product {
         return name;
     }
 
+    /**
+     * @param amount The amount of products that one wants to buy of this product
+     * @return The price for one single instance of this Product, given the total amount of items the user wants to
+     *         buy.
+     */
     public double getPriceFor(int amount) {
         return price.getPriceFor(amount);
     }
@@ -100,7 +103,6 @@ public class Product {
     public int getMinimumAge() {
         return minimumAge;
     }
-
 
     public boolean equals(Object o) {
         if (this == o) return true;

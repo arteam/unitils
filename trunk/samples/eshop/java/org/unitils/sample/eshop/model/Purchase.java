@@ -28,6 +28,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Entity;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *
@@ -60,13 +61,17 @@ public class Purchase {
     }
 
     public List<PurchaseItem> getItems() {
-        return items;
+        return Collections.unmodifiableList(items);
     }
 
     /**
-     * Adds amount items of the given Product to this Purchase.
-     * @param product
-     * @param amount
+     * Adds amount items of the given Product to this Purchase. If amount == 0 nothing is added. If this Purchase already
+     * contains a PurchaseItem for the given Product, the amount of this PurchaseItem is increased.
+     *
+     * @param product The product for which items are added to this Purchase
+     * @param amount The number of items of the given Product that are added to this Purchase
+     * @throws NotOldEnoughException If the user's age is not sufficient to be authorized to buy items of the given
+     *                               Product
      */
     public void addItem(Product product, int amount) {
         if (product.getMinimumAge() > user.getAge()) {
@@ -82,6 +87,11 @@ public class Purchase {
         }
     }
 
+    /**
+     * @param product A product
+     * @return If this Purchase contains a PurchaseItem for the given Product, this PurchaseItem is returned. Otherwise,
+     * null is returned.
+     */
     public PurchaseItem getItemForProduct(Product product) {
         for (PurchaseItem item : items) {
             if (item.getProduct().equals(product)) {
@@ -91,6 +101,9 @@ public class Purchase {
         return null;
     }
 
+    /**
+     * @return The total price for this purchase
+     */
     public double getTotalPrice() {
         double totalPrice = 0d;
         for (PurchaseItem item : items) {

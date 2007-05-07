@@ -44,15 +44,17 @@ public class ProductPrice {
     protected ProductPrice() {}
 
     public ProductPrice(double price) {
-        this();
         this.priceTable = asList(new PriceTableItem(0, price));
     }
 
-    public ProductPrice(List<PriceTableItem> staffle) {
-        this();
-        this.priceTable = staffle;
+    public ProductPrice(List<PriceTableItem> priceTable) {
+        this.priceTable = priceTable;
     }
 
+    /**
+     * @param amount The amount of items for which the concrete price is retrieved
+     * @return The concrete price, given the number of items of the substance to which this price applies.
+     */
     public double getPriceFor(int amount) {
         PriceTableItem applicablePriceTableItem = null;
         for (PriceTableItem priceTableItem : priceTable) {

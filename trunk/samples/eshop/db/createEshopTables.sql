@@ -1,3 +1,5 @@
+create schema ESHOP authorization DBA;
+
 create table ESHOP.USER (id bigint not null, userName varchar(255) not null, age integer not null, primary key (id));
 create table ESHOP.PRODUCT (id bigint not null, name varchar(255) not null, minimumAge integer not null, primary key (id));
 create table ESHOP.PRODUCT_PRICE_TABLE (id bigint not null, amount integer not null, price double not null, PRODUCT_ID bigint not null, primary key (id), foreign key (product_id) references product(id) );
