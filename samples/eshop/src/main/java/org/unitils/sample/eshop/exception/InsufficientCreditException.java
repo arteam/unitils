@@ -1,8 +1,7 @@
 package org.unitils.sample.eshop.exception;
 
 /**
- * @author Filip Neven
- * @author Tim Ducheyne
+ * Exception indicating that a user has not enough credit to pay a certain amount
  */
 public class InsufficientCreditException extends EShopException {
 

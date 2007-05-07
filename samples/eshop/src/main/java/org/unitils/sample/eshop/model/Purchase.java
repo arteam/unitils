@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- *
+ * Represents a Purchase that a User makes. A Purchase consists of different PurchaseItems.
  */
 @Entity
 @Table(name = "PURCHASE")

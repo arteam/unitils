@@ -16,7 +16,7 @@
 package org.unitils.sample.eshop.exception;
 
 /**
- * 
+ * Base exception type for the Eshop application
  */
 public class EShopException extends RuntimeException {
 

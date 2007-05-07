@@ -25,7 +25,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 /**
- *
+ * Represents an eshop user
  */
 @Entity
 @Table(name = "USER")
