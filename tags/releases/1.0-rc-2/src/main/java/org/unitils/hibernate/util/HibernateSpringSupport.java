@@ -33,7 +33,7 @@ public interface HibernateSpringSupport {
      * @return The <code>SessionFactory</code> configured in spring for the given testObject, null if no such
      * <code>SessionFactory</code> was configured.
      */
-    SessionFactory getSessionFactory(Object testObject);
+    SessionInterceptingSessionFactory getSessionFactory(Object testObject);
 
     /**
      * Returns the hibernate <code>Configuration</code> that was configured in spring for the given testObject, if any
