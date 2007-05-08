@@ -20,8 +20,6 @@ import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.IdentityHashMap;
 
 /**
  * Wrapper or decorator for a <code>TestDataSource</code> that makes sure that for every <code>Connection</code>
@@ -34,10 +32,6 @@ public class ConstraintsCheckDisablingDataSource extends BaseDataSourceDecorator
 
     /* The implementation of ConstraintsDisabler that is used */
     private ConstraintsDisabler constraintsDisabler;
-
-    /* Map used to remember on which Connections we already disabled constraints checking. This is done to avoid that
-       a database call is made each time we retrieve a Connection from the connection pool */
-    private Map<Connection, Connection> connectionsWithConstraintsCheckingDisabled = new IdentityHashMap<Connection, Connection>();
 
 
     /**
@@ -60,10 +54,7 @@ public class ConstraintsCheckDisablingDataSource extends BaseDataSourceDecorator
      */
     public Connection getConnection() throws SQLException {
         Connection conn = super.getConnection();
-        if (!connectionsWithConstraintsCheckingDisabled.containsKey(conn)) {
-            constraintsDisabler.disableConstraintsOnConnection(conn);
-            connectionsWithConstraintsCheckingDisabled.put(conn, conn);
-        }
+        constraintsDisabler.disableConstraintsOnConnection(conn);
         return conn;
     }
 
