@@ -478,12 +478,28 @@ abstract public class DbSupport {
      * Converts the given identifier to uppercase/lowercase depending on the DBMS. If a value is surrounded with double
      * quotes (") and the DBMS supports quoted database object names, the case is left untouched and the double quotes
      * are stripped. These values are treated as case sensitive names.
+     * <p/>
+     * Identifiers can be prefixed with schema names. These schema names will be converted in the same way as described
+     * above. Quoting the schema name will make it case sensitive.
+     * Examples:
+     * <p/>
+     * mySchema.myTable -> MYSCHEMA.MYTABLE
+     * "mySchema".myTable -> mySchema.MYTABLE
+     * "mySchema"."myTable" -> mySchema.myTable
      *
      * @param identifier The identifier, not null
      * @return The name converted to correct case if needed, not null
      */
     public String toCorrectCaseIdentifier(String identifier) {
         identifier = identifier.trim();
+
+        int index = identifier.indexOf('.');
+        if (index != -1) {
+            String schemaNamePart = identifier.substring(0, index);
+            String identifierPart = identifier.substring(index + 1);
+            return toCorrectCaseIdentifier(schemaNamePart) + "." + toCorrectCaseIdentifier(identifierPart);
+        }
+
         if (identifier.startsWith(identifierQuoteString) && identifier.endsWith(identifierQuoteString)) {
             return identifier.substring(1, identifier.length() - 1);
         }

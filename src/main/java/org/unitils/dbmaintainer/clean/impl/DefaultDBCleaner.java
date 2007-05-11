@@ -29,23 +29,23 @@ import java.util.*;
 /**
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
  * that are configured as tables to preserve. This includes the tables that are listed in the property
- * {@link #PROPKEY_TABLESTOPRESERVE}, {@link #PROPKEY_DBCLEARER_ITEMSTOPRESERVE}. and the table that is configured as
+ * {@link #PROPKEY_PRESERVE_TABLES}, {@link #PROPKEY_PRESERVE_ONLY_DATA_TABLES}. and the table that is configured as
  * version table using the property {@link #PROPKEY_VERSION_TABLE_NAME}.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
 
     /**
      * Property key for the tables that should not be cleaned
      */
-    public static final String PROPKEY_TABLESTOPRESERVE = "dbMaintainer.cleanDb.tablesToPreserve";
+    public static final String PROPKEY_PRESERVE_ONLY_DATA_TABLES = "dbMaintainer.preserveOnlyData.tables";
 
     /**
-     * Property key for the tables that should not be cleared (these tables should also not be cleaned
+     * The key of the property that specifies which tables should not be dropped (shouls also not be cleaned)
      */
-    public static final String PROPKEY_DBCLEARER_ITEMSTOPRESERVE = "dbMaintainer.clearDb.itemsToPreserve";
+    public static final String PROPKEY_PRESERVE_TABLES = "dbMaintainer.preserve.tables";
 
     /**
      * The key of the property that specifies the name of the datase table in which the
@@ -69,10 +69,9 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      */
     protected void doInit(Properties configuration) {
         tablesToPreserve = new HashSet<String>();
-        // todo make other schemas also possible
         tablesToPreserve.add(defaultDbSupport.toCorrectCaseIdentifier(PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration)));
-        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_TABLESTOPRESERVE, configuration), defaultDbSupport));
-        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_DBCLEARER_ITEMSTOPRESERVE, configuration), defaultDbSupport));
+        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_PRESERVE_TABLES, configuration), defaultDbSupport));
+        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_PRESERVE_ONLY_DATA_TABLES, configuration), defaultDbSupport));
     }
 
 
@@ -87,7 +86,7 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
             Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {
                 // check whether table needs to be preserved
-                if (tablesToPreserve.contains(tableName)) {
+                if (tablesToPreserve.contains(tableName) || tablesToPreserve.contains(dbSupport.getSchemaName() + "." + tableName)) {
                     continue;
                 }
                 cleanTable(tableName, dbSupport);

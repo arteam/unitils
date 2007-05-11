@@ -254,7 +254,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Unitils.iml" filepath="$PROJECT_DIR$/Unitils.iml" />
-      <module fileurl="file://$PROJECT_DIR$/samples/eshop/Unitils-eshop-sample.iml" filepath="$PROJECT_DIR$/samples/eshop/Unitils-eshop-sample.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" />
