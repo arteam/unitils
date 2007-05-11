@@ -8,22 +8,25 @@ import org.unitils.sample.eshop.model.Product;
 import org.unitils.sample.eshop.model.ProductPrice;
 
 import static java.util.Arrays.asList;
+import java.util.Arrays;
 
-public class ProductTest extends UnitilsJUnit4 {
+public class ProductPriceTest {
 
-    private Product product;
+    private ProductPrice productPrice;
 
     @Before
     public void initFixture() {
-        ProductPrice price = new ProductPrice(asList(new ProductPrice.PriceTableItem(0, 20),
+        productPrice = new ProductPrice(Arrays.asList(
+                new ProductPrice.PriceTableItem(0, 20),
                 new ProductPrice.PriceTableItem(5, 15)));
-        product = new Product(0L, price, null, 0);
     }
 
     @Test
     public void testGetPriceFor() {
-        assertEquals(20.0, product.getPriceFor(1));
-        assertEquals(20.0, product.getPriceFor(4));
-        assertEquals(15.0, product.getPriceFor(5));
+        assertEquals(20.0, productPrice.getPriceFor(1));
+        assertEquals(20.0, productPrice.getPriceFor(4));
+        assertEquals(15.0, productPrice.getPriceFor(5));
     }
+
+
 }

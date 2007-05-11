@@ -36,12 +36,12 @@
 		</property>
 	</bean>
 
-    <!--bean id="dataSource" class="org.unitils.database.UnitilsDataSource" /-->
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <bean id="dataSource" class="org.unitils.database.UnitilsDataSource" />
+    <!--bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
         <property name="url" value="jdbc:hsqldb:hsql://localhost/eshop"/>
         <property name="username" value="sa"/>
         <property name="password" value=""/>
-    </bean>
+    </bean-->
 
 </beans>
