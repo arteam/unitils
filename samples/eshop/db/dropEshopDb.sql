@@ -10,5 +10,3 @@ drop sequence ESHOP.PRODUCT_ID_SEQ if exists;
 drop sequence ESHOP.PURCHASE_ID_SEQ if exists;
 drop sequence ESHOP.PURCHASE_ITEM_ID_SEQ if exists;
 drop sequence ESHOP.USER_ID_SEQ if exists;
-
-drop schema ESHOP;
