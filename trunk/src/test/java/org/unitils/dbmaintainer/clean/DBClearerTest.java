@@ -25,7 +25,6 @@ import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.core.dbsupport.TestSQLUtils.*;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
@@ -62,13 +61,6 @@ public class DBClearerTest extends UnitilsJUnit3 {
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         dbSupport = getDefaultDbSupport(configuration, dataSource);
-
-        // case insensitive names
-        String itemsToPreserve = "Test_table_Preserve, Test_view_Preserve, Test_sequence_Preserve, Test_trigger_Preserve, ";
-        // case sensitive names
-        itemsToPreserve += dbSupport.quoted("Test_CASE_Table_Preserve") + ", " + dbSupport.quoted("Test_CASE_View_Preserve") + ", " + dbSupport.quoted("Test_CASE_Sequence_Preserve") + ", " + dbSupport.quoted("Test_CASE_Trigger_Preserve");
-        configuration.setProperty(PROPKEY_ITEMSTOPRESERVE, itemsToPreserve);
-        // create clearer instance
         dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
 
         cleanupTestDatabase();
@@ -90,7 +82,7 @@ public class DBClearerTest extends UnitilsJUnit3 {
      * Checks if the tables are correctly dropped.
      */
     public void testClearDatabase_tables() throws Exception {
-        assertFalse(dbSupport.getTableNames().isEmpty());
+        assertEquals(2, dbSupport.getTableNames().size());
         dbClearer.clearSchemas();
         assertTrue(dbSupport.getTableNames().isEmpty());
     }
@@ -100,7 +92,7 @@ public class DBClearerTest extends UnitilsJUnit3 {
      * Checks if the views are correctly dropped
      */
     public void testClearDatabase_views() throws Exception {
-        assertFalse(dbSupport.getViewNames().isEmpty());
+        assertEquals(2, dbSupport.getViewNames().size());
         dbClearer.clearSchemas();
         assertTrue(dbSupport.getViewNames().isEmpty());
     }
@@ -114,7 +106,7 @@ public class DBClearerTest extends UnitilsJUnit3 {
             logger.warn("Current dialect does not support synonyms. Skipping test.");
             return;
         }
-        assertFalse(dbSupport.getSynonymNames().isEmpty());
+        assertEquals(2, dbSupport.getSynonymNames().size());
         dbClearer.clearSchemas();
         assertTrue(dbSupport.getSynonymNames().isEmpty());
     }
@@ -128,7 +120,7 @@ public class DBClearerTest extends UnitilsJUnit3 {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
-        assertFalse(dbSupport.getSequenceNames().isEmpty());
+        assertEquals(2, dbSupport.getSequenceNames().size());
         dbClearer.clearSchemas();
         assertTrue(dbSupport.getSequenceNames().isEmpty());
     }

@@ -338,6 +338,7 @@ public class HibernateModule implements Module, Flushable {
      */
     protected class HibernateTestListener extends TestListener {
 
+        @Override
         public void beforeAll() {
             createSpringHibernateSupport();
         }

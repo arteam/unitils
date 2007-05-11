@@ -21,11 +21,11 @@ import org.hsqldb.Trigger;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.*;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.impl.DefaultDBClearer;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.util.PropertyUtils;
@@ -84,14 +84,6 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
         dbSupportPublic = getDbSupport(configuration, dataSource, "PUBLIC");
         dbSupportSchemaA = getDbSupport(configuration, dataSource, "SCHEMA_A");
         dbSupportSchemaB = getDbSupport(configuration, dataSource, "SCHEMA_B");
-
-        // todo implement
-        // case insensitive names
-        String itemsToPreserve = "Test_table_Preserve, Test_view_Preserve, Test_sequence_Preserve, Test_trigger_Preserve, ";
-        // case sensitive names
-        DbSupport dbSupport = getDefaultDbSupport(configuration, dataSource);
-        itemsToPreserve += dbSupport.quoted("Test_CASE_Table_Preserve") + ", " + dbSupport.quoted("Test_CASE_View_Preserve") + ", " + dbSupport.quoted("Test_CASE_Sequence_Preserve") + ", " + dbSupport.quoted("Test_CASE_Trigger_Preserve");
-        configuration.setProperty(DefaultDBClearer.PROPKEY_ITEMSTOPRESERVE, itemsToPreserve);
         // create clearer instance
         dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
 
@@ -114,9 +106,9 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
      * Checks if the tables are correctly dropped.
      */
     public void testClearDatabase_tables() throws Exception {
-        assertFalse(dbSupportPublic.getTableNames().isEmpty());
-        assertFalse(dbSupportSchemaA.getTableNames().isEmpty());
-        assertFalse(dbSupportSchemaB.getTableNames().isEmpty());
+        assertEquals(1, dbSupportPublic.getTableNames().size());
+        assertEquals(1, dbSupportSchemaA.getTableNames().size());
+        assertEquals(1, dbSupportSchemaB.getTableNames().size());
         dbClearer.clearSchemas();
         assertTrue(dbSupportPublic.getTableNames().isEmpty());
         assertTrue(dbSupportSchemaA.getTableNames().isEmpty());
@@ -128,9 +120,9 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
      * Checks if the views are correctly dropped
      */
     public void testClearDatabase_views() throws Exception {
-        assertFalse(dbSupportPublic.getViewNames().isEmpty());
-        assertFalse(dbSupportSchemaA.getViewNames().isEmpty());
-        assertFalse(dbSupportSchemaB.getViewNames().isEmpty());
+        assertEquals(1, dbSupportPublic.getViewNames().size());
+        assertEquals(1, dbSupportSchemaA.getViewNames().size());
+        assertEquals(1, dbSupportSchemaB.getViewNames().size());
         dbClearer.clearSchemas();
         assertTrue(dbSupportPublic.getViewNames().isEmpty());
         assertTrue(dbSupportSchemaA.getViewNames().isEmpty());
@@ -142,9 +134,9 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
      * Tests if the triggers are correctly dropped
      */
     public void testClearDatabase_sequences() throws Exception {
-        assertFalse(dbSupportPublic.getSequenceNames().isEmpty());
-        assertFalse(dbSupportSchemaA.getSequenceNames().isEmpty());
-        assertFalse(dbSupportSchemaB.getSequenceNames().isEmpty());
+        assertEquals(1, dbSupportPublic.getSequenceNames().size());
+        assertEquals(1, dbSupportSchemaA.getSequenceNames().size());
+        assertEquals(1, dbSupportSchemaB.getSequenceNames().size());
         dbClearer.clearSchemas();
         assertTrue(dbSupportPublic.getSequenceNames().isEmpty());
         assertTrue(dbSupportSchemaA.getSequenceNames().isEmpty());

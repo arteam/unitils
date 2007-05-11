@@ -308,11 +308,13 @@ public class SpringModule implements Module {
     }
 
 
+    //todo javadoc
     public void registerBeanPostProcessorType(Class<? extends BeanPostProcessor> beanPostProcessorType) {
         applicationContextManager.addBeanPostProcessorType(beanPostProcessorType);
     }
 
 
+    //todo javadoc
     public BeanPostProcessor getBeanPostProcessor(Object testObject, Class<? extends BeanPostProcessor> beanPostProcessorType) {
         if (applicationContextManager.hasApplicationContext(testObject)) {
             return applicationContextManager.getBeanPostProcessor(getApplicationContext(testObject), beanPostProcessorType);
