@@ -17,6 +17,7 @@ package org.unitils.dbmaintainer.structure.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
@@ -98,10 +99,15 @@ public class DefaultSequenceUpdater extends BaseDatabaseTask implements Sequence
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
-            if (primaryKeyColumnNames.size() == 1) {
-                String primaryKeyColumnName = primaryKeyColumnNames.iterator().next();
-                logger.debug("Incrementing value for identity column " + primaryKeyColumnName + " in database schema " + dbSupport.getSchemaName());
-                dbSupport.incrementIdentityColumnToValue(tableName, primaryKeyColumnName, lowestAcceptableSequenceValue);
+            for (String primaryKeyColumnName : primaryKeyColumnNames) {
+                try {
+                    dbSupport.incrementIdentityColumnToValue(tableName, primaryKeyColumnName, lowestAcceptableSequenceValue);
+                    logger.debug("Incrementing value for identity column " + primaryKeyColumnName + " in database schema " + dbSupport.getSchemaName());
+
+                } catch (UnitilsException e) {
+                    // primary key is not an identity column
+                    // skip column
+                }
             }
         }
     }
