@@ -18,7 +18,6 @@ package org.unitils.core.dbsupport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import static org.unitils.core.util.SQLUtils.*;
-import org.unitils.core.UnitilsException;
 
 import java.sql.Connection;
 import java.util.Set;
@@ -112,21 +111,16 @@ public class HsqldbDbSupport extends DbSupport {
 
 
     /**
-     * Increments the identity value for the specified primary key on the specified table to the given value. If there
+     * Increments the identity value for the specified identity column on the specified table to the given value. If there
      * is no identity specified on the given primary key, the method silently finishes without effect.
      *
-     * @param tableName            The table with the identity column, not null
-     * @param primaryKeyColumnName The column, not null
-     * @param identityValue        The new value
+     * @param tableName          The table with the identity column, not null
+     * @param identityColumnName The column, not null
+     * @param identityValue      The new value
      */
     @Override
-    public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
-        try {
-            executeUpdate("alter table " + qualified(tableName) + " alter column " + primaryKeyColumnName + " RESTART WITH " + identityValue, getDataSource());
-        } catch (UnitilsException e) {
-            // Exception is ignored. Todo: clean this up, make sure we are sure that we're dealing with an identity
-            // column before invoking this method
-        }
+    public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
+        executeUpdate("alter table " + qualified(tableName) + " alter column " + identityColumnName + " RESTART WITH " + identityValue, getDataSource());
     }
 
 
