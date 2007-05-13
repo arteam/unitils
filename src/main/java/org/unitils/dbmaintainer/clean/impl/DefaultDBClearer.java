@@ -38,6 +38,11 @@ import java.util.Set;
 public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
     /**
+     * The key of the property that specifies of which schemas nothing should be dropped
+     */
+    public static final String PROPKEY_PRESERVE_SCHEMAS = "dbMaintainer.preserve.schemas";
+
+    /**
      * The key of the property that specifies which tables should not be dropped
      */
     public static final String PROPKEY_PRESERVE_TABLES = "dbMaintainer.preserve.tables";
@@ -60,6 +65,11 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBClearer.class);
+
+    /**
+     * Names of schemas that should left untouched.
+     */
+    protected Set<String> schemasToPreserve;
 
     /**
      * Names of tables that should not be dropped.
@@ -89,10 +99,11 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * @param configuration the config, not null
      */
     protected void doInit(Properties configuration) {
-        tablesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration);
-        viewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_VIEWS, configuration);
-        synonymsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SYNONYMS, configuration);
-        sequencesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SEQUENCES, configuration);
+        schemasToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SCHEMAS, configuration, false);
+        tablesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration, true);
+        viewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_VIEWS, configuration, true);
+        synonymsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SYNONYMS, configuration, true);
+        sequencesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SEQUENCES, configuration, true);
     }
 
 
@@ -103,6 +114,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      */
     public void clearSchemas() {
         for (DbSupport dbSupport : dbSupports) {
+            // check whether schema needs to be preserved
+            if (schemasToPreserve.contains(dbSupport.getSchemaName())) {
+                continue;
+            }
             logger.info("Clearing (dropping) database schema " + dbSupport.getSchemaName());
             dropTables(dbSupport);
             dropViews(dbSupport);
@@ -192,19 +207,20 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
     /**
      * Gets the list of items to preserve. The case is correct if necesary. Quoting an identifier
-     * makes it case sensitive. The identifiers will be quailified with the default schema name if no
+     * makes it case sensitive. If requested, the identifiers will be quailified with the default schema name if no
      * schema name is used as prefix.
      *
-     * @param propertyName  The name of the property that defines the items, not null
-     * @param configuration The config, not null
+     * @param propertyName        The name of the property that defines the items, not null
+     * @param configuration       The config, not null
+     * @param prefixDefaultSchema True to prefix item with default schema when needed
      * @return The set of items, not null
      */
-    protected Set<String> getItemsToPreserve(String propertyName, Properties configuration) {
+    protected Set<String> getItemsToPreserve(String propertyName, Properties configuration, boolean prefixDefaultSchema) {
         Set<String> result = new HashSet<String>();
         List<String> itemsToPreserve = getStringList(propertyName, configuration);
         for (String itemToPreserve : itemsToPreserve) {
             String correctCaseitemToPreserve = defaultDbSupport.toCorrectCaseIdentifier(itemToPreserve);
-            if (correctCaseitemToPreserve.indexOf('.') == -1) {
+            if (prefixDefaultSchema && correctCaseitemToPreserve.indexOf('.') == -1) {
                 correctCaseitemToPreserve = defaultDbSupport.getSchemaName() + "." + correctCaseitemToPreserve;
             }
             result.add(correctCaseitemToPreserve);

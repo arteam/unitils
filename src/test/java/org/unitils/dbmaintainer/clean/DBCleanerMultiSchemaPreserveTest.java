@@ -18,13 +18,16 @@ package org.unitils.dbmaintainer.clean;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.TestSQLUtils;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
+import static org.unitils.core.dbsupport.TestSQLUtils.isEmpty;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_ONLY_DATA_TABLES;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -62,17 +65,18 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        this.disabled = !"hsqldb".equals(PropertyUtils.getString(DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT, configuration));
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
         if (disabled) {
             return;
         }
 
         // configure 3 schemas
-        configuration.setProperty(DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
-        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, dataSource);
+        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
+        dbSupport = getDefaultDbSupport(configuration, dataSource);
         // items to preserve
+        configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS, "schema_c");
         configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_TABLES, "test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST"));
-        dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
+        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
 
         dropTestTables();
         createTestTables();
@@ -92,13 +96,15 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
      * Tests if the tables in all schemas are correctly cleaned.
      */
     public void testCleanDatabase() throws Exception {
-        assertFalse(TestSQLUtils.isEmpty("TEST", dataSource));
-        assertFalse(TestSQLUtils.isEmpty("SCHEMA_A.TEST", dataSource));
-        assertFalse(TestSQLUtils.isEmpty("SCHEMA_B.TEST", dataSource));
+        assertFalse(isEmpty("TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_B.TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_C.TEST", dataSource));
         dbCleaner.cleanSchemas();
-        assertFalse(TestSQLUtils.isEmpty("TEST", dataSource));
-        assertFalse(TestSQLUtils.isEmpty("SCHEMA_A.TEST", dataSource));
-        assertTrue(TestSQLUtils.isEmpty("SCHEMA_B.TEST", dataSource));
+        assertFalse(isEmpty("TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
+        assertTrue(isEmpty("SCHEMA_B.TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_C.TEST", dataSource));
     }
 
 
@@ -117,6 +123,10 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
         executeUpdate("create table SCHEMA_B.TEST (dataset varchar(100))", dataSource);
         executeUpdate("insert into SCHEMA_B.TEST values('test')", dataSource);
+        // SCHEMA_C
+        executeUpdate("create schema SCHEMA_C AUTHORIZATION DBA", dataSource);
+        executeUpdate("create table SCHEMA_C.TEST (dataset varchar(100))", dataSource);
+        executeUpdate("insert into SCHEMA_C.TEST values('test')", dataSource);
     }
 
 
@@ -129,6 +139,8 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
         executeUpdateQuietly("drop table SCHEMA_B.TEST", dataSource);
         executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_C.TEST", dataSource);
+        executeUpdateQuietly("drop schema SCHEMA_C", dataSource);
     }
 
 

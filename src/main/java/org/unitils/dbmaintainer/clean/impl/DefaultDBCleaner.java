@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.dbmaintainer.clean.DBCleaner;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SCHEMAS;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
 
@@ -38,6 +39,11 @@ import java.util.Set;
  * @author Filip Neven
  */
 public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
+
+    /**
+     * Property key for schemas that should not be cleaned at all
+     */
+    public static final String PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS = "dbMaintainer.preserveOnlyData.schemas";
 
     /**
      * Property key for the tables that should not be cleaned
@@ -59,6 +65,11 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
     private static Log logger = LogFactory.getLog(DefaultDBCleaner.class);
 
     /**
+     * Names of schemas that should left untouched.
+     */
+    protected Set<String> schemasToPreserve;
+
+    /**
      * The tables that should not be cleaned
      */
     protected Set<String> tablesToPreserve;
@@ -70,9 +81,11 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      * @param configuration The configuration, not null
      */
     protected void doInit(Properties configuration) {
-        tablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME, configuration);
-        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration));
-        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_ONLY_DATA_TABLES, configuration));
+        schemasToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SCHEMAS, configuration, false);
+        schemasToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS, configuration, false));
+        tablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME, configuration, true);
+        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration, true));
+        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_ONLY_DATA_TABLES, configuration, true));
     }
 
 
@@ -82,6 +95,10 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      */
     public void cleanSchemas() {
         for (DbSupport dbSupport : dbSupports) {
+            // check whether schema needs to be preserved
+            if (schemasToPreserve.contains(dbSupport.getSchemaName())) {
+                continue;
+            }
             logger.info("Cleaning database schema " + dbSupport.getSchemaName());
 
             Set<String> tableNames = dbSupport.getTableNames();
@@ -112,19 +129,20 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
 
     /**
      * Gets the list of items to preserve. The case is correct if necesary. Quoting an identifier
-     * makes it case sensitive. The identifiers will be quailified with the default schema name if no
+     * makes it case sensitive. If requested, the identifiers will be quailified with the default schema name if no
      * schema name is used as prefix.
      *
-     * @param propertyName  The name of the property that defines the items, not null
-     * @param configuration The config, not null
+     * @param propertyName        The name of the property that defines the items, not null
+     * @param configuration       The config, not null
+     * @param prefixDefaultSchema True to prefix item with default schema when needed
      * @return The set of items, not null
      */
-    protected Set<String> getItemsToPreserve(String propertyName, Properties configuration) {
+    protected Set<String> getItemsToPreserve(String propertyName, Properties configuration, boolean prefixDefaultSchema) {
         Set<String> result = new HashSet<String>();
         List<String> itemsToPreserve = getStringList(propertyName, configuration);
         for (String itemToPreserve : itemsToPreserve) {
             String correctCaseitemToPreserve = defaultDbSupport.toCorrectCaseIdentifier(itemToPreserve);
-            if (correctCaseitemToPreserve.indexOf('.') == -1) {
+            if (prefixDefaultSchema && correctCaseitemToPreserve.indexOf('.') == -1) {
                 correctCaseitemToPreserve = defaultDbSupport.getSchemaName() + "." + correctCaseitemToPreserve;
             }
             result.add(correctCaseitemToPreserve);
