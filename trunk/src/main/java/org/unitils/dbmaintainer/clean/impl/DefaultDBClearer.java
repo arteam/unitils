@@ -121,7 +121,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
             // check whether table needs to be preserved
-            if (tablesToPreserve.contains(tableName) || tablesToPreserve.contains(dbSupport.getSchemaName() + "." + tableName)) {
+            if (tablesToPreserve.contains(dbSupport.getSchemaName() + "." + tableName)) {
                 continue;
             }
             logger.debug("Dropping table " + tableName + " in database schema " + dbSupport.getSchemaName());
@@ -139,7 +139,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> viewNames = dbSupport.getViewNames();
         for (String viewName : viewNames) {
             // check whether view needs to be preserved
-            if (viewsToPreserve.contains(viewName) || viewsToPreserve.contains(dbSupport.getSchemaName() + "." + viewName)) {
+            if (viewsToPreserve.contains(dbSupport.getSchemaName() + "." + viewName)) {
                 continue;
             }
             logger.debug("Dropping view " + viewName + " in database schema " + dbSupport.getSchemaName());
@@ -160,7 +160,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> synonymNames = dbSupport.getSynonymNames();
         for (String synonymName : synonymNames) {
             // check whether table needs to be preserved
-            if (synonymsToPreserve.contains(synonymName) || synonymsToPreserve.contains(dbSupport.getSchemaName() + "." + synonymName)) {
+            if (synonymsToPreserve.contains(dbSupport.getSchemaName() + "." + synonymName)) {
                 continue;
             }
             logger.debug("Dropping synonym " + synonymName + " in database schema " + dbSupport.getSchemaName());
@@ -181,7 +181,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> sequenceNames = dbSupport.getSequenceNames();
         for (String sequenceName : sequenceNames) {
             // check whether sequence needs to be preserved
-            if (sequencesToPreserve.contains(sequenceName) || sequencesToPreserve.contains(dbSupport.getSchemaName() + "." + sequenceName)) {
+            if (sequencesToPreserve.contains(dbSupport.getSchemaName() + "." + sequenceName)) {
                 continue;
             }
             logger.debug("Dropping sequence " + sequenceName + " in database schema " + dbSupport.getSchemaName());
@@ -192,7 +192,8 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
     /**
      * Gets the list of items to preserve. The case is correct if necesary. Quoting an identifier
-     * makes it case sensitive.
+     * makes it case sensitive. The identifiers will be quailified with the default schema name if no
+     * schema name is used as prefix.
      *
      * @param propertyName  The name of the property that defines the items, not null
      * @param configuration The config, not null
@@ -203,6 +204,9 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         List<String> itemsToPreserve = getStringList(propertyName, configuration);
         for (String itemToPreserve : itemsToPreserve) {
             String correctCaseitemToPreserve = defaultDbSupport.toCorrectCaseIdentifier(itemToPreserve);
+            if (correctCaseitemToPreserve.indexOf('.') == -1) {
+                correctCaseitemToPreserve = defaultDbSupport.getSchemaName() + "." + correctCaseitemToPreserve;
+            }
             result.add(correctCaseitemToPreserve);
         }
         return result;

@@ -20,24 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/resources/unitils.properties" afterPath="$PROJECT_DIR$/src/test/resources/unitils.properties" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaPreserveTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/unitils.properties" afterPath="$PROJECT_DIR$/src/site/resources/unitils.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.ipr" afterPath="$PROJECT_DIR$/Unitils.ipr" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/hibernate/HibernateModule.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaPreserveTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/site/resources/unitils-default.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerPreserveTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaPreserveTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaPreserveTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaPreserveTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaPreserveTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -66,7 +53,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$PostgreSqlDbSupportTest.es" NAME="PostgreSqlDbSupportTest" MODIFIED="1175623605669">
       <FILTER>org.unitils.core.dbsupport.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$org.unitils.es" NAME="org.unitils" MODIFIED="1178907788070" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$org.unitils.es" NAME="org.unitils" MODIFIED="1179074119969" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -186,7 +173,53 @@
     <option name="myCurrentFavoritesList" value="Unitils" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="DBClearerMultiSchemaPreserveTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaPreserveTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="83" column="62" selection-start="3499" selection-end="3499" vertical-scroll-proportion="0.42135367">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DefaultDBCleaner.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="76" column="55" selection-start="3022" selection-end="3022" vertical-scroll-proportion="0.09723546">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DBCleanerMultiSchemaPreserveTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaPreserveTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="13" selection-start="1986" selection-end="1986" vertical-scroll-proportion="0.6158246">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DBCleanerTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="110" column="16" selection-start="3866" selection-end="3866" vertical-scroll-proportion="0.20591038">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DefaultDBClearer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="91" column="86" selection-start="3106" selection-end="3184" vertical-scroll-proportion="0.3403241">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -548,44 +581,6 @@
           <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\core" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src\test\java\org\unitils\core\dbsupport" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="Unitils" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:D:\_tim\unitils\trunk\src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
       </PATH>
       <PATH>
         <PATH_ELEMENT>
@@ -648,7 +643,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure PackagesPane="false" ProjectPane="false" Scope="false" Favorites="false" />
+      <showStructure Favorites="false" PackagesPane="false" Scope="false" ProjectPane="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -712,13 +707,13 @@
   </component>
   <component name="RestoreUpdateTree" />
   <component name="RunManager" selected="JUnit.org.unitils">
-    <tempConfiguration default="false" name="DBCleanerMultiSchemaPreserveTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+    <tempConfiguration default="false" name="DBCleanerTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <pattern value="org.unitils.dbmaintainer.clean.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.clean" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.clean.DBCleanerMultiSchemaPreserveTest" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.clean.DBCleanerTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -734,6 +729,32 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -757,31 +778,15 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <module name="" />
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="" />
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module name="" />
@@ -794,16 +799,6 @@
       <option name="VM_PARAMETERS" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="" />
     </configuration>
     <configuration default="false" name="DuplicateFileSearch" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="util.DuplicateFileSearch" />
@@ -1245,36 +1240,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="105" selection-start="2194" selection-end="2413" vertical-scroll-proportion="0.78952473">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaPreserveTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="112" selection-start="821" selection-end="821" vertical-scroll-proportion="0.083661415">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="146" selection-start="1074" selection-end="1074" vertical-scroll-proportion="0.27550048">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="0" selection-start="0" selection-end="615" vertical-scroll-proportion="0.24308866">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerPreserveTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="36" column="23" selection-start="1383" selection-end="1383" vertical-scroll-proportion="0.27931362">
@@ -1291,9 +1256,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBClearer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="91" column="86" selection-start="3106" selection-end="3184" vertical-scroll-proportion="0.3403241">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="110" column="16" selection-start="3866" selection-end="3866" vertical-scroll-proportion="0.20591038">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBCleanerMultiSchemaPreserveTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="0" selection-start="1432" selection-end="1432" vertical-scroll-proportion="0.38894185">
+        <state line="56" column="13" selection-start="1986" selection-end="1986" vertical-scroll-proportion="0.6158246">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerMultiSchemaPreserveTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="83" column="62" selection-start="3499" selection-end="3499" vertical-scroll-proportion="0.42135367">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/clean/impl/DefaultDBCleaner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="55" selection-start="3022" selection-end="3022" vertical-scroll-proportion="0.09723546">
           <folding />
         </state>
       </provider>
