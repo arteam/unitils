@@ -20,7 +20,8 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.TestSQLUtils;
-import org.unitils.core.util.SQLUtils;
+import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_ONLY_DATA_TABLES;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
@@ -70,7 +71,7 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         configuration.setProperty(DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
         dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, dataSource);
         // items to preserve
-        configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_TABLES, "public.test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST") + ", " + dbSupport.quoted("SCHEMA_B") + ".test");
+        configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_TABLES, "test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST"));
         dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
 
         dropTestTables();
@@ -97,7 +98,7 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         dbCleaner.cleanSchemas();
         assertFalse(TestSQLUtils.isEmpty("TEST", dataSource));
         assertFalse(TestSQLUtils.isEmpty("SCHEMA_A.TEST", dataSource));
-        assertFalse(TestSQLUtils.isEmpty("SCHEMA_B.TEST", dataSource));
+        assertTrue(TestSQLUtils.isEmpty("SCHEMA_B.TEST", dataSource));
     }
 
 
@@ -106,16 +107,16 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
      */
     private void createTestTables() throws SQLException {
         // PUBLIC SCHEMA
-        SQLUtils.executeUpdate("create table TEST (dataset varchar(100))", dataSource);
-        SQLUtils.executeUpdate("insert into TEST values('test')", dataSource);
+        executeUpdate("create table TEST (dataset varchar(100))", dataSource);
+        executeUpdate("insert into TEST values('test')", dataSource);
         // SCHEMA_A
-        SQLUtils.executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
-        SQLUtils.executeUpdate("create table SCHEMA_A.TEST (dataset varchar(100))", dataSource);
-        SQLUtils.executeUpdate("insert into SCHEMA_A.TEST values('test')", dataSource);
+        executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
+        executeUpdate("create table SCHEMA_A.TEST (dataset varchar(100))", dataSource);
+        executeUpdate("insert into SCHEMA_A.TEST values('test')", dataSource);
         // SCHEMA_B
-        SQLUtils.executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
-        SQLUtils.executeUpdate("create table SCHEMA_B.TEST (dataset varchar(100))", dataSource);
-        SQLUtils.executeUpdate("insert into SCHEMA_B.TEST values('test')", dataSource);
+        executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
+        executeUpdate("create table SCHEMA_B.TEST (dataset varchar(100))", dataSource);
+        executeUpdate("insert into SCHEMA_B.TEST values('test')", dataSource);
     }
 
 
@@ -123,11 +124,11 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
      * Removes the test database tables
      */
     private void dropTestTables() {
-        TestSQLUtils.executeUpdateQuietly("drop table TEST", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop table SCHEMA_A.TEST", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop table SCHEMA_B.TEST", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
+        executeUpdateQuietly("drop table TEST", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_A.TEST", dataSource);
+        executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_B.TEST", dataSource);
+        executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
     }
 
 

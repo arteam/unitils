@@ -2,13 +2,12 @@ package org.unitils.dbmaintainer.clean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hsqldb.Trigger;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.TestSQLUtils;
-import org.unitils.core.util.SQLUtils;
+import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
@@ -69,10 +68,10 @@ public class DBClearerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         dbSupportSchemaA = DbSupportFactory.getDbSupport(configuration, dataSource, "SCHEMA_A");
         dbSupportSchemaB = DbSupportFactory.getDbSupport(configuration, dataSource, "SCHEMA_B");
         // configure items to preserve
-        configuration.setProperty(PROPKEY_PRESERVE_TABLES, "public.test_table, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_TABLE") + ", " + dbSupportSchemaB.quoted("SCHEMA_B") + ".test_table");
-        configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "public.test_view, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_VIEW") + ", " + dbSupportSchemaB.quoted("SCHEMA_B") + ".test_view");
-        configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "public.test_sequence, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_SEQUENCE") + ", " + dbSupportSchemaB.quoted("SCHEMA_B") + ".test_sequence");
-        configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "public.test_synonym, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_SYNONYM") + ", " + dbSupportSchemaB.quoted("SCHEMA_B") + ".test_synonym");
+        configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_TABLE"));
+        configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "test_view, " + "schema_a." + dbSupportSchemaA.quoted("TEST_VIEW"));
+        configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupportSchemaA.quoted("SCHEMA_A") + ".test_sequence");
+        configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "test_synonym, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_SYNONYM"));
         // create clearer instance
         dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
 
@@ -101,7 +100,7 @@ public class DBClearerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         dbClearer.clearSchemas();
         assertEquals(1, dbSupportPublic.getTableNames().size());
         assertEquals(1, dbSupportSchemaA.getTableNames().size());
-        assertEquals(1, dbSupportSchemaB.getTableNames().size());
+        assertEquals(0, dbSupportSchemaB.getTableNames().size());
     }
 
 
@@ -115,7 +114,7 @@ public class DBClearerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         dbClearer.clearSchemas();
         assertEquals(1, dbSupportPublic.getViewNames().size());
         assertEquals(1, dbSupportSchemaA.getViewNames().size());
-        assertEquals(1, dbSupportSchemaB.getViewNames().size());
+        assertEquals(0, dbSupportSchemaB.getViewNames().size());
     }
 
 
@@ -129,7 +128,7 @@ public class DBClearerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         dbClearer.clearSchemas();
         assertEquals(1, dbSupportPublic.getSequenceNames().size());
         assertEquals(1, dbSupportSchemaA.getSequenceNames().size());
-        assertEquals(1, dbSupportSchemaB.getSequenceNames().size());
+        assertEquals(0, dbSupportSchemaB.getSequenceNames().size());
     }
 
 
@@ -138,20 +137,20 @@ public class DBClearerMultiSchemaPreserveTest extends UnitilsJUnit3 {
      */
     private void createTestDatabase() throws Exception {
         // create schemas
-        SQLUtils.executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
-        SQLUtils.executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
+        executeUpdate("create schema SCHEMA_A AUTHORIZATION DBA", dataSource);
+        executeUpdate("create schema SCHEMA_B AUTHORIZATION DBA", dataSource);
         // create tables
-        SQLUtils.executeUpdate("create table TEST_TABLE (col1 varchar(100))", dataSource);
-        SQLUtils.executeUpdate("create table SCHEMA_A.TEST_TABLE (col1 varchar(100))", dataSource);
-        SQLUtils.executeUpdate("create table SCHEMA_B.TEST_TABLE (col1 varchar(100))", dataSource);
+        executeUpdate("create table TEST_TABLE (col1 varchar(100))", dataSource);
+        executeUpdate("create table SCHEMA_A.TEST_TABLE (col1 varchar(100))", dataSource);
+        executeUpdate("create table SCHEMA_B.TEST_TABLE (col1 varchar(100))", dataSource);
         // create views
-        SQLUtils.executeUpdate("create view TEST_VIEW as select col1 from TEST_TABLE", dataSource);
-        SQLUtils.executeUpdate("create view SCHEMA_A.TEST_VIEW as select col1 from SCHEMA_A.TEST_TABLE", dataSource);
-        SQLUtils.executeUpdate("create view SCHEMA_B.TEST_VIEW as select col1 from SCHEMA_B.TEST_TABLE", dataSource);
+        executeUpdate("create view TEST_VIEW as select col1 from TEST_TABLE", dataSource);
+        executeUpdate("create view SCHEMA_A.TEST_VIEW as select col1 from SCHEMA_A.TEST_TABLE", dataSource);
+        executeUpdate("create view SCHEMA_B.TEST_VIEW as select col1 from SCHEMA_B.TEST_TABLE", dataSource);
         // create sequences
-        SQLUtils.executeUpdate("create sequence TEST_SEQUENCE", dataSource);
-        SQLUtils.executeUpdate("create sequence SCHEMA_A.TEST_SEQUENCE", dataSource);
-        SQLUtils.executeUpdate("create sequence SCHEMA_B.TEST_SEQUENCE", dataSource);
+        executeUpdate("create sequence TEST_SEQUENCE", dataSource);
+        executeUpdate("create sequence SCHEMA_A.TEST_SEQUENCE", dataSource);
+        executeUpdate("create sequence SCHEMA_B.TEST_SEQUENCE", dataSource);
     }
 
 
@@ -160,33 +159,20 @@ public class DBClearerMultiSchemaPreserveTest extends UnitilsJUnit3 {
      */
     private void dropTestDatabase() throws Exception {
         // drop sequences
-        TestSQLUtils.executeUpdateQuietly("drop sequence TEST_SEQUENCE", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop sequence SCHEMA_A.TEST_SEQUENCE", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop sequence SCHEMA_B.TEST_SEQUENCE", dataSource);
+        executeUpdateQuietly("drop sequence TEST_SEQUENCE", dataSource);
+        executeUpdateQuietly("drop sequence SCHEMA_A.TEST_SEQUENCE", dataSource);
+        executeUpdateQuietly("drop sequence SCHEMA_B.TEST_SEQUENCE", dataSource);
         // drop views
-        TestSQLUtils.executeUpdateQuietly("drop view TEST_VIEW", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop view SCHEMA_A.TEST_VIEW", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop view SCHEMA_B.TEST_VIEW", dataSource);
+        executeUpdateQuietly("drop view TEST_VIEW", dataSource);
+        executeUpdateQuietly("drop view SCHEMA_A.TEST_VIEW", dataSource);
+        executeUpdateQuietly("drop view SCHEMA_B.TEST_VIEW", dataSource);
         // drop tables
-        TestSQLUtils.executeUpdateQuietly("drop table TEST_TABLE", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop table SCHEMA_A.TEST_TABLE", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop table SCHEMA_B.TEST_TABLE", dataSource);
+        executeUpdateQuietly("drop table TEST_TABLE", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_A.TEST_TABLE", dataSource);
+        executeUpdateQuietly("drop table SCHEMA_B.TEST_TABLE", dataSource);
         // drop schemas
-        TestSQLUtils.executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
-        TestSQLUtils.executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
-    }
-
-
-    /**
-     * Test trigger for hypersonic.
-     *
-     * @author Filip Neven
-     * @author Tim Ducheyne
-     */
-    public static class TestTrigger implements Trigger {
-
-        public void fire(int i, String string, String string1, Object[] objects, Object[] objects1) {
-        }
+        executeUpdateQuietly("drop schema SCHEMA_A", dataSource);
+        executeUpdateQuietly("drop schema SCHEMA_B", dataSource);
     }
 
 }

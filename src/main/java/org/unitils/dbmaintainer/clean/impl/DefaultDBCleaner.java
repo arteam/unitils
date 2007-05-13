@@ -21,10 +21,12 @@ import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
-import org.unitils.util.PropertyUtils;
 import static org.unitils.util.PropertyUtils.getStringList;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
@@ -68,10 +70,9 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      * @param configuration The configuration, not null
      */
     protected void doInit(Properties configuration) {
-        tablesToPreserve = new HashSet<String>();
-        tablesToPreserve.add(defaultDbSupport.toCorrectCaseIdentifier(PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration)));
-        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_PRESERVE_TABLES, configuration), defaultDbSupport));
-        tablesToPreserve.addAll(toCorrectCaseIdentifiers(getStringList(PROPKEY_PRESERVE_ONLY_DATA_TABLES, configuration), defaultDbSupport));
+        tablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME, configuration);
+        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration));
+        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_ONLY_DATA_TABLES, configuration));
     }
 
 
@@ -110,18 +111,23 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
 
 
     /**
-     * Converts the given list of identifiers to uppercase/lowercase depending on what the default
-     * for the database is. If a value is surrounded with double quotes (") it will not be converted and
-     * the double quotes will be stripped. These values are treated as case sensitive names.
+     * Gets the list of items to preserve. The case is correct if necesary. Quoting an identifier
+     * makes it case sensitive. The identifiers will be quailified with the default schema name if no
+     * schema name is used as prefix.
      *
-     * @param identifiers The identifiers, not null
-     * @param dbSupport   The database support, not null
-     * @return The names converted to correct case if needed, not null
+     * @param propertyName  The name of the property that defines the items, not null
+     * @param configuration The config, not null
+     * @return The set of items, not null
      */
-    protected List<String> toCorrectCaseIdentifiers(List<String> identifiers, DbSupport dbSupport) {
-        List<String> result = new ArrayList<String>();
-        for (String identifier : identifiers) {
-            result.add(dbSupport.toCorrectCaseIdentifier(identifier));
+    protected Set<String> getItemsToPreserve(String propertyName, Properties configuration) {
+        Set<String> result = new HashSet<String>();
+        List<String> itemsToPreserve = getStringList(propertyName, configuration);
+        for (String itemToPreserve : itemsToPreserve) {
+            String correctCaseitemToPreserve = defaultDbSupport.toCorrectCaseIdentifier(itemToPreserve);
+            if (correctCaseitemToPreserve.indexOf('.') == -1) {
+                correctCaseitemToPreserve = defaultDbSupport.getSchemaName() + "." + correctCaseitemToPreserve;
+            }
+            result.add(correctCaseitemToPreserve);
         }
         return result;
     }
