@@ -26,10 +26,12 @@ import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
 import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
@@ -41,6 +43,8 @@ import java.util.Properties;
 
 /**
  * Test class for the {@link XsdDataSetStructureGenerator} using multiple schemas.
+ * <p/>
+ * Currently this is only implemented for HsqlDb.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -132,9 +136,11 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
         if (disabled) {
             return;
         }
+
         xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XsdDataSetStructureGeneratorMultiSchemaTest");
         if (xsdDirectory.exists()) {
             deleteDirectory(xsdDirectory);
@@ -156,6 +162,9 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
      */
     protected void tearDown() throws Exception {
         super.tearDown();
+        if (disabled) {
+            return;
+        }
         dropTestTables();
         try {
             deleteDirectory(xsdDirectory);

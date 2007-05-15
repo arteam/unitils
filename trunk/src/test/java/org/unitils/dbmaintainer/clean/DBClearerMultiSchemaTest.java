@@ -98,6 +98,9 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
+        if (disabled) {
+            return;
+        }
         dropTestDatabase();
     }
 
@@ -106,6 +109,10 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
      * Checks if the tables are correctly dropped.
      */
     public void testClearDatabase_tables() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         assertEquals(1, dbSupportPublic.getTableNames().size());
         assertEquals(1, dbSupportSchemaA.getTableNames().size());
         assertEquals(1, dbSupportSchemaB.getTableNames().size());
@@ -120,6 +127,10 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
      * Checks if the views are correctly dropped
      */
     public void testClearDatabase_views() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         assertEquals(1, dbSupportPublic.getViewNames().size());
         assertEquals(1, dbSupportSchemaA.getViewNames().size());
         assertEquals(1, dbSupportSchemaB.getViewNames().size());
@@ -134,6 +145,10 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
      * Tests if the triggers are correctly dropped
      */
     public void testClearDatabase_sequences() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         assertEquals(1, dbSupportPublic.getSequenceNames().size());
         assertEquals(1, dbSupportSchemaA.getSequenceNames().size());
         assertEquals(1, dbSupportSchemaB.getSequenceNames().size());

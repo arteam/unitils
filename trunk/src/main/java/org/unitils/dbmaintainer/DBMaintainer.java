@@ -131,9 +131,12 @@ public class DBMaintainer {
     /* Indicates if database code should be cleared before installing a new version of the code  */
     protected boolean clearDbCodeEnabled;
 
+    /* Indicates if foreign key and not null constraints should removed after updating the database structure */
+    protected boolean disableConstraintsEnabled;
+
     /* Indicates whether a from scratch update should be performed when the previous update failed, but
-      none of the scripts were modified since that last update. If true a new update will be tried only when
-      changes were made to the script files */
+       none of the scripts were modified since that last update. If true a new update will be tried only when
+       changes were made to the script files */
     protected boolean keepRetryingAfterError;
 
 
@@ -170,10 +173,8 @@ public class DBMaintainer {
         clearDbCodeEnabled = PropertyUtils.getBoolean(PROPKEY_CLEAR_DB_CODE_ENABLED, configuration);
         dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource);
 
-        boolean disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLE_CONSTRAINTS_ENABLED, configuration);
-        if (disableConstraints) {
-            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
-        }
+        disableConstraintsEnabled = PropertyUtils.getBoolean(PROPKEY_DISABLE_CONSTRAINTS_ENABLED, configuration);
+        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
 
         boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATE_SEQUENCES_ENABLED, configuration);
         if (updateSequences) {
@@ -201,6 +202,8 @@ public class DBMaintainer {
         List<VersionScriptPair> versionScriptPairs;
         boolean updateDatabaseFromScratch = updateDatabaseFromScratch(currentVersion);
         if (updateDatabaseFromScratch) {
+            // constraints are removed before clearing the database, to be sure there will be no conflicts when dropping tables
+            constraintsDisabler.disableConstraints();
             dbClearer.clearSchemas();
             dbCodeClearer.clearSchemasCode();
             versionScriptPairs = scriptSource.getAllScripts();
@@ -222,7 +225,7 @@ public class DBMaintainer {
             executeScripts(versionScriptPairs);
 
             // Disable FK and not null constraints, if enabled
-            if (constraintsDisabler != null) {
+            if (disableConstraintsEnabled) {
                 constraintsDisabler.disableConstraints();
             }
             // Update sequences to a sufficiently high value, if enabled

@@ -40,7 +40,7 @@ public class TestSQLUtils {
                 String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
                 dbSupport.dropTable(correctCaseTableName);
             } catch (UnitilsException e) {
-                // Ignored
+                // Ignored                
             }
         }
     }
@@ -156,12 +156,13 @@ public class TestSQLUtils {
     /**
      * Utility method to check whether the given table is empty.
      *
-     * @param tableName  The table, not null
-     * @param dataSource The data source, not null
+     * @param tableName The table, not null
+     * @param dbSupport The db support, not null
      * @return True if empty
      */
-    public static boolean isEmpty(String tableName, DataSource dataSource) throws SQLException {
-        return getItemsAsStringSet("select * from " + tableName, dataSource).isEmpty();
+    public static boolean isEmpty(String tableName, DbSupport dbSupport) throws SQLException {
+        String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
+        return getItemsAsStringSet("select * from " + tableName, dbSupport.getDataSource()).isEmpty();
     }
 
 }

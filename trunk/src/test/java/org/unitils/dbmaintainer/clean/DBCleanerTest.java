@@ -87,11 +87,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables that are not configured as tables to preserve are correctly cleaned
      */
     public void testCleanDatabase() throws Exception {
-        assertFalse(isEmpty("TEST_TABLE", dataSource));
-        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table"), dataSource));
+        assertFalse(isEmpty("TEST_TABLE", dbSupport));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table"), dbSupport));
         dbCleaner.cleanSchemas();
-        assertTrue(isEmpty("TEST_TABLE", dataSource));
-        assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table"), dataSource));
+        assertTrue(isEmpty("TEST_TABLE", dbSupport));
+        assertTrue(isEmpty(dbSupport.quoted("Test_CASE_Table"), dbSupport));
     }
 
 
@@ -99,9 +99,9 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables that are configured as tables to preserve are left untouched
      */
     public void testCleanDatabase_preserveDbVersionTable() throws Exception {
-        assertFalse(isEmpty(versionTableName, dataSource));
+        assertFalse(isEmpty(versionTableName, dbSupport));
         dbCleaner.cleanSchemas();
-        assertFalse(isEmpty(versionTableName, dataSource));
+        assertFalse(isEmpty(versionTableName, dbSupport));
     }
 
 
@@ -109,11 +109,11 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Tests if the tables to preserve are left untouched
      */
     public void testCleanDatabase_preserveTablesToPreserve() throws Exception {
-        assertFalse(isEmpty("TEST_TABLE_PRESERVE", dataSource));
-        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve"), dataSource));
+        assertFalse(isEmpty("TEST_TABLE_PRESERVE", dbSupport));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve"), dbSupport));
         dbCleaner.cleanSchemas();
-        assertFalse(isEmpty("TEST_TABLE_PRESERVE", dataSource));
-        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve"), dataSource));
+        assertFalse(isEmpty("TEST_TABLE_PRESERVE", dbSupport));
+        assertFalse(isEmpty(dbSupport.quoted("Test_CASE_Table_Preserve"), dbSupport));
     }
 
 

@@ -20,7 +20,6 @@ import org.unitils.core.util.StoredIdentifierCase;
 import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
 import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
 
-import java.sql.Connection;
 import java.util.Set;
 
 /**
@@ -60,6 +59,42 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
+     * Gets the names of all columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the columns of the table with the given name
+     */
+    @Override
+    public Set<String> getColumnNames(String tableName) {
+        return getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'", getDataSource());
+    }
+
+
+    /**
+     * Gets the names of all primary columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the primary key columns of the table with the given name
+     */
+    @Override
+    public Set<String> getPrimaryKeyColumnNames(String tableName) {
+        return getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + getSchemaName() + "'", getDataSource());
+    }
+
+
+    /**
+     * Returns the names of all columns that have a 'not-null' constraint on them
+     *
+     * @param tableName The table, not null
+     * @return The set of column names, not null
+     */
+    @Override
+    public Set<String> getNotNullColummnNames(String tableName) {
+        return getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'", getDataSource());
+    }
+
+
+    /**
      * Retrieves the names of all the views in the database schema.
      *
      * @return The names of all views in the database
@@ -82,8 +117,7 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
-     * Increments the identity value for the specified primary key on the specified table to the given value. If there
-     * is no identity specified on the given primary key, the method silently finishes without effect.
+     * Increments the identity value for the specified primary key on the specified table to the given value.
      *
      * @param tableName            The table with the identity column, not null
      * @param primaryKeyColumnName The column, not null
@@ -96,13 +130,26 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
-     * Disables foreign key checking on all subsequent operations that are performed on the given connection object
+     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
      *
-     * @param connection The database connection, not null
+     * @param tableName The table, not null
+     * @return The set of constraint names, not null
      */
     @Override
-    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
-        executeUpdate("SET FOREIGN_KEY_CHECKS = 0", getDataSource());
+    public Set<String> getForeignKeyConstraintNames(String tableName) {
+        return getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'", getDataSource());
+    }
+
+
+    /**
+     * Disables the constraint with the given name on table with the given name.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
+    @Override
+    public void removeForeignKeyConstraint(String tableName, String constraintName) {
+        executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + constraintName, getDataSource());
     }
 
 
@@ -181,5 +228,6 @@ public class MySqlDbSupport extends DbSupport {
     public boolean supportsIdentityColumns() {
         return true;
     }
+
 
 }

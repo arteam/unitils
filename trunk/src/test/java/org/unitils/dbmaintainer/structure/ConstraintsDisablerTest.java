@@ -20,14 +20,12 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.core.dbsupport.TestSQLUtils.dropTestTables;
+import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -82,16 +80,15 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      * Tests whether foreign key constraints are correctly disabled
      */
     public void testDisableConstraints_foreignKey() throws Exception {
-        Connection connection = null;
         try {
-            connection = dataSource.getConnection();
-            constraintsDisabler.disableConstraints();
-            constraintsDisabler.disableConstraintsOnConnection(connection);
-            // Should not throw exception anymore
             executeUpdate("insert into table2 (col1) values ('test')", dataSource);
-        } finally {
-            closeQuietly(connection);
+            fail("UnitilsException should have been thrown");
+        } catch (UnitilsException e) {
+            // Expected foreign key violation
         }
+        constraintsDisabler.disableConstraints();
+        // Should not throw exception anymore
+        executeUpdate("insert into table2 (col1) values ('test')", dataSource);
     }
 
 
@@ -101,21 +98,13 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     public void testDisableConstraints_notNull() throws Exception {
         try {
             executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);
-            fail("SQLException should have been thrown");
+            fail("UnitilsException should have been thrown");
         } catch (UnitilsException e) {
-            // Foreign key violation, should throw SQLException
+            // Expected not null violation
         }
-
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-            constraintsDisabler.disableConstraints();
-            constraintsDisabler.disableConstraintsOnConnection(connection);
-            // Should not throw exception anymore
-            executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);
-        } finally {
-            closeQuietly(connection);
-        }
+        constraintsDisabler.disableConstraints();
+        // Should not throw exception anymore
+        executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);
     }
 
 
@@ -132,7 +121,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      * Drops the test tables
      */
     protected void cleanupTestDatabase() throws SQLException {
-        dropTestTables(dbSupport, "table2", "table1");
+        executeUpdateQuietly("drop table table2", dataSource);
+        executeUpdateQuietly("drop table table1", dataSource);
     }
 
 }

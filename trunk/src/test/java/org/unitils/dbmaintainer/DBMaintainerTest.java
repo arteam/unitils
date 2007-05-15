@@ -99,6 +99,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         dbMaintainer = new DBMaintainer();
         dbMaintainer.fromScratchEnabled = true;
         dbMaintainer.keepRetryingAfterError = true;
+        dbMaintainer.disableConstraintsEnabled = true;
 
         versionScriptPairs = new ArrayList<VersionScriptPair>();
         version0 = new Version(0L, 0L);
@@ -146,6 +147,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
+        mockConstraintsDisabler.disableConstraints();
         mockDbClearer.clearSchemas();
         mockDbCodeClearer.clearSchemasCode();
         expect(mockScriptSource.getAllScripts()).andReturn(versionScriptPairs);

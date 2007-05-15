@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer.clean;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
@@ -43,6 +45,9 @@ import java.util.Properties;
  * @author Filip Neven
  */
 public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DBCleanerMultiSchemaPreserveTest.class);
 
     /* DataSource for the test database, is injected */
     @TestDataSource
@@ -88,6 +93,9 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
      */
     protected void tearDown() throws Exception {
         super.tearDown();
+        if (disabled) {
+            return;
+        }
         dropTestTables();
     }
 
@@ -96,15 +104,19 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
      * Tests if the tables in all schemas are correctly cleaned.
      */
     public void testCleanDatabase() throws Exception {
-        assertFalse(isEmpty("TEST", dataSource));
-        assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
-        assertFalse(isEmpty("SCHEMA_B.TEST", dataSource));
-        assertFalse(isEmpty("SCHEMA_C.TEST", dataSource));
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        assertFalse(isEmpty("TEST", dbSupport));
+        assertFalse(isEmpty("SCHEMA_A.TEST", dbSupport));
+        assertFalse(isEmpty("SCHEMA_B.TEST", dbSupport));
+        assertFalse(isEmpty("SCHEMA_C.TEST", dbSupport));
         dbCleaner.cleanSchemas();
-        assertFalse(isEmpty("TEST", dataSource));
-        assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
-        assertTrue(isEmpty("SCHEMA_B.TEST", dataSource));
-        assertFalse(isEmpty("SCHEMA_C.TEST", dataSource));
+        assertFalse(isEmpty("TEST", dbSupport));
+        assertFalse(isEmpty("SCHEMA_A.TEST", dbSupport));
+        assertTrue(isEmpty("SCHEMA_B.TEST", dbSupport));
+        assertFalse(isEmpty("SCHEMA_C.TEST", dbSupport));
     }
 
 

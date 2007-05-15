@@ -25,12 +25,11 @@ import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEM
 import org.unitils.core.util.SQLUtils;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
-import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.Properties;
 import java.util.Set;
 
@@ -112,7 +111,46 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             return;
         }
         Set<String> result = dbSupport.getTableNames();
-        assertLenEquals(Arrays.asList(dbSupport.toCorrectCaseIdentifier("test_table"), "Test_CASE_Table"), result);
+        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_table"), "Test_CASE_Table"), result);
+    }
+
+
+    /**
+     * Tests getting the column names.
+     */
+    public void testGetColumnNames() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        Set<String> result = dbSupport.getColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
+        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1"), dbSupport.toCorrectCaseIdentifier("col2")), result);
+    }
+
+
+    /**
+     * Tests getting the primary column names.
+     */
+    public void testGetPrimaryKeyColumnNames() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        Set<String> result = dbSupport.getPrimaryKeyColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
+        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1")), result);
+    }
+
+
+    /**
+     * Tests getting the not null column names.
+     */
+    public void testGetNotNullColummnNames() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        Set<String> result = dbSupport.getNotNullColummnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
+        assertLenEquals(Arrays.asList(dbSupport.toCorrectCaseIdentifier("col1"), dbSupport.toCorrectCaseIdentifier("col2")), result);
     }
 
 
@@ -139,7 +177,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             return;
         }
         Set<String> result = dbSupport.getViewNames();
-        assertLenEquals(Arrays.asList(dbSupport.toCorrectCaseIdentifier("test_view"), "Test_CASE_View"), result);
+        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_view"), "Test_CASE_View"), result);
     }
 
 
@@ -166,7 +204,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             return;
         }
         Set<String> result = dbSupport.getSynonymNames();
-        assertLenEquals(Arrays.asList(dbSupport.toCorrectCaseIdentifier("TEST_SYNONYM"), "Test_CASE_Synonym"), result);
+        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("TEST_SYNONYM"), "Test_CASE_Synonym"), result);
     }
 
 
@@ -193,7 +231,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             return;
         }
         Set<String> result = dbSupport.getSequenceNames();
-        assertLenEquals(Arrays.asList(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), "Test_CASE_Sequence"), result);
+        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), "Test_CASE_Sequence"), result);
     }
 
 
@@ -220,7 +258,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             return;
         }
         Set<String> result = dbSupport.getTriggerNames();
-        assertLenEquals(Arrays.asList(dbSupport.toCorrectCaseIdentifier("test_trigger"), "Test_CASE_Trigger"), result);
+        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_trigger"), "Test_CASE_Trigger"), result);
     }
 
 
@@ -247,7 +285,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             return;
         }
         Set<String> result = dbSupport.getTypeNames();
-        assertLenEquals(Arrays.asList(dbSupport.toCorrectCaseIdentifier("TEST_TYPE"), "Test_CASE_Type"), result);
+        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("TEST_TYPE"), "Test_CASE_Type"), result);
     }
 
 
@@ -286,11 +324,11 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests disabling not null constraints on the test table.
      */
     public void testRemoveNotNullConstraint() throws Exception {
-        if (disabled || !dbSupport.supportsRemoveNotNullConstraint()) {
+        if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "col2");
+        dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), dbSupport.toCorrectCaseIdentifier("col2"));
 
         // should succeed now
         SQLUtils.executeUpdate("insert into test_table (col1, col2) values (1, null)", dataSource);
@@ -301,7 +339,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests disabling not null constraints on the test table but with an unexisting column
      */
     public void testRemoveNotNullConstraint_columnNotFound() throws Exception {
-        if (disabled || !dbSupport.supportsRemoveNotNullConstraint()) {
+        if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -384,19 +422,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
 
 
     /**
-     * Tests getting all not null constraints for the test table.
-     */
-    public void testGetTableConstraintNames_notNull() throws Exception {
-        if (disabled || !dbSupport.supportsGetTableConstraintNames()) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        Set<String> result = dbSupport.getTableConstraintNames("TEST_TABLE");
-        assertEquals(2, result.size());
-    }
-
-
-    /**
      * Tests getting all foreign key constraints for the test table.
      */
     public void testGetTableConstraintNames_foreignKey() throws Exception {
@@ -404,7 +429,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        Set<String> result = dbSupport.getTableConstraintNames("Test_CASE_Table");
+        Set<String> result = dbSupport.getForeignKeyConstraintNames("Test_CASE_Table");
         assertEquals(1, result.size());
     }
 
@@ -417,11 +442,11 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        Set<String> constraintNames = dbSupport.getTableConstraintNames("TEST_TABLE");
+        Set<String> constraintNames = dbSupport.getForeignKeyConstraintNames("TEST_TABLE");
         for (String constraintName : constraintNames) {
-            dbSupport.disableConstraint("TEST_TABLE", constraintName);
+            dbSupport.removeForeignKeyConstraint("TEST_TABLE", constraintName);
         }
-        Set<String> result = dbSupport.getTableConstraintNames("TEST_TABLE");
+        Set<String> result = dbSupport.getForeignKeyConstraintNames("TEST_TABLE");
         assertTrue(result.isEmpty());
     }
 
@@ -434,11 +459,11 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        Set<String> constraintNames = dbSupport.getTableConstraintNames("Test_CASE_Table");
+        Set<String> constraintNames = dbSupport.getForeignKeyConstraintNames("Test_CASE_Table");
         for (String constraintName : constraintNames) {
-            dbSupport.disableConstraint("Test_CASE_Table", constraintName);
+            dbSupport.removeForeignKeyConstraint("Test_CASE_Table", constraintName);
         }
-        Set<String> result = dbSupport.getTableConstraintNames("Test_CASE_Table");
+        Set<String> result = dbSupport.getForeignKeyConstraintNames("Test_CASE_Table");
         assertTrue(result.isEmpty());
     }
 
@@ -447,7 +472,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests disabling not null constraints on the test table but with an unexisting table name.
      */
     public void testRemoveNotNullConstraint_tableNotFound() throws Exception {
-        if (disabled || !dbSupport.supportsRemoveNotNullConstraint()) {
+        if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -457,28 +482,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         } catch (UnitilsException e) {
             // expected
         }
-    }
-
-
-    /**
-     * Tests disabling a foreign key constraint on the connection.
-     */
-    public void testDisableForeignKeyConstraintsCheckingOnConnection() throws Exception {
-        if (disabled || !dbSupport.supportsDisableForeignKeyConstraintsCheckingOnConnection()) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-            dbSupport.disableForeignKeyConstraintsCheckingOnConnection(connection);
-
-        } finally {
-            DbUtils.closeQuietly(connection, null, null);
-        }
-
-        // should succeed now
-        SQLUtils.executeUpdate("insert into `Test_CASE_Table` (col1) values (999)", dataSource);
     }
 
 

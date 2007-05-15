@@ -51,6 +51,23 @@ public class Db2DbSupport extends DbSupport {
     }
 
 
+    public Set<String> getColumnNames(String tableName) {
+        // todo implement
+        return null;
+    }
+
+
+    public Set<String> getPrimaryKeyColumnNames(String tableName) {
+        // todo implement
+        return null;
+    }
+
+
+    public Set<String> getNotNullColummnNames(String tableName) {
+        // todo implement
+        return null;
+    }
+
     /**
      * Retrieves the names of all the views in the database schema.
      *
@@ -112,13 +129,13 @@ public class Db2DbSupport extends DbSupport {
 
     /**
      * todo add schemaname to query
-     * Returns the foreign key and not null constraint names that are enabled/enforced for the table with the given name
+     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
      *
      * @param tableName The table, not null
      * @return The set of constraint names, not null
      */
     @Override
-    public Set<String> getTableConstraintNames(String tableName) {
+    public Set<String> getForeignKeyConstraintNames(String tableName) {
         return getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TABNAME = '" + tableName + "' and ENFORCED = 'Y'", getDataSource());
     }
 
@@ -130,7 +147,7 @@ public class Db2DbSupport extends DbSupport {
      * @param constraintName The constraint, not null
      */
     @Override
-    public void disableConstraint(String tableName, String constraintName) {
+    public void removeForeignKeyConstraint(String tableName, String constraintName) {
         executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName, getDataSource());
     }
 

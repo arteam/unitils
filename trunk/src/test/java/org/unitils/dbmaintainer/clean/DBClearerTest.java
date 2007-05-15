@@ -214,11 +214,13 @@ public class DBClearerTest extends UnitilsJUnit3 {
 
     /**
      * Creates all test database structures (view, tables...)
+     * <p/>
+     * NO FOREIGN KEY USED: drop cascade does not work in MySQL
      */
     private void createTestDatabaseMySql() throws Exception {
         // create tables
         executeUpdate("create table test_table (col1 int not null primary key AUTO_INCREMENT, col2 varchar(12) not null)", dataSource);
-        executeUpdate("create table `Test_CASE_Table` (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table `Test_CASE_Table` (col1 int)", dataSource);
         // create views
         executeUpdate("create view test_view as select col1 from test_table", dataSource);
         executeUpdate("create view `Test_CASE_View` as select col1 from `Test_CASE_Table`", dataSource);
