@@ -23,8 +23,9 @@ import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQui
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.HashSet;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
 
@@ -155,6 +156,33 @@ abstract public class DbSupport {
      * @return The names of all tables in the database
      */
     public abstract Set<String> getTableNames();
+
+
+    /**
+     * Gets the names of all columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the columns of the table with the given name
+     */
+    public abstract Set<String> getColumnNames(String tableName);
+
+
+    /**
+     * Gets the names of all primary columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the primary key columns of the table with the given name
+     */
+    public abstract Set<String> getPrimaryKeyColumnNames(String tableName);
+
+
+    /**
+     * Returns the names of all columns that have a 'not-null' constraint on them
+     *
+     * @param tableName The table, not null
+     * @return The set of column names, not null
+     */
+    public abstract Set<String> getNotNullColummnNames(String tableName);
 
 
     /**
@@ -293,60 +321,6 @@ abstract public class DbSupport {
 
 
     /**
-     * Gets the names of all primary columns of the given table.
-     *
-     * @param tableName The table, not null
-     * @return The names of the primary key columns of the table with the given name
-     */
-    public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rset = null;
-        try {
-            conn = dataSource.getConnection();
-            DatabaseMetaData metaData = conn.getMetaData();
-            rset = metaData.getPrimaryKeys(null, schemaName, tableName);
-            Set<String> primaryKeyColumnNames = new HashSet<String>();
-            while (rset.next()) {
-                primaryKeyColumnNames.add(rset.getString("COLUMN_NAME"));
-            }
-            return primaryKeyColumnNames;
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while looking up primary key column names", e);
-        } finally {
-            closeQuietly(conn, st, rset);
-        }
-    }
-
-
-    /**
-     * Gets the names of all columns of the given table.
-     *
-     * @param tableName The table, not null
-     * @return The names of the columns of the table with the given name
-     */
-    public Set<String> getColumnNames(String tableName) {
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rset = null;
-        try {
-            conn = dataSource.getConnection();
-            DatabaseMetaData metaData = conn.getMetaData();
-            rset = metaData.getColumns(null, schemaName, tableName, null);
-            Set<String> columnNames = new HashSet<String>();
-            while (rset.next()) {
-                columnNames.add(rset.getString("COLUMN_NAME"));
-            }
-            return columnNames;
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while looking up column names", e);
-        } finally {
-            closeQuietly(conn, st, rset);
-        }
-    }
-
-
-    /**
      * Increments the identity value for the specified identity column on the specified table to the given value. If there
      * is no identity specified on the given primary key, the method silently finishes without effect.
      *
@@ -356,16 +330,6 @@ abstract public class DbSupport {
      */
     public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
         throw new UnsupportedOperationException("Identity columns not supported for " + getDatabaseDialect());
-    }
-
-
-    /**
-     * Disables foreign key checking on all subsequent operations that are performed on the given connection object
-     *
-     * @param connection The database connection, not null
-     */
-    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
-        throw new UnsupportedOperationException("Disabling foreign key contstraints on connection not supported for " + getDatabaseDialect());
     }
 
 
@@ -381,45 +345,12 @@ abstract public class DbSupport {
 
 
     /**
-     * Returns the names of all columns that have a 'not-null' constraint on them
-     *
-     * @param tableName The table, not null
-     * @return The set of column names, not null
-     */
-    public Set<String> getNotNullColummnNames(String tableName) {
-        Connection conn = null;
-        ResultSet rs = null;
-        try {
-            conn = dataSource.getConnection();
-            DatabaseMetaData metaData = conn.getMetaData();
-            rs = metaData.getColumns(null, schemaName, tableName, null);
-            Set<String> notNullColumnNames = new HashSet<String>();
-            while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");
-                // Check if the column is not the primary key column
-
-                boolean nullable = rs.getBoolean("NULLABLE");
-                if (!nullable) {
-                    notNullColumnNames.add(columnName);
-                }
-            }
-            return notNullColumnNames;
-
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while looking up not null column names", e);
-        } finally {
-            closeQuietly(conn, null, rs);
-        }
-    }
-
-
-    /**
-     * Returns the foreign key and not null constraint names that are enabled/enforced for the table with the given name
+     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
      *
      * @param tableName The table, not null
      * @return The set of constraint names, not null
      */
-    public Set<String> getTableConstraintNames(String tableName) {
+    public Set<String> getForeignKeyConstraintNames(String tableName) {
         throw new UnsupportedOperationException("Retrieval of table constraints not supported for " + getDatabaseDialect());
     }
 
@@ -430,7 +361,7 @@ abstract public class DbSupport {
      * @param tableName      The table with the constraint, not null
      * @param constraintName The constraint, not null
      */
-    public void disableConstraint(String tableName, String constraintName) {
+    public void removeForeignKeyConstraint(String tableName, String constraintName) {
         throw new UnsupportedOperationException("Disabling of constraints not supported for " + getDatabaseDialect());
     }
 
@@ -632,31 +563,13 @@ abstract public class DbSupport {
 
 
     /**
+     * todo remove
+     * <p/>
      * Indicates whether the underlying DBMS supports getting table constraint names.
      *
      * @return True if getting constraint names is supported, false otherwise
      */
     public boolean supportsGetTableConstraintNames() {
-        return false;
-    }
-
-
-    /**
-     * Indicates whether the underlying DBMS supports removing not null constraint.
-     *
-     * @return True if removing not null constraint is supported, false otherwise
-     */
-    public boolean supportsRemoveNotNullConstraint() {
-        return false;
-    }
-
-
-    /**
-     * Indicates whether the underlying DBMS supports disabling FK constraints on the connection.
-     *
-     * @return True if disabling FK constraints on the connection is supported, false otherwise
-     */
-    public boolean supportsDisableForeignKeyConstraintsCheckingOnConnection() {
         return false;
     }
 

@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import static org.unitils.core.util.SQLUtils.*;
 
-import java.sql.Connection;
 import java.util.Set;
 
 /**
@@ -50,6 +49,42 @@ public class HsqldbDbSupport extends DbSupport {
     @Override
     public Set<String> getTableNames() {
         return getItemsAsStringSet("select TABLE_NAME from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_TYPE = 'TABLE' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
+    }
+
+
+    /**
+     * Gets the names of all columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the columns of the table with the given name
+     */
+    @Override
+    public Set<String> getColumnNames(String tableName) {
+        return getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
+    }
+
+
+    /**
+     * Gets the names of all primary columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the primary key columns of the table with the given name
+     */
+    @Override
+    public Set<String> getPrimaryKeyColumnNames(String tableName) {
+        return getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
+    }
+
+
+    /**
+     * Returns the names of all columns that have a 'not-null' constraint on them
+     *
+     * @param tableName The table, not null
+     * @return The set of column names, not null
+     */
+    @Override
+    public Set<String> getNotNullColummnNames(String tableName) {
+        return getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where IS_NULLABLE = 'NO' AND TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
     }
 
 
@@ -111,8 +146,7 @@ public class HsqldbDbSupport extends DbSupport {
 
 
     /**
-     * Increments the identity value for the specified identity column on the specified table to the given value. If there
-     * is no identity specified on the given primary key, the method silently finishes without effect.
+     * Increments the identity value for the specified identity column on the specified table to the given value.
      *
      * @param tableName          The table with the identity column, not null
      * @param identityColumnName The column, not null
@@ -125,13 +159,26 @@ public class HsqldbDbSupport extends DbSupport {
 
 
     /**
-     * Disables foreign key checking on all subsequent operations that are performed on the given connection object
+     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
      *
-     * @param connection The database connection, not null
+     * @param tableName The table, not null
+     * @return The set of constraint names, not null
      */
     @Override
-    public void disableForeignKeyConstraintsCheckingOnConnection(Connection connection) {
-        executeUpdate("set referential_integrity false", getDataSource());
+    public Set<String> getForeignKeyConstraintNames(String tableName) {
+        return getItemsAsStringSet("select CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE = 'FOREIGN KEY' AND TABLE_NAME = '" + tableName + "' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'", getDataSource());
+    }
+
+
+    /**
+     * Disables the constraint with the given name on table with the given name.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
+    @Override
+    public void removeForeignKeyConstraint(String tableName, String constraintName) {
+        executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName, getDataSource());
     }
 
 

@@ -88,6 +88,23 @@ public class MySqlDbSupportTest extends DbSupportTest {
 
 
     /**
+     * Tests dropping a table. Overriden because of foreign key problems in MySQL
+     * Drop cascade does not work in MySQL. Therefore we first need to drop 'Test_CASE_Table' and only then test_table.
+     */
+    @Override
+    public void testDropTable() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        dbSupport.dropTable("Test_CASE_Table");
+        dbSupport.dropTable("test_table");
+        Set<String> result = dbSupport.getTableNames();
+        assertTrue(result.isEmpty());
+    }
+
+
+    /**
      * Creates all test database structures (view, tables...)
      */
     protected void createTestDatabase() throws Exception {
@@ -107,7 +124,7 @@ public class MySqlDbSupportTest extends DbSupportTest {
      * Drops all created test database structures (views, tables...)
      */
     protected void cleanupTestDatabase() throws Exception {
-        dropTestTables(dbSupport, "test_table", "`Test_CASE_Table`");
+        dropTestTables(dbSupport, "`Test_CASE_Table`", "test_table");
         dropTestViews(dbSupport, "test_view", "`Test_CASE_View`");
         dropTestTriggers(dbSupport, "test_trigger", "`Test_CASE_Trigger`");
     }

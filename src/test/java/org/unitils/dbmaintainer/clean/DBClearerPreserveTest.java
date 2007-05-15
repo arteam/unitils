@@ -67,7 +67,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
         configuration.setProperty(DefaultDBClearer.PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupport.quoted("Test_CASE_Table"));
         configuration.setProperty(DefaultDBClearer.PROPKEY_PRESERVE_VIEWS, "test_view, " + dbSupport.quoted("Test_CASE_View"));
         configuration.setProperty(DefaultDBClearer.PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupport.quoted("Test_CASE_Sequence"));
-        configuration.setProperty(DefaultDBClearer.PROPKEY_PRESERVE_SYNONYMS, "test_table, " + dbSupport.quoted("Test_CASE_Table"));
+        configuration.setProperty(DefaultDBClearer.PROPKEY_PRESERVE_SYNONYMS, "test_synonym, " + dbSupport.quoted("Test_CASE_Synonym"));
 
         // todo Test_trigger_Preserve            Test_CASE_Trigger_Preserve
         dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);

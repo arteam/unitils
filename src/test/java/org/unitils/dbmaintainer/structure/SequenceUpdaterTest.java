@@ -95,7 +95,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
-        assertEquals(0, getCurrentSequenceValue());
         sequenceUpdater.updateSequences();
         assertEquals(1000, getCurrentSequenceValue());
     }
@@ -110,7 +109,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             return;
         }
         sequenceUpdater.updateSequences();
-        assertEquals(1000, getCurrentSequenceValue());
         sequenceUpdater.updateSequences();
         assertEquals(1000, getCurrentSequenceValue());
     }
@@ -124,7 +122,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             logger.warn("Current dialect does not support identity columns. Skipping test.");
             return;
         }
-        assertEquals(0, getCurrentIdentityColumnValue());
         sequenceUpdater.updateSequences();
         assertEquals(1000, getCurrentIdentityColumnValue());
     }
@@ -139,7 +136,6 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             return;
         }
         sequenceUpdater.updateSequences();
-        assertEquals(1000, getCurrentIdentityColumnValue());
         sequenceUpdater.updateSequences();
         assertEquals(1000, getCurrentIdentityColumnValue());
     }

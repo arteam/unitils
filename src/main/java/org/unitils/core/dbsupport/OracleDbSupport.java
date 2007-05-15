@@ -54,6 +54,42 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
+     * Gets the names of all columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the columns of the table with the given name
+     */
+    @Override
+    public Set<String> getColumnNames(String tableName) {
+        return getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "'", getDataSource());
+    }
+
+
+    /**
+     * Gets the names of all primary columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the primary key columns of the table with the given name
+     */
+    @Override
+    public Set<String> getPrimaryKeyColumnNames(String tableName) {
+        return getItemsAsStringSet("select col.COLUMN_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and con.CONSTRAINT_TYPE = 'P' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME", getDataSource());
+    }
+
+
+    /**
+     * Returns the names of all columns that have a 'not-null' constraint on them
+     *
+     * @param tableName The table, not null
+     * @return The set of column names, not null
+     */
+    @Override
+    public Set<String> getNotNullColummnNames(String tableName) {
+        return getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "' and NULLABLE = 'N'", getDataSource());
+    }
+
+
+    /**
      * Retrieves the names of all the views in the database schema.
      *
      * @return The names of all views in the database
@@ -145,6 +181,43 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
+     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
+     *
+     * @param tableName The table, not null
+     * @return The set of constraint names, not null
+     */
+    @Override
+    public Set<String> getForeignKeyConstraintNames(String tableName) {
+        return getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE = 'R' and STATUS = 'ENABLED'", getDataSource());
+    }
+
+
+    /**
+     * Disables the constraint with the given name on table with the given name.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
+    @Override
+    public void removeForeignKeyConstraint(String tableName, String constraintName) {
+        executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName, getDataSource());
+    }
+
+
+    /**
+     * Removes the not-null constraint on the specified column and table
+     *
+     * @param tableName  The table with the column, not null
+     * @param columnName The column to remove constraints from, not null
+     */
+    @Override
+    public void removeNotNullConstraint(String tableName, String columnName) {
+        String constraintName = getItemAsString("select con.CONSTRAINT_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and col.COLUMN_NAME = '" + columnName + "' and con.CONSTRAINT_TYPE = 'C' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME", getDataSource());
+        executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName, getDataSource());
+    }
+
+
+    /**
      * Returns the value of the sequence with the given name
      *
      * @param sequenceName The sequence, not null
@@ -153,18 +226,6 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public long getCurrentValueOfSequence(String sequenceName) {
         return getItemAsLong("select LAST_NUMBER from USER_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "'", getDataSource());
-    }
-
-
-    /**
-     * Returns the foreign key and not null constraint names that are enabled/enforced for the table with the given name
-     *
-     * @param tableName The table, not null
-     * @return The set of constraint names, not null
-     */
-    @Override
-    public Set<String> getTableConstraintNames(String tableName) {
-        return getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and (CONSTRAINT_TYPE = 'R' or CONSTRAINT_TYPE = 'C') and STATUS = 'ENABLED'", getDataSource());
     }
 
 
@@ -198,18 +259,6 @@ public class OracleDbSupport extends DbSupport {
         } finally {
             closeQuietly(conn, st, rs);
         }
-    }
-
-
-    /**
-     * Disables the constraint with the given name on table with the given name.
-     *
-     * @param tableName      The table with the constraint, not null
-     * @param constraintName The constraint, not null
-     */
-    @Override
-    public void disableConstraint(String tableName, String constraintName) {
-        executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName, getDataSource());
     }
 
 
@@ -266,5 +315,6 @@ public class OracleDbSupport extends DbSupport {
     public boolean supportsTypes() {
         return true;
     }
+
 
 }

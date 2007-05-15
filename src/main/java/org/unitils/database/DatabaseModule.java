@@ -25,9 +25,6 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.util.Flushable;
 import org.unitils.dbmaintainer.DBMaintainer;
-import org.unitils.dbmaintainer.structure.ConstraintsCheckDisablingDataSource;
-import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
@@ -170,15 +167,7 @@ public class DatabaseModule implements Module {
         // Get the factory for the data source
         DataSourceFactory dataSourceFactory = getConfiguredInstance(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
-        DataSource dataSource = dataSourceFactory.createDataSource();
-
-        // If contstraints disabling is active, a ConstraintsCheckDisablingDataSource is
-        // returned that wrappes the TestDataSource object
-        if (disableConstraints) {
-            ConstraintsDisabler constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
-            dataSource = new ConstraintsCheckDisablingDataSource(dataSource, constraintsDisabler);
-        }
-        return dataSource;
+        return dataSourceFactory.createDataSource();
     }
 
 

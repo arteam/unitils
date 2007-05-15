@@ -1,6 +1,8 @@
 package org.unitils.dbmaintainer.structure;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
@@ -9,9 +11,11 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
@@ -23,21 +27,16 @@ import java.util.Properties;
 
 /**
  * Test class for the {@link XsdDataSetStructureGenerator} for a single schema.
+ * <p/>
+ * Currently this is only implemented for HsqlDb.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
 
-    /* Tested object */
-    private DataSetStructureGenerator dataSetStructureGenerator;
-
-    /* The target directory for the test xsd files */
-    private File xsdDirectory;
-
-    /* DataSource for the test database. */
-    @TestDataSource
-    private DataSource dataSource = null;
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorTest.class);
 
 
     private static final String DATASET_XSD_CONTENT =
@@ -72,6 +71,20 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
                     "</xsd:schema>";
 
 
+    /* Tested object */
+    private DataSetStructureGenerator dataSetStructureGenerator;
+
+    /* The target directory for the test xsd files */
+    private File xsdDirectory;
+
+    /* DataSource for the test database. */
+    @TestDataSource
+    private DataSource dataSource = null;
+
+    /* True if current test is not for the current dialect */
+    private boolean disabled;
+
+
     /**
      * Initializes the test by creating following tables in the test database:
      * tableOne(columnA not null, columnB not null, columnC) and
@@ -80,13 +93,18 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
     protected void setUp() throws Exception {
         super.setUp();
 
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
+        if (disabled) {
+            return;
+        }
+
         xsdDirectory = new File(System.getProperty("java.io.tmpdir"), "XmlSchemaDatabaseStructureGeneratorTest");
         if (xsdDirectory.exists()) {
             deleteDirectory(xsdDirectory);
         }
         xsdDirectory.mkdirs();
 
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
@@ -103,6 +121,9 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
      */
     protected void tearDown() throws Exception {
         super.tearDown();
+        if (disabled) {
+            return;
+        }
         dropTestTables();
         try {
             deleteDirectory(xsdDirectory);
@@ -116,6 +137,10 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
      * Tests the generation of the xsd files for 1 database schema.
      */
     public void testGenerateDtd() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         dataSetStructureGenerator.generateDataSetStructure();
         assertFileContent(DATASET_XSD_CONTENT, new File(xsdDirectory, "dataset.xsd"));
         assertFileContent(PUBLIC_SCHEMA_XSD_CONTENT, new File(xsdDirectory, "PUBLIC.xsd"));
