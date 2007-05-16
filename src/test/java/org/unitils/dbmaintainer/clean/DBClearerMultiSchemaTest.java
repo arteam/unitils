@@ -21,6 +21,7 @@ import org.hsqldb.Trigger;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
@@ -81,11 +82,13 @@ public class DBClearerMultiSchemaTest extends UnitilsJUnit3 {
 
         // configure 3 schemas
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
-        dbSupportPublic = getDbSupport(configuration, dataSource, "PUBLIC");
-        dbSupportSchemaA = getDbSupport(configuration, dataSource, "SCHEMA_A");
-        dbSupportSchemaB = getDbSupport(configuration, dataSource, "SCHEMA_B");
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC");
+        dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A");
+        dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B");
+
         // create clearer instance
-        dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
+        dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 
         dropTestDatabase();
         createTestDatabase();

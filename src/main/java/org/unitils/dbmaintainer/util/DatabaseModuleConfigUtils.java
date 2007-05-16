@@ -16,10 +16,11 @@
 package org.unitils.dbmaintainer.util;
 
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import org.unitils.util.PropertyUtils;
 
-import javax.sql.DataSource;
 import java.util.Properties;
+
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Class containing configuration utility methods specifically for the {@link org.unitils.database.DatabaseModule} and
@@ -42,14 +43,14 @@ public class DatabaseModuleConfigUtils {
      *
      * @param databaseTaskType The type of the DatabaseTask, not null
      * @param configuration    The config, not null
-     * @param dataSource       The data source, not null
+     * @param sqlHandler       The sql handler, not null
      * @return The configured instance
      */
     @SuppressWarnings({"unchecked"})
-    public static <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, DataSource dataSource) {
+    public static <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, SQLHandler sqlHandler) {
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         DatabaseTask instance = getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
-        instance.init(configuration, dataSource);
+        instance.init(configuration, sqlHandler);
         return (T) instance;
     }
 

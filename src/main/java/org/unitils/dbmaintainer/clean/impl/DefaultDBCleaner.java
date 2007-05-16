@@ -15,19 +15,19 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import org.unitils.dbmaintainer.clean.DBCleaner;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SCHEMAS;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.dbmaintainer.clean.DBCleaner;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 /**
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
@@ -123,7 +123,7 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      */
     protected void cleanTable(String tableName, DbSupport dbSupport) {
         logger.debug("Deleting all records from table " + tableName + " in database schema " + dbSupport.getSchemaName());
-        executeUpdate("delete from " + dbSupport.qualified(tableName), dataSource);
+        sqlHandler.executeUpdate("delete from " + dbSupport.qualified(tableName));
     }
 
 

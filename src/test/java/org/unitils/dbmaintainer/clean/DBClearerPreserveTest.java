@@ -23,6 +23,7 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.TestSQLUtils;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.SQLUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.impl.DefaultDBClearer;
@@ -61,7 +62,9 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
+
 
         // configure items to preserve
         configuration.setProperty(DefaultDBClearer.PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupport.quoted("Test_CASE_Table"));
@@ -70,7 +73,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
         configuration.setProperty(DefaultDBClearer.PROPKEY_PRESERVE_SYNONYMS, "test_synonym, " + dbSupport.quoted("Test_CASE_Synonym"));
 
         // todo Test_trigger_Preserve            Test_CASE_Trigger_Preserve
-        dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
+        dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 
         cleanupTestDatabase();
         createTestDatabase();

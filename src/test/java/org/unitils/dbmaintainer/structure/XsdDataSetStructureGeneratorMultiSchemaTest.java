@@ -22,6 +22,7 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
+import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
@@ -150,7 +151,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, dataSource);
+        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, new SQLHandler(dataSource));
 
         dropTestTables();
         createTestTables();

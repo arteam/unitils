@@ -21,7 +21,10 @@ import org.hsqldb.Trigger;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.dbsupport.DbSupportFactory;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.*;
 import static org.unitils.core.dbsupport.TestSQLUtils.*;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
@@ -60,8 +63,10 @@ public class DBClearerTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = getDefaultDbSupport(configuration, dataSource);
-        dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
+
 
         cleanupTestDatabase();
         createTestDatabase();

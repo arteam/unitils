@@ -15,6 +15,18 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.readFileToString;
+import static org.unitils.util.PropertyUtils.getString;
+import static org.unitils.util.PropertyUtils.getStringList;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
@@ -26,13 +38,6 @@ import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.readFileToString;
-import static org.unitils.util.PropertyUtils.getString;
-import static org.unitils.util.PropertyUtils.getStringList;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem.
@@ -93,6 +98,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
             throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSION + " should not start with a '.'");
         }
     }
+    
 
     /**
      * Verfies that directories and files in the given list of fileLocations exist on the file system. If one of them
@@ -112,6 +118,20 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     }
 
 
+    /**
+     * Returns the current version of the scripts, i.e. the Version object as it would 
+     * be returned by a database that is up-to-date with the current script base.
+     * 
+     * @return the current version of the scripts
+     */
+    public Version getCurrentVersion() {
+        List<File> scriptFilesSorted = getScriptFilesSorted(true, scriptFileLocations);
+        long highestVersionIndex = getIndex(scriptFilesSorted.get(scriptFilesSorted.size() - 1));
+        long highestVersionTimeStamp = getHighestScriptTimestamp(scriptFilesSorted);
+        return new Version(highestVersionIndex, highestVersionTimeStamp);
+    }
+    
+    
     /**
      * This methods returns true if one or more scripts that have a version index equal to or lower than
      * the index specified by the given version object has been modified since the timestamp specfied by

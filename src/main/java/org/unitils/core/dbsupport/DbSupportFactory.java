@@ -16,12 +16,12 @@
 package org.unitils.core.dbsupport;
 
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import org.unitils.util.PropertyUtils;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.unitils.util.PropertyUtils;
 
 /**
  * todo javadoc
@@ -47,12 +47,12 @@ public class DbSupportFactory {
      * default schema. The default schema is the first schema in the configured list of schemas.
      *
      * @param configuration The config, not null
-     * @param dataSource    The data source, not null
+     * @param sqlHandler    The sql handler, not null
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
-    public static DbSupport getDefaultDbSupport(Properties configuration, DataSource dataSource) {
+    public static DbSupport getDefaultDbSupport(Properties configuration, SQLHandler sqlHandler) {
         String defaultSchemaName = PropertyUtils.getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
-        return getDbSupport(configuration, dataSource, defaultSchemaName);
+        return getDbSupport(configuration, sqlHandler, defaultSchemaName);
     }
 
 
@@ -60,14 +60,14 @@ public class DbSupportFactory {
      * Returns the dbms specific {@link DbSupport} as configured in the given <code>Configuration</code>.
      *
      * @param configuration The config, not null
-     * @param dataSource    The data source, not null
+     * @param sqlHandler    The sql handler, not null
      * @param schemaName    The schema name, not null
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
-    public static DbSupport getDbSupport(Properties configuration, DataSource dataSource, String schemaName) {
+    public static DbSupport getDbSupport(Properties configuration, SQLHandler sqlHandler, String schemaName) {
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         DbSupport dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
-        dbSupport.init(configuration, dataSource, schemaName);
+        dbSupport.init(configuration, sqlHandler, schemaName);
         return dbSupport;
     }
 
@@ -76,14 +76,14 @@ public class DbSupportFactory {
      * Returns the dbms specific {@link DbSupport} instances for all configured schemas.
      *
      * @param configuration The config, not null
-     * @param dataSource    The data source, not null
+     * @param sqlHandler    The sql handler, not null
      * @return The dbms specific {@link DbSupport}, not null
      */
-    public static List<DbSupport> getDbSupports(Properties configuration, DataSource dataSource) {
+    public static List<DbSupport> getDbSupports(Properties configuration, SQLHandler sqlHandler) {
         List<DbSupport> result = new ArrayList<DbSupport>();
         List<String> schemaNames = PropertyUtils.getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true);
         for (String schemaName : schemaNames) {
-            DbSupport dbSupport = getDbSupport(configuration, dataSource, schemaName);
+            DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
             result.add(dbSupport);
         }
         return result;

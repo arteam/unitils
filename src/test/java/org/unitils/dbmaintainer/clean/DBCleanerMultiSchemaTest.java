@@ -21,6 +21,7 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
+import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.dbsupport.TestSQLUtils.isEmpty;
@@ -75,8 +76,10 @@ public class DBCleanerMultiSchemaTest extends UnitilsJUnit3 {
 
         // configure 3 schemas
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
-        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, dataSource);
-        dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
+        dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
+
 
         dropTestTables();
         createTestTables();

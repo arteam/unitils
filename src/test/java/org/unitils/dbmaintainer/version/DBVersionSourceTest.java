@@ -15,14 +15,8 @@
  */
 package org.unitils.dbmaintainer.version;
 
-import org.apache.commons.lang.time.DateUtils;
-import org.unitils.UnitilsJUnit3;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import org.unitils.dbunit.annotation.DataSet;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
@@ -30,6 +24,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+
+import org.apache.commons.lang.time.DateUtils;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbunit.annotation.DataSet;
 
 /**
  * Test class for {@link org.unitils.dbmaintainer.version.impl.DBVersionSource}. The implementation is tested using
@@ -60,8 +62,9 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbVersionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource);
-        dbSupport = getDefaultDbSupport(configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbVersionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, sqlHandler);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         dropVersionTable();
         createVersionTable();
@@ -153,7 +156,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
             try {
                 String longDataType = dbSupport.getLongDataType();
                 String correctCaseTableName = dbSupport.toCorrectCaseIdentifier("db_version");
-                st.execute("create table " + dbSupport.qualified(correctCaseTableName) + " (version_index " + longDataType + ", last_updated_on " +
+                st.execute("create table " + dbSupport.qualified(correctCaseTableName) + " (version_index " + longDataType + ", version_timestamp " +
                         longDataType + ", last_update_succeeded " + longDataType + ")");
             } catch (SQLException e) {
                 e.printStackTrace();

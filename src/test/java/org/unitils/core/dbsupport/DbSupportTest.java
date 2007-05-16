@@ -82,7 +82,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         if (disabled) {
             return;
         }
-        dbSupport.init(configuration, dataSource, schemaName);
+        dbSupport.init(configuration, new SQLHandler(dataSource), schemaName);
 
         cleanupTestDatabase();
         createTestDatabase();

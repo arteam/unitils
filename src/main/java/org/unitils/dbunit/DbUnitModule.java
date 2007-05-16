@@ -15,33 +15,36 @@
  */
 package org.unitils.dbunit;
 
-import org.dbunit.database.DatabaseConfig;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.datatype.IDataTypeFactory;
 import static org.dbunit.operation.DatabaseOperation.CLEAN_INSERT;
-import org.unitils.core.Module;
-import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import org.unitils.database.DatabaseModule;
-import org.unitils.dbunit.annotation.DataSet;
-import org.unitils.dbunit.annotation.ExpectedDataSet;
-import org.unitils.dbunit.util.DataSetXmlReader;
-import org.unitils.dbunit.util.DbUnitAssert;
-import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 
-import javax.sql.DataSource;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.dbunit.database.DatabaseConfig;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.datatype.IDataTypeFactory;
+import org.unitils.core.Module;
+import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.DatabaseModule;
+import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.dbunit.util.DataSetXmlReader;
+import org.unitils.dbunit.util.DbUnitAssert;
+import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -325,7 +328,8 @@ public class DbUnitModule implements Module {
         try {
             // A db support instance is created to get the default schema name in correct casing
             DataSource dataSource = getDatabaseModule().getDataSource();
-            DbSupport defaultDbSupport = getDefaultDbSupport(configuration, dataSource);
+            SQLHandler sqlHandler = new SQLHandler(dataSource);
+            DbSupport defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
             DataSetXmlReader dataSetXmlReader = new DataSetXmlReader(defaultDbSupport.getSchemaName());
             return dataSetXmlReader.readDataSetXml(in);
@@ -347,7 +351,8 @@ public class DbUnitModule implements Module {
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
         // A db support instance is created to get the schema name in correct casing
         DataSource dataSource = getDatabaseModule().getDataSource();
-        DbSupport dbSupport = getDbSupport(configuration, dataSource, schemaName);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
 
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());

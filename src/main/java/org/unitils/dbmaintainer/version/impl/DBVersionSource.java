@@ -263,7 +263,7 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
         Statement st = null;
         ResultSet rs = null;
         try {
-            conn = dataSource.getConnection();
+            conn = sqlHandler.getDataSource().getConnection();
             st = conn.createStatement();
             rs = st.executeQuery("select " + versionIndexColumnName + ", " + versionTimestampColumnName + " from " + defaultDbSupport.qualified(versionTableName));
             rs.next();
@@ -283,21 +283,14 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
      * @param version The new version that the database should be updated to
      */
     private void setDbVersionImpl(Version version) {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            int updateCount = st.executeUpdate("update " + defaultDbSupport.qualified(versionTableName) + " set " + versionIndexColumnName +
-                    " = " + version.getIndex() + ", " + versionTimestampColumnName + " = " + version.getTimeStamp());
-            if (updateCount != 1) {
-                throw new UnitilsException("Error while setting database version. There should be exactly 1 version record, found " + updateCount);
-            }
-
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while setting database version", e);
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
+        int updateCount = sqlHandler.executeUpdate("update "
+                + defaultDbSupport.qualified(versionTableName) + " set " + versionIndexColumnName
+                + " = " + version.getIndex() + ", " + versionTimestampColumnName + " = "
+                + version.getTimeStamp() + ", " + lastUpdateSucceededColumnName + " = 1");
+        if (updateCount != 1 && sqlHandler.isDoExecuteUpdates()) {
+            throw new UnitilsException(
+                    "Error while setting database version. There should be exactly 1 version record, found "
+                            + updateCount);
         }
     }
 
@@ -312,9 +305,10 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
         Statement st = null;
         ResultSet rs = null;
         try {
-            conn = dataSource.getConnection();
+            conn = sqlHandler.getDataSource().getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select " + lastUpdateSucceededColumnName + " from " + defaultDbSupport.qualified(versionTableName));
+            rs = st.executeQuery("select " + lastUpdateSucceededColumnName + " from "
+                    + defaultDbSupport.qualified(versionTableName));
             if (rs.next()) {
                 return (rs.getInt(lastUpdateSucceededColumnName) == 1);
             } else {
@@ -334,21 +328,13 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
      * @param succeeded True for success
      */
     private void registerUpdateSucceededImpl(boolean succeeded) {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            int updateCount = st.executeUpdate("update " + defaultDbSupport.qualified(versionTableName) + " set " +
-                    lastUpdateSucceededColumnName + " = " + (succeeded ? "1" : "0"));
-            if (updateCount != 1) {
-                throw new UnitilsException("Error while registering update succeeded. There should be exactly 1 version record, found " + updateCount);
-            }
-
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while registering update succeeded.", e);
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
+        int updateCount = sqlHandler.executeUpdate("update "
+                + defaultDbSupport.qualified(versionTableName) + " set "
+                + lastUpdateSucceededColumnName + " = " + (succeeded ? "1" : "0"));
+        if (updateCount != 1 && sqlHandler.isDoExecuteUpdates()) {
+            throw new UnitilsException(
+                    "Error while registering update succeeded. There should be exactly 1 version record, found "
+                            + updateCount);
         }
     }
 
@@ -361,9 +347,10 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
         Statement st = null;
         ResultSet rs = null;
         try {
-            conn = dataSource.getConnection();
+            conn = sqlHandler.getDataSource().getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select " + codeScriptsTimestampColumnName + " from " + defaultDbSupport.qualified(versionTableName));
+            rs = st.executeQuery("select " + codeScriptsTimestampColumnName + " from "
+                    + defaultDbSupport.qualified(versionTableName));
             rs.next();
             return rs.getLong(codeScriptsTimestampColumnName);
 
@@ -380,21 +367,14 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
      * @param timestamp The new timestamp
      */
     private void setCodeScriptsTimestampImpl(long timestamp) {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            int updateCount = st.executeUpdate("update " + defaultDbSupport.qualified(versionTableName) + " set " +
-                    codeScriptsTimestampColumnName + " = " + timestamp + "");
-            if (updateCount != 1) {
-                throw new UnitilsException("Error while setting database version. There should be exactly 1 version record, found " + updateCount);
-            }
-
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while setting database version", e);
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
+        int updateCount = sqlHandler.executeCodeUpdate("update "
+                + defaultDbSupport.qualified(versionTableName) + " set "
+                + codeScriptsTimestampColumnName + " = " + timestamp + ", "
+                + lastCodeUpdateSucceededColumnName + " = 1");
+        if (updateCount != 1 && sqlHandler.isDoExecuteUpdates()) {
+            throw new UnitilsException(
+                    "Error while setting database version. There should be exactly 1 version record, found "
+                            + updateCount);
         }
     }
 
@@ -409,9 +389,10 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
         Statement st = null;
         ResultSet rs = null;
         try {
-            conn = dataSource.getConnection();
+            conn = sqlHandler.getDataSource().getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select " + lastCodeUpdateSucceededColumnName + " from " + defaultDbSupport.qualified(versionTableName));
+            rs = st.executeQuery("select " + lastCodeUpdateSucceededColumnName + " from "
+                    + defaultDbSupport.qualified(versionTableName));
             if (rs.next()) {
                 return (rs.getInt(lastCodeUpdateSucceededColumnName) == 1);
             } else {
@@ -431,20 +412,13 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
      * @param succeeded True for success
      */
     private void registerCodeUpdateSucceededImpl(boolean succeeded) {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            int updateCount = st.executeUpdate("update " + defaultDbSupport.qualified(versionTableName) + " set " +
-                    lastCodeUpdateSucceededColumnName + " = " + (succeeded ? "1" : "0"));
-            if (updateCount != 1) {
-                throw new UnitilsException("Error while registering update succeeded. There should be exactly 1 version record, found " + updateCount);
-            }
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while registering update succeeded.", e);
-        } finally {
-            DbUtils.closeQuietly(conn, st, null);
+        int updateCount = sqlHandler.executeCodeUpdate("update "
+                + defaultDbSupport.qualified(versionTableName) + " set "
+                + lastCodeUpdateSucceededColumnName + " = " + (succeeded ? "1" : "0"));
+        if (updateCount != 1 && sqlHandler.isDoExecuteUpdates()) {
+            throw new UnitilsException(
+                    "Error while registering update succeeded. There should be exactly 1 version record, found "
+                            + updateCount);
         }
     }
 
@@ -460,7 +434,7 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
         Statement st = null;
         ResultSet rs = null;
         try {
-            conn = dataSource.getConnection();
+            conn = sqlHandler.getDataSource().getConnection();
             st = conn.createStatement();
             // Check if the version table exists
             DatabaseMetaData metadata = conn.getMetaData();
@@ -470,10 +444,10 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
             if (!rs.next()) {
                 // The version table does not exist. Create it
                 logger.info("The table " + defaultDbSupport.qualified(versionTableName) + " doesn't exist yet. It is being created");
-                executeUpdate("create table " + defaultDbSupport.qualified(versionTableName) + " ( " + versionIndexColumnName +
+                sqlHandler.executeUpdate("create table " + defaultDbSupport.qualified(versionTableName) + " ( " + versionIndexColumnName +
                         " " + longDataType + ", " + versionTimestampColumnName + " " + longDataType + ", " +
                         lastUpdateSucceededColumnName + " " + longDataType + ", " + codeScriptsTimestampColumnName + " " +
-                        longDataType + ", " + lastCodeUpdateSucceededColumnName + " " + longDataType + " )", dataSource);
+                        longDataType + ", " + lastCodeUpdateSucceededColumnName + " " + longDataType + " )");
             } else {
                 // Check if the version table has the expected columns
                 rs.close();
@@ -482,8 +456,8 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
                     // The version table exists but the version index column does not. Create it
                     logger.info("Column " + versionIndexColumnName + " is missing on table " +
                             defaultDbSupport.qualified(versionTableName) + ". It is being created");
-                    executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
-                            versionIndexColumnName + " " + longDataType, dataSource);
+                    sqlHandler.executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
+                            versionIndexColumnName + " " + longDataType);
                 }
                 rs.close();
                 rs = metadata.getColumns(null, schemaName, versionTableName, versionTimestampColumnName);
@@ -491,8 +465,8 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
                     // The version table exists but the version timestamp column does not. Create it
                     logger.info("Column " + versionTimestampColumnName + " is missing on table " +
                             defaultDbSupport.qualified(versionTableName) + ". It is being created");
-                    executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
-                            versionTimestampColumnName + " " + longDataType, dataSource);
+                    sqlHandler.executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
+                            versionTimestampColumnName + " " + longDataType);
                 }
                 rs.close();
                 rs = metadata.getColumns(null, schemaName, versionTableName, lastUpdateSucceededColumnName);
@@ -500,8 +474,8 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
                     // The version table exists but the last update succeeded column does not. Create it
                     logger.info("Column " + lastUpdateSucceededColumnName + " is missing on table " +
                             defaultDbSupport.qualified(versionTableName) + ". It is being created");
-                    executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
-                            lastUpdateSucceededColumnName + " " + longDataType, dataSource);
+                    sqlHandler.executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
+                            lastUpdateSucceededColumnName + " " + longDataType);
                 }
                 rs.close();
                 rs = metadata.getColumns(null, schemaName, versionTableName, codeScriptsTimestampColumnName);
@@ -509,8 +483,8 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
                     // The version table exists but the version timestamp column does not. Create it
                     logger.info("Column " + codeScriptsTimestampColumnName + " is missing on table " +
                             defaultDbSupport.qualified(versionTableName) + ". It is being created");
-                    executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
-                            codeScriptsTimestampColumnName + " " + longDataType, dataSource);
+                    sqlHandler.executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
+                            codeScriptsTimestampColumnName + " " + longDataType);
                 }
                 rs.close();
                 rs = metadata.getColumns(null, schemaName, versionTableName, lastCodeUpdateSucceededColumnName);
@@ -518,8 +492,8 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
                     // The version table exists but the last update succeeded column does not. Create it
                     logger.info("Column " + lastCodeUpdateSucceededColumnName + " is missing on table " +
                             defaultDbSupport.qualified(versionTableName) + ". It is being created");
-                    executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
-                            lastCodeUpdateSucceededColumnName + " " + longDataType, dataSource);
+                    sqlHandler.executeUpdate("alter table " + defaultDbSupport.qualified(versionTableName) + " add " +
+                            lastCodeUpdateSucceededColumnName + " " + longDataType);
                 }
             }
             // The version table and columns exist. Check if a record with the version is available
@@ -527,9 +501,9 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
             rs = st.executeQuery("select * from " + defaultDbSupport.qualified(versionTableName));
             if (!rs.next()) {
                 // The version table is empty. Insert a record with default version numbers.
-                executeUpdate("insert into " + defaultDbSupport.qualified(versionTableName) + " (" + versionIndexColumnName + ", " +
+                sqlHandler.executeUpdate("insert into " + defaultDbSupport.qualified(versionTableName) + " (" + versionIndexColumnName + ", " +
                         versionTimestampColumnName + ", " + lastUpdateSucceededColumnName + ", " +
-                        codeScriptsTimestampColumnName + ", " + lastCodeUpdateSucceededColumnName + ") values (0, 0, 0, 0, 0)", dataSource);
+                        codeScriptsTimestampColumnName + ", " + lastCodeUpdateSucceededColumnName + ") values (0, 0, 0, 0, 0)");
             } else {
                 // version table was ok
                 return true;

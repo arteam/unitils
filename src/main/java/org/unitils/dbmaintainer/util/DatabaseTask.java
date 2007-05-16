@@ -15,8 +15,11 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import javax.sql.DataSource;
 import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.unitils.core.dbsupport.SQLHandler;
 
 /**
  * Task that can be performed on a database.
@@ -32,6 +35,6 @@ public interface DatabaseTask {
      * @param configuration The configuration, not null
      * @param dataSource    The datasource, not null
      */
-    public void init(Properties configuration, DataSource dataSource);
+    public void init(Properties configuration, SQLHandler sqlHandler);
 
 }

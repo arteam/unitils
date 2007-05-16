@@ -15,12 +15,11 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import org.unitils.dbmaintainer.script.ScriptRunner;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
-
 import java.util.List;
 import java.util.Properties;
+
+import org.unitils.dbmaintainer.script.ScriptRunner;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 /**
  * Implementation of {@link ScriptRunner} that runs an SQL script.
@@ -48,7 +47,7 @@ public class SQLScriptRunner extends BaseDatabaseTask implements ScriptRunner {
     public void execute(String script) {
         List<String> statements = parseStatements(script);
         for (String statement : statements) {
-            executeUpdate(statement, dataSource);
+            sqlHandler.executeUpdate(statement);
         }
     }
 

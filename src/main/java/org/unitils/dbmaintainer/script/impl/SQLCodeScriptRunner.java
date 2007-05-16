@@ -15,13 +15,12 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import static org.unitils.core.util.SQLUtils.executeUpdate;
+import java.util.List;
+import java.util.Properties;
+
 import org.unitils.dbmaintainer.script.CodeScriptRunner;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.dbmaintainer.util.SQLCodeScriptParser;
-
-import java.util.List;
-import java.util.Properties;
 
 /**
  * todo javadoc
@@ -49,7 +48,7 @@ public class SQLCodeScriptRunner extends BaseDatabaseTask implements CodeScriptR
     public void execute(String script) {
         List<String> statements = parseStatements(script);
         for (String statement : statements) {
-            executeUpdate(statement, dataSource);
+            sqlHandler.executeCodeUpdate(statement);
         }
     }
 
