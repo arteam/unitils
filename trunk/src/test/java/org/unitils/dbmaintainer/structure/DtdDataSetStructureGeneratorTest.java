@@ -1,23 +1,26 @@
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.lang.StringUtils;
-import org.unitils.UnitilsJUnit3;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
 import static org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.lang.StringUtils;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 /**
  * Test class for the FlatXmlDataSetDtdGenerator
@@ -52,8 +55,9 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", DtdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, dataSource);
-        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
+        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 
         dbClearer.clearSchemas();
         createTestTables();

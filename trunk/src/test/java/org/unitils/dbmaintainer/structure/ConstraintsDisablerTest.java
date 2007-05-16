@@ -19,7 +19,10 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.dbsupport.DbSupportFactory;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.*;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
@@ -58,8 +61,9 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = getDefaultDbSupport(configuration, dataSource);
-        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler);
 
         cleanupTestDatabase();
         createTestTables();

@@ -162,7 +162,7 @@ public class TestSQLUtils {
      */
     public static boolean isEmpty(String tableName, DbSupport dbSupport) throws SQLException {
         String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
-        return getItemsAsStringSet("select * from " + tableName, dbSupport.getDataSource()).isEmpty();
+        return dbSupport.getSQLHandler().getItemsAsStringSet("select * from " + tableName).isEmpty();
     }
 
 }

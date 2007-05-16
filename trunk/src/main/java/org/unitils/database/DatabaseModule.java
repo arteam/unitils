@@ -21,6 +21,7 @@ import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.util.Flushable;
@@ -103,7 +104,7 @@ public class DatabaseModule implements Module {
         if (dataSource == null) {
             dataSource = createDataSource();
             if (updateDatabaseSchemaEnabled) {
-                updateDatabaseSchema();
+                updateDatabase();
             }
         }
         return dataSource;
@@ -129,15 +130,33 @@ public class DatabaseModule implements Module {
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link DBMaintainer} for more information.
      */
-    public void updateDatabaseSchema() {
+    public void updateDatabase() {
+        updateDatabase(new SQLHandler(getDataSource()));
+    }
+    
+    
+    /**
+     * Determines whether the test database is outdated and, if that is the case, updates the database with the
+     * latest changes. See {@link DBMaintainer} for more information.
+     * 
+     * @param sqlHandler SQLHandler that needs to be used for the database updates
+     * todo make configurable using properties
+     */
+    public void updateDatabase(SQLHandler sqlHandler) {
         try {
-            logger.info("Updating database schema if needed.");
-            DBMaintainer dbMaintainer = new DBMaintainer(configuration, getDataSource());
+            logger.info("Updating database if needed.");
+            DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
             dbMaintainer.updateDatabase();
 
         } catch (UnitilsException e) {
             throw new UnitilsException("Error while updating database", e);
         }
+    }
+    
+    
+    public void setDatabaseToCurrentVersion() {
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, new SQLHandler(getDataSource()));
+        dbMaintainer.setDatabaseToCurrentVersion();
     }
 
 

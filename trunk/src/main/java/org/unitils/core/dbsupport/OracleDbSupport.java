@@ -49,7 +49,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTableNames() {
-        return getItemsAsStringSet("select TABLE_NAME from USER_TABLES", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from USER_TABLES");
     }
 
 
@@ -61,7 +61,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getColumnNames(String tableName) {
-        return getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "'");
     }
 
 
@@ -73,7 +73,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        return getItemsAsStringSet("select col.COLUMN_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and con.CONSTRAINT_TYPE = 'P' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select col.COLUMN_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and con.CONSTRAINT_TYPE = 'P' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME");
     }
 
 
@@ -85,7 +85,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getNotNullColummnNames(String tableName) {
-        return getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "' and NULLABLE = 'N'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "' and NULLABLE = 'N'");
     }
 
 
@@ -96,7 +96,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getViewNames() {
-        return getItemsAsStringSet("select VIEW_NAME from USER_VIEWS", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select VIEW_NAME from USER_VIEWS");
     }
 
 
@@ -107,7 +107,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getSynonymNames() {
-        return getItemsAsStringSet("select SYNONYM_NAME from USER_SYNONYMS", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select SYNONYM_NAME from USER_SYNONYMS");
     }
 
 
@@ -118,7 +118,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getSequenceNames() {
-        return getItemsAsStringSet("select SEQUENCE_NAME from USER_SEQUENCES", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select SEQUENCE_NAME from USER_SEQUENCES");
     }
 
 
@@ -129,7 +129,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getItemsAsStringSet("select TRIGGER_NAME from USER_TRIGGERS triggers, USER_TABLES tables where tables.TABLE_NAME = triggers.TABLE_NAME", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select TRIGGER_NAME from USER_TRIGGERS triggers, USER_TABLES tables where tables.TABLE_NAME = triggers.TABLE_NAME");
     }
 
 
@@ -140,7 +140,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTypeNames() {
-        return getItemsAsStringSet("select TYPE_NAME from USER_TYPES", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select TYPE_NAME from USER_TYPES");
     }
 
 
@@ -152,7 +152,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void dropTable(String tableName) {
-        executeUpdate("drop table " + qualified(tableName) + " cascade constraints", getDataSource());
+        getSQLHandler().executeUpdate("drop table " + qualified(tableName) + " cascade constraints");
     }
 
 
@@ -164,7 +164,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void dropView(String viewName) {
-        executeUpdate("drop view " + qualified(viewName) + " cascade constraints", getDataSource());
+        getSQLHandler().executeUpdate("drop view " + qualified(viewName) + " cascade constraints");
     }
 
 
@@ -176,7 +176,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void dropType(String typeName) {
-        executeUpdate("drop type " + qualified(typeName) + " force", getDataSource());
+        getSQLHandler().executeUpdate("drop type " + qualified(typeName) + " force");
     }
 
 
@@ -188,7 +188,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE = 'R' and STATUS = 'ENABLED'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE = 'R' and STATUS = 'ENABLED'");
     }
 
 
@@ -200,7 +200,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName, getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName);
     }
 
 
@@ -212,8 +212,8 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void removeNotNullConstraint(String tableName, String columnName) {
-        String constraintName = getItemAsString("select con.CONSTRAINT_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and col.COLUMN_NAME = '" + columnName + "' and con.CONSTRAINT_TYPE = 'C' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME", getDataSource());
-        executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName, getDataSource());
+        String constraintName = getSQLHandler().getItemAsString("select con.CONSTRAINT_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and col.COLUMN_NAME = '" + columnName + "' and con.CONSTRAINT_TYPE = 'C' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME");
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName);
     }
 
 
@@ -225,7 +225,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public long getCurrentValueOfSequence(String sequenceName) {
-        return getItemAsLong("select LAST_NUMBER from USER_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "'", getDataSource());
+        return getSQLHandler().getItemAsLong("select LAST_NUMBER from USER_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "'");
     }
 
 
@@ -241,18 +241,18 @@ public class OracleDbSupport extends DbSupport {
         ResultSet rs = null;
         Statement st = null;
         try {
-            conn = getDataSource().getConnection();
+            conn = getSQLHandler().getDataSource().getConnection();
             st = conn.createStatement();
             rs = st.executeQuery("select LAST_NUMBER, INCREMENT_BY from USER_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "'");
             while (rs.next()) {
                 long lastNumber = rs.getLong("LAST_NUMBER");
                 long incrementBy = rs.getLong("INCREMENT_BY");
                 String sqlChangeIncrement = "alter sequence " + qualified(sequenceName) + " increment by " + (newSequenceValue - lastNumber);
-                executeUpdate(sqlChangeIncrement, getDataSource());
+                getSQLHandler().executeUpdate(sqlChangeIncrement);
                 String sqlNextSequenceValue = "select " + qualified(sequenceName) + ".NEXTVAL from DUAL";
-                executeUpdate(sqlNextSequenceValue, getDataSource());
+                getSQLHandler().executeUpdate(sqlNextSequenceValue);
                 String sqlResetIncrement = "alter sequence " + qualified(sequenceName) + " increment by " + incrementBy;
-                executeUpdate(sqlResetIncrement, getDataSource());
+                getSQLHandler().executeUpdate(sqlResetIncrement);
             }
         } catch (SQLException e) {
             throw new UnitilsException("Error while incrementing sequence to value", e);

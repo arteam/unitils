@@ -18,11 +18,12 @@ package org.unitils.core.dbsupport;
 import org.unitils.core.UnitilsException;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.core.util.StoredIdentifierCase;
-import static org.unitils.core.util.StoredIdentifierCase.*;
+import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
+import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
+import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -58,7 +59,7 @@ abstract public class DbSupport {
     private String schemaName;
 
     /* Gives access to the database */
-    private DataSource dataSource;
+    private SQLHandler sqlHandler;
 
     /* Indicates whether database identifiers are stored in lowercase, uppercase or mixed case */
     private StoredIdentifierCase storedIdentifierCase;
@@ -84,11 +85,11 @@ abstract public class DbSupport {
      * correct value.
      *
      * @param configuration The config, not null
-     * @param dataSource    The data source, not null
+     * @param sqlHandler    The sql handler, not null
      * @param schemaName    The name of the database schema
      */
-    public void init(Properties configuration, DataSource dataSource, String schemaName) {
-        this.dataSource = dataSource;
+    public void init(Properties configuration, SQLHandler sqlHandler, String schemaName) {
+        this.sqlHandler = sqlHandler;
 
         String identifierQuoteString = PropertyUtils.getString(PROPKEY_IDENTIFIER_QUOTE_STRING + "." + getDatabaseDialect(), configuration);
         String storedIdentifierCaseValue = PropertyUtils.getString(PROPKEY_STORED_IDENTIFIER_CASE + "." + getDatabaseDialect(), configuration);
@@ -141,12 +142,12 @@ abstract public class DbSupport {
 
 
     /**
-     * Gets the data source.
+     * Gets the sql handler.
      *
      * @return the data source, not null
      */
-    public DataSource getDataSource() {
-        return dataSource;
+    public SQLHandler getSQLHandler() {
+        return sqlHandler;
     }
 
 
@@ -240,7 +241,7 @@ abstract public class DbSupport {
      * @param tableName The table to drop (case-sensitive), not null
      */
     public void dropTable(String tableName) {
-        executeUpdate("drop table " + qualified(tableName) + " cascade", dataSource);
+        sqlHandler.executeUpdate("drop table " + qualified(tableName) + " cascade");
     }
 
 
@@ -251,7 +252,7 @@ abstract public class DbSupport {
      * @param viewName The view to drop (case-sensitive), not null
      */
     public void dropView(String viewName) {
-        executeUpdate("drop view " + qualified(viewName) + " cascade", dataSource);
+        sqlHandler.executeUpdate("drop view " + qualified(viewName) + " cascade");
     }
 
     /**
@@ -261,7 +262,7 @@ abstract public class DbSupport {
      * @param synonymName The synonym to drop (case-sensitive), not null
      */
     public void dropSynonym(String synonymName) {
-        executeUpdate("drop synonym " + qualified(synonymName), dataSource);
+        sqlHandler.executeUpdate("drop synonym " + qualified(synonymName));
     }
 
 
@@ -272,7 +273,7 @@ abstract public class DbSupport {
      * @param sequenceName The sequence to drop (case-sensitive), not null
      */
     public void dropSequence(String sequenceName) {
-        executeUpdate("drop sequence " + qualified(sequenceName), dataSource);
+        sqlHandler.executeUpdate("drop sequence " + qualified(sequenceName));
     }
 
 
@@ -283,7 +284,7 @@ abstract public class DbSupport {
      * @param triggerName The trigger to drop (case-sensitive), not null
      */
     public void dropTrigger(String triggerName) {
-        executeUpdate("drop trigger " + qualified(triggerName), dataSource);
+        sqlHandler.executeUpdate("drop trigger " + qualified(triggerName));
     }
 
 
@@ -464,7 +465,7 @@ abstract public class DbSupport {
 
         Connection connection = null;
         try {
-            connection = dataSource.getConnection();
+            connection = sqlHandler.getDataSource().getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             if (databaseMetaData.storesUpperCaseIdentifiers()) {
                 return UPPER_CASE;
@@ -497,7 +498,7 @@ abstract public class DbSupport {
 
         Connection connection = null;
         try {
-            connection = dataSource.getConnection();
+            connection = sqlHandler.getDataSource().getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String quoteString = databaseMetaData.getIdentifierQuoteString();
             if (quoteString == null || "".equals(quoteString.trim())) {

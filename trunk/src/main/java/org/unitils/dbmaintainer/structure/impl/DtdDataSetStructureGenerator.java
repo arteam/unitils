@@ -15,6 +15,17 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.sql.Connection;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -27,17 +38,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
 import org.unitils.util.PropertyUtils;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.sql.Connection;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Implementation of {@link DataSetStructureGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format
@@ -109,7 +110,7 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseTask implements Da
     protected String generateDtdContent() {
         Connection conn = null;
         try {
-            conn = dataSource.getConnection();
+            conn = sqlHandler.getDataSource().getConnection();
             IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, defaultDbSupport.getSchemaName());
 
             StringWriter stringWriter = new StringWriter();

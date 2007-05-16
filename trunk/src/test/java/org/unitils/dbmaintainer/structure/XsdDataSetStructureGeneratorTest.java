@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
+import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
@@ -108,8 +109,9 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
-        dataSetStructureGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, dataSource);
-        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dataSetStructureGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
+        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 
         dbClearer.clearSchemas();
         createTestTables();

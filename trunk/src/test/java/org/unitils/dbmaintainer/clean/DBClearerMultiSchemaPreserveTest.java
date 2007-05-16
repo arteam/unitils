@@ -6,6 +6,7 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
+import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
@@ -67,10 +68,11 @@ public class DBClearerMultiSchemaPreserveTest extends UnitilsJUnit3 {
 
         // configure 3 schemas
         configuration.setProperty(DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
-        dbSupportPublic = DbSupportFactory.getDbSupport(configuration, dataSource, "PUBLIC");
-        dbSupportSchemaA = DbSupportFactory.getDbSupport(configuration, dataSource, "SCHEMA_A");
-        dbSupportSchemaB = DbSupportFactory.getDbSupport(configuration, dataSource, "SCHEMA_B");
-        dbSupportSchemaC = DbSupportFactory.getDbSupport(configuration, dataSource, "SCHEMA_C");
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupportPublic = DbSupportFactory.getDbSupport(configuration, sqlHandler, "PUBLIC");
+        dbSupportSchemaA = DbSupportFactory.getDbSupport(configuration, sqlHandler, "SCHEMA_A");
+        dbSupportSchemaB = DbSupportFactory.getDbSupport(configuration, sqlHandler, "SCHEMA_B");
+        dbSupportSchemaC = DbSupportFactory.getDbSupport(configuration, sqlHandler, "SCHEMA_C");
         // configure items to preserve
         configuration.setProperty(PROPKEY_PRESERVE_SCHEMAS, "schema_c");
         configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_TABLE"));
@@ -78,7 +80,7 @@ public class DBClearerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupportSchemaA.quoted("SCHEMA_A") + ".test_sequence");
         configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "test_synonym, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_SYNONYM"));
         // create clearer instance
-        dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
+        dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 
         dropTestDatabase();
         createTestDatabase();

@@ -87,7 +87,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public Set<String> getSequenceNames() {
-        return getItemsAsStringSet("select SEQNAME from SYSIBM.SYSSEQUENCES where SEQSCHEMA = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select SEQNAME from SYSIBM.SYSSEQUENCES where SEQSCHEMA = '" + getSchemaName() + "'");
     }
 
 
@@ -98,7 +98,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getItemsAsStringSet("select NAME from SYSIBM.SYSTRIGGERS where SCHEMA = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select NAME from SYSIBM.SYSTRIGGERS where SCHEMA = '" + getSchemaName() + "'");
     }
 
 
@@ -110,7 +110,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public long getCurrentValueOfSequence(String sequenceName) {
-        return getItemAsLong("VALUES PREVVAL FOR " + qualified(sequenceName), getDataSource());
+        return getSQLHandler().getItemAsLong("VALUES PREVVAL FOR " + qualified(sequenceName));
     }
 
 
@@ -122,8 +122,8 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) {
-        executeUpdate("ALTER SEQUENCE " + qualified(sequenceName) + " RESTART WITH " + newSequenceValue, getDataSource());
-        executeUpdate("VALUES NEXTVAL FOR " + qualified(sequenceName), getDataSource());
+        getSQLHandler().executeUpdate("ALTER SEQUENCE " + qualified(sequenceName) + " RESTART WITH " + newSequenceValue);
+        getSQLHandler().executeUpdate("VALUES NEXTVAL FOR " + qualified(sequenceName));
     }
 
 
@@ -136,7 +136,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TABNAME = '" + tableName + "' and ENFORCED = 'Y'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TABNAME = '" + tableName + "' and ENFORCED = 'Y'");
     }
 
 
@@ -148,7 +148,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName, getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName);
     }
 
 

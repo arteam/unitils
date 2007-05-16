@@ -18,6 +18,7 @@ package org.unitils.dbmaintainer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.clean.DBCodeClearer;
@@ -61,7 +62,7 @@ import java.util.Properties;
  * </ul>
  * <p/>
  * To obtain a properly configured <code>DBMaintainer</code>, invoke the contructor
- * {@link #DBMaintainer(Properties,DataSource)} with a <code>TestDataSource</code> providing access
+ * {@link #DBMaintainer(Properties,SQLHandler)} with a <code>TestDataSource</code> providing access
  * to the database and a <code>Configuration</code> object containing all necessary properties.
  *
  * @author Filip Neven
@@ -152,38 +153,38 @@ public class DBMaintainer {
      * derived from the given <code>Configuration</code> object.
      *
      * @param configuration the configuration, not null
-     * @param dataSource    the data source, not null
+     * @param sqlHandler    the data source, not null
      */
-    public DBMaintainer(Properties configuration, DataSource dataSource) {
-        scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, dataSource);
-        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, dataSource);
-        versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, dataSource);
-        scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, dataSource);
+    public DBMaintainer(Properties configuration, SQLHandler sqlHandler) {
+        scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, sqlHandler);
+        codeScriptRunner = getConfiguredDatabaseTaskInstance(CodeScriptRunner.class, configuration, sqlHandler);
+        versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, sqlHandler);
+        scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, sqlHandler);
 
         boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DB_CLEANER_ENABLED, configuration);
         if (cleanDbEnabled) {
-            dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
+            dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
         }
 
         fromScratchEnabled = PropertyUtils.getBoolean(PROPKEY_FROM_SCRATCH_ENABLED, configuration);
         keepRetryingAfterError = PropertyUtils.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, configuration);
         if (fromScratchEnabled) {
-            dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, dataSource);
+            dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
         }
         clearDbCodeEnabled = PropertyUtils.getBoolean(PROPKEY_CLEAR_DB_CODE_ENABLED, configuration);
-        dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, dataSource);
+        dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, sqlHandler);
 
         disableConstraintsEnabled = PropertyUtils.getBoolean(PROPKEY_DISABLE_CONSTRAINTS_ENABLED, configuration);
-        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, dataSource);
+        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler);
 
         boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATE_SEQUENCES_ENABLED, configuration);
         if (updateSequences) {
-            sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, dataSource);
+            sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler);
         }
 
         boolean generateDtd = PropertyUtils.getBoolean(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, configuration);
         if (generateDtd) {
-            dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, dataSource);
+            dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
         }
     }
 
@@ -326,7 +327,6 @@ public class DBMaintainer {
 
             // update the db version and mark as successful
             versionSource.setDbVersion(versionScriptPair.getVersion());
-            versionSource.registerUpdateSucceeded(true);
             logger.info("Database version successfully incremented to " + versionScriptPair.getVersion());
         }
     }
@@ -357,7 +357,16 @@ public class DBMaintainer {
         }
         // if the execution of all scripts succeeded, update the code scripts timestamp and mark as successful
         versionSource.setCodeScriptsTimestamp(scriptSource.getCodeScriptsTimestamp());
-        versionSource.registerCodeUpdateSucceeded(true);
     }
 
+
+    /**
+     * Updates the database version to the current version of the update scripts, without changing anything else in
+     * the database. Can be used to initialize the database for future updates, knowning that the current state of the
+     * database is synchronized with the current state of the scripts.
+     */
+    public void setDatabaseToCurrentVersion() {
+        Version currentVersion = scriptSource.getCurrentVersion();
+        versionSource.setDbVersion(currentVersion);
+    }
 }

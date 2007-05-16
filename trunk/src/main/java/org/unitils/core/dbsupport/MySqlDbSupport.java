@@ -54,7 +54,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTableNames() {
-        return getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + getSchemaName() + "' and table_type = 'BASE TABLE'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + getSchemaName() + "' and table_type = 'BASE TABLE'");
     }
 
 
@@ -66,7 +66,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getColumnNames(String tableName) {
-        return getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -78,7 +78,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        return getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -90,7 +90,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getNotNullColummnNames(String tableName) {
-        return getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -101,7 +101,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getViewNames() {
-        return getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + getSchemaName() + "' and table_type = 'VIEW'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + getSchemaName() + "' and table_type = 'VIEW'");
     }
 
 
@@ -112,7 +112,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getItemsAsStringSet("select trigger_name from information_schema.triggers where trigger_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select trigger_name from information_schema.triggers where trigger_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -125,7 +125,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
-        executeUpdate("alter table " + qualified(tableName) + " AUTO_INCREMENT = " + identityValue, getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " AUTO_INCREMENT = " + identityValue);
     }
 
 
@@ -137,7 +137,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -149,7 +149,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + constraintName, getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + constraintName);
     }
 
 
@@ -162,7 +162,7 @@ public class MySqlDbSupport extends DbSupport {
     @Override
     public void removeNotNullConstraint(String tableName, String columnName) {
         String type = getColumnType(tableName, columnName);
-        executeUpdate("alter table " + qualified(tableName) + " change column " + columnName + " " + columnName + " " + type + " NULL ", getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " change column " + columnName + " " + columnName + " " + type + " NULL ");
     }
 
 
@@ -175,7 +175,7 @@ public class MySqlDbSupport extends DbSupport {
      * @return The type, not null
      */
     protected String getColumnType(String tableName, String columnName) {
-        return getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + columnName + "'", getDataSource());
+        return getSQLHandler().getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + columnName + "'");
     }
 
 

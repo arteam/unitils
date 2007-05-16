@@ -44,7 +44,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTableNames() {
-        return getItemsAsStringSet("select table_name from information_schema.tables where table_type = 'BASE TABLE' and table_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_type = 'BASE TABLE' and table_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -56,7 +56,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getColumnNames(String tableName) {
-        return getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -68,7 +68,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        return getItemsAsStringSet("select column_name from information_schema.table_constraints con, information_schema.key_column_usage key where con.table_name = '" + tableName + "' and con.table_schema = '" + getSchemaName() + "' and key.table_name = '" + tableName + "' and key.table_schema = '" + getSchemaName() + "' and con.constraint_type = 'PRIMARY KEY'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.table_constraints con, information_schema.key_column_usage key where con.table_name = '" + tableName + "' and con.table_schema = '" + getSchemaName() + "' and key.table_name = '" + tableName + "' and key.table_schema = '" + getSchemaName() + "' and con.constraint_type = 'PRIMARY KEY'");
     }
 
 
@@ -80,7 +80,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getNotNullColummnNames(String tableName) {
-        return getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -91,7 +91,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getViewNames() {
-        return getItemsAsStringSet("select table_name from information_schema.tables where table_type = 'VIEW' and table_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_type = 'VIEW' and table_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -106,7 +106,7 @@ public class PostgreSqlDbSupport extends DbSupport {
         // Should be replaced by the original query on information_schema.sequences in future, since this is a more elegant solution
         // This is the original query:
         // getItemsAsStringSet("select sequence_name from information_schema.sequences where sequence_schema = '" + getSchemaName() + "'", getDataSource());
-        return getItemsAsStringSet("select c.relname from pg_class c join pg_namespace n on (c.relnamespace = n.oid) where c.relkind = 'S' and n.nspname = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select c.relname from pg_class c join pg_namespace n on (c.relnamespace = n.oid) where c.relkind = 'S' and n.nspname = '" + getSchemaName() + "'");
     }
 
 
@@ -117,7 +117,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getItemsAsStringSet("select trigger_name from information_schema.triggers where trigger_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select trigger_name from information_schema.triggers where trigger_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -128,7 +128,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTypeNames() {
-        return getItemsAsStringSet("select object_name from information_schema.data_type_privileges where object_type = 'USER-DEFINED TYPE' and object_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select object_name from information_schema.data_type_privileges where object_type = 'USER-DEFINED TYPE' and object_schema = '" + getSchemaName() + "'");
     }
 
 
@@ -140,7 +140,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public void dropType(String typeName) {
-        executeUpdate("drop type " + qualified(typeName) + " cascade", getDataSource());
+        getSQLHandler().executeUpdate("drop type " + qualified(typeName) + " cascade");
     }
 
 
@@ -152,7 +152,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public long getCurrentValueOfSequence(String sequenceName) {
-        return getItemAsLong("select last_value from " + qualified(sequenceName), getDataSource());
+        return getSQLHandler().getItemAsLong("select last_value from " + qualified(sequenceName));
     }
 
 
@@ -164,7 +164,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) {
-        getItemAsLong("select setval('" + qualified(sequenceName) + "', " + newSequenceValue + ")", getDataSource());
+        getSQLHandler().getItemAsLong("select setval('" + qualified(sequenceName) + "', " + newSequenceValue + ")");
     }
 
 
@@ -176,7 +176,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getItemsAsStringSet("select constraint_name from information_schema.table_constraints where table_name = '" + tableName + "' and constraint_type = 'FOREIGN KEY' and constraint_schema = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select constraint_name from information_schema.table_constraints where table_name = '" + tableName + "' and constraint_type = 'FOREIGN KEY' and constraint_schema = '" + getSchemaName() + "'");
     }
 
     /**
@@ -187,7 +187,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        executeUpdate("alter table " + qualified(tableName) + " drop constraint \"" + constraintName + "\"", getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint \"" + constraintName + "\"");
     }
 
 
@@ -199,7 +199,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public void removeNotNullConstraint(String tableName, String columnName) {
-        executeUpdate("alter table " + qualified(tableName) + " alter column " + columnName + " drop not null", getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + columnName + " drop not null");
     }
 
 

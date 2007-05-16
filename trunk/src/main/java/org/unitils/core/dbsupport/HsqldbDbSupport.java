@@ -15,9 +15,8 @@
  */
 package org.unitils.core.dbsupport;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import static org.unitils.core.util.SQLUtils.*;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.getItemsAsStringSet;
 
 import java.util.Set;
 
@@ -28,10 +27,6 @@ import java.util.Set;
  * @author Tim Ducheyne
  */
 public class HsqldbDbSupport extends DbSupport {
-
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(HsqldbDbSupport.class);
-
 
     /**
      * Creates support for HsqlDb databases.
@@ -48,7 +43,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTableNames() {
-        return getItemsAsStringSet("select TABLE_NAME from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_TYPE = 'TABLE' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_TYPE = 'TABLE' AND TABLE_SCHEM = '" + getSchemaName() + "'");
     }
 
 
@@ -60,7 +55,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getColumnNames(String tableName) {
-        return getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'");
     }
 
 
@@ -72,7 +67,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        return getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'");
     }
 
 
@@ -84,7 +79,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getNotNullColummnNames(String tableName) {
-        return getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where IS_NULLABLE = 'NO' AND TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where IS_NULLABLE = 'NO' AND TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'");
     }
 
 
@@ -95,7 +90,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getViewNames() {
-        return getItemsAsStringSet("select TABLE_NAME from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_TYPE = 'VIEW' AND TABLE_SCHEM = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from INFORMATION_SCHEMA.SYSTEM_TABLES where TABLE_TYPE = 'VIEW' AND TABLE_SCHEM = '" + getSchemaName() + "'");
     }
 
 
@@ -106,7 +101,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getSequenceNames() {
-        return getItemsAsStringSet("select SEQUENCE_NAME from INFORMATION_SCHEMA.SYSTEM_SEQUENCES where SEQUENCE_SCHEMA = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select SEQUENCE_NAME from INFORMATION_SCHEMA.SYSTEM_SEQUENCES where SEQUENCE_SCHEMA = '" + getSchemaName() + "'");
     }
 
 
@@ -117,7 +112,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getItemsAsStringSet("select TRIGGER_NAME from INFORMATION_SCHEMA.SYSTEM_TRIGGERS where TRIGGER_SCHEM = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select TRIGGER_NAME from INFORMATION_SCHEMA.SYSTEM_TRIGGERS where TRIGGER_SCHEM = '" + getSchemaName() + "'");
     }
 
 
@@ -129,7 +124,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public long getCurrentValueOfSequence(String sequenceName) {
-        return getItemAsLong("select START_WITH from INFORMATION_SCHEMA.SYSTEM_SEQUENCES where SEQUENCE_SCHEMA = '" + getSchemaName() + "' and SEQUENCE_NAME = '" + sequenceName + "'", getDataSource());
+        return getSQLHandler().getItemAsLong("select START_WITH from INFORMATION_SCHEMA.SYSTEM_SEQUENCES where SEQUENCE_SCHEMA = '" + getSchemaName() + "' and SEQUENCE_NAME = '" + sequenceName + "'");
     }
 
 
@@ -141,7 +136,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) {
-        executeUpdate("alter sequence " + qualified(sequenceName) + " restart with " + newSequenceValue, getDataSource());
+        getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " restart with " + newSequenceValue);
     }
 
 
@@ -154,7 +149,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
-        executeUpdate("alter table " + qualified(tableName) + " alter column " + identityColumnName + " RESTART WITH " + identityValue, getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + identityColumnName + " RESTART WITH " + identityValue);
     }
 
 
@@ -166,7 +161,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getItemsAsStringSet("select CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE = 'FOREIGN KEY' AND TABLE_NAME = '" + tableName + "' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'", getDataSource());
+        return getSQLHandler().getItemsAsStringSet("select CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE = 'FOREIGN KEY' AND TABLE_NAME = '" + tableName + "' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
     }
 
 
@@ -178,7 +173,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName, getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName);
     }
 
 
@@ -190,7 +185,7 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public void removeNotNullConstraint(String tableName, String columnName) {
-        executeUpdate("alter table " + qualified(tableName) + " alter column " + columnName + " set null", getDataSource());
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + columnName + " set null");
     }
 
 

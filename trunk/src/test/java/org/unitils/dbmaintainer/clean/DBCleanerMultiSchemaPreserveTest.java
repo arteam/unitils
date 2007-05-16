@@ -20,8 +20,11 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.dbsupport.DbSupportFactory;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.*;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.dbsupport.TestSQLUtils.isEmpty;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
@@ -77,11 +80,12 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
 
         // configure 3 schemas
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
-        dbSupport = getDefaultDbSupport(configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
         // items to preserve
         configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS, "schema_c");
         configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_TABLES, "test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST"));
-        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
+        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
 
         dropTestTables();
         createTestTables();

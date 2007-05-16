@@ -15,13 +15,16 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupports;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 
-import javax.sql.DataSource;
 import java.util.List;
 import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
 
 /**
  * Base class for a database task.
@@ -32,7 +35,7 @@ import java.util.Properties;
 abstract public class BaseDatabaseTask implements DatabaseTask {
 
     /* Provides connections to the unit test database*/
-    protected DataSource dataSource;
+    protected SQLHandler sqlHandler;
 
     /* DbSupport for the default schema */
     protected DbSupport defaultDbSupport;
@@ -45,12 +48,12 @@ abstract public class BaseDatabaseTask implements DatabaseTask {
      * Initializes the database operation class with the given {@link Properties}, {@link DataSource}.
      *
      * @param configuration The configuration, not null
-     * @param dataSource    The datasource, not null
+     * @param sqlHandler    The sql handler, not null
      */
-    public void init(Properties configuration, DataSource dataSource) {
-        this.dataSource = dataSource;
-        this.dbSupports = getDbSupports(configuration, dataSource);
-        this.defaultDbSupport = getDefaultDbSupport(configuration, dataSource);
+    public void init(Properties configuration, SQLHandler sqlHandler) {
+        this.sqlHandler = sqlHandler;
+        this.dbSupports = getDbSupports(configuration, sqlHandler);
+        this.defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         doInit(configuration);
     }

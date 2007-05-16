@@ -88,7 +88,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
 
         private boolean updateDataSchemaCalled = false;
 
-        public void updateDatabaseSchema() {
+        public void updateDatabase() {
             updateDataSchemaCalled = true;
         }
     }

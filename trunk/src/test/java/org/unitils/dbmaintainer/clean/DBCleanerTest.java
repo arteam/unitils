@@ -18,7 +18,10 @@ package org.unitils.dbmaintainer.clean;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.dbsupport.DbSupportFactory;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.*;
 import static org.unitils.core.dbsupport.TestSQLUtils.*;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
@@ -59,13 +62,14 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = getDefaultDbSupport(configuration, dataSource);
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         // items to preserve
         configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_TABLES, "Test_table_Preserve");
         configuration.setProperty(PROPKEY_PRESERVE_TABLES, dbSupport.quoted("Test_CASE_Table_Preserve"));
         // create cleaner instance
-        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, dataSource);
+        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
         versionTableName = configuration.getProperty(PROPKEY_VERSION_TABLE_NAME);
 
         cleanupTestDatabase();
