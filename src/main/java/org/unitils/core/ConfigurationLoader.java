@@ -72,15 +72,28 @@ public class ConfigurationLoader {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(ConfigurationLoader.class);
 
-
+    
     /**
      * Creates and loads all configuration settings.
      *
      * @return the settings, not null
      */
     public Properties loadConfiguration() {
+        return loadConfiguration(null);
+    }
+    
+
+    /**
+     * Creates and loads all configuration settings.
+     * 
+     * @param customConfigurationFileName The name of the custom configuration file. 
+     *        May be null: if so, the fileName is retrieved from the default properties. 
+     *
+     * @return the settings, not null
+     */
+    public Properties loadConfiguration(String customConfigurationFileName) {
         Properties defaultProperties = createDefaultProperties();
-        Properties customProperties = createCustomProperties(defaultProperties);
+        Properties customProperties = createCustomProperties(defaultProperties, customConfigurationFileName);
         Properties localProperties = createLocalProperties(defaultProperties, customProperties);
 
         Properties result = new Properties();
@@ -126,10 +139,13 @@ public class ConfigurationLoader {
      * {@link #PROPKEY_CUSTOM_CONFIGURATION} property in the given default configuration.
      *
      * @param defaultProperties the default settings, not null
+     * @param customConfigurationFileName TODO
      * @return the custom settings, null if not found or not loaded
      */
-    protected Properties createCustomProperties(Properties defaultProperties) {
-        String customConfigurationFileName = getString(PROPKEY_CUSTOM_CONFIGURATION, null, defaultProperties);
+    protected Properties createCustomProperties(Properties defaultProperties, String customConfigurationFileName) {
+        if (customConfigurationFileName == null) {
+            customConfigurationFileName = getString(PROPKEY_CUSTOM_CONFIGURATION, null, defaultProperties);
+        }
         if (customConfigurationFileName == null) {
             // loading of local settings disabled
             return null;
@@ -208,5 +224,8 @@ public class ConfigurationLoader {
             closeQuietly(inputStream);
         }
     }
+
+
+    
 
 }

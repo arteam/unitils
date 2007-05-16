@@ -15,12 +15,13 @@
  */
 package org.unitils.util;
 
-import org.unitils.core.UnitilsException;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.unitils.core.UnitilsException;
 
 /**
  * Utilities for working with property files.
@@ -40,7 +41,7 @@ public class PropertyUtils {
      * @return The trimmed string value, not null
      */
     public static String getString(String propertyName, Properties properties) {
-        String value = properties.getProperty(propertyName);
+        String value = getProperty(propertyName, properties);
         if (value == null || "".equals(value.trim())) {
             throw new UnitilsException("No value found for property " + propertyName);
         }
@@ -58,7 +59,7 @@ public class PropertyUtils {
      * @return The trimmed string value, not null
      */
     public static String getString(String propertyName, String defaultValue, Properties properties) {
-        String value = properties.getProperty(propertyName);
+        String value = getProperty(propertyName, properties);
         if (value == null || "".equals(value.trim())) {
             return defaultValue;
         }
@@ -92,7 +93,7 @@ public class PropertyUtils {
      * @return The trimmed string list, empty or exception if none found
      */
     public static List<String> getStringList(String propertyName, Properties properties, boolean required) {
-        String values = properties.getProperty(propertyName);
+        String values = getProperty(propertyName, properties);
         if (values == null || "".equals(values.trim())) {
             return new ArrayList<String>(0);
         }
@@ -118,7 +119,7 @@ public class PropertyUtils {
      * @return The boolean value, not null
      */
     public static boolean getBoolean(String propertyName, Properties properties) {
-        String value = properties.getProperty(propertyName);
+        String value = getProperty(propertyName, properties);
         if (value == null || "".equals(value.trim())) {
             throw new UnitilsException("No value found for property " + propertyName);
         }
@@ -136,7 +137,7 @@ public class PropertyUtils {
      * @return The boolean value, not null
      */
     public static boolean getBoolean(String propertyName, boolean defaultValue, Properties properties) {
-        String value = properties.getProperty(propertyName);
+        String value = getProperty(propertyName, properties);
         if (value == null || "".equals(value.trim())) {
             return defaultValue;
         }
@@ -153,7 +154,7 @@ public class PropertyUtils {
      * @return The long value, not null
      */
     public static long getLong(String propertyName, Properties properties) {
-        String value = properties.getProperty(propertyName);
+        String value = getProperty(propertyName, properties);
         if (value == null || "".equals(value.trim())) {
             throw new UnitilsException("No value found for property " + propertyName);
         }
@@ -177,7 +178,7 @@ public class PropertyUtils {
      * @return The string value, not null
      */
     public static long getLong(String propertyName, long defaultValue, Properties properties) {
-        String value = properties.getProperty(propertyName);
+        String value = getProperty(propertyName, properties);
         if (value == null || "".equals(value.trim())) {
             return defaultValue;
         }
@@ -222,4 +223,14 @@ public class PropertyUtils {
         }
         return (T) createInstanceOfType(className);
     }
+    
+    
+    private static String getProperty(String propertyName, Properties properties) {
+        String value = System.getProperty(propertyName);
+        if (value == null) {
+            value = properties.getProperty(propertyName);
+        }
+        return value;
+    }
+    
 }
