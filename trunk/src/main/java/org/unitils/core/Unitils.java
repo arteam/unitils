@@ -68,11 +68,8 @@ public class Unitils implements Module {
      * ConfigurationLoader}
      */
     public static void initSingletonInstance() {
-        ConfigurationLoader configurationLoader = new ConfigurationLoader();
-        Properties configuration = configurationLoader.loadConfiguration();
-
         unitils = new Unitils();
-        unitils.init(configuration);
+        unitils.init();
     }
 
 
@@ -92,10 +89,29 @@ public class Unitils implements Module {
     public Unitils() {
         testContext = new TestContext();
     }
-
-
+    
+    
     /**
-     * Iniitializes Unitils with the given configuration. All the modules taht are configured in the given configuration
+     * Initializes unitils with the configuration files. 
+     */
+    public void init() {
+        init((String) null);
+    }
+    
+    
+    /**
+     * Initializes unitils with the given custom configuration file
+     * 
+     * @param customConfigurationFileName The name of the custom configuration file
+     */
+    public void init(String customConfigurationFileName) {
+        ConfigurationLoader configurationLoader = new ConfigurationLoader();
+        Properties properties = configurationLoader.loadConfiguration(customConfigurationFileName);
+        init(properties);
+    }
+    
+    /**
+     * Initializes Unitils with the given configuration. All the modules that are configured in the given configuration
      * are also created and initialized with this configuration.
      * @param configuration
      */
