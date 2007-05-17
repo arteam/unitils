@@ -15,9 +15,12 @@
  */
 package org.unitils.util;
 
+import org.unitils.core.UnitilsException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -114,21 +117,23 @@ public class AnnotationUtils {
 
     @SuppressWarnings({"unchecked"})
     public static <S extends Annotation, T> T getMethodOrClassLevelAnnotationProperty(Class<S> annotationClass,
-                        AnnotationPropertyAccessor<S, T> annotationPropertyAccessor, T defaultValue, Method method) {
+                        String annotationPropertyName, T defaultValue, Method method) {
 
         S annotation = method.getAnnotation(annotationClass);
         if (annotation != null) {
-            T propertyValue = annotationPropertyAccessor.getAnnotationProperty(annotation);
+            Method annotationProperty = getAnnotationPropertyWithName(annotationClass, annotationPropertyName);
+            T propertyValue = (T) getAnnotationPropertyValue(annotationProperty, annotation);
             if (!defaultValue.equals(propertyValue)) {
                 return propertyValue;
             }
         }
-        return getClassLevelAnnotationProperty(annotationClass, annotationPropertyAccessor, defaultValue, method.getDeclaringClass());
+        return getClassLevelAnnotationProperty(annotationClass, annotationPropertyName, defaultValue, method.getDeclaringClass());
     }
+
 
     @SuppressWarnings({"unchecked"})
     private static <S extends Annotation, T> T getClassLevelAnnotationProperty(Class<S> annotationClass,
-                         AnnotationPropertyAccessor<S, T> annotationPropertyAccessor, T defaultValue, Class<?> clazz) {
+                         String annotationPropertyName, T defaultValue, Class<?> clazz) {
 
         if (Object.class.equals(clazz)) {
             return defaultValue;
@@ -136,12 +141,37 @@ public class AnnotationUtils {
 
         S annotation = clazz.getAnnotation(annotationClass);
         if (annotation != null) {
-            T propertyValue = annotationPropertyAccessor.getAnnotationProperty(annotation);
+            Method annotationProperty = getAnnotationPropertyWithName(annotationClass, annotationPropertyName);
+            T propertyValue = (T) getAnnotationPropertyValue(annotationProperty, annotation);
             if (!defaultValue.equals(propertyValue)) {
                 return propertyValue;
             }
         }
-        return getClassLevelAnnotationProperty(annotationClass, annotationPropertyAccessor, defaultValue, clazz.getSuperclass());
+        return getClassLevelAnnotationProperty(annotationClass, annotationPropertyName, defaultValue, clazz.getSuperclass());
+    }
+
+
+    public static Method getAnnotationPropertyWithName(Class<? extends Annotation> annotation, String annotationPropertyName) {
+        try {
+            return annotation.getMethod(annotationPropertyName);
+        } catch (NoSuchMethodException e) {
+            throw new UnitilsException("Could not find annotation property named " + annotationPropertyName + " on annotation " +
+                    annotation.getName());
+        }
+    }
+
+
+    public static <T> T getAnnotationPropertyValue(Method annotationProperty, Annotation annotation) {
+        try {
+            //noinspection unchecked
+            return (T) annotationProperty.invoke(annotation);
+        } catch (IllegalAccessException e) {
+            throw new UnitilsException("Error retrieving value of property " + annotationProperty.getName() +
+                " of annotation of type " + annotation.getClass().getSimpleName(), e);
+        } catch (InvocationTargetException e) {
+            throw new UnitilsException("Error retrieving value of property " + annotationProperty.getName() +
+                " of annotation of type " + annotation.getClass().getSimpleName(), e);
+        }
     }
 
 }

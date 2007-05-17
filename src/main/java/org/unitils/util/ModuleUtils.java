@@ -15,6 +15,7 @@
  */
 package org.unitils.util;
 
+import static org.unitils.util.AnnotationUtils.getAnnotationPropertyWithName;
 import static org.apache.commons.lang.ClassUtils.getShortClassName;
 import org.unitils.core.Module;
 import org.unitils.core.UnitilsException;
@@ -114,7 +115,7 @@ public class ModuleUtils {
                     String annotationPropertyName, T enumValue, Map<Class<? extends Annotation>, Map<Method, String>> allDefaultValues,
                     String defaultValueName) {
 
-        Method annotationProperty = ReflectionUtils.getAnnotationPropertyWithName(annotation, annotationPropertyName);
+        Method annotationProperty = getAnnotationPropertyWithName(annotation, annotationPropertyName);
         String valueAsString = getValueAsStringReplaceDefault(annotation, annotationProperty, enumValue.name(),
                 allDefaultValues, defaultValueName);
         //noinspection unchecked
@@ -138,7 +139,7 @@ public class ModuleUtils {
                     String annotationPropertyName, Class<?> value, Map<Class<? extends Annotation>, Map<Method, String>> allDefaultValues,
                     Class defaultValueClass) {
 
-        Method annotationProperty = ReflectionUtils.getAnnotationPropertyWithName(annotation, annotationPropertyName);
+        Method annotationProperty = getAnnotationPropertyWithName(annotation, annotationPropertyName);
         String valueAsString = getValueAsStringReplaceDefault(annotation, annotationProperty, value.getName(),
                 allDefaultValues, defaultValueClass.getName());
         return ReflectionUtils.getClassWithName(valueAsString);

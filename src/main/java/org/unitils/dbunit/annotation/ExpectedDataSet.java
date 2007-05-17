@@ -15,6 +15,9 @@
  */
 package org.unitils.dbunit.annotation;
 
+import org.unitils.dbunit.datasetfactory.DataSetFactory;
+import org.unitils.dbunit.datasetfactory.DefaultDataSetFactory;
+
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Inherited;
@@ -83,5 +86,7 @@ public @interface ExpectedDataSet {
      * @return the fileName, empty for default
      */
     String value() default "";
+
+    Class<? extends DataSetFactory> factory() default DefaultDataSetFactory.class;
 
 }

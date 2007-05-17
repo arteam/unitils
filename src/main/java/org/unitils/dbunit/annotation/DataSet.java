@@ -17,6 +17,8 @@ package org.unitils.dbunit.annotation;
 
 import org.unitils.dbunit.datasetoperation.DataSetOperation;
 import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
+import org.unitils.dbunit.datasetfactory.DataSetFactory;
+import org.unitils.dbunit.datasetfactory.DefaultDataSetFactory;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
@@ -87,5 +89,12 @@ public @interface DataSet {
      */
     String value() default "";
 
+    /**
+     * The operation that needs to be executed to get the dbunit dataset into the database
+     *
+     * @return An implementation class of {@link DataSetOperation}. {@link DefaultDataSetOperation} for default
+     */
     Class<? extends DataSetOperation> operation() default DefaultDataSetOperation.class;
+
+    Class<? extends DataSetFactory> factory() default DefaultDataSetFactory.class;
 }
