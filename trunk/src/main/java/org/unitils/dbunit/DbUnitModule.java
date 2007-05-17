@@ -141,7 +141,7 @@ public class DbUnitModule implements Module {
                 // no dataset specified
                 return;
             }
-            org.unitils.dbunit.dataSetOperation.DataSetOperation dataSetOperation = getDataSetOperation(testMethod);
+            DataSetOperation dataSetOperation = getDataSetOperation(testMethod);
 
             for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
                 IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
