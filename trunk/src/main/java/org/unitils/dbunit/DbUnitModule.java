@@ -15,21 +15,7 @@
  */
 package org.unitils.dbunit;
 
-import static org.dbunit.operation.DatabaseOperation.CLEAN_INSERT;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -39,6 +25,8 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
@@ -47,6 +35,25 @@ import org.unitils.dbunit.util.DataSetXmlReader;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
+import org.unitils.dbunit.dataSetOperation.DataSetOperation;
+import org.unitils.dbunit.dataSetOperation.DefaultDataSetOperation;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.unitils.util.AnnotationPropertyAccessor;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import org.unitils.util.ReflectionUtils;
+import org.unitils.util.ModuleUtils;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+
+import javax.sql.DataSource;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -73,12 +80,16 @@ import org.unitils.dbunit.util.MultiSchemaDataSet;
  */
 public class DbUnitModule implements Module {
 
+    /* Map holding the default configuration of the dbunit module annotations */
+    private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
+
     /*
-     * Object that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
-     * caching is time-consuming, this object is created only once and used througout the entire test run. The
+     * Objects that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
+     * caching is time-consuming, this object is created only once and used throughout the entire test run. The
      * underlying JDBC Connection however is 'closed' (returned to the pool) after every database operation.
      *
-     * todo javadoc
+     * A different DbUnit connection is used for every database schema. Since DbUnit can only work with a single schema,
+     * this is the simplest way to obtain multi-schema support. 
      */
     private Map<String, DbUnitDatabaseConnection> dbUnitDatabaseConnections = new HashMap<String, DbUnitDatabaseConnection>();
 
@@ -93,6 +104,8 @@ public class DbUnitModule implements Module {
      */
     public void init(Properties configuration) {
         this.configuration = configuration;
+
+        defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DbUnitModule.class, configuration, DataSet.class);
     }
 
 
@@ -128,9 +141,11 @@ public class DbUnitModule implements Module {
                 // no dataset specified
                 return;
             }
+            DataSetOperation dataSetOperation = getDataSetOperation(testMethod);
+
             for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
                 IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
-                CLEAN_INSERT.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
+                dataSetOperation.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
             }
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
@@ -162,8 +177,6 @@ public class DbUnitModule implements Module {
 
 
     /**
-     * todo javadoc
-     * <p/>
      * Compares the contents of the expected DbUnitDataSet with the contents of the database. Only the tables and columns
      * that occur in the expected DbUnitDataSet are compared with the database contents.
      *
@@ -210,31 +223,19 @@ public class DbUnitModule implements Module {
      * @return The dataset, null if there is no data set
      */
     public MultiSchemaDataSet getTestDataSets(Method testMethod) {
-        Class<?> testClass = testMethod.getDeclaringClass();
-
-        // get the value of the method-level annotation
-        String dataSetFileName = null;
-        DataSet dataSetAnnotationMethod = testMethod.getAnnotation(DataSet.class);
-        if (dataSetAnnotationMethod != null) {
-            dataSetFileName = dataSetAnnotationMethod.value();
-
-        } else {
-            // no method-level found, try class-level
-            DataSet dataSetAnnotationClass = testClass.getAnnotation(DataSet.class);
-            if (dataSetAnnotationClass != null) {
-                dataSetFileName = dataSetAnnotationClass.value();
-            }
-        }
-
-        // check no annotations found
-        if (dataSetFileName == null) {
+        DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod);
+        if (dataSetAnnotation == null) {
+            // No @DataSet annotation found
             return null;
         }
+
+        String dataSetFileName = dataSetAnnotation.value();
+        Class<?> testClass = testMethod.getDeclaringClass();
 
         // empty means, use default file name
         if ("".equals(dataSetFileName)) {
             // first try method specific default file name
-            dataSetFileName = getMethodLevelDefaultTestDataSetFileName(testClass, testMethod);
+            dataSetFileName = getMethodLevelDefaultTestDataSetFileName(testMethod);
             MultiSchemaDataSet dataSets = createDataSets(testClass, dataSetFileName);
             if (dataSets != null) {
                 // found file, so return
@@ -260,34 +261,20 @@ public class DbUnitModule implements Module {
      * @return The dataset, null if there is no data set
      */
     public MultiSchemaDataSet getExpectedTestDataSets(Method testMethod) {
-        Class<?> testClass = testMethod.getDeclaringClass();
-
-        // get the value of the method-level annotation
-        String dataSetFileName = null;
-        ExpectedDataSet expectedDataSetAnnotation = testMethod.getAnnotation(ExpectedDataSet.class);
-        if (expectedDataSetAnnotation != null) {
-            dataSetFileName = expectedDataSetAnnotation.value();
-
-        } else {
-            // no method-level found, try class-level
-            ExpectedDataSet expectedDataSetAnnotationClass = testClass.getAnnotation(ExpectedDataSet.class);
-            if (expectedDataSetAnnotationClass != null) {
-                dataSetFileName = expectedDataSetAnnotationClass.value();
-            }
-        }
-
-        // check no annotations found
-        if (dataSetFileName == null) {
+        ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod);
+        if (expectedDataSetAnnotation == null) {
+            // No @ExpectedDataSet annotation found
             return null;
         }
 
+        String dataSetFileName = expectedDataSetAnnotation.value();
         // empty means use default file name
         if ("".equals(dataSetFileName)) {
             // first try method specific default file name
-            dataSetFileName = getDefaultExpectedDataSetFileName(testClass, testMethod);
+            dataSetFileName = getDefaultExpectedDataSetFileName(testMethod);
         }
 
-        MultiSchemaDataSet dataSets = createDataSets(testClass, dataSetFileName);
+        MultiSchemaDataSet dataSets = createDataSets(testMethod.getDeclaringClass(), dataSetFileName);
         if (dataSets == null) {
             throw new UnitilsException("Could not find expected DbUnit dataset with name " + dataSetFileName);
         }
@@ -345,6 +332,24 @@ public class DbUnitModule implements Module {
     }
 
 
+    @SuppressWarnings({"unchecked"})
+    protected DataSetOperation getDataSetOperation(Method testMethod) {
+        AnnotationPropertyAccessor<DataSet, Class<? extends DataSetOperation>> dataSetOperationAccessor =
+                new AnnotationPropertyAccessor<DataSet, Class<? extends DataSetOperation>>() {
+            public Class<? extends DataSetOperation> getAnnotationProperty(DataSet annotation) {
+                return annotation.operation();
+            }
+        };
+        Class<? extends DataSetOperation> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class,
+                dataSetOperationAccessor, DefaultDataSetOperation.class, testMethod);
+        dataSetOperationClass = (Class<? extends DataSetOperation>) ModuleUtils.getClassValueReplaceDefault(DataSet.class,
+                "operation", dataSetOperationClass, defaultAnnotationPropertyValues, DefaultDataSetOperation.class);
+
+        return ReflectionUtils.createInstanceOfType(dataSetOperationClass);
+    }
+
+
+
     /**
      * Creates a new instance of dbUnit's <code>IDatabaseConnection</code>
      *
@@ -388,12 +393,11 @@ public class DbUnitModule implements Module {
      * Gets the name of the default testdata file at method level. The default name is constructed as
      * follows: classname + '.' + methodName + '.xml'
      *
-     * @param testClass The test class, not null
      * @param method    The test method, not null
      * @return The default filename, not null
      */
-    protected String getMethodLevelDefaultTestDataSetFileName(Class<?> testClass, Method method) {
-        String className = testClass.getName();
+    protected String getMethodLevelDefaultTestDataSetFileName(Method method) {
+        String className = method.getDeclaringClass().getName();
         return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + ".xml";
     }
 
@@ -415,12 +419,11 @@ public class DbUnitModule implements Module {
      * Gets the name of the expected dataset file. The default name of this file is constructed as
      * follows: 'classname without packagename'.'testname'-result.xml.
      *
-     * @param testClass The test class, not null
      * @param method    The test method, not null
      * @return The expected dataset filename, not null
      */
-    protected static String getDefaultExpectedDataSetFileName(Class<?> testClass, Method method) {
-        String className = testClass.getName();
+    protected static String getDefaultExpectedDataSetFileName(Method method) {
+        String className = method.getDeclaringClass().getName();
         return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + "-result.xml";
     }
 

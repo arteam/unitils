@@ -15,6 +15,9 @@
  */
 package org.unitils.dbunit.annotation;
 
+import org.unitils.dbunit.dataSetOperation.DataSetOperation;
+import org.unitils.dbunit.dataSetOperation.DefaultDataSetOperation;
+
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Inherited;
@@ -84,4 +87,5 @@ public @interface DataSet {
      */
     String value() default "";
 
+    Class<? extends DataSetOperation> operation() default DefaultDataSetOperation.class;
 }

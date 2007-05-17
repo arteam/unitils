@@ -15,11 +15,13 @@
  */
 package org.unitils.util;
 
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
@@ -36,6 +38,11 @@ import java.util.List;
  */
 public class AnnotationUtilsTest extends TestCase {
 
+    private AnnotationPropertyAccessor levelPropertyAccessor = new AnnotationPropertyAccessor<TestAnnotation, String>() {
+        public String getAnnotationProperty(TestAnnotation testAnnotation) {
+            return testAnnotation.level();
+        }
+    };
 
     /**
      * Test to get all annotated fields.
@@ -69,7 +76,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith() {
         List<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", asList("method"), annotatedMethods);
+        assertPropertyLenEquals("name", asList("annotatedMethod"), annotatedMethods);
     }
 
 
@@ -87,7 +94,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith_methodFromSuperClass() {
         List<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", asList("method", "subMethod"), annotatedMethods);
+        assertPropertyLenEquals("name", asList("annotatedMethod", "annotatedSubMethod"), annotatedMethods);
     }
 
 
@@ -96,16 +103,78 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith_noMethodsFromSuperClass() {
         List<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class, false);
-        assertPropertyLenEquals("name", asList("subMethod"), annotatedMethods);
+        assertPropertyLenEquals("name", asList("annotatedSubMethod"), annotatedMethods);
+    }
+
+    /**
+     * Tests getting a method level annotation
+     */
+    public void testGetMethodOrClassLevelAnnotation_methodLevel() throws Exception {
+        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestClass.class.getDeclaredMethod("annotatedMethod"));
+        assertEquals("method", testAnnotation.level());
+    }
+
+    /**
+     * Tests getting a class level annotation
+     */
+    public void testGetMethodOrClassLevelAnnotation_classLevel() throws Exception {
+        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestClass.class.getDeclaredMethod("unAnnotatedMethod"));
+        assertEquals("class", testAnnotation.level());
+    }
+
+    /**
+     * Tests getting an annotation from the superclass
+     */
+    public void testGetMethodOrClassLevelAnnotation_superClassLevel() throws Exception {
+        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestSubClass.class.getDeclaredMethod("unAnnotatedSubMethod"));
+        assertEquals("class", testAnnotation.level());
+    }
+
+    /**
+     * Tests getting a method level annotation property
+     */
+    public void testGetMethodOrClassLevelAnnotationProperty_methodLevel() throws Exception {
+        String level = (String) AnnotationUtils.getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, levelPropertyAccessor,
+                "", TestClass.class.getDeclaredMethod("annotatedMethod"));
+        assertEquals("method", level);
+    }
+
+    /**
+     * Tests getting a class level annotation property
+     */
+    public void testGetMethodOrClassLevelAnnotationProperty_classLevel() throws Exception {
+        String level = (String) AnnotationUtils.getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, levelPropertyAccessor,
+                "", TestClass.class.getDeclaredMethod("unAnnotatedMethod"));
+        assertEquals("class", level);
+    }
+
+    /**
+     * Tests getting a super class level annotation property
+     */
+    public void testGetMethodOrClassLevelAnnotationProperty_superClassLevel() throws Exception {
+        String level = (String) AnnotationUtils.getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, levelPropertyAccessor,
+                "", TestSubClass.class.getDeclaredMethod("unAnnotatedSubMethod"));
+        assertEquals("class", level);
+    }
+
+    /**
+     * Tests getting an annotation property when the method level annotation uses the default
+     */
+    public void testGetMethodOrClassLevelAnnotationProperty_methodLevelWithDefaultProperty() throws Exception {
+        String level = (String) AnnotationUtils.getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, levelPropertyAccessor,
+                "", TestSubClass.class.getDeclaredMethod("annotatedSubMethod"));
+        assertEquals("class", level);
     }
 
 
     /**
      * Test annotation.
      */
-    @Target({FIELD, METHOD})
+    @Target({TYPE, FIELD, METHOD})
     @Retention(RUNTIME)
     private @interface TestAnnotation {
+
+        String level() default "";
     }
 
 
@@ -113,13 +182,17 @@ public class AnnotationUtilsTest extends TestCase {
      * Test class that class containing annotated fields and methods.
      */
     @SuppressWarnings({"UnusedDeclaration"})
+    @TestAnnotation(level = "class")
     private static class TestClass {
 
         @TestAnnotation
         private String field;
 
-        @TestAnnotation
-        private void method() {
+        @TestAnnotation(level = "method")
+        private void annotatedMethod() {
+        }
+        
+        private void unAnnotatedMethod() {
         }
     }
 
@@ -146,7 +219,10 @@ public class AnnotationUtilsTest extends TestCase {
         private String subField;
 
         @TestAnnotation
-        private void subMethod() {
+        private void annotatedSubMethod() {
+        }
+
+        private void unAnnotatedSubMethod() {
         }
 
     }

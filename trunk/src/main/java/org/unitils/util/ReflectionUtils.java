@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.*;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -461,4 +462,20 @@ public class ReflectionUtils {
         return methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
     }
 
+    public static Method getAnnotationPropertyWithName(Class<? extends Annotation> annotation, String annotationPropertyName) {
+        try {
+            return annotation.getMethod(annotationPropertyName);
+        } catch (NoSuchMethodException e) {
+            throw new UnitilsException("Could not find annotation property named " + annotationPropertyName + " on annotation " +
+                    annotation.getName());
+        }
+    }
+
+    public static Class<?> getClassWithName(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new UnitilsException("Could not find class with name " + className, e);
+        }
+    }
 }

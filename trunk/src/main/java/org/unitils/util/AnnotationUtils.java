@@ -38,7 +38,7 @@ public class AnnotationUtils {
      * @param annotation The annotation, not null
      * @return A List containing fields annotated with the given annotation, empty list if none found
      */
-    public static <T extends Annotation> List<Field> getFieldsAnnotatedWith(Class clazz, Class<T> annotation) {
+    public static <T extends Annotation> List<Field> getFieldsAnnotatedWith(Class<? extends Object> clazz, Class<T> annotation) {
         if (Object.class.equals(clazz)) {
             return Collections.emptyList();
         }
@@ -89,6 +89,59 @@ public class AnnotationUtils {
             annotatedMethods.addAll(getMethodsAnnotatedWith(clazz.getSuperclass(), annotation));
         }
         return annotatedMethods;
+    }
+
+    public static <T extends Annotation> T getMethodOrClassLevelAnnotation(Class<T> annotationClass, Method method) {
+        T annotation = method.getAnnotation(annotationClass);
+        if (annotation != null) {
+            return annotation;
+        }
+        return getClassLevelAnnotation(annotationClass, method.getDeclaringClass());
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static <T extends Annotation> T getClassLevelAnnotation(Class<T> annotationClass, Class clazz) {
+        if (Object.class.equals(clazz)) {
+            return null;
+        }
+
+        T annotation = (T) clazz.getAnnotation(annotationClass);
+        if (annotation != null) {
+            return annotation;
+        }
+        return getClassLevelAnnotation(annotationClass, clazz.getSuperclass());
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static <S extends Annotation, T> T getMethodOrClassLevelAnnotationProperty(Class<S> annotationClass,
+                        AnnotationPropertyAccessor<S, T> annotationPropertyAccessor, T defaultValue, Method method) {
+
+        S annotation = method.getAnnotation(annotationClass);
+        if (annotation != null) {
+            T propertyValue = annotationPropertyAccessor.getAnnotationProperty(annotation);
+            if (!defaultValue.equals(propertyValue)) {
+                return propertyValue;
+            }
+        }
+        return getClassLevelAnnotationProperty(annotationClass, annotationPropertyAccessor, defaultValue, method.getDeclaringClass());
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private static <S extends Annotation, T> T getClassLevelAnnotationProperty(Class<S> annotationClass,
+                         AnnotationPropertyAccessor<S, T> annotationPropertyAccessor, T defaultValue, Class<?> clazz) {
+
+        if (Object.class.equals(clazz)) {
+            return defaultValue;
+        }
+
+        S annotation = clazz.getAnnotation(annotationClass);
+        if (annotation != null) {
+            T propertyValue = annotationPropertyAccessor.getAnnotationProperty(annotation);
+            if (!defaultValue.equals(propertyValue)) {
+                return propertyValue;
+            }
+        }
+        return getClassLevelAnnotationProperty(annotationClass, annotationPropertyAccessor, defaultValue, clazz.getSuperclass());
     }
 
 }
