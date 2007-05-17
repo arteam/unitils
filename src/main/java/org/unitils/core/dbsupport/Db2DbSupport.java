@@ -74,14 +74,21 @@ public class Db2DbSupport extends DbSupport {
     }
 
 
+    /**
+     * Returns the names of all columns that have a 'not-null' constraint on them
+     *
+     * @param tableName The table, not null
+     * @return The set of column names, not null
+     */
     @Override
     public Set<String> getNotNullColummnNames(String tableName) {
         return getSQLHandler().getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where NULLS = 'N' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
     }
 
+
     /**
      * Retrieves the names of all the views in the database schema.
-     *
+     * <p/>
      * TODO check view types
      * V = View (untyped) W = Typed view
      *
