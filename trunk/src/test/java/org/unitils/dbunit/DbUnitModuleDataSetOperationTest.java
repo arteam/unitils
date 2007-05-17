@@ -3,7 +3,7 @@ package org.unitils.dbunit;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
-import org.unitils.dbunit.dataSetOperation.DataSetOperation;
+import org.unitils.dbunit.datasetoperation.DataSetOperation;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;

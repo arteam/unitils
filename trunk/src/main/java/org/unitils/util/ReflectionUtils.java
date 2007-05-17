@@ -461,15 +461,7 @@ public class ReflectionUtils {
         }
         return methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
     }
-
-    public static Method getAnnotationPropertyWithName(Class<? extends Annotation> annotation, String annotationPropertyName) {
-        try {
-            return annotation.getMethod(annotationPropertyName);
-        } catch (NoSuchMethodException e) {
-            throw new UnitilsException("Could not find annotation property named " + annotationPropertyName + " on annotation " +
-                    annotation.getName());
-        }
-    }
+    
 
     public static Class<?> getClassWithName(String className) {
         try {

@@ -37,13 +37,15 @@ import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
 import org.unitils.dbunit.datasetoperation.DataSetOperation;
 import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
+import org.unitils.dbunit.datasetfactory.DataSetFactory;
+import org.unitils.dbunit.datasetfactory.DefaultDataSetFactory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import org.unitils.util.AnnotationPropertyAccessor;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import org.unitils.util.ReflectionUtils;
 import org.unitils.util.ModuleUtils;
+import org.unitils.util.AnnotationUtils;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 
 import javax.sql.DataSource;
@@ -105,7 +107,7 @@ public class DbUnitModule implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
 
-        defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DbUnitModule.class, configuration, DataSet.class);
+        defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DbUnitModule.class, configuration, DataSet.class, ExpectedDataSet.class);
     }
 
 
@@ -163,7 +165,7 @@ public class DbUnitModule implements Module {
      */
     public void insertTestData(InputStream inputStream, DatabaseOperation databaseOperation) {
         try {
-            MultiSchemaDataSet multiSchemaDataSet = createDataSet(inputStream);
+            MultiSchemaDataSet multiSchemaDataSet = getDataSet(inputStream);
             for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
                 IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
                 databaseOperation.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
@@ -232,20 +234,22 @@ public class DbUnitModule implements Module {
         String dataSetFileName = dataSetAnnotation.value();
         Class<?> testClass = testMethod.getDeclaringClass();
 
+        DataSetFactory dataSetFactory = getDataSetFactory(DataSet.class, testMethod);
+
         // empty means, use default file name
         if ("".equals(dataSetFileName)) {
             // first try method specific default file name
-            dataSetFileName = getMethodLevelDefaultTestDataSetFileName(testMethod);
-            MultiSchemaDataSet dataSets = createDataSets(testClass, dataSetFileName);
+            dataSetFileName = getMethodLevelDefaultTestDataSetFileName(testMethod, dataSetFactory.getDataSetFileExtension());
+            MultiSchemaDataSet dataSets = getDataSet(testClass, dataSetFileName, dataSetFactory);
             if (dataSets != null) {
                 // found file, so return
                 return dataSets;
             }
             // not found, try class default file name
-            dataSetFileName = getClassLevelDefaultTestDataSetFileName(testClass);
+            dataSetFileName = getClassLevelDefaultTestDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension());
         }
 
-        MultiSchemaDataSet dataSets = createDataSets(testClass, dataSetFileName);
+        MultiSchemaDataSet dataSets = getDataSet(testClass, dataSetFileName, dataSetFactory);
         if (dataSets == null) {
             throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetFileName);
         }
@@ -267,14 +271,16 @@ public class DbUnitModule implements Module {
             return null;
         }
 
+        DataSetFactory dataSetFactory = getDataSetFactory(ExpectedDataSet.class, testMethod);
+
         String dataSetFileName = expectedDataSetAnnotation.value();
         // empty means use default file name
         if ("".equals(dataSetFileName)) {
             // first try method specific default file name
-            dataSetFileName = getDefaultExpectedDataSetFileName(testMethod);
+            dataSetFileName = getDefaultExpectedDataSetFileName(testMethod, dataSetFactory.getDataSetFileExtension());
         }
 
-        MultiSchemaDataSet dataSets = createDataSets(testMethod.getDeclaringClass(), dataSetFileName);
+        MultiSchemaDataSet dataSets = getDataSet(testMethod.getDeclaringClass(), dataSetFileName, dataSetFactory);
         if (dataSets == null) {
             throw new UnitilsException("Could not find expected DbUnit dataset with name " + dataSetFileName);
         }
@@ -288,16 +294,17 @@ public class DbUnitModule implements Module {
      *
      * @param testClass       The test class, not null
      * @param dataSetFilename The name, (start with '/' for absolute names), not null
+     * @param dataSetFactory  DataSetFactory responsible for creating the dataset file
      * @return The data set, null if the file does not exist
      */
-    protected MultiSchemaDataSet createDataSets(Class testClass, String dataSetFilename) {
+    protected MultiSchemaDataSet getDataSet(Class testClass, String dataSetFilename, DataSetFactory dataSetFactory) {
         try {
             InputStream in = testClass.getResourceAsStream(dataSetFilename);
             if (in == null) {
                 // file does not exist
                 return null;
             }
-            return createDataSet(in);
+            return getDataSet(in);
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to create DbUnit dataset for file " + dataSetFilename, e);
@@ -314,7 +321,7 @@ public class DbUnitModule implements Module {
      * @param in the InputStream, not null
      * @return The DbUnit <code>IDataSet</code>
      */
-    public MultiSchemaDataSet createDataSet(InputStream in) {
+    public MultiSchemaDataSet getDataSet(InputStream in) {
         try {
             // A db support instance is created to get the default schema name in correct casing
             DataSource dataSource = getDatabaseModule().getDataSource();
@@ -334,14 +341,8 @@ public class DbUnitModule implements Module {
 
     @SuppressWarnings({"unchecked"})
     protected DataSetOperation getDataSetOperation(Method testMethod) {
-        AnnotationPropertyAccessor<DataSet, Class<? extends DataSetOperation>> dataSetOperationAccessor =
-                new AnnotationPropertyAccessor<DataSet, Class<? extends DataSetOperation>>() {
-            public Class<? extends DataSetOperation> getAnnotationProperty(DataSet annotation) {
-                return annotation.operation();
-            }
-        };
         Class<? extends DataSetOperation> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class,
-                dataSetOperationAccessor, DefaultDataSetOperation.class, testMethod);
+                "operation", DefaultDataSetOperation.class, testMethod);
         dataSetOperationClass = (Class<? extends DataSetOperation>) ModuleUtils.getClassValueReplaceDefault(DataSet.class,
                 "operation", dataSetOperationClass, defaultAnnotationPropertyValues, DefaultDataSetOperation.class);
 
@@ -394,11 +395,12 @@ public class DbUnitModule implements Module {
      * follows: classname + '.' + methodName + '.xml'
      *
      * @param method    The test method, not null
+     * @param extension The configured extension of dataset files
      * @return The default filename, not null
      */
-    protected String getMethodLevelDefaultTestDataSetFileName(Method method) {
+    protected String getMethodLevelDefaultTestDataSetFileName(Method method, String extension) {
         String className = method.getDeclaringClass().getName();
-        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + ".xml";
+        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + '.' + extension;
     }
 
 
@@ -407,11 +409,12 @@ public class DbUnitModule implements Module {
      * follows: 'classname without packagename'.xml
      *
      * @param testClass The test class, not null
+     * @param extension The configured extension of dataset files
      * @return The default filename, not null
      */
-    protected String getClassLevelDefaultTestDataSetFileName(Class<?> testClass) {
+    protected String getClassLevelDefaultTestDataSetFileName(Class<?> testClass, String extension) {
         String className = testClass.getName();
-        return className.substring(className.lastIndexOf(".") + 1) + ".xml";
+        return className.substring(className.lastIndexOf(".") + 1) + '.' + extension;
     }
 
 
@@ -420,11 +423,29 @@ public class DbUnitModule implements Module {
      * follows: 'classname without packagename'.'testname'-result.xml.
      *
      * @param method    The test method, not null
+     * @param extension The configured extension of dataset files
      * @return The expected dataset filename, not null
      */
-    protected static String getDefaultExpectedDataSetFileName(Method method) {
+    protected static String getDefaultExpectedDataSetFileName(Method method, String extension) {
         String className = method.getDeclaringClass().getName();
-        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + "-result.xml";
+        return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + "-result." + extension;
+    }
+
+
+    /**
+     * Get the configured DataSetFactory for the given method
+
+     * @param annotationClass The class of the annotation, i.e. DataSet.class or ExpectedDataSet.class
+     * @param testMethod The method for which we need the configured DataSetFactory
+     * @return The configured DataSetFactory
+     */
+    protected DataSetFactory getDataSetFactory(Class<? extends Annotation> annotationClass, Method testMethod) {
+        Class<? extends DataSetFactory> dataSetFactoryClass = AnnotationUtils.getMethodOrClassLevelAnnotationProperty(annotationClass,
+                "factory", DefaultDataSetFactory.class, testMethod);
+        //noinspection unchecked
+        dataSetFactoryClass = (Class<? extends DataSetFactory>) ModuleUtils.getClassValueReplaceDefault(annotationClass,
+                "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DefaultDataSetFactory.class);
+        return ReflectionUtils.createInstanceOfType(dataSetFactoryClass);
     }
 
 
