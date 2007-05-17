@@ -1,20 +1,35 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.core.dbsupport;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-import org.hibernate.connection.ConnectionProvider;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.ResultSet;
-import java.util.Set;
+import java.sql.Statement;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
+ * todo move to db maintainer
+ * <p/>
  * Class to which database updates and queries are passed. Is in fact a utility class, but is a concrete instance to
  * enable decorating it or switching it with another implementation, allowing things like a dry run, creating a script
  * file or logging updates to a log file or database table.
@@ -48,9 +63,9 @@ public class SQLHandler {
     /**
      * Constructs a new instance that connects to the given DataSource
      *
-     * @param dataSource The data source, not null
+     * @param dataSource       The data source, not null
      * @param doExecuteUpdates Boolean indicating whether updates should effectively be executed on the underlying
-     *        database
+     *                         database
      */
     public SQLHandler(DataSource dataSource, boolean doExecuteUpdates) {
         this.dataSource = dataSource;
@@ -60,7 +75,7 @@ public class SQLHandler {
     /**
      * Executes the given statement.
      *
-     * @param sql        The sql string for retrieving the items
+     * @param sql The sql string for retrieving the items
      * @return The nr of updates
      */
     public int executeUpdate(String sql) {
@@ -77,7 +92,7 @@ public class SQLHandler {
             } catch (Exception e) {
                 throw new UnitilsException("Error while executing statement: " + sql, e);
             } finally {
-                DbUtils.closeQuietly(connection, statement, null);
+                closeQuietly(connection, statement, null);
             }
         }
         return 0;
@@ -87,7 +102,7 @@ public class SQLHandler {
     /**
      * Executes the given code update statement.
      *
-     * @param sql        The sql string for retrieving the items
+     * @param sql The sql string for retrieving the items
      * @return The nr of updates
      */
     public int executeCodeUpdate(String sql) {
@@ -104,7 +119,7 @@ public class SQLHandler {
             } catch (Exception e) {
                 throw new UnitilsException("Error while executing statement: " + sql, e);
             } finally {
-                DbUtils.closeQuietly(connection, statement, null);
+                closeQuietly(connection, statement, null);
             }
         }
         return 0;
@@ -115,7 +130,7 @@ public class SQLHandler {
      * Returns the long extracted from the result of the given query. If no value is found, a {@link UnitilsException}
      * is thrown.
      *
-     * @param sql        The sql string for retrieving the items
+     * @param sql The sql string for retrieving the items
      * @return The long item value
      */
     public long getItemAsLong(String sql) {
@@ -146,7 +161,7 @@ public class SQLHandler {
      * Returns the value extracted from the result of the given query. If no value is found, a {@link UnitilsException}
      * is thrown.
      *
-     * @param sql        The sql string for retrieving the items
+     * @param sql The sql string for retrieving the items
      * @return The string item value
      */
     public String getItemAsString(String sql) {
@@ -176,7 +191,7 @@ public class SQLHandler {
     /**
      * Returns the items extracted from the result of the given query.
      *
-     * @param sql        The sql string for retrieving the items
+     * @param sql The sql string for retrieving the items
      * @return The items, not null
      */
     public Set<String> getItemsAsStringSet(String sql) {
@@ -210,7 +225,6 @@ public class SQLHandler {
     }
 
     /**
-     *
      * @return Whether updates are executed on the database or not
      */
     public boolean isDoExecuteUpdates() {

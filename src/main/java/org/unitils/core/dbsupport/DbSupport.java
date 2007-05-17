@@ -17,9 +17,7 @@ package org.unitils.core.dbsupport;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.StoredIdentifierCase;
-import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
-import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
-import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
+import static org.unitils.core.util.StoredIdentifierCase.*;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
@@ -240,7 +238,7 @@ abstract public class DbSupport {
      * @param tableName The table to drop (case-sensitive), not null
      */
     public void dropTable(String tableName) {
-        sqlHandler.executeUpdate("drop table " + qualified(tableName) + " cascade");
+        getSQLHandler().executeUpdate("drop table " + qualified(tableName) + " cascade");
     }
 
 
@@ -251,8 +249,9 @@ abstract public class DbSupport {
      * @param viewName The view to drop (case-sensitive), not null
      */
     public void dropView(String viewName) {
-        sqlHandler.executeUpdate("drop view " + qualified(viewName) + " cascade");
+        getSQLHandler().executeUpdate("drop view " + qualified(viewName) + " cascade");
     }
+
 
     /**
      * Removes the synonym with the given name from the database
@@ -261,7 +260,7 @@ abstract public class DbSupport {
      * @param synonymName The synonym to drop (case-sensitive), not null
      */
     public void dropSynonym(String synonymName) {
-        sqlHandler.executeUpdate("drop synonym " + qualified(synonymName));
+        getSQLHandler().executeUpdate("drop synonym " + qualified(synonymName));
     }
 
 
@@ -272,7 +271,7 @@ abstract public class DbSupport {
      * @param sequenceName The sequence to drop (case-sensitive), not null
      */
     public void dropSequence(String sequenceName) {
-        sqlHandler.executeUpdate("drop sequence " + qualified(sequenceName));
+        getSQLHandler().executeUpdate("drop sequence " + qualified(sequenceName));
     }
 
 
@@ -283,7 +282,7 @@ abstract public class DbSupport {
      * @param triggerName The trigger to drop (case-sensitive), not null
      */
     public void dropTrigger(String triggerName) {
-        sqlHandler.executeUpdate("drop trigger " + qualified(triggerName));
+        getSQLHandler().executeUpdate("drop trigger " + qualified(triggerName));
     }
 
 
@@ -464,7 +463,8 @@ abstract public class DbSupport {
 
         Connection connection = null;
         try {
-            connection = sqlHandler.getDataSource().getConnection();
+            connection = getSQLHandler().getDataSource().getConnection();
+
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             if (databaseMetaData.storesUpperCaseIdentifiers()) {
                 return UPPER_CASE;
@@ -497,7 +497,8 @@ abstract public class DbSupport {
 
         Connection connection = null;
         try {
-            connection = sqlHandler.getDataSource().getConnection();
+            connection = getSQLHandler().getDataSource().getConnection();
+
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String quoteString = databaseMetaData.getIdentifierQuoteString();
             if (quoteString == null || "".equals(quoteString.trim())) {

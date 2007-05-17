@@ -18,13 +18,17 @@ package org.unitils.dbmaintainer.clean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.TestSQLUtils;
 import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.core.util.SQLUtils;
+import org.unitils.core.dbsupport.TestSQLUtils;
+import static org.unitils.core.dbsupport.TestSQLUtils.*;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.impl.DefaultDBClearer;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
@@ -57,6 +61,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
     /**
      * Configures the tested object. Creates a test table, index, view and sequence
      */
+    @BeforeMethod
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -64,7 +69,6 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new SQLHandler(dataSource);
         dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
-
 
         // configure items to preserve
         configuration.setProperty(DefaultDBClearer.PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupport.quoted("Test_CASE_Table"));
@@ -83,6 +87,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
     /**
      * Removes all test tables.
      */
+    @AfterMethod
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -93,6 +98,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
     /**
      * Checks if the tables are correctly dropped.
      */
+    @Test
     public void testClearDatabase_tables() throws Exception {
         assertEquals(2, dbSupport.getTableNames().size());
         dbClearer.clearSchemas();
@@ -103,6 +109,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
     /**
      * Checks if the views are correctly dropped
      */
+    @Test
     public void testClearDatabase_views() throws Exception {
         assertEquals(2, dbSupport.getViewNames().size());
         dbClearer.clearSchemas();
@@ -113,6 +120,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
     /**
      * Checks if the synonyms are correctly dropped
      */
+    @Test
     public void testClearDatabase_synonyms() throws Exception {
         if (!dbSupport.supportsSynonyms()) {
             logger.warn("Current dialect does not support synonyms. Skipping test.");
@@ -127,6 +135,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
     /**
      * Tests if the triggers are correctly dropped
      */
+    @Test
     public void testClearDatabase_sequences() throws Exception {
         if (!dbSupport.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
@@ -151,8 +160,10 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
             createTestDatabaseOracle();
         } else if ("postgresql".equals(dialect)) {
             createTestDatabasePostgreSql();
+        } else if ("db2".equals(dialect)) {
+            createTestDatabaseDb2();
         } else {
-            fail("This test is not implemented for current dialect: " + dialect);
+            assert false : "This test is not implemented for current dialect: " + dialect;
         }
     }
 
@@ -170,6 +181,8 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
             cleanupTestDatabaseOracle();
         } else if ("postgresql".equals(dialect)) {
             cleanupTestDatabasePostgreSql();
+        } else if ("db2".equals(dialect)) {
+            cleanupTestDatabaseDb2();
         }
     }
 
@@ -182,18 +195,18 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
      */
     private void createTestDatabaseHsqlDb() throws Exception {
         // create tables
-        SQLUtils.executeUpdate("create table test_table (col1 int not null identity, col2 varchar(12) not null)", dataSource);
-        SQLUtils.executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 int not null identity, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
         // create views
-        SQLUtils.executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        SQLUtils.executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
         // create sequences
-        SQLUtils.executeUpdate("create sequence test_sequence", dataSource);
-        SQLUtils.executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        executeUpdate("create sequence test_sequence", dataSource);
+        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
         // create triggers
         // todo move to code clearer test
-        SQLUtils.executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
-        SQLUtils.executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
+        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
+        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
     }
 
 
@@ -201,10 +214,10 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseHsqlDb() throws Exception {
-        TestSQLUtils.dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
-        TestSQLUtils.dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
-        TestSQLUtils.dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
-        TestSQLUtils.dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
     }
 
 
@@ -229,14 +242,14 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
      */
     private void createTestDatabaseMySql() throws Exception {
         // create tables
-        SQLUtils.executeUpdate("create table test_table (col1 int not null primary key AUTO_INCREMENT, col2 varchar(12) not null)", dataSource);
-        SQLUtils.executeUpdate("create table `Test_CASE_Table` (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 int not null primary key AUTO_INCREMENT, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table `Test_CASE_Table` (col1 int, foreign key (col1) references test_table(col1))", dataSource);
         // create views
-        SQLUtils.executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        SQLUtils.executeUpdate("create view `Test_CASE_View` as select col1 from `Test_CASE_Table`", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view `Test_CASE_View` as select col1 from `Test_CASE_Table`", dataSource);
         // create triggers
-        SQLUtils.executeUpdate("create trigger test_trigger before insert on `Test_CASE_Table` FOR EACH ROW begin end", dataSource);
-        SQLUtils.executeUpdate("create trigger `Test_CASE_Trigger` after insert on `Test_CASE_Table` FOR EACH ROW begin end", dataSource);
+        executeUpdate("create trigger test_trigger before insert on `Test_CASE_Table` FOR EACH ROW begin end", dataSource);
+        executeUpdate("create trigger `Test_CASE_Trigger` after insert on `Test_CASE_Table` FOR EACH ROW begin end", dataSource);
     }
 
 
@@ -244,9 +257,9 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseMySql() throws Exception {
-        TestSQLUtils.dropTestTables(dbSupport, "test_table", "`Test_CASE_Table`");
-        TestSQLUtils.dropTestViews(dbSupport, "test_view", "`Test_CASE_View`");
-        TestSQLUtils.dropTestTriggers(dbSupport, "test_trigger", "`Test_CASE_Trigger`");
+        dropTestTables(dbSupport, "test_table", "`Test_CASE_Table`");
+        dropTestViews(dbSupport, "test_view", "`Test_CASE_View`");
+        dropTestTriggers(dbSupport, "test_trigger", "`Test_CASE_Trigger`");
     }
 
     //
@@ -258,23 +271,23 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
      */
     private void createTestDatabaseOracle() throws Exception {
         // create tables
-        SQLUtils.executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
-        SQLUtils.executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
         // create views
-        SQLUtils.executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        SQLUtils.executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
         // create synonyms
-        SQLUtils.executeUpdate("create synonym test_synonym for test_table", dataSource);
-        SQLUtils.executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create synonym test_synonym for test_table", dataSource);
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
         // create sequences
-        SQLUtils.executeUpdate("create sequence test_sequence", dataSource);
-        SQLUtils.executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        executeUpdate("create sequence test_sequence", dataSource);
+        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
         // create triggers
-        SQLUtils.executeUpdate("create or replace trigger test_trigger before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end test_trigger", dataSource);
-        SQLUtils.executeUpdate("create or replace trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end \"Test_CASE_Trigger\"", dataSource);
+        executeUpdate("create or replace trigger test_trigger before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end test_trigger", dataSource);
+        executeUpdate("create or replace trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" begin dbms_output.put_line('test'); end \"Test_CASE_Trigger\"", dataSource);
         // create types
-        SQLUtils.executeUpdate("create type test_type AS (col1 int)", dataSource);
-        SQLUtils.executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
+        executeUpdate("create type test_type AS (col1 int)", dataSource);
+        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
     }
 
 
@@ -282,12 +295,12 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseOracle() throws Exception {
-        TestSQLUtils.dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
-        TestSQLUtils.dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         TestSQLUtils.dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
-        TestSQLUtils.dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
-        TestSQLUtils.dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        TestSQLUtils.dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
+        dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
     }
 
     //
@@ -299,26 +312,26 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
      */
     private void createTestDatabasePostgreSql() throws Exception {
         // create tables
-        SQLUtils.executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
-        SQLUtils.executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
+        executeUpdate("create table test_table (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 varchar(10), foreign key (col1) references test_table(col1))", dataSource);
         // create views
-        SQLUtils.executeUpdate("create view test_view as select col1 from test_table", dataSource);
-        SQLUtils.executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
         // create sequences
-        SQLUtils.executeUpdate("create sequence test_sequence", dataSource);
-        SQLUtils.executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        executeUpdate("create sequence test_sequence", dataSource);
+        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
         // create triggers
         try {
-            SQLUtils.executeUpdate("create language plpgsql", dataSource);
+            executeUpdate("create language plpgsql", dataSource);
         } catch (Exception e) {
             // ignore language already exists
         }
-        SQLUtils.executeUpdate("create or replace function test() returns trigger as $$ declare begin end; $$ language plpgsql", dataSource);
-        SQLUtils.executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
-        SQLUtils.executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
+        executeUpdate("create or replace function test() returns trigger as $$ declare begin end; $$ language plpgsql", dataSource);
+        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
+        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW EXECUTE PROCEDURE test()", dataSource);
         // create types
-        SQLUtils.executeUpdate("create type test_type AS (col1 int)", dataSource);
-        SQLUtils.executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
+        executeUpdate("create type test_type AS (col1 int)", dataSource);
+        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int)", dataSource);
     }
 
 
@@ -326,12 +339,49 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabasePostgreSql() throws Exception {
-        TestSQLUtils.dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
-        TestSQLUtils.dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
-        TestSQLUtils.dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
-        TestSQLUtils.dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        TestSQLUtils.dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
     }
 
+    //
+    // Database setup for Db2
+    //
+
+    /**
+     * Creates all test database structures (view, tables...)
+     */
+    private void createTestDatabaseDb2() throws Exception {
+        // create tables
+        executeUpdate("create table test_table (col1 int not null primary key generated by default as identity, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        // create views
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create sequences
+        executeUpdate("create sequence test_sequence", dataSource);
+        executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
+        // create triggers
+        executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" FOR EACH ROW when (1 < 0) SIGNAL SQLSTATE '0'", dataSource);
+        executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" FOR EACH ROW when (1 < 0) SIGNAL SQLSTATE '0'", dataSource);
+        // create types
+        executeUpdate("create type test_type AS (col1 int) MODE DB2SQL", dataSource);
+        executeUpdate("create type \"Test_CASE_Type\" AS (col1 int) MODE DB2SQL", dataSource);
+    }
+
+
+    /**
+     * Drops all created test database structures (views, tables...)
+     */
+    private void cleanupTestDatabaseDb2() throws Exception {
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
+    }
 
 }

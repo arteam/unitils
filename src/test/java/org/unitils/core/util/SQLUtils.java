@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * todo put back in main sources and let sql handler use this
+ * <p/>
  * Utilities for executing statements and queries.
  *
  * @author Tim Ducheyne

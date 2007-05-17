@@ -160,21 +160,8 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public void removeNotNullConstraint(String tableName, String columnName) {
-        String type = getColumnType(tableName, columnName);
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " change column " + columnName + " " + columnName + " " + type + " NULL ");
-    }
-
-
-    /**
-     * Gets the type of the column with the given name in the given table. An exception is thrown if
-     * the column could not be found
-     *
-     * @param tableName  The table, not null
-     * @param columnName The column, not null
-     * @return The type, not null
-     */
-    protected String getColumnType(String tableName, String columnName) {
-        return getSQLHandler().getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + columnName + "'");
+        String columnType = getSQLHandler().getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + columnName + "'");
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " change column " + columnName + " " + columnName + " " + columnType + " NULL ");
     }
 
 

@@ -15,6 +15,7 @@
  */
 package org.unitils.core.dbsupport;
 
+import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
@@ -313,42 +314,10 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         }
 
         dbSupport.incrementIdentityColumnToValue(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "col1", 30);
-        SQLUtils.executeUpdate("insert into test_table (col2) values ('xxxx')", dataSource);
+        executeUpdate("insert into test_table (col2) values ('xxxx')", dataSource);
 
         long result = SQLUtils.getItemAsLong("select col1 from test_table", dataSource);
         assertEquals(30, result);
-    }
-
-
-    /**
-     * Tests disabling not null constraints on the test table.
-     */
-    public void testRemoveNotNullConstraint() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), dbSupport.toCorrectCaseIdentifier("col2"));
-
-        // should succeed now
-        SQLUtils.executeUpdate("insert into test_table (col1, col2) values (1, null)", dataSource);
-    }
-
-
-    /**
-     * Tests disabling not null constraints on the test table but with an unexisting column
-     */
-    public void testRemoveNotNullConstraint_columnNotFound() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        try {
-            dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "xxxx");
-            fail("UnitilsException expected.");
-        } catch (UnitilsException e) {
-            // expected
-        }
     }
 
 
@@ -435,26 +404,9 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
 
 
     /**
-     * Tests disabling not null constraints on the test table.
-     */
-    public void testDisableConstraint_notNull() throws Exception {
-        if (disabled || !dbSupport.supportsGetTableConstraintNames()) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-        Set<String> constraintNames = dbSupport.getForeignKeyConstraintNames("TEST_TABLE");
-        for (String constraintName : constraintNames) {
-            dbSupport.removeForeignKeyConstraint("TEST_TABLE", constraintName);
-        }
-        Set<String> result = dbSupport.getForeignKeyConstraintNames("TEST_TABLE");
-        assertTrue(result.isEmpty());
-    }
-
-
-    /**
      * Tests disabling a foreign key constraint on the test table.
      */
-    public void testDisableConstraint_foreignKey() throws Exception {
+    public void testRemoveForeignKeyConstraint() throws Exception {
         if (disabled || !dbSupport.supportsGetTableConstraintNames()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
@@ -465,6 +417,38 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         }
         Set<String> result = dbSupport.getForeignKeyConstraintNames("Test_CASE_Table");
         assertTrue(result.isEmpty());
+    }
+
+
+    /**
+     * Tests disabling not null constraints on the test table.
+     */
+    public void testRemoveNotNullConstraint() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), dbSupport.toCorrectCaseIdentifier("col2"));
+
+        // should succeed now
+        executeUpdate("insert into test_table (col1, col2) values (1, null)", dataSource);
+    }
+
+
+    /**
+     * Tests disabling not null constraints on the test table but with an unexisting column
+     */
+    public void testRemoveNotNullConstraint_columnNotFound() throws Exception {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+        try {
+            dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "xxxx");
+            fail("UnitilsException expected.");
+        } catch (UnitilsException e) {
+            // expected
+        }
     }
 
 

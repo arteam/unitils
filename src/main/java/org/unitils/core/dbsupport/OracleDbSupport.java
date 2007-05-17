@@ -199,7 +199,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName);
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName);
     }
 
 
