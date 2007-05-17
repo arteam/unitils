@@ -62,9 +62,6 @@ public class DatabaseModule implements Module {
     /* Property keys indicating if the database schema should be updated before performing the tests */
     public static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
 
-    /* Property key indicating if the database constraints should org disabled after updating the database */
-    public static final String PROPKEY_DISABLECONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
-
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
@@ -73,9 +70,6 @@ public class DatabaseModule implements Module {
 
     /* The configuration of Unitils */
     private Properties configuration;
-
-    /* Indicates if database constraints should be disabled */
-    private boolean disableConstraints;
 
     /* Indicates if the DBMaintainer should be invoked to update the database */
     private boolean updateDatabaseSchemaEnabled;
@@ -89,7 +83,6 @@ public class DatabaseModule implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
 
-        disableConstraints = PropertyUtils.getBoolean(PROPKEY_DISABLECONSTRAINTS_ENABLED, configuration);
         updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED, configuration);
     }
 

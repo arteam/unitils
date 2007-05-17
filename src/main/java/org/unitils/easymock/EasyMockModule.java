@@ -26,13 +26,20 @@ import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.AfterCreateMock;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.annotation.RegularMock;
-import org.unitils.easymock.util.*;
+import org.unitils.easymock.util.Calls;
+import org.unitils.easymock.util.Dates;
+import org.unitils.easymock.util.Defaults;
+import org.unitils.easymock.util.InvocationOrder;
+import org.unitils.easymock.util.LenientMocksControl;
+import org.unitils.easymock.util.Order;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
-import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
@@ -75,7 +82,7 @@ public class EasyMockModule implements Module {
     private List<MocksControl> mocksControls;
 
     /* Map holding the default configuration of the mock annotations */
-    private Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues;
+    private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
 
     /* Indicates whether verify() is automatically called on every mock object after each test method execution */
     private boolean autoVerifyAfterTestEnabled;
@@ -85,7 +92,7 @@ public class EasyMockModule implements Module {
      */
     public void init(Properties configuration) {
         mocksControls = new ArrayList<MocksControl>();
-        defaultEnumValues = getAnnotationEnumDefaults(EasyMockModule.class, configuration, RegularMock.class, Mock.class);
+        defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(EasyMockModule.class, configuration, RegularMock.class, Mock.class);
         autoVerifyAfterTestEnabled = PropertyUtils.getBoolean(PROPKEY_AUTO_VERIFY_AFTER_TEST_ENABLED, configuration);
     }
 
@@ -113,8 +120,9 @@ public class EasyMockModule implements Module {
      */
     public <T> T createRegularMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls) {
         // Get anotation arguments and replace default values if needed
-        invocationOrder = getValueReplaceDefault(RegularMock.class, invocationOrder, defaultEnumValues);
-        calls = getValueReplaceDefault(RegularMock.class, calls, defaultEnumValues);
+        invocationOrder = getEnumValueReplaceDefault(RegularMock.class, "invocationOrder", invocationOrder,
+                defaultAnnotationPropertyValues);
+        calls = getEnumValueReplaceDefault(RegularMock.class, "calls", calls, defaultAnnotationPropertyValues);
 
         MocksControl mocksControl;
         if (Calls.LENIENT == calls) {
@@ -152,11 +160,11 @@ public class EasyMockModule implements Module {
      */
     public <T> T createMock(Class<T> mockType, InvocationOrder invocationOrder, Calls calls, Order order, Dates dates, Defaults defaults) {
         // Get anotation arguments and replace default values if needed
-        invocationOrder = getValueReplaceDefault(Mock.class, invocationOrder, defaultEnumValues);
-        calls = getValueReplaceDefault(Mock.class, calls, defaultEnumValues);
-        order = getValueReplaceDefault(Mock.class, order, defaultEnumValues);
-        dates = getValueReplaceDefault(Mock.class, dates, defaultEnumValues);
-        defaults = getValueReplaceDefault(Mock.class, defaults, defaultEnumValues);
+        invocationOrder = getEnumValueReplaceDefault(Mock.class, "invocationOrder", invocationOrder, defaultAnnotationPropertyValues);
+        calls = getEnumValueReplaceDefault(Mock.class, "calls", calls, defaultAnnotationPropertyValues);
+        order = getEnumValueReplaceDefault(Mock.class, "order", order, defaultAnnotationPropertyValues);
+        dates = getEnumValueReplaceDefault(Mock.class, "dates", dates, defaultAnnotationPropertyValues);
+        defaults = getEnumValueReplaceDefault(Mock.class, "defaults", defaults, defaultAnnotationPropertyValues);
 
         List<ReflectionComparatorMode> comparatorModes = new ArrayList<ReflectionComparatorMode>();
         if (Order.LENIENT == order) {

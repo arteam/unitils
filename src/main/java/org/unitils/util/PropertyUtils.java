@@ -191,6 +191,11 @@ public class PropertyUtils {
     }
 
 
+    public static boolean containsProperty(String propertyName, Properties properties) {
+        return getProperty(propertyName, properties) != null;    
+    }
+
+
     /**
      * Gets an instance of the type specified by the property with the given name. If no such property is found, the
      * value is empty or the instance cannot be created, an exception will be raised.
@@ -232,5 +237,5 @@ public class PropertyUtils {
         }
         return value;
     }
-    
+
 }

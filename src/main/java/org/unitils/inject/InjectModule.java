@@ -15,6 +15,7 @@
  */
 package org.unitils.inject;
 
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,8 +28,7 @@ import org.unitils.inject.util.PropertyAccess;
 import org.unitils.inject.util.Restore;
 import org.unitils.inject.util.ValueToRestore;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.ModuleUtils.getAnnotationEnumDefaults;
-import static org.unitils.util.ModuleUtils.getValueReplaceDefault;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import org.unitils.util.PropertyUtils;
 import static org.unitils.util.ReflectionUtils.*;
 
@@ -63,7 +63,7 @@ public class InjectModule implements Module {
     private static final String PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED = "InjectModule.TestedObject.createIfNull.enabled";
 
     /* Map holding the default configuration of the inject annotations */
-    private Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> defaultEnumValues;
+    private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
 
     /* List holding all values to restore after test was performed */
     private List<ValueToRestore> valuesToRestoreAfterTest = new ArrayList<ValueToRestore>();
@@ -78,7 +78,7 @@ public class InjectModule implements Module {
      * @param configuration The configuration, not null
      */
     public void init(Properties configuration) {
-        defaultEnumValues = getAnnotationEnumDefaults(InjectModule.class, configuration, InjectInto.class, InjectIntoStatic.class, InjectIntoByType.class, InjectIntoStaticByType.class);
+        defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(InjectModule.class, configuration, InjectInto.class, InjectIntoStatic.class, InjectIntoByType.class, InjectIntoStaticByType.class);
         createTestedObjectsIfNullEnabled = PropertyUtils.getBoolean(PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED, configuration);
     }
 
@@ -252,7 +252,7 @@ public class InjectModule implements Module {
         }
         Object objectToInject = getFieldValue(test, fieldToInjectStatic);
 
-        Restore restore = getValueReplaceDefault(InjectIntoStatic.class, injectIntoStaticAnnotation.restore(), defaultEnumValues);
+        Restore restore = getEnumValueReplaceDefault(InjectIntoStatic.class, "restore", injectIntoStaticAnnotation.restore(), defaultAnnotationPropertyValues);
         try {
             Object oldValue = InjectionUtils.injectStatic(objectToInject, targetClass, property);
             storeValueToRestoreAfterTest(targetClass, property, fieldToInjectStatic.getType(), null, oldValue, restore);
@@ -275,7 +275,8 @@ public class InjectModule implements Module {
         InjectIntoByType injectIntoByTypeAnnotation = fieldToInject.getAnnotation(InjectIntoByType.class);
 
         Object objectToInject = getFieldValue(test, fieldToInject);
-        PropertyAccess propertyAccess = getValueReplaceDefault(InjectIntoByType.class, injectIntoByTypeAnnotation.propertyAccess(), defaultEnumValues);
+        PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoByType.class, "propertyAccess",
+                injectIntoByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
 
         List targets = getTargets(InjectIntoByType.class, fieldToInject, injectIntoByTypeAnnotation.target(), test);
         if (targets.size() == 0) {
@@ -309,8 +310,9 @@ public class InjectModule implements Module {
         Class targetClass = injectIntoStaticByTypeAnnotation.target();
         Object objectToInject = getFieldValue(test, fieldToAutoInjectStatic);
 
-        Restore restore = getValueReplaceDefault(InjectIntoStaticByType.class, injectIntoStaticByTypeAnnotation.restore(), defaultEnumValues);
-        PropertyAccess propertyAccess = getValueReplaceDefault(InjectIntoStaticByType.class, injectIntoStaticByTypeAnnotation.propertyAccess(), defaultEnumValues);
+        Restore restore = getEnumValueReplaceDefault(InjectIntoStaticByType.class, "restore", injectIntoStaticByTypeAnnotation.restore(), defaultAnnotationPropertyValues);
+        PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoStaticByType.class, "propertyAccess",
+                injectIntoStaticByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
         try {
             Object oldValue = InjectionUtils.autoInjectStatic(objectToInject, fieldToAutoInjectStatic.getType(), targetClass, propertyAccess);
             storeValueToRestoreAfterTest(targetClass, null, fieldToAutoInjectStatic.getType(), propertyAccess, oldValue, restore);
