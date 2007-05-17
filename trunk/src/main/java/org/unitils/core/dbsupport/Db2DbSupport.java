@@ -18,13 +18,12 @@ package org.unitils.core.dbsupport;
 import java.util.Set;
 
 /**
- * todo include schemanames in all statements where applicable
- * <p/>
  * Implementation of {@link DbSupport} for an IBM DB2 database
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Tuomas Jormola
  * @author Frederick Beernaert
+ * @author Filip Neven
  */
 public class Db2DbSupport extends DbSupport {
 
@@ -39,31 +38,44 @@ public class Db2DbSupport extends DbSupport {
 
     /**
      * Returns the names of all tables in the database.
+     * <p/>
+     * TODO check table types
      *
      * @return The names of all tables in the database
      */
     @Override
     public Set<String> getTableNames() {
-        // todo implement
-        return null;
+        return getSQLHandler().getItemsAsStringSet("select TABNAME from SYSCAT.TABLES where TABSCHEMA = '" + getSchemaName() + "' and TYPE = 'T'");
     }
 
 
+    /**
+     * Gets the names of all columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the columns of the table with the given name
+     */
+    @Override
     public Set<String> getColumnNames(String tableName) {
-        // todo implement
-        return null;
+        return getSQLHandler().getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
     }
 
 
+    /**
+     * Gets the names of all primary columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the primary key columns of the table with the given name
+     */
+    @Override
     public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        // todo implement
-        return null;
+        return getSQLHandler().getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where KEYSEQ is not null and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
     }
 
 
+    @Override
     public Set<String> getNotNullColummnNames(String tableName) {
-        // todo implement
-        return null;
+        return getSQLHandler().getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where NULLS = 'N' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
     }
 
     /**
@@ -73,8 +85,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public Set<String> getViewNames() {
-        // todo implement
-        return null;
+        return getSQLHandler().getItemsAsStringSet("select TABNAME from SYSCAT.TABLES where TABSCHEMA = '" + getSchemaName() + "' and TYPE = 'V'");
     }
 
 
@@ -85,7 +96,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public Set<String> getSequenceNames() {
-        return getSQLHandler().getItemsAsStringSet("select SEQNAME from SYSIBM.SYSSEQUENCES where SEQSCHEMA = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select SEQNAME from SYSCAT.SEQUENCES where SEQTYPE = 'S' AND SEQSCHEMA = '" + getSchemaName() + "'");
     }
 
 
@@ -96,7 +107,52 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getSQLHandler().getItemsAsStringSet("select NAME from SYSIBM.SYSTRIGGERS where SCHEMA = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select TRIGNAME from SYSCAT.TRIGGERS where TRIGSCHEMA = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Retrieves the names of all the types in the database schema.
+     *
+     * @return The names of all types in the database
+     */
+    @Override
+    public Set<String> getTypeNames() {
+        return getSQLHandler().getItemsAsStringSet("select TYPENAME from SYSCAT.DATATYPES where TYPESCHEMA = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Removes the table with the given name from the database.
+     * Note: the table name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param tableName The table to drop (case-sensitive), not null
+     */
+    public void dropTable(String tableName) {
+        getSQLHandler().executeUpdate("drop table " + qualified(tableName));
+    }
+
+
+    /**
+     * Removes the view with the given name from the database
+     * Note: the view name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param viewName The view to drop (case-sensitive), not null
+     */
+    public void dropView(String viewName) {
+        getSQLHandler().executeUpdate("drop view " + qualified(viewName));
+    }
+
+
+    /**
+     * Drops the type with the given name from the database
+     * Note: the type name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param typeName The type to drop (case-sensitive), not null
+     */
+    @Override
+    public void dropType(String typeName) {
+        getSQLHandler().executeUpdate("drop type " + qualified(typeName));
     }
 
 
@@ -108,7 +164,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public long getCurrentValueOfSequence(String sequenceName) {
-        return getSQLHandler().getItemAsLong("VALUES PREVVAL FOR " + qualified(sequenceName));
+        return getSQLHandler().getItemAsLong("select next value for " + qualified(sequenceName) + " from SYSIBM.SYSDUMMY1");
     }
 
 
@@ -120,13 +176,24 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) {
-        getSQLHandler().executeUpdate("ALTER SEQUENCE " + qualified(sequenceName) + " RESTART WITH " + newSequenceValue);
-        getSQLHandler().executeUpdate("VALUES NEXTVAL FOR " + qualified(sequenceName));
+        getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " restart with " + newSequenceValue);
     }
 
 
     /**
-     * todo add schemaname to query
+     * Increments the identity value for the specified identity column on the specified table to the given value. If there
+     * is no identity specified on the given primary key, the method silently finishes without effect.
+     *
+     * @param tableName          The table with the identity column, not null
+     * @param identityColumnName The column, not null
+     * @param identityValue      The new value
+     */
+    public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + identityColumnName + " restart with " + identityValue);
+    }
+
+
+    /**
      * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
      *
      * @param tableName The table, not null
@@ -134,7 +201,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TABNAME = '" + tableName + "' and ENFORCED = 'Y'");
+        return getSQLHandler().getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TYPE = 'F' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
     }
 
 
@@ -147,6 +214,19 @@ public class Db2DbSupport extends DbSupport {
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
         getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName);
+    }
+
+
+    /**
+     * Removes the not-null constraint on the specified column and table
+     *
+     * @param tableName  The table with the column, not null
+     * @param columnName The column to remove constraints from, not null
+     */
+    @Override
+    public void removeNotNullConstraint(String tableName, String columnName) {
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + columnName + " drop not null");
+        getSQLHandler().executeUpdate("call SYSPROC.ADMIN_CMD('REORG TABLE " + qualified(tableName) + "')");
     }
 
 
@@ -179,6 +259,17 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public boolean supportsIdentityColumns() {
+        return true;
+    }
+
+
+    /**
+     * Types are supported
+     *
+     * @return true
+     */
+    @Override
+    public boolean supportsTypes() {
         return true;
     }
 }

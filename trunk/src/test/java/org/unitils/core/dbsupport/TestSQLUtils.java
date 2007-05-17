@@ -40,7 +40,7 @@ public class TestSQLUtils {
                 String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
                 dbSupport.dropTable(correctCaseTableName);
             } catch (UnitilsException e) {
-                // Ignored                
+                // Ignored
             }
         }
     }
