@@ -18,25 +18,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\lib\db2jcc_license_cu.jar" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/core/util/SQLUtils.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/core/util/SQLUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerPreserveTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerPreserveTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/DbSupportTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/DbSupportTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/SQLHandler.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/SQLHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iml" afterPath="$PROJECT_DIR$/Unitils.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/MySqlDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/MySqlDbSupport.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/TestSQLUtils.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/TestSQLUtils.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/Db2SupportTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/db2java.zip" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\lib\db2jcc.jar" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java" />
-      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\lib\db2jcc_license_cisuz.jar" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -207,7 +190,7 @@
       <file leaf-file-name="OracleDbSupport.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="203" column="36" selection-start="6693" selection-end="6693" vertical-scroll-proportion="0.0165692">
+            <state line="218" column="7" selection-start="7500" selection-end="7500" vertical-scroll-proportion="0.2651072">
               <folding />
             </state>
           </provider>
@@ -222,10 +205,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DBClearerPreserveTest.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="DBClearerPreserveTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerPreserveTest.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="65" column="88" selection-start="2264" selection-end="2264" vertical-scroll-proportion="0.01633045">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Db2DbSupport.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="85" column="7" selection-start="2932" selection-end="2932" vertical-scroll-proportion="0.7223823">
               <folding />
             </state>
           </provider>
@@ -1435,13 +1427,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="231" column="100" selection-start="8237" selection-end="8237" vertical-scroll-proportion="0.3823247">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/Db2SupportTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="60" column="94" selection-start="1406" selection-end="2642" vertical-scroll-proportion="0.0">
@@ -1459,27 +1444,6 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/MySqlDbSupport.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="92" column="42" selection-start="3525" selection-end="3525" vertical-scroll-proportion="0.0165692">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="203" column="36" selection-start="6693" selection-end="6693" vertical-scroll-proportion="0.0165692">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="654" selection-end="654" vertical-scroll-proportion="0.01633045">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="120" column="0" selection-start="4610" selection-end="4610" vertical-scroll-proportion="0.01633045">
           <folding />
         </state>
       </provider>
@@ -1505,9 +1469,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="218" column="7" selection-start="7500" selection-end="7500" vertical-scroll-proportion="0.2651072">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="0" selection-start="654" selection-end="654" vertical-scroll-proportion="0.01633045">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerPreserveTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="65" column="88" selection-start="2264" selection-end="2264" vertical-scroll-proportion="0.01633045">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="120" column="0" selection-start="4610" selection-end="4610" vertical-scroll-proportion="0.01633045">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="85" column="7" selection-start="2932" selection-end="2932" vertical-scroll-proportion="0.7223823">
           <folding />
         </state>
       </provider>
