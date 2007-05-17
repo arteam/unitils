@@ -15,8 +15,6 @@
  */
 package org.unitils.core.dbsupport;
 
-import static org.unitils.core.util.SQLUtils.*;
-
 import java.util.Set;
 
 /**

@@ -16,7 +16,6 @@
 package org.unitils.core.dbsupport;
 
 import org.unitils.core.UnitilsException;
-import static org.unitils.core.util.SQLUtils.*;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import java.sql.Connection;

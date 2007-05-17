@@ -16,7 +16,6 @@
 package org.unitils.core.dbsupport;
 
 import org.unitils.core.UnitilsException;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.core.util.StoredIdentifierCase;
 import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
 import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;

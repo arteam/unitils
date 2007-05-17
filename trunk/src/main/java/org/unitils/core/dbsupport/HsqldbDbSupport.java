@@ -15,9 +15,6 @@
  */
 package org.unitils.core.dbsupport;
 
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.getItemsAsStringSet;
-
 import java.util.Set;
 
 /**
