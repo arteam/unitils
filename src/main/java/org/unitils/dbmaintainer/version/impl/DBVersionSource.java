@@ -18,14 +18,17 @@ package org.unitils.dbmaintainer.version.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionSource;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 /**

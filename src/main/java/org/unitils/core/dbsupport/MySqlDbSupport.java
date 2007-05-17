@@ -15,7 +15,6 @@
  */
 package org.unitils.core.dbsupport;
 
-import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.core.util.StoredIdentifierCase;
 import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
 import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
