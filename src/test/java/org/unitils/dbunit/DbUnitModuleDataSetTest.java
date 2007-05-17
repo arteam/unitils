@@ -22,6 +22,7 @@ import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
+import org.dbunit.operation.DatabaseOperation;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
@@ -170,11 +171,11 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
 
 
     /**
-     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream)}
+     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream, DatabaseOperation)}
      */
     public void testInsertTestData_directCall() throws Exception {
         InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
-        dbUnitModule.insertTestData(dataSetIS);
+        dbUnitModule.insertTestData(dataSetIS, DatabaseOperation.CLEAN_INSERT);
         assertLoadedDataSet("CustomDataSet.xml");
     }
 

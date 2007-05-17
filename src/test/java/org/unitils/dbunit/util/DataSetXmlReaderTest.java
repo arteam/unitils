@@ -92,13 +92,13 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      * row has less columns than the first one.
      */
     public void testLoadDataSet_lessColumnsLast() throws Exception {
-        Map<String, IDataSet> result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_LESS_COLUMNS_LAST.getBytes()));
+        MultiSchemaDataSet result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_LESS_COLUMNS_LAST.getBytes()));
 
         // there should be 1 dataset for the default schema A
-        assertLenEquals(new String[]{"SCHEMA_A"}, result.keySet());
+        assertLenEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
 
         // the dataset should contain 2 tables with the same name
-        IDataSet dataSet = result.get("SCHEMA_A");
+        IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
         assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
         ITableIterator tableIterator = dataSet.iterator();
 
@@ -126,13 +126,13 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      * row has less columns than the second one.
      */
     public void testLoadDataSet_lessColumnsFirst() throws Exception {
-        Map<String, IDataSet> result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_LESS_COLUMNS_FIRST.getBytes()));
+        MultiSchemaDataSet result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_LESS_COLUMNS_FIRST.getBytes()));
 
         // there should be 1 dataset for the default schema A
-        assertLenEquals(new String[]{"SCHEMA_A"}, result.keySet());
+        assertLenEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
 
         // the dataset should contain 2 tables with the same name
-        IDataSet dataSet = result.get("SCHEMA_A");
+        IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
         assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
         ITableIterator tableIterator = dataSet.iterator();
 
@@ -160,23 +160,22 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      * schema D (overrides default schema A) contains 3 records for TABLE_A, schema B and C contain 2 records for TABLE_A.
      */
     public void testLoadDataSet_multiSchema() throws Exception {
-        Map<String, IDataSet> result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_MULTI_SCHEMA.getBytes()));
+        MultiSchemaDataSet result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_MULTI_SCHEMA.getBytes()));
 
         // there should be 3 schemas
-        assertLenEquals(new String[]{"SCHEMA_D", "SCHEMA_B", "SCHEMA_C"}, result.keySet());
+        assertLenEquals(new String[]{"SCHEMA_D", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
 
         // schema D should contain 3 tables
-        IDataSet dataSetA = result.get("SCHEMA_D");
+        IDataSet dataSetA = result.getDataSetForSchema("SCHEMA_D");
         assertLenEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A"}, dataSetA.getTableNames());
-        ITableIterator tableIterator = dataSetA.iterator();
 
         // schema B should contain 2 tables
-        IDataSet dataSetB = result.get("SCHEMA_B");
+        IDataSet dataSetB = result.getDataSetForSchema("SCHEMA_B");
         assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
 
         // schema C should contain 2 tables
-        IDataSet dataSetC = result.get("SCHEMA_C");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
+        IDataSet dataSetC = result.getDataSetForSchema("SCHEMA_C");
+        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetC.getTableNames());
     }
 
 
@@ -185,23 +184,22 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      * schema A (default) contains 3 records for TABLE_A, schema B and C contain 2 records for TABLE_A.
      */
     public void testLoadDataSet_multiSchemaNoDefault() throws Exception {
-        Map<String, IDataSet> result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_MULTI_SCHEMA_NO_DEFAULT.getBytes()));
+        MultiSchemaDataSet result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_MULTI_SCHEMA_NO_DEFAULT.getBytes()));
 
         // there should be 3 schemas
-        assertLenEquals(new String[]{"SCHEMA_A", "SCHEMA_B", "SCHEMA_C"}, result.keySet());
+        assertLenEquals(new String[]{"SCHEMA_A", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
 
         // default schema A should contain 3 tables
-        IDataSet dataSetA = result.get("SCHEMA_A");
+        IDataSet dataSetA = result.getDataSetForSchema("SCHEMA_A");
         assertLenEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A"}, dataSetA.getTableNames());
-        ITableIterator tableIterator = dataSetA.iterator();
 
         // schema B should contain 2 tables
-        IDataSet dataSetB = result.get("SCHEMA_B");
+        IDataSet dataSetB = result.getDataSetForSchema("SCHEMA_B");
         assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
 
         // schema C should contain 2 tables
-        IDataSet dataSetC = result.get("SCHEMA_C");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
+        IDataSet dataSetC = result.getDataSetForSchema("SCHEMA_C");
+        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetC.getTableNames());
 
 
     }
