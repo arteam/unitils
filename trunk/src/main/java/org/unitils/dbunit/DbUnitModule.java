@@ -33,6 +33,7 @@ import javax.sql.DataSource;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
+import org.dbunit.operation.DatabaseOperation;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
@@ -45,6 +46,7 @@ import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.util.DataSetXmlReader;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
+import org.unitils.dbunit.util.MultiSchemaDataSet;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -121,13 +123,13 @@ public class DbUnitModule implements Module {
      */
     public void insertTestData(Method testMethod) {
         try {
-            Map<String, IDataSet> dataSets = getTestDataSets(testMethod);
-            if (dataSets == null) {
+            MultiSchemaDataSet multiSchemaDataSet = getTestDataSets(testMethod);
+            if (multiSchemaDataSet == null) {
                 // no dataset specified
                 return;
             }
-            for (String schemaName : dataSets.keySet()) {
-                IDataSet dataSet = dataSets.get(schemaName);
+            for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
+                IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
                 CLEAN_INSERT.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
             }
         } catch (Exception e) {
@@ -142,13 +144,14 @@ public class DbUnitModule implements Module {
      * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
      *
      * @param inputStream The stream containing the test data set, not null
+     * @param databaseOperation The dbunit DatabaseOperation that must be executed on this DataSet
      */
-    public void insertTestData(InputStream inputStream) {
+    public void insertTestData(InputStream inputStream, DatabaseOperation databaseOperation) {
         try {
-            Map<String, IDataSet> dataSets = createDataSet(inputStream);
-            for (String schemaName : dataSets.keySet()) {
-                IDataSet dataSet = dataSets.get(schemaName);
-                CLEAN_INSERT.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
+            MultiSchemaDataSet multiSchemaDataSet = createDataSet(inputStream);
+            for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
+                IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
+                databaseOperation.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
             }
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset.", e);
@@ -169,13 +172,13 @@ public class DbUnitModule implements Module {
     public void assertDbContentAsExpected(Method testMethod) {
         try {
             // get the expected dataset
-            Map<String, IDataSet> expectedDataSets = getExpectedTestDataSets(testMethod);
+            MultiSchemaDataSet expectedDataSets = getExpectedTestDataSets(testMethod);
             if (expectedDataSets == null) {
                 // no data set should be compared
                 return;
             }
-            for (String schemaName : expectedDataSets.keySet()) {
-                IDataSet expectedDataSet = expectedDataSets.get(schemaName);
+            for (String schemaName : expectedDataSets.getSchemaNames()) {
+                IDataSet expectedDataSet = expectedDataSets.getDataSetForSchema(schemaName);
 
                 // first make sure every database update is flushed to the database
                 getDatabaseModule().flushDatabaseUpdates();
@@ -206,7 +209,7 @@ public class DbUnitModule implements Module {
      * @param testMethod The test method, not null
      * @return The dataset, null if there is no data set
      */
-    public Map<String, IDataSet> getTestDataSets(Method testMethod) {
+    public MultiSchemaDataSet getTestDataSets(Method testMethod) {
         Class<?> testClass = testMethod.getDeclaringClass();
 
         // get the value of the method-level annotation
@@ -232,7 +235,7 @@ public class DbUnitModule implements Module {
         if ("".equals(dataSetFileName)) {
             // first try method specific default file name
             dataSetFileName = getMethodLevelDefaultTestDataSetFileName(testClass, testMethod);
-            Map<String, IDataSet> dataSets = createDataSets(testClass, dataSetFileName);
+            MultiSchemaDataSet dataSets = createDataSets(testClass, dataSetFileName);
             if (dataSets != null) {
                 // found file, so return
                 return dataSets;
@@ -241,7 +244,7 @@ public class DbUnitModule implements Module {
             dataSetFileName = getClassLevelDefaultTestDataSetFileName(testClass);
         }
 
-        Map<String, IDataSet> dataSets = createDataSets(testClass, dataSetFileName);
+        MultiSchemaDataSet dataSets = createDataSets(testClass, dataSetFileName);
         if (dataSets == null) {
             throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetFileName);
         }
@@ -256,7 +259,7 @@ public class DbUnitModule implements Module {
      * @param testMethod The test method, not null
      * @return The dataset, null if there is no data set
      */
-    public Map<String, IDataSet> getExpectedTestDataSets(Method testMethod) {
+    public MultiSchemaDataSet getExpectedTestDataSets(Method testMethod) {
         Class<?> testClass = testMethod.getDeclaringClass();
 
         // get the value of the method-level annotation
@@ -284,7 +287,7 @@ public class DbUnitModule implements Module {
             dataSetFileName = getDefaultExpectedDataSetFileName(testClass, testMethod);
         }
 
-        Map<String, IDataSet> dataSets = createDataSets(testClass, dataSetFileName);
+        MultiSchemaDataSet dataSets = createDataSets(testClass, dataSetFileName);
         if (dataSets == null) {
             throw new UnitilsException("Could not find expected DbUnit dataset with name " + dataSetFileName);
         }
@@ -300,7 +303,7 @@ public class DbUnitModule implements Module {
      * @param dataSetFilename The name, (start with '/' for absolute names), not null
      * @return The data set, null if the file does not exist
      */
-    protected Map<String, IDataSet> createDataSets(Class testClass, String dataSetFilename) {
+    protected MultiSchemaDataSet createDataSets(Class testClass, String dataSetFilename) {
         try {
             InputStream in = testClass.getResourceAsStream(dataSetFilename);
             if (in == null) {
@@ -324,7 +327,7 @@ public class DbUnitModule implements Module {
      * @param in the InputStream, not null
      * @return The DbUnit <code>IDataSet</code>
      */
-    public Map<String, IDataSet> createDataSet(InputStream in) {
+    public MultiSchemaDataSet createDataSet(InputStream in) {
         try {
             // A db support instance is created to get the default schema name in correct casing
             DataSource dataSource = getDatabaseModule().getDataSource();

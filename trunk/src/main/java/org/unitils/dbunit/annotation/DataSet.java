@@ -15,6 +15,9 @@
  */
 package org.unitils.dbunit.annotation;
 
+import org.dbunit.operation.DatabaseOperation;
+import org.unitils.dbunit.util.DataSetOperation;
+
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import java.lang.annotation.Retention;
@@ -83,4 +86,7 @@ public @interface DataSet {
      * @return the fileName, empty for default
      */
     String value() default "";
+
+    DataSetOperation operation() default DataSetOperation.DEFAULT;
+
 }

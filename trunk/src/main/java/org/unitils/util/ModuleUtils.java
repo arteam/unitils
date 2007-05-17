@@ -44,11 +44,8 @@ public class ModuleUtils {
     //todo javadoc
     @SuppressWarnings({"unchecked"})
     public static Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> getAnnotationEnumDefaults(Class<? extends Module> moduleClass, Properties configuration, Class<? extends Annotation>... annotationClasses) {
-        Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> result = new HashMap<Class<? extends Annotation>, Map<Class<Enum>, Enum>>();
 
-        if (annotationClasses == null) {
-            return result;
-        }
+        Map<Class<? extends Annotation>, Map<Class<Enum>, Enum>> result = new HashMap<Class<? extends Annotation>, Map<Class<Enum>, Enum>>();
 
         for (Class<? extends Annotation> annotationClass : annotationClasses) {
 

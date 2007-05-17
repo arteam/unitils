@@ -73,7 +73,7 @@ public class DataSetXmlReader {
      *
      * @param defaultSchemaName The schema name to use when none is specified, not null
      */
-    public DataSetXmlReader(String defaultSchemaName) throws DataSetException {
+    public DataSetXmlReader(String defaultSchemaName) {
         this.defaultSchemaName = defaultSchemaName;
     }
 
@@ -85,7 +85,7 @@ public class DataSetXmlReader {
      * @param in the xml content stream, not null
      * @return The data sets (schema name, data set), not null
      */
-    public Map<String, IDataSet> readDataSetXml(InputStream in) {
+    public MultiSchemaDataSet readDataSetXml(InputStream in) {
         try {
             DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
             XMLReader xmlReader = createXMLReader();
@@ -145,8 +145,8 @@ public class DataSetXmlReader {
          *
          * @return The data sets (schema name, data set), not null
          */
-        public Map<String, IDataSet> getDataSets() {
-            Map<String, IDataSet> result = new HashMap<String, IDataSet>();
+        public MultiSchemaDataSet getDataSets() {
+            MultiSchemaDataSet result = new MultiSchemaDataSet();
 
             // wrap datasets in replacement datasets
             for (String schemaName : dataSets.keySet()) {
@@ -154,7 +154,7 @@ public class DataSetXmlReader {
 
                 ReplacementDataSet replacementDataSet = new ReplacementDataSet(cachedDataSet);
                 replacementDataSet.addReplacementObject("[null]", null);
-                result.put(schemaName, replacementDataSet);
+                result.addSchemaDataSet(schemaName, replacementDataSet);
             }
             return result;
         }

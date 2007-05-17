@@ -40,7 +40,7 @@ abstract public class BaseDatabaseTask implements DatabaseTask {
     /* DbSupport for the default schema */
     protected DbSupport defaultDbSupport;
 
-    /* DbSupport for the all schemas */
+    /* DbSupport for all schemas */
     protected List<DbSupport> dbSupports;
 
 
