@@ -40,6 +40,7 @@ public class Db2DbSupport extends DbSupport {
      * Returns the names of all tables in the database.
      * <p/>
      * TODO check table types
+     * A = Alias G = Global temporary table H = Hierarchy table L = Detached table N = Nickname S = Materialized query table T = Table (untyped) U = Typed table V = View (untyped) W = Typed view
      *
      * @return The names of all tables in the database
      */
@@ -80,6 +81,9 @@ public class Db2DbSupport extends DbSupport {
 
     /**
      * Retrieves the names of all the views in the database schema.
+     *
+     * TODO check view types
+     * V = View (untyped) W = Typed view
      *
      * @return The names of all views in the database
      */
@@ -157,6 +161,9 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
+     * todo rename + javadoc about currval and nextval  calling this method has the side effect of increasing the nr
+     * <p/>
+     * <p/>
      * Returns the value of the sequence with the given name
      *
      * @param sequenceName The sequence, not null
