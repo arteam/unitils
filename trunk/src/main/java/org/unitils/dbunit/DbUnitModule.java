@@ -35,8 +35,8 @@ import org.unitils.dbunit.util.DataSetXmlReader;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import org.unitils.dbunit.dataSetOperation.DataSetOperation;
-import org.unitils.dbunit.dataSetOperation.DefaultDataSetOperation;
+import org.unitils.dbunit.datasetoperation.DataSetOperation;
+import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.AnnotationPropertyAccessor;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
@@ -141,7 +141,7 @@ public class DbUnitModule implements Module {
                 // no dataset specified
                 return;
             }
-            DataSetOperation dataSetOperation = getDataSetOperation(testMethod);
+            org.unitils.dbunit.dataSetOperation.DataSetOperation dataSetOperation = getDataSetOperation(testMethod);
 
             for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
                 IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);

@@ -15,8 +15,8 @@
  */
 package org.unitils.dbunit.annotation;
 
-import org.unitils.dbunit.dataSetOperation.DataSetOperation;
-import org.unitils.dbunit.dataSetOperation.DefaultDataSetOperation;
+import org.unitils.dbunit.datasetoperation.DataSetOperation;
+import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
