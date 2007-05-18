@@ -1,21 +1,38 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbunit;
 
+import org.dbunit.dataset.IDataSet;
 import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
+import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.getItemAsString;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetoperation.DataSetOperation;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
-import org.unitils.core.ConfigurationLoader;
-import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
-import static org.unitils.core.util.SQLUtils.getItemAsString;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import org.dbunit.dataset.IDataSet;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -51,8 +68,8 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
     }
 
     public void testLoadDataSet_customDataSetOperation() throws Exception {
-       dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"));
-       assertTrue(MockDataSetOperation.operationExecuted);
+        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"));
+        assertTrue(MockDataSetOperation.operationExecuted);
     }
 
     /**
@@ -81,7 +98,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
         executeUpdateQuietly("drop table TEST", dataSource);
     }
 
-     /**
+    /**
      * Test class with a class level dataset
      */
     @DataSet

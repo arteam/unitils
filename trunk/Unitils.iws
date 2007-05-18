@@ -18,8 +18,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/BaseDataSetOperation.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/BaseDataSetOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/DataSetOperation.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/DataSetOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/util/AnnotationPropertyAccessor.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/util/AnnotationPropertyAccessor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/CleanInsertOperation.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/CleanInsertOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetOperationTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetOperationTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/InsertOperation.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/InsertOperation.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/RefreshOperation.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/RefreshOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/MultiSchemaXmlDataSetFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/MultiSchemaXmlDataSetFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/DefaultDataSetOperation.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/DefaultDataSetOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/DataSetFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/DataSetFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/DefaultDataSetFactory.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/DefaultDataSetFactory.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -178,37 +188,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OracleDbSupport.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="OracleDbSupport.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="218" column="7" selection-start="7500" selection-end="7500" vertical-scroll-proportion="0.2651072">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DataSet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="0" selection-start="654" selection-end="654" vertical-scroll-proportion="0.01633045">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DBClearerPreserveTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerPreserveTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="65" column="88" selection-start="2264" selection-end="2264" vertical-scroll-proportion="0.01633045">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Db2DbSupport.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="2" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+            <state line="218" column="7" selection-start="7500" selection-end="7500" vertical-scroll-proportion="0.0165692">
               <folding />
             </state>
           </provider>
@@ -858,7 +841,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure Favorites="false" ProjectPane="false" Scope="false" PackagesPane="false" />
+      <showStructure PackagesPane="false" ProjectPane="false" Scope="false" Favorites="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -944,23 +927,6 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="" />
-    </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module name="" />
       <option name="MAIN_CLASS_NAME" />
@@ -996,6 +962,13 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -1014,6 +987,16 @@
       <method>
         <option name="Make" value="true" />
       </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="" />
     </configuration>
     <configuration default="false" name="DuplicateFileSearch" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="util.DuplicateFileSearch" />
@@ -1397,86 +1380,88 @@
     <option name="myLastEditedConfigurable" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/clean/DBClearerTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/DataSetFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="365" column="5" selection-start="15299" selection-end="15299" vertical-scroll-proportion="0.9673391">
+        <state line="23" column="2" selection-start="762" selection-end="762" vertical-scroll-proportion="0.3429395">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/OracleDbSupportTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/MultiSchemaXmlDataSetFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="71" column="71" selection-start="2837" selection-end="3275" vertical-scroll-proportion="0.9097022">
+        <state line="33" column="0" selection-start="1095" selection-end="1095" vertical-scroll-proportion="0.5389049">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/DefaultDataSetFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="13" selection-start="700" selection-end="700" vertical-scroll-proportion="0.32660902">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/MySqlDbSupportTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/DefaultDataSetOperation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="0" selection-start="1557" selection-end="1557" vertical-scroll-proportion="0.33525455">
+        <state line="15" column="0" selection-start="615" selection-end="615" vertical-scroll-proportion="0.24495678">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/Db2SupportTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/CleanInsertOperation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="94" selection-start="1406" selection-end="2642" vertical-scroll-proportion="0.0">
+        <state line="29" column="8" selection-start="1061" selection-end="1061" vertical-scroll-proportion="0.39193085">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/DefaultSequenceUpdater.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/DataSetOperation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="96" column="13" selection-start="3711" selection-end="3711" vertical-scroll-proportion="0.6147935">
+        <state line="25" column="40" selection-start="1149" selection-end="1149" vertical-scroll-proportion="0.39193085">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/SQLHandler.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/InsertOperation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="3" selection-start="1063" selection-end="1063" vertical-scroll-proportion="0.3429395">
+        <state line="29" column="8" selection-start="1024" selection-end="1024" vertical-scroll-proportion="0.39193085">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/util/SQLUtils.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/BaseDataSetOperation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="61" selection-start="1152" selection-end="1152" vertical-scroll-proportion="0.32660902">
+        <state line="15" column="0" selection-start="615" selection-end="615" vertical-scroll-proportion="0.24495678">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/structure/SequenceUpdaterTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetoperation/RefreshOperation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="120" column="0" selection-start="4610" selection-end="4610" vertical-scroll-proportion="0.01633045">
+        <state line="31" column="8" selection-start="1246" selection-end="1246" vertical-scroll-proportion="0.42459175">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetOperationTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="181" column="7" selection-start="5710" selection-end="5903" vertical-scroll-proportion="0.3170029">
+        <state line="0" column="2" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/MySqlDbSupport.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbunit/DbUnitModuleDataSetMultiSchemaTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="90" column="42" selection-start="3283" selection-end="3283" vertical-scroll-proportion="0.0165692">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="218" column="7" selection-start="7500" selection-end="7500" vertical-scroll-proportion="0.2651072">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="654" selection-end="654" vertical-scroll-proportion="0.01633045">
+        <state line="0" column="0" selection-start="0" selection-end="614" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -1488,9 +1473,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/annotation/DataSet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="2" selection-start="2" selection-end="2" vertical-scroll-proportion="0.0">
+        <state line="16" column="0" selection-start="654" selection-end="654" vertical-scroll-proportion="0.01633045">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/OracleDbSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="218" column="7" selection-start="7500" selection-end="7500" vertical-scroll-proportion="0.0165692">
           <folding />
         </state>
       </provider>
