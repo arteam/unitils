@@ -21,11 +21,9 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
-import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
-import static org.unitils.core.dbsupport.TestSQLUtils.isEmpty;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
+import org.unitils.core.dbsupport.SQLHandler;
+import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
@@ -69,10 +67,10 @@ public class DBCleanerMultiSchemaTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-            this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
-            if (disabled) {
-                return;
-            }
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
+        if (disabled) {
+            return;
+        }
 
         // configure 3 schemas
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");

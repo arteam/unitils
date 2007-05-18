@@ -26,9 +26,7 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.core.dbsupport.TestSQLUtils;
-import static org.unitils.core.dbsupport.TestSQLUtils.*;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.impl.DefaultDBClearer;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
@@ -297,7 +295,7 @@ public class DBClearerPreserveTest extends UnitilsJUnit3 {
     private void cleanupTestDatabaseOracle() throws Exception {
         dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
-        TestSQLUtils.dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
         dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");

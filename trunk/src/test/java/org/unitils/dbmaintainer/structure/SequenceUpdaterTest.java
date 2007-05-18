@@ -20,12 +20,9 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.core.dbsupport.TestSQLUtils.dropTestSequences;
-import static org.unitils.core.dbsupport.TestSQLUtils.dropTestTables;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.getItemAsLong;
+import org.unitils.core.dbsupport.SQLHandler;
+import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
@@ -74,7 +71,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         SQLHandler sqlHandler = new SQLHandler(dataSource);
         sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler);
         dbSupport = getDefaultDbSupport(configuration, sqlHandler);
-        
+
         cleanupTestDatabase();
         createTestDatabase();
     }

@@ -15,14 +15,13 @@
  */
 package org.unitils.dbunit;
 
+import org.dbunit.operation.DatabaseOperation;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.core.dbsupport.TestSQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
-import org.dbunit.operation.DatabaseOperation;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
@@ -171,7 +170,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
 
 
     /**
-     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream, DatabaseOperation)}
+     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream,DatabaseOperation)}
      */
     public void testInsertTestData_directCall() throws Exception {
         InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
