@@ -123,6 +123,11 @@ public class SpringModule implements Module {
     }
 
 
+    public boolean isApplicationContextConfiguredFor(Object testObject) {
+        return applicationContextManager.hasApplicationContext(testObject);
+    }
+
+
     /**
      * Gets the application context for this test. A new one will be created if it does not exist yet. If a superclass
      * has also declared the creation of an application context, this one will be retrieved (or created if it was not
@@ -315,7 +320,7 @@ public class SpringModule implements Module {
 
 
     //todo javadoc
-    public BeanPostProcessor getBeanPostProcessor(Object testObject, Class<? extends BeanPostProcessor> beanPostProcessorType) {
+    public <T extends BeanPostProcessor> T getBeanPostProcessor(Object testObject, Class<T> beanPostProcessorType) {
         if (applicationContextManager.hasApplicationContext(testObject)) {
             return applicationContextManager.getBeanPostProcessor(getApplicationContext(testObject), beanPostProcessorType);
         } else {

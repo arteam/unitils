@@ -30,7 +30,7 @@ import java.sql.SQLException;
 public class BaseDataSourceDecorator implements DataSource {
 
     /* The TestDataSource that is wrapped */
-    private DataSource wrappedDataSource;
+    protected DataSource wrappedDataSource;
 
 
     /**

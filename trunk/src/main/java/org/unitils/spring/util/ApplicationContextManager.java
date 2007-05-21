@@ -172,12 +172,13 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
 
 
     // todo javadoc
-    public BeanPostProcessor getBeanPostProcessor(ApplicationContext applicationContext, Class<? extends BeanPostProcessor> beanPostProcessorType) {
-        Map<Class<? extends BeanPostProcessor>, BeanPostProcessor> beanPostProcessorMap = beanPostProcessors.get(applicationContext);
+    public <T extends BeanPostProcessor> T getBeanPostProcessor(ApplicationContext applicationContext, Class<T> beanPostProcessorType) {
+        Map<Class<? extends BeanPostProcessor>, ? extends BeanPostProcessor> beanPostProcessorMap = beanPostProcessors.get(applicationContext);
         if (beanPostProcessorMap == null) {
             return null;
         } else {
-            return beanPostProcessorMap.get(beanPostProcessorType);
+            //noinspection unchecked
+            return (T) beanPostProcessorMap.get(beanPostProcessorType);
         }
     }
 

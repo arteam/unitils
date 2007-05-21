@@ -86,8 +86,20 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
      * @return The session factory bean post processor, null if not found
      */
     protected SessionFactoryWrappingBeanPostProcessor getSessionFactoryWrappingBeanPostProcessor(Object testObject) {
-        BeanPostProcessor beanPostProcessor = getSpringModule().getBeanPostProcessor(testObject, SessionFactoryWrappingBeanPostProcessor.class);
+        BeanPostProcessor beanPostProcessor = getSpringModule().getBeanPostProcessor(testObject,
+                SessionFactoryWrappingBeanPostProcessor.class);
         return (SessionFactoryWrappingBeanPostProcessor) beanPostProcessor;
+    }
+
+
+    /**
+     * Ensures that the spring application context is loaded. This could be not the case since the application context
+     * is lazily loaded
+     *
+     * @param testObject The test inst null not null
+     */
+    protected void ensureApplicationContextLoaded(Object testObject) {
+        getSpringModule().getApplicationContext(testObject);
     }
 
 

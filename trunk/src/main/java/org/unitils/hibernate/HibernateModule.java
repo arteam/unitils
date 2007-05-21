@@ -303,7 +303,7 @@ public class HibernateModule implements Module, Flushable {
      * SpringHibernateSupport is not enabled.
      */
     protected void createSpringHibernateSupport() {
-        if (getSpringModule() == null) {
+        if (!isSpringModuleEnabled()) {
             return;
         }
         try {
@@ -314,14 +314,14 @@ public class HibernateModule implements Module, Flushable {
     }
 
 
-    // todo REMOVE
-    // this creates a classloading dependency between to Spring module
-    protected SpringModule getSpringModule() {
-        try {
-            return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
-        } catch (UnitilsException e) {
-            return null;
-        }
+    /**
+     * Verifies whether the SpringModule is enabled. If not, this means that either the property unitils.modules doesn't
+     * include spring, or unitils.module.spring.enabled, or that the module could not be loaded because spring is not
+     * in the classpath.
+     * @return true if the SpringModule is enabled, false otherwise
+     */
+    protected boolean isSpringModuleEnabled() {
+        return Unitils.getInstance().getModulesRepository().isModuleEnabled("org.unitils.spring.SpringModule");
     }
 
 

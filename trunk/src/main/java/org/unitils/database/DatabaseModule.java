@@ -15,6 +15,8 @@
  */
 package org.unitils.database;
 
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -23,22 +25,31 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.util.Flushable;
+import org.unitils.database.transaction.TransactionManager;
+import org.unitils.database.transaction.TransactionMode;
+import org.unitils.database.transaction.TransactionManagerFactory;
 import org.unitils.dbmaintainer.DBMaintainer;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import org.unitils.util.PropertyUtils;
+import org.unitils.util.AnnotationUtils;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Properties;
+import java.util.Map;
 
 /**
+ * todo add javadoc explaining transaction behavior.
+ *
  * Module that provides basic support for database testing such as the creation of a datasource that connectes to the
  * test database and the maintaince of the test database structure.
  * <p/>
@@ -59,11 +70,14 @@ import java.util.Properties;
  */
 public class DatabaseModule implements Module {
 
-    /* Property keys indicating if the database schema should be updated before performing the tests */
+    /* Property indicating if the database schema should be updated before performing the tests */
     public static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
+
+    /* Map holding the default configuration of the database module annotations */
+    private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
 
     /* The datasource instance */
     private DataSource dataSource;
@@ -74,6 +88,10 @@ public class DatabaseModule implements Module {
     /* Indicates if the DBMaintainer should be invoked to update the database */
     private boolean updateDatabaseSchemaEnabled;
 
+    private TransactionManager transactionManager;
+
+    private ThreadLocal<Object> transactionShouldBeActiveFor = new ThreadLocal<Object>();
+
 
     /**
      * Initializes this module using the given <code>Configuration</code>
@@ -83,6 +101,7 @@ public class DatabaseModule implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
 
+        defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
         updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED, configuration);
     }
 
@@ -98,6 +117,10 @@ public class DatabaseModule implements Module {
             dataSource = createDataSource();
             if (updateDatabaseSchemaEnabled) {
                 updateDatabase();
+            }
+            dataSource = transactionManager.registerDataSource(dataSource);
+            if (transactionShouldBeActiveFor.get() != null) {
+                transactionManager.startTransaction(transactionShouldBeActiveFor.get());
             }
         }
         return dataSource;
@@ -126,12 +149,12 @@ public class DatabaseModule implements Module {
     public void updateDatabase() {
         updateDatabase(new SQLHandler(getDataSource()));
     }
-    
-    
+
+
     /**
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link DBMaintainer} for more information.
-     * 
+     *
      * @param sqlHandler SQLHandler that needs to be used for the database updates
      * todo make configurable using properties
      */
@@ -145,8 +168,8 @@ public class DatabaseModule implements Module {
             throw new UnitilsException("Error while updating database", e);
         }
     }
-    
-    
+
+
     public void setDatabaseToCurrentVersion() {
         DBMaintainer dbMaintainer = new DBMaintainer(configuration, new SQLHandler(getDataSource()));
         dbMaintainer.setDatabaseToCurrentVersion();
@@ -182,6 +205,52 @@ public class DatabaseModule implements Module {
         return dataSourceFactory.createDataSource();
     }
 
+    protected void initTransactionManager() {
+        transactionManager = createTransactionManager();
+    }
+
+    protected TransactionManager createTransactionManager() {
+        TransactionManagerFactory factory = getConfiguredInstance(TransactionManagerFactory.class, configuration);
+        return factory.getTransactionManager();
+    }
+
+    public boolean isTransactionsEnabled(Method testMethod) {
+        TransactionMode transactionMode = getTransactionMode(testMethod);
+        return transactionMode != TransactionMode.DISABLED;
+    }
+
+    protected TransactionMode getTransactionMode(Method testMethod) {
+        TransactionMode transactionMode = AnnotationUtils.getMethodOrClassLevelAnnotationProperty(Transactional.class,
+                "value", TransactionMode.DEFAULT, testMethod);
+        transactionMode = getEnumValueReplaceDefault(Transactional.class, "value", transactionMode,
+                defaultAnnotationPropertyValues);
+        return transactionMode;
+    }
+
+    public void startTransaction(Object testObject) {
+        transactionShouldBeActiveFor.set(testObject);
+        transactionManager.startTransaction(testObject);
+    }
+
+    protected void commitOrRollbackTransaction(Object testObject, Method testMethod) {
+        TransactionMode transactionMode = getTransactionMode(testMethod);
+        if (transactionMode == TransactionMode.COMMIT) {
+            commitTransaction(testObject);
+        } else if (getTransactionMode(testMethod) == TransactionMode.ROLLBACK) {
+            rollbackTransaction(testObject);
+        }
+    }
+
+    public void commitTransaction(Object testObject) {
+        transactionManager.commit(testObject);
+        transactionShouldBeActiveFor.remove();
+    }
+
+    public void rollbackTransaction(Object testObject) {
+        transactionManager.rollback(testObject);
+        transactionShouldBeActiveFor.remove();
+    }
+
 
     /**
      * @return The {@link TestListener} associated with this module
@@ -197,8 +266,27 @@ public class DatabaseModule implements Module {
     protected class DatabaseTestListener extends TestListener {
 
         @Override
+        public void beforeAll() {
+            initTransactionManager();
+        }
+
+        @Override
         public void beforeTestSetUp(Object testObject) {
             injectDataSource(testObject);
+        }
+
+        @Override
+        public void beforeTestMethod(Object testObject, Method testMethod) {
+            if (isTransactionsEnabled(testMethod)) {
+                startTransaction(testObject);
+            }
+        }
+
+        @Override
+        public void afterTestMethod(Object testObject, Method testMethod) {
+            if (isTransactionsEnabled(testMethod)) {
+                commitOrRollbackTransaction(testObject, testMethod);
+            }
         }
     }
 }
