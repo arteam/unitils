@@ -92,9 +92,17 @@ public @interface DataSet {
     /**
      * The operation that needs to be executed to get the dbunit dataset into the database
      *
-     * @return An implementation class of {@link DataSetOperation}. {@link DefaultDataSetOperation} for default
+     * @return An implementation class of {@link DataSetOperation}. Use the default value {@link DefaultDataSetOperation}
+     *         to make use of the default DataSetOperation configured in the unitils configuration.
      */
     Class<? extends DataSetOperation> operation() default DefaultDataSetOperation.class;
 
+    /**
+     * The factory that needs to be used to read the dataset file and create a {@link org.unitils.dbunit.util.MultiSchemaDataSet}
+     * object
+     * 
+     * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DefaultDataSetFactory}
+     *         to make use of the default DataSetOperation configured in the unitils configuration.
+     */
     Class<? extends DataSetFactory> factory() default DefaultDataSetFactory.class;
 }

@@ -21,35 +21,11 @@ import java.util.*;
 
 
 /**
- * A class for testing equality of 2 objects using reflection. <br>
- * The {@link Object#equals} method is often used for business logic equality checking. The {@link Object#equals} method
- * can for example return true when the id fields of 2 instances have equal values, no matter what the values of the
- * other fields are. This class offers another way to check equality of objects.
+ * Abstract superclass that defines a template for sub implementations that can compare objects of a certain kind.
+ * Different instances of different subtypes will be chained to obtain a reflection comparator chain. This chain
+ * will compare two objects with eachother through reflection. Depending on the composition of the chain, a number
+ * of 'leniency levels' are in operation.
  * <p/>
- * The {@link #getDifference} methods will use reflection to get and compare the values of all fields in the objects. If
- * a field contains another object, the same reflection comparison will be done recursively on these inner objects. All
- * fields in superclasses will also be compared using reflection. Static and transient fields will be ignored.
- * <p/>
- * As an exception, the {@link Object#equals} method will be called instead of using reflection on all
- * java.lang.* type field values. Eg a field of type java.lang.Integer will be compared using its equals method. No
- * superclass comparison is done on java.lang.* type classes. Eg the java.lang.Ojbect class fields will not be compared.
- * <p/>
- * If an object is an array or a collection, all its elements will be traversed and compared with the other array or
- * collection in the same way using reflection. The actual type of collection or whether a collection is compared with
- * an array is not important. It will only go through the array or collection and compare the elements. For example, an
- * Arraylist can be compared with an array or a LinkedList.
- * <p/>
- * By default, a strict comparison is performed, but if needed, some leniency can be configured by setting one or more
- * comparator modes: <ul>
- * <li>ignore defaults: all fields that have a default java value for the left object will be ignored. Eg if
- * the left object contains an int field with value 0 it will not be compared to the value of the right object.</li>
- * <li>lenient dates: only check whether both Date objects contain a value or not, the value itself
- * is not compared. Eg. if the left object contained a date with value 1-1-2006 and the right object contained a date
- * with value 2-2-2006 they would still be considered equal.</li>
- * <li>lenient order: only check whether both collections or arrays contain the same value, the actual order of the
- * values is not compared. Eg. if the left object is int[]{ 1, 2} and the right value is int[]{2, 1} they would still
- * be considered equal.</li>
- * </ul>
  * If the check indicates that both objects are not equal, the first (and only the first!) found difference is returned.
  * The actual difference can then be retrieved by the fieldStack, leftValue and rightValue properties.
  *
@@ -59,19 +35,21 @@ import java.util.*;
 abstract public class ReflectionComparator {
 
     /**
-     * todo javadoc
+     * Root of the comparator chain. Comparisons must start with calling the getDifference method of this object
      */
     protected ReflectionComparator rootComparator;
 
     /**
-     * todo javadoc
+     * Next element in the comparator chain.
      */
     protected ReflectionComparator chainedComparator;
 
     /**
-     * todo javadoc
+     * Constructs a new instance, with the given comparator as the next element in the chain. Makes sure that this
+     * instance is registered as root comparator of the given chained comparator. Setting the root comparator gets
+     * propagated to all elements in the chain. This way, all comparators share the same root at all times.
      *
-     * @param chainedComparator
+     * @param chainedComparator The next comparator in the chain
      */
     public ReflectionComparator(ReflectionComparator chainedComparator) {
         this.chainedComparator = chainedComparator;
@@ -79,9 +57,10 @@ abstract public class ReflectionComparator {
     }
 
     /**
-     * todo javadoc
+     * Sets the root comparator. This operation is propagated to all comparators in the chain. This way, all comparators
+     * share the same root at all times.
      *
-     * @param rootComparator
+     * @param rootComparator The root comparator, i.e. the first comparator in the chain
      */
     protected void setRootComparator(ReflectionComparator rootComparator) {
         this.rootComparator = rootComparator;
@@ -103,8 +82,8 @@ abstract public class ReflectionComparator {
 
 
     /**
-     * Checks whether there is a difference between the left and right objects. The meaning of no difference is
-     * determined by the set comparator modes. See class javadoc for more info.
+     * Checks whether there is a difference between the left and right objects. Whether there is a difference, depends
+     * on the concrete comparators in the chain.
      *
      * @param left  the left instance
      * @param right the right instance
@@ -118,18 +97,18 @@ abstract public class ReflectionComparator {
     /**
      * If this ReflectionComparator is able to check whether their is a difference in the given left
      * and right objects (i.e. {@link #canHandle(Object, Object)} returns true), the objects are compared.
-     * todo javadoc
      *
-     * @param left
-     * @param right
-     * @param fieldStack
-     * @param traversedInstancePairs
-     * @return
+     * @param left The left instance
+     * @param right The right instance
+     * @param fieldStack Stack indicating the path from the root of the object structure to the object that is currently
+*                   compared
+     * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
      */
     protected Difference getDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
         if (isAlreadyTraversedInstancePair(left, right, traversedInstancePairs)) {
             return null;
         }
+        
         if (canHandle(left, right)) {
             registerTraversedInstancePair(left, right, traversedInstancePairs);
             return doGetDifference(left, right, fieldStack, traversedInstancePairs);
@@ -143,13 +122,16 @@ abstract public class ReflectionComparator {
     }
 
     /**
-     * todo javadoc
+     * Abstract method that makes up the core of a reflection comparator. Implementations should return a concrete
+     * {@link Difference} object when left and right are different, or null otherwise. This method will only be called
+     * if {@link #canHandle(Object, Object)} returns true. An implementation doesn't have to take care of chaining or
+     * circular references.
      *
-     * @param left
-     * @param right
-     * @param fieldStack
-     * @param traversedInstancePairs
-     * @return
+     * @param left The left instance
+     * @param right The right instance
+     * @param fieldStack Stack indicating the path from the root of the object structure to the object that is currently
+*                   compared
+     * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
      */
     abstract protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs);
 
@@ -168,11 +150,13 @@ abstract public class ReflectionComparator {
     }
 
     /**
-     * todo javadoc
+     * Registers the fact that the given left and right object have been compared, to make sure the same two objects
+     * will not be compared again (to avoid infinite loops in case of circular references)
      *
-     * @param left
-     * @param right
-     * @param traversedInstancePairs
+     * @param left the left instance
+     * @param right the right instance
+     * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
+     *                               same objects will not be compared again, in order to avoid infinite loops
      */
     private void registerTraversedInstancePair(Object left, Object right, Set<TraversedInstancePair> traversedInstancePairs) {
         if (left != null && right != null) {
@@ -181,12 +165,14 @@ abstract public class ReflectionComparator {
     }
 
     /**
-     * todo javadoc
+     * Checks whether the given left and right object have already been compared, according to the given set of
+     * traversedInstancePairs.
      *
-     * @param left
-     * @param right
-     * @param traversedInstancePairs
-     * @return
+     * @param left the left instance
+     * @param right the right instance
+     * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
+     *                               same objects will not be compared again, in order to avoid infinite loops
+     * @return true if the given left and right object have already been compared
      */
     private boolean isAlreadyTraversedInstancePair(Object left, Object right, Set<TraversedInstancePair> traversedInstancePairs) {
         if (left == null || right == null) {
@@ -294,27 +280,50 @@ abstract public class ReflectionComparator {
     }
 
     /**
-     * todo javadoc
+     * Value object that represents a pair of objects that have been compared with eachother. Two instances of this
+     * class are equal when the leftObject and rightObject fields reference the same instances. 
      */
     protected static class TraversedInstancePair {
 
+        /**
+         * The left object
+         */
         private Object leftObject;
 
+        /**
+         * The right object
+         */
         private Object rightObject;
 
+        /**
+         * Constructs a new instance with the given left and right object
+         *
+         * @param leftObject the left instance
+         * @param rightObject the right instance
+         */
         public TraversedInstancePair(Object leftObject, Object rightObject) {
             this.leftObject = leftObject;
             this.rightObject = rightObject;
         }
 
+        /**
+         * @return The left instance
+         */
         public Object getLeftObject() {
             return leftObject;
         }
 
+        /**
+         * @return The right instance
+         */
         public Object getRightObject() {
             return rightObject;
         }
 
+        /**
+         * @param o Another object
+         * @return true when the other object is a TraversedInstancePair with the same left and right object instances.
+         */
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -327,6 +336,9 @@ abstract public class ReflectionComparator {
             return true;
         }
 
+        /**
+         * @return This object's hashcode
+         */
         public int hashCode() {
             int result;
             result = leftObject.hashCode();

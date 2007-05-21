@@ -15,6 +15,9 @@
  */
 package org.unitils.core;
 
+import org.unitils.util.ReflectionUtils;
+import org.unitils.spring.SpringModule;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,6 +103,18 @@ public class ModulesRepository {
             }
         }
         return result;
+    }
+
+
+    public boolean isModuleEnabled(String fullyQualifiedClassName) {
+        //noinspection unchecked
+        Class<? extends Module> moduleClass = (Class<? extends Module>) ReflectionUtils.getClassWithName(fullyQualifiedClassName);
+        return isModuleEnabled(moduleClass);
+    }
+
+
+    public boolean isModuleEnabled(Class<? extends Module> moduleClass) {
+        return getModulesOfType(moduleClass).size() >= 0;
     }
 
 
