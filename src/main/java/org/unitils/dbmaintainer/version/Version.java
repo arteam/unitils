@@ -61,6 +61,7 @@ public class Version {
     /**
      * @return The string representation of the version.
      */
+    @Override
     public String toString() {
         return "Index " + index + "; timestamp = " + timeStamp;
     }

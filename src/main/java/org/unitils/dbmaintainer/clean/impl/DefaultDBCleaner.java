@@ -80,6 +80,7 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      *
      * @param configuration The configuration, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
         schemasToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SCHEMAS, configuration, false);
         schemasToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS, configuration, false));

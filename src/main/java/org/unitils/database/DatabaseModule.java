@@ -15,8 +15,22 @@
  */
 package org.unitils.database;
 
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -27,25 +41,13 @@ import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
-import org.unitils.database.util.Flushable;
 import org.unitils.database.transaction.TransactionManager;
-import org.unitils.database.transaction.TransactionMode;
 import org.unitils.database.transaction.TransactionManagerFactory;
+import org.unitils.database.transaction.TransactionMode;
+import org.unitils.database.util.Flushable;
 import org.unitils.dbmaintainer.DBMaintainer;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import org.unitils.util.PropertyUtils;
 import org.unitils.util.AnnotationUtils;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import javax.sql.DataSource;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Properties;
-import java.util.Map;
+import org.unitils.util.PropertyUtils;
 
 /**
  * todo add javadoc explaining transaction behavior.
@@ -214,41 +216,55 @@ public class DatabaseModule implements Module {
         return factory.getTransactionManager();
     }
 
-    public boolean isTransactionsEnabled(Method testMethod) {
-        TransactionMode transactionMode = getTransactionMode(testMethod);
+    public boolean isTransactionsEnabled(Object testObject) {
+        TransactionMode transactionMode = getTransactionMode(testObject);
         return transactionMode != TransactionMode.DISABLED;
     }
 
-    protected TransactionMode getTransactionMode(Method testMethod) {
-        TransactionMode transactionMode = AnnotationUtils.getMethodOrClassLevelAnnotationProperty(Transactional.class,
-                "value", TransactionMode.DEFAULT, testMethod);
+    protected TransactionMode getTransactionMode(Object testObject) {
+        TransactionMode transactionMode = AnnotationUtils.getClassLevelAnnotationProperty(Transactional.class,
+                "value", TransactionMode.DEFAULT, testObject.getClass());
         transactionMode = getEnumValueReplaceDefault(Transactional.class, "value", transactionMode,
                 defaultAnnotationPropertyValues);
         return transactionMode;
     }
 
     public void startTransaction(Object testObject) {
-        transactionShouldBeActiveFor.set(testObject);
-        transactionManager.startTransaction(testObject);
+        if (dataSource == null) {
+            transactionShouldBeActiveFor.set(testObject);
+        } else {
+            transactionManager.startTransaction(testObject);
+        }
     }
 
-    protected void commitOrRollbackTransaction(Object testObject, Method testMethod) {
-        TransactionMode transactionMode = getTransactionMode(testMethod);
-        if (transactionMode == TransactionMode.COMMIT) {
-            commitTransaction(testObject);
-        } else if (getTransactionMode(testMethod) == TransactionMode.ROLLBACK) {
-            rollbackTransaction(testObject);
+    protected void commitOrRollbackTransaction(Object testObject) {
+        if (dataSource == null) {
+            transactionShouldBeActiveFor.remove();
+        } else {
+            TransactionMode transactionMode = getTransactionMode(testObject);
+            if (transactionMode == TransactionMode.COMMIT) {
+                commitTransaction(testObject);
+            } else if (getTransactionMode(testObject) == TransactionMode.ROLLBACK) {
+                rollbackTransaction(testObject);
+            }
         }
     }
 
     public void commitTransaction(Object testObject) {
-        transactionManager.commit(testObject);
-        transactionShouldBeActiveFor.remove();
+        if (dataSource == null) {
+            transactionShouldBeActiveFor.remove();
+        } else {
+            transactionManager.commit(testObject);
+        }
+
     }
 
     public void rollbackTransaction(Object testObject) {
-        transactionManager.rollback(testObject);
-        transactionShouldBeActiveFor.remove();
+        if (dataSource == null) {
+            transactionShouldBeActiveFor.remove();
+        } else {
+            transactionManager.rollback(testObject);
+        }
     }
 
 
@@ -273,19 +289,20 @@ public class DatabaseModule implements Module {
         @Override
         public void beforeTestSetUp(Object testObject) {
             injectDataSource(testObject);
-        }
-
-        @Override
-        public void beforeTestMethod(Object testObject, Method testMethod) {
-            if (isTransactionsEnabled(testMethod)) {
+            if (isTransactionsEnabled(testObject)) {
                 startTransaction(testObject);
             }
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod) {
-            if (isTransactionsEnabled(testMethod)) {
-                commitOrRollbackTransaction(testObject, testMethod);
+        public void beforeTestMethod(Object testObject, Method testMethod) {
+
+        }
+
+        @Override
+        public void afterTestTearDown(Object testObject) {
+            if (isTransactionsEnabled(testObject)) {
+                commitOrRollbackTransaction(testObject);
             }
         }
     }

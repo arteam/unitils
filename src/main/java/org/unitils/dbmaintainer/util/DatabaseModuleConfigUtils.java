@@ -40,7 +40,8 @@ public class DatabaseModuleConfigUtils {
     /**
      * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
      * The concrete instance must extend the class {@link DatabaseTask}.
-     *
+     * 
+     * @param <T>              The type of the DatabaseTask 
      * @param databaseTaskType The type of the DatabaseTask, not null
      * @param configuration    The config, not null
      * @param sqlHandler       The sql handler, not null

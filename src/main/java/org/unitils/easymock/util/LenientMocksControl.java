@@ -15,15 +15,19 @@
  */
 package org.unitils.easymock.util;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import org.easymock.ArgumentsMatcher;
 import org.easymock.IAnswer;
 import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.internal.MocksClassControl;
-import org.easymock.internal.*;
+import org.easymock.internal.IMocksControlState;
+import org.easymock.internal.Invocation;
+import org.easymock.internal.LastControl;
+import org.easymock.internal.Range;
+import org.easymock.internal.RecordState;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * An EasyMock mock control that uses the reflection argument matcher for all arguments of a method invocation.
@@ -88,6 +92,7 @@ public class LenientMocksControl extends MocksClassControl {
      *
      * @return the state, wrapped in case of a RecordState
      */
+    @Override
     public IMocksControlState getState() {
         IMocksControlState mocksControlState = super.getState();
         if (mocksControlState instanceof RecordState) {

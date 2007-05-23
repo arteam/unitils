@@ -15,11 +15,12 @@
  */
 package org.unitils.core.dbsupport;
 
-import org.unitils.core.util.StoredIdentifierCase;
 import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
 import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
 
 import java.util.Set;
+
+import org.unitils.core.util.StoredIdentifierCase;
 
 /**
  * Implementation of {@link DbSupport} for a MySql database.
@@ -176,6 +177,7 @@ public class MySqlDbSupport extends DbSupport {
      * @param identifier The identifier, not null
      * @return The name converted to correct case if needed, not null
      */
+    @Override
     public String toCorrectCaseIdentifier(String identifier) {
         identifier = identifier.trim();
         String identifierQuoteString = getIdentifierQuoteString();

@@ -16,12 +16,19 @@
 package org.unitils.easymock;
 
 import static org.easymock.EasyMock.reportMatcher;
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
-import org.unitils.easymock.util.*;
-import org.unitils.reflectionassert.ReflectionComparatorMode;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.util.Calls;
+import org.unitils.easymock.util.Dates;
+import org.unitils.easymock.util.Defaults;
+import org.unitils.easymock.util.InvocationOrder;
+import org.unitils.easymock.util.Order;
+import org.unitils.easymock.util.ReflectionArgumentMatcher;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 /**
  * Utility facade for handling EasyMock things such as replay or manually creating a mock.
@@ -38,7 +45,8 @@ public class EasyMockUnitils {
      * ignore defaults and lenient order.
      * <p/>
      * Same as refEq with ignore defaults and lenient order as comparator modes.
-     *
+     * 
+     * @param <T> The type of the object to compare with 
      * @param object the value
      * @return null
      */
@@ -50,7 +58,8 @@ public class EasyMockUnitils {
     /**
      * Expects the given object argument but uses a reflection argument matcher with the given comparator modes
      * to compare the given value with the actual value during the test.
-     *
+     * 
+     * @param <T>    the type of the object to compare with 
      * @param object the value
      * @param modes  the comparator modes
      * @return null
@@ -70,8 +79,9 @@ public class EasyMockUnitils {
      * <p/>
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()} is called.
-     *
-     * @param mockType the class type for the mock, not null
+     * 
+     * @param <T> the type of the mock 
+     * @param mockType the type of the mock, not null
      * @return a mock for the given class or interface, not null
      */
     public static <T> T createRegularMock(Class<T> mockType) {
@@ -84,7 +94,8 @@ public class EasyMockUnitils {
      * <p/>
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()} is called.
-     *
+     * 
+     * @param <T>             the type of the mock 
      * @param mockType        the class type for the mock, not null
      * @param invocationOrder the order setting, not null
      * @param calls           the calls setting, not null
@@ -105,8 +116,9 @@ public class EasyMockUnitils {
      * <p/>
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()} is called.
-     *
-     * @param mockType the class type for the mock, not null
+     * 
+     * @param <T> the type of the mock 
+     * @param mockType the type of the mock, not null
      * @return a mock for the given class or interface, not null
      */
     public static <T> T createMock(Class<T> mockType) {
@@ -123,8 +135,9 @@ public class EasyMockUnitils {
      * <p/>
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()} is called.
-     *
-     * @param mockType        the class type for the mock, not null
+     * 
+     * @param <T>             the type of the mock 
+     * @param mockType        the type of the mock, not null
      * @param invocationOrder the invocation order setting, not null
      * @param calls           the calls setting, not null
      * @param order           the order setting, not null
@@ -140,7 +153,7 @@ public class EasyMockUnitils {
      * Unit tests should call this method after having set their recorded expected behavior on the mock objects.
      * <p/>
      * This method makes sure EasyMock's replay method is called on every mock object that was supplied to the
-     * fields annotated with {@link @Mock}, or directly created by the
+     * fields annotated with {@link org.unitils.easymock.annotation.Mock}, or directly created by the
      * {@link #createRegularMock(Class,InvocationOrder,Calls)} and
      * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} methods.
      * <p/>
@@ -155,8 +168,8 @@ public class EasyMockUnitils {
      * Unit tests can call this method to check whether all recorded expected behavior was actually observed during
      * the test.
      * <p/>
-     * This method makes sure {@link org.easymock.internal.MocksControl#verify method is called for every mock mock object
-     * that was injected to a field annotated with {@link @Mock}, or directly created by the
+     * This method makes sure {@link org.easymock.internal.MocksControl#verify} method is called for every mock mock object
+     * that was injected to a field annotated with {@link Mock}, or directly created by the
      * {@link #createRegularMock(Class,InvocationOrder,Calls)} or
      * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)} methods.
      * <p/>

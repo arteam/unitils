@@ -15,14 +15,15 @@
  */
 package org.unitils.database;
 
-import static org.easymock.classextension.EasyMock.expect;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.transaction.SimpleTransactionManager;
-import org.unitils.database.transaction.TransactionManager;
+import static org.easymock.EasyMock.expect;
 import static org.unitils.database.transaction.TransactionMode.COMMIT;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 
 import java.sql.Connection;
+
+import org.unitils.database.annotations.Transactional;
+import org.unitils.database.transaction.SimpleTransactionManager;
+import org.unitils.database.transaction.TransactionManager;
 
 /**
  * @author Filip Neven
@@ -37,10 +38,12 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
     /**
      * Initializes the test fixture.
      */
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
         databaseModule = new DatabaseModule() {
+            @Override
             protected TransactionManager createTransactionManager() {
                 return new SimpleTransactionManager();
             }
@@ -83,7 +86,7 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(rollbackTest, RollbackTest.class.getMethod("test"));
+        databaseModule.commitOrRollbackTransaction(rollbackTest);
     }
 
     public void testTransactions_simpleTransactionManager_commit() throws Exception {
@@ -100,7 +103,7 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(commitTest, CommitTest.class.getMethod("test"));
+        databaseModule.commitOrRollbackTransaction(commitTest);
     }
 
 

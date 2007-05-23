@@ -15,17 +15,18 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 /**
  * Implementation of {@link DBClearer}. This implementation individually drops every table, view, constraint,
@@ -102,6 +103,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      *
      * @param configuration the config, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
         schemasToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SCHEMAS, configuration, false);
         tablesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration, true);

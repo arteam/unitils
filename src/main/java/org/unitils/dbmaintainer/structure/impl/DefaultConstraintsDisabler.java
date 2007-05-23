@@ -15,14 +15,14 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
-
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Default implementation of {@link ConstraintsDisabler}
@@ -42,6 +42,7 @@ public class DefaultConstraintsDisabler extends BaseDatabaseTask implements Cons
      *
      * @param configuration the config, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
     }
 

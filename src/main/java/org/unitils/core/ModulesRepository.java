@@ -15,13 +15,12 @@
  */
 package org.unitils.core;
 
-import org.unitils.util.ReflectionUtils;
-import org.unitils.spring.SpringModule;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.unitils.util.ReflectionUtils;
 
 /**
  * A class for holding and retrieving modules.
@@ -72,8 +71,9 @@ public class ModulesRepository {
     /**
      * Gets the modules that is of the given type or a sub-type.
      * A UnitilsException is thrown when there is not exactly 1 possible match.
-     *
-     * @param type the type, not null
+     * 
+     * @param <T> The module type 
+     * @param type the module type, not null
      * @return the module, not null
      */
     public <T extends Module> T getModuleOfType(Class<T> type) {
@@ -90,7 +90,8 @@ public class ModulesRepository {
 
     /**
      * Gets all modules that are of the given type or a sub-type.
-     *
+
+     * @param <T> The module type 
      * @param type the type, not null
      * @return the modules, an empty list if none found
      */
@@ -106,9 +107,10 @@ public class ModulesRepository {
     }
 
 
+    @SuppressWarnings("unchecked")
     public boolean isModuleEnabled(String fullyQualifiedClassName) {
-        //noinspection unchecked
-        Class<? extends Module> moduleClass = (Class<? extends Module>) ReflectionUtils.getClassWithName(fullyQualifiedClassName);
+        Class<? extends Module> moduleClass = (Class<? extends Module>) 
+                ReflectionUtils.getClassWithName(fullyQualifiedClassName);
         return isModuleEnabled(moduleClass);
     }
 
@@ -132,12 +134,12 @@ public class ModulesRepository {
     /**
      * Creates test listeners for each of the given modules.
      *
-     * @param modules the modules, not null
+     * @param moduleList the modules, not null
      * @return the listeners for each module, not null
      */
-    private Map<Module, TestListener> createTestListeners(List<Module> modules) {
-        Map<Module, TestListener> result = new HashMap<Module, TestListener>(modules.size());
-        for (Module module : modules) {
+    private Map<Module, TestListener> createTestListeners(List<Module> moduleList) {
+        Map<Module, TestListener> result = new HashMap<Module, TestListener>(moduleList.size());
+        for (Module module : moduleList) {
             result.put(module, module.createTestListener());
         }
         return result;

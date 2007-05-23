@@ -15,6 +15,11 @@
  */
 package org.unitils.dbmaintainer;
 
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -29,15 +34,10 @@ import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
 import org.unitils.dbmaintainer.version.VersionSource;
 import org.unitils.util.PropertyUtils;
-
-import javax.sql.DataSource;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * A class for performing automatic maintenance of a database.<br>

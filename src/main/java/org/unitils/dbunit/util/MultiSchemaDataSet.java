@@ -1,11 +1,10 @@
 package org.unitils.dbunit.util;
 
-import org.dbunit.dataset.IDataSet;
-
-import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.dbunit.dataset.IDataSet;
 
 /**
  * @author Filip Neven

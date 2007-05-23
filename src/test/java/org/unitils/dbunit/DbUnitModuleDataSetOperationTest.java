@@ -15,18 +15,22 @@
  */
 package org.unitils.dbunit;
 
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
+import static org.unitils.core.util.SQLUtils.getItemAsString;
+
+import java.sql.SQLException;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.dbunit.dataset.IDataSet;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
-import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetoperation.DataSetOperation;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
-
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.Properties;
 
 /**
  * todo javadoc
@@ -41,6 +45,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
     @TestDataSource
     private DataSource dataSource = null;
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
@@ -54,6 +59,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
         MockDataSetOperation.operationExecuted = false;
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
 

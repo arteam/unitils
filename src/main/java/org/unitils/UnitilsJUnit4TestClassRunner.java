@@ -15,6 +15,9 @@
  */
 package org.unitils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.junit.Ignore;
 import org.junit.internal.runners.InitializationError;
 import org.junit.internal.runners.TestClassMethodsRunner;
@@ -25,9 +28,6 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Custom test runner that will Unitils-enable your test. This will make sure that the
@@ -261,6 +261,7 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
      */
     protected void createShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
                 if (testListener != null) {
                     testListener.afterAll();

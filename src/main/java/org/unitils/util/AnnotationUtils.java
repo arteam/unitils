@@ -132,7 +132,7 @@ public class AnnotationUtils {
 
 
     @SuppressWarnings({"unchecked"})
-    private static <S extends Annotation, T> T getClassLevelAnnotationProperty(Class<S> annotationClass,
+    public static <S extends Annotation, T> T getClassLevelAnnotationProperty(Class<S> annotationClass,
                          String annotationPropertyName, T defaultValue, Class<?> clazz) {
 
         if (Object.class.equals(clazz)) {

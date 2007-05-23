@@ -35,6 +35,7 @@ public class SQLScriptRunner extends BaseDatabaseTask implements ScriptRunner {
      *
      * @param configuration The config, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
     }
 

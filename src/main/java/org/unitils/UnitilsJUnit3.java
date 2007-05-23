@@ -15,17 +15,18 @@
  */
 package org.unitils;
 
+import java.lang.reflect.Method;
+
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-
-import java.lang.reflect.Method;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
@@ -51,7 +52,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
 
     /**
-     * Creates a test without a name. Be sure to call {@link #setName} afterwards.
+     * Creates a test without a name. Be sure to call {@link TestCase#setName} afterwards.
      */
     public UnitilsJUnit3() {
         this(null);
@@ -78,6 +79,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
      *
      * @param testResult junits test result, not null
      */
+    @Override
     public void run(TestResult testResult) {
         try {
             // if this the first test, call beforeAll
@@ -111,6 +113,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * and the beforeTestClass of that new class. The last afterTestClass is called just before the afterAll,
      * during the shutdown of the VM.
      */
+    @Override
     public void runBare() throws Throwable {
         // simulate class level methods
         // if this is the first test of a test class (previous test was of a different test class),
@@ -161,6 +164,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
      * Overriden JUnit3 method to be able to call {@link TestListener#beforeTestMethod} and
      * {@link TestListener#afterTestMethod}.
      */
+    @Override
     protected void runTest() throws Throwable {
         Throwable firstThrowable = null;
         try {
@@ -232,6 +236,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
      */
     protected void createShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
                 if (testListener != null) {
                     if (lastTestClass != null) {

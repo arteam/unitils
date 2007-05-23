@@ -29,8 +29,11 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.util.Flushable;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.hibernate.util.*;
-import org.unitils.spring.SpringModule;
+import org.unitils.hibernate.util.HibernateAssert;
+import org.unitils.hibernate.util.HibernateConnectionProvider;
+import org.unitils.hibernate.util.HibernateSpringSupport;
+import org.unitils.hibernate.util.SessionFactoryManager;
+import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getString;
@@ -297,7 +300,8 @@ public class HibernateModule implements Module, Flushable {
 
     /**
      * Creates an instance of {@link org.unitils.hibernate.util.HibernateSpringSupportImpl}, that
-     * implements the dependency to the {@link SpringModule}. If the {@link SpringModule} is not
+     * implements the dependency to the {@link org.unitils.spring.SpringModule}. If the
+     * {@link org.unitils.spring.SpringModule} is not
      * active, or if a dependency of {@link org.unitils.hibernate.util.HibernateSpringSupportImpl}
      * could not be found in the classpath, the instance is not loaded and the
      * SpringHibernateSupport is not enabled.

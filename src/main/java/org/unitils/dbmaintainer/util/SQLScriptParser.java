@@ -43,6 +43,7 @@ public class SQLScriptParser extends BaseScriptParser {
     }
 
 
+    @Override
     protected boolean reachedEndOfStatement(char[] script, int currentIndexInScript, StatementBuilder statementBuilder, List<String> statements) {
         return (getCurrentChar(script, currentIndexInScript) == ';');
     }

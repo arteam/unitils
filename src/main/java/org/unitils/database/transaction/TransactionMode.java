@@ -16,11 +16,34 @@
 package org.unitils.database.transaction;
 
 /**
+ * Enum defining whether a test must be run in a transaction and, if yes, what will be commit/rollback behavior.
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public enum TransactionMode {
 
-    DISABLED, COMMIT, ROLLBACK, DEFAULT;
+    /**
+     * Value indicating that transactions should be disabled, i.e. the test should not be run in a transaction
+     */
+    DISABLED,
+
+    /**
+     * Value indicating that the test should be executed in a transaction, and that this transaction must be committed
+     * at the end of the test.
+     */
+    COMMIT,
+
+    /**
+     * Value indicating that the test should be executed in a transaction, and that this transaction must be rollbacked
+     * at the end of the test.
+     */
+    ROLLBACK,
+
+    /**
+     * Value indicating that the default behavior is defined by the unitils property
+     * <code>DatabaseModule.Transactional.value.default</code> is in use.
+     */
+    DEFAULT;
 
 }

@@ -15,7 +15,24 @@
  */
 package org.unitils.dbunit;
 
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -25,37 +42,21 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.dbunit.datasetfactory.DataSetFactory;
+import org.unitils.dbunit.datasetfactory.DefaultDataSetFactory;
+import org.unitils.dbunit.datasetoperation.DataSetOperation;
+import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
 import org.unitils.dbunit.util.DataSetXmlReader;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import org.unitils.dbunit.datasetoperation.DataSetOperation;
-import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
-import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetfactory.DefaultDataSetFactory;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import org.unitils.util.ReflectionUtils;
-import org.unitils.util.ModuleUtils;
 import org.unitils.util.AnnotationUtils;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-
-import javax.sql.DataSource;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.lang.annotation.Annotation;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import org.unitils.util.ModuleUtils;
+import org.unitils.util.ReflectionUtils;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -70,7 +71,7 @@ import java.util.Properties;
  * If the method specific data set file is found, this will be used, otherwise it will look for the class-level data set
  * file. See the {@link DataSet} javadoc for more info.
  * <p/>
- * By annotating a method with the {@link @ExpectedDataSet} annotation or by calling the {@link #assertDbContentAsExpected}
+ * By annotating a method with the {@link ExpectedDataSet} annotation or by calling the {@link #assertDbContentAsExpected}
  * method, the contents of the database can be compared with the contents of a dataset. The expected dataset can be
  * passed as an argument of the annotation. If no file name is specified it looks for a file in the same directory
  * as the test class that has following name: 'classname without packagename'.'test method name'-result.xml.
@@ -439,10 +440,10 @@ public class DbUnitModule implements Module {
      * @param testMethod The method for which we need the configured DataSetFactory
      * @return The configured DataSetFactory
      */
+    @SuppressWarnings("unchecked")
     protected DataSetFactory getDataSetFactory(Class<? extends Annotation> annotationClass, Method testMethod) {
         Class<? extends DataSetFactory> dataSetFactoryClass = AnnotationUtils.getMethodOrClassLevelAnnotationProperty(annotationClass,
                 "factory", DefaultDataSetFactory.class, testMethod);
-        //noinspection unchecked
         dataSetFactoryClass = (Class<? extends DataSetFactory>) ModuleUtils.getClassValueReplaceDefault(annotationClass,
                 "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DefaultDataSetFactory.class);
         return ReflectionUtils.createInstanceOfType(dataSetFactoryClass);

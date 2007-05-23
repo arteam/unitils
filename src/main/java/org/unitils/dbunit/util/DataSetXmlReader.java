@@ -16,16 +16,27 @@
 package org.unitils.dbunit.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import org.dbunit.dataset.*;
-import org.dbunit.dataset.datatype.DataType;
-import org.unitils.core.UnitilsException;
-import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.SAXParserFactory;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.parsers.SAXParserFactory;
+
+import org.dbunit.dataset.CachedDataSet;
+import org.dbunit.dataset.Column;
+import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.DefaultTableMetaData;
+import org.dbunit.dataset.ITableMetaData;
+import org.dbunit.dataset.ReplacementDataSet;
+import org.dbunit.dataset.datatype.DataType;
+import org.unitils.core.UnitilsException;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * A reader for DbUnit xml datasets that creates a new ITable instance for each element (row).
@@ -168,6 +179,7 @@ public class DataSetXmlReader {
          * @param qName      the element name (should be table name for table rows)
          * @param attributes the attributes (should be table columns for table rows)
          */
+        @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             try {
                 // begin element of data set, if default namespace set, it will override the default schema
@@ -216,6 +228,7 @@ public class DataSetXmlReader {
          * @param localName the local xml name
          * @param qName     the element name
          */
+        @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             try {
                 // end element of data set
@@ -237,7 +250,7 @@ public class DataSetXmlReader {
          * @param attributes the attributes, not null
          * @return the meta data, not null
          */
-        protected ITableMetaData createTableMetaData(String tableName, Attributes attributes) throws DataSetException {
+        protected ITableMetaData createTableMetaData(String tableName, Attributes attributes) {
             Column[] columns = new Column[attributes.getLength()];
             for (int i = 0; i < attributes.getLength(); i++) {
                 columns[i] = new Column(attributes.getQName(i), DataType.UNKNOWN);
@@ -272,6 +285,7 @@ public class DataSetXmlReader {
          *
          * @param e The exception
          */
+        @Override
         public void error(SAXParseException e) throws SAXException {
             throw e;
         }

@@ -36,6 +36,7 @@ public class SQLCodeScriptRunner extends BaseDatabaseTask implements CodeScriptR
      *
      * @param configuration The config, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
     }
 

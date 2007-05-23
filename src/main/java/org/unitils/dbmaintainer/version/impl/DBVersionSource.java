@@ -15,6 +15,13 @@
  */
 package org.unitils.dbmaintainer.version.impl;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -23,13 +30,6 @@ import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionSource;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
 
 /**
  * Implementation of <code>VersionSource</code> that stores the version in the database. The version is stored in the
@@ -88,6 +88,7 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
      *
      * @param configuration the configuration, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
         this.versionTableName = PropertyUtils.getString(PROPKEY_VERSION_TABLE_NAME, configuration);
         this.versionIndexColumnName = PropertyUtils.getString(PROPKEY_VERSION_INDEX_COLUMN_NAME, configuration);
