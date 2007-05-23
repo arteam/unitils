@@ -83,7 +83,7 @@ abstract public class BaseScriptParser {
      */
     public List<String> parseStatements(String script) {
         List<String> statements = new ArrayList<String>();
-        StatementBuilder statementBuilder = new StatementBuilder(preserveComments, preserveNewLines);
+        StatementBuilder statementBuilder = new StatementBuilder();
 
         // loop over all chars and pass current and next char to handle methods (use 0 for next of last char)
         char[] chars = script.toCharArray();
@@ -130,7 +130,8 @@ abstract public class BaseScriptParser {
      * New line chars (\n and \r) will be replaced by a single space.
      *
      * @param script     the comlete script as a char array
-     * @param statement  the current statement buffer, not null
+     * @param currentIndexInScript The current character index in the given script
+     * @param statementBuilder The object used as buffer for assembling the statement
      * @param statements the statement list, not null
      * @return true if the next char should be skipped
      */
@@ -184,8 +185,8 @@ abstract public class BaseScriptParser {
 
 
     /**
-     * @param script
-     * @param currentIndexInScript
+     * @param script The script that is processed
+     * @param currentIndexInScript The current character index in the given script
      * @param statementBuilder
      * @param statements
      * @return true if the end of the current statement has been reached, false otherwise
@@ -195,7 +196,9 @@ abstract public class BaseScriptParser {
 
     /**
      * Handles a char in a line comment (-- comment). Looks for an end of line to end the comment. Skips all other chars.
-     *
+
+     * @param script The script that is processed, not null
+     * @param currentIndexInScript The current character index in the given script 
      * @param statementBuilder the current statement builder, not null
      * @param statements       the statement list, not null
      * @return true if the next char should be skipped
@@ -215,9 +218,10 @@ abstract public class BaseScriptParser {
 
     /**
      * Handles char in a block comment. Checks for the ending of the comment * followed by /. Skips all other chars.
-     *
+     
+     * @param script  The script that is processed, not null
+     * @param currentIndexInScript The current character index in the given script 
      * @param statementBuilder the current statement builder, not null
-     * @param statement        the current statement buffer, not null
      * @param statements       the statement list, not null
      * @return true if the next char should be skipped
      */
@@ -238,10 +242,10 @@ abstract public class BaseScriptParser {
     /**
      * Handles a char in a quotedOrEmpty literal ('text'). Checks for the ending quote, but ignores escaped quotes. All
      * chars, including newlines (\n \r), are appended to the statement.
-     *
-     * @param current    the current char
-     * @param next       the next char, 0 if there is no next char
-     * @param statement  the current statement buffer, not null
+     * 
+     * @param script 
+     * @param currentIndexInScript The current character index in the given script 
+     * @param statementBuilder 
      * @param statements the statement list, not null
      * @return true if the next char should be skipped
      */
@@ -264,10 +268,10 @@ abstract public class BaseScriptParser {
     /**
      * Handles a char in a double quotedOrEmpty string ("text"). Checks for the ending double quote, but ignores escaped
      * double quotes. All chars, including newlines (\n \r), are appended to the statement.
-     *
-     * @param current    the current char
-     * @param next       the next char, 0 if there is no next char
-     * @param statement  the current statement buffer, not null
+     * 
+     * @param script The script that is processed
+     * @param currentIndexInScript The current character index in the given script 
+     * @param statementBuilder 
      * @param statements the statement list, not null
      * @return true if the next char should be skipped
      */
@@ -306,13 +310,7 @@ abstract public class BaseScriptParser {
 
         private StringBuffer statement;
 
-        private boolean preserveComments;
-
-        private boolean preserveNewLines;
-
-        public StatementBuilder(boolean preserveComments, boolean preserveNewLines) {
-            this.preserveComments = preserveComments;
-            this.preserveNewLines = preserveNewLines;
+        public StatementBuilder() {
             resetStatement();
         }
 

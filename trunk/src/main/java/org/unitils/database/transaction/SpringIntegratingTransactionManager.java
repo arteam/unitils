@@ -15,25 +15,26 @@
  */
 package org.unitils.database.transaction;
 
-import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
-import org.unitils.spring.SpringModule;
+import javax.sql.DataSource;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.BeansException;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-
-import javax.sql.DataSource;
+import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+import org.unitils.spring.SpringModule;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SpringIntegratingTransactionManager extends BaseTransactionManager {
+public class SpringIntegratingTransactionManager implements TransactionManager {
 
+    private DataSource dataSource;
     private ThreadLocal<TransactionStatus> transactionStatusHolder = new ThreadLocal<TransactionStatus>();
     private PlatformTransactionManager defaultSpringTransactionManager;
 
@@ -41,7 +42,7 @@ public class SpringIntegratingTransactionManager extends BaseTransactionManager 
         getSpringModule().registerBeanPostProcessorType(SpringTransactionManagerInterceptingBeanPostProcessor.class);    
     }
 
-    protected void doStartTransaction(Object testObject) {
+    public void startTransaction(Object testObject) {
         PlatformTransactionManager springConfiguredTransactionManager = getSpringTransactionManager(testObject);
         if (springConfiguredTransactionManager == null) {
             throw new UnitilsException("No PlatformTransactionManager has been configured in a spring ApplicationContext " +
@@ -52,7 +53,7 @@ public class SpringIntegratingTransactionManager extends BaseTransactionManager 
         transactionStatusHolder.set(transactionStatus);
     }
 
-    protected void doCommit(Object testObject) {
+    public void commit(Object testObject) {
         TransactionStatus transactionStatus = transactionStatusHolder.get();
         if (transactionStatus == null) {
             throw new UnitilsException("Trying to commit, while no transaction is currently active");
@@ -61,7 +62,7 @@ public class SpringIntegratingTransactionManager extends BaseTransactionManager 
         transactionStatusHolder.remove();
     }
 
-    protected void doRollback(Object testObject) {
+    public void rollback(Object testObject) {
         TransactionStatus transactionStatus = transactionStatusHolder.get();
         if (transactionStatus == null) {
             throw new UnitilsException("Trying to rollback, while no transaction is currently active");
@@ -70,12 +71,9 @@ public class SpringIntegratingTransactionManager extends BaseTransactionManager 
         transactionStatusHolder.remove();
     }
 
-    public DataSource wrapDataSource(DataSource originalDataSource) {
-        return originalDataSource;
-    }
-
-    public boolean isSpringTransactionManagerConfigured(Object testObject) {
-        return getSpringTransactionManager(testObject) != null;
+    public DataSource registerDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+        return dataSource;
     }
 
     /**
@@ -101,10 +99,10 @@ public class SpringIntegratingTransactionManager extends BaseTransactionManager 
     protected PlatformTransactionManager getSpringConfiguredTransactionManager(Object testObject) {
         SpringTransactionManagerInterceptingBeanPostProcessor beanPostProcessor = getSpringModule().getBeanPostProcessor(
                 testObject, SpringTransactionManagerInterceptingBeanPostProcessor.class);
-        if (beanPostProcessor == null) {
-            return null;
+        if (beanPostProcessor != null && beanPostProcessor.getSpringTransactionManager() != null) {
+            return beanPostProcessor.getSpringTransactionManager();
         }
-        return beanPostProcessor.getSpringTransactionManager();
+        return getDefaultSpringTransactionManager(testObject);
     }
 
     protected PlatformTransactionManager getDefaultSpringTransactionManager(Object testObject) {
@@ -135,9 +133,10 @@ public class SpringIntegratingTransactionManager extends BaseTransactionManager 
 
         /**
          * Intercepts every instance of <code>PlatformTransactionManager</code>.
-         * @param bean
-         * @param beanName
-         * @return
+         * 
+         * @param bean     The new bean instance
+         * @param beanName The name of the bean
+         * @return The post processed bean. Is in all cases equal to the given bean parameter
          * @throws BeansException
          */
         public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {

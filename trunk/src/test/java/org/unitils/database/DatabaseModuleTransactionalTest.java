@@ -15,17 +15,17 @@
  */
 package org.unitils.database;
 
-import org.unitils.UnitilsJUnit3;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.easymock.annotation.Mock;
-import org.unitils.easymock.util.Order;
-import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
-import org.unitils.database.config.DataSourceFactory;
-
-import javax.sql.DataSource;
-import java.util.Properties;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.database.config.DataSourceFactory;
+import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
+import org.unitils.easymock.annotation.Mock;
 
 /**
  * @author Filip Neven
@@ -38,11 +38,15 @@ abstract public class DatabaseModuleTransactionalTest extends UnitilsJUnit3 {
     protected static MockDataSource mockDataSource;
 
     @Mock
-    protected static Connection mockConnection1, mockConnection2;
+    protected static Connection mockConnection1;
+    
+    @Mock
+    protected static Connection mockConnection2;
 
     protected Properties configuration;
 
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -74,6 +78,7 @@ abstract public class DatabaseModuleTransactionalTest extends UnitilsJUnit3 {
         }
 
 
+        @Override
         public Connection getConnection() throws SQLException {
             if (firstTime) {
                 firstTime = false;

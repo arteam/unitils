@@ -16,10 +16,15 @@
 package org.unitils.database.transaction;
 
 /**
+ * Defines the contract for a factory that can create implementations of the {@link TransactionManager} interface.
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public interface TransactionManagerFactory {
 
+    /**
+     * @return An implementation of {@link TransactionManager}
+     */
     TransactionManager getTransactionManager();
 }

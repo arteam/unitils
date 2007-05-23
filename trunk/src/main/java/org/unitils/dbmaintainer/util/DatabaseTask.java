@@ -33,7 +33,7 @@ public interface DatabaseTask {
      * Initializes the database operation class with the given {@link Properties}, {@link DataSource}.
      *
      * @param configuration The configuration, not null
-     * @param dataSource    The datasource, not null
+     * @param sqlHandler    The sql handler, not null
      */
     public void init(Properties configuration, SQLHandler sqlHandler);
 

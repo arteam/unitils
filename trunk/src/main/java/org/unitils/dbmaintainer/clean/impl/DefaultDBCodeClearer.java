@@ -15,17 +15,18 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.clean.DBCodeClearer;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.dbmaintainer.clean.DBCodeClearer;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 /**
  * Defines the contract for implementations that clear all database source code from a database schema, to avoid problems
@@ -51,6 +52,7 @@ public class DefaultDBCodeClearer extends BaseDatabaseTask implements DBCodeClea
     protected Set<String> itemsToPreserve = new HashSet<String>();
 
 
+    @Override
     protected void doInit(Properties configuration) {
         List<String> itemsToPreserveOrigCase = getStringList(PROPKEY_ITEMSTOPRESERVE, configuration);
         for (String itemToPreserve : itemsToPreserveOrigCase) {

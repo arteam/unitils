@@ -15,7 +15,6 @@
  */
 package org.unitils.core.util;
 
-import org.unitils.core.UnitilsException;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
@@ -28,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.unitils.core.UnitilsException;
 
 /**
  * Class for managing and creating instances of a given type. A given annotation controls how a new instance will be created.
@@ -71,6 +72,9 @@ import java.util.Map;
  * If an instance needs to be recreated (for example because a test made modification to it), it can be removed from
  * the cache by calling {@link #invalidateInstance}
  *
+ * @param <T> Type of the object that is configured by the annotations
+ * @param <A> Type of the annotation that is used for configuring the instance
+ 
  * @author Tim Ducheyne
  * @author Filip Neven
  */

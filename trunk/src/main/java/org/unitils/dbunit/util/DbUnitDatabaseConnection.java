@@ -15,11 +15,12 @@
  */
 package org.unitils.dbunit.util;
 
-import org.dbunit.database.AbstractDatabaseConnection;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.dbunit.database.AbstractDatabaseConnection;
 
 /**
  * Implementation of DBUnits <code>IDatabaseConnection</code> interface. This implementation returns connections from
@@ -58,6 +59,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      * Method that is invoked by DBUnit when the connection is no longer needed. This method is not implemented,
      * connections are 'closed' (returned to the connection pool) after every DBUnit operation
      */
+    @Override
     public void close() throws SQLException {
         // Nothing to be done. Connections are closed (i.e. returned to the pool) after every dbUnit operation
     }
@@ -66,6 +68,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     /**
      * @return The database schema name
      */
+    @Override
     public String getSchema() {
         return schemaName;
     }
@@ -78,6 +81,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      *
      * @return A JDBC connection
      */
+    @Override
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
             currentlyUsedConnection = dataSource.getConnection();
@@ -88,6 +92,8 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
 
     /**
      * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
+     * 
+     * @throws SQLException When connection close fails
      */
     public void closeJdbcConnection() throws SQLException {
         if (currentlyUsedConnection != null) {

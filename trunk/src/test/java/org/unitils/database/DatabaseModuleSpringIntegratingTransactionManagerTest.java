@@ -16,18 +16,18 @@
 package org.unitils.database;
 
 import static org.easymock.EasyMock.expect;
+import static org.unitils.database.transaction.TransactionMode.COMMIT;
+import static org.unitils.easymock.EasyMockUnitils.replay;
+
+import java.sql.Connection;
+
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.transaction.SpringIntegratingTransactionManager;
 import org.unitils.database.transaction.TransactionManager;
-import static org.unitils.database.transaction.TransactionMode.COMMIT;
-import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.spring.SpringModule;
 import org.unitils.spring.annotation.SpringApplicationContext;
-
-import java.sql.Connection;
 
 /**
  * @author Filip Neven
@@ -73,7 +73,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         Connection conn2 = DataSourceUtils.getConnection(databaseModule.getDataSource());
         DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(noApplicationContextTest, NoApplicationContextTest.class.getMethod("test"));
+        databaseModule.commitOrRollbackTransaction(noApplicationContextTest);
     }
 
     public void testTransactions_springIntegratingTransactionManager_rollback() throws Exception {
@@ -91,7 +91,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         Connection conn2 = DataSourceUtils.getConnection(databaseModule.getDataSource());
         DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(rollbackTest, RollbackTest.class.getMethod("test"));
+        databaseModule.commitOrRollbackTransaction(rollbackTest);
     }
 
     public void testTransactions_springIntegratingTransactionManager_commit() throws Exception {
@@ -109,7 +109,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         Connection conn2 = DataSourceUtils.getConnection(databaseModule.getDataSource());
         DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(commitTest, CommitTest.class.getMethod("test"));
+        databaseModule.commitOrRollbackTransaction(commitTest);
     }
 
     private SpringModule getSpringModule() {

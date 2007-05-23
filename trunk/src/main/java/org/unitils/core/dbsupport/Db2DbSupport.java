@@ -139,6 +139,7 @@ public class Db2DbSupport extends DbSupport {
      *
      * @param tableName The table to drop (case-sensitive), not null
      */
+    @Override
     public void dropTable(String tableName) {
         getSQLHandler().executeUpdate("drop table " + qualified(tableName));
     }
@@ -150,6 +151,7 @@ public class Db2DbSupport extends DbSupport {
      *
      * @param viewName The view to drop (case-sensitive), not null
      */
+    @Override
     public void dropView(String viewName) {
         getSQLHandler().executeUpdate("drop view " + qualified(viewName));
     }
@@ -202,6 +204,7 @@ public class Db2DbSupport extends DbSupport {
      * @param identityColumnName The column, not null
      * @param identityValue      The new value
      */
+    @Override
     public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
         getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + identityColumnName + " restart with " + identityValue);
     }

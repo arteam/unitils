@@ -15,6 +15,9 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -22,9 +25,6 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.util.PropertyUtils;
-
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Implementation of {@link SequenceUpdater}. All sequences and identity columns that have a value lower than the value
@@ -50,6 +50,7 @@ public class DefaultSequenceUpdater extends BaseDatabaseTask implements Sequence
      *
      * @param configuration The config, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
         lowestAcceptableSequenceValue = PropertyUtils.getLong(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, configuration);
     }

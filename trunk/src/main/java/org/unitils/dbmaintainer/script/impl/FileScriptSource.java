@@ -84,6 +84,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      *
      * @param configuration The configuration, not null
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void doInit(Properties configuration) {
         scriptFileLocations = getStringList(PROPKEY_SCRIPTFILES_LOCATIONS, configuration);

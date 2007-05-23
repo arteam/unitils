@@ -15,24 +15,29 @@
  */
 package org.unitils.hibernate.util;
 
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import static org.hibernate.cfg.Environment.CURRENT_SESSION_CONTEXT_CLASS;
-import org.unitils.core.UnitilsException;
-import org.unitils.core.util.AnnotatedInstanceManager;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
-import static java.util.Arrays.asList;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.util.AnnotatedInstanceManager;
+import org.unitils.hibernate.annotation.HibernateSessionFactory;
 
 /**
  * A class for managing and creating Hibernate configurations and session factories.
@@ -202,6 +207,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @param locations The locations where to find configuration files, not null
      * @return the configuration, not null
      */
+    @Override
     protected Configuration createInstanceForValues(List<String> locations) {
         try {
             // create instance
@@ -232,6 +238,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @param annotation The annotation
      * @return The locations, null if no values were specified
      */
+    @Override
     protected List<String> getAnnotationValues(HibernateSessionFactory annotation) {
         if (annotation == null) {
             return null;

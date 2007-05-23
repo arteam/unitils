@@ -15,12 +15,12 @@
  */
 package org.unitils.dbunit.datasetoperation;
 
+import java.sql.SQLException;
+
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
-
-import java.sql.SQLException;
 
 /**
  * {@link org.unitils.dbunit.datasetoperation.DataSetOperation} that 'refreshes' the contents of the database with the contents of the dataset. This means
@@ -40,6 +40,7 @@ public class RefreshOperation extends BaseDataSetOperation {
      * @param dbUnitDatabaseConnection DbUnit class providing access to the database
      * @param dataSet                  The dbunit dataset
      */
+    @Override
     public void doExecute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet) throws DatabaseUnitException, SQLException {
         DatabaseOperation.REFRESH.execute(dbUnitDatabaseConnection, dataSet);
     }

@@ -31,6 +31,7 @@ public class SQLCodeScriptParser extends BaseScriptParser {
     }
 
 
+    @Override
     protected boolean reachedEndOfStatement(char[] script, int currentIndexInScript, StatementBuilder statementBuilder, List<String> statements) {
         return getCurrentChar(script, currentIndexInScript) == '/'
                 && (statementBuilder.getLastChar() == '\n' || statementBuilder.getLastChar() == '\r')

@@ -15,10 +15,29 @@
  */
 package org.unitils.easymock;
 
-import org.easymock.classextension.internal.MocksClassControl;
-import org.easymock.internal.MocksControl;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
 import static org.easymock.internal.MocksControl.MockType.NICE;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.easymock.classextension.internal.MocksClassControl;
+import org.easymock.internal.MocksControl;
 import org.easymock.internal.ReplayState;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
@@ -33,33 +52,15 @@ import org.unitils.easymock.util.InvocationOrder;
 import org.unitils.easymock.util.LenientMocksControl;
 import org.unitils.easymock.util.Order;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Module for testing with mock objects using EasyMock.
  * <p/>
  * Mock creation is simplified by automatically inserting EasyMock generated mocks for fields annotated with the
- * {@link @Mock} annotation.
+ * {@link Mock} annotation.
  * <p/>
- * All methods annotated with {@link @AfterCreateMock} will be called when a mock object was created. This provides
+ * All methods annotated with {@link AfterCreateMock} will be called when a mock object was created. This provides
  * you with a hook method for custom handling of the mock (e.g. adding the mocks to a service locator repository).
  * A method can only be called if it has following signature <code>void myMethod(Object mock, String name, Class type)</code>.
  * <p/>
@@ -112,7 +113,8 @@ public class EasyMockModule implements Module {
      * <p/>
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()}  is called.
-     *
+     * 
+     * @param <T>             the type of the mock 
      * @param mockType        the class type for the mock, not null
      * @param invocationOrder the order setting, not null
      * @param calls           the calls setting, not null
@@ -149,8 +151,9 @@ public class EasyMockModule implements Module {
      * If returns is set to LENIENT, a nice mock is created, else a default mock is created
      * If arguments is lenient a lenient control is create, else an EasyMock control is created
      * If order is set to strict, invocation order checking is enabled
-     *
-     * @param mockType        the class/interface, not null
+     * 
+     * @param <T>             the type of the mock 
+     * @param mockType        the type of the mock, not null
      * @param invocationOrder the order setting, not null
      * @param calls           the calls setting, not null
      * @param order           todo
@@ -204,8 +207,8 @@ public class EasyMockModule implements Module {
 
 
     /**
-     * This method makes sure {@link org.easymock.internal.MocksControl#verify method is called for every mock mock object
-     * that was injected to a field annotated with {@link @Mock}, or directly created by calling
+     * This method makes sure {@link org.easymock.internal.MocksControl#verify} method is called for every mock mock object
+     * that was injected to a field annotated with {@link Mock}, or directly created by calling
      * {@link #createRegularMock(Class,InvocationOrder,Calls)} or
      * {@link #createMock(Class,InvocationOrder,Calls,Order,Dates,Defaults)}.
      * <p/>
@@ -223,11 +226,11 @@ public class EasyMockModule implements Module {
 
 
     /**
-     * Creates and sets a mock for all {@link @RegularMock} annotated fields.
+     * Creates and sets a mock for all {@link RegularMock} annotated fields.
      * <p/>
      * The
      * todo javadoc
-     * method is called for creating the mocks. Ones the mock is created, all methods annotated with {@link @AfterCreateMock} will be called passing the created mock.
+     * method is called for creating the mocks. Ones the mock is created, all methods annotated with {@link AfterCreateMock} will be called passing the created mock.
      *
      * @param testObject the test, not null
      */
@@ -263,7 +266,7 @@ public class EasyMockModule implements Module {
 
 
     /**
-     * Calls all {@link @AfterCreateMock} annotated methods on the test, passing the given mock.
+     * Calls all {@link AfterCreateMock} annotated methods on the test, passing the given mock.
      * These annotated methods must have following signature <code>void myMethod(Object mock, String name, Class type)</code>.
      * If this is not the case, a runtime exception is called.
      *

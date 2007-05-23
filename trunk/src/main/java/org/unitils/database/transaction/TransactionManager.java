@@ -18,11 +18,18 @@ package org.unitils.database.transaction;
 import javax.sql.DataSource;
 
 /**
+ * Defines the contract for classes that can make sure unit tests managed by unitils are executed in a transaction.
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public interface TransactionManager {
 
+    /**
+     * Starts a transaction.
+     *
+     * @param testObject
+     */
     void startTransaction(Object testObject);
 
     void commit(Object testObject);

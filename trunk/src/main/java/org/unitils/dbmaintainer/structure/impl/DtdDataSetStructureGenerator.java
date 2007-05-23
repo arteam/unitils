@@ -62,6 +62,7 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseTask implements Da
      *
      * @param configuration The config, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
         dtdFileName = PropertyUtils.getString(PROPKEY_DTD_FILENAME, configuration);
     }

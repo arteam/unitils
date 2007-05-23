@@ -1,11 +1,6 @@
 package org.unitils.dbmaintainer.structure.impl;
 
-import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import org.unitils.util.PropertyUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,6 +8,12 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Properties;
 import java.util.Set;
+
+import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Implementation of {@link DataSetStructureGenerator} that generates xml schema files for data sets.
@@ -40,6 +41,7 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseTask implements Da
      *
      * @param configuration The config, not null
      */
+    @Override
     protected void doInit(Properties configuration) {
         xsdDirectoryName = PropertyUtils.getString(PROPKEY_XSD_DIR_NAME, configuration);
         complexTypeSuffix = PropertyUtils.getString(PROPKEY_XSD_COMPLEX_TYPE_SUFFIX, configuration);

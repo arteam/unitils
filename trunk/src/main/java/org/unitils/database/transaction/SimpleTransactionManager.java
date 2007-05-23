@@ -15,30 +15,38 @@
  */
 package org.unitils.database.transaction;
 
-import org.unitils.database.util.BaseConnectionDecorator;
-import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
-import org.unitils.core.UnitilsException;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.unitils.core.UnitilsException;
+import org.unitils.database.util.BaseConnectionDecorator;
+import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SimpleTransactionManager extends BaseTransactionManager<SimpleTransactionManager.SimpleTransactionalDataSource> {
+public class SimpleTransactionManager implements TransactionManager {
 
-    protected void doStartTransaction(Object testObject) {
+    private SimpleTransactionalDataSource dataSource;
+
+    public void startTransaction(Object testObject) {
         dataSource.startTransaction();
     }
 
-    protected void doCommit(Object testObject) {
+    public void commit(Object testObject) {
         dataSource.commitTransaction();
     }
 
-    protected void doRollback(Object testObject) {
+    public void rollback(Object testObject) {
         dataSource.rollbackTransaction();
+    }
+
+    public DataSource registerDataSource(DataSource originalDataSource) {
+        this.dataSource = new SimpleTransactionalDataSource(originalDataSource);
+        return this.dataSource;
     }
 
     public SimpleTransactionalDataSource wrapDataSource(DataSource originalDataSource) {
@@ -102,6 +110,7 @@ public class SimpleTransactionManager extends BaseTransactionManager<SimpleTrans
             }
         }
 
+        @Override
         public Connection getConnection() throws SQLException {
             return getConnection(new GetConnectionMethod() {
 
@@ -111,6 +120,7 @@ public class SimpleTransactionManager extends BaseTransactionManager<SimpleTrans
             });
         }
 
+        @Override
         public Connection getConnection(final String username, final String password) throws SQLException {
             return getConnection(new GetConnectionMethod() {
 
@@ -168,6 +178,7 @@ public class SimpleTransactionManager extends BaseTransactionManager<SimpleTrans
             super(wrappedConnection);
         }
 
+        @Override
         public void close() throws SQLException {
             // Connection close is supressed
         }
