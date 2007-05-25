@@ -15,6 +15,21 @@
  */
 package org.unitils.spring;
 
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.PropertyUtils.getInstance;
+import static org.unitils.util.ReflectionUtils.getFieldName;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.isSetter;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -29,17 +44,6 @@ import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 import org.unitils.spring.util.ApplicationContextFactory;
 import org.unitils.spring.util.ApplicationContextManager;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.PropertyUtils.getInstance;
-import static org.unitils.util.ReflectionUtils.*;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and
@@ -122,7 +126,10 @@ public class SpringModule implements Module {
         return beans.values().iterator().next();
     }
 
-
+    /**
+     * @param testObject The test object
+     * @return Whether an ApplicationContext has been configured for the given testObject
+     */
     public boolean isApplicationContextConfiguredFor(Object testObject) {
         return applicationContextManager.hasApplicationContext(testObject);
     }

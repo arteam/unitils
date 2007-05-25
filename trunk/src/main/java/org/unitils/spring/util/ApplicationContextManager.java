@@ -15,6 +15,14 @@
  */
 package org.unitils.spring.util;
 
+import static java.util.Arrays.asList;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -25,13 +33,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.spring.annotation.SpringApplicationContext;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
-import java.util.ArrayList;
-import static java.util.Arrays.asList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A class for managing and creating Spring application contexts.
@@ -133,6 +134,7 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
      * @param locations The locations where to find configuration files, not null
      * @return the context, not null
      */
+    @Override
     protected ApplicationContext createInstanceForValues(List<String> locations) {
         try {
             // create application context
@@ -172,12 +174,12 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
 
 
     // todo javadoc
+    @SuppressWarnings("unchecked")
     public <T extends BeanPostProcessor> T getBeanPostProcessor(ApplicationContext applicationContext, Class<T> beanPostProcessorType) {
         Map<Class<? extends BeanPostProcessor>, ? extends BeanPostProcessor> beanPostProcessorMap = beanPostProcessors.get(applicationContext);
         if (beanPostProcessorMap == null) {
             return null;
         } else {
-            //noinspection unchecked
             return (T) beanPostProcessorMap.get(beanPostProcessorType);
         }
     }
@@ -191,6 +193,7 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
      * @param annotation The annotation
      * @return The locations, null if no values were specified
      */
+    @Override
     protected List<String> getAnnotationValues(SpringApplicationContext annotation) {
         if (annotation == null) {
             return null;

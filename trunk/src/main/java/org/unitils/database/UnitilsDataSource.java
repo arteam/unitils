@@ -16,7 +16,7 @@
 package org.unitils.database;
 
 import org.unitils.core.Unitils;
-import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
+import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
 
 import javax.sql.DataSource;
 
@@ -28,13 +28,13 @@ import javax.sql.DataSource;
  * with minimal effort. For example when using Spring, you could specify a bean definition named dataSource that
  * connects to the test database as follows:
  * <pre><code>
- *     &lt;bean id="dataSource" class="org.unitils.database.UnitilsDataSource"&gt;
+ *     &lt;bean id="dataSource" class="org.unitils.database.UnitilsDataSource"/&gt;
  * </code></pre>
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class UnitilsDataSource extends BaseDataSourceDecorator {
+public class UnitilsDataSource extends BaseDataSourceProxy {
 
 
     /**

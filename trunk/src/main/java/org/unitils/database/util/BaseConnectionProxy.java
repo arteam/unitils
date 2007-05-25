@@ -15,169 +15,173 @@
  */
 package org.unitils.database.util;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLWarning;
 import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Savepoint;
+import java.sql.Statement;
 import java.util.Map;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class BaseConnectionDecorator implements Connection {
+public class BaseConnectionProxy implements Connection {
 
-    private Connection wrappedConnection;
+    private Connection targetConnection;
 
-    public BaseConnectionDecorator(Connection wrappedConnection) {
-        this.wrappedConnection = wrappedConnection;
+    public BaseConnectionProxy(Connection wrappedConnection) {
+        this.targetConnection = wrappedConnection;
     }
 
     public Statement createStatement() throws SQLException {
-        return wrappedConnection.createStatement();
+        return targetConnection.createStatement();
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return wrappedConnection.prepareStatement(sql);
+        return targetConnection.prepareStatement(sql);
     }
 
     public CallableStatement prepareCall(String sql) throws SQLException {
-        return wrappedConnection.prepareCall(sql);
+        return targetConnection.prepareCall(sql);
     }
 
     public String nativeSQL(String sql) throws SQLException {
-        return wrappedConnection.nativeSQL(sql);
+        return targetConnection.nativeSQL(sql);
     }
 
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        wrappedConnection.setAutoCommit(autoCommit);
+        targetConnection.setAutoCommit(autoCommit);
     }
 
     public boolean getAutoCommit() throws SQLException {
-        return wrappedConnection.getAutoCommit();
+        return targetConnection.getAutoCommit();
     }
 
     public void commit() throws SQLException {
-        wrappedConnection.commit();
+        targetConnection.commit();
     }
 
     public void rollback() throws SQLException {
-        wrappedConnection.rollback();
+        targetConnection.rollback();
     }
 
     public void close() throws SQLException {
-        wrappedConnection.close();
+        targetConnection.close();
     }
 
     public boolean isClosed() throws SQLException {
-        return wrappedConnection.isClosed();
+        return targetConnection.isClosed();
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {
-        return wrappedConnection.getMetaData();
+        return targetConnection.getMetaData();
     }
 
     public void setReadOnly(boolean readOnly) throws SQLException {
-        wrappedConnection.setReadOnly(readOnly);
+        targetConnection.setReadOnly(readOnly);
     }
 
     public boolean isReadOnly() throws SQLException {
-        return wrappedConnection.isReadOnly();
+        return targetConnection.isReadOnly();
     }
 
     public void setCatalog(String catalog) throws SQLException {
-        wrappedConnection.setCatalog(catalog);
+        targetConnection.setCatalog(catalog);
     }
 
     public String getCatalog() throws SQLException {
-        return wrappedConnection.getCatalog();
+        return targetConnection.getCatalog();
     }
 
     public void setTransactionIsolation(int level) throws SQLException {
-        wrappedConnection.setTransactionIsolation(level);
+        targetConnection.setTransactionIsolation(level);
     }
 
     public int getTransactionIsolation() throws SQLException {
-        return wrappedConnection.getTransactionIsolation();
+        return targetConnection.getTransactionIsolation();
     }
 
     public SQLWarning getWarnings() throws SQLException {
-        return wrappedConnection.getWarnings();
+        return targetConnection.getWarnings();
     }
 
     public void clearWarnings() throws SQLException {
-        wrappedConnection.clearWarnings();
+        targetConnection.clearWarnings();
     }
 
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        return wrappedConnection.createStatement(resultSetType, resultSetConcurrency);
+        return targetConnection.createStatement(resultSetType, resultSetConcurrency);
     }
 
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return wrappedConnection.prepareStatement(sql, resultSetType, resultSetConcurrency);
+        return targetConnection.prepareStatement(sql, resultSetType, resultSetConcurrency);
     }
 
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return wrappedConnection.prepareCall(sql, resultSetType, resultSetConcurrency);
+        return targetConnection.prepareCall(sql, resultSetType, resultSetConcurrency);
     }
 
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        return wrappedConnection.getTypeMap();
+        return targetConnection.getTypeMap();
     }
 
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        wrappedConnection.setTypeMap(map);
+        targetConnection.setTypeMap(map);
     }
 
     public void setHoldability(int holdability) throws SQLException {
-        wrappedConnection.setHoldability(holdability);
+        targetConnection.setHoldability(holdability);
     }
 
     public int getHoldability() throws SQLException {
-        return wrappedConnection.getHoldability();
+        return targetConnection.getHoldability();
     }
 
     public Savepoint setSavepoint() throws SQLException {
-        return wrappedConnection.setSavepoint();
+        return targetConnection.setSavepoint();
     }
 
     public Savepoint setSavepoint(String name) throws SQLException {
-        return wrappedConnection.setSavepoint(name);
+        return targetConnection.setSavepoint(name);
     }
 
     public void rollback(Savepoint savepoint) throws SQLException {
-        wrappedConnection.rollback(savepoint);
+        targetConnection.rollback(savepoint);
     }
 
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        wrappedConnection.releaseSavepoint(savepoint);
+        targetConnection.releaseSavepoint(savepoint);
     }
 
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return wrappedConnection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+        return targetConnection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return wrappedConnection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+        return targetConnection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return wrappedConnection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+        return targetConnection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
-        return wrappedConnection.prepareStatement(sql, autoGeneratedKeys);
+        return targetConnection.prepareStatement(sql, autoGeneratedKeys);
     }
 
     public PreparedStatement prepareStatement(String sql, int columnIndexes[]) throws SQLException {
-        return wrappedConnection.prepareStatement(sql, columnIndexes);
+        return targetConnection.prepareStatement(sql, columnIndexes);
     }
 
     public PreparedStatement prepareStatement(String sql, String columnNames[]) throws SQLException {
-        return wrappedConnection.prepareStatement(sql, columnNames);
+        return targetConnection.prepareStatement(sql, columnNames);
+    }
+    
+    public Connection getTargetConnection() {
+        return targetConnection;
     }
 }

@@ -21,7 +21,6 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.unitils.core.Unitils;
 import org.unitils.hibernate.HibernateModule;
 import org.unitils.spring.SpringModule;
-import org.unitils.spring.util.SessionFactoryWrappingBeanPostProcessor;
 
 /**
  * A support class containing Hibernate and {@link HibernateModule} related actions for the spring module.
@@ -43,7 +42,7 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
         LocalSessionFactoryBean.class.getName();
 
         // Register the BeanPostProcessor that intercepts SessionFactory creation
-        getSpringModule().registerBeanPostProcessorType(SessionFactoryWrappingBeanPostProcessor.class);
+        getSpringModule().registerBeanPostProcessorType(SessionFactoryInterceptingBeanPostProcessor.class);
     }
 
 
@@ -55,7 +54,7 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
      *         <code>SessionFactory</code> was configured.
      */
     public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
-        SessionFactoryWrappingBeanPostProcessor beanPostProcessor = getSessionFactoryWrappingBeanPostProcessor(testObject);
+        SessionFactoryInterceptingBeanPostProcessor beanPostProcessor = getSessionFactoryWrappingBeanPostProcessor(testObject);
         if (beanPostProcessor == null) {
             return null;
         }
@@ -71,7 +70,7 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
      *         <code>Configuration</code> was configured.
      */
     public Configuration getConfiguration(Object testObject) {
-        SessionFactoryWrappingBeanPostProcessor beanPostProcessor = getSessionFactoryWrappingBeanPostProcessor(testObject);
+        SessionFactoryInterceptingBeanPostProcessor beanPostProcessor = getSessionFactoryWrappingBeanPostProcessor(testObject);
         if (beanPostProcessor == null) {
             return null;
         }
@@ -80,15 +79,15 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
 
 
     /**
-     * Gets the registered SessionFactoryWrappingBeanPostProcessor.
+     * Gets the registered SessionFactoryInterceptingBeanPostProcessor.
      *
      * @param testObject The test instance, not null
      * @return The session factory bean post processor, null if not found
      */
-    protected SessionFactoryWrappingBeanPostProcessor getSessionFactoryWrappingBeanPostProcessor(Object testObject) {
+    protected SessionFactoryInterceptingBeanPostProcessor getSessionFactoryWrappingBeanPostProcessor(Object testObject) {
         BeanPostProcessor beanPostProcessor = getSpringModule().getBeanPostProcessor(testObject,
-                SessionFactoryWrappingBeanPostProcessor.class);
-        return (SessionFactoryWrappingBeanPostProcessor) beanPostProcessor;
+                SessionFactoryInterceptingBeanPostProcessor.class);
+        return (SessionFactoryInterceptingBeanPostProcessor) beanPostProcessor;
     }
 
 

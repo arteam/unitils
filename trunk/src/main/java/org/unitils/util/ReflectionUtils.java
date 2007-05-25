@@ -15,13 +15,16 @@
  */
 package org.unitils.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.unitils.core.UnitilsException;
-
-import java.lang.reflect.*;
-import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
 
 /**
  * Utility methods that use reflection for instance creation or class inspection.
@@ -64,7 +67,9 @@ public class ReflectionUtils {
 
     /**
      * Creates an instance of the given type
-     * @param type The type
+     * 
+     * @param <T> The type of the instance
+     * @param type The type of the instance
      * @return An instance of this type
      * @throws UnitilsException If an instance could not be created
      */
@@ -72,7 +77,7 @@ public class ReflectionUtils {
         try {
             Constructor<T> constructor = type.getConstructor();
             constructor.setAccessible(true);
-            return (T) constructor.newInstance();
+            return constructor.newInstance();
 
         } catch (Exception e) {
             throw new UnitilsException("Error while trying to create object of class " + type.getName(), e);
@@ -470,4 +475,5 @@ public class ReflectionUtils {
             throw new UnitilsException("Could not find class with name " + className, e);
         }
     }
+    
 }

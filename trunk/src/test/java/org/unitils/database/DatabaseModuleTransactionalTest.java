@@ -21,27 +21,30 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.unitils.UnitilsJUnit3;
+import junit.framework.TestCase;
+
+import org.easymock.classextension.EasyMock;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
 import org.unitils.database.config.DataSourceFactory;
-import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
-import org.unitils.easymock.annotation.Mock;
+import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
+import org.unitils.spring.SpringModule;
 
 /**
+ * Base class for tests that verify the transactional behavior of the database module
+ * 
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-abstract public class DatabaseModuleTransactionalTest extends UnitilsJUnit3 {
+abstract public class DatabaseModuleTransactionalTest extends TestCase {
 
     protected DatabaseModule databaseModule;
 
     protected static MockDataSource mockDataSource;
 
-    @Mock
-    protected static Connection mockConnection1;
+    protected static Connection mockConnection1 = EasyMock.createMock(Connection.class);
     
-    @Mock
-    protected static Connection mockConnection2;
+    protected static Connection mockConnection2 = EasyMock.createMock(Connection.class);
 
     protected Properties configuration;
 
@@ -51,11 +54,16 @@ abstract public class DatabaseModuleTransactionalTest extends UnitilsJUnit3 {
         super.setUp();
 
         mockDataSource = new MockDataSource();
+        EasyMock.reset(mockConnection1);
+        EasyMock.reset(mockConnection2);
 
         configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty("org.unitils.database.config.DataSourceFactory.implClassName", MockDataSourceFactory.class.getName());
     }
 
+    /**
+     * Mock DataSourceFactory, that returns the static mockDataSource
+     */
     public static class MockDataSourceFactory implements DataSourceFactory {
 
         public void init(Properties configuration) {
@@ -66,7 +74,11 @@ abstract public class DatabaseModuleTransactionalTest extends UnitilsJUnit3 {
         }
     }
 
-    public static class MockDataSource extends BaseDataSourceDecorator {
+    /**
+     * Mock DataSource, that returns connection1 when it is called the first time, and connection2
+     * when it is called the second time, in order to simulate a connection pool.
+     */
+    public static class MockDataSource extends BaseDataSourceProxy {
 
         boolean firstTime = true;
 
@@ -87,5 +99,13 @@ abstract public class DatabaseModuleTransactionalTest extends UnitilsJUnit3 {
                 return mockConnection2;
             }
         }
+    }
+    
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
+    
+    protected SpringModule getSpringModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
     }
 }

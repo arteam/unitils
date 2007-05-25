@@ -16,21 +16,27 @@
 package org.unitils.database;
 
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.unitils.database.transaction.TransactionMode.COMMIT;
-import static org.unitils.easymock.EasyMockUnitils.replay;
+import static org.unitils.database.transaction.TransactionMode.DISABLED;
 
 import java.sql.Connection;
 
+import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.transaction.SimpleTransactionManager;
-import org.unitils.database.transaction.TransactionManager;
 
 /**
+ * Tests verifying whether the SimpleTransactionManager functions correctly.
+ * 
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTransactionalTest {
 
+    private TransactionsDisabledTest transactionsDisabledTest;
+    
     private RollbackTest rollbackTest;
 
     private CommitTest commitTest;
@@ -42,76 +48,100 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
     public void setUp() throws Exception {
         super.setUp();
 
-        databaseModule = new DatabaseModule() {
-            @Override
-            protected TransactionManager createTransactionManager() {
-                return new SimpleTransactionManager();
-            }
-        };
-        databaseModule.init(configuration);
+        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", 
+                SimpleTransactionManager.class.getName());
+        Unitils.getInstance().init(configuration);
+        
+        databaseModule = getDatabaseModule();
+        databaseModule.initTransactionManager();
 
+        transactionsDisabledTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
     }
 
-    public void testTransactions_simpleTransactionManager_disabled() throws Exception {
-        expect(mockConnection1.getAutoCommit()).andReturn(false).andReturn(true).anyTimes();
-        mockConnection1.setAutoCommit(true);
+    /**
+     * Tests for a test with transactions disabled 
+     */
+    public void testWithTransactionsDisabled() throws Exception {
         mockConnection1.close();
-
-        expect(mockConnection2.getAutoCommit()).andReturn(false).andReturn(true).anyTimes();
-        mockConnection2.setAutoCommit(true);
         mockConnection2.close();
-        replay();
+        replay(mockConnection1, mockConnection2);
 
-        databaseModule.initTransactionManager();
+        databaseModule.startTransactionIfPossible(transactionsDisabledTest);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
+        databaseModule.commitOrRollbackTransactionIfPossible(transactionsDisabledTest);
+        
+        verify(mockConnection1, mockConnection2);
     }
 
-    public void testTransactions_simpleTransactionManager_rollback() throws Exception {
+    /**
+     * Tests with a test with transaction rollback configured
+     */
+    public void testRollback() throws Exception {
         expect(mockConnection1.getAutoCommit()).andReturn(true).andReturn(false).anyTimes();
         mockConnection1.setAutoCommit(false);
         mockConnection1.rollback();
         mockConnection1.close();
-        replay();
+        replay(mockConnection1, mockConnection2);
         
-        databaseModule.initTransactionManager();
-        databaseModule.startTransaction(rollbackTest);
+        databaseModule.startTransactionIfPossible(rollbackTest);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(rollbackTest);
+        databaseModule.commitOrRollbackTransactionIfPossible(rollbackTest);
+        
+        verify(mockConnection1, mockConnection2);
     }
 
-    public void testTransactions_simpleTransactionManager_commit() throws Exception {
+    /**
+     * Tests with a test with transaction commit configured
+     */
+    public void testCommit() throws Exception {
         expect(mockConnection1.getAutoCommit()).andReturn(true).andReturn(false).anyTimes();
         mockConnection1.setAutoCommit(false);
         mockConnection1.commit();
         mockConnection1.close();
-        replay();
+        replay(mockConnection1, mockConnection2);
 
-        databaseModule.initTransactionManager();
-        databaseModule.startTransaction(commitTest);
+        databaseModule.startTransactionIfPossible(commitTest);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(commitTest);
+        databaseModule.commitOrRollbackTransactionIfPossible(commitTest);
+        
+        verify(mockConnection1, mockConnection2);
     }
 
+    /**
+     * Class that plays the role of a unit test, with transactions disabled
+     */
+    @Transactional(DISABLED)
+    public static class TransactionsDisabledTest {
+        
+        public void test() {}
+    }
 
+    /**
+     * Class that plays the role of a unit test, with transaction rollback enabled (=default,
+     * so no @Transactional annotation required
+     */
     public static class RollbackTest {
 
         public void test() {}
     }
 
+    /**
+     * Class that plays the role of a unit test, with transaction commit enabled
+     */
     @Transactional(COMMIT)
     public static class CommitTest {
 
