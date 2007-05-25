@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.spring.util;
+package org.unitils.hibernate.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
 import org.unitils.core.UnitilsException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A <code>BeanPostProcessor</code> that checks wether beans are created in spring's <code>ApplicationContext</code>
@@ -37,10 +31,7 @@ import java.util.Map;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SessionFactoryWrappingBeanPostProcessor implements BeanPostProcessor {
-
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(SessionFactoryWrappingBeanPostProcessor.class);
+public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProcessor {
 
     /**
      * The wrapped SessionFactory that was intercepted by this BeanPostProcessor, if any
@@ -105,7 +96,7 @@ public class SessionFactoryWrappingBeanPostProcessor implements BeanPostProcesso
 
     /**
      * @return The <code>SessionFactory</code> that was intercepted by this <code>BeanPostProcessor</code>, wrapped in a
-     * {@link SessionFactoryWrappingBeanPostProcessor}, if any
+     * {@link SessionFactoryInterceptingBeanPostProcessor}, if any
      */
     public SessionInterceptingSessionFactory getInterceptedSessionFactory() {
         return sessionFactory;

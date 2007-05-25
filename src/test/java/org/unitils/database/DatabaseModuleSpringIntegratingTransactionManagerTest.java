@@ -16,8 +16,9 @@
 package org.unitils.database;
 
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.unitils.database.transaction.TransactionMode.COMMIT;
-import static org.unitils.easymock.EasyMockUnitils.replay;
 
 import java.sql.Connection;
 
@@ -25,11 +26,11 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.transaction.SpringIntegratingTransactionManager;
-import org.unitils.database.transaction.TransactionManager;
-import org.unitils.spring.SpringModule;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
 /**
+ * Tests verifying whether the SpringIntegratingTransactionManagerTest functions correctly.
+ * 
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -44,89 +45,110 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
     /**
      * Initializes the test fixture.
      */
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
-        databaseModule = new DatabaseModule() {
-            protected TransactionManager createTransactionManager() {
-                return new SpringIntegratingTransactionManager();
-            }
-        };
-        databaseModule.init(configuration);
+        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", 
+                SpringIntegratingTransactionManager.class.getName());
+        Unitils.getInstance().init(configuration);
+        
+        databaseModule = getDatabaseModule();
+        databaseModule.registerSpringDataSourceBeanPostProcessor();
+        databaseModule.initTransactionManager();
 
         noApplicationContextTest = new NoApplicationContextTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
     }
 
-    public void testTransactions_springIntegratingTransactionManager_noSpringTransactionManagerConfigured() throws Exception {
+    /**
+     * Tests for a test with transactions enabled but no spring transaction manager configured in
+     * an application context associated with the test. 
+     */
+    public void testNoSpringTransactionManagerConfigured() throws Exception {
+        mockConnection1.close();
+        mockConnection2.close();
+        replay(mockConnection1, mockConnection2);
+
+        databaseModule.startTransactionIfPossible(noApplicationContextTest);
+        Connection conn1 = DataSourceUtils.getConnection(databaseModule.getDataSource());
+        Connection conn2 = DataSourceUtils.getConnection(databaseModule.getDataSource());
+        assertNotSame(conn1, conn2);
+        DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
+        DataSourceUtils.releaseConnection(conn2, databaseModule.getDataSource());
+        databaseModule.commitOrRollbackTransactionIfPossible(noApplicationContextTest);
+        
+        verify(mockConnection1, mockConnection2);
+    }
+
+    /**
+     * Tests with a test that has an ApplicationContext configured, rolling back the transaction
+     */
+    public void testRollback() throws Exception {
         expect(mockConnection1.getAutoCommit()).andStubReturn(false);
         expect(mockConnection1.isReadOnly()).andStubReturn(false);
         mockConnection1.rollback();
         mockConnection1.close();
-        replay();
+        replay(mockConnection1, mockConnection2);
 
-        databaseModule.initTransactionManager();
-        databaseModule.startTransaction(noApplicationContextTest);
+        databaseModule.startTransactionIfPossible(rollbackTest);
         Connection conn1 = DataSourceUtils.getConnection(databaseModule.getDataSource());
         DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
         Connection conn2 = DataSourceUtils.getConnection(databaseModule.getDataSource());
         DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(noApplicationContextTest);
+        databaseModule.commitOrRollbackTransactionIfPossible(rollbackTest);
+        
+        verify(mockConnection1, mockConnection2);
     }
 
-    public void testTransactions_springIntegratingTransactionManager_rollback() throws Exception {
-        expect(mockConnection1.getAutoCommit()).andStubReturn(false);
-        expect(mockConnection1.isReadOnly()).andStubReturn(false);
-        mockConnection1.rollback();
-        mockConnection1.close();
-        replay();
-
-        mockDataSource = (MockDataSource) getSpringModule().getApplicationContext(rollbackTest).getBean("dataSource");
-        databaseModule.initTransactionManager();
-        databaseModule.startTransaction(rollbackTest);
-        Connection conn1 = DataSourceUtils.getConnection(databaseModule.getDataSource());
-        DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
-        Connection conn2 = DataSourceUtils.getConnection(databaseModule.getDataSource());
-        DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
-        assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(rollbackTest);
-    }
-
-    public void testTransactions_springIntegratingTransactionManager_commit() throws Exception {
+    
+    /**
+     * Tests with a test that has an ApplicationContext configured, committing the transaction
+     */
+    public void testCommit() throws Exception {
         expect(mockConnection1.getAutoCommit()).andStubReturn(false);
         expect(mockConnection1.isReadOnly()).andStubReturn(false);
         mockConnection1.commit();
         mockConnection1.close();
-        replay();
+        replay(mockConnection1, mockConnection2);
 
-        mockDataSource = (MockDataSource) getSpringModule().getApplicationContext(commitTest).getBean("dataSource");
-        databaseModule.initTransactionManager();
-        databaseModule.startTransaction(commitTest);
+        databaseModule.startTransactionIfPossible(commitTest);
         Connection conn1 = DataSourceUtils.getConnection(databaseModule.getDataSource());
         DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
         Connection conn2 = DataSourceUtils.getConnection(databaseModule.getDataSource());
         DataSourceUtils.releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(commitTest);
+        databaseModule.commitOrRollbackTransactionIfPossible(commitTest);
+        
+        verify(mockConnection1, mockConnection2);
     }
 
-    private SpringModule getSpringModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
-    }
-
+    /**
+     * Class that plays the role of a unit test, with transaction rollback enabled, but no 
+     * spring application context configured, so no transaction will be started
+     */
     public static class NoApplicationContextTest {
 
         public void test() {}
     }
 
+    /**
+     * Class that plays the role of a unit test, with a TransactionManager configured in a spring
+     * application context, with transaction rollback enabled (=default, so no @Transactional 
+     * annotation required
+     */
     @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
     public static class RollbackTest {
 
         public void test() {}
     }
 
+    /**
+     * Class that plays the role of a unit test, with a TransactionManager configured in a spring
+     * application context, with transaction commit enabled
+     */
     @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
     @Transactional(COMMIT)
     public static class CommitTest {

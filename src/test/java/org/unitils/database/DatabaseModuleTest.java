@@ -15,12 +15,13 @@
  */
 package org.unitils.database;
 
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
-
-import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * Tests for the DatabaseModule
@@ -37,6 +38,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
     /**
      * Initializes the test fixture.
      */
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 

@@ -33,7 +33,7 @@ import org.unitils.dbunit.datasetoperation.DataSetOperation;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 
 /**
- * todo javadoc
+ * Tests DbUnitModule's feature for using different DataSetOperations
  *
  * @author Filip Neven
  * @author Tim Ducheyne

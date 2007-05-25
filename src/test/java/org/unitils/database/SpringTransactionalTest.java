@@ -15,17 +15,18 @@
  */
 package org.unitils.database;
 
-import org.springframework.test.AbstractTransactionalSpringContextTests;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.unitils.dbmaintainer.util.BaseDataSourceDecorator;
-import static org.unitils.easymock.EasyMockUnitils.replay;
-import org.unitils.database.util.BaseConnectionDecorator;
-import org.easymock.classextension.EasyMock;
 import static org.easymock.EasyMock.expect;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.easymock.classextension.EasyMock;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.test.AbstractTransactionalSpringContextTests;
+import org.unitils.database.util.BaseConnectionProxy;
+import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
 
 /**
  * @author Filip Neven
@@ -35,18 +36,18 @@ public class SpringTransactionalTest extends AbstractTransactionalSpringContextT
 
     private static Connection mockConnection1 = EasyMock.createStrictMock(Connection.class), mockConnection2 = EasyMock.createStrictMock(Connection.class);
 
-    private static BaseConnectionDecorator con1 = new BaseConnectionDecorator(mockConnection1), con2 = new BaseConnectionDecorator(mockConnection2);
+    private static BaseConnectionProxy con1 = new BaseConnectionProxy(mockConnection1), con2 = new BaseConnectionProxy(mockConnection2);
 
     protected String[] getConfigLocations() {
         return new String[] {"org/unitils/database/ac.xml"};
     }
 
     protected void onSetUpBeforeTransaction() throws Exception {
-        setDefaultRollback(false);
+        setDefaultRollback(true);
 
         expect(mockConnection1.getAutoCommit()).andStubReturn(false);
         expect(mockConnection1.isReadOnly()).andStubReturn(false);
-        mockConnection1.commit();
+        mockConnection1.rollback();
         mockConnection1.close();
         EasyMock.replay(mockConnection1, mockConnection2);
     }
@@ -65,7 +66,7 @@ public class SpringTransactionalTest extends AbstractTransactionalSpringContextT
         EasyMock.verify(mockConnection1, mockConnection2);
     }
 
-    public static class MockDataSource extends BaseDataSourceDecorator {
+    public static class MockDataSource extends BaseDataSourceProxy {
 
         boolean firstTime = true;
 

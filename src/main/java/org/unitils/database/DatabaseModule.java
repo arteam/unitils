@@ -42,12 +42,13 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.transaction.TransactionManager;
-import org.unitils.database.transaction.TransactionManagerFactory;
 import org.unitils.database.transaction.TransactionMode;
+import org.unitils.database.util.DynamicThreadLocalDataSourceProxy;
 import org.unitils.database.util.Flushable;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.PropertyUtils;
+import org.unitils.util.ReflectionUtils;
 
 /**
  * todo add javadoc explaining transaction behavior.
@@ -82,7 +83,7 @@ public class DatabaseModule implements Module {
     private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
 
     /* The datasource instance */
-    private DataSource dataSource;
+    private DynamicThreadLocalDataSourceProxy dataSource;
 
     /* The configuration of Unitils */
     private Properties configuration;
@@ -90,8 +91,13 @@ public class DatabaseModule implements Module {
     /* Indicates if the DBMaintainer should be invoked to update the database */
     private boolean updateDatabaseSchemaEnabled;
 
+    /* The transaction manager */
     private TransactionManager transactionManager;
 
+    /* 
+     * ThreadLocal that remembers if a transaction is active for this thread, but this transaction was started
+     * while the DataSource was not loaded yet. In this case, the transaction is not really started 
+     */
     private ThreadLocal<Object> transactionShouldBeActiveFor = new ThreadLocal<Object>();
 
 
@@ -114,13 +120,12 @@ public class DatabaseModule implements Module {
      *
      * @return The <code>DataSource</code>
      */
-    public DataSource getDataSource() {
+    public DynamicThreadLocalDataSourceProxy getDataSource() {
         if (dataSource == null) {
-            dataSource = createDataSource();
+            dataSource = new DynamicThreadLocalDataSourceProxy(createDataSource());
             if (updateDatabaseSchemaEnabled) {
                 updateDatabase();
             }
-            dataSource = transactionManager.registerDataSource(dataSource);
             if (transactionShouldBeActiveFor.get() != null) {
                 transactionManager.startTransaction(transactionShouldBeActiveFor.get());
             }
@@ -172,6 +177,12 @@ public class DatabaseModule implements Module {
     }
 
 
+    /**
+     * Updates the database version to the current version, without issuing any other updates to the database.
+     * This method can be used for example after you've manually brought the database to the latest version, but
+     * the database version is not yet set to the current one. This method can also be useful for example for
+     * reinitializing the database after having reorganized the scripts folder.
+     */
     public void setDatabaseToCurrentVersion() {
         DBMaintainer dbMaintainer = new DBMaintainer(configuration, new SQLHandler(getDataSource()));
         dbMaintainer.setDatabaseToCurrentVersion();
@@ -207,20 +218,37 @@ public class DatabaseModule implements Module {
         return dataSourceFactory.createDataSource();
     }
 
+    
+    /**
+     * Initializes the Unitils transaction manager
+     */
     protected void initTransactionManager() {
         transactionManager = createTransactionManager();
     }
 
+    
+    /**
+     * @return An instance of the transactionManager, like configured in the Unitils configuration
+     */
     protected TransactionManager createTransactionManager() {
-        TransactionManagerFactory factory = getConfiguredInstance(TransactionManagerFactory.class, configuration);
-        return factory.getTransactionManager();
+        return getConfiguredInstance(TransactionManager.class, configuration);
     }
 
+    
+    /**
+     * @param testObject The test object, not null
+     * @return True if transactions are enabled for this test object, false otherwise
+     */
     public boolean isTransactionsEnabled(Object testObject) {
         TransactionMode transactionMode = getTransactionMode(testObject);
         return transactionMode != TransactionMode.DISABLED;
     }
 
+    
+    /**
+     * @param testObject The test object, not null
+     * @return The {@link TransactionMode} for the given object
+     */
     protected TransactionMode getTransactionMode(Object testObject) {
         TransactionMode transactionMode = AnnotationUtils.getClassLevelAnnotationProperty(Transactional.class,
                 "value", TransactionMode.DEFAULT, testObject.getClass());
@@ -229,6 +257,35 @@ public class DatabaseModule implements Module {
         return transactionMode;
     }
 
+    
+    /**
+     * @param testObject The test object, not null
+     * @return True if the TransactionManager is 'active', meaning able to manage transactions
+     */
+    private boolean isTransactionManagerActive(Object testObject) {
+        return transactionManager.isActive(testObject);
+    }
+    
+    
+    /**
+     * Starts a transaction if possible, i.e. if transactions are enabled and a transactionManager is
+     * active for the given testObject
+     * 
+     * @param testObject The test object, not null
+     */
+    protected void startTransactionIfPossible(Object testObject) {
+        if (isTransactionsEnabled(testObject) && isTransactionManagerActive(testObject)) {
+            startTransaction(testObject);
+        }
+    }
+
+    /**
+     * Starts a transaction. If the Unitils DataSource was not loaded yet, we simply remember that a 
+     * transaction was started but don't actually start it. If the DataSource is loaded within this 
+     * test, the transaction will be started immediately after loading the DataSource.
+     * 
+     * @param testObject The test object, not null
+     */
     public void startTransaction(Object testObject) {
         if (dataSource == null) {
             transactionShouldBeActiveFor.set(testObject);
@@ -237,10 +294,15 @@ public class DatabaseModule implements Module {
         }
     }
 
-    protected void commitOrRollbackTransaction(Object testObject) {
-        if (dataSource == null) {
-            transactionShouldBeActiveFor.remove();
-        } else {
+    
+    /**
+     * Commits or rollbacks the current transaction, if transactions are enabled and a transactionManager is
+     * active for the given testObject
+     * 
+     * @param testObject The test object, not null
+     */
+    protected void commitOrRollbackTransactionIfPossible(Object testObject) {
+        if (isTransactionsEnabled(testObject) && isTransactionManagerActive(testObject)) {
             TransactionMode transactionMode = getTransactionMode(testObject);
             if (transactionMode == TransactionMode.COMMIT) {
                 commitTransaction(testObject);
@@ -250,6 +312,12 @@ public class DatabaseModule implements Module {
         }
     }
 
+    
+    /**
+     * Commits the current transaction. This will cause an exception if a transaction was not active
+     * 
+     * @param testObject The test object, not null
+     */
     public void commitTransaction(Object testObject) {
         if (dataSource == null) {
             transactionShouldBeActiveFor.remove();
@@ -259,11 +327,40 @@ public class DatabaseModule implements Module {
 
     }
 
+    
+    /**
+     * Rollbacks the current transaction. This will cause an exception if a transaction was not active
+     * 
+     * @param testObject The test object, not null
+     */
     public void rollbackTransaction(Object testObject) {
         if (dataSource == null) {
             transactionShouldBeActiveFor.remove();
         } else {
             transactionManager.rollback(testObject);
+        }
+    }
+    
+    
+    /**
+     * Registers the {@link org.unitils.database.util.DataSourceInterceptingBeanPostProcessor} with the
+     * {@link org.unitils.spring.SpringModule}. This will make sure that a bean of type {@link UnitilsDataSource}
+     * is replaced with the actual untils data source in the spring application context.
+     */
+    @SuppressWarnings("unchecked")
+    protected void registerSpringDataSourceBeanPostProcessor() {
+        String springModuleName = "org.unitils.spring.SpringModule";
+        if (Unitils.getInstance().getModulesRepository().isModuleEnabled(springModuleName)) {
+            try {
+                Class springModuleClass = Class.forName(springModuleName);
+                Module springModule = Unitils.getInstance().getModulesRepository().getModuleOfType(springModuleClass);
+                Method registerBeanPostProcessorTypeMethod = springModuleClass.getMethod("registerBeanPostProcessorType", Class.class);
+                Class dataSourceInterceptingBeanPostProcessorClass = ReflectionUtils.getClassWithName(
+                        "org.unitils.database.util.DataSourceInterceptingBeanPostProcessor");
+                registerBeanPostProcessorTypeMethod.invoke(springModule, dataSourceInterceptingBeanPostProcessorClass);
+            } catch (Exception e) {
+                throw new UnitilsException("Error while trying to register SpringDataSourceBeanPostProcessor in SpringModule", e);
+            }
         }
     }
 
@@ -283,27 +380,19 @@ public class DatabaseModule implements Module {
 
         @Override
         public void beforeAll() {
+            registerSpringDataSourceBeanPostProcessor();
             initTransactionManager();
         }
 
         @Override
         public void beforeTestSetUp(Object testObject) {
             injectDataSource(testObject);
-            if (isTransactionsEnabled(testObject)) {
-                startTransaction(testObject);
-            }
-        }
-
-        @Override
-        public void beforeTestMethod(Object testObject, Method testMethod) {
-
+            startTransactionIfPossible(testObject);
         }
 
         @Override
         public void afterTestTearDown(Object testObject) {
-            if (isTransactionsEnabled(testObject)) {
-                commitOrRollbackTransaction(testObject);
-            }
+            commitOrRollbackTransactionIfPossible(testObject);
         }
     }
 }
