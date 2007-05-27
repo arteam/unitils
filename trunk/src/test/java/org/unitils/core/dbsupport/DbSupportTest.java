@@ -361,7 +361,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         }
 
         dbSupport.incrementSequenceToValue(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), 30);
-        long result = dbSupport.getCurrentValueOfSequence(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"));
+        long result = dbSupport.getSequenceValue(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"));
         assertEquals(30, result);
     }
 

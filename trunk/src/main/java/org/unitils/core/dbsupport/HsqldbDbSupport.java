@@ -114,13 +114,15 @@ public class HsqldbDbSupport extends DbSupport {
 
 
     /**
-     * Returns the value of the sequence with the given name
+     * Returns the value of the sequence with the given name.
+     * <p/>
+     * Note: this can have the side-effect of increasing the sequence value.
      *
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
     @Override
-    public long getCurrentValueOfSequence(String sequenceName) {
+    public long getSequenceValue(String sequenceName) {
         return getSQLHandler().getItemAsLong("select START_WITH from INFORMATION_SCHEMA.SYSTEM_SEQUENCES where SEQUENCE_SCHEMA = '" + getSchemaName() + "' and SEQUENCE_NAME = '" + sequenceName + "'");
     }
 

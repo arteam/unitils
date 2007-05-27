@@ -154,7 +154,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      */
     private void assertCurrentSequenceValueBetween(long minValue, long maxValue) throws SQLException {
         String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier("test_sequence");
-        long currentValue = dbSupport.getCurrentValueOfSequence(correctCaseSequenceName);
+        long currentValue = dbSupport.getSequenceValue(correctCaseSequenceName);
         assertTrue("Current sequence value is not between " + minValue + " and " + maxValue, (currentValue >= minValue && currentValue <= maxValue));
     }
 
