@@ -16,6 +16,8 @@
 package org.unitils.database.config;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import static org.unitils.util.PropertyUtils.getString;
 
 import javax.sql.DataSource;
@@ -28,6 +30,9 @@ import java.util.Properties;
  * @author Filip Neven
  */
 public class PropertiesDataSourceFactory implements DataSourceFactory {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(PropertiesDataSourceFactory.class);
 
     /* Propery key of the database driver class name */
     private static final String PROPKEY_DATASOURCE_DRIVERCLASSNAME = "database.driverClassName";
@@ -71,6 +76,7 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
      * @see DataSourceFactory#createDataSource()
      */
     public DataSource createDataSource() {
+        logger.info("Creating data source. Driver: " + driverClassName + ", url: " + databaseUrl + ", user: " + userName + ", password: <not shown>");
         BasicDataSource dataSource = getNewDataSource();
         dataSource.setDriverClassName(driverClassName);
         dataSource.setUsername(userName);

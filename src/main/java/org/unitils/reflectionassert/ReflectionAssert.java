@@ -50,11 +50,10 @@ import java.util.Collection;
  * The name assert..RefEquals is chosen instead of assert..Equals so it can be added as a static import
  * without naming collisions.
  *
- * @see ReflectionComparator
- * @see ReflectionComparatorMode
- *
  * @author Tim Ducheyne
  * @author Filip Neven
+ * @see ReflectionComparator
+ * @see ReflectionComparatorMode
  */
 public class ReflectionAssert {
 
@@ -389,7 +388,7 @@ public class ReflectionAssert {
             Object ognlExprObj = Ognl.parseExpression(ognlExpression);
             return Ognl.getValue(ognlExprObj, ognlContext, object);
         } catch (OgnlException e) {
-            throw new UnitilsException("Failed to get proerty value using OGNL expression " + ognlExpression, e);
+            throw new UnitilsException("Failed to get property value using OGNL expression " + ognlExpression, e);
         }
     }
 
