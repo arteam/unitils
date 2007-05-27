@@ -139,7 +139,7 @@ public class DatabaseModule implements Module {
      * This will look for modules that implement {@link Flushable} and call flushDatabaseUpdates on these module.
      */
     public void flushDatabaseUpdates() {
-        logger.info("Flusing database updates.");
+        logger.info("Flushing database updates.");
         List<Flushable> flushables = Unitils.getInstance().getModulesRepository().getModulesOfType(Flushable.class);
         for (Flushable flushable : flushables) {
             flushable.flushDatabaseUpdates();
