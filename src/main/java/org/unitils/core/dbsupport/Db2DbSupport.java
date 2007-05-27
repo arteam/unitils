@@ -170,16 +170,15 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
-     * todo rename + javadoc about currval and nextval  calling this method has the side effect of increasing the nr
+     * Returns the value of the sequence with the given name.
      * <p/>
-     * <p/>
-     * Returns the value of the sequence with the given name
+     * Note: this can have the side-effect of increasing the sequence value.
      *
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
     @Override
-    public long getCurrentValueOfSequence(String sequenceName) {
+    public long getSequenceValue(String sequenceName) {
         return getSQLHandler().getItemAsLong("select next value for " + qualified(sequenceName) + " from SYSIBM.SYSDUMMY1");
     }
 

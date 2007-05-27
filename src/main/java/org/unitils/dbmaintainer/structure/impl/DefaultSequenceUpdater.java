@@ -80,7 +80,7 @@ public class DefaultSequenceUpdater extends BaseDatabaseTask implements Sequence
         }
         Set<String> sequenceNames = dbSupport.getSequenceNames();
         for (String sequenceName : sequenceNames) {
-            if (dbSupport.getCurrentValueOfSequence(sequenceName) < lowestAcceptableSequenceValue) {
+            if (dbSupport.getSequenceValue(sequenceName) < lowestAcceptableSequenceValue) {
                 logger.debug("Incrementing value for sequence " + sequenceName + " in database schema " + dbSupport.getSchemaName());
                 dbSupport.incrementSequenceToValue(sequenceName, lowestAcceptableSequenceValue);
             }

@@ -217,13 +217,15 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
-     * Returns the value of the sequence with the given name
+     * Returns the value of the sequence with the given name.
+     * <p/>
+     * Note: this can have the side-effect of increasing the sequence value.
      *
      * @param sequenceName The sequence, not null
      * @return The value of the sequence with the given name
      */
     @Override
-    public long getCurrentValueOfSequence(String sequenceName) {
+    public long getSequenceValue(String sequenceName) {
         return getSQLHandler().getItemAsLong("select LAST_NUMBER from USER_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "'");
     }
 
