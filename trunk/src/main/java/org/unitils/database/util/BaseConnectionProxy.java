@@ -15,17 +15,12 @@
  */
 package org.unitils.database.util;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Savepoint;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Map;
 
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -180,7 +175,7 @@ public class BaseConnectionProxy implements Connection {
     public PreparedStatement prepareStatement(String sql, String columnNames[]) throws SQLException {
         return targetConnection.prepareStatement(sql, columnNames);
     }
-    
+
     public Connection getTargetConnection() {
         return targetConnection;
     }

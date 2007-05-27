@@ -15,9 +15,6 @@
  */
 package org.unitils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.junit.Ignore;
 import org.junit.internal.runners.InitializationError;
 import org.junit.internal.runners.TestClassMethodsRunner;
@@ -28,6 +25,9 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Custom test runner that will Unitils-enable your test. This will make sure that the
@@ -74,8 +74,8 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
                 testListener.beforeAll();
                 beforeAllCalled = true;
 
-            } catch (Throwable e) {
-                notifier.fireTestFailure(new Failure(getDescription(), e));
+            } catch (Throwable t) {
+                notifier.fireTestFailure(new Failure(getDescription(), t));
                 return;
             }
         }
@@ -84,15 +84,15 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
             testListener.beforeTestClass(getTestClass());
             super.run(notifier);
 
-        } catch (Throwable e) {
-            notifier.fireTestFailure(new Failure(getDescription(), e));
+        } catch (Throwable t) {
+            notifier.fireTestFailure(new Failure(getDescription(), t));
         }
 
         try {
             testListener.afterTestClass(getTestClass());
 
-        } catch (Throwable e) {
-            notifier.fireTestFailure(new Failure(getDescription(), e));
+        } catch (Throwable t) {
+            notifier.fireTestFailure(new Failure(getDescription(), t));
         }
     }
 
@@ -102,7 +102,6 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
      * at the apropriate moments.
      */
     public static class CustomTestClassMethodsRunner extends TestClassMethodsRunner {
-
 
         /* The current test instance */
         private Object testObject;
@@ -139,20 +138,19 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
          */
         @Override
         protected void invokeTestMethod(Method method, RunNotifier notifier) {
-
             try {
                 super.invokeTestMethod(method, notifier);
 
-            } catch (Throwable e) {
-                notifier.fireTestFailure(new Failure(getDescription(), e));
+            } catch (Throwable t) {
+                notifier.fireTestFailure(new Failure(getDescription(), t));
             }
 
             if (!isIgnored(method)) {
                 try {
                     testListener.afterTestTearDown(testObject);
 
-                } catch (Throwable e) {
-                    notifier.fireTestFailure(new Failure(getDescription(), e));
+                } catch (Throwable t) {
+                    notifier.fireTestFailure(new Failure(getDescription(), t));
                 }
             }
             testObject = null;
@@ -176,7 +174,6 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
      * at the apropriate moments.
      */
     public static class CustomTestMethodRunner extends TestMethodRunner {
-
 
         /* The test instance on which to invoke the test method */
         private Object testObject;
@@ -207,35 +204,37 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
         @Override
         protected void executeMethodBody() throws IllegalAccessException, InvocationTargetException {
 
-            RuntimeException runtimeException = null;
-            IllegalAccessException illegalAccessException = null;
-            InvocationTargetException invocationTargetException = null;
+            Throwable throwable = null;
             try {
                 testListener.beforeTestMethod(testObject, testMethod);
                 super.executeMethodBody();
 
-            } catch (IllegalAccessException a) {  // hold exceptions until later, first call afterTestMethod
-                illegalAccessException = a;
-            } catch (InvocationTargetException i) {
-                invocationTargetException = i;
-            } catch (RuntimeException e) {
-                runtimeException = e;
+            } catch (Throwable t) {  // hold exceptions until later, first call afterTestMethod
+                throwable = t;
             }
 
             try {
-                testListener.afterTestMethod(testObject, testMethod);
+                testListener.afterTestMethod(testObject, testMethod, throwable);
 
-            } catch (RuntimeException t) {
+            } catch (Throwable t) {
                 // first exception is typically the most meaningful, so ignore second exception
-                if (runtimeException == null && illegalAccessException == null && invocationTargetException == null) {
-                    runtimeException = t;
+                if (throwable == null) {
+                    throwable = t;
                 }
             }
 
-            // if there were exceptions, throw the first one
-            if (runtimeException != null) throw runtimeException;
-            if (illegalAccessException != null) throw illegalAccessException;
-            if (invocationTargetException != null) throw invocationTargetException;
+            if (throwable instanceof IllegalAccessException) {
+                throw (IllegalAccessException) throwable;
+            }
+            if (throwable instanceof InvocationTargetException) {
+                throw (InvocationTargetException) throwable;
+            }
+            if (throwable instanceof RuntimeException) {
+                throw (RuntimeException) throwable;
+            }
+            if (throwable != null) {
+                throw new RuntimeException(throwable);
+            }
         }
     }
 

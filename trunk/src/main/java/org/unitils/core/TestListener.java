@@ -66,7 +66,12 @@ public abstract class TestListener {
         // empty
     }
 
-    public void afterTestMethod(Object testObject, Method testMethod) {
+    /**
+     * @param testObject    The test object, not null
+     * @param testMethod    The test method, not null
+     * @param testThrowable The throwable thrown during the test or beforeTestMethod, null if none was thrown
+     */
+    public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable) {
         // empty
     }
 

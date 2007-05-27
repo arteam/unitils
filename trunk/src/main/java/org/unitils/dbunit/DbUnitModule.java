@@ -15,24 +15,6 @@
  */
 package org.unitils.dbunit;
 
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -42,6 +24,8 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
@@ -54,9 +38,23 @@ import org.unitils.dbunit.util.DataSetXmlReader;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.AnnotationUtils;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import org.unitils.util.ModuleUtils;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import org.unitils.util.ReflectionUtils;
+
+import javax.sql.DataSource;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -161,7 +159,7 @@ public class DbUnitModule implements Module {
     /**
      * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
      *
-     * @param inputStream The stream containing the test data set, not null
+     * @param inputStream       The stream containing the test data set, not null
      * @param databaseOperation The dbunit DatabaseOperation that must be executed on this DataSet
      */
     public void insertTestData(InputStream inputStream, DatabaseOperation databaseOperation) {
@@ -351,7 +349,6 @@ public class DbUnitModule implements Module {
     }
 
 
-
     /**
      * Creates a new instance of dbUnit's <code>IDatabaseConnection</code>
      *
@@ -435,9 +432,9 @@ public class DbUnitModule implements Module {
 
     /**
      * Get the configured DataSetFactory for the given method
-
+     *
      * @param annotationClass The class of the annotation, i.e. DataSet.class or ExpectedDataSet.class
-     * @param testMethod The method for which we need the configured DataSetFactory
+     * @param testMethod      The method for which we need the configured DataSetFactory
      * @return The configured DataSetFactory
      */
     @SuppressWarnings("unchecked")
@@ -485,8 +482,10 @@ public class DbUnitModule implements Module {
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod) {
-            assertDbContentAsExpected(testMethod);
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
+            if (throwable == null) {
+                assertDbContentAsExpected(testMethod);
+            }
         }
 
     }

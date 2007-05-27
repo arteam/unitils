@@ -15,15 +15,25 @@
  */
 package org.unitils.easymock;
 
+import org.easymock.classextension.internal.MocksClassControl;
+import org.easymock.internal.MocksControl;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
 import static org.easymock.internal.MocksControl.MockType.NICE;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import org.easymock.internal.ReplayState;
+import org.unitils.core.Module;
+import org.unitils.core.TestListener;
+import org.unitils.core.UnitilsException;
+import org.unitils.easymock.annotation.AfterCreateMock;
+import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.annotation.RegularMock;
+import org.unitils.easymock.util.*;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import org.unitils.util.PropertyUtils;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
 
@@ -35,24 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.easymock.classextension.internal.MocksClassControl;
-import org.easymock.internal.MocksControl;
-import org.easymock.internal.ReplayState;
-import org.unitils.core.Module;
-import org.unitils.core.TestListener;
-import org.unitils.core.UnitilsException;
-import org.unitils.easymock.annotation.AfterCreateMock;
-import org.unitils.easymock.annotation.Mock;
-import org.unitils.easymock.annotation.RegularMock;
-import org.unitils.easymock.util.Calls;
-import org.unitils.easymock.util.Dates;
-import org.unitils.easymock.util.Defaults;
-import org.unitils.easymock.util.InvocationOrder;
-import org.unitils.easymock.util.LenientMocksControl;
-import org.unitils.easymock.util.Order;
-import org.unitils.reflectionassert.ReflectionComparatorMode;
-import org.unitils.util.PropertyUtils;
 
 /**
  * Module for testing with mock objects using EasyMock.
@@ -113,8 +105,8 @@ public class EasyMockModule implements Module {
      * <p/>
      * An instance of the mock control is stored, so that it can be set to the replay/verify state when
      * {@link #replay()} or {@link #verify()}  is called.
-     * 
-     * @param <T>             the type of the mock 
+     *
+     * @param <T>             the type of the mock
      * @param mockType        the class type for the mock, not null
      * @param invocationOrder the order setting, not null
      * @param calls           the calls setting, not null
@@ -151,8 +143,8 @@ public class EasyMockModule implements Module {
      * If returns is set to LENIENT, a nice mock is created, else a default mock is created
      * If arguments is lenient a lenient control is create, else an EasyMock control is created
      * If order is set to strict, invocation order checking is enabled
-     * 
-     * @param <T>             the type of the mock 
+     *
+     * @param <T>             the type of the mock
      * @param mockType        the type of the mock, not null
      * @param invocationOrder the order setting, not null
      * @param calls           the calls setting, not null
@@ -314,8 +306,8 @@ public class EasyMockModule implements Module {
          * of all created mocks.
          */
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod) {
-            if (autoVerifyAfterTestEnabled) {
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
+            if (autoVerifyAfterTestEnabled && throwable == null) {
                 verify();
             }
         }

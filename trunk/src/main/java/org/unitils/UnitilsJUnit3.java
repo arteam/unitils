@@ -15,18 +15,17 @@
  */
 package org.unitils;
 
-import java.lang.reflect.Method;
-
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+
+import java.lang.reflect.Method;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
@@ -177,7 +176,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
         }
 
         try {
-            testListener.afterTestMethod(this, getCurrentTestMethod());
+            testListener.afterTestMethod(this, getCurrentTestMethod(), firstThrowable);
 
         } catch (Throwable t) {
             // first exception is typically the most meaningful, so ignore second exception
