@@ -28,8 +28,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * todo move to db maintainer
- * <p/>
  * Class to which database updates and queries are passed. Is in fact a utility class, but is a concrete instance to
  * enable decorating it or switching it with another implementation, allowing things like a dry run, creating a script
  * file or logging updates to a log file or database table.
@@ -71,6 +69,7 @@ public class SQLHandler {
         this.dataSource = dataSource;
         this.doExecuteUpdates = doExecuteUpdates;
     }
+
 
     /**
      * Executes the given statement.
@@ -217,12 +216,14 @@ public class SQLHandler {
         }
     }
 
+
     /**
      * @return The DataSource
      */
     public DataSource getDataSource() {
         return dataSource;
     }
+
 
     /**
      * @return Whether updates are executed on the database or not

@@ -42,7 +42,8 @@ import java.lang.reflect.Method;
  * <li>[Unitils] afterAll</li>
  * </ul>
  * <p/>
- * todo exception behavior javadoc
+ * The after methods will always when the before counterpart has run (or begun). For example if an exception occurs during
+ * the beforeTestClass method, the afterTestClass will still be called.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -50,24 +51,56 @@ import java.lang.reflect.Method;
 public abstract class TestListener {
 
 
+    /**
+     * Invoked before any of the tests are run.
+     * This can be overriden to for example add general initialisation.
+     */
     public void beforeAll() {
         // empty
     }
 
+
+    /**
+     * Invoked before any of the test in a test class are run.
+     * This can be overriden to for example add test-class initialisation.
+     *
+     * @param testClass The test class, not null
+     */
     public void beforeTestClass(Class<?> testClass) {
         // empty
     }
 
+
+    /**
+     * Invoked before the test setup (eg @Before) is run.
+     * This can be overriden to for example initialize the test-fixture.
+     *
+     * @param testObject The test instance, not null
+     */
     public void beforeTestSetUp(Object testObject) {
         // empty
     }
 
+
+    /**
+     * Invoked before the test but after the test setup (eg @Before) is run.
+     * This can be overriden to for example further initialize the test-fixture using values that were set during
+     * the test setup.
+     *
+     * @param testObject The test instance, not null
+     * @param testMethod The test method, not null
+     */
     public void beforeTestMethod(Object testObject, Method testMethod) {
         // empty
     }
 
+
     /**
-     * @param testObject    The test object, not null
+     * Invoked after the test run but before the test tear down (eg @After).
+     * This can be overriden to for example add assertions for testing the result of the test.
+     * It the before method or the test raised an exception, this exception will be passed to the method.
+     *
+     * @param testObject    The test instance, not null
      * @param testMethod    The test method, not null
      * @param testThrowable The throwable thrown during the test or beforeTestMethod, null if none was thrown
      */
@@ -75,14 +108,33 @@ public abstract class TestListener {
         // empty
     }
 
+
+    /**
+     * Invoked after the test tear down (eg @After).
+     * This can be overriden to for example peform extra cleanup after the test.
+     *
+     * @param testObject The test instance, not null
+     */
     public void afterTestTearDown(Object testObject) {
         // empty
     }
 
+
+    /**
+     * Invoked after all tests of a test class have run.
+     * This can be overriden to for example peform extra cleanup after the test.
+     *
+     * @param testClass The test class, not null
+     */
     public void afterTestClass(Class<?> testClass) {
         // empty
     }
 
+
+    /**
+     * Invoked after all of the tests have run.
+     * This can be overriden to for example add general finalisation.
+     */
     public void afterAll() {
         // empty
     }
