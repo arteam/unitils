@@ -15,22 +15,6 @@
  */
 package org.unitils.database;
 
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -47,12 +31,26 @@ import org.unitils.database.util.DynamicThreadLocalDataSourceProxy;
 import org.unitils.database.util.Flushable;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.util.AnnotationUtils;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
 import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import javax.sql.DataSource;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * todo add javadoc explaining transaction behavior.
- *
+ * <p/>
  * Module that provides basic support for database testing such as the creation of a datasource that connectes to the
  * test database and the maintaince of the test database structure.
  * <p/>
@@ -163,7 +161,7 @@ public class DatabaseModule implements Module {
      * latest changes. See {@link DBMaintainer} for more information.
      *
      * @param sqlHandler SQLHandler that needs to be used for the database updates
-     * todo make configurable using properties
+     *                   todo make configurable using properties
      */
     public void updateDatabase(SQLHandler sqlHandler) {
         try {
@@ -218,7 +216,7 @@ public class DatabaseModule implements Module {
         return dataSourceFactory.createDataSource();
     }
 
-    
+
     /**
      * Initializes the Unitils transaction manager
      */
@@ -226,7 +224,7 @@ public class DatabaseModule implements Module {
         transactionManager = createTransactionManager();
     }
 
-    
+
     /**
      * @return An instance of the transactionManager, like configured in the Unitils configuration
      */
@@ -234,7 +232,7 @@ public class DatabaseModule implements Module {
         return getConfiguredInstance(TransactionManager.class, configuration);
     }
 
-    
+
     /**
      * @param testObject The test object, not null
      * @return True if transactions are enabled for this test object, false otherwise
@@ -244,7 +242,7 @@ public class DatabaseModule implements Module {
         return transactionMode != TransactionMode.DISABLED;
     }
 
-    
+
     /**
      * @param testObject The test object, not null
      * @return The {@link TransactionMode} for the given object
@@ -257,7 +255,7 @@ public class DatabaseModule implements Module {
         return transactionMode;
     }
 
-    
+
     /**
      * @param testObject The test object, not null
      * @return True if the TransactionManager is 'active', meaning able to manage transactions
@@ -265,12 +263,12 @@ public class DatabaseModule implements Module {
     private boolean isTransactionManagerActive(Object testObject) {
         return transactionManager.isActive(testObject);
     }
-    
-    
+
+
     /**
      * Starts a transaction if possible, i.e. if transactions are enabled and a transactionManager is
      * active for the given testObject
-     * 
+     *
      * @param testObject The test object, not null
      */
     protected void startTransactionIfPossible(Object testObject) {
@@ -280,10 +278,10 @@ public class DatabaseModule implements Module {
     }
 
     /**
-     * Starts a transaction. If the Unitils DataSource was not loaded yet, we simply remember that a 
-     * transaction was started but don't actually start it. If the DataSource is loaded within this 
+     * Starts a transaction. If the Unitils DataSource was not loaded yet, we simply remember that a
+     * transaction was started but don't actually start it. If the DataSource is loaded within this
      * test, the transaction will be started immediately after loading the DataSource.
-     * 
+     *
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
@@ -294,11 +292,11 @@ public class DatabaseModule implements Module {
         }
     }
 
-    
+
     /**
      * Commits or rollbacks the current transaction, if transactions are enabled and a transactionManager is
      * active for the given testObject
-     * 
+     *
      * @param testObject The test object, not null
      */
     protected void commitOrRollbackTransactionIfPossible(Object testObject) {
@@ -312,10 +310,10 @@ public class DatabaseModule implements Module {
         }
     }
 
-    
+
     /**
      * Commits the current transaction. This will cause an exception if a transaction was not active
-     * 
+     *
      * @param testObject The test object, not null
      */
     public void commitTransaction(Object testObject) {
@@ -327,10 +325,10 @@ public class DatabaseModule implements Module {
 
     }
 
-    
+
     /**
      * Rollbacks the current transaction. This will cause an exception if a transaction was not active
-     * 
+     *
      * @param testObject The test object, not null
      */
     public void rollbackTransaction(Object testObject) {
@@ -340,8 +338,8 @@ public class DatabaseModule implements Module {
             transactionManager.rollback(testObject);
         }
     }
-    
-    
+
+
     /**
      * Registers the {@link org.unitils.database.util.DataSourceInterceptingBeanPostProcessor} with the
      * {@link org.unitils.spring.SpringModule}. This will make sure that a bean of type {@link UnitilsDataSource}

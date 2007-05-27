@@ -1286,7 +1286,6 @@ public class UnitilsInvocationExceptionTest {
      * @return the test result
      */
     private Result performJUnit4Test() throws Exception {
-
         Result result = new Result();
         RunNotifier runNotifier = new RunNotifier();
         runNotifier.addListener(result.createListener());
@@ -1302,7 +1301,6 @@ public class UnitilsInvocationExceptionTest {
      * @return the test result
      */
     private TestListenerAdapter performTestNGTest() {
-
         TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
         TestNG testng = new TestNG();
         testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class});

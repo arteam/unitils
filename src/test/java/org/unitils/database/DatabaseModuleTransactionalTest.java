@@ -15,24 +15,21 @@
  */
 package org.unitils.database;
 
+import junit.framework.TestCase;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.reset;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.database.config.DataSourceFactory;
+import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
-import junit.framework.TestCase;
-
-import org.easymock.classextension.EasyMock;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.Unitils;
-import org.unitils.database.config.DataSourceFactory;
-import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
-import org.unitils.spring.SpringModule;
-
 /**
  * Base class for tests that verify the transactional behavior of the database module
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -42,9 +39,9 @@ abstract public class DatabaseModuleTransactionalTest extends TestCase {
 
     protected static MockDataSource mockDataSource;
 
-    protected static Connection mockConnection1 = EasyMock.createMock(Connection.class);
-    
-    protected static Connection mockConnection2 = EasyMock.createMock(Connection.class);
+    protected static Connection mockConnection1 = createMock(Connection.class);
+
+    protected static Connection mockConnection2 = createMock(Connection.class);
 
     protected Properties configuration;
 
@@ -54,12 +51,13 @@ abstract public class DatabaseModuleTransactionalTest extends TestCase {
         super.setUp();
 
         mockDataSource = new MockDataSource();
-        EasyMock.reset(mockConnection1);
-        EasyMock.reset(mockConnection2);
+        reset(mockConnection1);
+        reset(mockConnection2);
 
         configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty("org.unitils.database.config.DataSourceFactory.implClassName", MockDataSourceFactory.class.getName());
     }
+
 
     /**
      * Mock DataSourceFactory, that returns the static mockDataSource
@@ -73,6 +71,7 @@ abstract public class DatabaseModuleTransactionalTest extends TestCase {
             return mockDataSource;
         }
     }
+
 
     /**
      * Mock DataSource, that returns connection1 when it is called the first time, and connection2
@@ -100,12 +99,5 @@ abstract public class DatabaseModuleTransactionalTest extends TestCase {
             }
         }
     }
-    
-    protected DatabaseModule getDatabaseModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-    }
-    
-    protected SpringModule getSpringModule() {
-        return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
-    }
+
 }

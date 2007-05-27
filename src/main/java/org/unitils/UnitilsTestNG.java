@@ -133,7 +133,7 @@ public abstract class UnitilsTestNG implements IHookable {
         }
 
         try {
-            testListener.afterTestMethod(this, testResult.getMethod().getMethod());
+            testListener.afterTestMethod(this, testResult.getMethod().getMethod(), firstRuntimeException);
 
         } catch (RuntimeException e) {
             // first exception is typically the most meaningful, so ignore second exception

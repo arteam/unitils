@@ -29,11 +29,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.util.Flushable;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.hibernate.util.HibernateAssert;
-import org.unitils.hibernate.util.HibernateConnectionProvider;
-import org.unitils.hibernate.util.HibernateSpringSupport;
-import org.unitils.hibernate.util.SessionFactoryManager;
-import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
+import org.unitils.hibernate.util.*;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getString;
@@ -322,6 +318,7 @@ public class HibernateModule implements Module, Flushable {
      * Verifies whether the SpringModule is enabled. If not, this means that either the property unitils.modules doesn't
      * include spring, or unitils.module.spring.enabled, or that the module could not be loaded because spring is not
      * in the classpath.
+     *
      * @return true if the SpringModule is enabled, false otherwise
      */
     protected boolean isSpringModuleEnabled() {
@@ -353,7 +350,7 @@ public class HibernateModule implements Module, Flushable {
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod) {
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
             closeSessions(testObject);
         }
     }

@@ -15,31 +15,28 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
+import org.unitils.database.annotations.Transactional;
+import org.unitils.database.transaction.SimpleTransactionManager;
 import static org.unitils.database.transaction.TransactionMode.COMMIT;
 import static org.unitils.database.transaction.TransactionMode.DISABLED;
 
 import java.sql.Connection;
 
-import org.unitils.core.Unitils;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.transaction.SimpleTransactionManager;
-
 /**
  * Tests verifying whether the SimpleTransactionManager functions correctly.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTransactionalTest {
 
     private TransactionsDisabledTest transactionsDisabledTest;
-    
+
     private RollbackTest rollbackTest;
 
     private CommitTest commitTest;
+
 
     /**
      * Initializes the test fixture.
@@ -48,11 +45,9 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
     public void setUp() throws Exception {
         super.setUp();
 
-        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", 
-                SimpleTransactionManager.class.getName());
-        Unitils.getInstance().init(configuration);
-        
-        databaseModule = getDatabaseModule();
+        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", SimpleTransactionManager.class.getName());
+        databaseModule = new DatabaseModule();
+        databaseModule.init(configuration);
         databaseModule.initTransactionManager();
 
         transactionsDisabledTest = new TransactionsDisabledTest();
@@ -60,8 +55,9 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         commitTest = new CommitTest();
     }
 
+
     /**
-     * Tests for a test with transactions disabled 
+     * Tests for a test with transactions disabled
      */
     public void testWithTransactionsDisabled() throws Exception {
         mockConnection1.close();
@@ -75,9 +71,10 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         conn2.close();
         assertNotSame(conn1, conn2);
         databaseModule.commitOrRollbackTransactionIfPossible(transactionsDisabledTest);
-        
+
         verify(mockConnection1, mockConnection2);
     }
+
 
     /**
      * Tests with a test with transaction rollback configured
@@ -88,7 +85,7 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection1.rollback();
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
-        
+
         databaseModule.startTransactionIfPossible(rollbackTest);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
@@ -96,9 +93,10 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         conn2.close();
         assertSame(conn1, conn2);
         databaseModule.commitOrRollbackTransactionIfPossible(rollbackTest);
-        
+
         verify(mockConnection1, mockConnection2);
     }
+
 
     /**
      * Tests with a test with transaction commit configured
@@ -117,18 +115,21 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         conn2.close();
         assertSame(conn1, conn2);
         databaseModule.commitOrRollbackTransactionIfPossible(commitTest);
-        
+
         verify(mockConnection1, mockConnection2);
     }
+
 
     /**
      * Class that plays the role of a unit test, with transactions disabled
      */
     @Transactional(DISABLED)
     public static class TransactionsDisabledTest {
-        
-        public void test() {}
+
+        public void test() {
+        }
     }
+
 
     /**
      * Class that plays the role of a unit test, with transaction rollback enabled (=default,
@@ -136,8 +137,10 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
      */
     public static class RollbackTest {
 
-        public void test() {}
+        public void test() {
+        }
     }
+
 
     /**
      * Class that plays the role of a unit test, with transaction commit enabled
@@ -145,8 +148,8 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
     @Transactional(COMMIT)
     public static class CommitTest {
 
-        public void test() {}
+        public void test() {
+        }
     }
-
 
 }

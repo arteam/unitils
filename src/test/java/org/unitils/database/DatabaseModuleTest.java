@@ -15,13 +15,12 @@
  */
 package org.unitils.database;
 
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
+
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Tests for the DatabaseModule
@@ -63,12 +62,6 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
         assertNotNull(dbTest.dataSourceFromMethod);
         assertSame(dbTest.dataSourceFromField, dbTest.dataSourceFromMethod);
         assertTrue(databaseModule.updateDataSchemaCalled);
-    }
-
-
-    public void testTransactionCommit() throws Exception {
-        DbTest dbTest = new DbTest();
-
     }
 
 

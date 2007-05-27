@@ -101,7 +101,7 @@ public class TracingTestListener extends TestListener {
     }
 
     @Override
-    public void afterTestMethod(Object testObject, Method testMethod) {
+    public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
         callList.add(formatString(UNITILS, AFTER_TEST_METHOD, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(AFTER_TEST_METHOD);
     }

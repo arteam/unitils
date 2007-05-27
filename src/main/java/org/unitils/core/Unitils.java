@@ -44,6 +44,7 @@ public class Unitils implements Module {
 
     /**
      * Returns the singleton instance
+     *
      * @return the singleton instance, not null
      */
     public static synchronized Unitils getInstance() {
@@ -56,6 +57,7 @@ public class Unitils implements Module {
 
     /**
      * Sets the singleton instance to the given object
+     *
      * @param unitils the singleton instance
      */
     public static void setInstance(Unitils unitils) {
@@ -89,19 +91,19 @@ public class Unitils implements Module {
     public Unitils() {
         testContext = new TestContext();
     }
-    
-    
+
+
     /**
-     * Initializes unitils with the configuration files. 
+     * Initializes unitils with the configuration files.
      */
     public void init() {
         init((String) null);
     }
-    
-    
+
+
     /**
      * Initializes unitils with the given custom configuration file
-     * 
+     *
      * @param customConfigurationFileName The name of the custom configuration file
      */
     public void init(String customConfigurationFileName) {
@@ -109,11 +111,12 @@ public class Unitils implements Module {
         Properties properties = configurationLoader.loadConfiguration(customConfigurationFileName);
         init(properties);
     }
-    
+
     /**
      * Initializes Unitils with the given configuration. All the modules that are configured in the given configuration
      * are also created and initialized with this configuration.
-     * @param configuration
+     *
+     * @param configuration The config, not null
      */
     public void init(Properties configuration) {
         this.configuration = configuration;
@@ -124,6 +127,7 @@ public class Unitils implements Module {
     /**
      * Creates a new instance of {@link TestListener}. This instance provides hook callback methods that enable intervening
      * during the execution of unit tests.
+     *
      * @return A new instance of {@link TestListener}
      */
     public TestListener createTestListener() {
@@ -133,6 +137,7 @@ public class Unitils implements Module {
 
     /**
      * Returns the {@link ModulesRepository} that provides access to the modules that are configured in unitils.
+     *
      * @return the {@link ModulesRepository}
      */
     public ModulesRepository getModulesRepository() {
@@ -143,6 +148,7 @@ public class Unitils implements Module {
     /**
      * Returns the {@link TestContext} that, during the execution of the test suite, keeps track of the current test
      * object, class and test method that are executing.
+     *
      * @return the {@link TestContext}
      */
     public TestContext getTestContext() {
@@ -152,6 +158,7 @@ public class Unitils implements Module {
 
     /**
      * Returns all properties that are used to configure unitils and the different modules.
+     *
      * @return a <code>Properties</code> object
      */
     public Properties getConfiguration() {
@@ -162,7 +169,8 @@ public class Unitils implements Module {
     /**
      * Configures all unitils modules using the given <code>Properties</code> object, and stores them in a {@link
      * ModulesRepository}. The configuration of the modules is delegated to a {@link ModulesLoader} instance.
-     * @param configuration
+     *
+     * @param configuration The config, not null
      * @return a new {@link ModulesRepository}
      */
     protected ModulesRepository createModulesRepository(Properties configuration) {
@@ -176,7 +184,7 @@ public class Unitils implements Module {
      * Implementation of {@link TestListener} that ensures that at every point during the run of a test, every {@link
      * Module} gets the chance of performing some behavior, by calling the {@link TestListener} of each module in turn.
      * Also makes sure that the state of the instance of {@link TestContext} returned by {@link Unitils#getTestContext()}
-     * is correctly set to the current test class, test object and test method.  
+     * is correctly set to the current test class, test object and test method.
      */
     private class UnitilsTestListener extends TestListener {
 
@@ -237,7 +245,7 @@ public class Unitils implements Module {
 
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod) {
+        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
@@ -245,7 +253,7 @@ public class Unitils implements Module {
 
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
-                modulesRepository.getTestListener(module).afterTestMethod(testObject, testMethod);
+                modulesRepository.getTestListener(module).afterTestMethod(testObject, testMethod, throwable);
             }
         }
 
