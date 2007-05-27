@@ -73,6 +73,11 @@ Summary
 
 * News
 ~~~~~~
+    <<2007-03-15 - Article on Spring site>>
+  
+    The {{{spring_article.html}Testing Spring - Hibernate applications with Unitils}} article was posted on the Spring site, demonstrating 
+    how one can use Unitils to easily test Spring-Hibernate applications.    
+    
     <<2007-04-22 - Release of Unitils 1.0 rc 2>>
   
     Release candidate 2 for Unitils is available. It contains fixes for reported issues and support for extra databases such as PostgreSql and 
