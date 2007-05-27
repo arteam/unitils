@@ -286,7 +286,7 @@ database.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 +-----+
 database.userName=john
 database.password=secret
-database.schemaName=test_john
+database.schemaNames=test_john
 +-----+
 
     Each of these unitils-local.properties files should be placed in the corresponding home folders of the user's (<System.getProperty("user.home")>). 
@@ -543,7 +543,7 @@ database.driverClassName=oracle.jdbc.driver.OracleDriver
 database.url=jdbc:oracle:thin:@yourmachine:1521:YOUR_DB
 database.userName=john
 database.password=secret
-database.schemaName=test_john
+database.schemaNames=test_john
 +-----+
 
     As described in the {{{#Configuration}Configuration}} section you would typically put the driver and url properties in the project's <unitils.properties> setting them for 
@@ -581,6 +581,43 @@ Connection connection = dataSource.getConnection();
 +-----+
 
 
+*** {Using multi-schema data sets}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Sometimes applications connect to more than one database schema. To facilitate this, Unitils extended the data set xml definition to allow it to 
+    contain data for multiple schemas. Following example loads data for tables in 2 different schemas:
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns="SCHEMA_A" xmlns:b="SCHEMA_B">
+    <user id="1" userName="jack" />    
+    <b:role id="1" roleName="admin" />
+</dataset>
++-----+    
+
+    In this case we defined 2 schemas, <SCHEMA_A> and <SCHEMA_B>. The first schema, <SCHEMA_A>, is linked to the default xml namespace, the second schema, <SCHEMA_B>, is 
+    linked to xml namespace b. If a table xml element is prefixed with namespace b, the table is expected to be in schema <SCHEMA_B>, if it doesn't have a namespace
+    prefix it is considered to be in SCHEMA_A. In the example, the <SCHEMA_A.user> and <SCHEMA_B.role> tables will first be emptied and then loaded with the specified 
+    records. 
+    
+    If no default namespace is specified, it is by default set to the first schema name in the <database.schemaNames> list. So suppose you have defined following
+    schema names:
+    
++-----+
+database.schemaNames=SCHEMA_A, SCHEMA_B
++-----+   
+
+    This will make <SCHEMA_A> the default schema. You can then simplify the above data set example by leaving out the default namespace declaration:
+    
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:b="SCHEMA_B">
+    <user id="1" userName="jack" />    
+    <b:role id="1" roleName="admin" />
+</dataset>
++-----+    
+
+
 
 * {Unit test database maintenance}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -606,6 +643,10 @@ Connection connection = dataSource.getConnection();
     []
     
     Following section describes how Unitils provides support for these 2 last guidelines: automatic test database schema maintenance and constraints disabling.
+
+
+** {Maintaining the database structure}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     A powerful <DBMaintainer> is provided to automatically update each developer's individual database schema when needed. It will check whether 
     database structure updates are available and apply them if necessary. To avoid unintended updates to the database, this database maintainer is disabled
@@ -660,23 +701,40 @@ dbscripts/ 001_initial.sql
     By default the database maintainer will store the current version of a database schema in a <DB_VERSION> table. This way, it can determine whether the database is 
     up to date or not. This table will automatically be created if it does not yet exist.
 
+
+** {Preserving items}
+~~~~~~~~~~~~~~~~~~~~~
+
     Before doing an update, all data in the database is deleted. This is done to avoid errors executing update scripts that add not-null columns or foreign keys 
     to existing tables. Sometimes, you can have tables of which the content may not be deleted. E.g. a table that contains read-only data such as configuration 
     settings. To enable this, it is possible to specify a number of tables for which the data should be preserved. If tables, sequences... may not be dropped when 
     rebuilding the schema from scratch, the database maintainer can also be configured to preserve these items. 
     
 +-----+
-dbMaintainer.cleanDb.tablesToPreserve=CONFIG_TABLE, USER_TABLE  // will not be cleared (but still dropped)
-dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be dropped or cleared
+dbMaintainer.preserve.schemas=
+dbMaintainer.preserve.tables=USER_TABLE
+dbMaintainer.preserve.views=
+dbMaintainer.preserve.synonyms=
+dbMaintainer.preserve.sequences=PK_SEQUENCE
+
+dbMaintainer.preserveOnlyData.schemas=
+dbMaintainer.preserveOnlyData.tables=CONFIGURATION_SETTINGS
 +-----+
     
+    The first set of properties define the tables, views etc. that should be left untouched by the database maintainer. These will not be dropped or cleared. The last
+    properties define tables that should not be emptied when updating the database. They however will be dropped when the database is rebuilt from scratch.
+        
+
+** {Disabling constraints and updating sequences}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     The database maintainer does more than just update the schema structure. After each update, it performs following actions:
 
     * <Disable foreign key and not-null constraints>
 
     * <Update sequences to a high value>
 
-    * <Generate a DTD of the schema structure>
+    * <Generate an XSD or DTD of the schema structure>
 
     []
     
@@ -687,20 +745,6 @@ dbMaintainer.clearDb.itemsToPreserve=SPECIAL_TABLE, MY_SEQUENCE // will not be d
     All sequences and identity columns are updated to a sufficiently high initial value (1000 by default). This way, you can use fixed primary key values 
     when inserting test data, avoiding conflicts with for example primary key sequences.
     
-    The generated DTD describes the structure of the database in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} 
-    format. If you're using an IDE like Eclipse or IntelliJ, this generated DTD can help you create data sets more quickly and with less chances of writing errors.
-    Just add a doctype declaration to your data set pointing to the DTD file and the IDE will offer you auto-completion and validation while you are editing the file. 
-    
-+-----+
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE dataset SYSTEM "../dtds/database.dtd">
-
-<dataset>
-    <user userName="jack" active="true" />
-    <user userName="jim"  active="false" />
-</dataset>
-+-----+
-        
     The database maintainer is highly configurable. You can switch on or off things like constraints disabling, disable from scratch updates... Consult the
     {{{unitils-default.properties} unitils-default.properties}} for a list of possible configuration settings and their values. 
     
@@ -713,14 +757,51 @@ database.dialect=oracle
         
     Currently there is support for following databases:
     
-    * Oracle: Tested with version 9i
+    * <<Oracle>> - Tested with version 9i, 10g, 10XE
     
-    * Hsqldb: Tested with version 1.8.0
+    * <<Hsqldb>> - Tested with version 1.8.0
     
-    * MySQL: Tested with version 5.0
+    * <<MySQL>> - Tested with version 5.0
+    
+    * <<PostgreSQL>> - Tested with version 8.2
+    
+    * <<DB2>> - Tested with version 9
 
     []
  
+
+** {Generating an XSD or DTD of the database structure}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    The generated DTD describes the structure of the database in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} 
+    format. If you're using an IDE like Eclipse or IntelliJ, this generated DTD can help you create data sets more quickly and with less chances of writing errors.
+    
++-----+
+dataSetStructureGenerator.xsd.dirName=c:/xsds
++-----+
+
+    For backward compatibility reasons, a DTD can also be generated instead of an XSD. This DTD however does not support multiple database schemas. Only the structure 
+    of the default database schema, i.e. the first one in the <database.schemaNames> list will be described. You can switch to the DTD generator by setting following properties:
+    
++-----+
+org.unitils.dbmaintainer.structure.DataSetStructureGenerator.implClassName=org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator
+dataSetStructureGenerator.dtd.filename=c:/dtds/MyDatabase.dtd
++-----+
+
+    This will generate a DTD at the specified location. You can then use this DTD in your data set by adding a doctype declaration 
+    pointing to the DTD file. As with XDS, the IDE will then offer you auto-completion and validation while you are editing the file. 
+    
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE dataset SYSTEM "c:/dtds/database.dtd">
+
+<dataset>
+    <user userName="jack" active="true" />
+    <user userName="jim"  active="false" />
+</dataset>
++-----+
+        
+    
  
 
 
@@ -1091,7 +1172,7 @@ public void setUserService(UserService userService) {
     You could for example create a <unitils-local.properties> that lets Unitils connect to the developers own unit-test database:
 
 +-----+
-database.schemaName=UNIT_TEST_JOHN
+database.schemaNames=UNIT_TEST_JOHN
 database.userName=john
 database.password=1234
 +-----+    
