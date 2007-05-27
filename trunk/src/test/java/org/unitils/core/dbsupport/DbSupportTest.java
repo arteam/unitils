@@ -54,9 +54,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
     /* Instance under test */
     protected DbSupport dbSupport;
 
-    /* True if current test is not for the current dialect */
-    protected boolean disabled;
-
 
     /**
      * Creates a new test for the given db support instance
@@ -80,10 +77,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         // todo multiple schema names
         String schemaName = PropertyUtils.getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
-        disabled = !testDatabaseDialect.equals(databaseDialect);
-        if (disabled) {
-            return;
-        }
         dbSupport.init(configuration, new SQLHandler(dataSource), schemaName);
 
         cleanupTestDatabase();
@@ -97,9 +90,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        if (disabled) {
-            return;
-        }
         cleanupTestDatabase();
     }
 
@@ -108,10 +98,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the table names.
      */
     public void testGetTableNames() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Set<String> result = dbSupport.getTableNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL quoting behavior: quoted identifiers are not treated as case sensitive.
@@ -126,10 +112,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the column names.
      */
     public void testGetColumnNames() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Set<String> result = dbSupport.getColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
         assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1"), dbSupport.toCorrectCaseIdentifier("col2")), result);
     }
@@ -139,10 +121,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the primary column names.
      */
     public void testGetPrimaryKeyColumnNames() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Set<String> result = dbSupport.getPrimaryKeyColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
         assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1")), result);
     }
@@ -152,10 +130,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the not null column names.
      */
     public void testGetNotNullColummnNames() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Set<String> result = dbSupport.getNotNullColummnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
         assertLenEquals(Arrays.asList(dbSupport.toCorrectCaseIdentifier("col1"), dbSupport.toCorrectCaseIdentifier("col2")), result);
     }
@@ -165,10 +139,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the table names but no tables in db.
      */
     public void testGetTableNames_noFound() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         cleanupTestDatabase();
         Set<String> result = dbSupport.getTableNames();
         assertTrue(result.isEmpty());
@@ -179,10 +149,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the view names.
      */
     public void testGetViewNames() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Set<String> result = dbSupport.getViewNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL quoting behavior: quoted identifiers are not treated as case sensitive.
@@ -197,10 +163,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the view names but no views in db.
      */
     public void testGetViewNames_noFound() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         cleanupTestDatabase();
         Set<String> result = dbSupport.getViewNames();
         assertTrue(result.isEmpty());
@@ -211,7 +173,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the synonym names.
      */
     public void testGetSynonymNames() throws Exception {
-        if (disabled || !dbSupport.supportsSynonyms()) {
+        if (!dbSupport.supportsSynonyms()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -224,7 +186,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the synonym names but no synonym in db.
      */
     public void testGetSynonymNames_noFound() throws Exception {
-        if (disabled || !dbSupport.supportsSynonyms()) {
+        if (!dbSupport.supportsSynonyms()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -238,7 +200,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the sequence names.
      */
     public void testGetSequenceNames() throws Exception {
-        if (disabled || !dbSupport.supportsSequences()) {
+        if (!dbSupport.supportsSequences()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -251,7 +213,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the sequence names but no sequences in db.
      */
     public void testGetSequenceNames_noFound() throws Exception {
-        if (disabled || !dbSupport.supportsSequences()) {
+        if (!dbSupport.supportsSequences()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -265,7 +227,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the trigger names.
      */
     public void testGetTriggerNames() throws Exception {
-        if (disabled || !dbSupport.supportsTriggers()) {
+        if (!dbSupport.supportsTriggers()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -283,7 +245,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the trigger names but no triggers in db.
      */
     public void testGetTriggerNames_noFound() throws Exception {
-        if (disabled || !dbSupport.supportsTriggers()) {
+        if (!dbSupport.supportsTriggers()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -297,7 +259,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the user-defined type names.
      */
     public void testGetTypeNames() throws Exception {
-        if (disabled || !dbSupport.supportsTypes()) {
+        if (!dbSupport.supportsTypes()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -310,7 +272,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting the user-defined types names but no user-defined types in db.
      */
     public void testGetTypeNames_noFound() throws Exception {
-        if (disabled || !dbSupport.supportsTypes()) {
+        if (!dbSupport.supportsTypes()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -324,7 +286,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests incrementing the current value of the primary key.
      */
     public void testIncrementIdentityColumnToValue() throws Exception {
-        if (disabled || !dbSupport.supportsIdentityColumns()) {
+        if (!dbSupport.supportsIdentityColumns()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -341,11 +303,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests dropping a table.
      */
     public void testDropTable() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // Drop cascade does not work in MySQL. Therefore we first need to
             // drop 'Test_CASE_Table' and only then test_table.
@@ -367,11 +324,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests dropping a view.
      */
     public void testDropView() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
-
         Set<String> viewNames = dbSupport.getViewNames();
         for (String viewName : viewNames) {
             dbSupport.dropView(viewName);
@@ -385,7 +337,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests dropping a type.
      */
     public void testDropType() throws Exception {
-        if (disabled || !dbSupport.supportsTypes()) {
+        if (!dbSupport.supportsTypes()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -403,7 +355,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests incrementing and getting the current sequence value.
      */
     public void testGetCurrentValueOfSequence() throws Exception {
-        if (disabled || !dbSupport.supportsSequences()) {
+        if (!dbSupport.supportsSequences()) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
@@ -418,10 +370,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests getting all foreign key constraints for the test table.
      */
     public void testGetTableConstraintNames_foreignKey() throws Exception {
-        if (disabled || !dbSupport.supportsGetTableConstraintNames()) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Set<String> result = dbSupport.getForeignKeyConstraintNames("Test_CASE_Table");
         assertEquals(1, result.size());
     }
@@ -431,10 +379,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests disabling a foreign key constraint on the test table.
      */
     public void testRemoveForeignKeyConstraint() throws Exception {
-        if (disabled || !dbSupport.supportsGetTableConstraintNames()) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         Set<String> constraintNames = dbSupport.getForeignKeyConstraintNames("Test_CASE_Table");
         for (String constraintName : constraintNames) {
             dbSupport.removeForeignKeyConstraint("Test_CASE_Table", constraintName);
@@ -448,12 +392,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests disabling not null constraints on the test table.
      */
     public void testRemoveNotNullConstraint() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), dbSupport.toCorrectCaseIdentifier("col2"));
-
         // should succeed now
         executeUpdate("insert into test_table (col1, col2) values (1, null)", dataSource);
     }
@@ -463,10 +402,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests disabling not null constraints on the test table but with an unexisting column
      */
     public void testRemoveNotNullConstraint_columnNotFound() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         try {
             dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "xxxx");
             fail("UnitilsException expected.");
@@ -480,10 +415,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests disabling not null constraints on the test table but with an unexisting table name.
      */
     public void testRemoveNotNullConstraint_tableNotFound() throws Exception {
-        if (disabled) {
-            logger.warn("Test is not for current dialect. Skipping test.");
-            return;
-        }
         try {
             dbSupport.removeNotNullConstraint("xxxx", "col2");
             fail("UnitilsException expected.");

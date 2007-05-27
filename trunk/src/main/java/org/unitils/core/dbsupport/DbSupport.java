@@ -553,6 +553,7 @@ abstract public class DbSupport {
         return false;
     }
 
+
     /**
      * Indicates whether the underlying DBMS supports identity columns
      *
@@ -561,18 +562,5 @@ abstract public class DbSupport {
     public boolean supportsIdentityColumns() {
         return false;
     }
-
-
-    /**
-     * todo remove
-     * <p/>
-     * Indicates whether the underlying DBMS supports getting table constraint names.
-     *
-     * @return True if getting constraint names is supported, false otherwise
-     */
-    public boolean supportsGetTableConstraintNames() {
-        return false;
-    }
-
 
 }
