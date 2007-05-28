@@ -309,10 +309,12 @@
     </library>
     <library name="unitils-1.0-rc-3">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/unitils-1.0-rc-3.jar!/" />
+        <root url="file://D:/_tim/unitils/trunk/target/classes" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="file://D:/_tim/unitils/trunk/src/main/java" />
+      </SOURCES>
     </library>
   </component>
   <component name="uidesigner-configuration">

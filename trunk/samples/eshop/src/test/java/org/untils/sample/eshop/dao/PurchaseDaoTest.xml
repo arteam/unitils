@@ -1,12 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<dataset>
-    <user id="1" />
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="dataset.xsd">
+
+    <USER ID="1"/>
     <!-- purchase 1 -->
-    <purchase id="1" user_id="1" />
-    <purchase_item id="1" purchase_id="1" amount="5" />
-    <purchase_item id="2" purchase_id="1" amount="10" />
+    <PURCHASE ID="1" USER_ID="1"/>
+    <PURCHASE_ITEM ID="1" PURCHASE_ID="1" AMOUNT="5"/>
+    <PURCHASE_ITEM ID="2" PURCHASE_ID="1" AMOUNT="10"/>
 
     <!-- purchase 2 -->
-    <purchase id="2" user_id="1" />
-    <purchase_item id="21" purchase_id="2" amount="15" />
+    <PURCHASE ID="2" USER_ID="1"/>
+    <PURCHASE_ITEM ID="21" PURCHASE_ID="2" AMOUNT="15"/>
+
 </dataset>

@@ -15,45 +15,39 @@
  */
 package org.untils.sample.eshop.dao;
 
-import org.dbunit.DBTestCase;
-import org.dbunit.PropertiesBasedJdbcDatabaseTester;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.dbunit.annotation.DataSet;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.sample.eshop.dao.PurchaseDao;
 import org.unitils.sample.eshop.model.User;
+import org.unitils.spring.annotation.SpringApplicationContext;
+import org.unitils.spring.annotation.SpringBean;
 
 /**
- * 
+ * todo javadoc
  */
-public class PurchaseDaoTest extends DBTestCase {
+@DataSet
+@SpringApplicationContext({"eshop-config.xml", "test-config.xml"})
+public class PurchaseDaoTest extends UnitilsJUnit4 {
 
-    private PurchaseDao purchaseDao = new PurchaseDao();
+    /* Object under test */
+    @SpringBean("purchaseDao")
+    private PurchaseDao purchaseDao;
 
-    public PurchaseDaoTest(String string) {
-        super(string);
-        System.setProperty( PropertiesBasedJdbcDatabaseTester.DBUNIT_DRIVER_CLASS, "org.hsqldb.jdbcDriver");
-        System.setProperty( PropertiesBasedJdbcDatabaseTester.DBUNIT_CONNECTION_URL,
-                "jdbc:hsqldb:hsql://localhost/eshop");
-        System.setProperty( PropertiesBasedJdbcDatabaseTester.DBUNIT_USERNAME, "sa");
-        System.setProperty( PropertiesBasedJdbcDatabaseTester.DBUNIT_PASSWORD, "");
-	    System.setProperty( PropertiesBasedJdbcDatabaseTester.DBUNIT_SCHEMA, "ESHOP");
+    /* Test user */
+    private User testUser;
+
+
+    @Before
+    public void initializeFixture() {
+        testUser = new User(1L, null, 0);
     }
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("eshop-config.xml");
-        purchaseDao = (PurchaseDao) applicationContext.getBean("purchaseDao");
-    }
-
+    @Test
     public void testCalculateTotalPurchaseAmount() {
-        long totalAmount = purchaseDao.calculateTotalPurchaseAmount(new User(1L, null, 0));
-        assertEquals(30, totalAmount); 
-    }
-
-    protected IDataSet getDataSet() throws Exception {
-        return new FlatXmlDataSet(getClass().getResourceAsStream("PurchaseDaoTest.xml"));
+        Long totalAmount = purchaseDao.calculateTotalPurchaseAmount(testUser);
+        assertLenEquals(30, totalAmount);
     }
 }

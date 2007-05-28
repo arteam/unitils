@@ -773,19 +773,82 @@ database.dialect=oracle
 ** {Generating an XSD or DTD of the database structure}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    The generated DTD describes the structure of the database in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} 
-    format. If you're using an IDE like Eclipse or IntelliJ, this generated DTD can help you create data sets more quickly and with less chances of writing errors.
+    After updating the database structure, the database maintainer will also generate some xml schemas (XSD) that describe the structure of the database. These XSDs 
+    can help you create data sets more quickly and with less chances of writing errors. If you're using an IDE like Eclipse or IntelliJ, these can offer you
+    code-completion and give warnings and errors when there is something incorrect in your datasets.
+    
+    The database maintainer will generate 1 XSD for each configured database schema. The XSDs will have the same name as the corresponding database schemas, 
+    e.g. <SCHEMA_A.xsd>. Next to these schema XSDs, a general <dataset.xsd> will also be generated. This XSD bundles all schema XSDs. This is the one you 
+    will need to use in your XML declaration.
+    
+    The target location for the XSDs is configured by setting following property:
     
 +-----+
-dataSetStructureGenerator.xsd.dirName=c:/xsds
+dataSetStructureGenerator.xsd.dirName=target/xsd
 +-----+
-
+    
+    The directory will be created by the database maintainer if it does not exist yet. Suppose you are using 2 database schemas: 
+    
++-----+
+database.schemaNames=SCHEMA_A, SCHEMA_B
++-----+    
+    
+    Because <SCHEMA_A> is the first schema in the list, it is considered to be the default database schema. The database maintainer will generate 3 XSDs for this:
+    
++-----+
+target/xsd/ dataset.xsd
+target/xsd/ SCHEMA_A.xsd
+target/xsd/ SCHEMA_B.xsd
++-----+    
+    
+    The schema XSDs, <SCHEMA_A.xsd> and <SCHEMA_B.xsd>, have a targetNamespace set to <SCHEMA_A> and <SCHEMA_B> respectively. This means that you need to declare a namespace to 
+    use them. We actually already showed an example of this in the {{{#Using multi-schema data sets}Using multi-schema data sets}} section. The <dataset.xsd>, bundles
+    these 2 namespaces and also adds the structure of the default schema, <SCHEMA_A>, to the default (no-prefix) namespace. This is the xsd that you should use by 
+    adding it as a <noNamespaceSchemaLocation> in your dataset xml.
+    
+    Let's clarify this using an example dataset that uses the <dataset.xsd>:
+    
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="target/xsd/dataset.xsd"
+         xmlns:a="SCHEMA_A" xmlns:b="SCHEMA_B">
+         
+    <user id="1" userName="jack" />    
+    <a:user id="1" userName="jack" />    
+    <b:role id="1" roleName="admin" />
+    
+</dataset>
++-----+
+    
+    The first 2 attributes of the dataset element configure the XSD of the dataset to point to the <dataset.xsd>. This actually configures the validation of 
+    3 namespaces: the default namespace, the <SCHEMA_A> namespace and the <SCHEMA_B> namespace. The last 2 attributes configure the usage of the <SCHEMA_A> and <SCHEMA_B> namespace. 
+    
+    As a result, the user table element (without namespace prefix) is validated against the default database schema structure, i.e. <SCHEMA_A>. The same is true for the user 
+    element that is explicitly prefixed with the <SCHEMA_A> namespace (prefix a). The role table element is prefixed with the <SCHEMA_B> namespace and will thus be validated
+    against the <SCHEMA_B> database structure.
+    
+    If you only use 1 database schema, there is no need to use namespaces, you can just use the default namespace. For example suppose the above 
+    example only used a single database schema, you would get following data set.
+    
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="target/xsd/dataset.xsd">
+         
+    <user id="1" userName="jack" />    
+    <user id="1" userName="jack" />    
+    <role id="1" roleName="admin" />
+    
+</dataset>
++-----+    
+    
     For backward compatibility reasons, a DTD can also be generated instead of an XSD. This DTD however does not support multiple database schemas. Only the structure 
-    of the default database schema, i.e. the first one in the <database.schemaNames> list will be described. You can switch to the DTD generator by setting following properties:
+    of the default database schema, i.e. the first one in the <database.schemaNames> list will be described. 
+    
+    You can switch to the DTD generator by setting following properties:
     
 +-----+
 org.unitils.dbmaintainer.structure.DataSetStructureGenerator.implClassName=org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator
-dataSetStructureGenerator.dtd.filename=c:/dtds/MyDatabase.dtd
+dataSetStructureGenerator.dtd.filename=target/dtd/MyDatabase.dtd
 +-----+
 
     This will generate a DTD at the specified location. You can then use this DTD in your data set by adding a doctype declaration 
@@ -793,7 +856,7 @@ dataSetStructureGenerator.dtd.filename=c:/dtds/MyDatabase.dtd
     
 +-----+
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE dataset SYSTEM "c:/dtds/database.dtd">
+<!DOCTYPE dataset SYSTEM "target/dtd/database.dtd">
 
 <dataset>
     <user userName="jack" active="true" />
