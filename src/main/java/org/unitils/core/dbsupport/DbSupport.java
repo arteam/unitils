@@ -31,6 +31,8 @@ import java.util.Set;
  * Helper class that implements a number of common operations on a database schema. Operations that can be implemented
  * using general JDBC or ANSI SQL constructs, are impelemented in this base abstract class. Operations that are DBMS
  * specific are abstract, and their implementation is left to DBMS specific subclasses.
+ * <p/>
+ * todo add getIdentityColumns
  *
  * @author Filip Neven
  * @author Frederick Beernaert

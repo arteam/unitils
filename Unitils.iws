@@ -18,9 +18,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/SQLHandler.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/SQLHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestListener.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/TestListener.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\samples\eshop\lib\unitils-1.0-rc-3-20070507-1.jar" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/test/java/org/untils/sample/eshop/model/ProductPriceTest.java" afterPath="$PROJECT_DIR$/samples/eshop/src/test/java/org/untils/sample/eshop/model/ProductPriceTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/db/eshop.properties" afterPath="$PROJECT_DIR$/samples/eshop/db/eshop.properties" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/samples/eshop/db/dtd" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/samples/eshop/lib/unitils-1.0-rc-3.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/eshop.iws" afterPath="$PROJECT_DIR$/samples/eshop/eshop.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/eshop.iml" afterPath="$PROJECT_DIR$/samples/eshop/eshop.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/test/java/org/untils/sample/eshop/BaseHibernateTest.java" afterPath="$PROJECT_DIR$/samples/eshop/src/test/java/org/untils/sample/eshop/BaseHibernateTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/main/resources/log4j.xml" afterPath="$PROJECT_DIR$/samples/eshop/src/main/resources/log4j.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/test/resources/unitils.properties" afterPath="$PROJECT_DIR$/samples/eshop/src/test/resources/unitils.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/eshop.ipr" afterPath="$PROJECT_DIR$/samples/eshop/eshop.ipr" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -169,26 +180,7 @@
     <option name="myCurrentFavoritesList" value="Unitils" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="DbSupport.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="307" column="0" selection-start="9856" selection-end="9856" vertical-scroll-proportion="0.55749637">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DbSupportTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/DbSupportTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="417" column="0" selection-start="14372" selection-end="14372" vertical-scroll-proportion="0.88355166">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -1449,13 +1441,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="30" y="-4" width="1574" height="1208" extended-state="0" />
-    <editor active="false" />
+    <frame x="34" y="0" width="1566" height="1200" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
-      <window_info id="TODO" active="true" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3287037" order="7" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287037" order="7" />
       <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3548387" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41296297" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24946696" order="1" />
@@ -1612,13 +1604,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/DbSupportTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="417" column="0" selection-start="14372" selection-end="14372" vertical-scroll-proportion="0.88355166">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/Db2DbSupport.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="180" column="16" selection-start="5961" selection-end="5961" vertical-scroll-proportion="0.3326978">
@@ -1663,7 +1648,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/dbsupport/DbSupport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="307" column="0" selection-start="9856" selection-end="9856" vertical-scroll-proportion="0.55749637">
+        <state line="34" column="30" selection-start="1441" selection-end="1441" vertical-scroll-proportion="0.38894185">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/core/dbsupport/DbSupportTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="417" column="0" selection-start="14372" selection-end="14372" vertical-scroll-proportion="0.5786463">
           <folding />
         </state>
       </provider>

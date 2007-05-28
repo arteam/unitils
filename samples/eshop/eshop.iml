@@ -16,6 +16,7 @@
     <orderEntry type="library" name="all-deps" level="project" />
     <orderEntry type="library" name="unitils-1.0-rc-3-20070426-1" level="project" />
     <orderEntry type="library" name="unitils-1.0-rc-3-20070507-1" level="project" />
+    <orderEntry type="library" name="unitils-1.0-rc-3" level="project" />
     <orderEntryProperties />
   </component>
 </module>
