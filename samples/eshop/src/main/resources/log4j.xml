@@ -10,7 +10,7 @@
     </appender>
 
     <logger name="org.unitils">
-        <level value="INFO" />        
+        <level value="DEBUG" />        
     </logger>
 
     <root>
