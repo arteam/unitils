@@ -15,17 +15,22 @@
  */
 package org.unitils.database;
 
-import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.reset;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.database.config.DataSourceFactory;
-import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import junit.framework.TestCase;
+
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.Unitils;
+import org.unitils.database.config.DataSourceFactory;
+import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
+import org.unitils.spring.SpringModule;
 
 /**
  * Base class for tests that verify the transactional behavior of the database module
@@ -99,5 +104,14 @@ abstract public class DatabaseModuleTransactionalTest extends TestCase {
             }
         }
     }
+    
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
+    
+    protected SpringModule getSpringModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
+    }
+
 
 }

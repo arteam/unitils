@@ -15,13 +15,18 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.*;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.transaction.SimpleTransactionManager;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.unitils.database.transaction.TransactionMode.COMMIT;
 import static org.unitils.database.transaction.TransactionMode.DISABLED;
+import static org.unitils.database.transaction.TransactionMode.ROLLBACK;
 
 import java.sql.Connection;
+
+import org.unitils.core.Unitils;
+import org.unitils.database.annotations.Transactional;
+import org.unitils.database.transaction.SimpleTransactionManager;
 
 /**
  * Tests verifying whether the SimpleTransactionManager functions correctly.
@@ -45,14 +50,23 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
     public void setUp() throws Exception {
         super.setUp();
 
-        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", SimpleTransactionManager.class.getName());
-        databaseModule = new DatabaseModule();
-        databaseModule.init(configuration);
+        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", 
+                SimpleTransactionManager.class.getName());
+        Unitils.getInstance().init(configuration);
+        
+        databaseModule = getDatabaseModule();
         databaseModule.initTransactionManager();
 
         transactionsDisabledTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
+
+    }
+    
+    
+    @Override
+    public void tearDown() throws Exception {
+        Unitils.getInstance().init();
     }
 
 
@@ -135,6 +149,7 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
      * Class that plays the role of a unit test, with transaction rollback enabled (=default,
      * so no @Transactional annotation required
      */
+    @Transactional(ROLLBACK)
     public static class RollbackTest {
 
         public void test() {

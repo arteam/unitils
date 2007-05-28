@@ -15,16 +15,21 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.springframework.jdbc.datasource.DataSourceUtils.getConnection;
 import static org.springframework.jdbc.datasource.DataSourceUtils.releaseConnection;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.transaction.AutoDetectTransactionManager;
 import static org.unitils.database.transaction.TransactionMode.COMMIT;
 import static org.unitils.database.transaction.TransactionMode.DISABLED;
-import org.unitils.spring.annotation.SpringApplicationContext;
+import static org.unitils.database.transaction.TransactionMode.ROLLBACK;
 
 import java.sql.Connection;
+
+import org.unitils.core.Unitils;
+import org.unitils.database.annotations.Transactional;
+import org.unitils.database.transaction.AutoDetectTransactionManager;
+import org.unitils.spring.annotation.SpringApplicationContext;
 
 /**
  * Tests verifying whether the AutoDetectTransactionManager functions correctly.
@@ -51,10 +56,11 @@ public class DatabaseModuleAutoDetectTransactionManagerTest extends DatabaseModu
     public void setUp() throws Exception {
         super.setUp();
 
-        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", AutoDetectTransactionManager.class.getName());
-        databaseModule = new DatabaseModule();
-        databaseModule.init(configuration);
-        databaseModule.registerSpringDataSourceBeanPostProcessor();
+        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", 
+                AutoDetectTransactionManager.class.getName());
+        Unitils.getInstance().init(configuration);
+        
+        databaseModule = getDatabaseModule();
         databaseModule.initTransactionManager();
 
         transactionsDisabledTest = new TransactionsDisabledTest();
@@ -62,6 +68,12 @@ public class DatabaseModuleAutoDetectTransactionManagerTest extends DatabaseModu
         noApplicationContextCommitTest = new NoApplicationContextCommitTest();
         applicationContextRollbackTest = new ApplicationContextRollbackTest();
         applicationContextCommitTest = new ApplicationContextCommitTest();
+    }
+    
+    
+    @Override
+    public void tearDown() throws Exception {
+        Unitils.getInstance().init();
     }
 
 
@@ -188,6 +200,7 @@ public class DatabaseModuleAutoDetectTransactionManagerTest extends DatabaseModu
      * Class that plays the role of a unit test, with transaction rollback enabled (=default,
      * so no @Transactional annotation required
      */
+    @Transactional(ROLLBACK)
     public static class NoApplicationContextRollbackTest {
 
         public void test() {
@@ -212,6 +225,7 @@ public class DatabaseModuleAutoDetectTransactionManagerTest extends DatabaseModu
      * annotation required
      */
     @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
+    @Transactional(ROLLBACK)
     public static class ApplicationContextRollbackTest {
 
         public void test() {

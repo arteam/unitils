@@ -15,15 +15,21 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.springframework.jdbc.datasource.DataSourceUtils.getConnection;
 import static org.springframework.jdbc.datasource.DataSourceUtils.releaseConnection;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.transaction.SpringIntegratingTransactionManager;
 import static org.unitils.database.transaction.TransactionMode.COMMIT;
-import org.unitils.spring.annotation.SpringApplicationContext;
+import static org.unitils.database.transaction.TransactionMode.DISABLED;
+import static org.unitils.database.transaction.TransactionMode.ROLLBACK;
 
 import java.sql.Connection;
+
+import org.unitils.core.Unitils;
+import org.unitils.database.annotations.Transactional;
+import org.unitils.database.transaction.SpringIntegratingTransactionManager;
+import org.unitils.spring.annotation.SpringApplicationContext;
 
 /**
  * Tests verifying whether the SpringIntegratingTransactionManagerTest functions correctly.
@@ -46,16 +52,23 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
     @Override
     public void setUp() throws Exception {
         super.setUp();
-
-        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", SpringIntegratingTransactionManager.class.getName());
-        databaseModule = new DatabaseModule();
-        databaseModule.init(configuration);
-        databaseModule.registerSpringDataSourceBeanPostProcessor();
+        
+        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", 
+                SpringIntegratingTransactionManager.class.getName());
+        Unitils.getInstance().init(configuration);
+        
+        databaseModule = getDatabaseModule();
         databaseModule.initTransactionManager();
 
         noApplicationContextTest = new NoApplicationContextTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
+    }
+    
+    
+    @Override
+    public void tearDown() throws Exception {
+        Unitils.getInstance().init();
     }
 
 
@@ -128,6 +141,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * Class that plays the role of a unit test, with transaction rollback enabled, but no
      * spring application context configured, so no transaction will be started
      */
+    @Transactional(DISABLED)
     public static class NoApplicationContextTest {
 
         public void test() {
@@ -141,6 +155,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * annotation required
      */
     @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
+    @Transactional(ROLLBACK)
     public static class RollbackTest {
 
         public void test() {
