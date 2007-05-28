@@ -16,20 +16,10 @@
 package org.unitils.sample.eshop.model;
 
 
-import static java.util.Arrays.asList;
-import javax.persistence.Embeddable;
-import javax.persistence.OneToMany;
-import javax.persistence.JoinColumn;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
+import static java.util.Arrays.asList;
 import java.util.List;
-import java.util.Arrays;
 
 /**
  * Composite object that represents the price of a Product. Can be a simple price, or can consist of a price table
@@ -42,7 +32,8 @@ public class ProductPrice {
     @JoinColumn(name = "PRODUCT_ID")
     private List<PriceTableItem> priceTable = new ArrayList<PriceTableItem>();
 
-    protected ProductPrice() {}
+    protected ProductPrice() {
+    }
 
     /**
      * Constructs a simple ProductPrice object, in which a single price is used whatever amount of products is bought
@@ -56,7 +47,7 @@ public class ProductPrice {
     /**
      * Constructs a ProductPrice object, in which the given priceTable is used to defer the price. Typically, lower
      * prices are used when ordering a larger amount of products
-     * 
+     *
      * @param priceTable The priceTable that will be used for defering the price of a Product.
      */
     public ProductPrice(List<PriceTableItem> priceTable) {
@@ -74,6 +65,9 @@ public class ProductPrice {
                 applicablePriceTableItem = priceTableItem;
             }
         }
+        if (applicablePriceTableItem == null) {
+            return -1;
+        }
         return applicablePriceTableItem.getPrice();
     }
 
@@ -86,7 +80,7 @@ public class ProductPrice {
     public static class PriceTableItem {
 
         @Id
-        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="SEQUENCE")
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
         private Long id;
 
         @Column(name = "AMOUNT")
@@ -95,7 +89,8 @@ public class ProductPrice {
         @Column
         private double price;
 
-        protected PriceTableItem() {}
+        protected PriceTableItem() {
+        }
 
         public PriceTableItem(int amount, double price) {
             this();

@@ -17,18 +17,10 @@ package org.unitils.sample.eshop.model;
 
 import org.unitils.sample.eshop.exception.NotOldEnoughException;
 
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Entity;
-import java.util.List;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents a Purchase that a User makes. A Purchase consists of different PurchaseItems.
@@ -50,7 +42,8 @@ public class Purchase {
     @JoinColumn(name = "PURCHASE_ID")
     private List<PurchaseItem> items = new ArrayList<PurchaseItem>();
 
-    protected Purchase() {}
+    protected Purchase() {
+    }
 
     public Purchase(User user) {
         this.user = user;
@@ -69,7 +62,7 @@ public class Purchase {
      * contains a PurchaseItem for the given Product, the amount of this PurchaseItem is increased.
      *
      * @param product The product for which items are added to this Purchase
-     * @param amount The number of items of the given Product that are added to this Purchase
+     * @param amount  The number of items of the given Product that are added to this Purchase
      * @throws NotOldEnoughException If the user's age is not sufficient to be authorized to buy items of the given
      *                               Product
      */
@@ -90,7 +83,7 @@ public class Purchase {
     /**
      * @param product A product
      * @return If this Purchase contains a PurchaseItem for the given Product, this PurchaseItem is returned. Otherwise,
-     * null is returned.
+     *         null is returned.
      */
     public PurchaseItem getItemForProduct(Product product) {
         for (PurchaseItem item : items) {
@@ -111,5 +104,5 @@ public class Purchase {
         }
         return totalPrice;
     }
-    
+
 }

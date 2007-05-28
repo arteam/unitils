@@ -16,15 +16,7 @@
 package org.unitils.sample.eshop.model;
 
 
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Embedded;
-import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import java.util.Arrays;
+import javax.persistence.*;
 
 /**
  * Represents an eshop Product
@@ -35,7 +27,7 @@ import java.util.Arrays;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="SEQUENCE")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
     private Long id;
 
     @Embedded
@@ -48,15 +40,16 @@ public class Product {
     /**
      * Empty constructor. Exists only to enable proxying.
      */
-    protected Product() {}
+    protected Product() {
+    }
 
     /**
      * Constructor that initializes a product with a given ProductPrice, name and minimumAge
-
-     * @param id
-     * @param price
-     * @param name
-     * @param minimumAge
+     *
+     * @param id         The id
+     * @param price      The price table, not null
+     * @param name       The name of the product, not null
+     * @param minimumAge The age limit
      */
     public Product(long id, ProductPrice price, String name, int minimumAge) {
         this.id = id;
@@ -68,10 +61,10 @@ public class Product {
     /**
      * Convience constructor for products having a single price
      *
-     * @param id
-     * @param price
-     * @param name
-     * @param minimumAge
+     * @param id         The id
+     * @param price      The price
+     * @param name       The name of the product, not null
+     * @param minimumAge The age limit
      */
     public Product(long id, double price, String name, int minimumAge) {
         this(id, new ProductPrice(price), name, minimumAge);
@@ -108,9 +101,7 @@ public class Product {
 
         Product product = (Product) o;
 
-        if (!id.equals(product.id)) return false;
-
-        return true;
+        return id.equals(product.id);
     }
 
     public int hashCode() {
