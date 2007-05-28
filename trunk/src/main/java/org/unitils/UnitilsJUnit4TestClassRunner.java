@@ -67,7 +67,6 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
      */
     @Override
     public void run(RunNotifier notifier) {
-
         // if this the first test, call beforeAll
         if (!beforeAllCalled) {
             try {
@@ -203,13 +202,13 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
          */
         @Override
         protected void executeMethodBody() throws IllegalAccessException, InvocationTargetException {
-
             Throwable throwable = null;
             try {
                 testListener.beforeTestMethod(testObject, testMethod);
                 super.executeMethodBody();
 
-            } catch (Throwable t) {  // hold exceptions until later, first call afterTestMethod
+            } catch (Throwable t) {
+                // hold exceptions until later, first call afterTestMethod
                 throwable = t;
             }
 

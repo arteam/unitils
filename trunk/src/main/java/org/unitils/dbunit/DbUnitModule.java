@@ -39,13 +39,12 @@ import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import org.unitils.util.AnnotationUtils;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import org.unitils.util.ModuleUtils;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
@@ -233,6 +232,7 @@ public class DbUnitModule implements Module {
         String dataSetFileName = dataSetAnnotation.value();
         Class<?> testClass = testMethod.getDeclaringClass();
 
+        // Create configured factory for data sets
         DataSetFactory dataSetFactory = getDataSetFactory(DataSet.class, testMethod);
 
         // empty means, use default file name
@@ -270,6 +270,7 @@ public class DbUnitModule implements Module {
             return null;
         }
 
+        // Create configured factory for data sets
         DataSetFactory dataSetFactory = getDataSetFactory(ExpectedDataSet.class, testMethod);
 
         String dataSetFileName = expectedDataSetAnnotation.value();
@@ -340,12 +341,10 @@ public class DbUnitModule implements Module {
 
     @SuppressWarnings({"unchecked"})
     protected DataSetOperation getDataSetOperation(Method testMethod) {
-        Class<? extends DataSetOperation> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class,
-                "operation", DefaultDataSetOperation.class, testMethod);
-        dataSetOperationClass = (Class<? extends DataSetOperation>) ModuleUtils.getClassValueReplaceDefault(DataSet.class,
-                "operation", dataSetOperationClass, defaultAnnotationPropertyValues, DefaultDataSetOperation.class);
+        Class<? extends DataSetOperation> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "operation", DefaultDataSetOperation.class, testMethod);
+        dataSetOperationClass = (Class<? extends DataSetOperation>) getClassValueReplaceDefault(DataSet.class, "operation", dataSetOperationClass, defaultAnnotationPropertyValues, DefaultDataSetOperation.class);
 
-        return ReflectionUtils.createInstanceOfType(dataSetOperationClass);
+        return createInstanceOfType(dataSetOperationClass);
     }
 
 
@@ -439,11 +438,9 @@ public class DbUnitModule implements Module {
      */
     @SuppressWarnings("unchecked")
     protected DataSetFactory getDataSetFactory(Class<? extends Annotation> annotationClass, Method testMethod) {
-        Class<? extends DataSetFactory> dataSetFactoryClass = AnnotationUtils.getMethodOrClassLevelAnnotationProperty(annotationClass,
-                "factory", DefaultDataSetFactory.class, testMethod);
-        dataSetFactoryClass = (Class<? extends DataSetFactory>) ModuleUtils.getClassValueReplaceDefault(annotationClass,
-                "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DefaultDataSetFactory.class);
-        return ReflectionUtils.createInstanceOfType(dataSetFactoryClass);
+        Class<? extends DataSetFactory> dataSetFactoryClass = getMethodOrClassLevelAnnotationProperty(annotationClass, "factory", DefaultDataSetFactory.class, testMethod);
+        dataSetFactoryClass = (Class<? extends DataSetFactory>) getClassValueReplaceDefault(annotationClass, "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DefaultDataSetFactory.class);
+        return createInstanceOfType(dataSetFactoryClass);
     }
 
 

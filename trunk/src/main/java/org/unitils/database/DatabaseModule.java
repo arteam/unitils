@@ -37,7 +37,7 @@ import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
-import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import javax.sql.DataSource;
@@ -248,10 +248,8 @@ public class DatabaseModule implements Module {
      * @return The {@link TransactionMode} for the given object
      */
     protected TransactionMode getTransactionMode(Object testObject) {
-        TransactionMode transactionMode = AnnotationUtils.getClassLevelAnnotationProperty(Transactional.class,
-                "value", TransactionMode.DEFAULT, testObject.getClass());
-        transactionMode = getEnumValueReplaceDefault(Transactional.class, "value", transactionMode,
-                defaultAnnotationPropertyValues);
+        TransactionMode transactionMode = AnnotationUtils.getClassLevelAnnotationProperty(Transactional.class, "value", TransactionMode.DEFAULT, testObject.getClass());
+        transactionMode = getEnumValueReplaceDefault(Transactional.class, "value", transactionMode, defaultAnnotationPropertyValues);
         return transactionMode;
     }
 
@@ -348,17 +346,18 @@ public class DatabaseModule implements Module {
     @SuppressWarnings("unchecked")
     protected void registerSpringDataSourceBeanPostProcessor() {
         String springModuleName = "org.unitils.spring.SpringModule";
-        if (Unitils.getInstance().getModulesRepository().isModuleEnabled(springModuleName)) {
-            try {
-                Class springModuleClass = Class.forName(springModuleName);
-                Module springModule = Unitils.getInstance().getModulesRepository().getModuleOfType(springModuleClass);
-                Method registerBeanPostProcessorTypeMethod = springModuleClass.getMethod("registerBeanPostProcessorType", Class.class);
-                Class dataSourceInterceptingBeanPostProcessorClass = ReflectionUtils.getClassWithName(
-                        "org.unitils.database.util.DataSourceInterceptingBeanPostProcessor");
-                registerBeanPostProcessorTypeMethod.invoke(springModule, dataSourceInterceptingBeanPostProcessorClass);
-            } catch (Exception e) {
-                throw new UnitilsException("Error while trying to register SpringDataSourceBeanPostProcessor in SpringModule", e);
-            }
+        if (!Unitils.getInstance().getModulesRepository().isModuleEnabled(springModuleName)) {
+            return;
+        }
+        try {
+            Class springModuleClass = Class.forName(springModuleName);
+            Module springModule = Unitils.getInstance().getModulesRepository().getModuleOfType(springModuleClass);
+            Method registerBeanPostProcessorTypeMethod = springModuleClass.getMethod("registerBeanPostProcessorType", Class.class);
+            Class dataSourceInterceptingBeanPostProcessorClass = getClassWithName("org.unitils.database.util.DataSourceInterceptingBeanPostProcessor");
+            registerBeanPostProcessorTypeMethod.invoke(springModule, dataSourceInterceptingBeanPostProcessorClass);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error while trying to register SpringDataSourceBeanPostProcessor in SpringModule", e);
         }
     }
 
@@ -384,6 +383,7 @@ public class DatabaseModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject) {
+            //todo first start transaction, then inject
             injectDataSource(testObject);
             startTransactionIfPossible(testObject);
         }

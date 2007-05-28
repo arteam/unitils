@@ -15,23 +15,23 @@
  */
 package org.unitils.dbmaintainer.version;
 
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.dbunit.annotation.DataSet;
+import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * Test class for {@link org.unitils.dbmaintainer.version.impl.DBVersionSource}. The implementation is tested using
@@ -48,7 +48,7 @@ public class DBVersionSourceTest extends UnitilsJUnit3 {
 
     /* The dataSource */
     @TestDataSource
-    private javax.sql.DataSource dataSource = null;
+    private DataSource dataSource = null;
 
     /* Database type specific support */
     private DbSupport dbSupport;

@@ -16,12 +16,9 @@
 package org.unitils.core.dbsupport;
 
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import org.unitils.util.PropertyUtils;
+
+import java.util.*;
 
 /**
  * todo javadoc
@@ -40,6 +37,9 @@ public class DbSupportFactory {
      * Property key for the database schema names
      */
     public static final String PROPKEY_DATABASE_SCHEMA_NAMES = "database.schemaNames";
+
+    /* Cache of created db support instance, per schema name */
+    private static Map<String, DbSupport> dbSupportCache = new HashMap<String, DbSupport>();
 
 
     /**
@@ -65,9 +65,17 @@ public class DbSupportFactory {
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
     public static DbSupport getDbSupport(Properties configuration, SQLHandler sqlHandler, String schemaName) {
+        // try to retrieve from cache
+        DbSupport dbSupport = dbSupportCache.get(schemaName);
+        if (dbSupport != null) {
+            return dbSupport;
+        }
+        // create new instance
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-        DbSupport dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
+        dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
         dbSupport.init(configuration, sqlHandler, schemaName);
+        // add to cache
+        dbSupportCache.put(schemaName, dbSupport);
         return dbSupport;
     }
 

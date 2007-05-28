@@ -80,21 +80,22 @@ public class SQLHandler {
     public int executeUpdate(String sql) {
         logger.info(sql);
 
-        if (doExecuteUpdates) {
-            Connection connection = null;
-            Statement statement = null;
-            try {
-                connection = dataSource.getConnection();
-                statement = connection.createStatement();
-                return statement.executeUpdate(sql);
-
-            } catch (Exception e) {
-                throw new UnitilsException("Error while executing statement: " + sql, e);
-            } finally {
-                closeQuietly(connection, statement, null);
-            }
+        if (!doExecuteUpdates) {
+            // skip update
+            return 0;
         }
-        return 0;
+        Connection connection = null;
+        Statement statement = null;
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            return statement.executeUpdate(sql);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error while executing statement: " + sql, e);
+        } finally {
+            closeQuietly(connection, statement, null);
+        }
     }
 
 
@@ -107,21 +108,22 @@ public class SQLHandler {
     public int executeCodeUpdate(String sql) {
         logger.info(sql);
 
-        if (doExecuteUpdates) {
-            Connection connection = null;
-            Statement statement = null;
-            try {
-                connection = dataSource.getConnection();
-                statement = connection.createStatement();
-                return statement.executeUpdate(sql);
-
-            } catch (Exception e) {
-                throw new UnitilsException("Error while executing statement: " + sql, e);
-            } finally {
-                closeQuietly(connection, statement, null);
-            }
+        if (!doExecuteUpdates) {
+            // skip update
+            return 0;
         }
-        return 0;
+        Connection connection = null;
+        Statement statement = null;
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            return statement.executeUpdate(sql);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error while executing statement: " + sql, e);
+        } finally {
+            closeQuietly(connection, statement, null);
+        }
     }
 
 
@@ -208,6 +210,32 @@ public class SQLHandler {
                 result.add(resultSet.getString(1));
             }
             return result;
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error while executing statement: " + sql, e);
+        } finally {
+            closeQuietly(connection, statement, resultSet);
+        }
+    }
+
+
+    /**
+     * Returns true if the query returned a record.
+     *
+     * @param sql The sql string for checking the existence
+     * @return True if a record was returned
+     */
+    public boolean exists(String sql) {
+        logger.debug(sql);
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            return resultSet.next();
 
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);

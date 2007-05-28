@@ -1,3 +1,18 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.dbmaintainer.structure;
 
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +57,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
 
     private static final String DATASET_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns:dflt=\"PUBLIC \">\n" +
+                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns:dflt=\"PUBLIC\">\n" +
                     "   <xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\" />\n" +
                     "   <xsd:element name=\"dataset\">\n" +
                     "       <xsd:complexType>\n" +
@@ -57,7 +72,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
 
     private static final String PUBLIC_SCHEMA_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"PUBLIC \">\n" +
+                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"PUBLIC\">\n" +
                     "   <xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />\n" +
                     "   <xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />\n" +
                     "   <xsd:complexType name=\"TABLE_1__type\">\n" +
@@ -138,7 +153,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
     /**
      * Tests the generation of the xsd files for 1 database schema.
      */
-    public void testGenerateDtd() throws Exception {
+    public void testGenerateDataSetStructure() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
