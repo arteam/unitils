@@ -15,6 +15,22 @@
  */
 package org.unitils.database;
 
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -31,22 +47,7 @@ import org.unitils.database.util.DynamicThreadLocalDataSourceProxy;
 import org.unitils.database.util.Flushable;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.util.AnnotationUtils;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import javax.sql.DataSource;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * todo add javadoc explaining transaction behavior.
@@ -339,30 +340,6 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * Registers the {@link org.unitils.database.util.DataSourceInterceptingBeanPostProcessor} with the
-     * {@link org.unitils.spring.SpringModule}. This will make sure that a bean of type {@link UnitilsDataSource}
-     * is replaced with the actual untils data source in the spring application context.
-     */
-    @SuppressWarnings("unchecked")
-    protected void registerSpringDataSourceBeanPostProcessor() {
-        String springModuleName = "org.unitils.spring.SpringModule";
-        if (!Unitils.getInstance().getModulesRepository().isModuleEnabled(springModuleName)) {
-            return;
-        }
-        try {
-            Class springModuleClass = Class.forName(springModuleName);
-            Module springModule = Unitils.getInstance().getModulesRepository().getModuleOfType(springModuleClass);
-            Method registerBeanPostProcessorTypeMethod = springModuleClass.getMethod("registerBeanPostProcessorType", Class.class);
-            Class dataSourceInterceptingBeanPostProcessorClass = getClassWithName("org.unitils.database.util.DataSourceInterceptingBeanPostProcessor");
-            registerBeanPostProcessorTypeMethod.invoke(springModule, dataSourceInterceptingBeanPostProcessorClass);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Error while trying to register SpringDataSourceBeanPostProcessor in SpringModule", e);
-        }
-    }
-
-
-    /**
      * @return The {@link TestListener} associated with this module
      */
     public TestListener createTestListener() {
@@ -377,7 +354,6 @@ public class DatabaseModule implements Module {
 
         @Override
         public void beforeAll() {
-            registerSpringDataSourceBeanPostProcessor();
             initTransactionManager();
         }
 
