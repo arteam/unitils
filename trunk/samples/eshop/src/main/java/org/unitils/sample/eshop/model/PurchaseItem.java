@@ -15,15 +15,7 @@
  */
 package org.unitils.sample.eshop.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.*;
 
 /**
  * Represents an amount of items of a certain Product that is contained in a certain Purchase
@@ -44,7 +36,8 @@ public class PurchaseItem {
     @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
-    protected PurchaseItem() {}
+    protected PurchaseItem() {
+    }
 
     public PurchaseItem(Product product, int amount) {
         this.product = product;
