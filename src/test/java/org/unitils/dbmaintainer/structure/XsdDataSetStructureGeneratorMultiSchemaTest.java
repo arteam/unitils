@@ -59,7 +59,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
     /* Expected content of dataset.xsd */
     private static final String DATASET_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns:dflt=\"PUBLIC \">\n" +
+                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns:dflt=\"PUBLIC\">\n" +
                     "   <xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\" />\n" +
                     "   <xsd:import namespace=\"SCHEMA_A\" schemaLocation=\"SCHEMA_A.xsd\" />\n" +
                     "   <xsd:element name=\"dataset\">\n" +
@@ -77,7 +77,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
     /* Expected content of PUBLIC.xsd */
     private static final String PUBLIC_SCHEMA_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"PUBLIC \">\n" +
+                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"PUBLIC\">\n" +
                     "   <xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />\n" +
                     "   <xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />\n" +
                     "   <xsd:complexType name=\"TABLE_1__type\">\n" +
@@ -95,7 +95,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
     /* Expected content of SCHEMA_A.xsd */
     private static final String SCHEMA_A_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"SCHEMA_A \">\n" +
+                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"SCHEMA_A\">\n" +
                     "   <xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />\n" +
                     "   <xsd:element name=\"TABLE_4\" type=\"TABLE_4__type\" />\n" +
                     "   <xsd:element name=\"TABLE_3\" type=\"TABLE_3__type\" />\n" +
