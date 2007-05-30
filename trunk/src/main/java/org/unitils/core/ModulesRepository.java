@@ -80,11 +80,11 @@ public class ModulesRepository {
         List<T> modulesOfType = getModulesOfType(type);
         if (modulesOfType.size() > 1) {
             throw new UnitilsException("More than one module found of type " + type.getName());
-        } else if (modulesOfType.size() == 1) {
-            return modulesOfType.get(0);
-        } else {
+        }
+        if (modulesOfType.size() < 1) {
             throw new UnitilsException("No module found of type " + type.getName());
         }
+        return modulesOfType.get(0);
     }
 
 
@@ -107,17 +107,39 @@ public class ModulesRepository {
     }
 
 
-    //todo javadoc
+    /**
+     * Checks whether a module of a type with the given class name exists. The class name can also be
+     * the super-type of an existing module.
+     *
+     * @param fullyQualifiedClassName The class name, not null
+     * @return True if the module exists and is enabled
+     */
     @SuppressWarnings("unchecked")
     public boolean isModuleEnabled(String fullyQualifiedClassName) {
-        Class<? extends Module> moduleClass = (Class<? extends Module>) getClassWithName(fullyQualifiedClassName);
+        Class<? extends Module> moduleClass;
+        try {
+            moduleClass = (Class<? extends Module>) getClassWithName(fullyQualifiedClassName);
+
+        } catch (UnitilsException e) {
+            // class could not be loaded
+            return false;
+        }
         return isModuleEnabled(moduleClass);
     }
 
 
-    //todo javadoc
+    /**
+     * Checks whether a module of a type exists. The class an also be the super-type of an existing module.
+     *
+     * @param moduleClass The class, not null
+     * @return True if the module exists and is enabled
+     */
     public boolean isModuleEnabled(Class<? extends Module> moduleClass) {
-        return getModulesOfType(moduleClass).size() >= 0;
+        List<? extends Module> modulesOfType = getModulesOfType(moduleClass);
+        if (modulesOfType.size() > 1) {
+            throw new UnitilsException("More than one module found of type " + moduleClass.getName());
+        }
+        return modulesOfType.size() == 1;
     }
 
 

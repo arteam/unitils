@@ -43,8 +43,7 @@ public class ReflectionUtils {
     public static <T> T createInstanceOfType(String className) {
         try {
             Class<?> type = Class.forName(className);
-            T instance = (T) createInstanceOfType(type);
-            return instance;
+            return (T) createInstanceOfType(type);
 
         } catch (ClassCastException e) {
             throw new UnitilsException("Class " + className + " is not of expected type.", e);
@@ -464,12 +463,19 @@ public class ReflectionUtils {
     }
 
 
-    // todo javadoc
+    /**
+     * Gets the class for the given name.
+     * An UnitilsException is thrown when the class could not be loaded.
+     *
+     * @param className The name of the class, not null
+     * @return The class, not null
+     */
     public static Class<?> getClassWithName(String className) {
         try {
             return Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            throw new UnitilsException("Could not find class with name " + className, e);
+
+        } catch (Throwable t) {
+            throw new UnitilsException("Could not load class with name " + className, t);
         }
     }
 
