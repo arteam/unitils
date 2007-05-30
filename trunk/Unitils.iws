@@ -18,21 +18,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/test/java/org/untils/sample/eshop/dao/PurchaseDaoTest.java" afterPath="$PROJECT_DIR$/samples/eshop/src/test/java/org/untils/sample/eshop/dao/PurchaseDaoTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/SpringTransactionManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/test/java/org/untils/sample/eshop/dao/PurchaseDaoTest.xml" afterPath="$PROJECT_DIR$/samples/eshop/src/test/java/org/untils/sample/eshop/dao/PurchaseDaoTest.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/samples/eshop/src/test/resources/test-config.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/samples/eshop/db/dtd" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/SimpleTransactionManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/SimpleTransactionManager.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/DefaultTransactionManagerFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/core/ModulesRepository.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/core/ModulesRepository.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\database\transaction\AutoDetectTransactionManager.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleSimpleTransactionManagerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleSimpleTransactionManagerTest.java" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\database\util\DynamicThreadLocalDataSourceProxy.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleSpringIntegratingTransactionManagerTest.java" afterPath="$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleSpringIntegratingTransactionManagerTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Unitils.iws" afterPath="$PROJECT_DIR$/Unitils.iws" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/samples/eshop/db/xsd" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/eshop.iws" afterPath="$PROJECT_DIR$/samples/eshop/eshop.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/main/java/org/unitils/sample/eshop/dao/PurchaseDao.java" afterPath="$PROJECT_DIR$/samples/eshop/src/main/java/org/unitils/sample/eshop/dao/PurchaseDao.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/eshop.iml" afterPath="$PROJECT_DIR$/samples/eshop/eshop.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/main/resources/eshop-config.xml" afterPath="$PROJECT_DIR$/samples/eshop/src/main/resources/eshop-config.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/main/resources/log4j.xml" afterPath="$PROJECT_DIR$/samples/eshop/src/main/resources/log4j.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/lib/unitils-1.0-rc-3.jar" afterPath="$PROJECT_DIR$/samples/eshop/lib/unitils-1.0-rc-3.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/src/test/resources/unitils.properties" afterPath="$PROJECT_DIR$/samples/eshop/src/test/resources/unitils.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/eshop/eshop.ipr" afterPath="$PROJECT_DIR$/samples/eshop/eshop.ipr" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/site/apt/tutorial.apt" afterPath="$PROJECT_DIR$/src/site/apt/tutorial.apt" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\main\java\org\unitils\database\transaction\SpringIntegratingTransactionManager.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\_tim\unitils\trunk\src\test\java\org\unitils\database\DatabaseModuleAutoDetectTransactionManagerTest.java" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/TransactionManagerFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" afterPath="$PROJECT_DIR$/src/main/resources/unitils-default.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/TransactionManager.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/TransactionManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java" afterPath="$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java" />
     </list>
   </component>
   <component name="ChangeListSynchronizer" />
@@ -61,7 +65,7 @@
     <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$PostgreSqlDbSupportTest.es" NAME="PostgreSqlDbSupportTest" MODIFIED="1175623605669">
       <FILTER>org.unitils.core.dbsupport.*</FILTER>
     </SUITE>
-    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$org.unitils.es" NAME="org.unitils" MODIFIED="1180380661675" />
+    <SUITE FILE_PATH="C:\Documents and Settings\tidu\.IntelliJIdea60\system\coverage\Unitils$org.unitils.es" NAME="org.unitils" MODIFIED="1180553803061" />
   </component>
   <component name="Cvs2Configuration">
     <option name="PRUNE_EMPTY_DIRECTORIES" value="true" />
@@ -182,91 +186,84 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="unitils-default.properties" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="237" column="38" selection-start="15760" selection-end="15831" vertical-scroll-proportion="0.33333334">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="DatabaseModule.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="214" column="23" selection-start="9225" selection-end="9225" vertical-scroll-proportion="0.28250244">
+            <state line="127" column="62" selection-start="5811" selection-end="5811" vertical-scroll-proportion="0.6925315">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataSourceFactory.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/DataSourceFactory.java">
+      <file leaf-file-name="DatabaseModuleSimpleTransactionManagerTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleSimpleTransactionManagerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="34" selection-start="854" selection-end="871" vertical-scroll-proportion="0.41544476">
+            <state line="64" column="100" selection-start="1882" selection-end="1882" vertical-scroll-proportion="0.057225995">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DynamicThreadLocalDataSourceProxy.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/util/DynamicThreadLocalDataSourceProxy.java">
+      <file leaf-file-name="DefaultTransactionManagerFactory.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/DefaultTransactionManagerFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="115" selection-start="762" selection-end="762" vertical-scroll-proportion="0.26686218">
+            <state line="55" column="69" selection-start="1823" selection-end="1823" vertical-scroll-proportion="0.83511156">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TransactionManager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/TransactionManager.java">
+      <file leaf-file-name="ModulesRepository.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ModulesRepository.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="35" selection-start="850" selection-end="868" vertical-scroll-proportion="0.33333334">
+            <state line="112" column="114" selection-start="3288" selection-end="3288" vertical-scroll-proportion="0.4316198">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ConfigUtils.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ConfigUtils.java">
+      <file leaf-file-name="ReflectionUtils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="80" column="81" selection-start="4053" selection-end="4053" vertical-scroll-proportion="0.884653">
+            <state line="466" column="19" selection-start="18871" selection-end="18871" vertical-scroll-proportion="0.7526673">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DbUnitModule.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
+      <file leaf-file-name="DatabaseModuleTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="440" column="68" selection-start="20280" selection-end="20280" vertical-scroll-proportion="0.3561508">
+            <state line="56" column="37" selection-start="1709" selection-end="1709" vertical-scroll-proportion="0.25897187">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MultiSchemaXmlDataSetFactory.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/MultiSchemaXmlDataSetFactory.java">
+      <file leaf-file-name="SimpleTransactionManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/SimpleTransactionManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="41" column="49" selection-start="1459" selection-end="1459" vertical-scroll-proportion="0.5982405">
+            <state line="55" column="110" selection-start="2062" selection-end="2062" vertical-scroll-proportion="0.5935984">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataSetXmlReader.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/util/DataSetXmlReader.java">
+      <file leaf-file-name="SpringTransactionManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/SpringTransactionManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="183" column="57" selection-start="6706" selection-end="6706" vertical-scroll-proportion="0.36950147">
-              <folding />
+            <state line="71" column="0" selection-start="2944" selection-end="2944" vertical-scroll-proportion="0.5935984">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DBVersionSource.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/impl/DBVersionSource.java">
+      <file leaf-file-name="DatabaseModuleSpringIntegratingTransactionManagerTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleSpringIntegratingTransactionManagerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="427" column="37" selection-start="16582" selection-end="16582" vertical-scroll-proportion="0.2864125">
+            <state line="73" column="25" selection-start="2384" selection-end="2384" vertical-scroll-proportion="0.9670223">
               <folding />
             </state>
           </provider>
@@ -1216,7 +1213,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure PackagesPane="false" ProjectPane="false" Scope="false" Favorites="false" />
+      <showStructure Favorites="false" PackagesPane="false" Scope="false" ProjectPane="false" />
       <autoscrollToSource />
       <autoscrollFromSource />
       <sortByType />
@@ -1261,11 +1258,11 @@
       <recent name="be.ordina.util.ReflectionUtils" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.unitils.database.transaction" />
       <recent name="org.unitils.reflectionassert" />
       <recent name="org.unitils.reflectionassert.util" />
       <recent name="org.unitils.core.dbsupport" />
       <recent name="org.unitils.dbmaintainer.clean" />
-      <recent name="org.unitils.dbunit" />
     </key>
     <key name="IntroduceConstantDialog.RECENTS_KEY">
       <recent name="" />
@@ -1279,14 +1276,14 @@
     </key>
   </component>
   <component name="RestoreUpdateTree" />
-  <component name="RunManager" selected="JUnit.org.unitils">
-    <tempConfiguration default="false" name="DBVersionSourceTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <pattern value="org.unitils.dbmaintainer.version.*" />
+  <component name="RunManager" selected="JUnit.DatabaseModuleSimpleTransactionManagerTest">
+    <tempConfiguration default="false" name="DatabaseModuleSimpleTransactionManagerTest" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <pattern value="org.unitils.database.*" />
       <module name="Unitils" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="org.unitils.dbmaintainer.version" />
-      <option name="MAIN_CLASS_NAME" value="org.unitils.dbmaintainer.version.DBVersionSourceTest" />
+      <option name="PACKAGE_NAME" value="org.unitils.database" />
+      <option name="MAIN_CLASS_NAME" value="org.unitils.database.DatabaseModuleSimpleTransactionManagerTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -1302,6 +1299,13 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -1320,6 +1324,28 @@
       <method>
         <option name="Make" value="true" />
       </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="" />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
     </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
       <module name="" />
@@ -1343,35 +1369,6 @@
       <method>
         <option name="Make" value="true" />
       </method>
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <module name="" />
-    </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
     </configuration>
     <configuration default="false" name="DuplicateFileSearch" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="util.DuplicateFileSearch" />
@@ -1643,24 +1640,24 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="34" y="0" width="1566" height="1200" extended-state="1" />
+    <frame x="30" y="-4" width="1574" height="1208" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287037" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35473198" order="0" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41231343" order="1" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3541804" order="0" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41203704" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24946696" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38152984" order="11" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38148147" order="11" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39866155" order="6" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="9" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14392324" order="1" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962963" order="8" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.7369403" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.7361111" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24950625" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="4" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4712963" order="4" />
@@ -1755,107 +1752,109 @@
     <option name="myLastEditedConfigurable" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/structure/impl/XsdDataSetStructureGenerator.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/UnitilsJUnit4.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="135" column="169" selection-start="5732" selection-end="5732" vertical-scroll-proportion="0.45725265">
+        <state line="30" column="22" selection-start="1257" selection-end="1257" vertical-scroll-proportion="0.48617733">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ConfigUtils.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/SpringModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="80" column="81" selection-start="4053" selection-end="4053" vertical-scroll-proportion="0.884653">
+        <state line="64" column="13" selection-start="2951" selection-end="2951" vertical-scroll-proportion="0.33268672">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/DbUnitModule.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/spring/util/ApplicationContextManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="440" column="68" selection-start="20280" selection-end="20280" vertical-scroll-proportion="0.3561508">
+        <state line="84" column="72" selection-start="3543" selection-end="3543" vertical-scroll-proportion="0.07371484">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/datasetfactory/MultiSchemaXmlDataSetFactory.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/util/AnnotatedInstanceManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="41" column="49" selection-start="1459" selection-end="1459" vertical-scroll-proportion="0.5982405">
+        <state line="120" column="25" selection-start="4841" selection-end="4841" vertical-scroll-proportion="0.88166827">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://D:/_apps/java/dbunit-2.2/dbunit-2.2-sources.jar!/org/dbunit/dataset/ReplacementDataSet.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleSpringIntegratingTransactionManagerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="11" selection-start="1570" selection-end="1570" vertical-scroll-proportion="0.8288557">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/_apps/java/dbunit-2.2/dbunit-2.2-sources.jar!/org/dbunit/dataset/CachedDataSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="92" column="11" selection-start="2687" selection-end="2687" vertical-scroll-proportion="0.9661692">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbunit/util/DataSetXmlReader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="183" column="57" selection-start="6706" selection-end="6706" vertical-scroll-proportion="0.36950147">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/dbmaintainer/version/DBVersionSourceTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="58" selection-start="656" selection-end="656" vertical-scroll-proportion="0.13391985">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/dbmaintainer/version/impl/DBVersionSource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="427" column="37" selection-start="16582" selection-end="16582" vertical-scroll-proportion="0.2864125">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/util/DynamicThreadLocalDataSourceProxy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="115" selection-start="762" selection-end="762" vertical-scroll-proportion="0.26686218">
+        <state line="73" column="25" selection-start="2384" selection-end="2384" vertical-scroll-proportion="0.9670223">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/TransactionManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="35" selection-start="850" selection-end="868" vertical-scroll-proportion="0.33333334">
+        <state line="40" column="66" selection-start="1145" selection-end="1145" vertical-scroll-proportion="0.5786463">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/AutoDetectTransactionManager.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/SimpleTransactionManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="41" selection-start="1159" selection-end="1187" vertical-scroll-proportion="0.33919844">
+        <state line="55" column="110" selection-start="2062" selection-end="2062" vertical-scroll-proportion="0.5935984">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="37" selection-start="1709" selection-end="1709" vertical-scroll-proportion="0.25897187">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/DatabaseModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="214" column="23" selection-start="9225" selection-end="9225" vertical-scroll-proportion="0.28250244">
+        <state line="127" column="62" selection-start="5811" selection-end="5811" vertical-scroll-proportion="0.6925315">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/config/DataSourceFactory.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/org/unitils/database/DatabaseModuleSimpleTransactionManagerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="34" selection-start="854" selection-end="871" vertical-scroll-proportion="0.41544476">
+        <state line="64" column="100" selection-start="1882" selection-end="1882" vertical-scroll-proportion="0.057225995">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/unitils-default.properties">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/util/ReflectionUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="237" column="38" selection-start="15760" selection-end="15831" vertical-scroll-proportion="0.33333334">
+        <state line="466" column="19" selection-start="18871" selection-end="18871" vertical-scroll-proportion="0.7526673">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/SpringTransactionManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="71" column="0" selection-start="2944" selection-end="2944" vertical-scroll-proportion="0.5935984">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/database/transaction/DefaultTransactionManagerFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="55" column="69" selection-start="1823" selection-end="1823" vertical-scroll-proportion="0.83511156">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/_apps/java/jdk1.5.0_06/src.zip!/java/lang/Class.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="417" column="26" selection-start="17749" selection-end="17749" vertical-scroll-proportion="0.33267522">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/unitils/core/ModulesRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="112" column="114" selection-start="3288" selection-end="3288" vertical-scroll-proportion="0.4316198">
           <folding />
         </state>
       </provider>
