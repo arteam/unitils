@@ -2,6 +2,7 @@
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="dataset.xsd">
 
     <USER ID="1"/>
+
     <!-- purchase 1 -->
     <PURCHASE ID="1" USER_ID="1"/>
     <PURCHASE_ITEM ID="1" PURCHASE_ID="1" AMOUNT="5"/>
