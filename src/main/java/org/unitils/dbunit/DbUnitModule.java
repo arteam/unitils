@@ -185,16 +185,16 @@ public class DbUnitModule implements Module {
     public void assertDbContentAsExpected(Method testMethod) {
         try {
             // get the expected dataset
-            MultiSchemaDataSet expectedDataSets = getExpectedTestDataSets(testMethod);
-            if (expectedDataSets == null) {
+            MultiSchemaDataSet multiSchemaExpectedDataSet = getExpectedTestDataSet(testMethod);
+            if (multiSchemaExpectedDataSet == null) {
                 // no data set should be compared
                 return;
             }
-            for (String schemaName : expectedDataSets.getSchemaNames()) {
-                IDataSet expectedDataSet = expectedDataSets.getDataSetForSchema(schemaName);
-
-                // first make sure every database update is flushed to the database
-                getDatabaseModule().flushDatabaseUpdates();
+            // first make sure every database update is flushed to the database
+            getDatabaseModule().flushDatabaseUpdates();
+            
+            for (String schemaName : multiSchemaExpectedDataSet.getSchemaNames()) {
+                IDataSet expectedDataSet = multiSchemaExpectedDataSet.getDataSetForSchema(schemaName);
 
                 DbUnitAssert.assertDbContentAsExpected(expectedDataSet, getDbUnitDatabaseConnection(schemaName));
             }
@@ -220,7 +220,7 @@ public class DbUnitModule implements Module {
      * is raised.
      *
      * @param testMethod The test method, not null
-     * @return The dataset, null if there is no data set
+     * @return The dataset, null if no {@link DataSet} annotation is found.
      */
     public MultiSchemaDataSet getTestDataSets(Method testMethod) {
         DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod);
@@ -257,13 +257,13 @@ public class DbUnitModule implements Module {
 
 
     /**
-     * Returns the DbUnit <code>IDataSet</code> that represents the state of a number of database tables after the given
+     * Returns the {@link MultiSchemaDataSet} that represents the state of a number of database tables after the given
      * <code>Method</code> has been executed.
      *
      * @param testMethod The test method, not null
      * @return The dataset, null if there is no data set
      */
-    public MultiSchemaDataSet getExpectedTestDataSets(Method testMethod) {
+    public MultiSchemaDataSet getExpectedTestDataSet(Method testMethod) {
         ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod);
         if (expectedDataSetAnnotation == null) {
             // No @ExpectedDataSet annotation found
@@ -315,8 +315,7 @@ public class DbUnitModule implements Module {
     /**
      * todo javadoc
      * <p/>
-     * Create a dbunit <code>IDataSet</code> object, in which the file coming from the
-     * given <code>InputStream</code> is loaded.
+     * Create a {@link MultiSchemaDataSet}, in which the file <code>InputStream</code> is loaded.
      *
      * @param in the InputStream, not null
      * @return The DbUnit <code>IDataSet</code>
