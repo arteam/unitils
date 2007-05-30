@@ -33,10 +33,20 @@ import java.util.Properties;
  */
 public class DefaultTransactionManagerFactory implements TransactionManagerFactory {
 
+    /* Propery key of the database driver class name */
+    private static final String PROPKEY_TRANSACTION_MANAGER_TYPE = "transactionManager.type";
+
+    // todo javadoc
+    private String transactionManagerClassName;
+
+
+    private Properties configuration;
+
 
     //todo javadoc
     public void init(Properties configuration) {
 
+        //todo implement get class name using config utils               
     }
 
 
