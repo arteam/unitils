@@ -20,6 +20,7 @@ import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
 import static org.unitils.database.transaction.TransactionMode.*;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
@@ -64,6 +65,8 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
      * Tests for a test with transactions disabled
      */
     public void testWithTransactionsDisabled() throws Exception {
+        expect(mockConnection1.getAutoCommit()).andReturn(true);
+        expect(mockConnection2.getAutoCommit()).andReturn(true);
         mockConnection1.close();
         mockConnection2.close();
         replay(mockConnection1, mockConnection2);
@@ -90,12 +93,13 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
+        DataSource dataSource = databaseModule.getDataSource();
         databaseModule.startTransaction(rollbackTest);
-        Connection conn1 = databaseModule.getDataSource().getConnection();
-        conn1.close();
-        Connection conn2 = databaseModule.getDataSource().getConnection();
-        conn2.close();
-        assertSame(conn1, conn2);
+        Connection connection1 = dataSource.getConnection();
+        connection1.close();
+        Connection connection2 = dataSource.getConnection();
+        connection2.close();
+        assertSame(connection1, connection2);
         databaseModule.commitOrRollbackTransaction(rollbackTest);
 
         verify(mockConnection1, mockConnection2);
@@ -112,12 +116,13 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
+        DataSource dataSource = databaseModule.getDataSource();
         databaseModule.startTransaction(commitTest);
-        Connection conn1 = databaseModule.getDataSource().getConnection();
-        conn1.close();
-        Connection conn2 = databaseModule.getDataSource().getConnection();
-        conn2.close();
-        assertSame(conn1, conn2);
+        Connection connection1 = dataSource.getConnection();
+        connection1.close();
+        Connection connection2 = dataSource.getConnection();
+        connection2.close();
+        assertSame(connection1, connection2);
         databaseModule.commitOrRollbackTransaction(commitTest);
 
         verify(mockConnection1, mockConnection2);

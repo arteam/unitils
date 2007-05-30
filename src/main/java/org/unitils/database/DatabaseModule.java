@@ -90,12 +90,6 @@ public class DatabaseModule implements Module {
     /* The transaction manager */
     private TransactionManager transactionManager;
 
-    /*
-     * ThreadLocal that remembers if a transaction is active for this thread, but this transaction was started
-     * while the DataSource was not loaded yet. In this case, the transaction is not really started
-     */
-    private ThreadLocal<Object> transactionShouldBeActiveFor = new ThreadLocal<Object>();
-
 
     /**
      * Initializes this module using the given <code>Configuration</code>
@@ -122,10 +116,6 @@ public class DatabaseModule implements Module {
             dataSource = transactionManager.createTransactionalDataSource(createDataSource());
             if (updateDatabaseSchemaEnabled) {
                 updateDatabase();
-            }
-            Object testObject = transactionShouldBeActiveFor.get();
-            if (testObject != null) {
-                transactionManager.startTransaction(testObject);
             }
         }
         return dataSource;
@@ -260,10 +250,6 @@ public class DatabaseModule implements Module {
         if (transactionMode == DISABLED) {
             return;
         }
-        if (dataSource == null) {
-            transactionShouldBeActiveFor.set(testObject);
-            return;
-        }
         getTransactionManager().startTransaction(testObject);
     }
 
@@ -303,8 +289,8 @@ public class DatabaseModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject) {
-            startTransaction(testObject);
             injectDataSource(testObject);
+            startTransaction(testObject);
         }
 
         @Override

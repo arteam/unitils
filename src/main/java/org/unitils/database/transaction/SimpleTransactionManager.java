@@ -53,7 +53,8 @@ public class SimpleTransactionManager implements TransactionManager {
      */
     public void startTransaction(Object testObject) {
         if (transactionalDataSource == null) {
-            throw new UnitilsException("Trying to start transaction, but no datasource has been registered.");
+            // nothing to do
+            return;
         }
         transactionalDataSource.startTransaction();
     }
@@ -66,7 +67,8 @@ public class SimpleTransactionManager implements TransactionManager {
      */
     public void commit(Object testObject) {
         if (transactionalDataSource == null) {
-            throw new UnitilsException("Trying to commit transaction, but no transaction is currently active.");
+            // nothing to do
+            return;
         }
         transactionalDataSource.commitTransaction();
     }
@@ -79,7 +81,8 @@ public class SimpleTransactionManager implements TransactionManager {
      */
     public void rollback(Object testObject) {
         if (transactionalDataSource == null) {
-            throw new UnitilsException("Trying to rollback transaction, but no transaction is currently active.");
+            // nothing to do
+            return;
         }
         transactionalDataSource.rollbackTransaction();
     }
@@ -223,28 +226,28 @@ public class SimpleTransactionManager implements TransactionManager {
             ConnectionHolder connectionHolder = connectionHolders.get();
             if (connectionHolder == null) {
                 // No transaction has been initiated. Simply return a connection from the underlying DataSource
-                Connection conn = getConnectionMethod.getConnection();
+                Connection connection = getConnectionMethod.getConnection();
                 // Switch to auto commit if necessary. This is very expensive in some JDBC drivers, so we don't want to do
                 // it unnecessarily
-                if (!conn.getAutoCommit()) {
-                    conn.setAutoCommit(true);
+                if (!connection.getAutoCommit()) {
+                    connection.setAutoCommit(true);
                 }
-                return conn;
+                return connection;
             }
 
-            CloseSuppressingConnectionProxy conn = connectionHolder.getConnection();
-            if (conn == null) {
+            CloseSuppressingConnectionProxy connectionProxy = connectionHolder.getConnection();
+            if (connectionProxy == null) {
                 // First time that a Connection is requested during this transaction. Fetch a Connection and store it
                 // in the ConnectionHolder
-                conn = new CloseSuppressingConnectionProxy(getConnectionMethod.getConnection());
+                connectionProxy = new CloseSuppressingConnectionProxy(getConnectionMethod.getConnection());
                 // Switch to manual commit if necessary. This is very expensive in some JDBC drivers, so we don't want
                 // to do it unnecessarily
-                if (conn.getAutoCommit()) {
-                    conn.setAutoCommit(false);
+                if (connectionProxy.getAutoCommit()) {
+                    connectionProxy.setAutoCommit(false);
                 }
-                connectionHolder.setConnection(conn);
+                connectionHolder.setConnection(connectionProxy);
             }
-            return conn;
+            return connectionProxy;
         }
 
     }
