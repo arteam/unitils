@@ -15,12 +15,12 @@
  */
 package org.unitils.core;
 
+import static org.unitils.util.ReflectionUtils.getClassWithName;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.unitils.util.ReflectionUtils;
 
 /**
  * A class for holding and retrieving modules.
@@ -71,8 +71,8 @@ public class ModulesRepository {
     /**
      * Gets the modules that is of the given type or a sub-type.
      * A UnitilsException is thrown when there is not exactly 1 possible match.
-     * 
-     * @param <T> The module type 
+     *
+     * @param <T>  The module type
      * @param type the module type, not null
      * @return the module, not null
      */
@@ -90,8 +90,8 @@ public class ModulesRepository {
 
     /**
      * Gets all modules that are of the given type or a sub-type.
-
-     * @param <T> The module type 
+     *
+     * @param <T>  The module type
      * @param type the type, not null
      * @return the modules, an empty list if none found
      */
@@ -107,14 +107,15 @@ public class ModulesRepository {
     }
 
 
+    //todo javadoc
     @SuppressWarnings("unchecked")
     public boolean isModuleEnabled(String fullyQualifiedClassName) {
-        Class<? extends Module> moduleClass = (Class<? extends Module>) 
-                ReflectionUtils.getClassWithName(fullyQualifiedClassName);
+        Class<? extends Module> moduleClass = (Class<? extends Module>) getClassWithName(fullyQualifiedClassName);
         return isModuleEnabled(moduleClass);
     }
 
 
+    //todo javadoc
     public boolean isModuleEnabled(Class<? extends Module> moduleClass) {
         return getModulesOfType(moduleClass).size() >= 0;
     }

@@ -15,21 +15,15 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 import static org.springframework.jdbc.datasource.DataSourceUtils.getConnection;
 import static org.springframework.jdbc.datasource.DataSourceUtils.releaseConnection;
-import static org.unitils.database.transaction.TransactionMode.COMMIT;
-import static org.unitils.database.transaction.TransactionMode.DISABLED;
-import static org.unitils.database.transaction.TransactionMode.ROLLBACK;
-
-import java.sql.Connection;
-
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
-import org.unitils.database.transaction.SpringIntegratingTransactionManager;
+import static org.unitils.database.transaction.TransactionMode.*;
 import org.unitils.spring.annotation.SpringApplicationContext;
+
+import java.sql.Connection;
 
 /**
  * Tests verifying whether the SpringIntegratingTransactionManagerTest functions correctly.
@@ -52,20 +46,16 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        
-        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", 
-                SpringIntegratingTransactionManager.class.getName());
+
         Unitils.getInstance().init(configuration);
-        
         databaseModule = getDatabaseModule();
-        databaseModule.initTransactionManager();
 
         noApplicationContextTest = new NoApplicationContextTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
     }
-    
-    
+
+
     @Override
     public void tearDown() throws Exception {
         Unitils.getInstance().init();
@@ -81,13 +71,13 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         mockConnection2.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransactionIfPossible(noApplicationContextTest);
+        databaseModule.startTransaction(noApplicationContextTest);
         Connection conn1 = getConnection(databaseModule.getDataSource());
         Connection conn2 = getConnection(databaseModule.getDataSource());
         assertNotSame(conn1, conn2);
         releaseConnection(conn1, databaseModule.getDataSource());
         releaseConnection(conn2, databaseModule.getDataSource());
-        databaseModule.commitOrRollbackTransactionIfPossible(noApplicationContextTest);
+        databaseModule.commitOrRollbackTransaction(noApplicationContextTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -101,15 +91,16 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         expect(mockConnection1.isReadOnly()).andStubReturn(false);
         mockConnection1.rollback();
         mockConnection1.close();
+        mockConnection2.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransactionIfPossible(rollbackTest);
+        databaseModule.startTransaction(rollbackTest);
         Connection conn1 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         Connection conn2 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransactionIfPossible(rollbackTest);
+        databaseModule.commitOrRollbackTransaction(rollbackTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -125,13 +116,13 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransactionIfPossible(commitTest);
+        databaseModule.startTransaction(commitTest);
         Connection conn1 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         Connection conn2 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransactionIfPossible(commitTest);
+        databaseModule.commitOrRollbackTransaction(commitTest);
 
         verify(mockConnection1, mockConnection2);
     }

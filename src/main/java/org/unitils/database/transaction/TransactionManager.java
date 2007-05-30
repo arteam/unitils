@@ -15,6 +15,8 @@
  */
 package org.unitils.database.transaction;
 
+import javax.sql.DataSource;
+
 
 /**
  * Defines the contract for classes that can make sure unit tests managed by unitils are executed in a transaction.
@@ -24,6 +26,11 @@ package org.unitils.database.transaction;
  */
 public interface TransactionManager {
 
+
+    //todo javadoc
+    DataSource createTransactionalDataSource(DataSource dataSource);
+
+
     /**
      * Starts a transaction.
      *
@@ -31,29 +38,23 @@ public interface TransactionManager {
      */
     void startTransaction(Object testObject);
 
-    
+
     /**
-     * Commits the currently active transaction. This transaction must have been initiated by calling 
+     * Commits the currently active transaction. This transaction must have been initiated by calling
      * {@link #startTransaction(Object)} with the same testObject within the same thread.
-     * 
+     *
      * @param testObject The test instance, not null
      */
     void commit(Object testObject);
-    
+
 
     /**
-     * Rolls back the currently active transaction. This transaction must have been initiated by calling 
+     * Rolls back the currently active transaction. This transaction must have been initiated by calling
      * {@link #startTransaction(Object)} with the same testObject within the same thread.
-     * 
+     *
      * @param testObject The test instance, not null
      */
     void rollback(Object testObject);
 
-    
-    /**
-     * @param testObject The test instance, not null
-     * 
-     * @return Whether or not transaction management is possible for the given testObject
-     */
-    boolean isActive(Object testObject);
+
 }

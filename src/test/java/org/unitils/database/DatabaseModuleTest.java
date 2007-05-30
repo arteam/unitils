@@ -55,7 +55,6 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
      */
     public void testInjectDataSource() throws Exception {
         DbTest dbTest = new DbTest();
-        databaseModule.initTransactionManager();
         databaseModule.injectDataSource(dbTest);
 
         assertNotNull(dbTest.dataSourceFromField);

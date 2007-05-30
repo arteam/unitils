@@ -15,18 +15,12 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.unitils.database.transaction.TransactionMode.COMMIT;
-import static org.unitils.database.transaction.TransactionMode.DISABLED;
-import static org.unitils.database.transaction.TransactionMode.ROLLBACK;
-
-import java.sql.Connection;
-
+import static org.easymock.EasyMock.*;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
-import org.unitils.database.transaction.SimpleTransactionManager;
+import static org.unitils.database.transaction.TransactionMode.*;
+
+import java.sql.Connection;
 
 /**
  * Tests verifying whether the SimpleTransactionManager functions correctly.
@@ -50,20 +44,16 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
     public void setUp() throws Exception {
         super.setUp();
 
-        configuration.setProperty("org.unitils.database.transaction.TransactionManager.implClassName", 
-                SimpleTransactionManager.class.getName());
+        configuration.setProperty("unitils.module.spring.enabled", "false");
         Unitils.getInstance().init(configuration);
-        
         databaseModule = getDatabaseModule();
-        databaseModule.initTransactionManager();
 
         transactionsDisabledTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
-
     }
-    
-    
+
+
     @Override
     public void tearDown() throws Exception {
         Unitils.getInstance().init();
@@ -78,13 +68,13 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection2.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransactionIfPossible(transactionsDisabledTest);
+        databaseModule.startTransaction(transactionsDisabledTest);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransactionIfPossible(transactionsDisabledTest);
+        databaseModule.commitOrRollbackTransaction(transactionsDisabledTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -100,13 +90,13 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransactionIfPossible(rollbackTest);
+        databaseModule.startTransaction(rollbackTest);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransactionIfPossible(rollbackTest);
+        databaseModule.commitOrRollbackTransaction(rollbackTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -122,13 +112,13 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransactionIfPossible(commitTest);
+        databaseModule.startTransaction(commitTest);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransactionIfPossible(commitTest);
+        databaseModule.commitOrRollbackTransaction(commitTest);
 
         verify(mockConnection1, mockConnection2);
     }
