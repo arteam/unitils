@@ -72,7 +72,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
 
     private static final String PUBLIC_SCHEMA_XSD_CONTENT =
             "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"PUBLIC\">\n" +
+                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"PUBLIC\" targetNamespace=\"PUBLIC\">\n" +
                     "   <xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />\n" +
                     "   <xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />\n" +
                     "   <xsd:complexType name=\"TABLE_1__type\">\n" +

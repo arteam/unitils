@@ -133,7 +133,7 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseTask implements Da
             writer = new BufferedWriter(new FileWriter(new File(xsdDirectory, dbSupport.getSchemaName() + ".xsd")));
 
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" targetNamespace=\"" + dbSupport.getSchemaName() + "\">\n");
+            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"" + dbSupport.getSchemaName() + "\" targetNamespace=\"" + dbSupport.getSchemaName() + "\">\n");
 
             Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {

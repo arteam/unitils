@@ -27,9 +27,9 @@ import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionManagerFactory;
+import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
 import static org.unitils.database.util.TransactionMode.*;
-import org.unitils.database.util.Flushable;
 import org.unitils.dbmaintainer.DBMaintainer;
 import static org.unitils.util.AnnotationUtils.*;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
@@ -122,7 +122,11 @@ public class DatabaseModule implements Module {
     }
 
 
-    // todo javadoc
+    /**
+     * Gets the transaction manager or creates one if it does not exist yet.
+     *
+     * @return The transaction manager, not null
+     */
     public TransactionManager getTransactionManager() {
         if (transactionManager == null) {
             transactionManager = createTransactionManager();

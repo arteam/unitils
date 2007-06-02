@@ -56,6 +56,9 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
     }
 
 
+    /**
+     * Cleans up test by resetting the unitils instance.
+     */
     @Override
     public void tearDown() throws Exception {
         Unitils.getInstance().init();
