@@ -27,7 +27,15 @@ import javax.sql.DataSource;
 public interface TransactionManager {
 
 
-    //todo javadoc
+    /**
+     * Makes the given data source a transactional datasource.
+     * If no action needs to be performed, the given data source should be returned.
+     * <p/>
+     * This could for example be used to wrap the given data source for intercepting the creation of connections.
+     *
+     * @param dataSource The original data source, not null
+     * @return The transactional data source, not null
+     */
     DataSource createTransactionalDataSource(DataSource dataSource);
 
 

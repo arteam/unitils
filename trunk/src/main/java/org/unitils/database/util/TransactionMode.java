@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database.transaction;
+package org.unitils.database.util;
 
 /**
  * Enum defining whether a test must be run in a transaction and, if yes, what will be commit/rollback behavior.

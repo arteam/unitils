@@ -18,7 +18,7 @@ package org.unitils.database;
 import static org.easymock.EasyMock.*;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
-import static org.unitils.database.transaction.TransactionMode.*;
+import static org.unitils.database.util.TransactionMode.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

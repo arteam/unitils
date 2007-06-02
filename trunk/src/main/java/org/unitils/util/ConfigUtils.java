@@ -35,22 +35,6 @@ public class ConfigUtils {
 
 
     /**
-     * @param type          The type of the instance
-     * @param configuration The configuration containing the necessary properties for configuring the instance
-     * @return The instance of the given class, as configured by the given <code>Configuration</code> instance.
-     *         The configuration should contain a property with as key the fully qualified name of the interface type followed by
-     *         '.impl.className', and as value the fully qualified classname of the implementation type.
-     */
-    @SuppressWarnings({"unchecked"})
-    public static <T> T getConfiguredInstance(Class type, Properties configuration) {
-        String propKey = type.getName() + ".implClassName";
-        String implClassName = PropertyUtils.getString(propKey, configuration);
-        logger.debug("Creating instance of " + type + ". Implementation class " + implClassName);
-        return (T) createInstanceOfType(implClassName);
-    }
-
-
-    /**
      * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
      * Tries to retrieve a specific implementation first (propery key = fully qualified name of the interface
      * type + '.impl.className.' + implementationDiscriminatorValue). If this key does not exist, the generally configured
@@ -65,22 +49,46 @@ public class ConfigUtils {
      */
     @SuppressWarnings({"unchecked"})
     public static <T> T getConfiguredInstance(Class type, Properties configuration, String... implementationDiscriminatorValues) {
+        String implClassName = getConfiguredClassName(type, configuration, implementationDiscriminatorValues);
+        logger.debug("Creating instance of " + type + ". Implementation class " + implClassName);
+        return (T) createInstanceOfType(implClassName);
+    }
+
+
+    /**
+     * Retrieves the class name of the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
+     * Tries to retrieve a specific implementation first (propery key = fully qualified name of the interface
+     * type + '.impl.className.' + implementationDiscriminatorValue). If this key does not exist, the generally configured
+     * instance is retrieved (same property key without the implementationDiscriminatorValue).
+     *
+     * @param type          The type of the instance
+     * @param configuration The configuration containing the necessary properties for configuring the instance
+     * @param implementationDiscriminatorValues
+     *                      The values that define which specific implementation class should be used.
+     *                      This is typically an environment specific property, like the DBMS that is used.
+     * @return The configured class name
+     */
+    public static String getConfiguredClassName(Class type, Properties configuration, String... implementationDiscriminatorValues) {
         String propKey = type.getName() + ".implClassName";
-        String implementationSpecificPropKey = propKey;
-        for (String implementationDiscriminatorValue : implementationDiscriminatorValues) {
-            implementationSpecificPropKey += '.' + implementationDiscriminatorValue;
+
+        // first try specific instance using the given discriminators
+        if (implementationDiscriminatorValues != null) {
+            String implementationSpecificPropKey = propKey;
+            for (String implementationDiscriminatorValue : implementationDiscriminatorValues) {
+                implementationSpecificPropKey += '.' + implementationDiscriminatorValue;
+            }
+            if (configuration.containsKey(implementationSpecificPropKey)) {
+                return PropertyUtils.getString(implementationSpecificPropKey, configuration);
+            }
         }
 
-        if (configuration.containsKey(implementationSpecificPropKey)) {
-            String implClassName = PropertyUtils.getString(implementationSpecificPropKey, configuration);
-            logger.debug("Creating instance of " + type + ". Implementation class " + implClassName);
-            return (T) createInstanceOfType(implClassName);
-        }
+        // specifig not found, try general configured instance
         if (configuration.containsKey(propKey)) {
-            String implClassName = PropertyUtils.getString(propKey, configuration);
-            logger.debug("Creating instance of " + type + ". Implementation class " + implClassName);
-            return (T) createInstanceOfType(implClassName);
+            return PropertyUtils.getString(propKey, configuration);
         }
+
+        // no configuration found
         throw new UnitilsException("Missing configuration for " + propKey);
     }
+
 }

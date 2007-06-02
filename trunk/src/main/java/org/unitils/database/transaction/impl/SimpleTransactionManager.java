@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database.transaction;
+package org.unitils.database.transaction.impl;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.util.BaseConnectionProxy;
 import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
 
@@ -39,7 +40,14 @@ public class SimpleTransactionManager implements TransactionManager {
     protected SimpleTransactionalDataSource transactionalDataSource;
 
 
-    //todo javadoc
+    /**
+     * Makes the given data source a transactional datasource.
+     * This will wrap the given data source, so that the transaction manager can manage the creation/destruction of
+     * connections.
+     *
+     * @param dataSource The original data source, not null
+     * @return The transactional data source, not null
+     */
     public DataSource createTransactionalDataSource(DataSource dataSource) {
         transactionalDataSource = new SimpleTransactionalDataSource(dataSource);
         return transactionalDataSource;
