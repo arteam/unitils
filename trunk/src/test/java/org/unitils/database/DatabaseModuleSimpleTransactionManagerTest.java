@@ -55,6 +55,9 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
     }
 
 
+    /**
+     * Cleans up test by resetting the unitils instance.
+     */
     @Override
     public void tearDown() throws Exception {
         Unitils.getInstance().init();
@@ -68,7 +71,7 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         expect(mockConnection1.getAutoCommit()).andReturn(true);
         expect(mockConnection2.getAutoCommit()).andReturn(true);
         mockConnection1.close();
-        mockConnection2.close();
+        mockConnection2.close();        
         replay(mockConnection1, mockConnection2);
 
         databaseModule.startTransaction(transactionsDisabledTest);

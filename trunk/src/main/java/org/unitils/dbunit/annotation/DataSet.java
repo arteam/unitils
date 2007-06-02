@@ -15,10 +15,10 @@
  */
 package org.unitils.dbunit.annotation;
 
-import org.unitils.dbunit.datasetoperation.DataSetOperation;
-import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.DefaultDataSetFactory;
+import org.unitils.dbunit.datasetoperation.DataSetOperation;
+import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
@@ -89,6 +89,7 @@ public @interface DataSet {
      */
     String value() default "";
 
+
     /**
      * The operation that needs to be executed to get the dbunit dataset into the database
      *
@@ -97,10 +98,11 @@ public @interface DataSet {
      */
     Class<? extends DataSetOperation> operation() default DefaultDataSetOperation.class;
 
+
     /**
      * The factory that needs to be used to read the dataset file and create a {@link org.unitils.dbunit.util.MultiSchemaDataSet}
      * object
-     * 
+     *
      * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DefaultDataSetFactory}
      *         to make use of the default DataSetOperation configured in the unitils configuration.
      */
