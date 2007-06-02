@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.database.transaction;
+package org.unitils.database.transaction.impl;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -21,6 +21,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.transaction.TransactionManager;
 import org.unitils.spring.SpringModule;
 
 import javax.sql.DataSource;
@@ -43,7 +44,13 @@ public class SpringTransactionManager implements TransactionManager {
     private ThreadLocal<TransactionStatus> transactionStatusHolder = new ThreadLocal<TransactionStatus>();
 
 
-    //todo javadoc
+    /**
+     * Makes the given data source a transactional datasource.
+     * This will just return the given data source.
+     *
+     * @param dataSource The original data source, not null
+     * @return The transactional data source, not null
+     */
     public DataSource createTransactionalDataSource(DataSource dataSource) {
         return dataSource;
     }

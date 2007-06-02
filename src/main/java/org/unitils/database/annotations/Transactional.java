@@ -17,13 +17,12 @@ package org.unitils.database.annotations;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.unitils.database.transaction.TransactionMode.DEFAULT;
+import static org.unitils.database.util.TransactionMode.DEFAULT;
+import org.unitils.database.util.TransactionMode;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
-import org.unitils.database.transaction.TransactionMode;
 
 /**
  * Annotation enabling to specify if tests should be run in a transaction and, if yes, whether at the end of the test,

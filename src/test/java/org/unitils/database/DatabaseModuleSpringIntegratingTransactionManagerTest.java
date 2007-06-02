@@ -20,7 +20,7 @@ import static org.springframework.jdbc.datasource.DataSourceUtils.getConnection;
 import static org.springframework.jdbc.datasource.DataSourceUtils.releaseConnection;
 import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
-import static org.unitils.database.transaction.TransactionMode.*;
+import static org.unitils.database.util.TransactionMode.*;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
 import java.sql.Connection;
