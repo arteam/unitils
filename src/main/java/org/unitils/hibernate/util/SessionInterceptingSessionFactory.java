@@ -139,6 +139,8 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
 
     /**
      * Closes and clears all open sessions.
+     * <p/>
+     * todo implement
      */
     public void closeOpenSessions() {
         for (org.hibernate.Session session : sessions) {

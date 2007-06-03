@@ -15,7 +15,9 @@
  */
 package org.unitils.database.transaction.impl;
 
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.util.BaseConnectionProxy;
 import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
@@ -41,16 +43,18 @@ public class SimpleTransactionManager implements TransactionManager {
 
 
     /**
-     * Makes the given data source a transactional datasource.
+     * Initializes the transaction manager with the given {@link DataSource}.
+     * <p/>
      * This will wrap the given data source, so that the transaction manager can manage the creation/destruction of
-     * connections.
+     * connections. The wrapped data source is then installed in the database module.
      *
-     * @param dataSource The original data source, not null
-     * @return The transactional data source, not null
+     * @param dataSource The data source, not null
      */
-    public DataSource createTransactionalDataSource(DataSource dataSource) {
+    public void setDataSource(DataSource dataSource) {
         transactionalDataSource = new SimpleTransactionalDataSource(dataSource);
-        return transactionalDataSource;
+
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        databaseModule.setDataSource(transactionalDataSource);
     }
 
 

@@ -112,13 +112,19 @@ public class DatabaseModule implements Module {
      */
     public DataSource getDataSource() {
         if (dataSource == null) {
-            TransactionManager transactionManager = getTransactionManager();
-            dataSource = transactionManager.createTransactionalDataSource(createDataSource());
-            if (updateDatabaseSchemaEnabled) {
-                updateDatabase();
-            }
+            dataSource = createDataSource();
         }
         return dataSource;
+    }
+
+
+    /**
+     * Sets the given instance as data source for the database module.
+     *
+     * @param dataSource The data source, not null
+     */
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
 
@@ -160,11 +166,12 @@ public class DatabaseModule implements Module {
 
 
     /**
+     * todo make configurable using properties
+     * <p/>
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link DBMaintainer} for more information.
      *
      * @param sqlHandler SQLHandler that needs to be used for the database updates
-     *                   todo make configurable using properties
      */
     public void updateDatabase(SQLHandler sqlHandler) {
         try {
@@ -213,17 +220,27 @@ public class DatabaseModule implements Module {
      * @return the datasource
      */
     protected DataSource createDataSource() {
-        // Get the factory for the data source
+        System.out.println("Creating data source");
+        // Get the factory for the data source and create it
         DataSourceFactory dataSourceFactory = getConfiguredInstance(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
-        return dataSourceFactory.createDataSource();
+        DataSource dataSource = dataSourceFactory.createDataSource();
+
+        // Call the database maintainer if enabled
+        if (updateDatabaseSchemaEnabled) {
+            updateDatabase(new SQLHandler(dataSource));
+        }
+        // Install the data source in the transaction manager
+        getTransactionManager().setDataSource(dataSource);
+        return dataSource;
     }
 
 
     /**
-     * @return An instance of the transactionManager, like configured in the Unitils configuration
+     * @return An instance of the transactionManager, as configured in the Unitils configuration
      */
     protected TransactionManager createTransactionManager() {
+        System.out.println("Creating transactoin manager");
         // Get the factory for the transaction manager
         TransactionManagerFactory transactionManagerFactory = getConfiguredInstance(TransactionManagerFactory.class, configuration);
         transactionManagerFactory.init(configuration);
@@ -250,6 +267,7 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
+        System.out.println("Starting transaction");
         TransactionMode transactionMode = getTransactionMode(testObject);
         if (transactionMode == DISABLED) {
             return;
@@ -271,8 +289,10 @@ public class DatabaseModule implements Module {
         }
         TransactionManager transactionManager = getTransactionManager();
         if (transactionMode == COMMIT) {
+            System.out.println("Commiting transaction");
             transactionManager.commit(testObject);
         } else if (getTransactionMode(testObject) == ROLLBACK) {
+            System.out.println("Rolling back transaction");
             transactionManager.rollback(testObject);
         }
     }

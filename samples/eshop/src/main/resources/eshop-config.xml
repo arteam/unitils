@@ -13,7 +13,7 @@
     </bean>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
+        <property name="dataSource" ref="dataSource"/>        
         <property name="annotatedClasses">
             <list>
                 <value>org.unitils.sample.eshop.model.User</value>
@@ -41,4 +41,8 @@
         <property name="password" value=""/>
     </bean>
 
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
 </beans>

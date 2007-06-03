@@ -40,7 +40,6 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
     public HibernateSpringSupportImpl() {
         // Make sure Spring is in the classpath
         LocalSessionFactoryBean.class.getName();
-
         // Register the BeanPostProcessor that intercepts SessionFactory creation
         getSpringModule().registerBeanPostProcessorType(SessionFactoryInterceptingBeanPostProcessor.class);
     }
@@ -85,8 +84,7 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
      * @return The session factory bean post processor, null if not found
      */
     protected SessionFactoryInterceptingBeanPostProcessor getSessionFactoryWrappingBeanPostProcessor(Object testObject) {
-        BeanPostProcessor beanPostProcessor = getSpringModule().getBeanPostProcessor(testObject,
-                SessionFactoryInterceptingBeanPostProcessor.class);
+        BeanPostProcessor beanPostProcessor = getSpringModule().getBeanPostProcessor(testObject, SessionFactoryInterceptingBeanPostProcessor.class);
         return (SessionFactoryInterceptingBeanPostProcessor) beanPostProcessor;
     }
 
