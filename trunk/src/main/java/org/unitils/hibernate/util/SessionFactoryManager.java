@@ -15,29 +15,24 @@
  */
 package org.unitils.hibernate.util;
 
-import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import static org.hibernate.cfg.Environment.CURRENT_SESSION_CONTEXT_CLASS;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.util.AnnotatedInstanceManager;
+import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.unitils.core.UnitilsException;
-import org.unitils.core.util.AnnotatedInstanceManager;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
+import java.util.*;
+import static java.util.Arrays.asList;
 
 /**
  * A class for managing and creating Hibernate configurations and session factories.
@@ -94,7 +89,6 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @return The Hibernate session factory, not null
      */
     public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
-
         // Check if a SessionFactory has been configured
         Configuration configuration = getConfiguration(testObject);
         if (configuration == null) {

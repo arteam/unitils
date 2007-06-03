@@ -74,8 +74,7 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
         // if it's a session factory bean, wrap the session factory and store it
         if (bean instanceof SessionFactory && !(bean instanceof SessionInterceptingSessionFactory)) {
             if (processedBeanName != null && !processedBeanName.equals(beanName)) {
-                throw new UnitilsException("More than one SessionFactory is configured in the spring configuration. This " +
-                        "is not supported in Unitils");
+                throw new UnitilsException("More than one SessionFactory is configured in the spring configuration. This is not supported in Unitils");
             }
             processedBeanName = beanName;
 
@@ -85,8 +84,7 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
         // if it's a session factory factory bean, get and store configuration
         if (bean instanceof LocalSessionFactoryBean) {
             if (processedBeanName != null && !processedBeanName.equals(beanName)) {
-                throw new UnitilsException("More than one SessionFactory is configured in the spring configuration. This " +
-                        "is not supported in Unitils");
+                throw new UnitilsException("More than one SessionFactory is configured in the spring configuration. This is not supported in Unitils");
             }
             processedBeanName = beanName;
             configuration = ((LocalSessionFactoryBean) bean).getConfiguration();
@@ -94,13 +92,15 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
         return bean;
     }
 
+
     /**
      * @return The <code>SessionFactory</code> that was intercepted by this <code>BeanPostProcessor</code>, wrapped in a
-     * {@link SessionFactoryInterceptingBeanPostProcessor}, if any
+     *         {@link SessionFactoryInterceptingBeanPostProcessor}, if any
      */
     public SessionInterceptingSessionFactory getInterceptedSessionFactory() {
         return sessionFactory;
     }
+
 
     /**
      * @return The <code>Configuration</code> that was intercepted by this <code>BeanPostProcessor</code>, if any
