@@ -15,8 +15,8 @@
  */
 package org.unitils.database;
 
-import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.unitils.core.Unitils;
+import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
 
 import javax.sql.DataSource;
 
@@ -34,20 +34,25 @@ import javax.sql.DataSource;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class UnitilsDataSource extends TransactionAwareDataSourceProxy {
+public class UnitilsDataSource extends BaseDataSourceProxy {
 
 
     /**
      * Creates a datasource.
      */
     public UnitilsDataSource() {
-        // create data source
-        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        DataSource dataSource = databaseModule.createDataSource();
-        setTargetDataSource(dataSource);
+        super(getUnitilsDataSource());
+    }
 
-        // register data source
-        databaseModule.setDataSource(this);
+
+    /**
+     * Gets the Unitils datasource from the {@link DatabaseModule}.
+     *
+     * @return The DataSource, not null
+     */
+    private static DataSource getUnitilsDataSource() {
+        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+        return databaseModule.getDataSource();
     }
 
 }
