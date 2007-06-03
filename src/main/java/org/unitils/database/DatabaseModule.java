@@ -15,6 +15,27 @@
  */
 package org.unitils.database;
 
+import static org.unitils.database.util.TransactionMode.COMMIT;
+import static org.unitils.database.util.TransactionMode.DEFAULT;
+import static org.unitils.database.util.TransactionMode.DISABLED;
+import static org.unitils.database.util.TransactionMode.ROLLBACK;
+import static org.unitils.util.AnnotationUtils.getClassLevelAnnotationProperty;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -29,22 +50,8 @@ import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionManagerFactory;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
-import static org.unitils.database.util.TransactionMode.*;
 import org.unitils.dbmaintainer.DBMaintainer;
-import static org.unitils.util.AnnotationUtils.*;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import javax.sql.DataSource;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * todo add javadoc explaining transaction behavior.
@@ -175,7 +182,7 @@ public class DatabaseModule implements Module {
      */
     public void updateDatabase(SQLHandler sqlHandler) {
         try {
-            logger.info("Updating database if needed.");
+            logger.info("Checking if database has to be updated.");
             DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
             dbMaintainer.updateDatabase();
 
@@ -220,7 +227,7 @@ public class DatabaseModule implements Module {
      * @return the datasource
      */
     protected DataSource createDataSource() {
-        System.out.println("Creating data source");
+        logger.debug("Creating data source");
         // Get the factory for the data source and create it
         DataSourceFactory dataSourceFactory = getConfiguredInstance(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
@@ -240,7 +247,7 @@ public class DatabaseModule implements Module {
      * @return An instance of the transactionManager, as configured in the Unitils configuration
      */
     protected TransactionManager createTransactionManager() {
-        System.out.println("Creating transactoin manager");
+        logger.debug("Creating transaction manager");
         // Get the factory for the transaction manager
         TransactionManagerFactory transactionManagerFactory = getConfiguredInstance(TransactionManagerFactory.class, configuration);
         transactionManagerFactory.init(configuration);
@@ -267,7 +274,6 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
-        System.out.println("Starting transaction");
         TransactionMode transactionMode = getTransactionMode(testObject);
         if (transactionMode == DISABLED) {
             return;
@@ -289,10 +295,10 @@ public class DatabaseModule implements Module {
         }
         TransactionManager transactionManager = getTransactionManager();
         if (transactionMode == COMMIT) {
-            System.out.println("Commiting transaction");
+            logger.debug("Commiting transaction");
             transactionManager.commit(testObject);
         } else if (getTransactionMode(testObject) == ROLLBACK) {
-            System.out.println("Rolling back transaction");
+            logger.debug("Rolling back transaction");
             transactionManager.rollback(testObject);
         }
     }

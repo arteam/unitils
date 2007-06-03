@@ -15,12 +15,23 @@
  */
 package org.unitils.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import static org.unitils.util.PropertyUtils.*;
+import static org.unitils.util.PropertyUtils.getBoolean;
+import static org.unitils.util.PropertyUtils.getString;
+import static org.unitils.util.PropertyUtils.getStringList;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A class for loading unitils modules.
@@ -29,11 +40,11 @@ import java.util.*;
  * be used to construct properties that define the classnames and optionally the dependencies of these modules. E.g.
  * <pre><code>
  * unitils.modules= a, b, c, d
- * unitils.module.a.className= be.ordina.A
+ * unitils.module.a.className= org.unitils.A
  * unitils.module.a.runAfter= b, c
- * unitils.module.b.className= be.ordina.B
+ * unitils.module.b.className= org.unitils.B
  * unitils.module.b.runAfter= c
- * unitils.module.c.className= be.ordina.C
+ * unitils.module.c.className= org.unitils.C
  * unitils.module.d.enabled= false
  * </code></pre>
  * The above configuration will load 3 core classes A, B and C and will always perform processing in
