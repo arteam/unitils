@@ -15,6 +15,8 @@
  */
 package org.unitils.database.transaction.impl;
 
+import javax.sql.DataSource;
+
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -23,8 +25,6 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.spring.SpringModule;
-
-import javax.sql.DataSource;
 
 /**
  * Transaction manager that relies on Spring transaction management. When starting a Transaction, this transaction
@@ -60,7 +60,6 @@ public class SpringTransactionManager implements TransactionManager {
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
-        System.out.println("SpringTransactionManager.startTransaction");
         PlatformTransactionManager springTransactionManager = getSpringTransactionManager(testObject);
         TransactionStatus transactionStatus = springTransactionManager.getTransaction(createTransactionDefinition(testObject));
         transactionStatusHolder.set(transactionStatus);
@@ -74,7 +73,6 @@ public class SpringTransactionManager implements TransactionManager {
      * @param testObject The test object, not null
      */
     public void commit(Object testObject) {
-        System.out.println("SpringTransactionManager.commit");
         TransactionStatus transactionStatus = transactionStatusHolder.get();
         if (transactionStatus == null) {
             throw new UnitilsException("Trying to commit, while no transaction is currently active");
@@ -91,7 +89,6 @@ public class SpringTransactionManager implements TransactionManager {
      * @param testObject The test object, not null
      */
     public void rollback(Object testObject) {
-        System.out.println("SpringTransactionManager.rollback");
         TransactionStatus transactionStatus = transactionStatusHolder.get();
         if (transactionStatus == null) {
             throw new UnitilsException("Trying to rollback, while no transaction is currently active");
