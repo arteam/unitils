@@ -15,11 +15,10 @@
  */
 package org.unitils.dbmaintainer.util;
 
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import javax.sql.DataSource;
 
 /**
  * Base decorator or wrapper for a <code>DataSource</code>. Can be subclassed to create a decorator for a
@@ -40,6 +39,7 @@ public class BaseDataSourceProxy implements DataSource {
      */
     public BaseDataSourceProxy() {
     }
+
 
     /**
      * Creates a new instance that wraps the given <code>DataSource</code>
@@ -98,10 +98,14 @@ public class BaseDataSourceProxy implements DataSource {
         return getTargetDataSource().getLoginTimeout();
     }
 
+
+    //todo javadoc
     public DataSource getTargetDataSource() {
         return targetDataSource;
     }
 
+
+    //todo javadoc
     public void setTargetDataSource(DataSource targetDataSource) {
         this.targetDataSource = targetDataSource;
     }

@@ -15,10 +15,9 @@
  */
 package org.unitils.database.transaction.impl;
 
-import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.TransactionManager;
+import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.database.util.BaseConnectionProxy;
 import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
 
@@ -43,18 +42,17 @@ public class SimpleTransactionManager implements TransactionManager {
 
 
     /**
-     * Initializes the transaction manager with the given {@link DataSource}.
+     * Makes the given data source a transactional datasource.
      * <p/>
      * This will wrap the given data source, so that the transaction manager can manage the creation/destruction of
      * connections. The wrapped data source is then installed in the database module.
      *
-     * @param dataSource The data source, not null
+     * @param dataSource The original data source, not null
+     * @return The transactional data source, not null
      */
-    public void setDataSource(DataSource dataSource) {
+    public TransactionalDataSource createTransactionalDataSource(DataSource dataSource) {
         transactionalDataSource = new SimpleTransactionalDataSource(dataSource);
-
-        DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        databaseModule.setDataSource(transactionalDataSource);
+        return transactionalDataSource;
     }
 
 
@@ -105,7 +103,7 @@ public class SimpleTransactionManager implements TransactionManager {
      * is returned for a thread while a transaction is active, and that this connection is not closed while
      * the transaction is active.
      */
-    protected static class SimpleTransactionalDataSource extends BaseDataSourceProxy {
+    protected static class SimpleTransactionalDataSource extends BaseDataSourceProxy implements TransactionalDataSource {
 
         /**
          * ThreadLocal for storing the Connection associated to the treads using this DataSource
@@ -207,6 +205,12 @@ public class SimpleTransactionManager implements TransactionManager {
                     return getTargetDataSource().getConnection();
                 }
             });
+        }
+
+
+        //todo javadoc
+        public Connection getTransactionalConnection() throws SQLException {
+            return getConnection();
         }
 
 

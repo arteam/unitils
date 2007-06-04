@@ -15,8 +15,7 @@
  */
 package org.unitils.database.transaction.impl;
 
-import javax.sql.DataSource;
-
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -24,7 +23,14 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
+import org.unitils.database.transaction.TransactionalDataSource;
+import org.unitils.database.util.BaseConnectionProxy;
+import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
 import org.unitils.spring.SpringModule;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Transaction manager that relies on Spring transaction management. When starting a Transaction, this transaction
@@ -45,11 +51,16 @@ public class SpringTransactionManager implements TransactionManager {
 
 
     /**
-     * Initializes the transaction manager with the given {@link DataSource}.
+     * Makes the given data source a transactional datasource.
+     * If no action needs to be performed, the given data source should be returned.
+     * <p/>
+     * This could for example be used to wrap the given data source for intercepting the creation of connections.
      *
-     * @param dataSource The data source, not null
+     * @param dataSource The original data source, not null
+     * @return The transactional data source, not null
      */
-    public void setDataSource(DataSource dataSource) {
+    public TransactionalDataSource createTransactionalDataSource(DataSource dataSource) {
+        return new SpringTransactionalDataSource(dataSource);
     }
 
 
@@ -127,5 +138,75 @@ public class SpringTransactionManager implements TransactionManager {
     protected SpringModule getSpringModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
     }
+
+
+    /**
+     * todo javadoc
+     */
+    protected static class SpringTransactionalDataSource extends BaseDataSourceProxy implements TransactionalDataSource {
+
+
+        /**
+         * Creates a new instance without initializing the target <code>DataSource</code>. Make sure to call the method
+         * {@link #setTargetDataSource(javax.sql.DataSource)} before using this object.
+         */
+        public SpringTransactionalDataSource() {
+            super();
+        }
+
+
+        /**
+         * Creates a new instance that wraps the given <code>DataSource</code>
+         *
+         * @param wrappedDataSource the data source, not null
+         */
+        public SpringTransactionalDataSource(DataSource wrappedDataSource) {
+            super(wrappedDataSource);
+        }
+
+
+        //todo javadoc
+        public Connection getTransactionalConnection() throws SQLException {
+            return new CloseSuppressingConnectionProxy(DataSourceUtils.getConnection(this));
+        }
+
+
+        public Connection getConnection() throws SQLException {
+            return new CloseSuppressingConnectionProxy(super.getConnection());
+        }
+
+
+        /**
+         * Connection proxy that intercepts the call to the close() method, to make sure
+         * the connection is only closed when the transaction ends.
+         */
+        protected class CloseSuppressingConnectionProxy extends BaseConnectionProxy {
+
+            /**
+             * Constructs a new instance that proxies the given connection
+             *
+             * @param wrappedConnection The connection to wrap, not null
+             */
+            public CloseSuppressingConnectionProxy(Connection wrappedConnection) {
+                super(wrappedConnection);
+            }
+
+            /**
+             * todo javdoc
+             * Supresses the call to the close method, to make sure the connection is only closed
+             * when the transaction ends.
+             *
+             * @see java.sql.Connection#close()
+             */
+            @Override
+            public void close() throws SQLException {
+                // Let spring close the connection
+                // only close when not in a transaction
+                DataSourceUtils.doReleaseConnection(getTargetConnection(), SpringTransactionalDataSource.this);
+            }
+
+        }
+    }
+
 
 }

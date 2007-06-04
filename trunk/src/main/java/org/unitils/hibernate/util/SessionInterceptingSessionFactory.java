@@ -145,7 +145,7 @@ public class SessionInterceptingSessionFactory implements SessionFactory {
     public void closeOpenSessions() {
         for (org.hibernate.Session session : sessions) {
             if (session.isOpen()) {
-                session.close();
+                //   session.close();
             }
         }
         sessions.clear();

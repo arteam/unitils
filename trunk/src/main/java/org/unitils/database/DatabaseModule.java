@@ -15,27 +15,6 @@
  */
 package org.unitils.database;
 
-import static org.unitils.database.util.TransactionMode.COMMIT;
-import static org.unitils.database.util.TransactionMode.DEFAULT;
-import static org.unitils.database.util.TransactionMode.DISABLED;
-import static org.unitils.database.util.TransactionMode.ROLLBACK;
-import static org.unitils.util.AnnotationUtils.getClassLevelAnnotationProperty;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -50,8 +29,22 @@ import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionManagerFactory;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
+import static org.unitils.database.util.TransactionMode.*;
 import org.unitils.dbmaintainer.DBMaintainer;
+import static org.unitils.util.AnnotationUtils.*;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import javax.sql.DataSource;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * todo add javadoc explaining transaction behavior.
@@ -122,16 +115,6 @@ public class DatabaseModule implements Module {
             dataSource = createDataSource();
         }
         return dataSource;
-    }
-
-
-    /**
-     * Sets the given instance as data source for the database module.
-     *
-     * @param dataSource The data source, not null
-     */
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
     }
 
 
@@ -227,18 +210,18 @@ public class DatabaseModule implements Module {
      * @return the datasource
      */
     protected DataSource createDataSource() {
-        logger.debug("Creating data source");
+        logger.debug("Creating data source.");
         // Get the factory for the data source and create it
         DataSourceFactory dataSourceFactory = getConfiguredInstance(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
         DataSource dataSource = dataSourceFactory.createDataSource();
+        // Make data source transactional
+        dataSource = getTransactionManager().createTransactionalDataSource(dataSource);
 
         // Call the database maintainer if enabled
         if (updateDatabaseSchemaEnabled) {
             updateDatabase(new SQLHandler(dataSource));
         }
-        // Install the data source in the transaction manager
-        getTransactionManager().setDataSource(dataSource);
         return dataSource;
     }
 
