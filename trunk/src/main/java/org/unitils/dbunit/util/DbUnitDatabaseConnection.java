@@ -18,7 +18,6 @@ package org.unitils.dbunit.util;
 import org.dbunit.database.AbstractDatabaseConnection;
 import org.unitils.database.transaction.TransactionalDataSource;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -33,7 +32,7 @@ import java.sql.SQLException;
 public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
 
     /* DataSource that provides access to JDBC connections */
-    private DataSource dataSource;
+    private TransactionalDataSource dataSource;
 
     /* Name of the database schema */
     private String schemaName;
@@ -49,7 +48,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      * @param dataSource The data source, not null
      * @param schemaName The database schema, not null
      */
-    public DbUnitDatabaseConnection(DataSource dataSource, String schemaName) {
+    public DbUnitDatabaseConnection(TransactionalDataSource dataSource, String schemaName) {
         this.dataSource = dataSource;
         this.schemaName = schemaName;
     }
@@ -84,8 +83,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     @Override
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
-            //todo remove cast
-            currentlyUsedConnection = ((TransactionalDataSource) dataSource).getTransactionalConnection();
+            currentlyUsedConnection = dataSource.getTransactionalConnection();
         }
         return currentlyUsedConnection;
     }

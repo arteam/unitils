@@ -15,6 +15,8 @@
  */
 package org.unitils.database.transaction.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -25,7 +27,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.database.util.BaseConnectionProxy;
-import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
+import org.unitils.database.util.BaseDataSourceProxy;
 import org.unitils.spring.SpringModule;
 
 import javax.sql.DataSource;
@@ -44,10 +46,13 @@ import java.sql.SQLException;
  */
 public class SpringTransactionManager implements TransactionManager {
 
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(SpringTransactionManager.class);
+
     /**
      * ThreadLocal for holding the TransactionStatus as used by spring's transaction management
      */
-    private ThreadLocal<TransactionStatus> transactionStatusHolder = new ThreadLocal<TransactionStatus>();
+    protected ThreadLocal<TransactionStatus> transactionStatusHolder = new ThreadLocal<TransactionStatus>();
 
 
     /**
@@ -71,9 +76,17 @@ public class SpringTransactionManager implements TransactionManager {
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
-        PlatformTransactionManager springTransactionManager = getSpringTransactionManager(testObject);
-        TransactionStatus transactionStatus = springTransactionManager.getTransaction(createTransactionDefinition(testObject));
-        transactionStatusHolder.set(transactionStatus);
+        try {
+            logger.debug("Starting transaction");
+            PlatformTransactionManager springTransactionManager = getSpringTransactionManager(testObject);
+            TransactionStatus transactionStatus = springTransactionManager.getTransaction(createTransactionDefinition(testObject));
+            transactionStatusHolder.set(transactionStatus);
+
+        } catch (Throwable t) {
+            throw new UnitilsException("Unable to start transaction. Could not retrieve transaction manager from Spring context. A transaction manager " +
+                    "should be configured in the application context (e.g. DataSourceTransactionManager) or another Unitils transaction manager should " +
+                    "be used (e.g. SimpleTransactionManager by setting the 'transactionManager.type' property to 'simple')", t);
+        }
     }
 
 
@@ -88,6 +101,7 @@ public class SpringTransactionManager implements TransactionManager {
         if (transactionStatus == null) {
             throw new UnitilsException("Trying to commit, while no transaction is currently active");
         }
+        logger.debug("Commiting transaction");
         getSpringTransactionManager(testObject).commit(transactionStatus);
         transactionStatusHolder.remove();
     }
@@ -104,6 +118,7 @@ public class SpringTransactionManager implements TransactionManager {
         if (transactionStatus == null) {
             throw new UnitilsException("Trying to rollback, while no transaction is currently active");
         }
+        logger.debug("Rolling back transaction");
         getSpringTransactionManager(testObject).rollback(transactionStatus);
         transactionStatusHolder.remove();
     }
@@ -141,7 +156,8 @@ public class SpringTransactionManager implements TransactionManager {
 
 
     /**
-     * todo javadoc
+     * Proxy for a DataSource that makes the DataSource Spring transactional. Makes sure that connection are retrieved
+     * and closed using Springs <code>DataSourceUtils</code>
      */
     protected static class SpringTransactionalDataSource extends BaseDataSourceProxy implements TransactionalDataSource {
 
@@ -165,14 +181,13 @@ public class SpringTransactionManager implements TransactionManager {
         }
 
 
-        //todo javadoc
+        /**
+         * Retrieves a connection that can participate in a transaction.
+         *
+         * @return The connection, not null
+         */
         public Connection getTransactionalConnection() throws SQLException {
-            return new CloseSuppressingConnectionProxy(DataSourceUtils.getConnection(this));
-        }
-
-
-        public Connection getConnection() throws SQLException {
-            return new CloseSuppressingConnectionProxy(super.getConnection());
+            return new SpringConnectionProxy(DataSourceUtils.getConnection(this));
         }
 
 
@@ -180,28 +195,23 @@ public class SpringTransactionManager implements TransactionManager {
          * Connection proxy that intercepts the call to the close() method, to make sure
          * the connection is only closed when the transaction ends.
          */
-        protected class CloseSuppressingConnectionProxy extends BaseConnectionProxy {
+        private class SpringConnectionProxy extends BaseConnectionProxy {
 
             /**
              * Constructs a new instance that proxies the given connection
              *
              * @param wrappedConnection The connection to wrap, not null
              */
-            public CloseSuppressingConnectionProxy(Connection wrappedConnection) {
+            public SpringConnectionProxy(Connection wrappedConnection) {
                 super(wrappedConnection);
             }
 
+
             /**
-             * todo javdoc
-             * Supresses the call to the close method, to make sure the connection is only closed
-             * when the transaction ends.
-             *
-             * @see java.sql.Connection#close()
+             * Let spring close the connection. Only close when not in a transaction.
              */
             @Override
             public void close() throws SQLException {
-                // Let spring close the connection
-                // only close when not in a transaction
                 DataSourceUtils.doReleaseConnection(getTargetConnection(), SpringTransactionalDataSource.this);
             }
 

@@ -15,11 +15,13 @@
  */
 package org.unitils.database.transaction.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.database.util.BaseConnectionProxy;
-import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
+import org.unitils.database.util.BaseDataSourceProxy;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -34,6 +36,9 @@ import java.sql.SQLException;
  * @author Tim Ducheyne
  */
 public class SimpleTransactionManager implements TransactionManager {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(SimpleTransactionManager.class);
 
     /**
      * Wrapped instance of the DataSource
@@ -66,6 +71,7 @@ public class SimpleTransactionManager implements TransactionManager {
             // nothing to do
             return;
         }
+        logger.debug("Starting transaction");
         transactionalDataSource.startTransaction();
     }
 
@@ -80,6 +86,7 @@ public class SimpleTransactionManager implements TransactionManager {
             // nothing to do
             return;
         }
+        logger.debug("Commiting transaction");
         transactionalDataSource.commitTransaction();
     }
 
@@ -94,6 +101,7 @@ public class SimpleTransactionManager implements TransactionManager {
             // nothing to do
             return;
         }
+        logger.debug("Rolling back transaction");
         transactionalDataSource.rollbackTransaction();
     }
 
@@ -208,7 +216,12 @@ public class SimpleTransactionManager implements TransactionManager {
         }
 
 
-        //todo javadoc
+        /**
+         * Retrieves a connection that can participate in a transaction.
+         * No special connection needed, same as {@link #getConnection()}
+         *
+         * @return The connection, not null
+         */
         public Connection getTransactionalConnection() throws SQLException {
             return getConnection();
         }
@@ -268,6 +281,7 @@ public class SimpleTransactionManager implements TransactionManager {
 
     }
 
+
     /**
      * Holder class for a Connection. Used for storing the Connection that is used for a transaction.
      */
@@ -276,12 +290,14 @@ public class SimpleTransactionManager implements TransactionManager {
         /* The wrapped connection, which is a CloseSuppressingConnection */
         protected CloseSuppressingConnectionProxy connection;
 
+
         /**
          * @return The connection
          */
         public CloseSuppressingConnectionProxy getConnection() {
             return connection;
         }
+
 
         /**
          * Sets the connection to the given one
@@ -300,6 +316,7 @@ public class SimpleTransactionManager implements TransactionManager {
      */
     protected static class CloseSuppressingConnectionProxy extends BaseConnectionProxy {
 
+
         /**
          * Constructs a new instance that proxies the given connection
          *
@@ -308,6 +325,7 @@ public class SimpleTransactionManager implements TransactionManager {
         public CloseSuppressingConnectionProxy(Connection wrappedConnection) {
             super(wrappedConnection);
         }
+
 
         /**
          * Supresses the call to the close method, to make sure the connection is only closed
@@ -319,6 +337,7 @@ public class SimpleTransactionManager implements TransactionManager {
         public void close() throws SQLException {
             // Connection close is supressed
         }
+
 
         /**
          * Actually closes the connection.

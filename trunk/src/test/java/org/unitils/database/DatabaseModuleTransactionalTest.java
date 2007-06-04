@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
 import org.unitils.database.config.DataSourceFactory;
-import org.unitils.dbmaintainer.util.BaseDataSourceProxy;
+import org.unitils.database.util.BaseDataSourceProxy;
 import org.unitils.spring.SpringModule;
 
 /**

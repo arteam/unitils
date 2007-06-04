@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.util;
+package org.unitils.database.util;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -47,6 +47,26 @@ public class BaseDataSourceProxy implements DataSource {
      * @param targetDataSource the data source that is wrapped, not null
      */
     public BaseDataSourceProxy(DataSource targetDataSource) {
+        this.targetDataSource = targetDataSource;
+    }
+
+
+    /**
+     * Gets the wrapped data source
+     *
+     * @return The data source, not null
+     */
+    public DataSource getTargetDataSource() {
+        return targetDataSource;
+    }
+
+
+    /**
+     * Sets the wrapped data source
+     *
+     * @param targetDataSource The data source, not null
+     */
+    public void setTargetDataSource(DataSource targetDataSource) {
         this.targetDataSource = targetDataSource;
     }
 
@@ -99,14 +119,4 @@ public class BaseDataSourceProxy implements DataSource {
     }
 
 
-    //todo javadoc
-    public DataSource getTargetDataSource() {
-        return targetDataSource;
-    }
-
-
-    //todo javadoc
-    public void setTargetDataSource(DataSource targetDataSource) {
-        this.targetDataSource = targetDataSource;
-    }
 }
