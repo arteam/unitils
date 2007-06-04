@@ -271,7 +271,7 @@ public class DatabaseModule implements Module {
      *
      * @param testObject The test object, not null
      */
-    protected void commitOrRollbackTransaction(Object testObject) {
+    protected void endTransaction(Object testObject) {
         TransactionMode transactionMode = getTransactionMode(testObject);
         if (transactionMode == DISABLED) {
             return;
@@ -306,7 +306,7 @@ public class DatabaseModule implements Module {
 
         @Override
         public void afterTestTearDown(Object testObject) {
-            commitOrRollbackTransaction(testObject);
+            endTransaction(testObject);
         }
     }
 }

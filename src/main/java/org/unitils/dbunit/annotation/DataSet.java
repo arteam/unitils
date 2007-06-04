@@ -15,17 +15,16 @@
  */
 package org.unitils.dbunit.annotation;
 
-import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetfactory.DefaultDataSetFactory;
-import org.unitils.dbunit.datasetoperation.DataSetOperation;
-import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
-
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
+
+import org.unitils.dbunit.datasetfactory.DataSetFactory;
+import org.unitils.dbunit.datasetoperation.DataSetOperation;
 
 /**
  * Annotation indicating that a data set should be loaded before the test run.
@@ -93,18 +92,18 @@ public @interface DataSet {
     /**
      * The operation that needs to be executed to get the dbunit dataset into the database
      *
-     * @return An implementation class of {@link DataSetOperation}. Use the default value {@link DefaultDataSetOperation}
+     * @return An implementation class of {@link DataSetOperation}. Use the default value {@link DataSetOperation}
      *         to make use of the default DataSetOperation configured in the unitils configuration.
      */
-    Class<? extends DataSetOperation> operation() default DefaultDataSetOperation.class;
+    Class<? extends DataSetOperation> operation() default DataSetOperation.class;
 
 
     /**
      * The factory that needs to be used to read the dataset file and create a {@link org.unitils.dbunit.util.MultiSchemaDataSet}
      * object
      *
-     * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DefaultDataSetFactory}
+     * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
      *         to make use of the default DataSetOperation configured in the unitils configuration.
      */
-    Class<? extends DataSetFactory> factory() default DefaultDataSetFactory.class;
+    Class<? extends DataSetFactory> factory() default DataSetFactory.class;
 }

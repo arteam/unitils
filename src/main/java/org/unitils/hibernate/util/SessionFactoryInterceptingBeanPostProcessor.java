@@ -142,6 +142,7 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
         /**
          * Closes and clears all open sessions.
          */
+        @Override
         public void closeOpenSessions() {
             for (org.hibernate.Session session : sessions) {
                 if (session.isOpen()) {

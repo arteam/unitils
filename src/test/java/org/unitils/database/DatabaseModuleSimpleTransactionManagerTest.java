@@ -80,7 +80,7 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(transactionsDisabledTest);
+        databaseModule.endTransaction(transactionsDisabledTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -103,7 +103,7 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         Connection connection2 = dataSource.getConnection();
         connection2.close();
         assertSame(connection1, connection2);
-        databaseModule.commitOrRollbackTransaction(rollbackTest);
+        databaseModule.endTransaction(rollbackTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -126,7 +126,7 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         Connection connection2 = dataSource.getConnection();
         connection2.close();
         assertSame(connection1, connection2);
-        databaseModule.commitOrRollbackTransaction(commitTest);
+        databaseModule.endTransaction(commitTest);
 
         verify(mockConnection1, mockConnection2);
     }
