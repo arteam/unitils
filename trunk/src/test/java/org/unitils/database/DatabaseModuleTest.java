@@ -17,6 +17,7 @@ package org.unitils.database;
 
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 
 import javax.sql.DataSource;
@@ -88,7 +89,7 @@ public class DatabaseModuleTest extends UnitilsJUnit3 {
 
         private boolean updateDataSchemaCalled = false;
 
-        public void updateDatabase() {
+        public void updateDatabase(SQLHandler sqlHandler) {
             updateDataSchemaCalled = true;
         }
     }
