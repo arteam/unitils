@@ -94,7 +94,6 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         expect(mockConnection1.isReadOnly()).andStubReturn(false);
         mockConnection1.rollback();
         mockConnection1.close();
-        mockConnection2.close();
         replay(mockConnection1, mockConnection2);
 
         databaseModule.startTransaction(rollbackTest);
