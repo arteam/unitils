@@ -15,6 +15,26 @@
  */
 package org.unitils.dbunit;
 
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -24,37 +44,17 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetfactory.DefaultDataSetFactory;
 import org.unitils.dbunit.datasetoperation.DataSetOperation;
-import org.unitils.dbunit.datasetoperation.DefaultDataSetOperation;
 import org.unitils.dbunit.util.DataSetXmlReader;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
-import javax.sql.DataSource;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -341,8 +341,8 @@ public class DbUnitModule implements Module {
 
     @SuppressWarnings({"unchecked"})
     protected DataSetOperation getDataSetOperation(Method testMethod) {
-        Class<? extends DataSetOperation> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "operation", DefaultDataSetOperation.class, testMethod);
-        dataSetOperationClass = (Class<? extends DataSetOperation>) getClassValueReplaceDefault(DataSet.class, "operation", dataSetOperationClass, defaultAnnotationPropertyValues, DefaultDataSetOperation.class);
+        Class<? extends DataSetOperation> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "operation", DataSetOperation.class, testMethod);
+        dataSetOperationClass = (Class<? extends DataSetOperation>) getClassValueReplaceDefault(DataSet.class, "operation", dataSetOperationClass, defaultAnnotationPropertyValues, DataSetOperation.class);
 
         return createInstanceOfType(dataSetOperationClass);
     }
@@ -438,8 +438,8 @@ public class DbUnitModule implements Module {
      */
     @SuppressWarnings("unchecked")
     protected DataSetFactory getDataSetFactory(Class<? extends Annotation> annotationClass, Method testMethod) {
-        Class<? extends DataSetFactory> dataSetFactoryClass = getMethodOrClassLevelAnnotationProperty(annotationClass, "factory", DefaultDataSetFactory.class, testMethod);
-        dataSetFactoryClass = (Class<? extends DataSetFactory>) getClassValueReplaceDefault(annotationClass, "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DefaultDataSetFactory.class);
+        Class<? extends DataSetFactory> dataSetFactoryClass = getMethodOrClassLevelAnnotationProperty(annotationClass, "factory", DataSetFactory.class, testMethod);
+        dataSetFactoryClass = (Class<? extends DataSetFactory>) getClassValueReplaceDefault(annotationClass, "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DataSetFactory.class);
         return createInstanceOfType(dataSetFactoryClass);
     }
 

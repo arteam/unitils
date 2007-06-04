@@ -80,7 +80,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         assertNotSame(conn1, conn2);
         releaseConnection(conn1, databaseModule.getDataSource());
         releaseConnection(conn2, databaseModule.getDataSource());
-        databaseModule.commitOrRollbackTransaction(noApplicationContextTest);
+        databaseModule.endTransaction(noApplicationContextTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -102,7 +102,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         Connection conn2 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(rollbackTest);
+        databaseModule.endTransaction(rollbackTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -124,7 +124,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         Connection conn2 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.commitOrRollbackTransaction(commitTest);
+        databaseModule.endTransaction(commitTest);
 
         verify(mockConnection1, mockConnection2);
     }

@@ -15,14 +15,14 @@
  */
 package org.unitils.hibernate.util;
 
+import java.sql.Connection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
-
-import java.sql.Connection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A wrapper for a Hibernate session factory that will intercept all opened session factories and
@@ -54,6 +54,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
      *
      * @return the session, not null
      */
+    @Override
     public Session openSession() throws HibernateException {
         Session session = super.openSession();
         sessions.add(session);
@@ -67,6 +68,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
      * @param connection The connection to use
      * @return the session, not null
      */
+    @Override
     public Session openSession(Connection connection) {
         Session session = super.openSession(connection);
         sessions.add(session);
@@ -81,6 +83,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
      * @param interceptor The session interceptor to use
      * @return the session, not null
      */
+    @Override
     public Session openSession(Connection connection, Interceptor interceptor) {
         Session session = super.openSession(connection, interceptor);
         sessions.add(session);
@@ -94,6 +97,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
      * @param interceptor The session interceptor to use
      * @return the session, not null
      */
+    @Override
     public Session openSession(Interceptor interceptor) throws HibernateException {
         Session session = super.openSession(interceptor);
         sessions.add(session);
@@ -106,6 +110,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
      *
      * @return The current session
      */
+    @Override
     public Session getCurrentSession() throws HibernateException {
         Session session = super.getCurrentSession();
         sessions.add(session);
