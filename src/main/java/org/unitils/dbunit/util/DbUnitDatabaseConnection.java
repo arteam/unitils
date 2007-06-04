@@ -15,12 +15,12 @@
  */
 package org.unitils.dbunit.util;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import org.dbunit.database.AbstractDatabaseConnection;
+import org.unitils.database.transaction.TransactionalDataSource;
 
 import javax.sql.DataSource;
-
-import org.dbunit.database.AbstractDatabaseConnection;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Implementation of DBUnits <code>IDatabaseConnection</code> interface. This implementation returns connections from
@@ -84,7 +84,8 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     @Override
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
-            currentlyUsedConnection = dataSource.getConnection();
+            //todo remove cast
+            currentlyUsedConnection = ((TransactionalDataSource) dataSource).getTransactionalConnection();
         }
         return currentlyUsedConnection;
     }
@@ -92,7 +93,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
 
     /**
      * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
-     * 
+     *
      * @throws SQLException When connection close fails
      */
     public void closeJdbcConnection() throws SQLException {

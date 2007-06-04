@@ -35,7 +35,7 @@ import javax.sql.DataSource;
  */
 @DataSet
 @SpringApplicationContext({"eshop-config.xml", "test-config.xml"})
-@Transactional(TransactionMode.ROLLBACK)
+@Transactional(TransactionMode.DISABLED)
 public class PurchaseDaoTest extends UnitilsJUnit4 {
 
     /* Object under test */
