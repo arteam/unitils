@@ -20,6 +20,7 @@ import org.hibernate.cfg.Configuration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.unitils.core.UnitilsException;
 
 /**
@@ -117,7 +118,43 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
      * @return A {@link SessionInterceptingSessionFactory} wrapping the given <code>SessionFactory</code>
      */
     protected SessionInterceptingSessionFactory wrapSessionFactory(SessionFactory sessionFactory) {
-        return new SessionInterceptingSessionFactory(sessionFactory);
+        return new SpringSessionInterceptingSessionFactory(sessionFactory);
+    }
+
+
+    /**
+     * Proxy for a SessionFactory that makes sure that sessions are not closed when they are participating in a
+     * Spring transaction.
+     */
+    protected static class SpringSessionInterceptingSessionFactory extends SessionInterceptingSessionFactory {
+
+
+        /**
+         * Creates a wrapper for the given session factory.
+         *
+         * @param sessionFactory The factory, not null
+         */
+        public SpringSessionInterceptingSessionFactory(SessionFactory sessionFactory) {
+            super(sessionFactory);
+        }
+
+
+        /**
+         * Closes and clears all open sessions.
+         */
+        public void closeOpenSessions() {
+            for (org.hibernate.Session session : sessions) {
+                if (session.isOpen()) {
+                    // only close sessions that are not in a transaction
+                    // let spring close those at the end of the transaction
+                    boolean sessionInTransaction = SessionFactoryUtils.isSessionTransactional(session, this);
+                    if (!sessionInTransaction) {
+                        session.close();
+                    }
+                }
+            }
+            sessions.clear();
+        }
     }
 
 }

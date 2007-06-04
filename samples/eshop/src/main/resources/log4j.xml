@@ -14,11 +14,11 @@
     </logger>
 
     <logger name="org.springframework">
-        <level value="WARN" />
+        <level value="DEBUG" />
     </logger>
 
     <root>
-        <priority value="WARN" />
+        <priority value="DEBUG" />
         <appender-ref ref="STDOUT" />
     </root>
     

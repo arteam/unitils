@@ -28,6 +28,7 @@ import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
+import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
@@ -355,7 +356,7 @@ public class DbUnitModule implements Module {
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
         // A db support instance is created to get the schema name in correct casing
-        DataSource dataSource = getDatabaseModule().getDataSource();
+        TransactionalDataSource dataSource = getDatabaseModule().getDataSource();
         SQLHandler sqlHandler = new SQLHandler(dataSource);
         DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
 

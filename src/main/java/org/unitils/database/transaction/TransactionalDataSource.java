@@ -20,12 +20,22 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * todo javadoc
+ * Extension to the <code>DataSource</code> interface that allows for retrieving transaction aware connections.
+ * For example a connection can be returned that hooks into Spring's transaction management.
+ * <p/>
+ * Tests should typically do their own connection handling instead of using these transactional connections.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public interface TransactionalDataSource extends DataSource {
 
-    
-    //todo javadoc
+
+    /**
+     * Retrieves a connection that can participate in a transaction.
+     *
+     * @return The connection, not null
+     */
     public Connection getTransactionalConnection() throws SQLException;
 
 }

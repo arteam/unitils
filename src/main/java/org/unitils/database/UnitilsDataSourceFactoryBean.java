@@ -13,31 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.spring;
+package org.unitils.database;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.unitils.core.Unitils;
-import org.unitils.database.DatabaseModule;
 
 import javax.sql.DataSource;
 
 /**
- * todo javadoc
+ * DataSource factory bean to that lets the {@link DatabaseModule} create the data source.
+ * <p/>
+ * For example you could specify a bean definition named dataSource that connects to the test database as follows:
+ * <pre><code>
+ *     &lt;bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean"/&gt;
+ * </code></pre>
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class UnitilsDataSourceFactoryBean implements FactoryBean {
 
 
+    /**
+     * Gets the data source instance.
+     *
+     * @return The data source, not null
+     */
     public Object getObject() throws Exception {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
         return databaseModule.getDataSource();
     }
 
+
+    /**
+     * Gets the type of the instance, i.e. <code>DataSource</code>
+     *
+     * @return The type, not null
+     */
     public Class getObjectType() {
         return DataSource.class;
     }
 
 
-    //todo check
+    /**
+     * @return false, it is not a singleton
+     */
     public boolean isSingleton() {
         return true;
     }

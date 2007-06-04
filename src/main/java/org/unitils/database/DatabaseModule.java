@@ -27,6 +27,7 @@ import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionManagerFactory;
+import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
 import static org.unitils.database.util.TransactionMode.*;
@@ -79,7 +80,7 @@ public class DatabaseModule implements Module {
     private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
 
     /* The datasource instance */
-    private DataSource dataSource;
+    private TransactionalDataSource dataSource;
 
     /* The configuration of Unitils */
     private Properties configuration;
@@ -110,7 +111,7 @@ public class DatabaseModule implements Module {
      *
      * @return The <code>DataSource</code>
      */
-    public DataSource getDataSource() {
+    public TransactionalDataSource getDataSource() {
         if (dataSource == null) {
             dataSource = createDataSource();
         }
@@ -209,20 +210,20 @@ public class DatabaseModule implements Module {
      *
      * @return the datasource
      */
-    protected DataSource createDataSource() {
-        logger.debug("Creating data source.");
+    protected TransactionalDataSource createDataSource() {
         // Get the factory for the data source and create it
         DataSourceFactory dataSourceFactory = getConfiguredInstance(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
         DataSource dataSource = dataSourceFactory.createDataSource();
+
         // Make data source transactional
-        dataSource = getTransactionManager().createTransactionalDataSource(dataSource);
+        TransactionalDataSource transactionalDataSource = getTransactionManager().createTransactionalDataSource(dataSource);
 
         // Call the database maintainer if enabled
         if (updateDatabaseSchemaEnabled) {
-            updateDatabase(new SQLHandler(dataSource));
+            updateDatabase(new SQLHandler(transactionalDataSource));
         }
-        return dataSource;
+        return transactionalDataSource;
     }
 
 
@@ -230,7 +231,6 @@ public class DatabaseModule implements Module {
      * @return An instance of the transactionManager, as configured in the Unitils configuration
      */
     protected TransactionManager createTransactionManager() {
-        logger.debug("Creating transaction manager");
         // Get the factory for the transaction manager
         TransactionManagerFactory transactionManagerFactory = getConfiguredInstance(TransactionManagerFactory.class, configuration);
         transactionManagerFactory.init(configuration);
@@ -278,10 +278,8 @@ public class DatabaseModule implements Module {
         }
         TransactionManager transactionManager = getTransactionManager();
         if (transactionMode == COMMIT) {
-            logger.debug("Commiting transaction");
             transactionManager.commit(testObject);
         } else if (getTransactionMode(testObject) == ROLLBACK) {
-            logger.debug("Rolling back transaction");
             transactionManager.rollback(testObject);
         }
     }
