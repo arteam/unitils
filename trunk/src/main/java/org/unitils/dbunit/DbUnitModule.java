@@ -162,12 +162,12 @@ public class DbUnitModule implements Module {
      * @param inputStream       The stream containing the test data set, not null
      * @param databaseOperation The dbunit DatabaseOperation that must be executed on this DataSet
      */
-    public void insertTestData(InputStream inputStream, DatabaseOperation databaseOperation) {
+    public void insertTestData(InputStream inputStream, DataSetOperation dataSetOperation) {
         try {
             MultiSchemaDataSet multiSchemaDataSet = getDataSet(inputStream);
             for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
                 IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
-                databaseOperation.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
+                dataSetOperation.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
             }
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset.", e);
