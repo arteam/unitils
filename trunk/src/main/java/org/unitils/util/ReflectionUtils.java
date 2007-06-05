@@ -70,7 +70,7 @@ public class ReflectionUtils {
      */
     public static <T> T createInstanceOfType(Class<T> type) {
         try {
-            Constructor<T> constructor = type.getConstructor();
+            Constructor<T> constructor = type.getDeclaredConstructor();
             constructor.setAccessible(true);
             return constructor.newInstance();
 

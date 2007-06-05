@@ -116,7 +116,7 @@ public class InjectModule implements Module {
                     + " which is an abstract class. It is not automatically instantiated.");
         } else {
             try {
-                declaredClass.getConstructor();
+                declaredClass.getDeclaredConstructor();
                 Object instance = createInstanceOfType(declaredClass);
                 setFieldValue(testObject, testedObjectField, instance);
             } catch (NoSuchMethodException e) {
