@@ -15,19 +15,25 @@
  */
 package org.unitils.dbunit;
 
-import org.dbunit.operation.DatabaseOperation;
-import org.unitils.UnitilsJUnit3;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.UnitilsException;
-import static org.unitils.core.util.SQLUtils.*;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbunit.annotation.DataSet;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
+import static org.unitils.core.util.SQLUtils.getItemAsString;
+import static org.unitils.core.util.SQLUtils.getItemsAsStringSet;
 
-import javax.sql.DataSource;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
+
+import javax.sql.DataSource;
+
+import org.dbunit.operation.DatabaseOperation;
+import org.unitils.UnitilsJUnit3;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.datasetoperation.CleanInsertOperation;
 
 /**
  * Test class for loading of data sets using the {@link DbUnitModule}.
@@ -174,7 +180,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_directCall() throws Exception {
         InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
-        dbUnitModule.insertTestData(dataSetIS, DatabaseOperation.CLEAN_INSERT);
+        dbUnitModule.insertTestData(dataSetIS, new CleanInsertOperation());
         assertLoadedDataSet("CustomDataSet.xml");
     }
 

@@ -183,7 +183,20 @@ public class DatabaseModule implements Module {
      * reinitializing the database after having reorganized the scripts folder.
      */
     public void setDatabaseToCurrentVersion() {
-        DBMaintainer dbMaintainer = new DBMaintainer(configuration, new SQLHandler(getDataSource()));
+        setDatabaseToCurrentVersion(new SQLHandler(getDataSource()));
+    }
+    
+    
+    /**
+     * Updates the database version to the current version, without issuing any other updates to the database.
+     * This method can be used for example after you've manually brought the database to the latest version, but
+     * the database version is not yet set to the current one. This method can also be useful for example for
+     * reinitializing the database after having reorganized the scripts folder.
+     * 
+     * @param sqlHandler The {@link SQLHandler} to which all commands are issued
+     */
+    public void setDatabaseToCurrentVersion(SQLHandler sqlHandler) {
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
         dbMaintainer.setDatabaseToCurrentVersion();
     }
 
