@@ -15,6 +15,11 @@
  */
 package org.unitils.database.transaction.impl;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -22,10 +27,6 @@ import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.database.util.BaseConnectionProxy;
 import org.unitils.database.util.BaseDataSourceProxy;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Default, simple implementation of {@link TransactionManager}. Implements transactions by wrapping the Unitils
@@ -44,19 +45,36 @@ public class SimpleTransactionManager implements TransactionManager {
      * Wrapped instance of the DataSource
      */
     protected SimpleTransactionalDataSource transactionalDataSource;
+    
+    /**
+     * ThreadLocal used to remember for which thread a transaction has been started. If the DataSource is initialized after
+     * a transaction was started, a transaction is started immediately afterwards on this DataSource
+     */
+    protected ThreadLocal<Boolean> transactionActiveFor = new ThreadLocal<Boolean>(); 
 
 
     /**
-     * Makes the given data source a transactional datasource.
+     * Makes sure the given data source is a transactional datasource.
      * <p/>
-     * This will wrap the given data source, so that the transaction manager can manage the creation/destruction of
-     * connections. The wrapped data source is then installed in the database module.
+     * This will wrap the given data source, to make sure the transaction manager can manage the creation/destruction 
+     * of connections. The wrapped data source is also installed in the database module.
      *
      * @param dataSource The original data source, not null
      * @return The transactional data source, not null
      */
     public TransactionalDataSource createTransactionalDataSource(DataSource dataSource) {
+        if (transactionalDataSource != null) {
+            throw new UnitilsException("A DataSource has already been registered with this transaction manager");
+        }
         transactionalDataSource = new SimpleTransactionalDataSource(dataSource);
+        
+        // If startTransaction has been called before on this thread, a transaction is active. Since no DataSource
+        // was available at the time of calling startTransaction, the transaction has not been initiated yet
+        // on the DataSource. Therefore, we now call the startTransaction method on the transactional DataSource.
+        if (transactionActiveFor.get() != null) {
+            transactionalDataSource.startTransaction();
+        }
+        
         return transactionalDataSource;
     }
 
@@ -67,6 +85,11 @@ public class SimpleTransactionManager implements TransactionManager {
      * @param testObject The test instance, not null
      */
     public void startTransaction(Object testObject) {
+        if (transactionActiveFor.get() != null) {
+            throw new UnitilsException("A transaction was already associated with this thread");
+        }
+        transactionActiveFor.set(Boolean.TRUE);
+        
         if (transactionalDataSource == null) {
             // nothing to do
             return;
@@ -82,6 +105,10 @@ public class SimpleTransactionManager implements TransactionManager {
      * @param testObject The test instance, not null
      */
     public void commit(Object testObject) {
+        if (transactionActiveFor.get() == null) {
+            throw new UnitilsException("Trying to commit transaction, but no transaction has been intiated on this thread");
+        }
+        
         if (transactionalDataSource == null) {
             // nothing to do
             return;
@@ -97,6 +124,10 @@ public class SimpleTransactionManager implements TransactionManager {
      * @param testObject The test instance, not null
      */
     public void rollback(Object testObject) {
+        if (transactionActiveFor.get() == null) {
+            throw new UnitilsException("Trying to rollback transaction, but no transaction has been intiated on this thread");
+        }
+        
         if (transactionalDataSource == null) {
             // nothing to do
             return;
@@ -251,7 +282,7 @@ public class SimpleTransactionManager implements TransactionManager {
          * @return a Connection
          * @throws SQLException If a problem occurs retrieving the connection from the underlying DataSource
          */
-        private Connection getConnection(GetConnectionMethod getConnectionMethod) throws SQLException {
+        protected Connection getConnection(GetConnectionMethod getConnectionMethod) throws SQLException {
             ConnectionHolder connectionHolder = connectionHolders.get();
             if (connectionHolder == null) {
                 // No transaction has been initiated. Simply return a connection from the underlying DataSource
