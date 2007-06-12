@@ -51,7 +51,7 @@ public class PurchaseServiceTest {
 
         product1 = new Product(1L, 5.0, null, 0);
         product2 = new Product(2L, 5.0, null, 0);
-        purchase = new Purchase(new User(0L, null, 0));
+        purchase = new Purchase(new User(0L));
         purchase.addItem(product1, 1);
         purchase.addItem(product2, 2);
     }

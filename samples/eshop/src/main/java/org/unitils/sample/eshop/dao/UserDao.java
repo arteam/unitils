@@ -16,6 +16,10 @@
 package org.unitils.sample.eshop.dao;
 
 import org.unitils.sample.eshop.model.User;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.MatchMode;
+
+import java.util.List;
 
 /**
  * DAO for the User class
@@ -24,6 +28,19 @@ public class UserDao extends HibernateCrudDao<User> {
 
     public UserDao() {
         super(User.class);
+    }
+
+    /**
+     * Find users by last name.
+     * @param lastName the last name used to search users.
+     * @return a list of users for which the last name contains the specified search string.
+     */
+    @SuppressWarnings("unchecked")
+    public List<User> findByLastName(String lastName) {
+        return getSession()
+                .createCriteria(User.class)
+                .add(Restrictions.like("lastName", lastName, MatchMode.ANYWHERE))
+                .list();
     }
 
 }
