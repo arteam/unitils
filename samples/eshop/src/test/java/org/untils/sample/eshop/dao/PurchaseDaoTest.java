@@ -22,8 +22,7 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
-import org.unitils.dbunit.datasetoperation.InsertOperation;
-
+import org.unitils.dbunit.datasetoperation.CleanInsertOperation;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.sample.eshop.dao.PurchaseDao;
 import org.unitils.sample.eshop.model.User;
@@ -35,9 +34,9 @@ import javax.sql.DataSource;
 /**
  * todo javadoc
  */
-@DataSet(operation = InsertOperation.class)
-@SpringApplicationContext({"eshop-config.xml", "test-config.xml"})
+@DataSet(operation = CleanInsertOperation.class)
 @Transactional(TransactionMode.ROLLBACK)
+@SpringApplicationContext({"eshop-config.xml", "test-config.xml"})
 public class PurchaseDaoTest extends UnitilsJUnit4 {
 
     /* Object under test */
@@ -61,8 +60,5 @@ public class PurchaseDaoTest extends UnitilsJUnit4 {
         Long totalAmount = purchaseDao.calculateTotalPurchaseAmount(testUser);
         assertLenEquals(30, totalAmount);
     }
-    
-    public static junit.framework.Test suite() {
-        return new JUnit4TestAdapter(CalculatorTest.class);
-    }
+
 }
