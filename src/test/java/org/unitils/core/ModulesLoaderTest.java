@@ -74,7 +74,6 @@ public class ModulesLoaderTest extends TestCase {
      * The c core should not have been loaded.
      */
     public void testLoadModules_notActive() {
-
         configuration.setProperty(PROPKEY_MODULES, "a, b, d");
 
         List<Module> result = modulesLoader.loadModules(configuration);
@@ -91,7 +90,6 @@ public class ModulesLoaderTest extends TestCase {
      * The core should have been ignored
      */
     public void testLoadModules_notEnabled() {
-
         configuration.setProperty(PROPKEY_MODULE_PREFIX + "d" + PROPKEY_MODULE_SUFFIX_ENABLED, "false");
 
         List<Module> result = modulesLoader.loadModules(configuration);
@@ -109,7 +107,6 @@ public class ModulesLoaderTest extends TestCase {
      * The doubles should have been ignored
      */
     public void testLoadModules_notDoubles() {
-
         configuration.setProperty(PROPKEY_MODULES, "a, b, c, d, a, b");
         configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_RUN_AFTER, "b, b, d, b, d");
 
@@ -128,7 +125,6 @@ public class ModulesLoaderTest extends TestCase {
      * Tests the loading with a totally empty configuration.
      */
     public void testLoadModules_emptyConfiguration() {
-
         configuration.clear();
 
         List<Module> result = modulesLoader.loadModules(configuration);
@@ -143,9 +139,7 @@ public class ModulesLoaderTest extends TestCase {
      * A warning should have been logged and the other modules should have been loaded.
      */
     public void testLoadModules_wrongClassName() {
-
         configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, "java.lang.String");
-
         try {
             modulesLoader.loadModules(configuration);
             fail();
@@ -161,7 +155,6 @@ public class ModulesLoaderTest extends TestCase {
      * A warning should have been logged and the other modules should have been loaded.
      */
     public void testLoadModules_classNotFound() {
-
         configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, "xxxxx");
 
         List<Module> result = modulesLoader.loadModules(configuration);
@@ -179,9 +172,7 @@ public class ModulesLoaderTest extends TestCase {
      * A runtime exception should have been thrown.
      */
     public void testLoadModules_circular() {
-
         configuration.setProperty(PROPKEY_MODULE_PREFIX + "b" + PROPKEY_MODULE_SUFFIX_RUN_AFTER, "c");
-
         try {
             modulesLoader.loadModules(configuration);
             fail();
@@ -194,19 +185,18 @@ public class ModulesLoaderTest extends TestCase {
 
     /**
      * Tests the loading of a core that is configured with a class name for a class that has a private constructor.
-     * A runtime exception should have been thrown.
      */
     public void testLoadModules_privateConstructor() {
-
         configuration.setProperty(PROPKEY_MODULE_PREFIX + "a" + PROPKEY_MODULE_SUFFIX_CLASS_NAME, TestModulePrivate.class.getName());
 
-        try {
-            modulesLoader.loadModules(configuration);
-            fail();
+        List<Module> result = modulesLoader.loadModules(configuration);
 
-        } catch (UnitilsException e) {
-            //expected
-        }
+        assertNotNull(result);
+        assertEquals(4, result.size());
+        assertTrue(result.get(0) instanceof TestModuleD);
+        assertTrue(result.get(1) instanceof TestModuleB);
+        assertTrue(result.get(2) instanceof TestModulePrivate);
+        assertTrue(result.get(3) instanceof TestModuleC);
     }
 
 
