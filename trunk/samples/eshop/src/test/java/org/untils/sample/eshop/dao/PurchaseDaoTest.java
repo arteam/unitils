@@ -53,7 +53,7 @@ public class PurchaseDaoTest extends UnitilsJUnit4 {
 
     @Before
     public void initializeFixture() {
-        testUser = new User(1L, null, 0);
+        testUser = new User(1L);
     }
 
     @Test

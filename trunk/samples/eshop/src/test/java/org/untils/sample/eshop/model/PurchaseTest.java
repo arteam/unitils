@@ -44,7 +44,7 @@ public class PurchaseTest {
 
     @Before
     public void initFixture() {
-        user = new User(1L, null, 17);
+        user = new User(1L);
         purchase = new Purchase(user);
         productInPurchase1 = new Product(1L, 10d, null, 0);
         productInPurchase2 = new Product(2L, 3d, null, 0);

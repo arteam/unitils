@@ -17,6 +17,7 @@ package org.unitils.sample.eshop.model;
 
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Represents an eshop user
@@ -34,10 +35,32 @@ public class User {
     private String userName;
 
     @Column
-    private int age;
+    private String firstName;
+
+    @Column
+    private String lastName;
+
+    @Column
+    private String email;
+
+    @Column
+    private Integer age;
+
+    protected User() {
+    }
+
+    public User(Long id) {
+        this.id = id;
+    }
+
+    public User(String userName, String firstName, String lastName) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
     public User(Long id, String userName, int age) {
-        this.id = id;
+        this(id);
         this.userName = userName;
         this.age = age;
     }
@@ -46,11 +69,49 @@ public class User {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
     public String getUserName() {
         return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public int getAge() {
         return age;
     }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 }
