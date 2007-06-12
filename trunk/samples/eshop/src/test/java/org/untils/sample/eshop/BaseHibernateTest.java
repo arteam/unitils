@@ -16,7 +16,7 @@
 package org.untils.sample.eshop;
 
 import org.springframework.context.ApplicationContext;
-import org.unitils.UnitilsJUnit3;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
 /**
@@ -24,7 +24,7 @@ import org.unitils.spring.annotation.SpringApplicationContext;
  * @author Tim Ducheyne
  */
 @SpringApplicationContext("classpath:/eshop-config.xml")
-public abstract class BaseHibernateTest extends UnitilsJUnit3 {
+public abstract class BaseHibernateTest extends UnitilsJUnit4 {
 
     @SpringApplicationContext
     ApplicationContext springApplicationContext;

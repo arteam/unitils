@@ -15,8 +15,8 @@
     </path>
     
     <path id="all-classpath">
-    	<pathelement location="classes"/>
-    	<pathelement location="test-classes"/>
+    	<pathelement location="target/classes"/>
+    	<pathelement location="target/test-classes"/>
     	<fileset dir="lib">
         <include name="**/*.jar"/>
       </fileset>
@@ -54,15 +54,15 @@
         </copy>
     </target>
     
-    <target name="run-tests" description="Run all unit tests" depends="compile-tests">
+    <target name="run-tests" description="Run all unit tests">
     		<mkdir dir="testresults"/>
     		<junit haltonfailure="no" printsummary="yes">
     				<classpath refid="all-classpath"/>
     				<formatter type="xml"/>
     				<batchtest fork="yes" todir="testresults">
     						<fileset dir="src/test/java">
-    								<include name="**/*Test.java"/>
-    								<exclude name="**/Base*Test.java"/>
+                                <include name="org/untils/sample/eshop/service/UserServiceTest.java"/>
+                                <include name="org/untils/sample/eshop/service/UserGroupServiceTest.java"/>    								
     						</fileset>
     				</batchtest>
     		</junit>

@@ -17,7 +17,6 @@ package org.unitils.sample.eshop.model;
 
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * Represents an eshop user
@@ -98,7 +97,7 @@ public class User {
         this.lastName = lastName;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 

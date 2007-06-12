@@ -15,16 +15,13 @@
  */
 package org.untils.sample.eshop.model;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.sample.eshop.exception.NotOldEnoughException;
 import org.unitils.sample.eshop.model.Product;
 import org.unitils.sample.eshop.model.Purchase;
-import org.unitils.sample.eshop.model.PurchaseItem;
 import org.unitils.sample.eshop.model.User;
-import org.unitils.sample.eshop.exception.NotOldEnoughException;
 
 /**
  * @author Filip Neven
@@ -45,6 +42,7 @@ public class PurchaseTest {
     @Before
     public void initFixture() {
         user = new User(1L);
+        user.setAge(12);
         purchase = new Purchase(user);
         productInPurchase1 = new Product(1L, 10d, null, 0);
         productInPurchase2 = new Product(2L, 3d, null, 0);
