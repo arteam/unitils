@@ -376,7 +376,7 @@ public class MyTest {
    
    * <SpringModule>: support for loading application contexts and retrieving and injecting Spring beans
 
-
+   []
 
 
 * {Database testing}
@@ -490,11 +490,13 @@ public class UserDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
+
+
 *** {Configuring the dataset load strategy}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     By default, datasets are loaded into the database using a <clean insert> strategy. This means that all data in the tables that are present in the 
-    dataset is deleted, after which the test data records are inserted. This behavior is configurable,  can be modified by changing the value
+    dataset is deleted, after which the test data records are inserted. This behavior is configurable, it can be modified by changing the value
     of the property <DbUnitModule.DataSet.loadStrategy.default>. Suppose we add following in unitils.properties:
     
 +-----+
@@ -504,7 +506,7 @@ DbUnitModule.DataSet.loadStrategy.default=org.unitils.dbunit.datasetloadstrategy
     This sets the load strategy to <insert> instead of <clean insert>. The result is that data already available in the tables present in the dataset 
     is not deleted, and test data records are simply inserted.
     
-    The loadStrategy that is used can also be configured for specific tests using a attribute of the <@DataSet> annotation. E.g.:
+    The loadStrategy that is used can also be configured for specific tests using an attribute of the <@DataSet> annotation. E.g.:
     
 +-----+
 @DataSet(loadStrategy = InsertLoadStrategy.class)
@@ -523,14 +525,21 @@ DbUnitModule.DataSet.loadStrategy.default=org.unitils.dbunit.datasetloadstrategy
     * UpdateLoadStrategy: Update the contents of the database with the contents of the dataset. This means that data of existing rows is updated. Fails if 
     the dataset contains records that are not in the database (i.e. a records having the same value for the primary key column).
 
+    []
+
+
+
 *** {Configuring the dataset factory}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Dataset files in Unitils have the <multischema xml> format, which is an extended version of DbUnits <FlatXmlDataSet> format. Configuration of the file
-    format and file extension is handled by a <DataSetFactory>. Although Unitils only supports one dataset format, the possibility is offered to implement a 
-    custom implementation of <DataSetFactory> to use a different file format. This can be done by specifying the value of the property 
-    <DbUnitModule.DataSet.factory.default> in unitils.properties or by using the factory attribute of the <@DataSet> annotation. Such a custom factory could 
-    e.g. be implemented to create an instance of DbUnit's <XlsDataSet>, if you want to use Excel files instead of XML.
+    format and file extension is handled by a <DataSetFactory>. 
+    
+    Although Unitils currenlty only supports one dataset format, the possibility is offered to implement a custom implementation of <DataSetFactory> to use a 
+    different file format. This can be done by specifying the value of the property <DbUnitModule.DataSet.factory.default> in unitils.properties or by using the factory 
+    attribute of the <@DataSet> annotation. Such a custom factory could e.g. be implemented to create an instance of DbUnit's <XlsDataSet>, if you want 
+    to use Excel files instead of XML.
+
 
 
 *** {Verifying test results}
@@ -569,6 +578,7 @@ public class UserDAOTest extends UnitilsJUnit4 {
     
     The use of result data sets should be kept to a minimum. Adding new data sets means more maintenance. As an alternative, you should always 
     try to perform the same check in the test code (e.g. by using a method <findActiveUsers()>).
+
 
 
 *** {Using multi-schema data sets}
@@ -660,6 +670,7 @@ Connection connection = dataSource.getConnection();
 +-----+
 
 
+
 *** {Transactions}
 ~~~~~~~~~~~~~~~~~~
 
@@ -671,6 +682,8 @@ Connection connection = dataSource.getConnection();
       modified. To make sure the database is in the same known state before every test, a transaction is started before and rolled back after 
       each test.
 
+    [] 
+    
     By default, transaction management is disabled. This default behavior can be changed by setting following property:
     
 +-----+
@@ -687,27 +700,31 @@ public class UserDaoTest extends UnitilsJUnit4 {
 +-----+
 
     This way, transaction management is enabled for the annotated class, making sure the transaction is rolled back after each test. The <@Transactional> 
-    annotation is inheritable, to enable this and other common configuration to be moved to a shared superclass.
+    annotation is inheritable, so it can be moved to a shared superclass instead of specifying it for each test separately.
 
     Transactions are implemented by a transaction manager. Unitils uses either a transaction manager configured in a spring application context, or a very simple,
     custom implementation that makes the Unitils datasource transactional. Which transaction manager Unitils chooses depends on the property <transactionManager.type>.
-    This property may have the values <spring>, <simple> or <auto>. If set to auto (the default), Unitils verifies if the spring module is enabled and that spring is
+    This property can be set to <spring>, <simple> or <auto>. If set to auto (the default), Unitils verifies if the spring module is enabled and that spring is
     in the classpath. If yes, the SpringTransactionManager will be used. If the spring module is not (or cannot be) enabled, the SimpleTransactionManager is automatically
     used.
     
-    By adding the following to your Unitils configuration, this autodectection mechanism is disabled, and transaction management is always done via Spring:
+    By adding the following to your Unitils configuration, this auto-dectection mechanism is disabled and transaction management is always done using the spring
+    transaction manager:
     
 +-----+
 transactionManager.type=spring
-+-----+       
++-----+           
+    
+    If <spring> is used for transaction management, Unitils expects that a bean of type <org.springframework.transaction.PlatformTransactionManager> in the ApplicationContext 
+    that was configured using the <@SpringApplicationContext> annotation. If not, an exception will be thrown.
+    
+    If <transactionManager.type> is set to <simple>, nothing further has to be configured. The unitils DataSource will then be wrapped by a proxy that makes all access to the
+    unit test database transactional using a very simple transaction manager implementation.
 
-    Since autodetection can lead to bugs that are hard to resolve, we recommend setting this property either to <spring> or to <simple>.
-    
-    If spring is used for transaction management, Unitils expects that a bean of type <org.springframework.transaction.PlatformTransactionManager> in an ApplicationContext 
-    (configured using the <@SpringApplicationContext> annotation). If not, an exception will be thrown.
-    
-    If <transactionManager.type is set to <simple>, nothing further has to be configured. The unitils DataSource will then be wrapped by a proxy that makes all access to the
-    unit test database transactional, using a very simple transaction manager implementation.
+
+
+
+
 
 * {Unit test database maintenance}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
