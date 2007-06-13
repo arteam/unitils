@@ -148,7 +148,7 @@ public class ModulesLoader {
             String className = getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME, configuration);
             try {
                 // create core instance
-                Object module = createInstanceOfType(className);
+                Object module = createInstanceOfType(className, false);
                 if (!(module instanceof Module)) {
                     throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
                 }

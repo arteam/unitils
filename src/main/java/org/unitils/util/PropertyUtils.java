@@ -207,7 +207,7 @@ public class PropertyUtils {
     @SuppressWarnings({"unchecked"})
     public static <T> T getInstance(String propertyName, Properties properties) {
         String className = getString(propertyName, properties);
-        return (T) createInstanceOfType(className);
+        return (T) createInstanceOfType(className, false);
     }
 
 
@@ -226,7 +226,7 @@ public class PropertyUtils {
         if (className == null) {
             return defaultValue;
         }
-        return (T) createInstanceOfType(className);
+        return (T) createInstanceOfType(className, false);
     }
     
     

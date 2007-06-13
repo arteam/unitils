@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.datasetoperation;
+package org.unitils.dbunit.datasetloadstrategy;
 
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.IDataSet;
@@ -23,16 +23,16 @@ import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import java.sql.SQLException;
 
 /**
- * Base implementation of {@link DataSetOperation}. Exists only to free implementing classes from the burden of having
+ * Base implementation of {@link DataSetLoadStrategy}. Exists only to free implementing classes from the burden of having
  * to convert checked exceptions into an unchecked {@link UnitilsException}.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-abstract public class BaseDataSetOperation implements DataSetOperation {
+abstract public class BaseDataSetLoadStrategy implements DataSetLoadStrategy {
 
     /**
-     * Executes this DataSetOperation. This means the given dataset is inserted in the database using the given dbUnit
+     * Executes this DataSetLoadStrategy. This means the given dataset is inserted in the database using the given dbUnit
      * database connection object.
      *
      * @param dbUnitDatabaseConnection DbUnit class providing access to the database
@@ -42,14 +42,14 @@ abstract public class BaseDataSetOperation implements DataSetOperation {
         try {
             doExecute(dbUnitDatabaseConnection, dataSet);
         } catch (DatabaseUnitException e) {
-            throw new UnitilsException("Error while executing DataSetOperation", e);
+            throw new UnitilsException("Error while executing DataSetLoadStrategy", e);
         } catch (SQLException e) {
-            throw new UnitilsException("Error while executing DataSetOperation", e);
+            throw new UnitilsException("Error while executing DataSetLoadStrategy", e);
         }
     }
 
     /**
-     * Executes this DataSetOperation. This means the given dbunit dataset is inserted in the database
+     * Executes this DataSetLoadStrategy. This means the given dbunit dataset is inserted in the database
      * using the given dbUnit database connection object. This method declares all exceptions that are thrown by dbunit,
      * so that they don't have to be taken care of in the underlying implementation.
      *

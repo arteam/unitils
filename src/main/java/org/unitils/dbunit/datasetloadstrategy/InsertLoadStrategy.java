@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.datasetoperation;
+package org.unitils.dbunit.datasetloadstrategy;
 
 import java.sql.SQLException;
 
@@ -23,16 +23,16 @@ import org.dbunit.operation.DatabaseOperation;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 
 /**
- * {@link DataSetOperation} that inserts a dataset, after removes all present data from the tables specified in the dataset.
+ * {@link DataSetLoadStrategy} that inserts the contents of the dataset into the database.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
- * @see DatabaseOperation#CLEAN_INSERT
+ * @see DatabaseOperation#INSERT
  */
-public class CleanInsertOperation extends BaseDataSetOperation {
+public class InsertLoadStrategy extends BaseDataSetLoadStrategy {
 
     /**
-     * Executes this DataSetOperation. This means the given dataset is inserted in the database using the given dbUnit
+     * Executes this DataSetLoadStrategy. This means the given dataset is inserted in the database using the given dbUnit
      * database connection object.
      *
      * @param dbUnitDatabaseConnection DbUnit class providing access to the database
@@ -40,6 +40,6 @@ public class CleanInsertOperation extends BaseDataSetOperation {
      */
     @Override
     public void doExecute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet) throws DatabaseUnitException, SQLException {
-        DatabaseOperation.CLEAN_INSERT.execute(dbUnitDatabaseConnection, dataSet);
+        DatabaseOperation.INSERT.execute(dbUnitDatabaseConnection, dataSet);
     }
 }

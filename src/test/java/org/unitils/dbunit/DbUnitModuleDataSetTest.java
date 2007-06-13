@@ -33,7 +33,7 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
-import org.unitils.dbunit.datasetoperation.CleanInsertOperation;
+import org.unitils.dbunit.datasetloadstrategy.CleanInsertLoadStrategy;
 
 /**
  * Test class for loading of data sets using the {@link DbUnitModule}.
@@ -180,7 +180,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_directCall() throws Exception {
         InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
-        dbUnitModule.insertTestData(dataSetIS, new CleanInsertOperation());
+        dbUnitModule.insertTestData(dataSetIS, new CleanInsertLoadStrategy());
         assertLoadedDataSet("CustomDataSet.xml");
     }
 

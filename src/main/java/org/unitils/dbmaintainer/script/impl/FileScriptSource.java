@@ -16,7 +16,6 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.readFileToString;
-import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.io.File;
@@ -66,7 +65,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     /**
      * Property key for the extension of the script files
      */
-    public static final String PROPKEY_SCRIPTFILES_FILEEXTENSION = "dbMaintainer.fileScriptSource.fileExtension";
+    public static final String PROPKEY_SCRIPTFILES_FILEEXTENSION = "dbMaintainer.fileScriptSource.fileExtensions";
 
     /* The directory in which the script files are located */
     private List<String> scriptFileLocations;
@@ -75,7 +74,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     private List<String> codeScriptFileLocations;
 
     /* The extension of the script files */
-    private String fileExtension;
+    private List<String> fileExtensions;
 
 
     /**
@@ -94,21 +93,23 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
         }
         codeScriptFileLocations = getStringList(PROPKEY_CODESCRIPTFILES_LOCATIONS, configuration);
         verifyExistence(codeScriptFileLocations, PROPKEY_CODESCRIPTFILES_LOCATIONS);
-        fileExtension = getString(PROPKEY_SCRIPTFILES_FILEEXTENSION, configuration);
-        if (fileExtension.startsWith(".")) {
-            throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSION + " should not start with a '.'");
+        fileExtensions = getStringList(PROPKEY_SCRIPTFILES_FILEEXTENSION, configuration);
+        for (String fileExtension : fileExtensions) {
+            if (fileExtension.startsWith(".")) {
+                throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSION + " should not start with a '.'");
+            }
         }
     }
     
 
     /**
      * Verfies that directories and files in the given list of fileLocations exist on the file system. If one of them
-     * doesn't exist, an exception is thrown (the given propertyName is shown in the exception message for clarity)
+     * doesn't exist, an exception is thrown
      *
-     * @param fileLocations
-     * @param propertyName
+     * @param fileLocations The directories and files that need to be checked
+     * @param propertyName The name of the property, to be included in the error message if one of the locations doesn't exist
      */
-    private void verifyExistence(List<String> fileLocations, String propertyName) {
+    protected void verifyExistence(List<String> fileLocations, String propertyName) {
         for (String fileLocation : fileLocations) {
             File file = new File(fileLocation);
             if (!file.exists()) {
@@ -134,7 +135,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     
     
     /**
-     * This methods returns true if one or more scripts that have a version index equal to or lower than
+     * Returns true if one or more scripts that have a version index equal to or lower than
      * the index specified by the given version object has been modified since the timestamp specfied by
      * the given version.
      *
@@ -205,58 +206,45 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
 
     /**
-     * todo javadoc
+     * Returns all available script files, sorted according to their version number
      *
-     * @param excludeFilesWithoutIndex
-     * @param filesLocation
+     * @param excludeFilesWithoutIndex Indicates if files that don't have an index number as start of their fileName 
+     * have to be excluded from the list
+     * @param filesLocations The directories where files are located
      * @return All available script files, sorted according to their version number
      */
-    protected List<File> getScriptFilesSorted(boolean excludeFilesWithoutIndex, List<String> filesLocation) {
-        List<File> scriptFiles = getScriptFiles(excludeFilesWithoutIndex, filesLocation);
+    protected List<File> getScriptFilesSorted(boolean excludeFilesWithoutIndex, List<String> filesLocations) {
+        List<File> scriptFiles = getScriptFiles(excludeFilesWithoutIndex, filesLocations);
         return sortFilesByIndex(scriptFiles);
     }
 
 
     /**
-     * todo javadoc
+     * Returns all available script files that can be found in one of the given directories or their subdirectories
      *
-     * @param excludeFilesWithoutIndex
-     * @param filesLocation
+     * @param excludeFilesWithoutIndex Indicates if files that don't have an index number as start of their fileName 
+     * have to be excluded from the list
+     * @param filesLocations The directories where files are located
      * @return All available script files
      */
-    private List<File> getScriptFiles(final boolean excludeFilesWithoutIndex, List<String> filesLocation) {
+    protected List<File> getScriptFiles(boolean excludeFilesWithoutIndex, List<String> filesLocations) {
         List<File> scriptFiles = new ArrayList<File>();
-        getScriptFiles(excludeFilesWithoutIndex, filesLocation, scriptFiles);
+        for (String filesLocation : filesLocations) {
+            getAllFilesIn(excludeFilesWithoutIndex, new File(filesLocation), scriptFiles);
+        }
         return scriptFiles;
     }
 
 
     /**
-     * Adds all available script files in the given locations to the given List of files
-     * <p/>
-     * todo javadoc
-     *
-     * @param excludeFilesWithoutIndex
-     * @param filesLocations
-     * @param files
+     * Adds all script files available in the given directory or one of its subdirectories to the given List of files
+     * 
+     * @param excludeFilesWithoutIndex Indicates if a files that don't have an index number as start of their fileName 
+     * have to be excluded from the list
+     * @param filesLocation The directory where the files are located
+     * @param files The list to which the available script files have to be added
      */
-    private void getScriptFiles(boolean excludeFilesWithoutIndex, List<String> filesLocations, List<File> files) {
-        for (String filesLocation : filesLocations) {
-            getAllFilesIn(excludeFilesWithoutIndex, new File(filesLocation), files);
-        }
-    }
-
-
-    /**
-     * Adds all available script files in the given location to the given List of files
-     * <p/>
-     * todo javadoc
-     *
-     * @param excludeFilesWithoutIndex
-     * @param filesLocation
-     * @param files
-     */
-    private void getAllFilesIn(boolean excludeFilesWithoutIndex, File filesLocation, List<File> files) {
+    protected void getAllFilesIn(boolean excludeFilesWithoutIndex, File filesLocation, List<File> files) {
         if (filesLocation.isDirectory()) {
             for (File subLocation : filesLocation.listFiles()) {
                 getAllFilesIn(excludeFilesWithoutIndex, subLocation, files);
@@ -270,17 +258,26 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
 
     /**
-     * todo javadoc
+     * Indicates if the given file is regarded as a script file
      *
-     * @param file
-     * @param excludeFilesWithoutIndex
+     * @param file The file
+     * @param excludeFilesWithoutIndex Indicates if a file that doesn't have an index number as start of its fileName
+     * is regarded as a script file
      * @return True if the given file is regarded as a script file.
      */
-    private boolean isScriptFile(File file, boolean excludeFilesWithoutIndex) {
+    protected boolean isScriptFile(File file, boolean excludeFilesWithoutIndex) {
         String name = file.getName();
-        if (!name.endsWith(fileExtension)) {
+        boolean fileExtensionSupported = false;
+        for (String fileExtension : fileExtensions) {
+            if (name.endsWith(fileExtension)) {
+                fileExtensionSupported = true;
+                break;
+            }
+        }
+        if (!fileExtensionSupported) {
             return false;
         }
+        
         if (excludeFilesWithoutIndex) {
             if (!StringUtils.contains(name, '_')) {
                 return false;
@@ -338,7 +335,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * @param scriptFiles the list of files, not null
      * @return highest timestamp of the given scriptFiles with index lower than maxIndex
      */
-    private Long getHighestScriptTimestamp(List<File> scriptFiles) {
+    protected Long getHighestScriptTimestamp(List<File> scriptFiles) {
         Long highestTimestamp = 0L;
         for (File scriptFile : scriptFiles) {
             highestTimestamp = Math.max(highestTimestamp, scriptFile.lastModified());
@@ -353,7 +350,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * @param currentVersion The current database version, not null
      * @return all script files having a newer version than the given one
      */
-    private List<File> getScriptFilesWithHigherIndex(long currentVersion) {
+    protected List<File> getScriptFilesWithHigherIndex(long currentVersion) {
         List<File> filesSorted = getScriptFilesSorted(true, scriptFileLocations);
         List<File> filesWithNewerVersion = new ArrayList<File>();
         for (File file : filesSorted) {
@@ -371,7 +368,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * @param files The script files
      * @return The scripts as a list of <code>VersionScriptPair</code> objects
      */
-    private List<VersionScriptPair> getVersionScriptPairsFromFiles(List<File> files) {
+    protected List<VersionScriptPair> getVersionScriptPairsFromFiles(List<File> files) {
         List<VersionScriptPair> scripts = new ArrayList<VersionScriptPair>();
         long timeStamp = getHighestScriptTimestamp(files);
         for (File file : files) {
@@ -386,8 +383,13 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     }
 
 
-    // todo javadoc
-    private List<Script> getScriptsFromFiles(List<File> files) {
+    /**
+     * Returns a List with the content of the given files as strings
+     * 
+     * @param files The files containing database update scripts
+     * @return The database update scripts as as list of strings
+     */
+    protected List<Script> getScriptsFromFiles(List<File> files) {
         List<Script> scripts = new ArrayList<Script>();
         for (File file : files) {
             try {

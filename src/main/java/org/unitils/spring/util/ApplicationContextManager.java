@@ -145,7 +145,7 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
                 applicationContext.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
                     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
                         for (Class<? extends BeanPostProcessor> beanPostProcessorType : beanPostProcessorTypes) {
-                            BeanPostProcessor beanPostProcessor = createInstanceOfType(beanPostProcessorType);
+                            BeanPostProcessor beanPostProcessor = createInstanceOfType(beanPostProcessorType, false);
                             registerBeanPostProcessor(applicationContext, beanPostProcessorType, beanPostProcessor);
                             beanFactory.addBeanPostProcessor(beanPostProcessor);
                         }

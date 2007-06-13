@@ -16,6 +16,18 @@
 package org.unitils.hibernate;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.PropertyUtils.getString;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
@@ -29,18 +41,11 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.util.Flushable;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.hibernate.util.*;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.PropertyUtils.getString;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import org.unitils.hibernate.util.HibernateAssert;
+import org.unitils.hibernate.util.HibernateConnectionProvider;
+import org.unitils.hibernate.util.HibernateSpringSupport;
+import org.unitils.hibernate.util.SessionFactoryManager;
+import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
 
 /**
  * todo javadoc
@@ -307,7 +312,7 @@ public class HibernateModule implements Module, Flushable {
             return;
         }
         try {
-            hibernateSpringSupport = createInstanceOfType("org.unitils.hibernate.util.HibernateSpringSupportImpl");
+            hibernateSpringSupport = createInstanceOfType("org.unitils.hibernate.util.HibernateSpringSupportImpl", false);
         } catch (UnitilsException e) {
             logger.warn("The HibernateSpringSupportImpl could not be loaded, probably due to a missing dependency", e);
         }
