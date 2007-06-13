@@ -447,7 +447,7 @@ public class UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
-    This will clear the user and usergroup tables and insert the user groups and user records. The first name of the smith user is explicitly 
+    This will clear the user and usergroup tables and insert the user groups and user records. The first name of the user named 'smith' is explicitly 
     set to a null value.
     
     Suppose the <testFindByMinimalAge()> method needs a specific data set instead of the class-level data set. You could create a file named 
@@ -463,7 +463,7 @@ public class UserDAOTest extends UnitilsJUnit4 {
 
     Method-level data sets should not be overused, since having more data files means you have to do more maintenance. You should first try 
     to reuse the data in the class level data set - in most cases a small set of test records can be reused for multiple tests. If this would 
-    result in a big and incoherent data set, maybe it's better to use a method specific one or to try to split the test in 2 separate tests, 
+    result in a big and incoherent data set, it may be better to use a method specific one, or to try to split the test in 2 separate tests, 
     each having their own data set.
     
     By setting the <@DataSet> annotation on class level a data set is loaded for every test in the class. If a data set should only be loaded for 
@@ -490,8 +490,50 @@ public class UserDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
+*** {Configuring the dataset load strategy}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*** {Asserting test results}
+    By default, datasets are loaded into the database using a <clean insert> strategy. This means that all data in the tables that are present in the 
+    dataset is deleted, after which the test data records are inserted. This behavior is configurable,  can be modified by changing the value
+    of the property <DbUnitModule.DataSet.loadStrategy.default>. Suppose we add following in unitils.properties:
+    
++-----+
+DbUnitModule.DataSet.loadStrategy.default=org.unitils.dbunit.datasetloadstrategy.InsertLoadStrategy
++-----+   
+
+    This sets the load strategy to <insert> instead of <clean insert>. The result is that data already available in the tables present in the dataset 
+    is not deleted, and test data records are simply inserted.
+    
+    The loadStrategy that is used can also be configured for specific tests using a attribute of the <@DataSet> annotation. E.g.:
+    
++-----+
+@DataSet(loadStrategy = InsertLoadStrategy.class)
++-----+
+    
+    For those familiar with DbUnit, configuring the load strategy is equivalent to using a different DatabaseOperation. Following are load strategies
+    that are supported by default:
+    
+    * CleanInsertLoadStrategy: Insert the dataset, after removal of all data currently present in the tables specified in the dataset
+    
+    * InsertLoadStrategy: Simply insert the dataset into the database
+    
+    * RefreshLoadStrategy: 'Refresh' the contents of the database with the contents of the dataset. This means that data of existing rows is updated and 
+    non-existing rows are inserted. Any rows that are in the database but not in the dataset stay unaffected
+    
+    * UpdateLoadStrategy: Update the contents of the database with the contents of the dataset. This means that data of existing rows is updated. Fails if 
+    the dataset contains records that are not in the database (i.e. a records having the same value for the primary key column).
+
+*** {Configuring the dataset factory}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Dataset files in Unitils have the <multischema xml> format, which is an extended version of DbUnits <FlatXmlDataSet> format. Configuration of the file
+    format and file extension is handled by a <DataSetFactory>. Although Unitils only supports one dataset format, the possibility is offered to implement a 
+    custom implementation of <DataSetFactory> to use a different file format. This can be done by specifying the value of the property 
+    <DbUnitModule.DataSet.factory.default> in unitils.properties or by using the factory attribute of the <@DataSet> annotation. Such a custom factory could 
+    e.g. be implemented to create an instance of DbUnit's <XlsDataSet>, if you want to use Excel files instead of XML.
+
+
+*** {Verifying test results}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Sometimes it can be useful to use data sets for checking the contents of a database after a test was run. For example when you want to check the 
     result of a bulk update method or a stored procedure. 
@@ -529,6 +571,43 @@ public class UserDAOTest extends UnitilsJUnit4 {
     try to perform the same check in the test code (e.g. by using a method <findActiveUsers()>).
 
 
+*** {Using multi-schema data sets}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Some applications connect to more than one database schema. To facilitate this, Unitils extends the data set xml definition to enable it to 
+    contain data for multiple schemas. Following example loads data for tables in 2 different schemas:
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns="SCHEMA_A" xmlns:b="SCHEMA_B">
+    <user id="1" userName="jack" />    
+    <b:role id="1" roleName="admin" />
+</dataset>
++-----+    
+
+    In this case we defined 2 schemas, <SCHEMA_A> and <SCHEMA_B>. The first schema, <SCHEMA_A>, is linked to the default xml namespace, the second schema, <SCHEMA_B>, is 
+    linked to xml namespace b. If a table xml element is prefixed with namespace b, the table is expected to be in schema <SCHEMA_B>, if it doesn't have a namespace
+    prefix it is considered to be in SCHEMA_A. In the example, test data is defines for tables <SCHEMA_A.user> and <SCHEMA_B.role>. 
+    
+    If no default namespace is specified, it is by default set to the first of the list of schema names defined by the property <database.schemaNames>. So suppose you 
+    have defined following schema names:
+    
++-----+
+database.schemaNames=SCHEMA_A, SCHEMA_B
++-----+   
+
+    This will make <SCHEMA_A> the default schema. You can then simplify the above data set example by leaving out the default namespace declaration:
+    
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:b="SCHEMA_B">
+    <user id="1" userName="jack" />    
+    <b:role id="1" roleName="admin" />
+</dataset>
++-----+    
+
+
+
 *** {Connecting to the test database}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     In the above examples we left out 1 important thing: where is the <DataSource> for connecting to the test database coming from and how
@@ -546,9 +625,9 @@ database.password=secret
 database.schemaNames=test_john
 +-----+
 
-    As described in the {{{#Configuration}Configuration}} section you would typically put the driver and url properties in the project's <unitils.properties> setting them for 
-    the project as a whole and put the user, password and schema properties in the <unitils-local.properties> defining them for that specific user only. This way you 
-    can let each developer connect to its own unit test database schema and run the tests without interference with others.
+    As described in the {{{#Configuration}Configuration}} section you would typically put the driver and url properties in the project's <unitils.properties>, defining them for 
+    the project as a whole and put the user, password and schema properties in the <unitils-local.properties>, defining them for that specific user only. This way you 
+    can make each developer connect to its own unit test database schema and run the tests without interference with others.
 
     Before a test is set up, the <DataSource> instance will be injected into the test instance: if a field or setter method is annotated with <@TestDataSource> is found, 
     it will be set to or called with this instance value. You still have to provide some project specific code that configures your code to use this datasource. Typically 
@@ -570,7 +649,7 @@ public abstract class BaseDAOTest extends UnitilsJUnit4 {
 }
 +-----+    
 
-    The above example used annotations to get a reference to the datasource, another way of making your code use the Unitils <DataSource> is by using 
+    The above example uses annotations to get a reference to the datasource. Another way of making your code use the Unitils <DataSource> is by using 
     an instance of <org.unitils.database.UnitilsDataSource>. This is a wrapper that delegates to the test datasource. Just create an instance
     using the default constructor and you are able to connect to the unit test database. This can be used in e.g. a datasource XML config file
     or programmatically as follows:
@@ -581,43 +660,54 @@ Connection connection = dataSource.getConnection();
 +-----+
 
 
-*** {Using multi-schema data sets}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*** {Transactions}
+~~~~~~~~~~~~~~~~~~
 
-    Sometimes applications connect to more than one database schema. To facilitate this, Unitils extended the data set xml definition to allow it to 
-    contain data for multiple schemas. Following example loads data for tables in 2 different schemas:
+    For different reasons, it can be useful to run tests that access a test database in a transaction. The most important are the following:
 
-+-----+
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset xmlns="SCHEMA_A" xmlns:b="SCHEMA_B">
-    <user id="1" userName="jack" />    
-    <b:role id="1" roleName="admin" />
-</dataset>
-+-----+    
+    * Database actions exist that only work properly when executed in a transaction, such as when using <SELECT FOR UPDATE> or triggers that execute <ON COMMIT>.
+ 
+    * A lot of projects like to run their test on a database that is pre-filled with some general-purpose data. During each test, data may be inserted or
+      modified. To make sure the database is in the same known state before every test, a transaction is started before and rolled back after 
+      each test.
 
-    In this case we defined 2 schemas, <SCHEMA_A> and <SCHEMA_B>. The first schema, <SCHEMA_A>, is linked to the default xml namespace, the second schema, <SCHEMA_B>, is 
-    linked to xml namespace b. If a table xml element is prefixed with namespace b, the table is expected to be in schema <SCHEMA_B>, if it doesn't have a namespace
-    prefix it is considered to be in SCHEMA_A. In the example, the <SCHEMA_A.user> and <SCHEMA_B.role> tables will first be emptied and then loaded with the specified 
-    records. 
-    
-    If no default namespace is specified, it is by default set to the first schema name in the <database.schemaNames> list. So suppose you have defined following
-    schema names:
+    By default, transaction management is disabled. This default behavior can be changed by setting following property:
     
 +-----+
-database.schemaNames=SCHEMA_A, SCHEMA_B
-+-----+   
+DatabaseModule.Transactional.value.default=commit
++-----+
 
-    This will make <SCHEMA_A> the default schema. You can then simplify the above data set example by leaving out the default namespace declaration:
+    With this setting, every test is executed in a transaction, which is committed. Other supported values for this property are <rollback> and <disabled>.
+    
+    The default transactional behavior can be modified at the level of a test class, by annotating the test class with <@Transactional>. For example:
     
 +-----+
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset xmlns:b="SCHEMA_B">
-    <user id="1" userName="jack" />    
-    <b:role id="1" roleName="admin" />
-</dataset>
-+-----+    
+@Transactional(TransactionMode.ROLLBACK)
+public class UserDaoTest extends UnitilsJUnit4 {
++-----+
 
+    This way, transaction management is enabled for the annotated class, making sure the transaction is rolled back after each test. The <@Transactional> 
+    annotation is inheritable, to enable this and other common configuration to be moved to a shared superclass.
 
+    Transactions are implemented by a transaction manager. Unitils uses either a transaction manager configured in a spring application context, or a very simple,
+    custom implementation that makes the Unitils datasource transactional. Which transaction manager Unitils chooses depends on the property <transactionManager.type>.
+    This property may have the values <spring>, <simple> or <auto>. If set to auto (the default), Unitils verifies if the spring module is enabled and that spring is
+    in the classpath. If yes, the SpringTransactionManager will be used. If the spring module is not (or cannot be) enabled, the SimpleTransactionManager is automatically
+    used.
+    
+    By adding the following to your Unitils configuration, this autodectection mechanism is disabled, and transaction management is always done via Spring:
+    
++-----+
+transactionManager.type=spring
++-----+       
+
+    Since autodetection can lead to bugs that are hard to resolve, we recommend setting this property either to <spring> or to <simple>.
+    
+    If spring is used for transaction management, Unitils expects that a bean of type <org.springframework.transaction.PlatformTransactionManager> in an ApplicationContext 
+    (configured using the <@SpringApplicationContext> annotation). If not, an exception will be thrown.
+    
+    If <transactionManager.type is set to <simple>, nothing further has to be configured. The unitils DataSource will then be wrapped by a proxy that makes all access to the
+    unit test database transactional, using a very simple transaction manager implementation.
 
 * {Unit test database maintenance}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

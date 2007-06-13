@@ -51,15 +51,7 @@
     <li><p><a href="#4.2">4.2 Test non-trivial queries</a></p></li>
     <li><p><a href="#4.3">4.3 Test bulk data manipulation methods</a></p></li>
 </ul>
-<p><a href="#5">5. Mock object testing guidelines</a></p>
-<ul>
-    <li><p><a href="#5.1">5.1 Structure of a mock object test</a></p></li>
-    <li><p><a href="#5.2">5.2 Think before you mock</a></p></li>
-    <li><p><a href="#5.3">5.3 Don't mock the tightly coupled</a></p></li>
-    <li><p><a href="#5.4">5.4 Keep expectation scenarios short</a></p></li>
-    <li><p><a href="#5.5">5.5 Minimize implementation exposure</a></p></li>
-    <li><p><a href="#5.6">5.6 Use lenient expectations</a></p></li>
-</ul>
+
 
 <p>The guidelines are work in progress and are intended to be open source. We have a <a href="http://sourceforge.net/forum/forum.php?forum_id=642599">
 guidelines forum</a> on which guidelines can be discussed and new ones can be proposed. We hope to hear from you. Feel free to post your comments.</p>
