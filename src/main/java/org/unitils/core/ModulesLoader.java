@@ -15,23 +15,12 @@
  */
 package org.unitils.core;
 
-import static org.unitils.util.PropertyUtils.getBoolean;
-import static org.unitils.util.PropertyUtils.getString;
-import static org.unitils.util.PropertyUtils.getStringList;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import static org.unitils.util.PropertyUtils.*;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+
+import java.util.*;
 
 /**
  * A class for loading unitils modules.
@@ -148,7 +137,7 @@ public class ModulesLoader {
             String className = getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME, configuration);
             try {
                 // create core instance
-                Object module = createInstanceOfType(className, false);
+                Object module = createInstanceOfType(className, true);
                 if (!(module instanceof Module)) {
                     throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
                 }
