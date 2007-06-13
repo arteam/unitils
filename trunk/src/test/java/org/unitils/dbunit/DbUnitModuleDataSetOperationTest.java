@@ -29,7 +29,7 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
-import org.unitils.dbunit.datasetoperation.DataSetOperation;
+import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 
 /**
@@ -56,7 +56,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
         dropTestTables();
         createTestTables();
 
-        MockDataSetOperation.operationExecuted = false;
+        MockDataSetLoadStrategy.operationExecuted = false;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
 
     public void testLoadDataSet_customDataSetOperation() throws Exception {
         dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"));
-        assertTrue(MockDataSetOperation.operationExecuted);
+        assertTrue(MockDataSetLoadStrategy.operationExecuted);
     }
 
     /**
@@ -111,12 +111,12 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
         public void testMethod1() {
         }
 
-        @DataSet(operation = MockDataSetOperation.class)
+        @DataSet(loadStrategy = MockDataSetLoadStrategy.class)
         public void testMethodCustomDataSetOperation() {
         }
     }
 
-    public static class MockDataSetOperation implements DataSetOperation {
+    public static class MockDataSetLoadStrategy implements DataSetLoadStrategy {
 
         private static boolean operationExecuted;
 

@@ -25,8 +25,8 @@ import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_ONLY_DATA_TABLES;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_DATA_SCHEMAS;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_DATA_TABLES;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.util.PropertyUtils;
@@ -79,8 +79,8 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
         SQLHandler sqlHandler = new SQLHandler(dataSource);
         dbSupport = getDefaultDbSupport(configuration, sqlHandler);
         // items to preserve
-        configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS, "schema_c");
-        configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_TABLES, "test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST"));
+        configuration.setProperty(PROPKEY_PRESERVE_DATA_SCHEMAS, "schema_c");
+        configuration.setProperty(PROPKEY_PRESERVE_DATA_TABLES, "test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST"));
         dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
 
         dropTestTables();

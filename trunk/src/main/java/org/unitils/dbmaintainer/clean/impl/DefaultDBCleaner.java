@@ -32,7 +32,7 @@ import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 /**
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
  * that are configured as tables to preserve. This includes the tables that are listed in the property
- * {@link #PROPKEY_PRESERVE_TABLES}, {@link #PROPKEY_PRESERVE_ONLY_DATA_TABLES}. and the table that is configured as
+ * {@link #PROPKEY_PRESERVE_TABLES}, {@link #PROPKEY_PRESERVE_DATA_TABLES}. and the table that is configured as
  * version table using the property {@link #PROPKEY_VERSION_TABLE_NAME}.
  *
  * @author Tim Ducheyne
@@ -41,17 +41,17 @@ import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
 
     /**
-     * Property key for schemas that should not be cleaned at all
+     * Property key for schemas in which none of the tables should be cleaned
      */
-    public static final String PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS = "dbMaintainer.preserveOnlyData.schemas";
+    public static final String PROPKEY_PRESERVE_DATA_SCHEMAS = "dbMaintainer.preserveDataOnly.schemas";
 
     /**
      * Property key for the tables that should not be cleaned
      */
-    public static final String PROPKEY_PRESERVE_ONLY_DATA_TABLES = "dbMaintainer.preserveOnlyData.tables";
+    public static final String PROPKEY_PRESERVE_DATA_TABLES = "dbMaintainer.preserveDataOnly.tables";
 
     /**
-     * The key of the property that specifies which tables should not be dropped (shouls also not be cleaned)
+     * Property that specifies which tables should not be dropped (should also not be cleaned)
      */
     public static final String PROPKEY_PRESERVE_TABLES = "dbMaintainer.preserve.tables";
 
@@ -83,10 +83,10 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
     @Override
     protected void doInit(Properties configuration) {
         schemasToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SCHEMAS, configuration, false);
-        schemasToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_ONLY_DATA_SCHEMAS, configuration, false));
+        schemasToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_DATA_SCHEMAS, configuration, false));
         tablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME, configuration, true);
         tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration, true));
-        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_ONLY_DATA_TABLES, configuration, true));
+        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_DATA_TABLES, configuration, true));
     }
 
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.datasetoperation;
+package org.unitils.dbunit.datasetloadstrategy;
 
 import org.dbunit.dataset.IDataSet;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
@@ -24,8 +24,8 @@ import org.unitils.dbunit.util.DbUnitDatabaseConnection;
  * Implementations must have an empty constructor so that an instance can be created using reflection.
  * <p/>
  * The concrete implementation class that is used can be configured using the annotation attribute
- * {@link org.unitils.dbunit.annotation.DataSet#operation()}. A default can be specified using the property
- * <code>DbUnitModule.DataSet.operation.default</code>.
+ * {@link org.unitils.dbunit.annotation.DataSet#loadStrategy()}. A default can be specified using the property
+ * <code>DbUnitModule.DataSet.loadStrategy.default</code>.
  * <p/>
  * This wrapper mechanism makes it very easy to use custom DbUnit <code>DatabaseOperation</code> composite object
  * structures, without sacrificing the powerfulness of Unitils' configuration system.
@@ -33,10 +33,10 @@ import org.unitils.dbunit.util.DbUnitDatabaseConnection;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DataSetOperation {
+public interface DataSetLoadStrategy {
 
     /**
-     * Executes this DataSetOperation. This means the given dataset is inserted in the database using the given dbUnit
+     * Executes this DataSetLoadStrategy. This means the given dataset is inserted in the database using the given dbUnit
      * database connection object.
      *
      * @param dbUnitDatabaseConnection DbUnit class providing access to the database

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.datasetoperation;
+package org.unitils.dbunit.datasetloadstrategy;
 
 import java.sql.SQLException;
 
@@ -23,18 +23,18 @@ import org.dbunit.operation.DatabaseOperation;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 
 /**
- * {@link org.unitils.dbunit.datasetoperation.DataSetOperation} that 'refreshes' the contents of the database with the contents of the dataset. This means
- * that data of existing rows are updated and non-existing rows are inserted. Any rows that are in the database but not
+ * {@link org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy} that 'refreshes' the contents of the database with the contents of the dataset. This means
+ * that data of existing rows is updated and non-existing rows are inserted. Any rows that are in the database but not
  * in the dataset stay unaffected.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @see DatabaseOperation#REFRESH
  */
-public class RefreshOperation extends BaseDataSetOperation {
+public class RefreshLoadStrategy extends BaseDataSetLoadStrategy {
 
     /**
-     * Executes this DataSetOperation. This means the given dataset is inserted in the database using the given dbUnit
+     * Executes this DataSetLoadStrategy. This means the given dataset is inserted in the database using the given dbUnit
      * database connection object.
      *
      * @param dbUnitDatabaseConnection DbUnit class providing access to the database

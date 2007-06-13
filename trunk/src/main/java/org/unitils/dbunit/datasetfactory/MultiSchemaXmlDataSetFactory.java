@@ -16,7 +16,7 @@
 package org.unitils.dbunit.datasetfactory;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.dbunit.util.DataSetXmlReader;
+import org.unitils.dbunit.util.MultiSchemaXmlDataSetReader;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -38,8 +38,8 @@ public class MultiSchemaXmlDataSetFactory implements DataSetFactory {
 
     public MultiSchemaDataSet createDataSet(String dataSetFileName, InputStream dataSetFileContents) {
         try {
-            DataSetXmlReader dataSetXmlReader = new DataSetXmlReader(defaultSchemaName);
-            return dataSetXmlReader.readDataSetXml(dataSetFileContents);
+            MultiSchemaXmlDataSetReader multiSchemaXmlDataSetReader = new MultiSchemaXmlDataSetReader(defaultSchemaName);
+            return multiSchemaXmlDataSetReader.readDataSetXml(dataSetFileContents);
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to create DbUnit dataset for input stream.", e);

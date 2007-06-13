@@ -38,7 +38,6 @@ import javax.sql.DataSource;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
-import org.dbunit.operation.DatabaseOperation;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
@@ -50,8 +49,8 @@ import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetoperation.DataSetOperation;
-import org.unitils.dbunit.util.DataSetXmlReader;
+import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
+import org.unitils.dbunit.util.MultiSchemaXmlDataSetReader;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
@@ -142,11 +141,11 @@ public class DbUnitModule implements Module {
                 // no dataset specified
                 return;
             }
-            DataSetOperation dataSetOperation = getDataSetOperation(testMethod);
+            DataSetLoadStrategy dataSetLoadStrategy = getDataSetOperation(testMethod);
 
             for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
                 IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
-                dataSetOperation.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
+                dataSetLoadStrategy.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
             }
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
@@ -162,12 +161,12 @@ public class DbUnitModule implements Module {
      * @param inputStream       The stream containing the test data set, not null
      * @param databaseOperation The dbunit DatabaseOperation that must be executed on this DataSet
      */
-    public void insertTestData(InputStream inputStream, DataSetOperation dataSetOperation) {
+    public void insertTestData(InputStream inputStream, DataSetLoadStrategy dataSetLoadStrategy) {
         try {
             MultiSchemaDataSet multiSchemaDataSet = getDataSet(inputStream);
             for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
                 IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
-                dataSetOperation.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
+                dataSetLoadStrategy.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
             }
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset.", e);
@@ -328,8 +327,8 @@ public class DbUnitModule implements Module {
             SQLHandler sqlHandler = new SQLHandler(dataSource);
             DbSupport defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
-            DataSetXmlReader dataSetXmlReader = new DataSetXmlReader(defaultDbSupport.getSchemaName());
-            return dataSetXmlReader.readDataSetXml(in);
+            MultiSchemaXmlDataSetReader multiSchemaXmlDataSetReader = new MultiSchemaXmlDataSetReader(defaultDbSupport.getSchemaName());
+            return multiSchemaXmlDataSetReader.readDataSetXml(in);
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to create DbUnit dataset for input stream.", e);
@@ -340,11 +339,11 @@ public class DbUnitModule implements Module {
 
 
     @SuppressWarnings({"unchecked"})
-    protected DataSetOperation getDataSetOperation(Method testMethod) {
-        Class<? extends DataSetOperation> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "operation", DataSetOperation.class, testMethod);
-        dataSetOperationClass = (Class<? extends DataSetOperation>) getClassValueReplaceDefault(DataSet.class, "operation", dataSetOperationClass, defaultAnnotationPropertyValues, DataSetOperation.class);
+    protected DataSetLoadStrategy getDataSetOperation(Method testMethod) {
+        Class<? extends DataSetLoadStrategy> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "loadStrategy", DataSetLoadStrategy.class, testMethod);
+        dataSetOperationClass = (Class<? extends DataSetLoadStrategy>) getClassValueReplaceDefault(DataSet.class, "loadStrategy", dataSetOperationClass, defaultAnnotationPropertyValues, DataSetLoadStrategy.class);
 
-        return createInstanceOfType(dataSetOperationClass);
+        return createInstanceOfType(dataSetOperationClass, false);
     }
 
 
@@ -440,7 +439,7 @@ public class DbUnitModule implements Module {
     protected DataSetFactory getDataSetFactory(Class<? extends Annotation> annotationClass, Method testMethod) {
         Class<? extends DataSetFactory> dataSetFactoryClass = getMethodOrClassLevelAnnotationProperty(annotationClass, "factory", DataSetFactory.class, testMethod);
         dataSetFactoryClass = (Class<? extends DataSetFactory>) getClassValueReplaceDefault(annotationClass, "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DataSetFactory.class);
-        return createInstanceOfType(dataSetFactoryClass);
+        return createInstanceOfType(dataSetFactoryClass, false);
     }
 
 

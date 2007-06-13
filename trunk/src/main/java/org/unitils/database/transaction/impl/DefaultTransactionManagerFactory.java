@@ -15,14 +15,15 @@
  */
 package org.unitils.database.transaction.impl;
 
-import org.unitils.core.Unitils;
-import org.unitils.database.transaction.TransactionManager;
-import org.unitils.database.transaction.TransactionManagerFactory;
 import static org.unitils.util.ConfigUtils.getConfiguredClassName;
-import org.unitils.util.PropertyUtils;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.util.Properties;
+
+import org.unitils.core.Unitils;
+import org.unitils.database.transaction.TransactionManager;
+import org.unitils.database.transaction.TransactionManagerFactory;
+import org.unitils.util.PropertyUtils;
 
 /**
  * Transaction manager factory implementation that will load a transaction manager determined by the {#PROPKEY_TRANSACTION_MANAGER_TYPE}
@@ -72,7 +73,7 @@ public class DefaultTransactionManagerFactory implements TransactionManagerFacto
      * @return The TransactionManager, not null
      */
     public TransactionManager createTransactionManager() {
-        return createInstanceOfType(transactionManagerClassName);
+        return createInstanceOfType(transactionManagerClassName, false);
     }
 
 

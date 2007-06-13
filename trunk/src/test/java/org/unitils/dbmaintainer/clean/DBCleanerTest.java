@@ -63,7 +63,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
         dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         // items to preserve
-        configuration.setProperty(PROPKEY_PRESERVE_ONLY_DATA_TABLES, "Test_table_Preserve");
+        configuration.setProperty(PROPKEY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
         configuration.setProperty(PROPKEY_PRESERVE_TABLES, dbSupport.quoted("Test_CASE_Table_Preserve"));
         // create cleaner instance
         dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);

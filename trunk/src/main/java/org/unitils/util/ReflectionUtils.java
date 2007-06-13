@@ -15,12 +15,16 @@
  */
 package org.unitils.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.unitils.core.UnitilsException;
-
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
 
 /**
  * Utility methods that use reflection for instance creation or class inspection.
@@ -34,16 +38,18 @@ public class ReflectionUtils {
     /**
      * Creates an instance of the class with the given name.
      * The class's no argument constructor is used to create an instance.
+     * @param <T> 
      *
      * @param className The name of the class, not null
+     * @param bypassAccessibility If true, no exception is thrown if the parameterless constructor is not public
      * @return An instance of this class
      * @throws UnitilsException if the class could not be found or no instance could be created
      */
     @SuppressWarnings({"unchecked"})
-    public static <T> T createInstanceOfType(String className) {
+    public static <T> T createInstanceOfType(String className, boolean bypassAccessibility) {
         try {
             Class<?> type = Class.forName(className);
-            return (T) createInstanceOfType(type);
+            return (T) createInstanceOfType(type, bypassAccessibility);
 
         } catch (ClassCastException e) {
             throw new UnitilsException("Class " + className + " is not of expected type.", e);
@@ -65,13 +71,16 @@ public class ReflectionUtils {
      *
      * @param <T>  The type of the instance
      * @param type The type of the instance
+     * @param bypassAccessibility If true, no exception is thrown if the parameterless constructor is not public
      * @return An instance of this type
      * @throws UnitilsException If an instance could not be created
      */
-    public static <T> T createInstanceOfType(Class<T> type) {
+    public static <T> T createInstanceOfType(Class<T> type, boolean bypassAccessibility) {
         try {
             Constructor<T> constructor = type.getDeclaredConstructor();
-            constructor.setAccessible(true);
+            if (bypassAccessibility) {
+                constructor.setAccessible(true);
+            }
             return constructor.newInstance();
 
         } catch (Exception e) {

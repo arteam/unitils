@@ -15,12 +15,13 @@
  */
 package org.unitils.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.core.UnitilsException;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 
 /**
  * Class containing configuration related utilities
@@ -51,7 +52,7 @@ public class ConfigUtils {
     public static <T> T getConfiguredInstance(Class type, Properties configuration, String... implementationDiscriminatorValues) {
         String implClassName = getConfiguredClassName(type, configuration, implementationDiscriminatorValues);
         logger.debug("Creating instance of " + type + ". Implementation class " + implClassName);
-        return (T) createInstanceOfType(implClassName);
+        return (T) createInstanceOfType(implClassName, false);
     }
 
 

@@ -15,14 +15,21 @@
  */
 package org.unitils.util;
 
-import junit.framework.TestCase;
-import org.unitils.core.UnitilsException;
-import static org.unitils.util.ReflectionUtils.*;
+import static java.util.Arrays.asList;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getFieldName;
+import static org.unitils.util.ReflectionUtils.getFieldValue;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import static java.util.Arrays.asList;
+
+import junit.framework.TestCase;
+
+import org.unitils.core.UnitilsException;
 
 /**
  * Test for {@link ReflectionUtils}.
@@ -46,6 +53,7 @@ public class ReflectionUtilsTest extends TestCase {
     /**
      * Sets up the test fixture.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -59,7 +67,7 @@ public class ReflectionUtilsTest extends TestCase {
      * Test for creating a class instance.
      */
     public void testCreateInstanceOfType() {
-        String result = (String) createInstanceOfType("java.lang.String");
+        String result = (String) createInstanceOfType("java.lang.String", false);
         assertNotNull(result);
     }
 
@@ -69,7 +77,7 @@ public class ReflectionUtilsTest extends TestCase {
      */
     public void testCreateInstanceOfType_classNotFound() {
         try {
-            createInstanceOfType("xxxxxx");
+            createInstanceOfType("xxxxxx", false);
             fail("UnitilsException expected");
 
         } catch (UnitilsException e) {

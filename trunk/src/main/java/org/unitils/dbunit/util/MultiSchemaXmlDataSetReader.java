@@ -73,7 +73,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DataSetXmlReader {
+public class MultiSchemaXmlDataSetReader {
 
     /* The schema name to use when none is specified */
     private String defaultSchemaName;
@@ -84,7 +84,7 @@ public class DataSetXmlReader {
      *
      * @param defaultSchemaName The schema name to use when none is specified, not null
      */
-    public DataSetXmlReader(String defaultSchemaName) {
+    public MultiSchemaXmlDataSetReader(String defaultSchemaName) {
         this.defaultSchemaName = defaultSchemaName;
     }
 

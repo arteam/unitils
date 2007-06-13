@@ -24,7 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
-import org.unitils.dbunit.datasetoperation.DataSetOperation;
+import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 
 /**
  * Annotation indicating that a data set should be loaded before the test run.
@@ -90,12 +90,12 @@ public @interface DataSet {
 
 
     /**
-     * The operation that needs to be executed to get the dbunit dataset into the database
+     * The strategy that needs to be used to get the dbunit dataset into the database
      *
-     * @return An implementation class of {@link DataSetOperation}. Use the default value {@link DataSetOperation}
-     *         to make use of the default DataSetOperation configured in the unitils configuration.
+     * @return An implementation class of {@link DataSetLoadStrategy}. Use the default value {@link DataSetLoadStrategy}
+     *         to make use of the default loadStragegy configured in the unitils configuration.
      */
-    Class<? extends DataSetOperation> operation() default DataSetOperation.class;
+    Class<? extends DataSetLoadStrategy> loadStrategy() default DataSetLoadStrategy.class;
 
 
     /**
@@ -103,7 +103,7 @@ public @interface DataSet {
      * object
      *
      * @return An implementation class of {@link DataSetFactory}. Use the default value {@link DataSetFactory}
-     *         to make use of the default DataSetOperation configured in the unitils configuration.
+     *         to make use of the default DataSetLoadStrategy configured in the unitils configuration.
      */
     Class<? extends DataSetFactory> factory() default DataSetFactory.class;
 }

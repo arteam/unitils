@@ -24,10 +24,9 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEqu
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
-import java.util.Map;
 
 /**
- * Test for {@link DataSetXmlReader}.
+ * Test for {@link MultiSchemaXmlDataSetReader}.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -75,7 +74,7 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
                     "</dataset>";
 
     /* Tested object */
-    private DataSetXmlReader dataSetXmlReader;
+    private MultiSchemaXmlDataSetReader multiSchemaXmlDataSetReader;
 
 
     /**
@@ -83,7 +82,7 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        dataSetXmlReader = new DataSetXmlReader("SCHEMA_A");
+        multiSchemaXmlDataSetReader = new MultiSchemaXmlDataSetReader("SCHEMA_A");
     }
 
 
@@ -92,7 +91,7 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      * row has less columns than the first one.
      */
     public void testLoadDataSet_lessColumnsLast() throws Exception {
-        MultiSchemaDataSet result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_LESS_COLUMNS_LAST.getBytes()));
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(new ByteArrayInputStream(XML_LESS_COLUMNS_LAST.getBytes()));
 
         // there should be 1 dataset for the default schema A
         assertLenEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
@@ -126,7 +125,7 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      * row has less columns than the second one.
      */
     public void testLoadDataSet_lessColumnsFirst() throws Exception {
-        MultiSchemaDataSet result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_LESS_COLUMNS_FIRST.getBytes()));
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(new ByteArrayInputStream(XML_LESS_COLUMNS_FIRST.getBytes()));
 
         // there should be 1 dataset for the default schema A
         assertLenEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
@@ -160,7 +159,7 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      * schema D (overrides default schema A) contains 3 records for TABLE_A, schema B and C contain 2 records for TABLE_A.
      */
     public void testLoadDataSet_multiSchema() throws Exception {
-        MultiSchemaDataSet result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_MULTI_SCHEMA.getBytes()));
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(new ByteArrayInputStream(XML_MULTI_SCHEMA.getBytes()));
 
         // there should be 3 schemas
         assertLenEquals(new String[]{"SCHEMA_D", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
@@ -184,7 +183,7 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
      * schema A (default) contains 3 records for TABLE_A, schema B and C contain 2 records for TABLE_A.
      */
     public void testLoadDataSet_multiSchemaNoDefault() throws Exception {
-        MultiSchemaDataSet result = dataSetXmlReader.readDataSetXml(new ByteArrayInputStream(XML_MULTI_SCHEMA_NO_DEFAULT.getBytes()));
+        MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(new ByteArrayInputStream(XML_MULTI_SCHEMA_NO_DEFAULT.getBytes()));
 
         // there should be 3 schemas
         assertLenEquals(new String[]{"SCHEMA_A", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
