@@ -61,7 +61,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
                     "   <xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\" />\n" +
                     "   <xsd:element name=\"dataset\">\n" +
                     "       <xsd:complexType>\n" +
-                    "           <xsd:choice minOccurs=\"1\" maxOccurs=\"unbounded\">\n" +
+                    "           <xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n" +
                     "               <xsd:element name=\"TABLE_1\" type=\"dflt:TABLE_1__type\" />\n" +
                     "               <xsd:element name=\"TABLE_2\" type=\"dflt:TABLE_2__type\" />\n" +
                     "               <xsd:any namespace=\"PUBLIC\" />\n" +

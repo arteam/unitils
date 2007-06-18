@@ -16,27 +16,16 @@
 package org.unitils.dbunit.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import org.dbunit.dataset.*;
+import org.dbunit.dataset.datatype.DataType;
+import org.unitils.core.UnitilsException;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.SAXParserFactory;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.parsers.SAXParserFactory;
-
-import org.dbunit.dataset.CachedDataSet;
-import org.dbunit.dataset.Column;
-import org.dbunit.dataset.DataSetException;
-import org.dbunit.dataset.DefaultTableMetaData;
-import org.dbunit.dataset.ITableMetaData;
-import org.dbunit.dataset.ReplacementDataSet;
-import org.dbunit.dataset.datatype.DataType;
-import org.unitils.core.UnitilsException;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * A reader for DbUnit xml datasets that creates a new ITable instance for each element (row).
@@ -121,6 +110,12 @@ public class MultiSchemaXmlDataSetReader {
         try {
             SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
             saxParserFactory.setNamespaceAware(true);
+
+            // disable validation, so dataset can still be used when a DTD or XSD is missing 
+            saxParserFactory.setValidating(false);
+            saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
             return saxParserFactory.newSAXParser().getXMLReader();
 
         } catch (Exception e) {

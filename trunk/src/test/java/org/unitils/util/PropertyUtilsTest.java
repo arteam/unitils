@@ -112,6 +112,19 @@ public class PropertyUtilsTest extends TestCase {
 
 
     /**
+     * Test for getting an unknown string list property
+     */
+    public void testGetStringList_requiredNotFound() {
+        try {
+            getStringList("xxxx", testProperties, true);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            //expected
+        }
+    }
+
+
+    /**
      * Test for getting a boolean property
      */
     public void testGetBoolean() {
