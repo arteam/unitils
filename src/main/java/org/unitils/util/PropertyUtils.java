@@ -15,13 +15,12 @@
  */
 package org.unitils.util;
 
+import org.unitils.core.UnitilsException;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import org.unitils.core.UnitilsException;
 
 /**
  * Utilities for working with property files.
@@ -95,6 +94,9 @@ public class PropertyUtils {
     public static List<String> getStringList(String propertyName, Properties properties, boolean required) {
         String values = getProperty(propertyName, properties);
         if (values == null || "".equals(values.trim())) {
+            if (required) {
+                throw new UnitilsException("No value found for property " + propertyName);
+            }
             return new ArrayList<String>(0);
         }
         String[] splitValues = values.split(",");
@@ -191,8 +193,15 @@ public class PropertyUtils {
     }
 
 
+    /**
+     * Checks whether the property with the given name exists in the System or in the given properties.
+     *
+     * @param propertyName The property name, not null
+     * @param properties   The properties if not found in System, not null
+     * @return True if the property exitsts
+     */
     public static boolean containsProperty(String propertyName, Properties properties) {
-        return getProperty(propertyName, properties) != null;    
+        return getProperty(propertyName, properties) != null;
     }
 
 
@@ -228,8 +237,15 @@ public class PropertyUtils {
         }
         return (T) createInstanceOfType(className, false);
     }
-    
-    
+
+
+    /**
+     * Gets a property from the System or from the given properties.
+     *
+     * @param propertyName The name of the property, not null
+     * @param properties   The properties if not found in System, not null
+     * @return The property value, null if not found
+     */
     private static String getProperty(String propertyName, Properties properties) {
         String value = System.getProperty(propertyName);
         if (value == null) {

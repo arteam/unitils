@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="java"/>
-	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="src/test/resources"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="lib" path="lib/antlr-2.7.6rc1.jar"/>
 	<classpathentry kind="lib" path="lib/asm.jar"/>
 	<classpathentry kind="lib" path="lib/asm-attrs.jar"/>
@@ -22,12 +23,13 @@
 	<classpathentry kind="lib" path="lib/hibernate3.2.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate-annotations-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
+	<classpathentry kind="lib" path="lib/jta.jar"/>
 	<classpathentry kind="lib" path="lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/ognl-2.6.9.jar"/>
-	<classpathentry kind="lib" path="lib/spring-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/spring-2.0.5.jar"/>
 	<classpathentry kind="lib" path="lib/testng-5.1-jdk15.jar"/>
-	<classpathentry sourcepath="unitils-src/main" kind="lib" path="lib/unitils-1.0-rc-3-20070426-1.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="lib/unitils-1.0-rc-3.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

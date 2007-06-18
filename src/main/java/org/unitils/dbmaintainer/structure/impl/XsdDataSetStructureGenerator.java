@@ -100,7 +100,7 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseTask implements Da
 
             writer.write("\t<xsd:element name=\"dataset\">\n");
             writer.write("\t\t<xsd:complexType>\n");
-            writer.write("\t\t\t<xsd:choice minOccurs=\"1\" maxOccurs=\"unbounded\">\n");
+            writer.write("\t\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
 
             Set<String> defaultSchemaTableNames = defaultDbSupport.getTableNames();
             for (String tableName : defaultSchemaTableNames) {
