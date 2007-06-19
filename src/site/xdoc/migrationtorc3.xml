@@ -1,0 +1,33 @@
+<document>
+  <properties>    
+    <title>Migration to RC 3</title>
+  </properties>  
+  <body>    
+    <section name="migrationtorc3">        
+    
+        <p>When migrating from Unitils RC 2 to RC 3, following changes need to be made:</p>
+        <ul>
+           <li>Rename the property database.schemaName to database.schemaNames in your configuration files. Multiple 
+           schema names may be specified, seperated by commas.</li>
+           <li>By default, the DBMaintainer will generate a number of XSDs describing your database instead of a DTD. If you want to
+           continue using DTD's, you have to add the property org.unitils.dbmaintainer.structure.DataSetStructureGenerator.implClassName
+           to your configuration with value org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator. You also
+           have to rename the property dtdGenerator.dtd.filename to dataSetStructureGenerator.dtd.filename. If you want to switch to
+           using XSD's (recommended), specify the path to the directory where the XSD files should be
+           put in the property dataSetStructureGenerator.xsd.dirName.</p></li>
+           <li>If present in your config, the property dbMaintainer.cleanDb.tablesToPreserve needs to be renamed to 
+           dbMaintainer.preserveDataOnly.tables. Table names may optionally be prefixed by their schema name. If all the tables 
+           from a certain database schema need to be preserved, you can specify this schema in 
+           dbMaintainer.preserveDataOnly.schemas.</li>
+           <li>dbMaintainer.clearDb.itemsToPreserve has been split up into multiple properties, for different types of
+           database items. If you specified this property, move your items to preserve to one of the properties 
+           dbMaintainer.preserve.tables, dbMaintainer.preserve.views, dbMaintainer.preserve.synonyms or
+           dbMaintainer.preserve.sequences. Identifiers may optionaly be prefixed by their schema name. If all the tables 
+           from a certain database schema need to be preserved, you can specify this schema in 
+           dbMaintainer.preserve.schemas.</li>
+
+        </ul>
+
+    </section>
+  </body>
+</document>

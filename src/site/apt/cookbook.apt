@@ -124,7 +124,7 @@ database.dialect=<my databasa dialect>
 +------+
 database.userName=<developers database login username>
 database.password=<developers database login password>
-database.schemaName=<developers database schema name>
+database.schemaNames=<developers database schema name>
 +------+
 
     Following is an example of a database test:
@@ -156,8 +156,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
 
 +-----+
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE dataset SYSTEM "<path to database dtd>">
-<dataset>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="<path to xsd directory>">
     <user firstname="John" lastname="Doe"/>
     <user firstname="Jane" lastname="Doe"/>
     <user firstname="Jack" lastname="Smith"/>
@@ -198,8 +197,8 @@ updateDataBaseSchema.enabled=true
 # Directory in which the database update scripts are located.
 dbMaintainer.fileScriptSource.scripts.location=<Path to your database update script files>
 
-# DbUnit database DTD file path
-dtdGenerator.dtd.filename=<Path to your database DTD>
+# DbUnit database XSD directory
+dataSetStructureGenerator.xsd.dirName=<Path to your database XSD directory>
 
 # Comma separated list of table names. The tables in question will not be cleaned by the DBCleaner. Tables like these
 # Comma separated list of table names. The tables in question will not be cleaned by the DBCleaner. Tables like these
@@ -226,10 +225,8 @@ dbscripts / 001_user_table.sql
 +-----+
 
     Unitils detects that a script was added and will invoke it on the database. If one of the existing scripts is altered, the
-    database is dropped and created from scratch, re-invoking all of the scripts. When the database is updated a DTD is generated 
-    that can be used for writing DBUnit data sets. 
-    
-    
+    database is dropped and created from scratch, re-invoking all of the scripts. When the database is updated XSD files are generated 
+    that can be used for validation and completion when writing DBUnit data sets. 
 
 
 * Enable Hibernate support
