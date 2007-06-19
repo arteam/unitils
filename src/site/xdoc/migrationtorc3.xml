@@ -3,7 +3,7 @@
     <title>Migration to RC 3</title>
   </properties>  
   <body>    
-    <section name="migrationtorc3">        
+    <section name="Migration to RC 3">
     
         <p>When migrating from Unitils RC 2 to RC 3, following changes need to be made:</p>
         <ul>
@@ -14,7 +14,7 @@
            to your configuration with value org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator. You also
            have to rename the property dtdGenerator.dtd.filename to dataSetStructureGenerator.dtd.filename. If you want to switch to
            using XSD's (recommended), specify the path to the directory where the XSD files should be
-           put in the property dataSetStructureGenerator.xsd.dirName.</p></li>
+           put in the property dataSetStructureGenerator.xsd.dirName.</li>
            <li>If present in your config, the property dbMaintainer.cleanDb.tablesToPreserve needs to be renamed to 
            dbMaintainer.preserveDataOnly.tables. Table names may optionally be prefixed by their schema name. If all the tables 
            from a certain database schema need to be preserved, you can specify this schema in 
