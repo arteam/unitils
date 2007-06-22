@@ -156,7 +156,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
 
 +-----+
 <?xml version='1.0' encoding='UTF-8'?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="<path to xsd directory>">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="<path to dataset.xsd file>">
     <user firstname="John" lastname="Doe"/>
     <user firstname="Jane" lastname="Doe"/>
     <user firstname="Jack" lastname="Smith"/>
@@ -323,7 +323,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     }
   
     @Test
-    public void testMappingToDatabase() {        
+    public void testMappingWithDatabase() {        
         HibernateAssert.assertMappingWithDatabaseConsistent();
     }
 }

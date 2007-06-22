@@ -27,7 +27,7 @@ import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.database.util.BaseConnectionProxy;
 import org.unitils.database.util.BaseDataSourceProxy;
-
+ 
 /**
  * Default, simple implementation of {@link TransactionManager}. Implements transactions by wrapping the Unitils
  * <code>DataSource</code>. This <code>DataSource</code> makes sure the same connection is returned for a thread
@@ -108,6 +108,7 @@ public class SimpleTransactionManager implements TransactionManager {
         if (transactionActiveFor.get() == null) {
             throw new UnitilsException("Trying to commit transaction, but no transaction has been intiated on this thread");
         }
+        transactionActiveFor.remove();
         
         if (transactionalDataSource == null) {
             // nothing to do
@@ -127,6 +128,7 @@ public class SimpleTransactionManager implements TransactionManager {
         if (transactionActiveFor.get() == null) {
             throw new UnitilsException("Trying to rollback transaction, but no transaction has been intiated on this thread");
         }
+        transactionActiveFor.remove();
         
         if (transactionalDataSource == null) {
             // nothing to do

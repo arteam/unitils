@@ -76,6 +76,8 @@ Summary
     <<2007-06-20 - Release of Unitils 1.0 rc 3>>
   
     Release candidate 3 for Unitils is available. It contains multi-schema support, transactional testing support and support for Db2.
+    Note that this version is not fully backwards compatible with rc 2, a small set of properties has been renamed or redefined. 
+    A migration path is available {{{migration.html} here}}.
     
     
     <<2007-03-15 - Article on Spring site>>
