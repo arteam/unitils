@@ -75,9 +75,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for no annotation on method-level and default annotation on class-level
      */
     public void testDataSet() throws Exception {
+    	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod1");
-        dbUnitModule.insertTestData(testMethod);
-        dbUnitModule.assertDbContentAsExpected(testMethod);
+        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
 
@@ -85,9 +86,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for custom annotation on method-level overriding default annotation on class-level
      */
     public void testInsertTestData_customMethodDataSet() throws Exception {
+    	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod2");
-        dbUnitModule.insertTestData(testMethod);
-        dbUnitModule.assertDbContentAsExpected(testMethod);
+        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
 
@@ -95,9 +97,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for default annotation on method-level and default annotation on class-level
      */
     public void testInsertTestData_classAndMethodDataSet() throws Exception {
+    	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod3");
-        dbUnitModule.insertTestData(testMethod);
-        dbUnitModule.assertDbContentAsExpected(testMethod);
+        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
 
@@ -107,8 +110,9 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_differentContent() throws Exception {
         try {
+        	Object testObject = new ExpectedDataSetTest();
             Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod4");
-            dbUnitModule.assertDbContentAsExpected(testMethod);
+            dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
             fail("Expected AssertionFailedError");
         } catch (AssertionFailedError e) {
             //expected
@@ -121,8 +125,9 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_notFound() throws Exception {
         try {
+        	Object testObject = new ExpectedDataSetTest();
             Method testMethod = ExpectedDataSetTest.class.getMethod("testNotFound1");
-            dbUnitModule.assertDbContentAsExpected(testMethod);
+            dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             //expected
@@ -135,8 +140,9 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_customNotFound() throws Exception {
         try {
+        	Object testObject = new ExpectedDataSetTest();
             Method testMethod = ExpectedDataSetTest.class.getMethod("testNotFound2");
-            dbUnitModule.assertDbContentAsExpected(testMethod);
+            dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             //expected
@@ -148,9 +154,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for default annotation on method-level and no annotation on class-level
      */
     public void testInsertTestData_noClassDataSet() throws Exception {
+    	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTestNoClassLevel.class.getMethod("testMethod1");
-        dbUnitModule.insertTestData(testMethod);
-        dbUnitModule.assertDbContentAsExpected(testMethod);
+        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
 
@@ -158,9 +165,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for custom annotation on method-level and no annotation on class-level
      */
     public void testInsertTestData_noClassDataSetCustomMethodDataSet() throws Exception {
+    	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTestNoClassLevel.class.getMethod("testMethod2");
-        dbUnitModule.insertTestData(testMethod);
-        dbUnitModule.assertDbContentAsExpected(testMethod);
+        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
 
@@ -168,9 +176,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for custom annotation on method-level and no annotation on class-level
      */
     public void testInsertTestData_noClassAndMethodDataSet() throws Exception {
+    	Object testObject = new ExpectedDataSetTestNoClassLevel();
         Method testMethod = ExpectedDataSetTestNoClassLevel.class.getMethod("testMethod3");
-        dbUnitModule.insertTestData(testMethod);
-        dbUnitModule.assertDbContentAsExpected(testMethod);
+        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
 
@@ -178,9 +187,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for no annotation on method-level and custom annotation on class-level
      */
     public void testInsertTestData_customClassDataSet() throws Exception {
+    	Object testObject = new ExpectedDataSetTestCustomClassLevel();
         Method testMethod = ExpectedDataSetTestCustomClassLevel.class.getMethod("testMethod1");
-        dbUnitModule.insertTestData(testMethod);
-        dbUnitModule.assertDbContentAsExpected(testMethod);
+        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
 
@@ -188,9 +198,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for default annotation on method-level overriding a custom annotation on class-level
      */
     public void testInsertTestData_customClassDataSetOverridenByDefault() throws Exception {
+    	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTestCustomClassLevel.class.getMethod("testMethod2");
-        dbUnitModule.insertTestData(testMethod);
-        dbUnitModule.assertDbContentAsExpected(testMethod);
+        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
     /**

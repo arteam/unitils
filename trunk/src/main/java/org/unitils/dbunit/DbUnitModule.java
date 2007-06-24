@@ -134,9 +134,9 @@ public class DbUnitModule implements Module {
      *
      * @param testMethod The method, not null
      */
-    public void insertTestData(Method testMethod) {
+    public void insertTestData(Method testMethod, Object testObject) {
         try {
-            MultiSchemaDataSet multiSchemaDataSet = getTestDataSets(testMethod);
+            MultiSchemaDataSet multiSchemaDataSet = getTestDataSets(testMethod, testObject);
             if (multiSchemaDataSet == null) {
                 // no dataset specified
                 return;
@@ -182,10 +182,10 @@ public class DbUnitModule implements Module {
      *
      * @param testMethod The test method, not null
      */
-    public void assertDbContentAsExpected(Method testMethod) {
+    public void assertDbContentAsExpected(Method testMethod, Object testObject) {
         try {
             // get the expected dataset
-            MultiSchemaDataSet multiSchemaExpectedDataSet = getExpectedTestDataSet(testMethod);
+            MultiSchemaDataSet multiSchemaExpectedDataSet = getExpectedTestDataSet(testMethod, testObject);
             if (multiSchemaExpectedDataSet == null) {
                 // no data set should be compared
                 return;
@@ -220,10 +220,11 @@ public class DbUnitModule implements Module {
      * is raised.
      *
      * @param testMethod The test method, not null
+     * @param testObject The test object, not null
      * @return The dataset, null if no {@link DataSet} annotation is found.
      */
-    public MultiSchemaDataSet getTestDataSets(Method testMethod) {
-        DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod);
+    public MultiSchemaDataSet getTestDataSets(Method testMethod, Object testObject) {
+        DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testObject.getClass());
         if (dataSetAnnotation == null) {
             // No @DataSet annotation found
             return null;
@@ -263,8 +264,8 @@ public class DbUnitModule implements Module {
      * @param testMethod The test method, not null
      * @return The dataset, null if there is no data set
      */
-    public MultiSchemaDataSet getExpectedTestDataSet(Method testMethod) {
-        ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod);
+    public MultiSchemaDataSet getExpectedTestDataSet(Method testMethod, Object testObject) {
+        ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testObject.getClass());
         if (expectedDataSetAnnotation == null) {
             // No @ExpectedDataSet annotation found
             return null;
@@ -465,22 +466,14 @@ public class DbUnitModule implements Module {
     protected class DbUnitListener extends TestListener {
 
         @Override
-        public void beforeAll() {
-            if (getDatabaseModule() == null) {
-                throw new UnitilsException("Invalid configuration: When the DbUnitModule is enabled, the DatabaseModule " +
-                        "should also be enabled and the DbUnitModule should be configured to run after the DatabaseModule");
-            }
-        }
-
-        @Override
         public void beforeTestMethod(Object testObject, Method testMethod) {
-            insertTestData(testMethod);
+            insertTestData(testMethod, testObject);
         }
 
         @Override
         public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
             if (throwable == null) {
-                assertDbContentAsExpected(testMethod);
+                assertDbContentAsExpected(testMethod, testObject);
             }
         }
 

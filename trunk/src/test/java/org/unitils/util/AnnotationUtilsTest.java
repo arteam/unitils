@@ -105,7 +105,7 @@ public class AnnotationUtilsTest extends TestCase {
      * Tests getting a method level annotation
      */
     public void testGetMethodOrClassLevelAnnotation_methodLevel() throws Exception {
-        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestClass.class.getDeclaredMethod("annotatedMethod"));
+        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestClass.class.getDeclaredMethod("annotatedMethod"), TestClass.class);
         assertEquals("method", testAnnotation.level());
     }
 
@@ -113,7 +113,7 @@ public class AnnotationUtilsTest extends TestCase {
      * Tests getting a class level annotation
      */
     public void testGetMethodOrClassLevelAnnotation_classLevel() throws Exception {
-        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestClass.class.getDeclaredMethod("unAnnotatedMethod"));
+        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestClass.class.getDeclaredMethod("unAnnotatedMethod"), TestClass.class);
         assertEquals("class", testAnnotation.level());
     }
 
@@ -121,7 +121,15 @@ public class AnnotationUtilsTest extends TestCase {
      * Tests getting an annotation from the superclass
      */
     public void testGetMethodOrClassLevelAnnotation_superClassLevel() throws Exception {
-        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestSubClass.class.getDeclaredMethod("unAnnotatedSubMethod"));
+        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestSubClass.class.getDeclaredMethod("unAnnotatedSubMethod"), TestSubClass.class);
+        assertEquals("class", testAnnotation.level());
+    }
+    
+    /**
+     * Tests getting an annotation from the subclass
+     */
+    public void testGetMethodOrClassLevelAnnotation_subClassLevel() throws Exception {
+        TestAnnotation testAnnotation = getMethodOrClassLevelAnnotation(TestAnnotation.class, TestClass.class.getDeclaredMethod("unAnnotatedMethod"), TestSubClass.class);
         assertEquals("class", testAnnotation.level());
     }
 
@@ -221,6 +229,5 @@ public class AnnotationUtilsTest extends TestCase {
         }
 
     }
-
 
 }
