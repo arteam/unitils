@@ -32,6 +32,7 @@ import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbunit.DbUnitModuleDataSetMultiSchemaTest.DataSetTest;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetloadstrategy.CleanInsertLoadStrategy;
 
@@ -79,7 +80,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for no annotation on method-level and default annotation on class-level
      */
     public void testDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod1"));
+        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod1"), new DataSetTest());
         assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTest.testMethod1.xml");
     }
 
@@ -88,7 +89,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for custom annotation on method-level overriding default annotation on class-level
      */
     public void testInsertTestData_customMethodDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod2"));
+        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod2"), new DataSetTest());
         assertLoadedDataSet("CustomDataSet.xml");
     }
 
@@ -97,7 +98,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for default annotation on method-level and default annotation on class-level
      */
     public void testInsertTestData_classAndMethodDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod3"));
+        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod3"), new DataSetTest());
         assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTest.testMethod3.xml");
     }
 
@@ -107,7 +108,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_notFound() throws Exception {
         try {
-            dbUnitModule.insertTestData(DataSetTest.class.getMethod("testNotFound1"));
+            dbUnitModule.insertTestData(DataSetTest.class.getMethod("testNotFound1"), new DataSetTest());
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             //expected
@@ -120,7 +121,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_customNotFound() throws Exception {
         try {
-            dbUnitModule.insertTestData(DataSetTest.class.getMethod("testNotFound2"));
+            dbUnitModule.insertTestData(DataSetTest.class.getMethod("testNotFound2"), new DataSetTest());
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             //expected
@@ -132,7 +133,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for default annotation on method-level and no annotation on class-level
      */
     public void testInsertTestData_noClassDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod1"));
+        dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod1"), new DataSetTestNoClassLevel());
         assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestNoClassLevel.testMethod1.xml");
     }
 
@@ -141,7 +142,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for custom annotation on method-level and no annotation on class-level
      */
     public void testInsertTestData_noClassDataSetCustomMethodDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod2"));
+        dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod2"), new DataSetTestNoClassLevel());
         assertLoadedDataSet("CustomDataSet.xml");
     }
 
@@ -151,7 +152,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * No data set should have been loaded.
      */
     public void testInsertTestData_noClassAndMethodDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod3"));
+        dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod3"), new DataSetTestNoClassLevel());
         Set<String> datasets = getItemsAsStringSet("select dataset from test", dataSource);
         assertTrue(datasets.isEmpty()); // nothing loaded
     }
@@ -161,7 +162,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for no annotation on method-level and custom annotation on class-level
      */
     public void testInsertTestData_customClassDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTestCustomClassLevel.class.getMethod("testMethod1"));
+        dbUnitModule.insertTestData(DataSetTestCustomClassLevel.class.getMethod("testMethod1"), new DataSetTestCustomClassLevel());
         assertLoadedDataSet("CustomDataSet.xml");
     }
 
@@ -170,13 +171,13 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for default annotation on method-level overriding a custom annotation on class-level
      */
     public void testInsertTestData_customClassDataSetOverridenByDefault() throws Exception {
-        dbUnitModule.insertTestData(DataSetTestCustomClassLevel.class.getMethod("testMethod2"));
+        dbUnitModule.insertTestData(DataSetTestCustomClassLevel.class.getMethod("testMethod2"), new DataSetTestCustomClassLevel());
         assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestCustomClassLevel.testMethod2.xml");
     }
 
 
     /**
-     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream,DatabaseOperation)}
+     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream,org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy)}
      */
     public void testInsertTestData_directCall() throws Exception {
         InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");

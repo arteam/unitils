@@ -28,6 +28,7 @@ import org.dbunit.dataset.IDataSet;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbunit.DbUnitModuleDataSetMultiSchemaTest.DataSetTest;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
@@ -67,12 +68,12 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
     }
 
     public void testLoadDataSet_defaultDataSetOperation() throws Exception {
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod1"));
+        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod1"), new DataSetTest());
         assertLoadedDataSet("DbUnitModuleDataSetOperationTest$DataSetTest.xml");
     }
 
     public void testLoadDataSet_customDataSetOperation() throws Exception {
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"));
+        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"), new DataSetTest());
         assertTrue(MockDataSetLoadStrategy.operationExecuted);
     }
 

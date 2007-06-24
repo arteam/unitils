@@ -90,7 +90,7 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("multiSchema"));
+        dbUnitModule.insertTestData(DataSetTest.class.getMethod("multiSchema"), new DataSetTest());
 
         assertLoadedDataSet("PUBLIC");
         assertLoadedDataSet("SCHEMA_A");
@@ -105,7 +105,7 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("multiSchemaNoDefault"));
+        dbUnitModule.insertTestData(DataSetTest.class.getMethod("multiSchemaNoDefault"), new DataSetTest());
 
         assertLoadedDataSet("PUBLIC");
         assertLoadedDataSet("SCHEMA_A");

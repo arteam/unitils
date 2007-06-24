@@ -94,12 +94,12 @@ public class AnnotationUtils {
         return annotatedMethods;
     }
 
-    public static <T extends Annotation> T getMethodOrClassLevelAnnotation(Class<T> annotationClass, Method method) {
+    public static <T extends Annotation> T getMethodOrClassLevelAnnotation(Class<T> annotationClass, Method method, Class actualTestClass) {
         T annotation = method.getAnnotation(annotationClass);
         if (annotation != null) {
             return annotation;
         }
-        return getClassLevelAnnotation(annotationClass, method.getDeclaringClass());
+        return getClassLevelAnnotation(annotationClass, actualTestClass);
     }
 
     @SuppressWarnings({"unchecked"})
