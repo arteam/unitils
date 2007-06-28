@@ -89,7 +89,7 @@ public class FileScriptSourceTest extends TestCase {
         // Initialize FileScriptSourceObject
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_LOCATIONS, DBCHANGE_FILE_DIRECTORY);
-        configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_FILEEXTENSION, "sql");
+        configuration.setProperty(FileScriptSource.PROPKEY_SCRIPTFILES_FILEEXTENSIONS, "sql");
 
         fileScriptSource = new FileScriptSource();
         fileScriptSource.doInit(configuration);
