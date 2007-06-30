@@ -166,7 +166,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     public Version getCurrentVersion() {
         List<File> scriptFilesSorted = getScriptFilesSorted(scriptFilesSpecification);
         long highestVersionIndex = getIndex(scriptFilesSorted.get(scriptFilesSorted.size() - 1));
-        long highestVersionTimeStamp = getHighestScriptTimestamp(scriptFilesSorted);
+        long highestVersionTimeStamp = getHighestScriptTimestamp(scriptFilesSpecification);
         return new Version(highestVersionIndex, highestVersionTimeStamp);
     }
 
@@ -209,7 +209,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * @return The highest timestamp of all the code scripts that are currently available
      */
     public long getCodeScriptsTimestamp() {
-        return getHighestScriptTimestamp(getScriptFiles(codeScriptFilesSpecification));
+        return getHighestScriptTimestamp(codeScriptFilesSpecification);
     }
 
     /**
@@ -360,6 +360,17 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
             return -1L;
         }
     }
+    
+    
+    /**
+     * Returns the highest timestamp of all the scriptFiles that adhere to the given {@link ScriptFilesSpecification}
+     * 
+     * @param scriptFilesSpecification The specification the scriptFiles should adhere to
+     * @return The highest timestamp 
+     */
+    protected Long getHighestScriptTimestamp(ScriptFilesSpecification scriptFilesSpecification) {
+    	return getHighestScriptTimestamp(getScriptFiles(scriptFilesSpecification));
+    }
 
     /**
      * Returns the highest timestamp of the given list of scriptFiles.
@@ -404,7 +415,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      */
     protected List<VersionScriptPair> getVersionScriptPairsFromFiles(List<File> files) {
         List<VersionScriptPair> scripts = new ArrayList<VersionScriptPair>();
-        long timeStamp = getHighestScriptTimestamp(files);
+        long timeStamp = getHighestScriptTimestamp(scriptFilesSpecification);
         for (File file : files) {
             try {
                 scripts.add(new VersionScriptPair(new Version(getIndex(file), timeStamp),
