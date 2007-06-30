@@ -15,16 +15,18 @@
  */
 package org.unitils.dbunit.util;
 
+import org.dbunit.dataset.IDataSet;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.dbunit.dataset.IDataSet;
 
 /**
  * Represents a DbUnit dataset that may contain data for multiple database schema's. For each schema, a DbUnit
  * <code>IDataSet</code> object can be registered using {@link #addSchemaDataSet(String, org.dbunit.dataset.IDataSet)}.
- * A schema's <code>IDataSet</code> can later be retrieved using {@link #getDataSetForSchema(String)}. Getting all the
+ * A schema's <code>IDataSet</code> can later be retrieved using {@link #getDataSetsForSchema(String)}. Getting all the
  * schema names for which a <code>IDataSet</code> exists can be done with {@link #getSchemaNames()}.
  *
  * @author Filip Neven
@@ -33,7 +35,7 @@ import org.dbunit.dataset.IDataSet;
 public class MultiSchemaDataSet {
 
     /* Maps schemanames on dbunit datasets */
-    public Map<String, IDataSet> schemaDataSetMap = new HashMap<String, IDataSet>();
+    public Map<String, List<IDataSet>> schemaDataSetMap = new HashMap<String, List<IDataSet>>();
 
 
     /**
@@ -42,7 +44,12 @@ public class MultiSchemaDataSet {
      * @param dataSet The dbunit dataset
      */
     public void addSchemaDataSet(String schema, IDataSet dataSet) {
-        schemaDataSetMap.put(schema, dataSet);
+    	List<IDataSet> schemaDataSets = schemaDataSetMap.get(schema);
+    	if (schemaDataSets == null) {
+    		schemaDataSets = new ArrayList<IDataSet>();
+    		schemaDataSetMap.put(schema, schemaDataSets);
+    	}
+    	schemaDataSets.add(dataSet);
     }
 
 
@@ -59,7 +66,7 @@ public class MultiSchemaDataSet {
      * @param schemaName The schema name
      * @return The dbunit dataset, or null if none registered for the given schema name
      */
-    public IDataSet getDataSetForSchema(String schemaName) {
+    public List<IDataSet> getDataSetsForSchema(String schemaName) {
         return schemaDataSetMap.get(schemaName);
     }
 }

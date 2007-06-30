@@ -85,7 +85,7 @@ public @interface ExpectedDataSet {
      *
      * @return the fileName, empty for default
      */
-    String value() default "";
+    String[] value() default {};
 
     Class<? extends DataSetFactory> factory() default DataSetFactory.class;
 

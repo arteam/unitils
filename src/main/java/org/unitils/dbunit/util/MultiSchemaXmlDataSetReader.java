@@ -81,11 +81,11 @@ public class MultiSchemaXmlDataSetReader {
     /**
      * Parses the datasets from the given input stream.
      * Each schema is given its own dataset.
-     *
+     * 
+     * @param multiSchemaDataSet Object that aggregates all dbunit datasets into one multi-schema dataset
      * @param in the xml content stream, not null
-     * @return The data sets (schema name, data set), not null
      */
-    public MultiSchemaDataSet readDataSetXml(InputStream in) {
+    public void readDataSetXml(MultiSchemaDataSet multiSchemaDataSet, InputStream in) {
         try {
             DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
             XMLReader xmlReader = createXMLReader();
@@ -93,7 +93,7 @@ public class MultiSchemaXmlDataSetReader {
             xmlReader.setErrorHandler(dataSetContentHandler);
             xmlReader.parse(new InputSource(in));
 
-            return dataSetContentHandler.getDataSets();
+            dataSetContentHandler.addDataSets(multiSchemaDataSet);
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to parse data set xml.", e);
@@ -147,22 +147,19 @@ public class MultiSchemaXmlDataSetReader {
 
 
         /**
-         * Gets the read data sets per schema.
-         *
-         * @return The data sets (schema name, data set), not null
-         */
-        public MultiSchemaDataSet getDataSets() {
-            MultiSchemaDataSet result = new MultiSchemaDataSet();
+         * Adds all dbunit dataset to the given {@link MultiSchemaDataSet} aggregation object
 
-            // wrap datasets in replacement datasets
+         * @param multiSchemaDataSet Object that aggregates all dbunit datasets into one multi-schema dataset
+         */
+        public void addDataSets(MultiSchemaDataSet multiSchemaDataSet) {
             for (String schemaName : dataSets.keySet()) {
                 CachedDataSet cachedDataSet = dataSets.get(schemaName);
 
+                // wrap datasets in replacement datasets, and replace [null] tokens by the null reference
                 ReplacementDataSet replacementDataSet = new ReplacementDataSet(cachedDataSet);
                 replacementDataSet.addReplacementObject("[null]", null);
-                result.addSchemaDataSet(schemaName, replacementDataSet);
+                multiSchemaDataSet.addSchemaDataSet(schemaName, replacementDataSet);
             }
-            return result;
         }
 
 

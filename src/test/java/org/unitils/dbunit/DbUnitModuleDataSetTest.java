@@ -15,10 +15,12 @@
  */
 package org.unitils.dbunit;
 
+import static java.util.Arrays.asList;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.getItemAsString;
 import static org.unitils.core.util.SQLUtils.getItemsAsStringSet;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
@@ -68,7 +70,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
 		dataSetFactory.init("PUBLIC");
 
         dropTestTable();
-        createTestTable();
+        createTestTables();
     }
 
 
@@ -151,7 +153,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_directCall() throws Exception {
         InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
-		dbUnitModule.insertTestData(null, dataSetIS, new CleanInsertLoadStrategy(), dataSetFactory);
+		dbUnitModule.insertTestData(dataSetIS, new CleanInsertLoadStrategy(), dataSetFactory);
         assertLoadedDataSet("CustomDataSet.xml");
     }
     
@@ -187,6 +189,16 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
     	dbUnitModule.insertTestData(DataSetTestSuperclass.class.getMethod("testMethod"), new DataSetTestSubClass_dataSetAnnotationOnSubClass());
     	assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestSubClass_dataSetAnnotationOnSubClass.xml");
     }
+    
+    
+    /**
+     * Test for loading a dataset consisting of multiple dataset files
+     */
+    public void testInsertTestData_multipleDataSets() throws Exception {
+    	dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethodMultipleDataSets"), new DataSetTest());
+    	assertLoadedDataSet("dataSet1.xml");
+    	assertLenEquals("dataSet2.xml", getItemAsString("select dataset from test1", dataSource));
+    }
 
 
     /**
@@ -203,8 +215,9 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
     /**
      * Utility method to create the test table.
      */
-    private void createTestTable() {
+    private void createTestTables() {
         executeUpdate("create table test (dataset varchar(100))", dataSource);
+        executeUpdate("create table test1 (dataset varchar(100))", dataSource);
     }
 
 
@@ -213,6 +226,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      */
     private void dropTestTable() {
         executeUpdateQuietly("drop table test", dataSource);
+        executeUpdateQuietly("drop table test1", dataSource);
     }
 
 
@@ -238,6 +252,10 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
 
         @DataSet("xxxxxx.xml")
         public void testNotFound2() {
+        }
+
+        @DataSet({"dataSet1.xml", "dataSet2.xml"})
+        public void testMethodMultipleDataSets() {
         }
     }
 
