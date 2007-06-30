@@ -138,7 +138,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodOrClassLevelAnnotationProperty_methodLevel() throws Exception {
         String level = getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, "level",
-                "", TestClass.class.getDeclaredMethod("annotatedMethod"));
+                "", TestClass.class.getDeclaredMethod("annotatedMethod"), TestClass.class);
         assertEquals("method", level);
     }
 
@@ -147,7 +147,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodOrClassLevelAnnotationProperty_classLevel() throws Exception {
         String level = getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, "level",
-                "", TestClass.class.getDeclaredMethod("unAnnotatedMethod"));
+                "", TestClass.class.getDeclaredMethod("unAnnotatedMethod"), TestClass.class);
         assertEquals("class", level);
     }
 
@@ -156,7 +156,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodOrClassLevelAnnotationProperty_superClassLevel() throws Exception {
         String level = getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, "level",
-                "", TestSubClass.class.getDeclaredMethod("unAnnotatedSubMethod"));
+                "", TestSubClass.class.getDeclaredMethod("unAnnotatedSubMethod"), TestSubClass.class);
         assertEquals("class", level);
     }
 
@@ -165,8 +165,18 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodOrClassLevelAnnotationProperty_methodLevelWithDefaultProperty() throws Exception {
         String level = getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, "level",
-                "", TestSubClass.class.getDeclaredMethod("annotatedSubMethod"));
+                "", TestSubClass.class.getDeclaredMethod("annotatedSubMethod"), TestSubClass.class);
         assertEquals("class", level);
+    }
+    
+    /**
+     * Tests getting an annotation property when a subclass exists that overrides the class-level annotation,
+     * and no annotation exists on the method
+     */
+    public void testGetMethodOrClassLevelAnnotationProperty_subClassWithMethodOnSuperClass() throws Exception {
+    	String level = getMethodOrClassLevelAnnotationProperty(TestAnnotation.class, "level",
+                "", TestClass.class.getDeclaredMethod("unAnnotatedMethod"), TestAnnotatedSubClass.class);
+        assertEquals("subClass", level);
     }
 
 
@@ -184,7 +194,7 @@ public class AnnotationUtilsTest extends TestCase {
     /**
      * Test class that class containing annotated fields and methods.
      */
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings("all")
     @TestAnnotation(level = "class")
     private static class TestClass {
 
@@ -202,7 +212,7 @@ public class AnnotationUtilsTest extends TestCase {
     /**
      * Test class that class containing no annotated fields and methods.
      */
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings("all")
     private static class TestClassNoAnnotation {
 
         private String field;
@@ -215,7 +225,7 @@ public class AnnotationUtilsTest extends TestCase {
     /**
      * Test class that extends the test super class. For testing inherited annotations.
      */
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings("all")
     private static class TestSubClass extends TestClass {
 
         @TestAnnotation
@@ -227,6 +237,15 @@ public class AnnotationUtilsTest extends TestCase {
 
         private void unAnnotatedSubMethod() {
         }
+
+    }
+    
+    /**
+     * Test class that extends the test super class, with class level annotation. For testing inherited annotations.
+     */
+    @SuppressWarnings({"UnusedDeclaration"})
+    @TestAnnotation(level="subClass")
+    private static class TestAnnotatedSubClass extends TestClass {
 
     }
 
