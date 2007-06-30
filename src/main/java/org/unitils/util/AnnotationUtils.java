@@ -64,7 +64,7 @@ public class AnnotationUtils {
      * @param annotation The annotation, not null
      * @return A List containing methods annotated with the given annotation, empty list if none found
      */
-    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation) {
+    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<T> annotation) {
         return getMethodsAnnotatedWith(clazz, annotation, true);
     }
 
@@ -77,7 +77,7 @@ public class AnnotationUtils {
      * @param includeInherited True for also looking for methods in super-classes
      * @return A List containing methods annotated with the given annotation, empty list if none found
      */
-    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class clazz, Class<T> annotation, boolean includeInherited) {
+    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<T> annotation, boolean includeInherited) {
         if (Object.class.equals(clazz)) {
             return Collections.emptyList();
         }
@@ -94,16 +94,16 @@ public class AnnotationUtils {
         return annotatedMethods;
     }
 
-    public static <T extends Annotation> T getMethodOrClassLevelAnnotation(Class<T> annotationClass, Method method, Class actualTestClass) {
+    public static <T extends Annotation> T getMethodOrClassLevelAnnotation(Class<T> annotationClass, Method method, Class<?> clazz) {
         T annotation = method.getAnnotation(annotationClass);
         if (annotation != null) {
             return annotation;
         }
-        return getClassLevelAnnotation(annotationClass, actualTestClass);
+        return getClassLevelAnnotation(annotationClass, clazz);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T extends Annotation> T getClassLevelAnnotation(Class<T> annotationClass, Class clazz) {
+    public static <T extends Annotation> T getClassLevelAnnotation(Class<T> annotationClass, Class<?> clazz) {
         if (Object.class.equals(clazz)) {
             return null;
         }
@@ -117,7 +117,7 @@ public class AnnotationUtils {
 
     @SuppressWarnings({"unchecked"})
     public static <S extends Annotation, T> T getMethodOrClassLevelAnnotationProperty(Class<S> annotationClass,
-                        String annotationPropertyName, T defaultValue, Method method) {
+                        String annotationPropertyName, T defaultValue, Method method, Class<?> clazz) {
 
         S annotation = method.getAnnotation(annotationClass);
         if (annotation != null) {
@@ -127,7 +127,7 @@ public class AnnotationUtils {
                 return propertyValue;
             }
         }
-        return getClassLevelAnnotationProperty(annotationClass, annotationPropertyName, defaultValue, method.getDeclaringClass());
+        return getClassLevelAnnotationProperty(annotationClass, annotationPropertyName, defaultValue, clazz);
     }
 
 

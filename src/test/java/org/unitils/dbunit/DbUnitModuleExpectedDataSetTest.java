@@ -154,7 +154,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for default annotation on method-level and no annotation on class-level
      */
     public void testInsertTestData_noClassDataSet() throws Exception {
-    	Object testObject = new ExpectedDataSetTest();
+    	Object testObject = new ExpectedDataSetTestNoClassLevel();
         Method testMethod = ExpectedDataSetTestNoClassLevel.class.getMethod("testMethod1");
         dbUnitModule.insertTestData(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
@@ -198,11 +198,12 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
      * Test for default annotation on method-level overriding a custom annotation on class-level
      */
     public void testInsertTestData_customClassDataSetOverridenByDefault() throws Exception {
-    	Object testObject = new ExpectedDataSetTest();
+    	Object testObject = new ExpectedDataSetTestCustomClassLevel();
         Method testMethod = ExpectedDataSetTestCustomClassLevel.class.getMethod("testMethod2");
         dbUnitModule.insertTestData(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
+    
 
     /**
      * Test class with a class level expected dataset.
