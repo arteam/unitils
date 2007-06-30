@@ -85,6 +85,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
             TEST1, TEST2
         }
 
+        @SuppressWarnings("unused")
         private TestEnum testEnumValue;
 
 
@@ -98,7 +99,8 @@ public class ReflectionComparatorEnumsTest extends TestCase {
          *
          * @param o the object to compare to
          */
-        public boolean equals(Object o) {
+        @Override
+		public boolean equals(Object o) {
             return false;
         }
     }

@@ -267,7 +267,7 @@ public class EasyMockModule implements Module {
      * @param name       the field(=mock) name, not null
      * @param type       the field(=mock) type
      */
-    protected void callAfterCreateMockMethods(Object testObject, Object mockObject, String name, Class type) {
+    protected void callAfterCreateMockMethods(Object testObject, Object mockObject, String name, Class<?> type) {
         List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {

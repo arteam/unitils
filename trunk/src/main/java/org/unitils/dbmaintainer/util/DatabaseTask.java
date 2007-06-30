@@ -15,11 +15,9 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.unitils.core.dbsupport.SQLHandler;
+
+import java.util.Properties;
 
 /**
  * Task that can be performed on a database.

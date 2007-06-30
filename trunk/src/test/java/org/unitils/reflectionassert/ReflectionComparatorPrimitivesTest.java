@@ -206,6 +206,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     /**
      * Test class with failing equals.
      */
+    @SuppressWarnings("unused")
     private static class Primitives {
 
         /* A fist int value */
@@ -236,6 +237,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
          *
          * @param o the object to compare to
          */
+        @Override
         public boolean equals(Object o) {
             return false;
         }

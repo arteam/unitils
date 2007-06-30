@@ -56,8 +56,8 @@ public class CollectionComparator extends ReflectionComparator {
         }
 
         int i = 0;
-        Iterator lhsIterator = leftCollection.iterator();
-        Iterator rhsIterator = rightCollection.iterator();
+        Iterator<?> lhsIterator = leftCollection.iterator();
+        Iterator<?> rhsIterator = rightCollection.iterator();
         while (lhsIterator.hasNext() && rhsIterator.hasNext()) {
             fieldStack.push("" + i++);
             Difference difference = rootComparator.getDifference(lhsIterator.next(), rhsIterator.next(), fieldStack, traversedInstancePairs);

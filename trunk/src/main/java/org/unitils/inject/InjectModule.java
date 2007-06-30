@@ -230,7 +230,7 @@ public class InjectModule implements Module {
         }
         Object objectToInject = getFieldValue(test, fieldToInject);
 
-        List targets = getTargets(InjectInto.class, fieldToInject, injectIntoAnnotation.target(), test);
+        List<Object> targets = getTargets(InjectInto.class, fieldToInject, injectIntoAnnotation.target(), test);
         if (targets.size() == 0) {
             throw new UnitilsException(getSituatedErrorMessage(InjectInto.class, fieldToInject, "The target should either be " +
                     "specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() +
@@ -257,7 +257,7 @@ public class InjectModule implements Module {
     protected void injectStatic(Object test, Field fieldToInjectStatic) {
         InjectIntoStatic injectIntoStaticAnnotation = fieldToInjectStatic.getAnnotation(InjectIntoStatic.class);
 
-        Class targetClass = injectIntoStaticAnnotation.target();
+        Class<?> targetClass = injectIntoStaticAnnotation.target();
         String property = injectIntoStaticAnnotation.property();
         if (StringUtils.isEmpty(property)) {
             throw new UnitilsException(getSituatedErrorMessage(InjectIntoStatic.class, fieldToInjectStatic, "Property cannot be empty"));
@@ -290,7 +290,7 @@ public class InjectModule implements Module {
         PropertyAccess propertyAccess = getEnumValueReplaceDefault(InjectIntoByType.class, "propertyAccess",
                 injectIntoByTypeAnnotation.propertyAccess(), defaultAnnotationPropertyValues);
 
-        List targets = getTargets(InjectIntoByType.class, fieldToInject, injectIntoByTypeAnnotation.target(), test);
+        List<Object> targets = getTargets(InjectIntoByType.class, fieldToInject, injectIntoByTypeAnnotation.target(), test);
         if (targets.size() == 0) {
             throw new UnitilsException(getSituatedErrorMessage(InjectIntoByType.class, fieldToInject, "The target should either be " +
                     "specified explicitly using the target property, or by using the @" + TestedObject.class.getSimpleName() +
@@ -319,7 +319,7 @@ public class InjectModule implements Module {
     protected void injectStaticByType(Object test, Field fieldToAutoInjectStatic) {
         InjectIntoStaticByType injectIntoStaticByTypeAnnotation = fieldToAutoInjectStatic.getAnnotation(InjectIntoStaticByType.class);
 
-        Class targetClass = injectIntoStaticByTypeAnnotation.target();
+        Class<?> targetClass = injectIntoStaticByTypeAnnotation.target();
         Object objectToInject = getFieldValue(test, fieldToAutoInjectStatic);
 
         Restore restore = getEnumValueReplaceDefault(InjectIntoStaticByType.class, "restore", injectIntoStaticByTypeAnnotation.restore(), defaultAnnotationPropertyValues);
@@ -343,7 +343,7 @@ public class InjectModule implements Module {
     protected void restore(ValueToRestore valueToRestore) {
 
         Object value = valueToRestore.getValue();
-        Class targetClass = valueToRestore.getTargetClass();
+        Class<?> targetClass = valueToRestore.getTargetClass();
 
         String property = valueToRestore.getProperty();
         if (property != null) {
@@ -369,7 +369,7 @@ public class InjectModule implements Module {
      * @param oldValue       The value that was replaced during the injection
      * @param restore        The type of reset, not DEFAULT
      */
-    protected void storeValueToRestoreAfterTest(Class targetClass, String property, Class fieldType, PropertyAccess propertyAccess, Object oldValue, Restore restore) {
+    protected void storeValueToRestoreAfterTest(Class<?> targetClass, String property, Class<?> fieldType, PropertyAccess propertyAccess, Object oldValue, Restore restore) {
         if (Restore.NO_RESTORE == restore || Restore.DEFAULT == restore) {
             return;
         }

@@ -18,13 +18,11 @@ package org.unitils.dbmaintainer.util;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupports;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 
-import java.util.List;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Base class for a database task.

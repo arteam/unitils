@@ -141,7 +141,7 @@ public class DefaultTransactionManagerFactoryTest extends DatabaseModuleTransact
         configuration.setProperty(TransactionManager.class.getName() + ".implClassName.simple", "xxxx");
         defaultTransactionManagerFactory.init(configuration);
         try {
-            TransactionManager result = defaultTransactionManagerFactory.createTransactionManager();
+            defaultTransactionManagerFactory.createTransactionManager();
             fail("Expected UnitilsException");
 
         } catch (UnitilsException e) {

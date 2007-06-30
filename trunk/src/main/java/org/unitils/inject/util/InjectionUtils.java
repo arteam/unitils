@@ -86,7 +86,7 @@ public class InjectionUtils {
      * @param property       The OGNL expression that defines where the object will be injected, not null
      * @return The object that was replaced by the injection
      */
-    public static Object injectStatic(Object objectToInject, Class targetClass, String property) {
+    public static Object injectStatic(Object objectToInject, Class<?> targetClass, String property) {
         String staticProperty = StringUtils.substringBefore(property, ".");
         if (property.equals(staticProperty)) {
             // Simple property: directly set value on this property
@@ -124,7 +124,7 @@ public class InjectionUtils {
      * @param propertyAccess     Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
-    public static Object autoInject(Object objectToInject, Class objectToInjectType, Object target, PropertyAccess propertyAccess) {
+    public static Object autoInject(Object objectToInject, Class<?> objectToInjectType, Object target, PropertyAccess propertyAccess) {
         if (target == null) {
             throw new UnitilsException("Target for injection should not be null");
         }
@@ -145,7 +145,7 @@ public class InjectionUtils {
      * @param propertyAccess     Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
-    public static Object autoInjectStatic(Object objectToInject, Class objectToInjectType, Class targetClass, PropertyAccess propertyAccess) {
+    public static Object autoInjectStatic(Object objectToInject, Class<?> objectToInjectType, Class<?> targetClass, PropertyAccess propertyAccess) {
         if (propertyAccess == PropertyAccess.FIELD) {
             return autoInjectToField(objectToInject, objectToInjectType, null, targetClass, true);
         }
@@ -167,7 +167,7 @@ public class InjectionUtils {
      * @param isStatic           Indicates wether injection should be performed on the target object or on the target class
      * @return The object that was replaced by the injection
      */
-    private static Object autoInjectToField(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
+    private static Object autoInjectToField(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
         // Try to find a field with an exact matching type
         Field fieldToInjectTo = null;
         List<Field> fieldsWithExactType = ReflectionUtils.getFieldsOfType(targetClass, objectToInjectType, isStatic);
@@ -234,7 +234,7 @@ public class InjectionUtils {
      * @param isStatic           Indicates wether injection should be performed on the target object or on the target class
      * @return The object that was replaced by the injection
      */
-    private static Object autoInjectToSetter(Object objectToInject, Class objectToInjectType, Object target, Class targetClass, boolean isStatic) {
+    private static Object autoInjectToSetter(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
         // Try to find a method with an exact matching type
         Method setterToInjectTo = null;
         List<Method> settersWithExactType = getSettersOfType(targetClass, objectToInjectType, isStatic);
@@ -303,7 +303,7 @@ public class InjectionUtils {
      * @param staticProperty The name of the property (simple name, not a composite expression)
      * @return The value of the static property from the given class
      */
-    private static Object getValueStatic(Class targetClass, String staticProperty) {
+    private static Object getValueStatic(Class<?> targetClass, String staticProperty) {
         Method staticGetter = getGetter(targetClass, staticProperty, true);
         if (staticGetter != null) {
             try {
@@ -330,7 +330,7 @@ public class InjectionUtils {
      * @param staticProperty The name of the property (simple name, not a composite expression)
      * @param value          The value to set
      */
-    private static void setValueStatic(Class targetClass, String staticProperty, Object value) {
+    private static void setValueStatic(Class<?> targetClass, String staticProperty, Object value) {
         Method staticSetter = ReflectionUtils.getSetter(targetClass, staticProperty, true);
         if (staticSetter != null) {
             try {

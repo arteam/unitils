@@ -52,6 +52,7 @@ import org.unitils.reflectionassert.ReflectionComparatorMode;
  * @see ReflectionComparatorMode
  * @see org.unitils.reflectionassert.ReflectionComparator
  */
+@SuppressWarnings("deprecation")
 public class LenientMocksControl extends MocksClassControl {
 
 
@@ -113,6 +114,7 @@ public class LenientMocksControl extends MocksClassControl {
      * Because some of the methods are declared final and some classes explicitly cast to subtypes, creating a wrapper
      * seems to be the only way to be able to intercept the matcher behavior.
      */
+    @SuppressWarnings("unchecked")
     private class InvocationInterceptor implements IMocksControlState {
 
         /* The wrapped record state */

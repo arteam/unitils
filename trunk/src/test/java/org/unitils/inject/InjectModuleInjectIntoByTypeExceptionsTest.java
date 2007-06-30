@@ -131,6 +131,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoByType_TargetIsNull {
 
         @InjectIntoByType(target = "injectOn")
@@ -140,18 +141,21 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
 
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoByType_TargetDoesntExist {
 
         @InjectIntoByType(target = "nonExisting")
         private ToInject toInject;
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoByType_NoTargetSpecified {
 
         @InjectIntoByType
         private ToInject toInject;
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoByType_NoPropertyOfType {
 
         @InjectIntoByType(target = "injectOn")
@@ -160,6 +164,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         private InjectOn_NoPropertyOfType injectOn = new InjectOn_NoPropertyOfType();
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoByType_MoreThanOneFieldOfType {
 
         @InjectIntoByType(target = "injectOn")
@@ -168,6 +173,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         private InjectOn_MoreThanOneFieldOfType injectOn = new InjectOn_MoreThanOneFieldOfType();
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoByType_MoreThanOneSetterOfType {
 
         @InjectIntoByType(target = "injectOn", propertyAccess = PropertyAccess.SETTER)
@@ -176,6 +182,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         private InjectOn_MoreThanOneSetterOfType injectOn = new InjectOn_MoreThanOneSetterOfType();
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoByType_MoreThanOneFieldOfSuperType {
 
         @InjectIntoByType(target = "injectOn")
@@ -184,6 +191,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         private InjectOn_MoreThanOneFieldOfSuperType injectOn = new InjectOn_MoreThanOneFieldOfSuperType();
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoByType_MoreThanOneSetterOfSuperType {
 
         @InjectIntoByType(target = "injectOn", propertyAccess = PropertyAccess.SETTER)
@@ -210,6 +218,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
     public class InjectOn_NoPropertyOfType {
     }
 
+    @SuppressWarnings("unused")
     public class InjectOn_MoreThanOneFieldOfType {
 
         private ToInject toInject1;
@@ -228,6 +237,7 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
 
     }
 
+    @SuppressWarnings("unused")
     public class InjectOn_MoreThanOneFieldOfSuperType {
 
         private ToInjectSuper toInject1;

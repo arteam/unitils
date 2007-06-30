@@ -15,23 +15,30 @@
  */
 package org.unitils.core.dbsupport;
 
+import static java.util.Arrays.asList;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.core.util.SQLUtils.dropTestSequences;
+import static org.unitils.core.util.SQLUtils.dropTestSynonyms;
+import static org.unitils.core.util.SQLUtils.dropTestTables;
+import static org.unitils.core.util.SQLUtils.dropTestTriggers;
+import static org.unitils.core.util.SQLUtils.dropTestTypes;
+import static org.unitils.core.util.SQLUtils.dropTestViews;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import org.unitils.core.util.SQLUtils;
-import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
+
 import java.util.Arrays;
-import static java.util.Arrays.asList;
 import java.util.Properties;
 import java.util.Set;
 
@@ -73,8 +80,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         super.setUp();
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        String testDatabaseDialect = dbSupport.getDatabaseDialect();
-        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         // todo multiple schema names
         String schemaName = PropertyUtils.getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
         dbSupport.init(configuration, new SQLHandler(dataSource), schemaName);

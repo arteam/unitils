@@ -38,6 +38,7 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+@SuppressWarnings("unchecked")
 public class BaseSessionInterceptingSessionFactoryProxy implements SessionFactory {
 
 
@@ -126,7 +127,7 @@ public class BaseSessionInterceptingSessionFactoryProxy implements SessionFactor
     /**
      * @see SessionFactory#getClassMetadata(Class)
      */
-    public ClassMetadata getClassMetadata(Class persistentClass) throws HibernateException {
+	public ClassMetadata getClassMetadata(Class persistentClass) throws HibernateException {
         return getTargetSessionFactory().getClassMetadata(persistentClass);
     }
 

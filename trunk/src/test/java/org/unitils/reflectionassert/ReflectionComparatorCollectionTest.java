@@ -121,7 +121,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
      * Test for two collections that have a different size.
      */
     public void testGetDifference_notEqualsDifferentSize() {
-        Iterator iterator = collectionB.iterator();
+        Iterator<?> iterator = collectionB.iterator();
         iterator.next();
         iterator.remove();
 
@@ -152,7 +152,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
      * Tests for objects with inner collections that have a different size.
      */
     public void testGetDifference_notEqualsInnerDifferentSize() {
-        Iterator iterator = collectionB.iterator();
+        Iterator<?> iterator = collectionB.iterator();
         iterator.next();
         iterator.remove();
 
@@ -185,7 +185,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
      * @param innerElement2       the value for the inner array of the 2nd element in the collection
      * @return the test collection
      */
-    private Collection<Element> createCollection(String stringValueElement2, Collection innerElement2) {
+    private Collection<Element> createCollection(String stringValueElement2, Collection<Element> innerElement2) {
         Collection<Element> collection = new ArrayList<Element>();
         collection.add(new Element("test 1", null));
         collection.add(new Element(stringValueElement2, innerElement2));
@@ -203,7 +203,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
         private String string;
 
         /* An inner collection */
-        private Collection inner;
+        private Collection<?> inner;
 
         /**
          * Creates and initializes the element.
@@ -211,7 +211,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
          * @param string the string value
          * @param inner  the inner collection
          */
-        public Element(String string, Collection inner) {
+        public Element(String string, Collection<?> inner) {
             this.string = string;
             this.inner = inner;
         }
@@ -230,7 +230,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
          *
          * @return the collection
          */
-        public Collection getInner() {
+        public Collection<?> getInner() {
             return inner;
         }
 
@@ -239,6 +239,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
          *
          * @param o the object to compare to
          */
+        @Override
         public boolean equals(Object o) {
             return false;
         }

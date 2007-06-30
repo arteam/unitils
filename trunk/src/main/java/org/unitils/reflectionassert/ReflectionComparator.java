@@ -193,7 +193,7 @@ abstract public class ReflectionComparator {
 
         /* When isEquals is false this will contain the stack of the fieldnames where the difference was found. <br>
          * The inner most field will be the top of the stack, eg "primitiveFieldInB", "fieldBinA", "fieldA". */
-        private Stack fieldStack;
+        private Stack<String> fieldStack;
 
         /* When isEquals is false this will contain the left value of the field where the difference was found. */
         private Object leftValue;
@@ -210,7 +210,7 @@ abstract public class ReflectionComparator {
          * @param rightValue the right instance
          * @param fieldStack the current field names
          */
-        protected Difference(String message, Object leftValue, Object rightValue, Stack fieldStack) {
+        protected Difference(String message, Object leftValue, Object rightValue, Stack<String> fieldStack) {
             this.message = message;
             this.leftValue = leftValue;
             this.rightValue = rightValue;
@@ -226,7 +226,7 @@ abstract public class ReflectionComparator {
          */
         public String getFieldStackAsString() {
             String result = "";
-            Iterator iterator = fieldStack.iterator();
+            Iterator<?> iterator = fieldStack.iterator();
             while (iterator.hasNext()) {
                 result += iterator.next();
                 if (iterator.hasNext()) {
@@ -254,7 +254,7 @@ abstract public class ReflectionComparator {
          *
          * @return the stack of field names, not null
          */
-        public Stack getFieldStack() {
+        public Stack<String> getFieldStack() {
             return fieldStack;
         }
 
@@ -324,6 +324,7 @@ abstract public class ReflectionComparator {
          * @param o Another object
          * @return true when the other object is a TraversedInstancePair with the same left and right object instances.
          */
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -339,6 +340,7 @@ abstract public class ReflectionComparator {
         /**
          * @return This object's hashcode
          */
+        @Override
         public int hashCode() {
             int result;
             result = leftObject.hashCode();

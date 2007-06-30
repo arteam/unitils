@@ -80,6 +80,7 @@ public class DataSetXmlReaderTest extends UnitilsJUnit3 {
     /**
      * Creates the test fixture.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         multiSchemaXmlDataSetReader = new MultiSchemaXmlDataSetReader("SCHEMA_A");

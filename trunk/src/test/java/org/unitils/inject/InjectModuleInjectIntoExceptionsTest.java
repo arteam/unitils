@@ -97,6 +97,7 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+    @SuppressWarnings("unused")
     public class TestInject_TargetIsNull {
 
         @InjectInto(target = "injectOn", property = "injectOnProperty")
@@ -106,18 +107,21 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
 
     }
 
+    @SuppressWarnings("unused")
     public class TestInject_TargetDoesntExist {
 
         @InjectInto(target = "nonExisting", property = "injectOnProperty")
         private ToInject toInject;
     }
 
+    @SuppressWarnings("unused")
     public class TestInject_NoTargetSpecified {
 
         @InjectInto(property = "injectOnProperty")
         private ToInject toInject;
     }
 
+    @SuppressWarnings("unused")
     public class TestInject_InvalidOGNLExpression {
 
         @InjectInto(target = "injectOn", property = "@#{[^")
@@ -126,6 +130,7 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
         private InjectOn injectOn = new InjectOn();
     }
 
+    @SuppressWarnings("unused")
     public class TestInject_NonExistingPropertyInOGNLExpression {
 
         @InjectInto(target = "injectOn", property = "nonExisting")

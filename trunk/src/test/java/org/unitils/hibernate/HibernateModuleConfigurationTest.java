@@ -20,10 +20,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.unitils.UnitilsJUnit3;
-import org.unitils.core.UnitilsException;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.hibernate.util.SessionFactoryManager;
 
 import java.util.List;
 import java.util.Properties;
@@ -187,7 +186,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
      */
     public void testGetHibernateConfiguration_customInitializationMethod() {
         HibernateTestCustomInitialization hibernateTestCustomInitialization = new HibernateTestCustomInitialization();
-        Configuration hibernateConfiguration = hibernateModule.getHibernateConfiguration(hibernateTestCustomInitialization);
+        hibernateModule.getHibernateConfiguration(hibernateTestCustomInitialization);
 
         assertTrue(hibernateTestCustomInitialization.initCalled);
     }
@@ -384,7 +383,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     public class HibernateTestCustomCreateWrongSignature {
 
         @HibernateSessionFactory
-        public List createMethod(String a) {
+        public List<?> createMethod(String a) {
             return null;
         }
     }
@@ -411,7 +410,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
     public class HibernateTestCustomInitializationWrongSignature {
 
         @HibernateSessionFactory
-        public List initializationMethod(String a) {
+        public List<?> initializationMethod(String a) {
             return null;
         }
     }

@@ -19,7 +19,6 @@ import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.unitils.core.Unitils;
-import org.unitils.hibernate.HibernateModule;
 import org.unitils.spring.SpringModule;
 
 /**

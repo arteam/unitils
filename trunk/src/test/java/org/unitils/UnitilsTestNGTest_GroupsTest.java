@@ -108,6 +108,7 @@ public class UnitilsTestNGTest_GroupsTest extends UnitilsTestNG {
         if (tracingTestListener != null) {
             return new Unitils() {
 
+            	@Override
                 public TestListener createTestListener() {
                     return tracingTestListener;
                 }

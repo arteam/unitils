@@ -15,12 +15,12 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;
 import java.util.Collection;
+
+import junit.framework.TestCase;
 
 
 /**
@@ -330,6 +330,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
          *
          * @param o the object to compare to
          */
+        @Override
         public boolean equals(Object o) {
             return false;
         }

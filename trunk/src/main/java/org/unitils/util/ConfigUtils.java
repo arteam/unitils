@@ -69,7 +69,7 @@ public class ConfigUtils {
      *                      This is typically an environment specific property, like the DBMS that is used.
      * @return The configured class name
      */
-    public static String getConfiguredClassName(Class type, Properties configuration, String... implementationDiscriminatorValues) {
+    public static String getConfiguredClassName(Class<?> type, Properties configuration, String... implementationDiscriminatorValues) {
         String propKey = type.getName() + ".implClassName";
 
         // first try specific instance using the given discriminators

@@ -153,7 +153,8 @@ public class ModulesRepositoryTest extends TestCase {
      */
     private static class TestModule2 extends TestModule1 implements Module {
 
-        public TestListener createTestListener() {
+        @Override
+		public TestListener createTestListener() {
             return new TestListener2();
         }
 

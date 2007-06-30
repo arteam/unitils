@@ -15,6 +15,8 @@
  */
 package org.unitils.thirdparty.org.apache.commons.io;
 
+import org.junit.Ignore;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,6 +65,7 @@ import java.util.List;
  * @author Sandy McArthur
  * @version $Id: FileUtils.java 384037 2006-03-07 22:26:37Z scolebourne $
  */
+@SuppressWarnings("all")
 public class FileUtils {
 
     /**
@@ -141,7 +144,7 @@ public class FileUtils {
      * @param files  a Collection containing java.io.File instances
      * @return an array of java.io.File
      */
-    public static File[] convertFileCollectionToFileArray(Collection files) {
+    public static File[] convertFileCollectionToFileArray(Collection<?> files) {
          return (File[]) files.toArray(new File[files.size()]);
     }
 
@@ -815,7 +818,7 @@ public class FileUtils {
      * @throws UnsupportedEncodingException if the encoding is not supported by the VM
      * @since Commons IO 1.1
      */
-    public static void writeLines(File file, String encoding, Collection lines) throws IOException {
+    public static void writeLines(File file, String encoding, Collection<?> lines) throws IOException {
         writeLines(file, encoding, lines, null);
     }
 
@@ -836,7 +839,7 @@ public class FileUtils {
      * @throws UnsupportedEncodingException if the encoding is not supported by the VM
      * @since Commons IO 1.1
      */
-    public static void writeLines(File file, String encoding, Collection lines, String lineEnding) throws IOException {
+    public static void writeLines(File file, String encoding, Collection<?> lines, String lineEnding) throws IOException {
         OutputStream out = new FileOutputStream(file);
         try {
             IOUtils.writeLines(lines, lineEnding, out, encoding);

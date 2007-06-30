@@ -23,7 +23,7 @@ public class ObjectComparator extends ReflectionComparator {
 
     protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
         // check different class type
-        Class clazz = left.getClass();
+        Class<?> clazz = left.getClass();
         if (!clazz.equals(right.getClass())) {
             return new Difference("Different class types. Left: " + clazz + ", right: " + right.getClass(), left, right, fieldStack);
         }
@@ -41,7 +41,7 @@ public class ObjectComparator extends ReflectionComparator {
      * @param traversedInstancePairs
      * @return the difference, null if there is no difference
      */
-    protected Difference compareFields(Object left, Object right, Class clazz, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
+    protected Difference compareFields(Object left, Object right, Class<?> clazz, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
 
@@ -70,7 +70,7 @@ public class ObjectComparator extends ReflectionComparator {
         }
 
         // compare fields declared in superclass
-        Class superclazz = clazz.getSuperclass();
+        Class<?> superclazz = clazz.getSuperclass();
         while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
             Difference difference = compareFields(left, right, superclazz, fieldStack, traversedInstancePairs);
             if (difference != null) {

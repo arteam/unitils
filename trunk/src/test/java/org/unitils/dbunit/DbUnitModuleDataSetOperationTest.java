@@ -19,19 +19,17 @@ import static org.unitils.core.util.SQLUtils.executeUpdate;
 import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.getItemAsString;
 
-import java.sql.SQLException;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.dbunit.dataset.IDataSet;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbunit.DbUnitModuleDataSetMultiSchemaTest.DataSetTest;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
+
+import javax.sql.DataSource;
+
+import java.util.Properties;
 
 /**
  * Tests DbUnitModule's feature for using different DataSetOperations
@@ -82,7 +80,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
      *
      * @param expectedDataSetName the name of the data set, not null
      */
-    private void assertLoadedDataSet(String expectedDataSetName) throws SQLException {
+    private void assertLoadedDataSet(String expectedDataSetName) {
         String dataSet = getItemAsString("select dataset from test", dataSource);
         assertEquals(expectedDataSetName, dataSet);
     }
@@ -90,7 +88,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
     /**
      * Creates the test tables.
      */
-    private void createTestTables() throws SQLException {
+    private void createTestTables() {
         // PUBLIC SCHEMA
         executeUpdate("create table TEST(dataset varchar(100))", dataSource);
     }

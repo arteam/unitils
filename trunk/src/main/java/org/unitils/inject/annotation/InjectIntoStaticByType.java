@@ -48,7 +48,7 @@ public @interface InjectIntoStaticByType {
      *
      * @return the target class, null for tested object
      */
-    Class target();
+    Class<?> target();
 
     /**
      * The property access that is used for injection

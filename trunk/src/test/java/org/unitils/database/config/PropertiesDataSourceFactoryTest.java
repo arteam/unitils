@@ -41,7 +41,8 @@ public class PropertiesDataSourceFactoryTest extends UnitilsJUnit3 {
         configuration.setProperty("database.password", "testpassword");
 
         propertiesFileDataSourceConfig = new PropertiesDataSourceFactory() {
-            protected BasicDataSource getNewDataSource() {
+            @Override
+			protected BasicDataSource getNewDataSource() {
                 return mockBasicDataSource;
             }
         };

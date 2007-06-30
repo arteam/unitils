@@ -83,7 +83,7 @@ public class TracingTestListener extends TestListener {
     }
 
     @Override
-    public void beforeTestClass(Class testClass) {
+    public void beforeTestClass(Class<?> testClass) {
         callList.add(formatString(UNITILS, BEFORE_TEST_CLASS, getClassName(testClass), null));
         throwExceptionIfRequested(BEFORE_TEST_CLASS);
     }
@@ -113,7 +113,7 @@ public class TracingTestListener extends TestListener {
     }
 
     @Override
-    public void afterTestClass(Class testClass) {
+    public void afterTestClass(Class<?> testClass) {
         callList.add(formatString(UNITILS, AFTER_TEST_CLASS, getClassName(testClass), null));
         throwExceptionIfRequested(AFTER_TEST_CLASS);
     }

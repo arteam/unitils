@@ -15,22 +15,25 @@
  */
 package org.unitils.dbmaintainer.clean;
 
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
+import static org.unitils.core.util.SQLUtils.isEmpty;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import org.unitils.core.dbsupport.SQLHandler;
-import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
+
 import java.util.Properties;
 
 /**
@@ -117,7 +120,7 @@ public class DBCleanerMultiSchemaTest extends UnitilsJUnit3 {
     /**
      * Creates the test tables.
      */
-    private void createTestTables() throws SQLException {
+    private void createTestTables() {
         // PUBLIC SCHEMA
         executeUpdate("create table TEST (dataset varchar(100))", dataSource);
         executeUpdate("insert into TEST values('test')", dataSource);

@@ -225,7 +225,7 @@ public class ReflectionAssert {
      * @param actualObjects          the objects that contain the property, not null
      * @throws AssertionFailedError when both objects are not equals
      */
-    public static void assertPropertyLenEquals(String propertyName, Collection expectedPropertyValues, Collection actualObjects) throws AssertionFailedError {
+    public static void assertPropertyLenEquals(String propertyName, Collection<?> expectedPropertyValues, Collection<?> actualObjects) throws AssertionFailedError {
         assertPropertyLenEquals(null, propertyName, expectedPropertyValues, actualObjects);
     }
 
@@ -247,7 +247,7 @@ public class ReflectionAssert {
      * @param modes                  the comparator modes
      * @throws AssertionFailedError when both objects are not equals
      */
-    public static void assertPropertyRefEquals(String propertyName, Collection expectedPropertyValues, Collection actualObjects, ReflectionComparatorMode... modes) throws AssertionFailedError {
+    public static void assertPropertyRefEquals(String propertyName, Collection<?> expectedPropertyValues, Collection<?> actualObjects, ReflectionComparatorMode... modes) throws AssertionFailedError {
         assertPropertyRefEquals(null, propertyName, expectedPropertyValues, actualObjects, modes);
     }
 
@@ -270,7 +270,7 @@ public class ReflectionAssert {
      * @param actualObjects          the objects that contain the property, not null
      * @throws AssertionFailedError when both objects are not equals
      */
-    public static void assertPropertyLenEquals(String message, String propertyName, Collection expectedPropertyValues, Collection actualObjects) throws AssertionFailedError {
+    public static void assertPropertyLenEquals(String message, String propertyName, Collection<?> expectedPropertyValues, Collection<?> actualObjects) throws AssertionFailedError {
         assertPropertyRefEquals(message, propertyName, expectedPropertyValues, actualObjects, LENIENT_ORDER, IGNORE_DEFAULTS);
     }
 
@@ -293,8 +293,8 @@ public class ReflectionAssert {
      * @param modes                  the comparator modes
      * @throws AssertionFailedError when both objects are not equals
      */
-    public static void assertPropertyRefEquals(String message, String propertyName, Collection expectedPropertyValues, Collection actualObjects, ReflectionComparatorMode... modes) throws AssertionFailedError {
-        Collection actualPropertyValues = CollectionUtils.collect(actualObjects, new OgnlTransformer(propertyName));
+    public static void assertPropertyRefEquals(String message, String propertyName, Collection<?> expectedPropertyValues, Collection<?> actualObjects, ReflectionComparatorMode... modes) throws AssertionFailedError {
+        Collection<?> actualPropertyValues = CollectionUtils.collect(actualObjects, new OgnlTransformer(propertyName));
         assertRefEquals(message, expectedPropertyValues, actualPropertyValues, modes);
     }
 

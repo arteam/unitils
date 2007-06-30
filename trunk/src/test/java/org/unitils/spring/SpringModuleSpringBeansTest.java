@@ -182,12 +182,12 @@ public class SpringModuleSpringBeansTest extends TestCase {
     private class SpringTestByType {
 
         @SpringBeanByType
-        private List testBean = null;
+        private List<?> testBean = null;
 
-        private List testBeanSetter = null;
+        private List<?> testBeanSetter = null;
 
         @SpringBeanByType
-        public void setTestBeanSetter(List testBeanSetter) {
+        public void setTestBeanSetter(List<?> testBeanSetter) {
             this.testBeanSetter = testBeanSetter;
         }
     }
@@ -199,7 +199,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     private class SpringTestByTypeAmbiguous {
 
         @SpringBeanByType
-        private Set testBean = null;
+        private Set<?> testBean = null;
     }
 
     /**
@@ -243,7 +243,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     private class SpringTestByTypeNotFound {
 
         @SpringBeanByType
-        private Map testBean = null;
+        private Map<?,?> testBean = null;
     }
 
     /**

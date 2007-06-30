@@ -15,14 +15,14 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
+
+import junit.framework.TestCase;
 
 
 /**
@@ -233,7 +233,7 @@ public class ReflectionComparatorTest extends TestCase {
      */
     public void testGetDifference_equalsIgnoredDefaultNoLazyLoading() {
         // create a proxy, that will fail if is accessed
-        Collection collection = (Collection) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Collection.class}, new InvocationHandler() {
+        Collection<?> collection = (Collection) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Collection.class}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 fail("Should not be invoked");
                 return null;
@@ -314,6 +314,7 @@ public class ReflectionComparatorTest extends TestCase {
          *
          * @param o the object to compare to
          */
+        @Override
         public boolean equals(Object o) {
             return false;
         }
@@ -327,14 +328,14 @@ public class ReflectionComparatorTest extends TestCase {
     private class CollectionWrapper {
 
         /* Collection instance */
-        protected Collection innerCollection;
+        protected Collection<?> innerCollection;
 
         /**
          * Creates a wrapper for the given collection.
          *
          * @param innerCollection The collection
          */
-        public CollectionWrapper(Collection innerCollection) {
+        public CollectionWrapper(Collection<?> innerCollection) {
             this.innerCollection = innerCollection;
         }
     }

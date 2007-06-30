@@ -112,6 +112,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Test class containing a static setter and field injection and default restore (= old value).
      */
+    @SuppressWarnings("unused")
     private class TestStaticSetterDefaultRestore {
 
         @InjectIntoStaticByType(target = SetterInjectionTarget.class, propertyAccess = SETTER)
@@ -124,6 +125,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Test class containing a static setter and field injection and no restore.
      */
+    @SuppressWarnings("unused")
     private class TestStaticSetterRestoreNothing {
 
         @InjectIntoStaticByType(target = SetterInjectionTarget.class, restore = Restore.NO_RESTORE)
@@ -136,6 +138,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Test class containing a static setter and field injection and old value restore.
      */
+    @SuppressWarnings("unused")
     private class TestStaticSetterRestoreOldValue {
 
         @InjectIntoStaticByType(target = SetterInjectionTarget.class, restore = Restore.OLD_VALUE)
@@ -148,6 +151,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Test class containing a static setter and field injection and a null value restore.
      */
+    @SuppressWarnings("unused")
     private class TestStaticSetterRestoreNull {
 
         @InjectIntoStaticByType(target = SetterInjectionTarget.class, restore = Restore.NULL_OR_0_VALUE)
@@ -161,6 +165,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Test class containing a static setter and field injection and primitive 0 value restore.
      */
+    @SuppressWarnings("unused")
     private class TestStaticSetterRestore0 {
 
         @InjectIntoStaticByType(target = SetterInjectionTarget.class, restore = Restore.NULL_OR_0_VALUE)
