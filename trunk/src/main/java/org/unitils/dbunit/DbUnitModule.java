@@ -24,6 +24,8 @@ import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
 import org.dbunit.database.DatabaseConfig;
+import org.dbunit.dataset.CompositeDataSet;
+import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.unitils.core.Module;
@@ -49,7 +51,10 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -136,17 +141,14 @@ public class DbUnitModule implements Module {
      */
     public void insertTestData(Method testMethod, Object testObject) {
         try {
-            MultiSchemaDataSet multiSchemaDataSet = getTestDataSets(testMethod, testObject);
+            MultiSchemaDataSet multiSchemaDataSet = getTestDataSet(testMethod, testObject);
             if (multiSchemaDataSet == null) {
                 // no dataset specified
                 return;
             }
             DataSetLoadStrategy dataSetLoadStrategy = getDataSetOperation(testMethod, testObject.getClass());
 
-            for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
-                IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
-                dataSetLoadStrategy.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
-            }
+            insertTestData(multiSchemaDataSet, dataSetLoadStrategy);
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
         } finally {
@@ -157,25 +159,33 @@ public class DbUnitModule implements Module {
 
     /**
      * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
-     * @param dataSetFileName     The name of the dataset file, may be null if not required by the {@link DataSetFactory}
-     *                            implementation that is used
+     * 
      * @param inputStream         The stream containing the test data set, not null
      * @param dataSetLoadStrategy The load strategy that must be used to load this dataset
      * @param dataSetFactory      The factory that must be used to read this dataset
      */
-    public void insertTestData(String dataSetFileName, InputStream inputStream, DataSetLoadStrategy dataSetLoadStrategy, DataSetFactory dataSetFactory) {
-        try {
-            MultiSchemaDataSet multiSchemaDataSet = getDataSet(dataSetFileName, inputStream, dataSetFactory);
-            for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
-                IDataSet dataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
-                dataSetLoadStrategy.execute(getDbUnitDatabaseConnection(schemaName), dataSet);
-            }
-        } catch (Exception e) {
-            throw new UnitilsException("Error inserting test data from DbUnit dataset.", e);
-        } finally {
-            closeJdbcConnection();
-        }
+    public void insertTestData(InputStream inputStream, DataSetLoadStrategy dataSetLoadStrategy, DataSetFactory dataSetFactory) {
+        MultiSchemaDataSet multiSchemaDataSet = getDataSet(inputStream, dataSetFactory);
+        insertTestData(multiSchemaDataSet, dataSetLoadStrategy);
     }
+    
+    
+    /**
+     * Loads the given multi schema dataset into the database, using the given loadstrategy
+     * 
+	 * @param multiSchemaDataSet  The multi schema dataset that is inserted in the database
+	 * @param dataSetLoadStrategy The load strategy that is used
+	 */
+	protected void insertTestData(MultiSchemaDataSet multiSchemaDataSet, DataSetLoadStrategy dataSetLoadStrategy) {
+		try {
+			for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
+			    IDataSet compositeDataSet = createCompositeDataSet(multiSchemaDataSet.getDataSetsForSchema(schemaName));
+			    dataSetLoadStrategy.execute(getDbUnitDatabaseConnection(schemaName), compositeDataSet);
+			}
+	    } finally {
+	        closeJdbcConnection();
+	    }
+	}
 
 
     /**
@@ -197,9 +207,8 @@ public class DbUnitModule implements Module {
             getDatabaseModule().flushDatabaseUpdates();
             
             for (String schemaName : multiSchemaExpectedDataSet.getSchemaNames()) {
-                IDataSet expectedDataSet = multiSchemaExpectedDataSet.getDataSetForSchema(schemaName);
-
-                DbUnitAssert.assertDbContentAsExpected(expectedDataSet, getDbUnitDatabaseConnection(schemaName));
+            	IDataSet compositeDataSet = createCompositeDataSet(multiSchemaExpectedDataSet.getDataSetsForSchema(schemaName));
+                DbUnitAssert.assertDbContentAsExpected(compositeDataSet, getDbUnitDatabaseConnection(schemaName));
             }
         } finally {
             closeJdbcConnection();
@@ -225,7 +234,7 @@ public class DbUnitModule implements Module {
      * @param testObject The test object, not null
      * @return The dataset, null if no {@link DataSet} annotation is found.
      */
-    public MultiSchemaDataSet getTestDataSets(Method testMethod, Object testObject) {
+    public MultiSchemaDataSet getTestDataSet(Method testMethod, Object testObject) {
         Class<?> testClass = testObject.getClass();
 		DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testClass);
         if (dataSetAnnotation == null) {
@@ -237,17 +246,14 @@ public class DbUnitModule implements Module {
         DataSetFactory dataSetFactory = getDataSetFactory(DataSet.class, testMethod, testClass);
 
         // Get the dataset file name
-        String dataSetFileName = dataSetAnnotation.value();
-        if ("".equals(dataSetFileName)) {
+        String[] dataSetFileNames = dataSetAnnotation.value();
+        if (dataSetFileNames.length == 0) {
         	// empty means, use default file name, which is the name of the class + extension
-            dataSetFileName = getClassLevelDefaultTestDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension());
+            dataSetFileNames = new String[] {getClassLevelDefaultTestDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension())};
         }
 
-        MultiSchemaDataSet dataSets = getDataSet(testClass, dataSetFileName, dataSetFactory);
-        if (dataSets == null) {
-            throw new UnitilsException("Could not find DbUnit dataset with name " + dataSetFileName);
-        }
-        return dataSets;
+        MultiSchemaDataSet dataSet = getDataSet(testClass, dataSetFileNames, dataSetFactory);
+        return dataSet;
     }
 
 
@@ -271,16 +277,13 @@ public class DbUnitModule implements Module {
         DataSetFactory dataSetFactory = getDataSetFactory(ExpectedDataSet.class, testMethod, testClass);
 
         // Get the dataset file name
-        String dataSetFileName = expectedDataSetAnnotation.value();
-        if ("".equals(dataSetFileName)) {
+        String[] dataSetFileNames = expectedDataSetAnnotation.value();
+        if (dataSetFileNames.length == 0) {
             // empty means use default file name
-            dataSetFileName = getDefaultExpectedDataSetFileName(testMethod, testClass, dataSetFactory.getDataSetFileExtension());
+            dataSetFileNames = new String[]{getDefaultExpectedDataSetFileName(testMethod, testClass, dataSetFactory.getDataSetFileExtension())};
         }
 
-        MultiSchemaDataSet dataSets = getDataSet(testMethod.getDeclaringClass(), dataSetFileName, dataSetFactory);
-        if (dataSets == null) {
-            throw new UnitilsException("Could not find expected DbUnit dataset with name " + dataSetFileName);
-        }
+        MultiSchemaDataSet dataSets = getDataSet(testMethod.getDeclaringClass(), dataSetFileNames, dataSetFactory);
         return dataSets;
     }
 
@@ -289,37 +292,25 @@ public class DbUnitModule implements Module {
      * Creates the dataset for the given file. Filenames that start with '/' are treated absolute. Filenames that
      * do not start with '/', are relative to the current class.
      *
-     * @param testClass       The test class, not null
-     * @param dataSetFileName The name, (start with '/' for absolute names), not null
-     * @param dataSetFactory  DataSetFactory responsible for creating the dataset file
+     * @param testClass        The test class, not null
+     * @param dataSetFileNames The names of the files, (start with '/' for absolute names), not null, not empty
+     * @param dataSetFactory   DataSetFactory responsible for creating the dataset file
      * @return The data set, null if the file does not exist
      */
-    protected MultiSchemaDataSet getDataSet(Class<?> testClass, String dataSetFileName, DataSetFactory dataSetFactory) {
-        try {
-            InputStream in = testClass.getResourceAsStream(dataSetFileName);
-            if (in == null) {
-                // file does not exist
-                return null;
-            }
-            return getDataSet(dataSetFileName, in, dataSetFactory);
-
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to create DbUnit dataset for file " + dataSetFileName, e);
-        }
+    protected MultiSchemaDataSet getDataSet(Class<?> testClass, String[] dataSetFileNames, DataSetFactory dataSetFactory) {
+        return dataSetFactory.createDataSet(testClass, dataSetFileNames);
     }
 
 
     /**
      * Create a {@link MultiSchemaDataSet}, in which the file <code>InputStream</code> is loaded.
-
-     * @param dataSetFileName The name of the dataset file (may be null, if not required by the {@link DataSetFactory}
-     *                        implementation that is used) 
+     * 
      * @param in              The InputStream, not null
      * @param dataSetFactory  The factory that must be used to load this dataset, not null 
      * @return The DbUnit <code>IDataSet</code>
      */
-    public MultiSchemaDataSet getDataSet(String dataSetFileName, InputStream in, DataSetFactory dataSetFactory) {
-    	return dataSetFactory.createDataSet(dataSetFileName, in);
+    public MultiSchemaDataSet getDataSet(InputStream in, DataSetFactory dataSetFactory) {
+    	return dataSetFactory.createDataSet(in);
     }
 
 
@@ -330,6 +321,27 @@ public class DbUnitModule implements Module {
 
         return createInstanceOfType(dataSetOperationClass, false);
     }
+    
+    
+    /**
+     * Creates a DbUnit dataset object that represents the union of the given List of datasets
+     * 
+	 * @param dataSets
+	 * @return A DbUnit dataset object that represents the union of the given List of datasets
+	 * @throws DataSetException
+	 */
+	private IDataSet createCompositeDataSet(List<IDataSet> dataSets) {
+		IDataSet compositeDataSet;
+		try {
+			IDataSet[] dataSetsArray = new IDataSet[dataSets.size()];
+			dataSets.toArray(dataSetsArray);
+			compositeDataSet = new CompositeDataSet(dataSetsArray);
+			return compositeDataSet;
+		} catch (DataSetException e) {
+			throw new UnitilsException("Error while creating composite dataset", e);
+		}
+		
+	}
 
 
     /**

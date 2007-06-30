@@ -27,6 +27,7 @@ import java.io.InputStream;
  */
 public interface DataSetFactory {
 
+	
     /**
      * Initializes this DataSetFactory
      *
@@ -34,15 +35,27 @@ public interface DataSetFactory {
      */
     void init(String defaultSchemaName);
 
+    
     /**
-     * Create a {@link MultiSchemaDataSet} using the given file. The file's name and contents are provided.
+     * Creates a {@link MultiSchemaDataSet} using the given file. The file's name(s) are provided.
+     * 
+     * @param resourceLoadClass The class from which the given files should be loaded as resource from the classpath
+     * @param dataSetFileNames The names of the dataset files
      *
-     * @param dataSetFileName     The name of the dataset file
+     * @return A {@link MultiSchemaDataSet} that represents the dataset
+     */
+    MultiSchemaDataSet createDataSet(Class<?> resourceLoadClass, String[] dataSetFileNames);
+    
+    
+    /**
+     * Creates a {@link MultiSchemaDataSet} using the given file. The file's contents are provided.
+     *
      * @param dataSetFileContents The contents of the dataset file
      * @return A {@link MultiSchemaDataSet} that represents the dataset
      */
-    MultiSchemaDataSet createDataSet(String dataSetFileName, InputStream dataSetFileContents);
+    MultiSchemaDataSet createDataSet(InputStream dataSetFileContents);
 
+    
     /**
      * @return The extension that files which can be interpreted by this factory must have (should not start with a '.')
      */

@@ -86,7 +86,7 @@ public @interface DataSet {
      *
      * @return the fileName, empty for default
      */
-    String value() default "";
+    String[] value() default {};
 
 
     /**

@@ -35,20 +35,65 @@ public class MultiSchemaXmlDataSetFactory implements DataSetFactory {
     public void init(String defaultSchemaName) {
         this.defaultSchemaName = defaultSchemaName;
     }
+    
+    
+    /**
+     * Creates a {@link MultiSchemaDataSet} using the given file. The file's name(s) are provided.
+     * 
+     * @param resourceLoadClass The class from which the given files should be loaded as resource from the classpath
+     * @param dataSetFileNames The names of the dataset files
+     *
+     * @return A {@link MultiSchemaDataSet} that represents the dataset
+     */
+	public MultiSchemaDataSet createDataSet(Class<?> resourceLoadClass, String[] dataSetFileNames) {
+		MultiSchemaDataSet result = new MultiSchemaDataSet();
+    	for (String dataSetFileName : dataSetFileNames) {
+    		InputStream dataSetAsStream = resourceLoadClass.getResourceAsStream(dataSetFileName);
+    		if (dataSetAsStream == null) {
+    			throw new UnitilsException("DataSet file with name " + dataSetFileName + " cannot be found");
+    		}
+    		addDataSets(result, dataSetAsStream);
+    	}
+    	return result;
+	}
 
-    public MultiSchemaDataSet createDataSet(String dataSetFileName, InputStream dataSetFileContents) {
-        try {
+	
+	/**
+     * Creates a {@link MultiSchemaDataSet} using the given file. The file's contents are provided.
+     *
+     * @param dataSetFileContents The contents of the dataset file
+     * @return A {@link MultiSchemaDataSet} that represents the dataset
+     */
+    public MultiSchemaDataSet createDataSet(InputStream dataSetFileContents) {
+    	MultiSchemaDataSet result = new MultiSchemaDataSet();
+    	addDataSets(result, dataSetFileContents);
+    	return result;
+    }
+
+    
+	/**
+	 * Adds the content of the given {@link InputStream} to the given {@link MultiSchemaDataSet}
+	 * 
+	 * @param multiSchemaDataSet  The aggregate that collects all individual DbUnit datasets
+	 * @param dataSetFileContents The content of the file that is added to the {@link MultiSchemaDataSet}
+	 */
+	private void addDataSets(MultiSchemaDataSet multiSchemaDataSet, InputStream dataSetFileContents) {
+		try {
             MultiSchemaXmlDataSetReader multiSchemaXmlDataSetReader = new MultiSchemaXmlDataSetReader(defaultSchemaName);
-            return multiSchemaXmlDataSetReader.readDataSetXml(dataSetFileContents);
-
+            multiSchemaXmlDataSetReader.readDataSetXml(multiSchemaDataSet, dataSetFileContents);
         } catch (Exception e) {
             throw new UnitilsException("Unable to create DbUnit dataset for input stream.", e);
         } finally {
             closeQuietly(dataSetFileContents);
         }
-    }
+	}
 
-    public String getDataSetFileExtension() {
+    
+	/**
+     * @return The extension that files which can be interpreted by this factory must have
+     */
+	public String getDataSetFileExtension() {
         return "xml";
     }
+	
 }
