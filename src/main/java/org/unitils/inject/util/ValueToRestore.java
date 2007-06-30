@@ -25,13 +25,13 @@ package org.unitils.inject.util;
 public class ValueToRestore {
 
     /* The target class on which to restore the value */
-    private Class targetClass;
+    private Class<?> targetClass;
 
     /* The OGNL expression indicating where to inject the restored value, null for auto-injection */
     private String property;
 
     /* The type of the field in which to restore the value */
-    private Class fieldType;
+    private Class<?> fieldType;
 
     /* In case auto-injection is to be used, this should hold the access type (field or setter) */
     private PropertyAccess propertyAccess;
@@ -39,7 +39,7 @@ public class ValueToRestore {
     /* The value to restore */
     private Object value;
 
-    public ValueToRestore(Class targetClass, String property, Class fieldType, PropertyAccess propertyAccess, Object value) {
+    public ValueToRestore(Class<?> targetClass, String property, Class<?> fieldType, PropertyAccess propertyAccess, Object value) {
         this.fieldType = fieldType;
         this.property = property;
         this.propertyAccess = propertyAccess;
@@ -47,7 +47,7 @@ public class ValueToRestore {
         this.value = value;
     }
 
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 
@@ -55,7 +55,7 @@ public class ValueToRestore {
         return property;
     }
 
-    public Class getFieldType() {
+    public Class<?> getFieldType() {
         return fieldType;
     }
 

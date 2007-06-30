@@ -205,7 +205,7 @@ public class ReflectionUtils {
      * @param isStatic True if static fields are to be returned, false for non-static
      * @return A list of Fields, empty list if none found
      */
-    public static List<Field> getFieldsAssignableFrom(Class clazz, Class type, boolean isStatic) {
+    public static List<Field> getFieldsAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
         List<Field> fieldsOfType = new ArrayList<Field>();
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
@@ -226,9 +226,9 @@ public class ReflectionUtils {
      * @param isStatic True if static fields are to be returned, false for non-static
      * @return The fields with the given type
      */
-    public static List<Field> getFieldsOfType(Class clazz, Class type, boolean isStatic) {
+    public static List<Field> getFieldsOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
         List<Field> fields = getFieldsOfTypeIgnoreSuper(clazz, type, isStatic);
-        Class superClass = clazz.getSuperclass();
+        Class<?> superClass = clazz.getSuperclass();
         if (!superClass.equals(Object.class)) {
             fields.addAll(getFieldsOfType(superClass, type, isStatic));
         }
@@ -245,7 +245,7 @@ public class ReflectionUtils {
      * @param isStatic True if static fields are to be returned, false for non-static
      * @return The fields with the given type
      */
-    private static List<Field> getFieldsOfTypeIgnoreSuper(Class clazz, Class type, boolean isStatic) {
+    private static List<Field> getFieldsOfTypeIgnoreSuper(Class<?> clazz, Class<?> type, boolean isStatic) {
         List<Field> fields = new ArrayList<Field>();
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
@@ -265,7 +265,7 @@ public class ReflectionUtils {
      * @param isStatic True if static setters are to be returned, false for non-static
      * @return A list of Methods, empty list if none found
      */
-    public static List<Method> getSettersAssignableFrom(Class clazz, Class type, boolean isStatic) {
+    public static List<Method> getSettersAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
         List<Method> settersAssignableFrom = new ArrayList<Method>();
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method method : declaredMethods) {
@@ -287,9 +287,9 @@ public class ReflectionUtils {
      * @param isStatic True if static setters are to be returned, false for non-static
      * @return All setters for an object of the given type
      */
-    public static List<Method> getSettersOfType(Class clazz, Class type, boolean isStatic) {
+    public static List<Method> getSettersOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
         List<Method> setters = getSettersOfTypeIgnoreSuper(clazz, type, isStatic);
-        Class superClass = clazz.getSuperclass();
+        Class<?> superClass = clazz.getSuperclass();
         if (!superClass.equals(Object.class)) {
             setters.addAll(getSettersOfType(superClass, type, isStatic));
         }
@@ -305,7 +305,7 @@ public class ReflectionUtils {
      * @param isStatic True if static setters are to be returned, false for non-static
      * @return All setters for an object of the given type
      */
-    private static List<Method> getSettersOfTypeIgnoreSuper(Class clazz, Class type, boolean isStatic) {
+    private static List<Method> getSettersOfTypeIgnoreSuper(Class<?> clazz, Class<?> type, boolean isStatic) {
         List<Method> settersOfType = new ArrayList<Method>();
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method method : declaredMethods) {
@@ -327,7 +327,7 @@ public class ReflectionUtils {
      * @param isStatic     True if a static setter is to be returned, false for non-static
      * @return The setter method that matches the given parameters, null if not found
      */
-    public static Method getSetter(Class clazz, String propertyName, boolean isStatic) {
+    public static Method getSetter(Class<?> clazz, String propertyName, boolean isStatic) {
         String setterName = "set" + StringUtils.capitalize(propertyName);
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for (Method method : declaredMethods) {
@@ -349,7 +349,7 @@ public class ReflectionUtils {
      * @param isStatic     True if a static getter is to be returned, false for non-static
      * @return The getter method that matches the given parameters, or null if no such method exists
      */
-    public static Method getGetter(Class clazz, String propertyName, boolean isStatic) {
+    public static Method getGetter(Class<?> clazz, String propertyName, boolean isStatic) {
         String getterName = "get" + StringUtils.capitalize(propertyName);
         try {
             Method getter = clazz.getDeclaredMethod(getterName);
@@ -398,7 +398,7 @@ public class ReflectionUtils {
      * @param isStatic  True if a static field is to be returned, false for non-static
      * @return The field that matches the given parameters, or null if no such field exists
      */
-    public static Field getFieldWithName(Class clazz, String fieldName, boolean isStatic) {
+    public static Field getFieldWithName(Class<?> clazz, String fieldName, boolean isStatic) {
         try {
             Field field = clazz.getDeclaredField(fieldName);
             if (Modifier.isStatic(field.getModifiers()) == isStatic) {
@@ -420,7 +420,7 @@ public class ReflectionUtils {
      * @return The actual enum value, not null
      * @throws UnitilsException if no value could be found with the given name
      */
-    public static <T extends Enum> T getEnumValue(Class<T> enumClass, String enumValueName) {
+    public static <T extends Enum<?>> T getEnumValue(Class<T> enumClass, String enumValueName) {
         T[] enumValues = enumClass.getEnumConstants();
         for (T enumValue : enumValues) {
             if (enumValueName.equalsIgnoreCase(enumValue.name())) {

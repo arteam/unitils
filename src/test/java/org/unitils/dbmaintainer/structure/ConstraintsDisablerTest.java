@@ -15,19 +15,20 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
+
 import java.util.Properties;
 
 /**
@@ -113,7 +114,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     /**
      * Creates the test tables
      */
-    protected void createTestTables() throws SQLException {
+    protected void createTestTables() {
         executeUpdate("create table table1 (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
         executeUpdate("create table table2 (col1 varchar(10), foreign key (col1) references table1(col1))", dataSource);
     }
@@ -122,7 +123,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     /**
      * Drops the test tables
      */
-    protected void cleanupTestDatabase() throws SQLException {
+    protected void cleanupTestDatabase() {
         executeUpdateQuietly("drop table table2", dataSource);
         executeUpdateQuietly("drop table table1", dataSource);
     }

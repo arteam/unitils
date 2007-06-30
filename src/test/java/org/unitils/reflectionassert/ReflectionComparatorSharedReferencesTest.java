@@ -76,6 +76,7 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
         assertNotNull(diff);
     }
 
+    @SuppressWarnings("unused")
     private static class References {
 
         private String name;
@@ -98,6 +99,7 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
             this.ref2 = ref2;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -109,6 +111,7 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
             return true;
         }
 
+        @Override
         public int hashCode() {
             return name.hashCode();
         }

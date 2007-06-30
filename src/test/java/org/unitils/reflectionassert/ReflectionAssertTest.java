@@ -230,6 +230,7 @@ public class ReflectionAssertTest extends TestCase {
          *
          * @param o the object to compare to
          */
+        @Override
         public boolean equals(Object o) {
             return false;
         }

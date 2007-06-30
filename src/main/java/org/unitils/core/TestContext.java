@@ -25,18 +25,18 @@ import java.lang.reflect.Method;
  */
 public class TestContext {
 
-    private Class testClass;
+    private Class<?> testClass;
 
     private Object testObject;
 
     private Method testMethod;
 
 
-    public Class getTestClass() {
+    public Class<?> getTestClass() {
         return testClass;
     }
 
-    public void setTestClass(Class testClass) {
+    public void setTestClass(Class<?> testClass) {
         this.testClass = testClass;
     }
 

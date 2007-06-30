@@ -23,15 +23,6 @@ import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.isSetter;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -44,6 +35,13 @@ import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 import org.unitils.spring.util.ApplicationContextFactory;
 import org.unitils.spring.util.ApplicationContextManager;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and
@@ -66,9 +64,6 @@ public class SpringModule implements Module {
 
     /* Property key of the class name of the application context factory */
     public static final String PROPKEY_APPLICATION_CONTEXT_FACTORY_CLASS_NAME = "SpringModule.applicationContextFactory.implClassName";
-
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(SpringModule.class);
 
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
@@ -116,7 +111,7 @@ public class SpringModule implements Module {
      * @return The bean, not null
      */
     public Object getSpringBeanByType(Object testObject, Class<?> type) {
-        Map beans = getApplicationContext(testObject).getBeansOfType(type);
+        Map<?,?> beans = getApplicationContext(testObject).getBeansOfType(type);
         if (beans == null || beans.size() == 0) {
             throw new UnitilsException("Unable to get Spring bean by type. No Spring bean found for type " + type.getSimpleName());
         }

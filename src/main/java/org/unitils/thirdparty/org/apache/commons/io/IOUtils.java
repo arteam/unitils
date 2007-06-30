@@ -75,6 +75,7 @@ import java.util.List;
  * @author Sandy McArthur
  * @version $Id: IOUtils.java 385117 2006-03-11 18:07:02Z scolebourne $
  */
+@SuppressWarnings("all")
 public class IOUtils {
     // NOTE: This class is focussed on InputStream, OutputStream, Reader and
     // Writer. Each method should take at least one of these as a parameter,
@@ -433,7 +434,7 @@ public class IOUtils {
      * @throws IOException if an I/O error occurs
      * @since Commons IO 1.1
      */
-    public static List readLines(Reader input) throws IOException {
+	public static List readLines(Reader input) throws IOException {
         BufferedReader reader = new BufferedReader(input);
         List list = new ArrayList();
         String line = reader.readLine();

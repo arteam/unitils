@@ -88,6 +88,7 @@ public class UnitilsJUnit3Test_TestClass2 extends UnitilsJUnit3 {
         if (tracingTestListener != null) {
             return new Unitils() {
 
+            	@Override
                 public TestListener createTestListener() {
                     return tracingTestListener;
                 }

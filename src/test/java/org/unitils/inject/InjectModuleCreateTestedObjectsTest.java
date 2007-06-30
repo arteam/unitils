@@ -94,9 +94,9 @@ public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
     private class TestObject_TestedObjectWithInterfaceType {
 
         @TestedObject
-        private List testedObject;
+        private List<?> testedObject;
 
-        public List getTestedObject() {
+        public List<?> getTestedObject() {
             return testedObject;
         }
 
@@ -106,9 +106,9 @@ public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
     private class TestObject_TestedObjectWithAbstractClassType {
 
         @TestedObject
-        private AbstractList testedObject;
+        private AbstractList<?> testedObject;
 
-        public List getTestedObject() {
+        public List<?> getTestedObject() {
             return testedObject;
         }
 
@@ -118,9 +118,9 @@ public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
     private class TestObject_TestedObjectWithTypeThatHasNoDefaultConstructor {
 
         @TestedObject
-        private EnumMap testedObject;
+        private EnumMap<?,?> testedObject;
 
-        public EnumMap getTestedObject() {
+        public EnumMap<?,?> getTestedObject() {
             return testedObject;
         }
 

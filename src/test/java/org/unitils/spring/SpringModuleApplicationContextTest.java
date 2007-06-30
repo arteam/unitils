@@ -318,7 +318,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     private class SpringTestCreateMethodWrongSignature {
 
         @SpringApplicationContext
-        protected List createMethod(String a) {
+        protected List<?> createMethod(String a) {
             return null;
         }
     }

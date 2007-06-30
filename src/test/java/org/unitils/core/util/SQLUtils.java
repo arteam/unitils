@@ -15,17 +15,18 @@
  */
 package org.unitils.core.util;
 
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
@@ -294,8 +295,7 @@ public class SQLUtils {
      * @param dbSupport The db support, not null
      * @return True if empty
      */
-    public static boolean isEmpty(String tableName, DbSupport dbSupport) throws SQLException {
-        String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
+    public static boolean isEmpty(String tableName, DbSupport dbSupport) {
         return dbSupport.getSQLHandler().getItemsAsStringSet("select * from " + tableName).isEmpty();
     }
 

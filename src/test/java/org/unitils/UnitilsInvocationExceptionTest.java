@@ -850,7 +850,7 @@ public class UnitilsInvocationExceptionTest {
      */
     private void assertInvocationOrder_beforeAll(String type, TracingTestListener tracingTestListener) {
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
@@ -876,7 +876,7 @@ public class UnitilsInvocationExceptionTest {
      */
     private void assertInvocationOrder_beforeTestClass(String type, TracingTestListener tracingTestListener) {
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
@@ -909,7 +909,7 @@ public class UnitilsInvocationExceptionTest {
      */
     private void assertInvocationOrder_testBeforeClass(String type, TracingTestListener tracingTestListener) {
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         // does not exist for JUnit3
         if ("JUnit4".equals(type)) {
@@ -945,7 +945,7 @@ public class UnitilsInvocationExceptionTest {
      */
     private void assertInvocationOrder_beforeTestSetUp(String type, TracingTestListener tracingTestListener) {
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
@@ -995,7 +995,7 @@ public class UnitilsInvocationExceptionTest {
      */
     private void assertInvocationOrder_testSetUp(String type, TracingTestListener tracingTestListener) {
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
@@ -1057,7 +1057,7 @@ public class UnitilsInvocationExceptionTest {
      */
     private void assertInvocationOrder_beforeTestMethod(String type, TracingTestListener tracingTestListener) {
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
@@ -1131,7 +1131,7 @@ public class UnitilsInvocationExceptionTest {
      */
     private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
@@ -1216,7 +1216,7 @@ public class UnitilsInvocationExceptionTest {
             return;
         }
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
         if ("TestNG".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
             assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
@@ -1255,7 +1255,7 @@ public class UnitilsInvocationExceptionTest {
             return;
         }
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
         if ("TestNG".equals(type)) {
             assertEquals("[Unitils] beforeAll", iterator.next());
             assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
@@ -1319,11 +1319,13 @@ public class UnitilsInvocationExceptionTest {
             super(testClass);
         }
 
-        protected Unitils getUnitils() {
+        @Override
+		protected Unitils getUnitils() {
 
             return new Unitils() {
 
-                public TestListener createTestListener() {
+                @Override
+				public TestListener createTestListener() {
                     return tracingTestListener;
                 }
             };

@@ -68,6 +68,7 @@ public class ReflectionArgumentMatcher<T> extends Equals {
      * @return true
      * @throws AssertionError in case expected and actual did not match
      */
+    @Override
     public boolean matches(Object actual) {
         return reflectionComparator.isEqual(getExpected(), actual);
     }

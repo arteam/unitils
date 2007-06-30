@@ -118,7 +118,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
         // if this is the first test of a test class (previous test was of a different test class),
         // first finalize the previous test class by calling afterTestClass, then call beforeTestClass
         // to start the new one
-        Class testClass = getClass();
+        Class<?> testClass = getClass();
         if (lastTestClass != testClass) {
             if (lastTestClass != null) {
                 try {

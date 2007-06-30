@@ -50,7 +50,7 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
      *
      * @return The type, not null
      */
-    public Class getObjectType() {
+    public Class<?> getObjectType() {
         return DataSource.class;
     }
 

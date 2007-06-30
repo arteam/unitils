@@ -203,7 +203,7 @@ public class Unitils implements Module {
 
 
         @Override
-        public void beforeTestClass(Class testClass) {
+        public void beforeTestClass(Class<?> testClass) {
             TestContext testContext = getTestContext();
             testContext.setTestClass(testClass);
             testContext.setTestObject(null);
@@ -273,7 +273,7 @@ public class Unitils implements Module {
 
 
         @Override
-        public void afterTestClass(Class testClass) {
+        public void afterTestClass(Class<?> testClass) {
             TestContext testContext = getTestContext();
             testContext.setTestClass(testClass);
             testContext.setTestObject(null);

@@ -21,7 +21,6 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
 
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.util.Calls;
 import org.unitils.easymock.util.Dates;
 import org.unitils.easymock.util.Defaults;

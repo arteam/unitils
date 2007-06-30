@@ -15,20 +15,24 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.util.SQLUtils.dropTestSequences;
+import static org.unitils.core.util.SQLUtils.dropTestTables;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.getItemAsLong;
+import static org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
-import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
+
 import java.util.Properties;
 
 /**
@@ -152,7 +156,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      * @param minValue The minimum value (included)
      * @param maxValue The maximum value (included)
      */
-    private void assertCurrentSequenceValueBetween(long minValue, long maxValue) throws SQLException {
+    private void assertCurrentSequenceValueBetween(long minValue, long maxValue) {
         String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier("test_sequence");
         long currentValue = dbSupport.getSequenceValue(correctCaseSequenceName);
         assertTrue("Current sequence value is not between " + minValue + " and " + maxValue, (currentValue >= minValue && currentValue <= maxValue));
@@ -165,7 +169,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      * @param minValue The minimum value (included)
      * @param maxValue The maximum value (included)
      */
-    private void assertCurrentIdentityColumnValueBetween(long minValue, long maxValue) throws SQLException {
+    private void assertCurrentIdentityColumnValueBetween(long minValue, long maxValue) {
         executeUpdate("delete from test_table1", dataSource);
         executeUpdate("insert into test_table1(col2) values('test')", dataSource);
         long currentValue = getItemAsLong("select col1 from test_table1 where col2 = 'test'", dataSource);

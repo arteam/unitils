@@ -53,7 +53,7 @@ public class EasyMockModuleTest extends UnitilsJUnit3 {
     public void testDataSet() throws Exception {
         MockTest mockTest = new MockTest();
         easyMockModule.createAndInjectMocksIntoTest(mockTest);
-        assertTrue(mockTest.testMock instanceof List);
+        assertNotNull(mockTest.testMock);
     }
 
     /**
@@ -62,7 +62,7 @@ public class EasyMockModuleTest extends UnitilsJUnit3 {
     public class MockTest {
 
         @Mock
-        protected List testMock;
+        protected List<?> testMock;
 
     }
 }

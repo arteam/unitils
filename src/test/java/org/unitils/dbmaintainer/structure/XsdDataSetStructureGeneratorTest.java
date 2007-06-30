@@ -15,30 +15,31 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.SQLHandler;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
-import java.sql.SQLException;
 import java.util.Properties;
 
 /**
@@ -167,7 +168,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
     /**
      * Creates the test tables.
      */
-    private void createTestTables() throws SQLException {
+    private void createTestTables() {
         executeUpdate("create table TABLE_1(columnA int not null identity, columnB varchar(1) not null, columnC varchar(1))", dataSource);
         executeUpdate("create table TABLE_2(column1 varchar(1), column2 varchar(1))", dataSource);
     }
@@ -176,7 +177,7 @@ public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
     /**
      * Removes the test database tables
      */
-    private void dropTestTables() throws SQLException {
+    private void dropTestTables() {
         executeUpdateQuietly("drop table TABLE_1", dataSource);
         executeUpdateQuietly("drop table TABLE_2", dataSource);
     }

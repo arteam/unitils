@@ -83,30 +83,35 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
         }
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoStaticByType_NoPropertyOfType {
 
         @InjectIntoStaticByType(target = InjectOn_NoPropertyOfType.class)
         private ToInject toInject;
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoStaticByType_MoreThanOneFieldOfType {
 
         @InjectIntoStaticByType(target = InjectOn_MoreThanOneFieldOfType.class)
         private ToInject toInject;
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoStaticByType_MoreThanOneSetterOfType {
 
         @InjectIntoStaticByType(target = InjectOn_MoreThanOneSetterOfType.class, propertyAccess = PropertyAccess.SETTER)
         private ToInject toInject;
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoStaticByType_MoreThanOneFieldOfSuperType {
 
         @InjectIntoStaticByType(target = InjectOn_MoreThanOneFieldOfSuperType.class)
         private ToInject toInject;
     }
 
+    @SuppressWarnings("unused")
     public class TestInjectIntoStaticByType_MoreThanOneSetterOfSuperType {
 
         @InjectIntoStaticByType(target = InjectOn_MoreThanOneSetterOfSuperType.class, propertyAccess = PropertyAccess.SETTER)
@@ -131,6 +136,7 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
     public static class InjectOn_NoPropertyOfType {
     }
 
+    @SuppressWarnings("unused")
     public static class InjectOn_MoreThanOneFieldOfType {
 
         private static ToInject toInject1;
@@ -149,6 +155,7 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
 
     }
 
+    @SuppressWarnings("unused")
     public static class InjectOn_MoreThanOneFieldOfSuperType {
 
         private static ToInjectSuper toInject1;

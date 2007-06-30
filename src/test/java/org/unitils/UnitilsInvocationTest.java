@@ -199,7 +199,7 @@ public class UnitilsInvocationTest {
         testng.addListener(testListenerAdapter);
         testng.run();
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] beforeTestClass   - GroupsTest", iterator.next());
         assertEquals("[Test]    testBeforeClass   - GroupsTest", iterator.next());
@@ -230,7 +230,7 @@ public class UnitilsInvocationTest {
         testng.addListener(testListenerAdapter);
         testng.run();
 
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
         assertEquals("[Unitils] afterAll", iterator.next());
         assertEquals(0, testListenerAdapter.getFailedTests().size());
@@ -253,7 +253,7 @@ public class UnitilsInvocationTest {
      * @param tracingTestListener the listener, not null
      */
     private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
-        Iterator iterator = tracingTestListener.getCallList().iterator();
+        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
 
         assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
@@ -326,11 +326,13 @@ public class UnitilsInvocationTest {
             super(testClass);
         }
 
-        protected Unitils getUnitils() {
+        @Override
+		protected Unitils getUnitils() {
 
             return new Unitils() {
 
-                public TestListener createTestListener() {
+                @Override
+				public TestListener createTestListener() {
                     return tracingTestListener;
                 }
             };
@@ -355,6 +357,7 @@ public class UnitilsInvocationTest {
             if (tracingTestListener != null) {
                 return new Unitils() {
 
+                	@Override
                     public TestListener createTestListener() {
                         return tracingTestListener;
                     }

@@ -138,7 +138,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
 
     /**
      * Test for getting all non-static setters for primitive fields assignable from.
-     * Note: {@Integer#TYPE} is the class type of a primitive int.
+     * Note: {@linnk Integer#TYPE} is the class type of a primitive int.
      */
     public void testGetSettersAssignableFrom_primitive() {
         List<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestObject.class, Integer.TYPE, false);
@@ -308,7 +308,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
         private int intField;
 
         /* has no getter */
-        protected Map setterOnlyField;
+        protected Map<?,?> setterOnlyField;
 
 
         public static Object getStaticObjectField() {
@@ -359,7 +359,7 @@ public class ReflectionUtilsTypesTest extends TestCase {
             this.intField = intField;
         }
 
-        public void setSetterOnlyField(Map setterOnlyField) {
+        public void setSetterOnlyField(Map<?,?> setterOnlyField) {
             this.setterOnlyField = setterOnlyField;
         }
 

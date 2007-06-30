@@ -47,7 +47,7 @@ public @interface InjectIntoStatic {
      *
      * @return the target class, null for tested object
      */
-    Class target();
+	Class<?> target();
 
     /**
      * OGNL expression that defines the property to which the object referenced by the annotated fiel is injected

@@ -15,18 +15,24 @@
  */
 package org.unitils.dbmaintainer.clean;
 
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.util.SQLUtils.dropTestTables;
+import static org.unitils.core.util.SQLUtils.dropTestViews;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.isEmpty;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_DATA_TABLES;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_TABLES;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_VERSION_TABLE_NAME;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
-import static org.unitils.core.util.SQLUtils.*;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.*;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
+
 import java.util.Properties;
 
 /**
@@ -135,7 +141,7 @@ public class DBCleanerTest extends UnitilsJUnit3 {
     /**
      * Removes the test database tables
      */
-    private void cleanupTestDatabase() throws SQLException {
+    private void cleanupTestDatabase() {
         dropTestTables(dbSupport, "TEST_TABLE", "TEST_TABLE_PRESERVE", dbSupport.quoted("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Table_Preserve"), versionTableName);
         dropTestViews(dbSupport, "TEST_VIEW");
     }

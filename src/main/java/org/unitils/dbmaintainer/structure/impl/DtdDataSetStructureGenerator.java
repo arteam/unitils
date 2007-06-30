@@ -18,14 +18,6 @@ package org.unitils.dbmaintainer.structure.impl;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.sql.Connection;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -33,12 +25,19 @@ import org.dbunit.dataset.FilteredDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.dbunit.dataset.xml.FlatDtdWriter;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.sql.Connection;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Implementation of {@link DataSetStructureGenerator} for the DbUnit {@link FlatXmlDataSet} XML test data files format

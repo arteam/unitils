@@ -101,6 +101,7 @@ public class UnitilsTestNGTest_TestClass2 extends UnitilsTestNG {
         if (tracingTestListener != null) {
             return new Unitils() {
 
+            	@Override
                 public TestListener createTestListener() {
                     return tracingTestListener;
                 }

@@ -111,7 +111,7 @@ public class ReflectionComparatorMapTest extends TestCase {
      * Test for two maps that have a different size.
      */
     public void testGetDifference_notEqualsDifferentSize() {
-        Iterator iterator = mapB.entrySet().iterator();
+        Iterator<?> iterator = mapB.entrySet().iterator();
         iterator.next();
         iterator.remove();
 
@@ -155,7 +155,7 @@ public class ReflectionComparatorMapTest extends TestCase {
      * Tests for objects with inner maps that have a different size.
      */
     public void testGetDifference_notEqualsInnerDifferentSize() {
-        Iterator iterator = mapB.entrySet().iterator();
+        Iterator<?> iterator = mapB.entrySet().iterator();
         iterator.next();
         iterator.remove();
 
@@ -189,7 +189,7 @@ public class ReflectionComparatorMapTest extends TestCase {
      * @param innerElement2       the value for the inner array of the 2nd element in the collection
      * @return the test collection
      */
-    private Map<String, Element> createMap(String keyElement2, String stringValueElement2, Map innerElement2) {
+    private Map<String, Element> createMap(String keyElement2, String stringValueElement2, Map<?,?> innerElement2) {
         Map<String, Element> map = new HashMap<String, Element>();
         map.put("key 1", new Element("test 1", null));
         map.put(keyElement2, new Element(stringValueElement2, innerElement2));
@@ -207,7 +207,7 @@ public class ReflectionComparatorMapTest extends TestCase {
         private String string;
 
         /* An inner map */
-        private Map inner;
+        private Map<?,?> inner;
 
 
         /**
@@ -216,7 +216,7 @@ public class ReflectionComparatorMapTest extends TestCase {
          * @param string the string value
          * @param inner  the inner map
          */
-        public Element(String string, Map inner) {
+        public Element(String string, Map<?,?> inner) {
             this.string = string;
             this.inner = inner;
         }
@@ -235,7 +235,7 @@ public class ReflectionComparatorMapTest extends TestCase {
          *
          * @return the map
          */
-        public Map getInner() {
+        public Map<?,?> getInner() {
             return inner;
         }
 
@@ -244,6 +244,7 @@ public class ReflectionComparatorMapTest extends TestCase {
          *
          * @param o the object to compare to
          */
+        @Override
         public boolean equals(Object o) {
             return false;
         }
