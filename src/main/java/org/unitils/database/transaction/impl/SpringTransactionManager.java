@@ -83,9 +83,9 @@ public class SpringTransactionManager implements TransactionManager {
             transactionStatusHolder.set(transactionStatus);
 
         } catch (Throwable t) {
-            throw new UnitilsException("Unable to start transaction. Could not retrieve transaction manager from Spring context. A transaction manager " +
-                    "should be configured in the application context (e.g. DataSourceTransactionManager) or another Unitils transaction manager should " +
-                    "be used (e.g. SimpleTransactionManager by setting the 'transactionManager.type' property to 'simple')", t);
+            throw new UnitilsException("Unable to start transaction. Could not retrieve PlatformTransactionManager from the Spring application context. " +
+            		"Make sure either to configure one, or use another Unitils transaction manager. (e.g. SimpleTransactionManager, by setting the " +
+            		"property 'transactionManager.type' to 'simple')", t);
         }
     }
 
