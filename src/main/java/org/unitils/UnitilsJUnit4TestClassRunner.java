@@ -137,11 +137,13 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
          */
         @Override
         protected void invokeTestMethod(Method method, RunNotifier notifier) {
-            try {
+            boolean failed = false;
+        	try {
                 super.invokeTestMethod(method, notifier);
 
             } catch (Throwable t) {
                 notifier.fireTestFailure(new Failure(getDescription(), t));
+                failed = true;
             }
 
             if (!isIgnored(method)) {
@@ -149,7 +151,13 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
                     testListener.afterTestTearDown(testObject);
 
                 } catch (Throwable t) {
-                    notifier.fireTestFailure(new Failure(getDescription(), t));
+                	// If a failure was already fired during the execution of the test method, firing 
+                	// a failure again would replace that error. In most cases, the exception reported 
+                	// during the method execution provides the most significant information, so we 
+                	// don't want to replace it.
+                	if (!failed) {
+                		notifier.fireTestFailure(new Failure(getDescription(), t));
+                	}
                 }
             }
             testObject = null;
