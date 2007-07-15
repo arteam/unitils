@@ -38,6 +38,7 @@ import org.unitils.hibernate.util.HibernateAssert;
 import org.unitils.hibernate.util.HibernateSpringSupport;
 import org.unitils.hibernate.util.SessionFactoryManager;
 import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
+import org.unitils.util.PropertyUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -88,6 +89,10 @@ public class HibernateModule implements Module, Flushable {
 
     /* Property key of the class name of the CurrentSessionContext to use, null for no context */
     public static final String PROPKEY_CURRENTSESSIONCONTEXT_CLASS_NAME = "HibernateModule.currentsessioncontext.implClassName";
+    
+    /* Key of property that indicates whether after each test, hibernate sessions that are still open
+     * need to be closed */
+    public static final String PROPKEY_AUTOCLOSESESSIONSAFTERTEST_ENABLED = "HibernateModule.autoCloseSessionsAfterTest.enabled";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(HibernateModule.class);
@@ -101,7 +106,11 @@ public class HibernateModule implements Module, Flushable {
      * The spring hibernate support, null if spring is not available
      */
     protected HibernateSpringSupport hibernateSpringSupport;
-
+    
+    /**
+     * boolean indicating if after each test, hibernate sessions that are still open need to be closed
+     */
+    protected boolean autoCloseSessionsAfterTest;
 
     /**
      * Initializes the module.
@@ -113,6 +122,8 @@ public class HibernateModule implements Module, Flushable {
 
         String currentSessionContextImplClassName = getString(PROPKEY_CURRENTSESSIONCONTEXT_CLASS_NAME, configuration);
         this.sessionFactoryManager = new SessionFactoryManager(configurationImplClassName, currentSessionContextImplClassName);
+        
+        autoCloseSessionsAfterTest = PropertyUtils.getBoolean(PROPKEY_AUTOCLOSESESSIONSAFTERTEST_ENABLED, configuration);
     }
 
 
@@ -353,8 +364,10 @@ public class HibernateModule implements Module, Flushable {
         }
 
         @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
-            closeSessions(testObject);
+        public void afterTestTearDown(Object testObject) {
+        	if (autoCloseSessionsAfterTest) {
+        		closeSessions(testObject);
+        	}
         }
     }
 }
