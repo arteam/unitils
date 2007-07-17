@@ -15,7 +15,6 @@
  */
 package org.unitils.core.dbsupport;
 
-import org.unitils.core.UnitilsException;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import java.sql.Connection;
@@ -23,6 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Set;
+
+import org.unitils.core.UnitilsException;
 
 /**
  * Implementation of {@link DbSupport} for an Oracle database.
@@ -175,7 +176,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void dropType(String typeName) {
-        getSQLHandler().executeUpdate("drop type " + qualified(typeName) + " force");
+        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName) + " force");
     }
 
 
@@ -199,7 +200,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName);
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName);
     }
 
 

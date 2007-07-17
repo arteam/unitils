@@ -165,7 +165,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void dropType(String typeName) {
-        getSQLHandler().executeUpdate("drop type " + qualified(typeName));
+        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName));
     }
 
 

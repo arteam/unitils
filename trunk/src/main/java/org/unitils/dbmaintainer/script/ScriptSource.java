@@ -78,5 +78,11 @@ public interface ScriptSource extends DatabaseTask {
      * @return All the code scripts that are currently available
      */
     List<Script> getAllCodeScripts();
+    
+    
+    /**
+     * @return All the postprocessing code scripts that are currently available
+     */
+    List<Script> getAllPostProcessingCodeScripts();
 
 }
