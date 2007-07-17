@@ -60,6 +60,12 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * Property key for the directory in which the code script files are located
      */
     public static final String PROPKEY_CODESCRIPTFILES_LOCATIONS = "dbMaintainer.fileScriptSource.code.locations";
+    
+    
+    /**
+     * Property key for the directory in which the code script files are located
+     */
+    public static final String PROPKEY_POSTPROCESSINGCODESCRIPTFILES_LOCATIONS = "dbMaintainer.fileScriptSource.postProcessingCode.locations";
 
     /**
      * Property key for the extension of the script files
@@ -71,7 +77,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      */
     public static final String PROPKEY_CODESCRIPTFILES_FILEEXTENSIONS = "dbMaintainer.fileScriptSource.code.fileExtensions";
 
-    private ScriptFilesSpecification scriptFilesSpecification, codeScriptFilesSpecification;
+    private ScriptFilesSpecification scriptFilesSpecification, codeScriptFilesSpecification, 
+            postProcessingCodeScriptFilesSpecification;
 
     /**
      * Uses the given configuration to initialize the script files directory, and the file extension
@@ -90,14 +97,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
                     + PROPKEY_SCRIPTFILES_LOCATIONS
                     + ". The Unitils database maintainer won't do anyting");
         }
-        final List<String> codeScriptFileLocations = getStringList(PROPKEY_CODESCRIPTFILES_LOCATIONS, configuration);
-        verifyExistence(codeScriptFileLocations, PROPKEY_CODESCRIPTFILES_LOCATIONS);
         final List<String> scriptFileExtensions = getStringList(PROPKEY_SCRIPTFILES_FILEEXTENSIONS, configuration);
         verifyScriptFileExtionsions(scriptFileExtensions);
-        final List<String> codeScriptFileExtensions = getStringList(PROPKEY_CODESCRIPTFILES_FILEEXTENSIONS,
-                configuration);
-        verifyScriptFileExtionsions(codeScriptFileExtensions);
-        
         scriptFilesSpecification = new ScriptFilesSpecification() {
             public List<String> getFileExtensions() {
                 return scriptFileExtensions;
@@ -110,12 +111,31 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
             }
         };
         
+        final List<String> codeScriptFileLocations = getStringList(PROPKEY_CODESCRIPTFILES_LOCATIONS, configuration);
+        verifyExistence(codeScriptFileLocations, PROPKEY_CODESCRIPTFILES_LOCATIONS);
+        final List<String> codeScriptFileExtensions = getStringList(PROPKEY_CODESCRIPTFILES_FILEEXTENSIONS,
+                configuration);
+        verifyScriptFileExtionsions(codeScriptFileExtensions);
         codeScriptFilesSpecification = new ScriptFilesSpecification() {
             public List<String> getFileExtensions() {
                 return codeScriptFileExtensions;
             }
             public List<String> getFileLocations() {
                 return codeScriptFileLocations;
+            }
+            public boolean isExcludeFilesWithoutIndex() {
+                return false;
+            }
+        };
+        
+        final List<String> postProcessingCodeScriptFileLocations = getStringList(PROPKEY_POSTPROCESSINGCODESCRIPTFILES_LOCATIONS, configuration);
+        verifyExistence(postProcessingCodeScriptFileLocations, PROPKEY_POSTPROCESSINGCODESCRIPTFILES_LOCATIONS);
+        postProcessingCodeScriptFilesSpecification = new ScriptFilesSpecification() {
+            public List<String> getFileExtensions() {
+                return codeScriptFileExtensions;
+            }
+            public List<String> getFileLocations() {
+                return postProcessingCodeScriptFileLocations;
             }
             public boolean isExcludeFilesWithoutIndex() {
                 return false;
@@ -218,7 +238,16 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     public List<Script> getAllCodeScripts() {
         return getScriptsFromFiles(getScriptFilesSorted(codeScriptFilesSpecification));
     }
+    
+    
+    /**
+     * @return All the postprocessing code scripts that are currently available
+     */
+    public List<Script> getAllPostProcessingCodeScripts() {
+        return getScriptsFromFiles(getScriptFilesSorted(postProcessingCodeScriptFilesSpecification));
+    }
 
+    
     /**
      * @param currentVersion
      *        The current database version, not null
