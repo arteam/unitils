@@ -250,13 +250,9 @@ public class HibernateModule implements Module, Flushable {
      * Hibernate <code>Session</code> provided by the method #getCurrentSession, flushing is not
      * needed.
      */
-    public void flushDatabaseUpdates() {
-        // get all open session factories
-        List<SessionInterceptingSessionFactory> sessionFactories = getSessionFactoryManager().getSessionFactories();
-        for (SessionInterceptingSessionFactory sessionFactory : sessionFactories) {
-            // flush all open sessions
-            sessionFactory.flushOpenSessions();
-        }
+    public void flushDatabaseUpdates(Object testObject) {
+        SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
+    	sessionFactory.flushOpenSessions();
     }
 
 

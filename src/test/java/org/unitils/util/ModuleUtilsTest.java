@@ -43,7 +43,8 @@ public class ModuleUtilsTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
 
         configuration.setProperty("ModuleUtilsTest.TestModule.ModuleUtilsTest.TestAnnotation1.testEnum.default", "VALUE1");
@@ -55,7 +56,7 @@ public class ModuleUtilsTest extends TestCase {
      * Test the loading of the default values.
      */
     public void testGetAnnotationEnumDefaults() {
-        Map<Class<? extends Annotation>, Map<Method, String>> result = getAnnotationPropertyDefaults(TestModule.class,
+        Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class,
                 configuration, TestAnnotation1.class, TestAnnotation2.class);
 
         TestEnum enumValue1 = getEnumValueReplaceDefault(TestAnnotation1.class, "testEnum", TestEnum.DEFAULT, result);
@@ -72,7 +73,7 @@ public class ModuleUtilsTest extends TestCase {
     public void testGetAnnotationEnumDefaults_defaultNotFound() {
         configuration.remove("ModuleUtilsTest.TestModule.ModuleUtilsTest.TestAnnotation2.testEnum.default");
 
-        Map<Class<? extends Annotation>, Map<Method, String>> result = getAnnotationPropertyDefaults(TestModule.class,
+        Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class,
                 configuration, TestAnnotation1.class, TestAnnotation2.class);
 
         TestEnum enumValue1 = getEnumValueReplaceDefault(TestAnnotation1.class, "testEnum", TestEnum.DEFAULT, result);
@@ -95,7 +96,7 @@ public class ModuleUtilsTest extends TestCase {
         configuration.remove("ModuleUtilsTest.TestModule.ModuleUtilsTest.TestAnnotation2.testEnum.default");
         configuration.setProperty("ModuleUtilsTest.TestModule.ModuleUtilsTest.TestAnnotation2.otherTestEnum.default", "VALUE2");
 
-        Map<Class<? extends Annotation>, Map<Method, String>> result = getAnnotationPropertyDefaults(TestModule.class,
+        Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class,
                 configuration, TestAnnotation1.class, TestAnnotation2.class);
 
         TestEnum enumValue1 = getEnumValueReplaceDefault(TestAnnotation1.class, "testEnum", TestEnum.DEFAULT, result);
@@ -114,7 +115,7 @@ public class ModuleUtilsTest extends TestCase {
      * Test the loading of the default values for no annotations. An empty map should have been returned.
      */
     public void testGetAnnotationEnumDefaults_noAnnotations() {
-        Map<Class<? extends Annotation>, Map<Method, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration);
+        Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration);
         assertTrue(result.isEmpty());
     }
 
@@ -123,7 +124,7 @@ public class ModuleUtilsTest extends TestCase {
      * Test get default enum replaced by default value.
      */
     public void testGetEnumValueReplaceDefault() {
-        Map<Class<? extends Annotation>, Map<Method, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration, TestAnnotation1.class);
+        Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration, TestAnnotation1.class);
 
         TestEnum enumValue1 = getEnumValueReplaceDefault(TestAnnotation1.class, "testEnum", TestEnum.DEFAULT, result);
         assertSame(TestEnum.VALUE1, enumValue1);
@@ -134,7 +135,7 @@ public class ModuleUtilsTest extends TestCase {
      * Test get enum value not replaced by default value.
      */
     public void testGetEnumValueReplaceDefault_normalValue() {
-        Map<Class<? extends Annotation>, Map<Method, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration, TestAnnotation1.class);
+        Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration, TestAnnotation1.class);
 
         TestEnum enumValue1 = getEnumValueReplaceDefault(TestAnnotation1.class, "testEnum", TestEnum.VALUE2, result);
         assertSame(TestEnum.VALUE2, enumValue1);
@@ -145,7 +146,7 @@ public class ModuleUtilsTest extends TestCase {
      * Test get enum value not replaced by default value. TestAnnotation2 has no default loaded.
      */
     public void testGetEnumValueReplaceDefault_noDefaultValueFound() {
-        Map<Class<? extends Annotation>, Map<Method, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration, TestAnnotation1.class);
+        Map<Class<? extends Annotation>, Map<String, String>> result = getAnnotationPropertyDefaults(TestModule.class, configuration, TestAnnotation1.class);
         try {
             getEnumValueReplaceDefault(TestAnnotation2.class, "testEnum", TestEnum.DEFAULT, result);
             fail("Expected UnitilsException");

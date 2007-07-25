@@ -75,7 +75,7 @@ public class InjectModule implements Module {
     private static final String PROPKEY_CREATE_TESTEDOBJECTS_IF_NULL_ENABLED = "InjectModule.TestedObject.createIfNull.enabled";
 
     /* Map holding the default configuration of the inject annotations */
-    private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
+    private Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
     /* List holding all values to restore after test was performed */
     private List<ValueToRestore> valuesToRestoreAfterTest = new ArrayList<ValueToRestore>();

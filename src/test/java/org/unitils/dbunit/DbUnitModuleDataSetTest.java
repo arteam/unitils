@@ -15,7 +15,6 @@
  */
 package org.unitils.dbunit;
 
-import static java.util.Arrays.asList;
 import static org.unitils.core.util.SQLUtils.executeUpdate;
 import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
 import static org.unitils.core.util.SQLUtils.getItemAsString;
@@ -88,7 +87,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for custom annotation on method-level overriding default annotation on class-level
      */
     public void testInsertTestData_customMethodDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod2"), new DataSetTest());
+        dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethod2"), new DataSetTest());
         assertLoadedDataSet("CustomDataSet.xml");
     }
 
@@ -98,7 +97,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_notFound() throws Exception {
         try {
-            dbUnitModule.insertTestData(DataSetTest.class.getMethod("testNotFound1"), new DataSetTest());
+            dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testNotFound1"), new DataSetTest());
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             //expected
@@ -111,7 +110,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      */
     public void testInsertTestData_customNotFound() throws Exception {
         try {
-            dbUnitModule.insertTestData(DataSetTest.class.getMethod("testNotFound2"), new DataSetTest());
+            dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testNotFound2"), new DataSetTest());
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             //expected
@@ -123,7 +122,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for custom annotation on method-level and no annotation on class-level
      */
     public void testInsertTestData_noClassDataSetCustomMethodDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod2"), new DataSetTestNoClassLevel());
+        dbUnitModule.insertDataSet(DataSetTestNoClassLevel.class.getMethod("testMethod2"), new DataSetTestNoClassLevel());
         assertLoadedDataSet("CustomDataSet.xml");
     }
 
@@ -133,7 +132,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * No data set should have been loaded.
      */
     public void testInsertTestData_noClassAndMethodDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTestNoClassLevel.class.getMethod("testMethod3"), new DataSetTestNoClassLevel());
+        dbUnitModule.insertDataSet(DataSetTestNoClassLevel.class.getMethod("testMethod3"), new DataSetTestNoClassLevel());
         Set<String> datasets = getItemsAsStringSet("select dataset from test", dataSource);
         assertTrue(datasets.isEmpty()); // nothing loaded
     }
@@ -143,17 +142,17 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for no annotation on method-level and custom annotation on class-level
      */
     public void testInsertTestData_customClassDataSet() throws Exception {
-        dbUnitModule.insertTestData(DataSetTestCustomClassLevel.class.getMethod("testMethod1"), new DataSetTestCustomClassLevel());
+        dbUnitModule.insertDataSet(DataSetTestCustomClassLevel.class.getMethod("testMethod1"), new DataSetTestCustomClassLevel());
         assertLoadedDataSet("CustomDataSet.xml");
     }
 
 
     /**
-     * Test for a direct call to {@link DbUnitModule#insertTestData(java.io.InputStream,org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy)}
+     * Test for a direct call to {@link DbUnitModule#insertDataSet(java.io.InputStream,org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy)}
      */
     public void testInsertTestData_directCall() throws Exception {
         InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
-		dbUnitModule.insertTestData(dataSetIS, new CleanInsertLoadStrategy(), dataSetFactory);
+		dbUnitModule.insertDataSet(dataSetIS, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
         assertLoadedDataSet("CustomDataSet.xml");
     }
     
@@ -166,7 +165,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * annotation is on the superclass method
      */
     public void testInsertTestData_methodOnSuperClassButInstanceOfSubClass_dataSetAnnotationOnMethod() throws Exception {
-    	dbUnitModule.insertTestData(DataSetTestSuperclass.class.getMethod("annotatedTestMethod"), new DataSetTestSubClass_dataSetAnnotationOnSubClass());
+    	dbUnitModule.insertDataSet(DataSetTestSuperclass.class.getMethod("annotatedTestMethod"), new DataSetTestSubClass_dataSetAnnotationOnSubClass());
     	assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestSubClass_dataSetAnnotationOnSubClass.xml");
     }
     
@@ -176,7 +175,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * annotation is on the superclass method
      */
     public void testInsertTestData_methodOnSuperClassButInstanceOfSubClass_dataSetAnnotationOnSuperclass() throws Exception {
-    	dbUnitModule.insertTestData(DataSetTestSuperclass_classLevelAnnotation.class.getMethod("testMethod"), new DataSetTestSubClass_dataSetAnnotationOnSuperClass());
+    	dbUnitModule.insertDataSet(DataSetTestSuperclass_classLevelAnnotation.class.getMethod("testMethod"), new DataSetTestSubClass_dataSetAnnotationOnSuperClass());
     	assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestSubClass_dataSetAnnotationOnSuperClass.xml");
     }
     
@@ -186,16 +185,18 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * annotation is on the superclass method
      */
     public void testInsertTestData_methodOnSuperClassButInstanceOfSubClass_dataSetAnnotationOnSubclass() throws Exception {
-    	dbUnitModule.insertTestData(DataSetTestSuperclass.class.getMethod("testMethod"), new DataSetTestSubClass_dataSetAnnotationOnSubClass());
+    	dbUnitModule.insertDataSet(DataSetTestSuperclass.class.getMethod("testMethod"), new DataSetTestSubClass_dataSetAnnotationOnSubClass());
     	assertLoadedDataSet("DbUnitModuleDataSetTest$DataSetTestSubClass_dataSetAnnotationOnSubClass.xml");
     }
     
     
     /**
      * Test for loading a dataset consisting of multiple dataset files
+     * 
+     * todo: make possible to define records in the same table in the two datasets
      */
     public void testInsertTestData_multipleDataSets() throws Exception {
-    	dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethodMultipleDataSets"), new DataSetTest());
+    	dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethodMultipleDataSets"), new DataSetTest());
     	assertLoadedDataSet("dataSet1.xml");
     	assertLenEquals("dataSet2.xml", getItemAsString("select dataset from test1", dataSource));
     }

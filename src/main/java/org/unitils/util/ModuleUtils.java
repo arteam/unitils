@@ -15,8 +15,8 @@
  */
 package org.unitils.util;
 
-import static org.unitils.util.AnnotationUtils.getAnnotationPropertyWithName;
 import static org.apache.commons.lang.ClassUtils.getShortClassName;
+
 import org.unitils.core.Module;
 import org.unitils.core.UnitilsException;
 
@@ -51,37 +51,59 @@ public class ModuleUtils {
      * @param annotationClasses The annotations for which we want the default values
      * @return An object that returns the annotation property default values
      */
-    public static Map<Class<? extends Annotation>, Map<Method, String>> getAnnotationPropertyDefaults(
+    public static Map<Class<? extends Annotation>, Map<String, String>> getAnnotationPropertyDefaults(
             Class<? extends Module> moduleClass, Properties configuration, Class<? extends Annotation>... annotationClasses) {
 
-        Map<Class<? extends Annotation>, Map<Method, String>> result = new HashMap<Class<? extends Annotation>, Map<Method, String>>();
+        Map<Class<? extends Annotation>, Map<String, String>> result = new HashMap<Class<? extends Annotation>, Map<String, String>>();
 
         for (Class<? extends Annotation> annotationClass : annotationClasses) {
 
             Method[] methods = annotationClass.getDeclaredMethods();
             for (Method method : methods) {
 
-                String propertyName = getShortClassName(moduleClass) + "." + getShortClassName(annotationClass) + "." +
-                        method.getName() + ".default";
+                String defaultValue = getAnnotationPropertyDefault(moduleClass, annotationClass, 
+                		method.getName(), configuration); 
 
-                if (!PropertyUtils.containsProperty(propertyName, configuration)) {
-                    continue;
-                }
-
-                Map<Method, String> defaultValueMap = result.get(annotationClass);
+                Map<String, String> defaultValueMap = result.get(annotationClass);
                 if (defaultValueMap == null) {
-                    defaultValueMap = new HashMap<Method, String>();
+                    defaultValueMap = new HashMap<String, String>();
                     result.put(annotationClass, defaultValueMap);
                 }
-                String defaultValueName = PropertyUtils.getString(propertyName, configuration);
-                defaultValueMap.put(method, defaultValueName);
+                defaultValueMap.put(method.getName(), defaultValue);
             }
         }
         return result;
     }
+    
+    
+    
 
 
     /**
+     * Returns the default for annotation property of the given annotation with the given name for
+     * the given moduleclass
+     * 
+	 * @param annotationClass
+	 * @param name
+	 * @param configuration
+	 * @return the default value
+	 */
+	public static String getAnnotationPropertyDefault(Class<? extends Module> moduleClass, 
+				Class<? extends Annotation> annotationClass, String name, Properties configuration) {
+		String propertyName = getShortClassName(moduleClass) + "." + getShortClassName(annotationClass) + "." +
+        name + ".default";
+
+		if (!PropertyUtils.containsProperty(propertyName, configuration)) {
+			return null;
+		}
+		return PropertyUtils.getString(propertyName, configuration);
+	}
+
+
+
+
+
+	/**
      * Replaces default enum value with the given default enum value.
      * If enumValue contains the value {@link #DEFAULT_ENUM_VALUE_NAME} the defaultValue will be returned otherwise
      * the enumValue itself will be returned.
@@ -93,7 +115,7 @@ public class ModuleUtils {
      * @return the enumValue or the defaultValue in case of a default
      */
     public static <T extends Enum<?>> T getEnumValueReplaceDefault(Class<? extends Annotation> annotation,
-                    String annotationPropertyName, T enumValue, Map<Class<? extends Annotation>, Map<Method, String>> allDefaultValues) {
+                    String annotationPropertyName, T enumValue, Map<Class<? extends Annotation>, Map<String, String>> allDefaultValues) {
 
         return getEnumValueReplaceDefault(annotation, annotationPropertyName, enumValue, allDefaultValues, DEFAULT_ENUM_VALUE_NAME);
     }
@@ -112,11 +134,10 @@ public class ModuleUtils {
      * @param defaultValueName  the name of the default value
      */
     public static <T extends Enum<?>> T getEnumValueReplaceDefault(Class<? extends Annotation> annotation,
-                    String annotationPropertyName, T enumValue, Map<Class<? extends Annotation>, Map<Method, String>> allDefaultValues,
+                    String annotationPropertyName, T enumValue, Map<Class<? extends Annotation>, Map<String, String>> allDefaultValues,
                     String defaultValueName) {
 
-        Method annotationProperty = getAnnotationPropertyWithName(annotation, annotationPropertyName);
-        String valueAsString = getValueAsStringReplaceDefault(annotation, annotationProperty, enumValue.name(),
+        String valueAsString = getValueAsStringReplaceDefault(annotation, annotationPropertyName, enumValue.name(),
                 allDefaultValues, defaultValueName);
         //noinspection unchecked
         return (T) ReflectionUtils.getEnumValue(enumValue.getClass(), valueAsString);
@@ -136,11 +157,10 @@ public class ModuleUtils {
      * @return the enumValue or the defaultValue in case of a default
      */
     public static Class<?> getClassValueReplaceDefault(Class<? extends Annotation> annotation,
-                    String annotationPropertyName, Class<?> value, Map<Class<? extends Annotation>, Map<Method, String>> allDefaultValues,
+                    String annotationPropertyName, Class<?> value, Map<Class<? extends Annotation>, Map<String, String>> allDefaultValues,
                     Class<?> defaultValueClass) {
 
-        Method annotationProperty = getAnnotationPropertyWithName(annotation, annotationPropertyName);
-        String valueAsString = getValueAsStringReplaceDefault(annotation, annotationProperty, value.getName(),
+        String valueAsString = getValueAsStringReplaceDefault(annotation, annotationPropertyName, value.getName(),
                 allDefaultValues, defaultValueClass.getName());
         return ReflectionUtils.getClassWithName(valueAsString);
     }
@@ -157,15 +177,15 @@ public class ModuleUtils {
      * @param defaultValueName   the name of the default value, eg DEFAULT, not null @return the enumValue or the defaultValue in case of a default
      * @return The default value as a string
      */
-    private static String getValueAsStringReplaceDefault(Class<? extends Annotation> annotation, Method annotationProperty, String valueAsString,
-                                                         Map<Class<? extends Annotation>, Map<Method, String>> allDefaultValues, String defaultValueName) {
+    private static String getValueAsStringReplaceDefault(Class<? extends Annotation> annotation, String annotationProperty, String valueAsString,
+                                                         Map<Class<? extends Annotation>, Map<String, String>> allDefaultValues, String defaultValueName) {
 
         if (!defaultValueName.equalsIgnoreCase(valueAsString)) {
             // no replace needed
             return valueAsString;
         }
 
-        Map<Method, String> defaultValues = allDefaultValues.get(annotation);
+        Map<String, String> defaultValues = allDefaultValues.get(annotation);
         if (defaultValues != null) {
             //noinspection SuspiciousMethodCalls
             String defaultValueAsString = defaultValues.get(annotationProperty);
@@ -175,7 +195,7 @@ public class ModuleUtils {
             }
         }
         // nothing found, raise exception
-        throw new UnitilsException("Could not replace default value. No default value found for annotation: " + annotation + ", property " + annotationProperty.getName() + ", defaultValues: " + allDefaultValues);
+        throw new UnitilsException("Could not replace default value. No default value found for annotation: " + annotation + ", property " + annotationProperty + ", defaultValues: " + allDefaultValues);
     }
 
 }

@@ -19,8 +19,8 @@ import org.unitils.dbmaintainer.util.DatabaseTask;
 
 
 /**
- * Defines the contract for implementations that clear a database schema, so that it can be recreated from scratch by
- * the {@link org.unitils.dbmaintainer.DBMaintainer}
+ * Defines the contract for implementations that clear a database schema, so that it can for instance 
+ * be recreated from scratch by the {@link org.unitils.dbmaintainer.DBMaintainer}
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -29,7 +29,7 @@ public interface DBClearer extends DatabaseTask {
 
 
     /**
-     * Clears the database schema.
+     * Clears the database schemas.
      */
     void clearSchemas();
 

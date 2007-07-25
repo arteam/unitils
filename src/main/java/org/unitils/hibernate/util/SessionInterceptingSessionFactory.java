@@ -19,10 +19,13 @@ import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
+import org.unitils.database.DatabaseModule;
 
 /**
  * A wrapper for a Hibernate session factory that will intercept all opened session factories and
@@ -33,6 +36,9 @@ import org.hibernate.classic.Session;
  */
 public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSessionFactoryProxy {
 
+	/* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(SessionInterceptingSessionFactory.class);
+	
     /**
      * The intercepted sessions.
      */
@@ -134,6 +140,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
     public void closeOpenSessions() {
         for (org.hibernate.Session session : sessions) {
             if (session.isOpen()) {
+            	logger.info("Closing hibernate session " + session);
                 session.close();
             }
         }
@@ -147,6 +154,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
     public void flushOpenSessions() {
         for (org.hibernate.Session session : sessions) {
             if (session.isOpen()) {
+            	logger.info("Flushing hibernate session " + session);
                 session.flush();
             }
         }

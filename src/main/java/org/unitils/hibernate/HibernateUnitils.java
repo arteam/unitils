@@ -34,13 +34,23 @@ public class HibernateUnitils {
      * correctly configured.
      */
     public static void assertMappingWithDatabaseConsistent() {
-        Unitils unitils = Unitils.getInstance();
-        Object testObject = unitils.getTestContext().getTestObject();
-        if (testObject == null) {
-            throw new UnitilsException("Unable to assert hibernate mapping for current test. No current test found.");
-        }
-        HibernateModule hibernateModule = unitils.getModulesRepository().getModuleOfType(HibernateModule.class);
-        hibernateModule.assertMappingWithDatabaseConsistent(testObject);
+        Object testObject = getTestObject();
+        getHibernateModule().assertMappingWithDatabaseConsistent(testObject);
+    }
+
+
+    /**
+     * Closes all open Hibernate session.
+     */
+    public static void closeSessions() {
+    	Object testObject = getTestObject();
+		getHibernateModule().closeSessions(testObject);
+    }
+    
+    
+    public static void flushDatabaseUpdates() {
+    	Object testObject = getTestObject();
+    	getHibernateModule().flushDatabaseUpdates(testObject);
     }
 
 
@@ -52,8 +62,27 @@ public class HibernateUnitils {
      * @param classes The classes for which to reset the configs, null for all configs
      */
     public static void invalidateHibernateConfiguration(Class<?>... classes) {
-        HibernateModule hibernateModule = Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
-        hibernateModule.invalidateConfiguration(classes);
+        getHibernateModule().invalidateConfiguration(classes);
     }
+    
+    
+    /**
+	 * @return The current test object
+	 */
+	private static Object getTestObject() {
+		Object testObject = Unitils.getInstance().getTestContext().getTestObject();
+        if (testObject == null) {
+            throw new UnitilsException("No current test found in context. Unable to execute specified operation");
+        }
+		return testObject;
+	}
+    
+    
+    /**
+	 * @return The {@link HibernateModule}
+	 */
+	private static HibernateModule getHibernateModule() {
+		return Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
+	}
 
 }
