@@ -75,7 +75,7 @@ public class EasyMockModule implements Module {
     private List<MocksControl> mocksControls;
 
     /* Map holding the default configuration of the mock annotations */
-    private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
+    private Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
     /* Indicates whether verify() is automatically called on every mock object after each test method execution */
     private boolean autoVerifyAfterTestEnabled;

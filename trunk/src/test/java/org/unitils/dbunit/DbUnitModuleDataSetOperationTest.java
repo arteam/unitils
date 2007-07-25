@@ -66,12 +66,12 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
     }
 
     public void testLoadDataSet_defaultDataSetOperation() throws Exception {
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethod1"), new DataSetTest());
+        dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethod1"), new DataSetTest());
         assertLoadedDataSet("DbUnitModuleDataSetOperationTest$DataSetTest.xml");
     }
 
     public void testLoadDataSet_customDataSetOperation() throws Exception {
-        dbUnitModule.insertTestData(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"), new DataSetTest());
+        dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"), new DataSetTest());
         assertTrue(MockDataSetLoadStrategy.operationExecuted);
     }
 

@@ -77,7 +77,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
     public void testDataSet() throws Exception {
     	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod1");
-        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.insertDataSet(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
@@ -88,7 +88,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
     public void testInsertTestData_customMethodDataSet() throws Exception {
     	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod2");
-        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.insertDataSet(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
@@ -99,7 +99,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
     public void testInsertTestData_classAndMethodDataSet() throws Exception {
     	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod3");
-        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.insertDataSet(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
@@ -156,7 +156,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
     public void testInsertTestData_noClassDataSet() throws Exception {
     	Object testObject = new ExpectedDataSetTestNoClassLevel();
         Method testMethod = ExpectedDataSetTestNoClassLevel.class.getMethod("testMethod1");
-        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.insertDataSet(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
@@ -167,7 +167,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
     public void testInsertTestData_noClassDataSetCustomMethodDataSet() throws Exception {
     	Object testObject = new ExpectedDataSetTest();
         Method testMethod = ExpectedDataSetTestNoClassLevel.class.getMethod("testMethod2");
-        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.insertDataSet(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
@@ -178,7 +178,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
     public void testInsertTestData_noClassAndMethodDataSet() throws Exception {
     	Object testObject = new ExpectedDataSetTestNoClassLevel();
         Method testMethod = ExpectedDataSetTestNoClassLevel.class.getMethod("testMethod3");
-        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.insertDataSet(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
@@ -189,7 +189,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
     public void testInsertTestData_customClassDataSet() throws Exception {
     	Object testObject = new ExpectedDataSetTestCustomClassLevel();
         Method testMethod = ExpectedDataSetTestCustomClassLevel.class.getMethod("testMethod1");
-        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.insertDataSet(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
@@ -200,7 +200,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit3 {
     public void testInsertTestData_customClassDataSetOverridenByDefault() throws Exception {
     	Object testObject = new ExpectedDataSetTestCustomClassLevel();
         Method testMethod = ExpectedDataSetTestCustomClassLevel.class.getMethod("testMethod2");
-        dbUnitModule.insertTestData(testMethod, testObject);
+        dbUnitModule.insertDataSet(testMethod, testObject);
         dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
     

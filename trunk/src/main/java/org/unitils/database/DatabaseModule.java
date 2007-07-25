@@ -31,7 +31,15 @@ import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
 import static org.unitils.database.util.TransactionMode.*;
+
 import org.unitils.dbmaintainer.DBMaintainer;
+import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
+import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
+import org.unitils.dbmaintainer.structure.SequenceUpdater;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import org.unitils.dbmaintainer.util.DatabaseTask;
+
 import static org.unitils.util.AnnotationUtils.*;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
@@ -77,7 +85,7 @@ public class DatabaseModule implements Module {
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
     /* Map holding the default configuration of the database module annotations */
-    private Map<Class<? extends Annotation>, Map<Method, String>> defaultAnnotationPropertyValues;
+    private Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
     /* The datasource instance */
     private TransactionalDataSource dataSource;
@@ -137,12 +145,13 @@ public class DatabaseModule implements Module {
      * be checked directly on the database.
      * <p/>
      * This will look for modules that implement {@link Flushable} and call flushDatabaseUpdates on these module.
+     * @param testObject TODO
      */
-    public void flushDatabaseUpdates() {
+    public void flushDatabaseUpdates(Object testObject) {
         logger.info("Flushing database updates.");
         List<Flushable> flushables = Unitils.getInstance().getModulesRepository().getModulesOfType(Flushable.class);
         for (Flushable flushable : flushables) {
-            flushable.flushDatabaseUpdates();
+            flushable.flushDatabaseUpdates(testObject);
         }
     }
 
@@ -152,7 +161,7 @@ public class DatabaseModule implements Module {
      * latest changes. See {@link DBMaintainer} for more information.
      */
     public void updateDatabase() {
-        updateDatabase(new SQLHandler(getDataSource()));
+        updateDatabase(getDefaultSqlHandler());
     }
 
 
@@ -183,10 +192,10 @@ public class DatabaseModule implements Module {
      * reinitializing the database after having reorganized the scripts folder.
      */
     public void setDatabaseToCurrentVersion() {
-        setDatabaseToCurrentVersion(new SQLHandler(getDataSource()));
+        setDatabaseToCurrentVersion(getDefaultSqlHandler());
     }
-    
-    
+
+
     /**
      * Updates the database version to the current version, without issuing any other updates to the database.
      * This method can be used for example after you've manually brought the database to the latest version, but
@@ -296,6 +305,66 @@ public class DatabaseModule implements Module {
             transactionManager.rollback(testObject);
         }
     }
+    
+    
+    /**
+	 * Clears all configured schema's. I.e. drops all tables, views and other database objects.
+	 */
+	public void clearSchemas() {
+		getConfiguredDatabaseTaskInstance(DBClearer.class).clearSchemas();
+	}
+	
+	
+	/**
+	 * Cleans all configured schema's. I.e. removes all data from its database tables.
+	 */
+	public void cleanSchemas() {
+		getConfiguredDatabaseTaskInstance(DBClearer.class).clearSchemas();
+	}
+	
+	
+	/**
+	 * Disables all foreigh key and not-null constraints on the configured schema's.
+	 */
+	public void disableConstraints() {
+		getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class).disableConstraints();
+	}
+	
+	
+	/**
+	 * Updates all sequences that have a value below a certain configurable treshold to become equal 
+	 * to this treshold
+	 */
+	public void updateSequences() {
+		getConfiguredDatabaseTaskInstance(SequenceUpdater.class).updateSequences();
+	}
+	
+	
+	/**
+	 * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
+	 * describes the structure of the database.
+	 */
+	public void generateDatasetDefinition() {
+		getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class).generateDataSetStructure();
+	}
+
+
+	/**
+	 * @return A configured instance of {@link DatabaseTask} of the given type
+	 */
+	private <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
+		return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, 
+				getDefaultSqlHandler());
+	}
+	
+	
+	/**
+	 * @return The default SQLHandler, which simply executes the sql statements on the unitils-configured
+	 * test database
+	 */
+	protected SQLHandler getDefaultSqlHandler() {
+		return new SQLHandler(getDataSource());
+	}
 
 
     /**

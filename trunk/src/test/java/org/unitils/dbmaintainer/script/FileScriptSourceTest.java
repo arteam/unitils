@@ -67,7 +67,8 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Cleans test directory and copies test files to it. Initializes test objects
      */
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
 
         // Create test directory
