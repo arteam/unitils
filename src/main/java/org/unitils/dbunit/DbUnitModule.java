@@ -212,7 +212,7 @@ public class DbUnitModule implements Module {
      */
     public void insertDataSet(InputStream inputStream, Class<? extends DataSetFactory> dataSetFactoryClass, 
     		Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
-    	DataSetLoadStrategy dataSetLoadStrategy = ReflectionUtils.createInstanceOfType(DataSetLoadStrategy.class, false);
+    	DataSetLoadStrategy dataSetLoadStrategy = ReflectionUtils.createInstanceOfType(dataSetLoadStrategyClass, false);
     	DataSetFactory dataSetFactory = ReflectionUtils.createInstanceOfType(dataSetFactoryClass, false);
     	insertDataSet(inputStream, dataSetFactory, dataSetLoadStrategy);
     }
