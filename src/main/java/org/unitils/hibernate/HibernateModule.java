@@ -251,8 +251,10 @@ public class HibernateModule implements Module, Flushable {
      * needed.
      */
     public void flushDatabaseUpdates(Object testObject) {
-        SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
-    	sessionFactory.flushOpenSessions();
+    	if (isSessionFactoryConfiguredFor(testObject)) {
+	        SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
+	    	sessionFactory.flushOpenSessions();
+    	}
     }
 
 
