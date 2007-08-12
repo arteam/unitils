@@ -124,6 +124,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockVersionSource.setDbVersion(version1);
         mockScriptRunner.execute("Script 2");
         mockVersionSource.setDbVersion(version2);
+        expect(mockScriptSource.getAllPostProcessingCodeScripts()).andReturn(new ArrayList<Script>());
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDataSetStructureGenerator.generateDataSetStructure();
@@ -153,6 +154,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockVersionSource.setDbVersion(version1);
         mockScriptRunner.execute("Script 2");
         mockVersionSource.setDbVersion(version2);
+        expect(mockScriptSource.getAllPostProcessingCodeScripts()).andReturn(new ArrayList<Script>());
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDataSetStructureGenerator.generateDataSetStructure();

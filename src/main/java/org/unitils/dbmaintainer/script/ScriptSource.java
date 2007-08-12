@@ -15,11 +15,11 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import java.util.List;
-
 import org.unitils.dbmaintainer.util.DatabaseTask;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
+
+import java.util.List;
 
 /**
  * Defines the contract for a source that provides scripts for updating the database to a given state.<br>
@@ -35,13 +35,13 @@ public interface ScriptSource extends DatabaseTask {
 
 
     /**
-     * Returns the current version of the scripts, i.e. the Version object as it would 
+     * Returns the current version of the scripts, i.e. the Version object as it would
      * be returned by a database that is up-to-date with the current script base.
-     * 
+     *
      * @return the current version of the scripts
      */
     public Version getCurrentVersion();
-    
+
     /**
      * This methods returns true if one or more scripts that have a version index equal to or lower than
      * the index specified by the given version object has been modified since the timestamp specfied by
@@ -56,14 +56,14 @@ public interface ScriptSource extends DatabaseTask {
     /**
      * @param currentVersion The current database version, not null
      * @return A List containing the scripts that need to be executed to update the database
-     *         from the given version to the latest one.
+     *         from the given version to the latest one, not null
      */
     List<VersionScriptPair> getNewScripts(Version currentVersion);
 
 
     /**
      * @return A List containing all available database update scripts. These scripts
-     *         can be used to completely recreate the database from scratch.
+     *         can be used to completely recreate the database from scratch, not null
      */
     List<VersionScriptPair> getAllScripts();
 
@@ -75,13 +75,13 @@ public interface ScriptSource extends DatabaseTask {
 
 
     /**
-     * @return All the code scripts that are currently available
+     * @return All the code scripts that are currently available, not null
      */
     List<Script> getAllCodeScripts();
-    
-    
+
+
     /**
-     * @return All the postprocessing code scripts that are currently available
+     * @return All the postprocessing code scripts that are currently available, not null
      */
     List<Script> getAllPostProcessingCodeScripts();
 
