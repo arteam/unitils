@@ -15,17 +15,6 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.readFileToString;
-import static org.unitils.util.PropertyUtils.getStringList;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
@@ -37,13 +26,19 @@ import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.readFileToString;
+import static org.unitils.util.PropertyUtils.getStringList;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Implementation of {@link ScriptSource} that reads script files from the filesystem. <p/> Script
  * files should be located in the directory configured by {@link #PROPKEY_SCRIPTFILES_LOCATIONS}.
  * Valid script files start with a version number followed by an underscore, and end with the
  * extension configured by {@link #PROPKEY_SCRIPTFILES_FILEEXTENSIONS}.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -60,8 +55,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * Property key for the directory in which the code script files are located
      */
     public static final String PROPKEY_CODESCRIPTFILES_LOCATIONS = "dbMaintainer.fileScriptSource.code.locations";
-    
-    
+
+
     /**
      * Property key for the directory in which the code script files are located
      */
@@ -77,15 +72,15 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      */
     public static final String PROPKEY_CODESCRIPTFILES_FILEEXTENSIONS = "dbMaintainer.fileScriptSource.code.fileExtensions";
 
-    private ScriptFilesSpecification scriptFilesSpecification, codeScriptFilesSpecification, 
-            postProcessingCodeScriptFilesSpecification;
+
+    private ScriptFilesSpecification scriptFilesSpecification, codeScriptFilesSpecification, postProcessingCodeScriptFilesSpecification;
+
 
     /**
      * Uses the given configuration to initialize the script files directory, and the file extension
      * of the script files.
-     * 
-     * @param configuration
-     *        The configuration, not null
+     *
+     * @param configuration The configuration, not null
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -94,8 +89,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
         verifyExistence(scriptFileLocations, PROPKEY_SCRIPTFILES_LOCATIONS);
         if (scriptFileLocations.isEmpty()) {
             logger.warn("No directories or files are specificied using the property "
-                    + PROPKEY_SCRIPTFILES_LOCATIONS
-                    + ". The Unitils database maintainer won't do anyting");
+                    + PROPKEY_SCRIPTFILES_LOCATIONS + ". The Unitils database maintainer won't do anyting");
         }
         final List<String> scriptFileExtensions = getStringList(PROPKEY_SCRIPTFILES_FILEEXTENSIONS, configuration);
         verifyScriptFileExtionsions(scriptFileExtensions);
@@ -103,40 +97,46 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
             public List<String> getFileExtensions() {
                 return scriptFileExtensions;
             }
+
             public List<String> getFileLocations() {
                 return scriptFileLocations;
             }
+
             public boolean isExcludeFilesWithoutIndex() {
                 return true;
             }
         };
-        
+
         final List<String> codeScriptFileLocations = getStringList(PROPKEY_CODESCRIPTFILES_LOCATIONS, configuration);
         verifyExistence(codeScriptFileLocations, PROPKEY_CODESCRIPTFILES_LOCATIONS);
-        final List<String> codeScriptFileExtensions = getStringList(PROPKEY_CODESCRIPTFILES_FILEEXTENSIONS,
-                configuration);
+        final List<String> codeScriptFileExtensions = getStringList(PROPKEY_CODESCRIPTFILES_FILEEXTENSIONS, configuration);
+
         verifyScriptFileExtionsions(codeScriptFileExtensions);
         codeScriptFilesSpecification = new ScriptFilesSpecification() {
             public List<String> getFileExtensions() {
                 return codeScriptFileExtensions;
             }
+
             public List<String> getFileLocations() {
                 return codeScriptFileLocations;
             }
+
             public boolean isExcludeFilesWithoutIndex() {
                 return false;
             }
         };
-        
+
         final List<String> postProcessingCodeScriptFileLocations = getStringList(PROPKEY_POSTPROCESSINGCODESCRIPTFILES_LOCATIONS, configuration);
         verifyExistence(postProcessingCodeScriptFileLocations, PROPKEY_POSTPROCESSINGCODESCRIPTFILES_LOCATIONS);
         postProcessingCodeScriptFilesSpecification = new ScriptFilesSpecification() {
             public List<String> getFileExtensions() {
                 return codeScriptFileExtensions;
             }
+
             public List<String> getFileLocations() {
                 return postProcessingCodeScriptFileLocations;
             }
+
             public boolean isExcludeFilesWithoutIndex() {
                 return false;
             }
@@ -145,14 +145,13 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     /**
      * Verifies the correctness of the script file extension list
-     * 
-     * @param fileExtensions
+     *
+     * @param fileExtensions The extensions to check
      */
     private void verifyScriptFileExtionsions(List<String> fileExtensions) {
         for (String fileExtension : fileExtensions) {
             if (fileExtension.startsWith(".")) {
-                throw new UnitilsException("FileScriptSource file extension defined by "
-                        + PROPKEY_SCRIPTFILES_FILEEXTENSIONS + " should not start with a '.'");
+                throw new UnitilsException("FileScriptSource file extension defined by " + PROPKEY_SCRIPTFILES_FILEEXTENSIONS + " should not start with a '.'");
             }
         }
     }
@@ -160,19 +159,16 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     /**
      * Verfies that directories and files in the given list of fileLocations exist on the file
      * system. If one of them doesn't exist, an exception is thrown
-     * 
-     * @param fileLocations
-     *        The directories and files that need to be checked
-     * @param propertyName
-     *        The name of the property, to be included in the error message if one of the locations
-     *        doesn't exist
+     *
+     * @param fileLocations The directories and files that need to be checked
+     * @param propertyName  The name of the property, to be included in the error message if one of the locations
+     *                      doesn't exist
      */
     protected void verifyExistence(List<String> fileLocations, String propertyName) {
         for (String fileLocation : fileLocations) {
             File file = new File(fileLocation);
             if (!file.exists()) {
-                throw new UnitilsException("File location " + fileLocation
-                        + " defined in property " + propertyName + " doesn't exist");
+                throw new UnitilsException("File location " + fileLocation + " defined in property " + propertyName + " doesn't exist");
             }
         }
     }
@@ -180,7 +176,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     /**
      * Returns the current version of the scripts, i.e. the Version object as it would be returned
      * by a database that is up-to-date with the current script base.
-     * 
+     *
      * @return the current version of the scripts
      */
     public Version getCurrentVersion() {
@@ -194,9 +190,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * Returns true if one or more scripts that have a version index equal to or lower than the
      * index specified by the given version object has been modified since the timestamp specfied by
      * the given version.
-     * 
-     * @param currentVersion
-     *        The current database version, not null
+     *
+     * @param currentVersion The current database version, not null
      * @return true if an existing script has been modified, false otherwise
      */
     public boolean existingScriptsModified(Version currentVersion) {
@@ -207,9 +202,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     /**
      * Returns a <code>List<VersionScriptPair></code> containing the statements that will update
      * the database from the given version to the latest one.
-     * 
-     * @param currentVersion
-     *        The current database version
+     *
+     * @param currentVersion The current database version
      * @return A List<VersionScriptPair> containing the scripts that need to be executed to update
      *         the database version to the latest one.
      */
@@ -238,8 +232,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     public List<Script> getAllCodeScripts() {
         return getScriptsFromFiles(getScriptFilesSorted(codeScriptFilesSpecification));
     }
-    
-    
+
+
     /**
      * @return All the postprocessing code scripts that are currently available
      */
@@ -247,10 +241,9 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
         return getScriptsFromFiles(getScriptFilesSorted(postProcessingCodeScriptFilesSpecification));
     }
 
-    
+
     /**
-     * @param currentVersion
-     *        The current database version, not null
+     * @param currentVersion The current database version, not null
      * @return The highest timestamp of all the scripts that were already executed
      */
     private Long getTimestampOfAlreadyExecutedScripts(final Version currentVersion) {
@@ -270,9 +263,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     /**
      * Returns all available script files, sorted according to their version number
-     * 
-     * @param filesSpecification 
-     *        Specification describing the files that can be regarded as a script file
+     *
+     * @param filesSpecification Specification describing the files that can be regarded as a script file
      * @return All available script files, sorted according to their version number
      */
     protected List<File> getScriptFilesSorted(ScriptFilesSpecification filesSpecification) {
@@ -282,8 +274,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     /**
      * Returns all available script files that can be found in one of the given directories or their
-     * @param filesSpecification 
-     *        Specification describing the files that can be regarded as a script file
+     *
+     * @param filesSpecification Specification describing the files that can be regarded as a script file
      * @return All available script files
      */
     protected List<File> getScriptFiles(ScriptFilesSpecification filesSpecification) {
@@ -297,15 +289,13 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     /**
      * Adds all script files available in the given directory or one of its subdirectories to the
      * given List of files
-     * @param filesSpecification 
-     *        Specification describing the files that can be regarded as a script file
-     * @param filesLocation
-     *        The directory where the files are located
-     * @param files
-     *        The list to which the available script files have to be added
+     *
+     * @param filesSpecification Specification describing the files that can be regarded as a script file
+     * @param filesLocation      The directory where the files are located
+     * @param files              The list to which the available script files have to be added
      */
     protected void getAllFilesIn(ScriptFilesSpecification filesSpecification,
-            File filesLocation, List<File> files) {
+                                 File filesLocation, List<File> files) {
         if (filesLocation.isDirectory()) {
             for (File subLocation : filesLocation.listFiles()) {
                 getAllFilesIn(filesSpecification, subLocation, files);
@@ -319,11 +309,9 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     /**
      * Indicates if the given file is regarded as a script file
-     * 
-     * @param file
-     *        The file
-     * @param scriptFileSpecification 
-     *        Specification describing the files that can be regarded as a script file
+     *
+     * @param file                    The file
+     * @param scriptFileSpecification Specification describing the files that can be regarded as a script file
      * @return True if the given file is regarded as a script file.
      */
     protected boolean isScriptFile(File file, ScriptFilesSpecification scriptFileSpecification) {
@@ -353,9 +341,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     /**
      * Sorts the given list of script files according to their index number
-     * 
-     * @param files
-     *        the list of files, not null
+     *
+     * @param files the list of files, not null
      * @return The sorted list of script files
      */
     protected List<File> sortFilesByIndex(List<File> files) {
@@ -373,9 +360,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     /**
      * Returns the version index of the given script file
-     * 
-     * @param scriptFile
-     *        The file containing a script
+     *
+     * @param scriptFile The file containing a script
      * @return The version of the script file
      */
     protected Long getIndex(File scriptFile) {
@@ -389,23 +375,22 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
             return -1L;
         }
     }
-    
-    
+
+
     /**
      * Returns the highest timestamp of all the scriptFiles that adhere to the given {@link ScriptFilesSpecification}
-     * 
+     *
      * @param scriptFilesSpecification The specification the scriptFiles should adhere to
-     * @return The highest timestamp 
+     * @return The highest timestamp
      */
     protected Long getHighestScriptTimestamp(ScriptFilesSpecification scriptFilesSpecification) {
-    	return getHighestScriptTimestamp(getScriptFiles(scriptFilesSpecification));
+        return getHighestScriptTimestamp(getScriptFiles(scriptFilesSpecification));
     }
 
     /**
      * Returns the highest timestamp of the given list of scriptFiles.
-     * 
-     * @param scriptFiles
-     *        the list of files, not null
+     *
+     * @param scriptFiles the list of files, not null
      * @return highest timestamp of the given scriptFiles with index lower than maxIndex
      */
     protected Long getHighestScriptTimestamp(List<File> scriptFiles) {
@@ -418,9 +403,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     /**
      * Returns all script files having a higher version index than the given one
-     * 
-     * @param currentVersion
-     *        The current database version, not null
+     *
+     * @param currentVersion The current database version, not null
      * @return all script files having a newer version than the given one
      */
     protected List<File> getScriptFilesWithHigherIndex(long currentVersion) {
@@ -437,9 +421,8 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     /**
      * Returns the scripts from the given list of script files as a list of
      * <code>VersionScriptPair</code> objects
-     * 
-     * @param files
-     *        The script files
+     *
+     * @param files The script files
      * @return The scripts as a list of <code>VersionScriptPair</code> objects
      */
     protected List<VersionScriptPair> getVersionScriptPairsFromFiles(List<File> files) {
@@ -448,8 +431,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
         for (File file : files) {
             try {
                 scripts.add(new VersionScriptPair(new Version(getIndex(file), timeStamp),
-                        new Script(file.getName(), readFileToString(file, System
-                                .getProperty("file.encoding")))));
+                        new Script(file.getName(), readFileToString(file, System.getProperty("file.encoding")))));
             } catch (IOException e) {
                 throw new UnitilsException("Error while trying to read file " + file);
             }
@@ -459,30 +441,30 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
     /**
      * Returns a List with the content of the given files as strings
-     * 
-     * @param files
-     *        The files containing database update scripts
+     *
+     * @param files The files containing database update scripts
      * @return The database update scripts as as list of strings
      */
     protected List<Script> getScriptsFromFiles(List<File> files) {
         List<Script> scripts = new ArrayList<Script>();
         for (File file : files) {
             try {
-                scripts.add(new Script(file.getName(), readFileToString(file, System
-                        .getProperty("file.encoding"))));
+                scripts.add(new Script(file.getName(), readFileToString(file, System.getProperty("file.encoding"))));
             } catch (IOException e) {
                 throw new UnitilsException("Error while trying to read file " + file);
             }
         }
         return scripts;
     }
-    
+
+
+    //todo javadoc
     protected interface ScriptFilesSpecification {
-        
+
         List<String> getFileExtensions();
-        
+
         List<String> getFileLocations();
-        
+
         boolean isExcludeFilesWithoutIndex();
     }
 
