@@ -16,6 +16,8 @@
 package org.unitils.dbunit.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.DataType;
 import org.unitils.core.UnitilsException;
@@ -64,6 +66,9 @@ import java.util.Map;
  */
 public class MultiSchemaXmlDataSetReader {
 
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(MultiSchemaXmlDataSetReader.class);
+
     /* The schema name to use when none is specified */
     private String defaultSchemaName;
 
@@ -81,9 +86,9 @@ public class MultiSchemaXmlDataSetReader {
     /**
      * Parses the datasets from the given input stream.
      * Each schema is given its own dataset.
-     * 
+     *
      * @param multiSchemaDataSet Object that aggregates all dbunit datasets into one multi-schema dataset
-     * @param in the xml content stream, not null
+     * @param in                 the xml content stream, not null
      */
     public void readDataSetXml(MultiSchemaDataSet multiSchemaDataSet, InputStream in) {
         try {
@@ -111,15 +116,32 @@ public class MultiSchemaXmlDataSetReader {
             SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
             saxParserFactory.setNamespaceAware(true);
 
-            // disable validation, so dataset can still be used when a DTD or XSD is missing 
-            saxParserFactory.setValidating(false);
-            saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
+            // disable validation, so dataset can still be used when a DTD or XSD is missing
+            disableValidation(saxParserFactory);
             return saxParserFactory.newSAXParser().getXMLReader();
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to create SAX parser to read data set xml.", e);
+        }
+    }
+
+
+    /**
+     * Disables validation on the given sax parser factory.
+     *
+     * @param saxParserFactory The factory, not null
+     */
+    protected void disableValidation(SAXParserFactory saxParserFactory) {
+        saxParserFactory.setValidating(false);
+        try {
+            saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        } catch (Exception e) {
+            logger.debug("Unable to set http://xml.org/sax/features/external-parameter-entities feature on SAX parser factory to false. Igoring exception: " + e.getMessage());
+        }
+        try {
+            saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        } catch (Exception e) {
+            logger.debug("Unable to set http://apache.org/xml/features/nonvalidating/load-external-dtd feature on SAX parser factory to false. Igoring exception: " + e.getMessage());
         }
     }
 
@@ -148,7 +170,7 @@ public class MultiSchemaXmlDataSetReader {
 
         /**
          * Adds all dbunit dataset to the given {@link MultiSchemaDataSet} aggregation object
-
+         *
          * @param multiSchemaDataSet Object that aggregates all dbunit datasets into one multi-schema dataset
          */
         public void addDataSets(MultiSchemaDataSet multiSchemaDataSet) {
