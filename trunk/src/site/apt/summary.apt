@@ -73,6 +73,13 @@ Summary
 
 * News
 ~~~~~~
+    <<2007-08-15 - Release of Unitils 1.0 rc 4>>
+  
+    Release candidate 4 for Unitils is available. It contains some important fixes, support for loading multiple data sets and easier access to 
+    the behavior of the dbmaintainer. Note that this version is not fully backwards compatible with rc 3, there is a small 
+    change in the default behavior of the @DataSet annotation. A migration path is available {{{migration.html} here}}.
+    
+    
     <<2007-06-20 - Release of Unitils 1.0 rc 3>>
   
     Release candidate 3 for Unitils is available. It contains multi-schema support, transactional testing support and support for Db2.
