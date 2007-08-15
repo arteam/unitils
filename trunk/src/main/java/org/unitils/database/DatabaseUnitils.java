@@ -23,24 +23,25 @@ import javax.sql.DataSource;
 /**
  * Class providing access to the functionality of the database module using static methods. Meant
  * to be used directly in unit tests.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class DatabaseUnitils {
-	
-	
-	/**
+
+
+    /**
      * Returns the DataSource that connects to the test database
+     *
      * @return The DataSource that connects to the test database
      */
-	public static DataSource getDataSource() {
-		return getDatabaseModule().getDataSource();
-	}
-	
-	
-	/**
-     * Flushes all pending updates to the database. This method is useful when the effect of updates 
+    public static DataSource getDataSource() {
+        return getDatabaseModule().getDataSource();
+    }
+
+
+    /**
+     * Flushes all pending updates to the database. This method is useful when the effect of updates
      * needs to be checked directly on the database.
      * <p/>
      * A typical usage of this method is, when updates were issues to the database using hibernate,
@@ -48,21 +49,21 @@ public class DatabaseUnitils {
      * using plain old JDBC.
      */
     public void flushDatabaseUpdates() {
-    	Object testObject = Unitils.getInstance().getTestContext().getTestObject();
+        Object testObject = Unitils.getInstance().getTestContext().getTestObject();
         getDatabaseModule().flushDatabaseUpdates(testObject);
     }
-	
-    
-	/**
+
+
+    /**
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link DBMaintainer} for more information.
      */
-	public static void updateDatabase() {
-		getDatabaseModule().updateDatabase();
-	}
-	
-	
-	/**
+    public static void updateDatabase() {
+        getDatabaseModule().updateDatabase();
+    }
+
+
+    /**
      * Updates the database version to the current version, without issuing any other updates to the database.
      * This method can be used for example after you've manually brought the database to the latest version, but
      * the database version is not yet set to the current one. This method can also be useful for example for
@@ -71,54 +72,58 @@ public class DatabaseUnitils {
     public void setDatabaseToCurrentVersion() {
         getDatabaseModule().setDatabaseToCurrentVersion();
     }
-	
-	
-	/**
-	 * Clears all configured schema's. I.e. drops all tables, views and other database objects.
-	 */
-	public static void clearSchemas() {
-		getDatabaseModule().clearSchemas();
-	}
-	
-	
-	/**
-	 * Cleans all configured schema's. I.e. removes all data from its database tables.
-	 */
-	public static void cleanSchemas() {
-		getDatabaseModule().cleanSchemas();
-	}
-	
-	
-	/**
-	 * Disables all foreigh key and not-null constraints on the configured schema's.
-	 */
-	public static void disableConstraints() {
-		getDatabaseModule().disableConstraints();
-	}
-	
-	
-	/**
-	 * Updates all sequences that have a value below a certain configurable treshold to become equal 
-	 * to this treshold
-	 */
-	public static void updateSequences() {
-		getDatabaseModule().updateSequences();
-	}
-	
-	
-	/**
-	 * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
-	 * describes the structure of the database.
-	 */
-	public static void generateDatasetDefinition() {
-		getDatabaseModule().generateDatasetDefinition();
-	}
-	
-	
-	/**
-	 * @return The database module
-	 */
-	private static DatabaseModule getDatabaseModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-	}
+
+
+    /**
+     * Clears all configured schema's. I.e. drops all tables, views and other database objects.
+     */
+    public static void clearSchemas() {
+        getDatabaseModule().clearSchemas();
+    }
+
+
+    /**
+     * Cleans all configured schema's. I.e. removes all data from its database tables.
+     */
+    public static void cleanSchemas() {
+        getDatabaseModule().cleanSchemas();
+    }
+
+
+    /**
+     * Disables all foreigh key and not-null constraints on the configured schema's.
+     */
+    public static void disableConstraints() {
+        getDatabaseModule().disableConstraints();
+    }
+
+
+    /**
+     * Updates all sequences that have a value below a certain configurable treshold to become equal
+     * to this treshold
+     */
+    public static void updateSequences() {
+        getDatabaseModule().updateSequences();
+    }
+
+
+    /**
+     * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
+     * describes the structure of the database.
+     */
+    public static void generateDatasetDefinition() {
+        getDatabaseModule().generateDatasetDefinition();
+    }
+
+
+    /**
+     * Gets the instance DatabaseModule that is registered in the modules repository.
+     * This instance implements the actual behavior of the static methods in this class.
+     * This way, other implementations can be plugged in, while keeping the simplicity of using static methods.
+     *
+     * @return the instance, not null
+     */
+    private static DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
 }

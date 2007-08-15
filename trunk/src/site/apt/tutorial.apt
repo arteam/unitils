@@ -415,16 +415,8 @@ public class UserDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    The <@DataSet> annotation in the test instructs Unitils to look for DbUnit data files that need to be loaded for the test. Unitils automatically looks for data set files 
-    that are in the same directory as the test class and have following name pattern:
-
-    * <className>.xml - for a data set that is shared by all tests in the test class.
-    
-    * <className>.<methodName>.xml - for a data set that is specific for the test method with the same name 
-    
-    []
-    
-    When a method-specific data set is found, this one is used for the test. Otherwise, Unitils will look for a class-level data set.
+    The <@DataSet> annotation in the test instructs Unitils to look for DbUnit data files that need to be loaded for the test. If no file name is specified,
+    Unitils automatically looks for a data set file that is in the same directory as the test class and has following name pattern: <className>.xml    
     
     The data set file should be in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} file 
     format and should contain all data needed for the test. All existing content of tables in the data set will first be deleted, then all data of the data 
@@ -442,12 +434,12 @@ public class UserDAOTest extends UnitilsJUnit4 {
     <user userName="jdoe"  name="doe"   firstname="john"   userGroup="admin" />
     
     <usergroup name="sales" />    
-    <user userName="smith" name="smith" firstname="[null]" userGroup="sales" />
+    <user userName="smith" name="smith" userGroup="sales" />
     
 </dataset>
 +-----+
 
-    This will clear the user and usergroup tables and insert the user groups and user records. The first name of the user named 'smith' is explicitly 
+    This will clear the user and usergroup tables and insert the user groups and user records. The first name of the user named 'smith' will be 
     set to a null value.
     
     Suppose the <testFindByMinimalAge()> method needs a specific data set instead of the class-level data set. You could create a file named 
@@ -461,18 +453,30 @@ public class UserDAOTest extends UnitilsJUnit4 {
 </dataset>
 +-----+
 
+    You can then use this data set by adding an <@DataSet> annotation to the method, overriding the default data set file of the class.
+    
++-----+    
+    @Test
+    @DataSet("UserDAOTest.testFindByMinimalAge.xml")
+    public void testFindByMinimalAge() {
+        List<User> result = userDao.findByMinimalAge(18);        
+        assertPropertyLenEquals("firstName", Arrays.asList("jack"), result);
+    }
++-----+
+
     Method-level data sets should not be overused, since having more data files means you have to do more maintenance. You should first try 
     to reuse the data in the class level data set - in most cases a small set of test records can be reused for multiple tests. If this would 
     result in a big and incoherent data set, it may be better to use a method specific one, or to try to split the test in 2 separate tests, 
     each having their own data set.
     
-    By setting the <@DataSet> annotation on class level a data set is loaded for every test in the class. If a data set should only be loaded for 
+    By setting the <@DataSet> annotation on class or superclass level a data set is loaded for every test in the class. If a data set should only be loaded for 
     some of the tests, you should remove the class level annotation and annotate the test methods instead. Datasets will then only be loaded 
     for the annotated tests. If your data set file does not comply with the naming conventions as described above, you can also specify a file name 
-    explicitly by passing the name as an argument to the <@DataSet> annotation:
+    explicitly by passing the name as an argument to the <@DataSet> annotation. You can also specify multiple data set file names, in case you 
+    want to use more than 1 data set:
 
 +-----+
-@DataSet("UserDAOTest_general.xml")
+@DataSet({"UserDAOTest_general.xml", "ConfigSettings.xml"})
 public class UserDAOTest extends UnitilsJUnit4 {
 
     @Test

@@ -15,6 +15,8 @@
  */
 package org.unitils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Ignore;
 import org.junit.internal.runners.InitializationError;
 import org.junit.internal.runners.TestClassMethodsRunner;
@@ -33,10 +35,18 @@ import java.lang.reflect.Method;
  * Custom test runner that will Unitils-enable your test. This will make sure that the
  * core unitils test listener methods are invoked in the expected order. See {@link TestListener} for
  * more information on the listener invocation order.
+ * <p/>
+ * NOTE: if a test fails, the error is logged as debug logging. This is a temporary work-around for
+ * a problem with IntelliJ JUnit-4 runner that reports a 'Wrong test finished' error when something went wrong
+ * in the before. [IDEA-12498] 
  *
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(UnitilsJUnit4TestClassRunner.class);
 
     /* The main test listener, that hooks this test into unitils */
     private static TestListener testListener;
@@ -74,6 +84,7 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
                 beforeAllCalled = true;
 
             } catch (Throwable t) {
+                logger.debug(getDescription(), t);
                 notifier.fireTestFailure(new Failure(getDescription(), t));
                 return;
             }
@@ -84,6 +95,7 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
             super.run(notifier);
 
         } catch (Throwable t) {
+            logger.debug(getDescription(), t);
             notifier.fireTestFailure(new Failure(getDescription(), t));
         }
 
@@ -91,6 +103,7 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
             testListener.afterTestClass(getTestClass());
 
         } catch (Throwable t) {
+            logger.debug(getDescription(), t);
             notifier.fireTestFailure(new Failure(getDescription(), t));
         }
     }
@@ -138,10 +151,11 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
         @Override
         protected void invokeTestMethod(Method method, RunNotifier notifier) {
             boolean failed = false;
-        	try {
+            try {
                 super.invokeTestMethod(method, notifier);
 
             } catch (Throwable t) {
+                logger.debug(getDescription(), t);
                 notifier.fireTestFailure(new Failure(getDescription(), t));
                 failed = true;
             }
@@ -151,13 +165,14 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
                     testListener.afterTestTearDown(testObject);
 
                 } catch (Throwable t) {
-                	// If a failure was already fired during the execution of the test method, firing 
-                	// a failure again would replace that error. In most cases, the exception reported 
-                	// during the method execution provides the most significant information, so we 
-                	// don't want to replace it.
-                	if (!failed) {
-                		notifier.fireTestFailure(new Failure(getDescription(), t));
-                	}
+                    // If a failure was already fired during the execution of the test method, firing
+                    // a failure again would replace that error. In most cases, the exception reported
+                    // during the method execution provides the most significant information, so we
+                    // don't want to replace it.
+                    if (!failed) {
+                        logger.debug(getDescription(), t);
+                        notifier.fireTestFailure(new Failure(getDescription(), t));
+                    }
                 }
             }
             testObject = null;
