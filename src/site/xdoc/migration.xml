@@ -3,6 +3,38 @@
     <title>Migration to RC 3</title>
   </properties>  
   <body>    
+    <section name="Migration to RC 4">
+    
+        <p>When migrating from Unitils RC 3 to RC 4, following change needs to be made:</p>
+        
+        <p>If no file name is specified for the @DataSet annotation, Unitils will no longer first look for a file named <i>className.methodName</i>.xml.
+        It will only look for a file named <i>className</i>.xml.</p>
+        
+        <p>All uses of method-specific data sets must therefore be replaced by explicitily loading the data set file. So, suppose you have a method-specific 
+        data set named <i>UserDAOTest.testFindByMinimalAge.xml</i>, this will no longer be loaded in following example:</p>
+        
+        <p><pre><code>
+        @DataSet
+        public class UserDAOTest extends UnitilsJUnit4 {
+                        
+            public void testFindByMinimalAge() {
+            }
+        }
+        </code></pre></p>
+        
+        This should be replaced by explicitly loading the data set on method-level.
+        
+        <p><pre><code>
+        @DataSet
+        public class UserDAOTest extends UnitilsJUnit4 {
+            
+            @DataSet("UserDAOTest.testFindByMinimalAge.xml")
+            public void testFindByMinimalAge() {
+            }
+        }
+        </code></pre></p>
+
+    </section>
     <section name="Migration to RC 3">
     
         <p>When migrating from Unitils RC 2 to RC 3, following changes need to be made:</p>
