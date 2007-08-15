@@ -23,6 +23,8 @@ import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetloadstrategy.CleanInsertLoadStrategy;
+import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
+import org.unitils.dbunit.datasetloadstrategy.InsertLoadStrategy;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.sample.eshop.dao.PurchaseDao;
 import org.unitils.sample.eshop.model.User;
@@ -34,8 +36,8 @@ import javax.sql.DataSource;
 /**
  * todo javadoc
  */
-@DataSet(loadStrategy = CleanInsertLoadStrategy.class)
-@Transactional(TransactionMode.DISABLED)
+@DataSet(loadStrategy = InsertLoadStrategy.class)
+@Transactional(TransactionMode.ROLLBACK)
 @SpringApplicationContext({"eshop-config.xml", "test-config.xml"})
 public class PurchaseDaoTest extends UnitilsJUnit4 {
 
