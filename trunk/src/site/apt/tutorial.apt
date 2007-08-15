@@ -416,7 +416,7 @@ public class UserDAOTest extends UnitilsJUnit4 {
 +-----+
 
     The <@DataSet> annotation in the test instructs Unitils to look for DbUnit data files that need to be loaded for the test. If no file name is specified,
-    Unitils automatically looks for a data set file that is in the same directory as the test class and has following name pattern: <className>.xml    
+    Unitils automatically looks for a data set file that is in the same directory as the test class and has following name pattern: <className>.xml
     
     The data set file should be in DbUnit's {{{http://www.dbunit.org/apidocs/org/dbunit/dataset/xml/FlatXmlDataSet.html} FlatXMLDataSet}} file 
     format and should contain all data needed for the test. All existing content of tables in the data set will first be deleted, then all data of the data 
@@ -456,12 +456,15 @@ public class UserDAOTest extends UnitilsJUnit4 {
     You can then use this data set by adding an <@DataSet> annotation to the method, overriding the default data set file of the class.
     
 +-----+    
+public class UserDAOTest extends UnitilsJUnit4 {
+
     @Test
     @DataSet("UserDAOTest.testFindByMinimalAge.xml")
     public void testFindByMinimalAge() {
         List<User> result = userDao.findByMinimalAge(18);        
         assertPropertyLenEquals("firstName", Arrays.asList("jack"), result);
     }
+}
 +-----+
 
     Method-level data sets should not be overused, since having more data files means you have to do more maintenance. You should first try 
