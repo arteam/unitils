@@ -53,11 +53,11 @@ Summary
         
         * Support for using a Spring-configured Hibernate SessionFactory in unit tests.
 
+    []
 
     The project started begin 2006 from an {{{http://www.j-technologies.be}Ordina J-Technologies}} discussion group on unit testing. The result was a list of guidelines 
     and Unitils emerged in an attempt to write code to support these guidelines. 
-
-
+        
 
 * Documentation
 ~~~~~~~~~~~~~~~
@@ -79,6 +79,8 @@ Summary
     the behavior of the dbmaintainer. Note that this version is not fully backwards compatible with rc 3, there is a small 
     change in the default behavior of the @DataSet annotation. A migration path is available {{{migration.html} here}}.
     
+    <<Important Note: Currenlty Unitils is not compatible with JUnit-4.4>>. There are some backwards incompatible changes to the TestRunner 
+    behavior in this new version. We will release a new version containing support for <JUnit-4.4> soon. Please use <JUnit-4.3.1> untill then.
     
     <<2007-06-20 - Release of Unitils 1.0 rc 3>>
   
