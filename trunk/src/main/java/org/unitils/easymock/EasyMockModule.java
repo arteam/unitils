@@ -80,6 +80,7 @@ public class EasyMockModule implements Module {
     /* Indicates whether verify() is automatically called on every mock object after each test method execution */
     private boolean autoVerifyAfterTestEnabled;
 
+
     /**
      * Initializes the module
      */
@@ -189,7 +190,7 @@ public class EasyMockModule implements Module {
 
 
     /**
-     *
+     * Replays all mock controls.
      */
     public void replay() {
         for (MocksControl mocksControl : mocksControls) {
