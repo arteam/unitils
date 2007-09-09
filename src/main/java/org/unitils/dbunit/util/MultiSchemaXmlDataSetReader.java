@@ -84,21 +84,23 @@ public class MultiSchemaXmlDataSetReader {
 
 
     /**
-     * Parses the datasets from the given input stream.
-     * Each schema is given its own dataset.
+     * Parses the datasets from the given input streams.
+     * Each schema is given its own dataset and each row is given its own table.
      *
-     * @param multiSchemaDataSet Object that aggregates all dbunit datasets into one multi-schema dataset
-     * @param in                 the xml content stream, not null
+     * @param inputStreams the xml content streams, not null
+     * @return The read data set, not null
      */
-    public void readDataSetXml(MultiSchemaDataSet multiSchemaDataSet, InputStream in) {
+    public MultiSchemaDataSet readDataSetXml(InputStream... inputStreams) {
         try {
             DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
             XMLReader xmlReader = createXMLReader();
             xmlReader.setContentHandler(dataSetContentHandler);
             xmlReader.setErrorHandler(dataSetContentHandler);
-            xmlReader.parse(new InputSource(in));
 
-            dataSetContentHandler.addDataSets(multiSchemaDataSet);
+            for (InputStream inputStream : inputStreams) {
+                xmlReader.parse(new InputSource(inputStream));
+            }
+            return dataSetContentHandler.getMultiSchemaDataSet();
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to parse data set xml.", e);
@@ -169,19 +171,26 @@ public class MultiSchemaXmlDataSetReader {
 
 
         /**
-         * Adds all dbunit dataset to the given {@link MultiSchemaDataSet} aggregation object
+         * Gets the result data set.
          *
-         * @param multiSchemaDataSet Object that aggregates all dbunit datasets into one multi-schema dataset
+         * @return the data set, not null
          */
-        public void addDataSets(MultiSchemaDataSet multiSchemaDataSet) {
+        public MultiSchemaDataSet getMultiSchemaDataSet() throws DataSetException {
+            // finalize all data sets
+            for (CachedDataSet dataSet : dataSets.values()) {
+                dataSet.endDataSet();
+            }
+
+            MultiSchemaDataSet multiSchemaDataSet = new MultiSchemaDataSet();
             for (String schemaName : dataSets.keySet()) {
                 CachedDataSet cachedDataSet = dataSets.get(schemaName);
 
                 // wrap datasets in replacement datasets, and replace [null] tokens by the null reference
                 ReplacementDataSet replacementDataSet = new ReplacementDataSet(cachedDataSet);
                 replacementDataSet.addReplacementObject("[null]", null);
-                multiSchemaDataSet.addSchemaDataSet(schemaName, replacementDataSet);
+                multiSchemaDataSet.setDataSetForSchema(schemaName, replacementDataSet);
             }
+            return multiSchemaDataSet;
         }
 
 
@@ -229,28 +238,6 @@ public class MultiSchemaXmlDataSetReader {
                 // end table for row
                 dataSet.endTable();
 
-            } catch (DataSetException e) {
-                throw new SAXException(e);
-            }
-        }
-
-
-        /**
-         * Processes an end element.
-         *
-         * @param uri       the xml namespace uri (= schema name)
-         * @param localName the local xml name
-         * @param qName     the element name
-         */
-        @Override
-        public void endElement(String uri, String localName, String qName) throws SAXException {
-            try {
-                // end element of data set
-                if ("dataset".equals(qName)) {
-                    for (CachedDataSet dataSet : dataSets.values()) {
-                        dataSet.endDataSet();
-                    }
-                }
             } catch (DataSetException e) {
                 throw new SAXException(e);
             }

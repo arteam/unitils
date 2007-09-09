@@ -15,17 +15,7 @@
  */
 package org.unitils.dbunit;
 
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
 import org.dbunit.database.DatabaseConfig;
-import org.dbunit.dataset.CompositeDataSet;
-import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.unitils.core.Module;
@@ -34,6 +24,7 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.TransactionalDataSource;
@@ -44,35 +35,27 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import org.unitils.util.ModuleUtils;
-import org.unitils.util.ReflectionUtils;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.*;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import javax.sql.DataSource;
-import javax.swing.text.DefaultEditorKit.InsertTabAction;
-
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
  * <p/>
  * Loading of DbUnit data sets can be done by annotating a class or method with the {@link DataSet} annotation. The name
- * data set file can be specified explicitly as an argument of the annotation. If no file name is specified, it looks
- * for following files in the same directory as the test class:
- * <ol>
- * <li>'classname without packagename'.'test method name'.xml</li>
- * <li>'classname without packagename'.xml</li>
- * <p/>
- * If the method specific data set file is found, this will be used, otherwise it will look for the class-level data set
- * file. See the {@link DataSet} javadoc for more info.
+ * of the data set files can be specified explicitly as an argument of the annotation. If no file name is specified, it looks
+ * for a file in the same directory as the test class named: 'classname without packagename'.xml.
  * <p/>
  * By annotating a method with the {@link ExpectedDataSet} annotation or by calling the {@link #assertDbContentAsExpected}
  * method, the contents of the database can be compared with the contents of a dataset. The expected dataset can be
@@ -86,21 +69,25 @@ import java.util.Properties;
  */
 public class DbUnitModule implements Module {
 
-    /* Map holding the default configuration of the dbunit module annotations */
-    private Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
+    /**
+     * Map holding the default configuration of the dbunit module annotations
+     */
+    protected Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
-    /*
+    /**
      * Objects that DbUnit uses to connect to the database and to cache some database metadata. Since DBUnit's data
      * caching is time-consuming, this object is created only once and used throughout the entire test run. The
      * underlying JDBC Connection however is 'closed' (returned to the pool) after every database operation.
-     *
+     * <p/>
      * A different DbUnit connection is used for every database schema. Since DbUnit can only work with a single schema,
-     * this is the simplest way to obtain multi-schema support. 
+     * this is the simplest way to obtain multi-schema support.
      */
-    private Map<String, DbUnitDatabaseConnection> dbUnitDatabaseConnections = new HashMap<String, DbUnitDatabaseConnection>();
+    protected Map<String, DbUnitDatabaseConnection> dbUnitDatabaseConnections = new HashMap<String, DbUnitDatabaseConnection>();
 
-    /* The unitils configuration */
-    private Properties configuration;
+    /**
+     * The unitils configuration
+     */
+    protected Properties configuration;
 
 
     /**
@@ -109,9 +96,8 @@ public class DbUnitModule implements Module {
      * @param configuration The config, not null
      */
     @SuppressWarnings("unchecked")
-	public void init(Properties configuration) {
+    public void init(Properties configuration) {
         this.configuration = configuration;
-
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DbUnitModule.class, configuration, DataSet.class, ExpectedDataSet.class);
     }
 
@@ -158,96 +144,92 @@ public class DbUnitModule implements Module {
             closeJdbcConnection();
         }
     }
-    
-    
+
+
     /**
      * Inserts the default dataset for the given test class into the database
-     * 
+     *
      * @param testClass The test class for which the default dataset must be loaded
      */
     public void insertDefaultDataSet(Class<?> testClass) {
-    	DataSetFactory dataSetFactory = getDefaultDataSetFactory();
-    	DataSetLoadStrategy dataSetLoadStrategy = getDefaultDataSetLoadStrategy();
-    	String[] dataSetFileNames = new String[] {getDefaultDataSetFileName(testClass, 
-    			dataSetFactory.getDataSetFileExtension())};
-    	MultiSchemaDataSet dataSet = getDataSet(testClass, dataSetFileNames, dataSetFactory);
-    	insertDataSet(dataSet, dataSetLoadStrategy);
+        DataSetFactory dataSetFactory = getDefaultDataSetFactory();
+        String[] dataSetFileNames = new String[]{getDefaultDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension())};
+        insertDataSet(testClass, dataSetFileNames);
     }
-    
-    
+
+
     /**
      * Inserts the dataset consisting of the given list of files into the database
-     * 
-     * @param testClass The test class for which the dataset must be loaded
+     *
+     * @param testClass        The test class for which the dataset must be loaded
      * @param dataSetFileNames The names of the files that define the test data
      */
     public void insertDataSet(Class<?> testClass, String... dataSetFileNames) {
-    	DataSetFactory dataSetFactory = getDefaultDataSetFactory();
-    	DataSetLoadStrategy dataSetLoadStrategy = getDefaultDataSetLoadStrategy();
-    	MultiSchemaDataSet dataSet = getDataSet(testClass, dataSetFileNames, dataSetFactory);
-    	insertDataSet(dataSet, dataSetLoadStrategy);
+        DataSetFactory dataSetFactory = getDefaultDataSetFactory();
+        DataSetLoadStrategy dataSetLoadStrategy = getDefaultDataSetLoadStrategy();
+        MultiSchemaDataSet dataSet = getDataSet(testClass, dataSetFileNames, dataSetFactory);
+        insertDataSet(dataSet, dataSetLoadStrategy);
     }
-    
-    
+
+
     /**
      * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>,
      * using the default {@link DataSetLoadStrategy} and {@link DataSetFactory} class.
-     * 
-     * @param inputStream         The stream containing the test data set, not null
+     *
+     * @param inputStream The stream containing the test data set, not null
      */
     @SuppressWarnings("unchecked")
-	public void insertDataSet(InputStream inputStream) {
-    	DataSetFactory dataSetFactory = getDefaultDataSetFactory();
-    	DataSetLoadStrategy dataSetLoadStrategy = getDefaultDataSetLoadStrategy();
-    	insertDataSet(inputStream, dataSetFactory, dataSetLoadStrategy);
+    public void insertDataSet(InputStream inputStream) {
+        DataSetFactory dataSetFactory = getDefaultDataSetFactory();
+        DataSetLoadStrategy dataSetLoadStrategy = getDefaultDataSetLoadStrategy();
+        insertDataSet(inputStream, dataSetFactory, dataSetLoadStrategy);
     }
 
 
     /**
      * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
-     * 
-     * @param inputStream         The stream containing the test data set, not null
-     * @param dataSetFactoryClass The class of the factory that must be used to read this dataset
+     *
+     * @param inputStream              The stream containing the test data set, not null
+     * @param dataSetFactoryClass      The class of the factory that must be used to read this dataset
      * @param dataSetLoadStrategyClass The class of the load strategy that must be used to load this dataset
      */
-    public void insertDataSet(InputStream inputStream, Class<? extends DataSetFactory> dataSetFactoryClass, 
-    		Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
-    	DataSetLoadStrategy dataSetLoadStrategy = ReflectionUtils.createInstanceOfType(dataSetLoadStrategyClass, false);
-    	DataSetFactory dataSetFactory = ReflectionUtils.createInstanceOfType(dataSetFactoryClass, false);
-    	insertDataSet(inputStream, dataSetFactory, dataSetLoadStrategy);
+    public void insertDataSet(InputStream inputStream, Class<? extends DataSetFactory> dataSetFactoryClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
+        DataSetLoadStrategy dataSetLoadStrategy = createInstanceOfType(dataSetLoadStrategyClass, false);
+        DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
+        insertDataSet(inputStream, dataSetFactory, dataSetLoadStrategy);
     }
 
 
-	/**
-	 * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
-	 * 
-	 * @param inputStream The stream containing the test data set, not null
-	 * @param dataSetFactory The factory that must be used to read this dataset inputstream
-	 * @param dataSetLoadStrategy The load strategy that must be used to load this dataset
-	 */
-	private void insertDataSet(InputStream inputStream, DataSetFactory dataSetFactory, DataSetLoadStrategy dataSetLoadStrategy) {
-		dataSetFactory.init(getDefaultDbSupport().getSchemaName());
-        MultiSchemaDataSet multiSchemaDataSet = getDataSet(inputStream, dataSetFactory);
+    /**
+     * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
+     *
+     * @param inputStream         The stream containing the test data set, not null
+     * @param dataSetFactory      The factory that must be used to read this dataset inputstream
+     * @param dataSetLoadStrategy The load strategy that must be used to load this dataset
+     */
+    protected void insertDataSet(InputStream inputStream, DataSetFactory dataSetFactory, DataSetLoadStrategy dataSetLoadStrategy) {
+        dataSetFactory.init(getDefaultDbSupport().getSchemaName());
+        MultiSchemaDataSet multiSchemaDataSet = dataSetFactory.createDataSet(inputStream);
         insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
-	}
-    
-    
+    }
+
+
     /**
      * Loads the given multi schema dataset into the database, using the given loadstrategy
-     * 
-	 * @param multiSchemaDataSet  The multi schema dataset that is inserted in the database
-	 * @param dataSetLoadStrategy The load strategy that is used
-	 */
-	protected void insertDataSet(MultiSchemaDataSet multiSchemaDataSet, DataSetLoadStrategy dataSetLoadStrategy) {
-		try {
-			for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
-			    IDataSet compositeDataSet = createCompositeDataSet(multiSchemaDataSet.getDataSetsForSchema(schemaName));
-			    dataSetLoadStrategy.execute(getDbUnitDatabaseConnection(schemaName), compositeDataSet);
-			}
-	    } finally {
-	        closeJdbcConnection();
-	    }
-	}
+     *
+     * @param multiSchemaDataSet  The multi schema dataset that is inserted in the database
+     * @param dataSetLoadStrategy The load strategy that is used
+     */
+    protected void insertDataSet(MultiSchemaDataSet multiSchemaDataSet, DataSetLoadStrategy dataSetLoadStrategy) {
+        try {
+            for (String schemaName : multiSchemaDataSet.getSchemaNames()) {
+                IDataSet schemaDataSet = multiSchemaDataSet.getDataSetForSchema(schemaName);
+                dataSetLoadStrategy.execute(getDbUnitDatabaseConnection(schemaName), schemaDataSet);
+            }
+        } finally {
+            closeJdbcConnection();
+        }
+    }
 
 
     /**
@@ -267,9 +249,9 @@ public class DbUnitModule implements Module {
             }
             // first make sure every database update is flushed to the database
             getDatabaseModule().flushDatabaseUpdates(testObject);
-            
+
             for (String schemaName : multiSchemaExpectedDataSet.getSchemaNames()) {
-            	IDataSet compositeDataSet = createCompositeDataSet(multiSchemaExpectedDataSet.getDataSetsForSchema(schemaName));
+                IDataSet compositeDataSet = multiSchemaExpectedDataSet.getDataSetForSchema(schemaName);
                 DbUnitAssert.assertDbContentAsExpected(compositeDataSet, getDbUnitDatabaseConnection(schemaName));
             }
         } finally {
@@ -283,11 +265,10 @@ public class DbUnitModule implements Module {
      * given test method. If no method-level or class-level {@link DataSet} annotation is found, null is returned.
      * If a method-level {@link DataSet} annotation is found this will be used, else the class-level will be used.
      * <p/>
-     * The value of the found annotation determines which file needs to be used for the dataset. If a filename is
-     * explicitly specified, this name will be used. Filenames that start with '/' are treated absolute. Filenames
+     * The value of the found annotation determines which files need to be used for the dataset. If one or more filenames are
+     * explicitly specified, these names will be used. Filenames that start with '/' are treated absolute. Filenames
      * that do not start with '/', are relative to the current class.
-     * If an empty filename ("") is specified, this method will look for a file named 'classname'.xml 
-     * {@link #getClassLevelDefaultTestDataSetFileName}).
+     * If an empty filename ("") is specified, this method will look for a file named 'classname'.xml.
      * <p/>
      * If a file is not found or could not be loaded (but was requested, because there is an annotation), an exception
      * is raised.
@@ -298,7 +279,7 @@ public class DbUnitModule implements Module {
      */
     public MultiSchemaDataSet getDataSet(Method testMethod, Object testObject) {
         Class<?> testClass = testObject.getClass();
-		DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testClass);
+        DataSet dataSetAnnotation = getMethodOrClassLevelAnnotation(DataSet.class, testMethod, testClass);
         if (dataSetAnnotation == null) {
             // No @DataSet annotation found
             return null;
@@ -310,12 +291,11 @@ public class DbUnitModule implements Module {
         // Get the dataset file name
         String[] dataSetFileNames = dataSetAnnotation.value();
         if (dataSetFileNames.length == 0) {
-        	// empty means, use default file name, which is the name of the class + extension
-            dataSetFileNames = new String[] {getDefaultDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension())};
+            // empty means, use default file name, which is the name of the class + extension
+            dataSetFileNames = new String[]{getDefaultDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension())};
         }
 
-        MultiSchemaDataSet dataSet = getDataSet(testClass, dataSetFileNames, dataSetFactory);
-        return dataSet;
+        return getDataSet(testClass, dataSetFileNames, dataSetFactory);
     }
 
 
@@ -329,7 +309,7 @@ public class DbUnitModule implements Module {
      */
     public MultiSchemaDataSet getExpectedDataSet(Method testMethod, Object testObject) {
         Class<? extends Object> testClass = testObject.getClass();
-		ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testClass);
+        ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testClass);
         if (expectedDataSetAnnotation == null) {
             // No @ExpectedDataSet annotation found
             return null;
@@ -345,8 +325,7 @@ public class DbUnitModule implements Module {
             dataSetFileNames = new String[]{getDefaultExpectedDataSetFileName(testMethod, testClass, dataSetFactory.getDataSetFileExtension())};
         }
 
-        MultiSchemaDataSet dataSets = getDataSet(testMethod.getDeclaringClass(), dataSetFileNames, dataSetFactory);
-        return dataSets;
+        return getDataSet(testMethod.getDeclaringClass(), dataSetFileNames, dataSetFactory);
     }
 
 
@@ -360,50 +339,39 @@ public class DbUnitModule implements Module {
      * @return The data set, null if the file does not exist
      */
     protected MultiSchemaDataSet getDataSet(Class<?> testClass, String[] dataSetFileNames, DataSetFactory dataSetFactory) {
-        return dataSetFactory.createDataSet(testClass, dataSetFileNames);
+        List<InputStream> dataSetInputStreams = new ArrayList<InputStream>();
+        try {
+            for (String dataSetFileName : dataSetFileNames) {
+                InputStream dataSetInputStream = testClass.getResourceAsStream(dataSetFileName);
+                if (dataSetInputStream == null) {
+                    throw new UnitilsException("DataSet file with name " + dataSetFileName + " cannot be found");
+                }
+                dataSetInputStreams.add(dataSetInputStream);
+            }
+            return dataSetFactory.createDataSet(dataSetInputStreams.toArray(new InputStream[0]));
+
+        } finally {
+            for (InputStream inputStream : dataSetInputStreams) {
+                closeQuietly(inputStream);
+            }
+        }
     }
 
 
     /**
-     * Create a {@link MultiSchemaDataSet}, in which the file <code>InputStream</code> is loaded.
-     * 
-     * @param in              The InputStream, not null
-     * @param dataSetFactory  The factory that must be used to load this dataset, not null 
-     * @return The DbUnit <code>IDataSet</code>
+     * Creates the DbUnit dataset operation for loading a data set for the given method. If a value for loadStrategy is
+     * found on an annotation, this class is used, otherwise the configured default class will be used.
+     *
+     * @param testMethod The method, not null
+     * @param testClass  The test class, not null
+     * @return The DbUnit operation, not null
      */
-    public MultiSchemaDataSet getDataSet(InputStream in, DataSetFactory dataSetFactory) {
-    	return dataSetFactory.createDataSet(in);
-    }
-
-
     @SuppressWarnings({"unchecked"})
     protected DataSetLoadStrategy getDataSetOperation(Method testMethod, Class testClass) {
         Class<? extends DataSetLoadStrategy> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "loadStrategy", DataSetLoadStrategy.class, testMethod, testClass);
         dataSetOperationClass = (Class<? extends DataSetLoadStrategy>) getClassValueReplaceDefault(DataSet.class, "loadStrategy", dataSetOperationClass, defaultAnnotationPropertyValues, DataSetLoadStrategy.class);
-
         return createInstanceOfType(dataSetOperationClass, false);
     }
-    
-    
-    /**
-     * Creates a DbUnit dataset object that represents the union of the given List of datasets
-     * 
-	 * @param dataSets
-	 * @return A DbUnit dataset object that represents the union of the given List of datasets
-	 * @throws DataSetException
-	 */
-	private IDataSet createCompositeDataSet(List<IDataSet> dataSets) {
-		IDataSet compositeDataSet;
-		try {
-			IDataSet[] dataSetsArray = new IDataSet[dataSets.size()];
-			dataSets.toArray(dataSetsArray);
-			compositeDataSet = new CompositeDataSet(dataSetsArray);
-			return compositeDataSet;
-		} catch (DataSetException e) {
-			throw new UnitilsException("Error while creating composite dataset", e);
-		}
-		
-	}
 
 
     /**
@@ -472,16 +440,15 @@ public class DbUnitModule implements Module {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + "-result." + extension;
     }
-    
-    
-	/**
-	 * @return The default {@link DataSetFactory} class as configured in unitils
-	 */
-	@SuppressWarnings("unchecked")
-	protected DataSetFactory getDefaultDataSetFactory() {
-		return getDataSetFactory((Class<? extends DataSetFactory>)
-    		ReflectionUtils.getClassWithName(ModuleUtils.getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "factory", configuration)));
-	}
+
+
+    /**
+     * @return The default {@link DataSetFactory} class as configured in unitils
+     */
+    @SuppressWarnings("unchecked")
+    protected DataSetFactory getDefaultDataSetFactory() {
+        return getDataSetFactory((Class<? extends DataSetFactory>) getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "factory", configuration)));
+    }
 
 
     /**
@@ -496,42 +463,40 @@ public class DbUnitModule implements Module {
     protected DataSetFactory getDataSetFactory(Class<? extends Annotation> annotationClass, Method testMethod, Class testClass) {
         Class<? extends DataSetFactory> dataSetFactoryClass = getMethodOrClassLevelAnnotationProperty(annotationClass, "factory", DataSetFactory.class, testMethod, testClass);
         dataSetFactoryClass = (Class<? extends DataSetFactory>) getClassValueReplaceDefault(annotationClass, "factory", dataSetFactoryClass, defaultAnnotationPropertyValues, DataSetFactory.class);
-        DataSetFactory dataSetFactory = getDataSetFactory(dataSetFactoryClass);
+        return getDataSetFactory(dataSetFactoryClass);
+    }
+
+
+    /**
+     * Creates and initializes a data set factory of the given type.
+     *
+     * @param dataSetFactoryClass The type, not null
+     * @return The {@link DataSetFactory} with the given class
+     */
+    protected DataSetFactory getDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
+        DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
+        dataSetFactory.init(getDefaultDbSupport().getSchemaName());
         return dataSetFactory;
     }
 
 
-	/**
-	 * @param dataSetFactoryClass
-	 * @return The {@link DataSetFactory} with the given class
-	 */
-	protected DataSetFactory getDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
-		DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        dataSetFactory.init(getDefaultDbSupport().getSchemaName());
-		return dataSetFactory;
-	}
-	
-    
-	/**
-	 * @return The default {@link DataSetLoadStrategy} class as configured in unitils
-	 */
-	@SuppressWarnings("unchecked")
-	protected DataSetLoadStrategy getDefaultDataSetLoadStrategy() {
-		return ReflectionUtils.createInstanceOfType((Class<? extends DataSetLoadStrategy>) 
-    		ReflectionUtils.getClassWithName(ModuleUtils.getAnnotationPropertyDefault(DbUnitModule.class, 
-			DataSet.class, "loadStrategy", configuration)), false);
-	}
-	
-	
-	/**
-	 * @return The default DbSupport (the one that connects to the default database schema)
-	 */
-	protected DbSupport getDefaultDbSupport() {
-		DataSource dataSource = getDatabaseModule().getDataSource();
-		SQLHandler sqlHandler = new SQLHandler(dataSource);
-		DbSupport defaultDbSupport = DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
-		return defaultDbSupport;
-	}
+    /**
+     * @return The default {@link DataSetLoadStrategy} class as configured in unitils
+     */
+    @SuppressWarnings("unchecked")
+    protected DataSetLoadStrategy getDefaultDataSetLoadStrategy() {
+        return createInstanceOfType((Class<? extends DataSetLoadStrategy>) getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "loadStrategy", configuration)), false);
+    }
+
+
+    /**
+     * @return The default DbSupport (the one that connects to the default database schema)
+     */
+    protected DbSupport getDefaultDbSupport() {
+        DataSource dataSource = getDatabaseModule().getDataSource();
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
+    }
 
 
     /**

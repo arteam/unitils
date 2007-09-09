@@ -17,16 +17,14 @@ package org.unitils.dbunit.util;
 
 import org.dbunit.dataset.IDataSet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Represents a DbUnit dataset that may contain data for multiple database schema's. For each schema, a DbUnit
- * <code>IDataSet</code> object can be registered using {@link #addSchemaDataSet(String, org.dbunit.dataset.IDataSet)}.
- * A schema's <code>IDataSet</code> can later be retrieved using {@link #getDataSetsForSchema(String)}. Getting all the
+ * <code>IDataSet</code> object can be registered using {@link #setDataSetForSchema(String,org.dbunit.dataset.IDataSet)}.
+ * A schema's <code>IDataSet</code> can later be retrieved using {@link #getDataSetForSchema(String)}. Getting all the
  * schema names for which a <code>IDataSet</code> exists can be done with {@link #getSchemaNames()}.
  *
  * @author Filip Neven
@@ -35,21 +33,29 @@ import java.util.Set;
 public class MultiSchemaDataSet {
 
     /* Maps schemanames on dbunit datasets */
-    public Map<String, List<IDataSet>> schemaDataSetMap = new HashMap<String, List<IDataSet>>();
+    public Map<String, IDataSet> schemaDataSetMap = new HashMap<String, IDataSet>();
 
 
     /**
-     * Adds a new dbunit <code>IDataSet</code> for the given schema.
-     * @param schema The schema name
-     * @param dataSet The dbunit dataset
+     * Returns the dbunit <code>IDataSet</code> for the given schema name, if any
+     *
+     * @param schemaName The schema name
+     * @return The dbunit dataset, or null if none registered for the given schema name
      */
-    public void addSchemaDataSet(String schema, IDataSet dataSet) {
-    	List<IDataSet> schemaDataSets = schemaDataSetMap.get(schema);
-    	if (schemaDataSets == null) {
-    		schemaDataSets = new ArrayList<IDataSet>();
-    		schemaDataSetMap.put(schema, schemaDataSets);
-    	}
-    	schemaDataSets.add(dataSet);
+    public IDataSet getDataSetForSchema(String schemaName) {
+        return schemaDataSetMap.get(schemaName);
+    }
+
+    /**
+     * Sets a dbunit <code>IDataSet</code> for the given schema. If a data set already existed for this schema,
+     * the old one is returned.
+     *
+     * @param schema  The schema name
+     * @param dataSet The dbunit dataset
+     * @return The replaced data set, null if none replaced
+     */
+    public IDataSet setDataSetForSchema(String schema, IDataSet dataSet) {
+        return schemaDataSetMap.put(schema, dataSet);
     }
 
 
@@ -61,12 +67,4 @@ public class MultiSchemaDataSet {
     }
 
 
-    /**
-     * Returns the dbunit <code>IDataSet</code> for the given schema name, if any
-     * @param schemaName The schema name
-     * @return The dbunit dataset, or null if none registered for the given schema name
-     */
-    public List<IDataSet> getDataSetsForSchema(String schemaName) {
-        return schemaDataSetMap.get(schemaName);
-    }
 }
