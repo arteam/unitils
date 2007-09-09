@@ -20,42 +20,31 @@ import org.unitils.dbunit.util.MultiSchemaDataSet;
 import java.io.InputStream;
 
 /**
- * todo javadoc
+ * Factory for creating DbUnit data sets.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public interface DataSetFactory {
 
-	
+
     /**
      * Initializes this DataSetFactory
      *
-     * @param defaultSchemaName The name of the default schema of the test database
+     * @param defaultSchemaName The name of the default schema of the test database, not null
      */
     void init(String defaultSchemaName);
 
-    
-    /**
-     * Creates a {@link MultiSchemaDataSet} using the given file. The file's name(s) are provided.
-     * 
-     * @param resourceLoadClass The class from which the given files should be loaded as resource from the classpath
-     * @param dataSetFileNames The names of the dataset files
-     *
-     * @return A {@link MultiSchemaDataSet} that represents the dataset
-     */
-    MultiSchemaDataSet createDataSet(Class<?> resourceLoadClass, String[] dataSetFileNames);
-    
-    
+
     /**
      * Creates a {@link MultiSchemaDataSet} using the given file. The file's contents are provided.
      *
-     * @param dataSetFileContents The contents of the dataset file
-     * @return A {@link MultiSchemaDataSet} that represents the dataset
+     * @param dataSetInputStreams The contents of the dataset files, not null
+     * @return A {@link MultiSchemaDataSet} containing the datasets per schema, not null
      */
-    MultiSchemaDataSet createDataSet(InputStream dataSetFileContents);
+    MultiSchemaDataSet createDataSet(InputStream... dataSetInputStreams);
 
-    
+
     /**
      * @return The extension that files which can be interpreted by this factory must have (should not start with a '.')
      */
