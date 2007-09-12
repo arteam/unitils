@@ -5,7 +5,7 @@
 
     <session-factory>
 
-        <property name="superValue">overriden</property>
+        <property name="name">org/unitils/hibernate/hibernate-sub.cfg.xml</property>        
 
     </session-factory>
 

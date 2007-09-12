@@ -130,6 +130,20 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
 
 
     /**
+     * Tests for more than 1 annotation with values. An exception should have been raised.
+     */
+    public void testGetApplicationContext_multipleAnnotationsWithValues() {
+        HibernateTestMultipleAnnotationsWithValues hibernateTestMultipleAnnotationsWithValues = new HibernateTestMultipleAnnotationsWithValues();
+        try {
+            hibernateModule.getHibernateConfiguration(hibernateTestMultipleAnnotationsWithValues);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            // expected
+        }
+    }
+
+
+    /**
      * Tests loading of a configuration annotation through a custom create method
      */
     public void testGetHibernateConfiguration_customCreateMethod() {
@@ -329,6 +343,19 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit3 {
         @HibernateSessionFactory
         public void setField(SessionFactory sessionFactory) {
         }
+    }
+
+    /**
+     * Test SpringTest class mixing multiple annotations.
+     */
+    @HibernateSessionFactory({"1"})
+    private class HibernateTestMultipleAnnotationsWithValues {
+
+        @HibernateSessionFactory({"2"})
+        protected SessionFactory field1;
+
+        @HibernateSessionFactory({"3"})
+        protected SessionFactory field2;
     }
 
     /**

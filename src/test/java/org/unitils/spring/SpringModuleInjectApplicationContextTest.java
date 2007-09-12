@@ -60,20 +60,6 @@ public class SpringModuleInjectApplicationContextTest extends TestCase {
 
 
     /**
-     * Tests assigning an application context that is created by multiple field and setter annotations.
-     * The same context should have been assigned..
-     */
-    public void testInjectApplicationContext_mixing() {
-        SpringTestMixing springTestMixing = new SpringTestMixing();
-        springModule.injectApplicationContext(springTestMixing);
-
-        assertNotNull(springTestMixing.field1);
-        assertSame(springTestMixing.field1, springTestMixing.field2);
-        assertSame(springTestMixing.field1, springTestMixing.setter);
-    }
-
-
-    /**
      * Tests assigning an application context but no context was created.
      */
     public void testInjectApplicationContext_noContextCreated() {
@@ -111,27 +97,6 @@ public class SpringModuleInjectApplicationContextTest extends TestCase {
 
 
         @SpringApplicationContext
-        public void setField(ApplicationContext setter) {
-            this.setter = setter;
-        }
-    }
-
-
-    /**
-     * Test SpringTest class.
-     */
-    private class SpringTestMixing {
-
-        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
-        private ApplicationContext field1 = null;
-
-        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
-        private ApplicationContext field2 = null;
-
-        private ApplicationContext setter;
-
-
-        @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
         public void setField(ApplicationContext setter) {
             this.setter = setter;
         }
