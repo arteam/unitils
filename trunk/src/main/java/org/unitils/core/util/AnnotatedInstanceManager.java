@@ -15,6 +15,7 @@
  */
 package org.unitils.core.util;
 
+import org.unitils.core.UnitilsException;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
@@ -28,41 +29,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.unitils.core.UnitilsException;
-
 /**
  * Class for managing and creating instances of a given type. A given annotation controls how a new instance will be created.
- * First all values of all found annotations in the test class or any super classes are collected . These values (super class values
- * before of sub class values), are then used to create the instance. If a custom create method is specified on the test class,
- * this method is used to create the instance, else {@link #createInstanceForValues} is used to create it. Custom create
- * methods are methods that are marked with the annotation and have one of following signatures:
+ * <p/>
+ * Instances will be created if an annotation instance is found that specifies values or if a custom create method
+ * is found. Custom create methods are methods that are marked with the annotation and have one of following signatures:
  * <ul>
  * <li>T createMethodName() or</li>
  * <li>T createMethodName(List<String> values)</li>
  * </ul>
- * For the second version the found values are passed to the creation method.
+ * For the second version the found annotation values are passed to the creation method.
+ * <p/>
+ * Subclass overrides superclass configuration. That is, when a subclass and superclass contain an annotation with values,
+ * only the values of the sub-class will be used. Same is true for custom create methods. Methods in subclasses override
+ * methods in superclasses.
  * <p/>
  * Lets explain all this with an example:
  * <pre><code>
  * ' @MyAnnotation("supervalue")
- *   public class SuperClass {
- *   }
+ * ' public class SuperClass {
+ * '
+ * '     @MyAnnotation
+ * '     protected MyType createMyType(List<String> values)
+ * ' }
  * '
  * ' @MyAnnotation({"value1", "value2"})
- *   public class MyClass extends SuperClass
- * <p/>
- * '     @MyAnnotation("value3")
- *       private MyType type
- * <p/>
- * '     @MyAnnotation
- *       protected MyType createMyType(List<String> values)
- * <p/>
- * <p/>
+ * ' public class MyClass extends SuperClass {
+ * '
+ * '}
  * </code></pre>
- * If a new instance needs to be created for this class, following steps are performed. First the value of the super class
- * annotation (supervalue) is retrieved. Next, the values of the MyClass are retrieved from the class annotation and the
- * field annotation. Lastly, the createMyType method is called to create the actual instance passing the list of
- * collected values (supervalue, value1, value2 and value3 in that order)
+ * Following steps are performed: there is annotation with 2 values on the sub class. These values override the value of
+ * the annotation in the superclass and will be used for creating a new instance. The 2 values are then passed to the
+ * createMyType custom create method to create the actual instance.
+ * <p/>
+ * If no custom create method is found, the default {@link #createInstanceForValues} method is called for creating
+ * the instance.
  * <p/>
  * Created instances are cached on the level in the hierarchy that caused the creation of the instance. That is,
  * if a subclass did not contain any annotations with values or any custom create methods, the super class is tried,
@@ -72,11 +73,10 @@ import org.unitils.core.UnitilsException;
  * If an instance needs to be recreated (for example because a test made modification to it), it can be removed from
  * the cache by calling {@link #invalidateInstance}
  *
- * @param <T> Type of the object that is configured by the annotations
- * @param <A> Type of the annotation that is used for configuring the instance
- 
  * @author Tim Ducheyne
  * @author Filip Neven
+ * @param <T> Type of the object that is configured by the annotations
+ * @param <A> Type of the annotation that is used for configuring the instance
  */
 public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
@@ -109,38 +109,15 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
 
     /**
-     * Gets an instance for the given test. An exception will be raised if no instance could be created because
-     * of an incorrect or missing configuration. For example, the annotation could not be found in the test object class
-     * or one of its super classes.
+     * Gets an instance for the given test. This will first look for values of annotations on the test class and
+     * its super classes. If there is a custom create method, that method is then used to create the instance
+     * (passing the values). If no create was found, {@link #createInstanceForValues} is called to create the instance.
      *
      * @param testObject The test object, not null
-     * @return The instance, not null
+     * @return The instance, null if not found
      */
     protected T getInstance(Object testObject) {
-        // check whether it already exists for the test class (eg registered instance)
-        T instance = instances.get(testObject.getClass());
-        if (instance != null) {
-            return instance;
-        }
-
-        // find class level for which a new instance should be created
-        Class<?> testClass = findClassLevelForCreateInstance(testObject.getClass());
-        if (testClass == null) {
-            return null;
-        }
-
-        // check whether it already exists
-        instance = instances.get(testClass);
-        if (instance != null) {
-            return instance;
-        }
-
-        // create instance
-        instance = createInstance(testObject, testClass);
-
-        // store instance in cache
-        registerInstance(testClass, instance);
-        return instance;
+        return getInstanceImpl(testObject, testObject.getClass());
     }
 
 
@@ -158,16 +135,13 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
     /**
      * Checks whether {@link #getInstance} will return an instance. If false is returned, {@link #getInstance} will
-     * throw an exception.
+     * return null.
      *
      * @param testObject The test object, not null
      * @return True if an instance is linked to the given test object
      */
     protected boolean hasInstance(Object testObject) {
-        if (instances.get(testObject.getClass()) != null) {
-            return true;
-        }
-        return findClassLevelForCreateInstance(testObject.getClass()) != null;
+        return hasInstanceImpl(testObject, testObject.getClass());
     }
 
 
@@ -190,177 +164,199 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
 
     /**
-     * Creates a new instance for the given test. This will first retrieve the values of all annotations on
-     * the test class and its super classes. If there is a custom create method, that method is then used
-     * to create the instance (passing the values). If no create was found, {@link #createInstanceForValues} is
-     * called to create the instance.
+     * Recursive implementation of {@link #hasInstance(Object)}.
      *
      * @param testObject The test object, not null
      * @param testClass  The level in the hierarchy
-     * @return The instance, not null
+     * @return True if an instance is linked to the given test object
      */
-    protected T createInstance(Object testObject, Class<?> testClass) {
-        // retrieve annotations values of test class and super classes
-        List<String> annotationValues = new ArrayList<String>();
-        getAnnotationValues(testObject, testClass, annotationValues);
-
-        // let custom create-method (if any) create instance
-        T instance = invokeCreateInstanceMethod(testObject, testClass, annotationValues);
-
-        // if no instance was created, use default creation mechanism
-        if (instance == null) {
-            instance = createInstanceForValues(annotationValues);
-        }
-        return instance;
-    }
-
-
-    /**
-     * Gets all values specified in annotations for the given testClass and all its super classes. Super class values
-     * in front of sub class values.
-     *
-     * @param testObject The test object, not null
-     * @param testClass  The current class in the hierarchy, can be null
-     * @param result     The list to which the values will be added, not null
-     */
-    protected void getAnnotationValues(Object testObject, Class<?> testClass, List<String> result) {
+    protected boolean hasInstanceImpl(Object testObject, Class<?> testClass) {
         // nothing to do (ends the recursion)
         if (testClass == null || testClass == Object.class) {
-            return;
+            return false;
         }
 
-        // add values of super classes
-        getAnnotationValues(testObject, testClass.getSuperclass(), result);
+        // check whether it already exists for the test class (eg registered instance)
+        if (instances.containsKey(testClass)) {
+            return true;
+        }
 
-        // get class level annotation values
-        List<String> classLevelAnnotationValues = getAnnotationValues(testClass.getAnnotation(annotationClass));
-        if (classLevelAnnotationValues != null) {
-            result.addAll(classLevelAnnotationValues);
+        // check annotation values
+        if (!getAnnotationValues(testClass).isEmpty()) {
+            return true;
         }
-        // get field level annotation values
-        List<Field> fields = getFieldsAnnotatedWith(testClass, annotationClass);
-        for (Field field : fields) {
-            List<String> fieldLevelAnnotationValues = getAnnotationValues(field.getAnnotation(annotationClass));
-            if (fieldLevelAnnotationValues != null) {
-                result.addAll(fieldLevelAnnotationValues);
-            }
+
+        // check custom create method
+        if (getCustomCreateMethod(testClass, false) != null) {
+            return true;
         }
-        // get method level annotation values
-        List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
-        for (Method method : methods) {
-            List<String> methodLevelAnnotationValues = getAnnotationValues(method.getAnnotation(annotationClass));
-            if (methodLevelAnnotationValues != null) {
-                result.addAll(methodLevelAnnotationValues);
-            }
-        }
+
+        // nothing found on this level, check super-class
+        return hasInstanceImpl(testObject, testClass.getSuperclass());
     }
 
 
     /**
-     * Creates an instance by calling a custom create method (if there is one). Such a create method should have one of
-     * following exact signatures:
-     * <ul>
-     * <li>Configuration createMethodName() or</li>
-     * <li>Configuration createMethodName(List<String> locations)</li>
-     * </ul>
-     * The second version receives the given locations. They both should return an instance (not null)
-     * <p/>
-     * If no create method was found, null is returned. If there is more than 1 create method found, an exception is raised.
+     * Recursive implementation of {@link #getInstance(Object)}.
      *
      * @param testObject The test object, not null
      * @param testClass  The level in the hierarchy
-     * @param locations  The specified locations if there are any, not null
-     * @return The instance, null if no create method was found
+     * @return The instance, null if not found
      */
-    @SuppressWarnings({"unchecked"})
-    protected T invokeCreateInstanceMethod(Object testObject, Class<?> testClass, List<String> locations) {
-        // get all annotated methods from the given test class, no superclasses
-        List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
-
-        T result = null;
-        boolean createMethodFound = false;
-        for (Method method : methods) {
-            // do not invoke setter methods
-            if (method.getReturnType() == Void.TYPE) {
-                continue;
-            }
-            if (!isCreateInstanceMethod(method)) {
-                throw new UnitilsException("Unable to invoke method annotated with @" + annotationClass.getSimpleName() +
-                        ". Ensure that this method has following signature: " + instanceClass.getName() + " myMethod( List<String> locations ) or " +
-                        instanceClass.getName() + " myMethod()");
-            }
-
-            // check whether there is more than 1 custom create method
-            if (createMethodFound) {
-                throw new UnitilsException("There can only be 1 method per class annotated with @" + annotationClass.getSimpleName() + " for creating a session factory.");
-            }
-            createMethodFound = true;
-
-            try {
-                // call method
-                if (method.getParameterTypes().length == 0) {
-                    result = (T) invokeMethod(testObject, method);
-                } else {
-                    result = (T) invokeMethod(testObject, method, locations);
-                }
-            } catch (InvocationTargetException e) {
-                throw new UnitilsException("Method " + testClass.getSimpleName() + "." + methods.get(0).getName() +
-                        " (annotated with " + annotationClass.getSimpleName() + ") has thrown an exception", e.getCause());
-            }
-            // check whether create returned a value
-            if (result == null) {
-                throw new UnitilsException("Method " + testClass.getSimpleName() + "." + methods.get(0).getName() +
-                        " (annotated with " + annotationClass.getSimpleName() + ") has returned null.");
-
-            }
-        }
-        return result;
-    }
-
-
-    /**
-     * Finds the level in the class hierarchy for which an instance should be created. That is, a class level that contains
-     * a custom create method or specifies a location in one of the annotations. Such a level should have its own instance
-     * and cannot reuse the instance of a superclass.
-     * <p/>
-     * If a class only contains annotations without locations (for example for injecting the instance into a field), the
-     * superclasses will be checked untill a level is found for which a config should be created. If no level is found,
-     * null is returned.
-     *
-     * @param testClass The current level in the hierarchy
-     * @return The level for which an instance should created, null if none found
-     */
-    protected Class<?> findClassLevelForCreateInstance(Class<?> testClass) {
+    protected T getInstanceImpl(Object testObject, Class<?> testClass) {
         // nothing to do (ends the recursion)
         if (testClass == null || testClass == Object.class) {
             return null;
         }
 
+        // check whether it already exists for the test class (eg registered instance)
+        T instance = instances.get(testClass);
+        if (instance != null) {
+            return instance;
+        }
+
+        // get annotation values of this class
+        List<String> annotationValues = getAnnotationValues(testClass);
+
+        // get custom create methods of this class
+        Method customCreateMethod = getCustomCreateMethod(testClass, false);
+
+        // invoke custom create method, if there is one
+        if (customCreateMethod != null) {
+            instance = invokeCustomCreateMethod(customCreateMethod, testObject, annotationValues);
+        } else if (!annotationValues.isEmpty()) {
+            customCreateMethod = getCustomCreateMethod(testClass, true);
+            if (customCreateMethod != null) {
+                // if there are values but no custom create method, use default creation mechanism
+                instance = invokeCustomCreateMethod(customCreateMethod, testObject, annotationValues);
+            } else {
+                instance = createInstanceForValues(annotationValues);
+            }
+        }
+
+        // if nothing found on this level, try super-class
+        if (instance == null) {
+            return getInstanceImpl(testObject, testClass.getSuperclass());
+        }
+
+        // initialize instance if needed
+        afterInstanceCreate(instance, testObject, testClass);
+
+        // store instance in cache
+        registerInstance(testClass, instance);
+        return instance;
+    }
+
+
+    /**
+     * Hook method that can be overriden to perform extra initialization after the instance was created.
+     *
+     * @param instance   The instance, not null
+     * @param testObject The test object, not null
+     * @param testClass  The level in the hierarchy
+     */
+    protected void afterInstanceCreate(T instance, Object testObject, Class<?> testClass) {
+    }
+
+
+    /**
+     * Gets the values of the annotations on the given class.
+     * This will look for class-level, method-level and field-level annotations with values.
+     * If more than 1 such annotation is found, an exception is raised.
+     * If no annotation was found, an empty list is returned.
+     *
+     * @param testClass The test class, not null
+     * @return The values of the annotation, empty list if none found
+     */
+    protected List<String> getAnnotationValues(Class<?> testClass) {
         // check class level annotation values
-        if (getAnnotationValues(testClass.getAnnotation(annotationClass)) != null) {
-            return testClass;
+        List<A> annotations = new ArrayList<A>();
+        A annotation = testClass.getAnnotation(annotationClass);
+        if (annotation != null && getAnnotationValues(annotation) != null) {
+            annotations.add(annotation);
         }
 
         // check field level annotation values
         List<Field> fields = getFieldsAnnotatedWith(testClass, annotationClass);
         for (Field field : fields) {
-            if (getAnnotationValues(field.getAnnotation(annotationClass)) != null) {
-                return testClass;
+            annotation = field.getAnnotation(annotationClass);
+            if (annotation != null && getAnnotationValues(annotation) != null) {
+                annotations.add(annotation);
             }
         }
 
         // check custom create methods and method level annotation values
         List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
         for (Method method : methods) {
-            if (isCreateInstanceMethod(method)) {
-                return testClass;
-            }
-            if (getAnnotationValues(method.getAnnotation(annotationClass)) != null) {
-                return testClass;
+            annotation = method.getAnnotation(annotationClass);
+            if (annotation != null && getAnnotationValues(annotation) != null) {
+                annotations.add(annotation);
             }
         }
-        // nothing found on this level, check superclass
-        return findClassLevelForCreateInstance(testClass.getSuperclass());
+
+        // check whether there is more than 1 annotation with values
+        if (annotations.size() > 1) {
+            throw new UnitilsException("There can only be 1 @" + annotationClass.getSimpleName() + " annotation with values per class.");
+        }
+
+        // if nothing found, return empty list
+        if (annotations.isEmpty()) {
+            return new ArrayList<String>();
+        }
+
+        // found exactly 1 annotation ==> get values
+        annotation = annotations.get(0);
+        return getAnnotationValues(annotation);
+    }
+
+
+    /**
+     * Gets the custom create methods on the given class.
+     * If there is more than 1 create method found, an exception is raised.
+     * If no create method was found, null is returned.
+     * If searchSuperClasses is true, it will also look in super classes for create methods.
+     *
+     * @param testClass          The test class, not null
+     * @param searchSuperClasses True to look recursively in superclasses
+     * @return The instance, null if no create method was found
+     */
+    protected Method getCustomCreateMethod(Class<?> testClass, boolean searchSuperClasses) {
+        // nothing to do (ends the recursion)
+        if (testClass == null || testClass == Object.class) {
+            return null;
+        }
+
+        // get all annotated methods from the given test class, no superclasses
+        List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
+
+        // look for correct signature (no return value)
+        List<Method> customCreateMethods = new ArrayList<Method>();
+        for (Method method : methods) {
+            // do not invoke setter methods
+            if (method.getReturnType() != Void.TYPE) {
+                customCreateMethods.add(method);
+            }
+        }
+
+        // check whether there is more than 1 custom create method
+        if (customCreateMethods.size() > 1) {
+            throw new UnitilsException("There can only be 1 method per class annotated with @" + annotationClass.getSimpleName() + " for creating a session factory.");
+        }
+
+        // if nothing found, look in superclass or return null
+        if (customCreateMethods.isEmpty()) {
+            if (searchSuperClasses) {
+                return getCustomCreateMethod(testClass.getSuperclass(), searchSuperClasses);
+            }
+            return null;
+        }
+
+        // found exactly 1 custom create method ==> check correct signature
+        Method customCreateMethod = customCreateMethods.get(0);
+        if (!isCustomCreateMethod(customCreateMethod)) {
+            throw new UnitilsException("Custom create method annotated with @" + annotationClass.getSimpleName() + " should have following signature: " + instanceClass.getName() + " myMethod( List<String> locations ) or " + instanceClass.getName() + " myMethod()");
+        }
+        return customCreateMethod;
     }
 
 
@@ -374,7 +370,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
      * @param method The method, not null
      * @return True if it has the correct signature
      */
-    protected boolean isCreateInstanceMethod(Method method) {
+    protected boolean isCustomCreateMethod(Method method) {
         Class<?>[] argumentTypes = method.getParameterTypes();
         if (argumentTypes.length > 1) {
             return false;
@@ -387,11 +383,45 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
 
     /**
-     * Gets the values that are specified for the given annotation. If the annotation is null or
-     * if no values were specified, null should be returned. An array with 1 empty string should
-     * also be considered to be empty.
+     * Creates an instance by calling a custom create method (if there is one). Such a create method should have one of
+     * following exact signatures:
+     * <ul>
+     * <li>Configuration createMethodName() or</li>
+     * <li>Configuration createMethodName(List<String> locations)</li>
+     * </ul>
+     * The second version receives the given locations. They both should return an instance (not null)
      *
-     * @param annotation The annotation
+     * @param customCreateMethod The create method, not null
+     * @param testObject         The test object, not null
+     * @param annotationValues   The specified locations if there are any, not null
+     * @return The instance, null if no create method was found
+     */
+    @SuppressWarnings({"unchecked"})
+    protected T invokeCustomCreateMethod(Method customCreateMethod, Object testObject, List<String> annotationValues) {
+        T result;
+        try {
+            // call method
+            if (customCreateMethod.getParameterTypes().length == 0) {
+                result = (T) invokeMethod(testObject, customCreateMethod);
+            } else {
+                result = (T) invokeMethod(testObject, customCreateMethod, annotationValues);
+            }
+        } catch (InvocationTargetException e) {
+            throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + customCreateMethod + " (annotated with " + annotationClass.getSimpleName() + ") has thrown an exception", e.getCause());
+        }
+        // check whether create returned a value
+        if (result == null) {
+            throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + customCreateMethod + " (annotated with " + annotationClass.getSimpleName() + ") has returned null.");
+        }
+        return result;
+    }
+
+
+    /**
+     * Gets the values that are specified for the given annotation. An array with 1 empty string should
+     * be considered to be empty and null should be returned.
+     *
+     * @param annotation The annotation, not null
      * @return The values, null if no values were specified
      */
     abstract protected List<String> getAnnotationValues(A annotation);

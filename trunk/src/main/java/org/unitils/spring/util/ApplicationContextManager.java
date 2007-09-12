@@ -15,14 +15,6 @@
  */
 package org.unitils.spring.util;
 
-import static java.util.Arrays.asList;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -33,6 +25,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.spring.annotation.SpringApplicationContext;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A class for managing and creating Spring application contexts.
@@ -186,18 +185,14 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
 
 
     /**
-     * Gets the locations that are specified for the given {@link SpringApplicationContext} annotation. If the
-     * annotation is null or if no locations were specified, null is returned. An array with 1 empty string is
-     * also be considered to be empty.
+     * Gets the locations that are specified for the given {@link SpringApplicationContext} annotation. An array with
+     * 1 empty string should be considered to be empty and null should be returned.
      *
-     * @param annotation The annotation
+     * @param annotation The annotation, not null
      * @return The locations, null if no values were specified
      */
     @Override
     protected List<String> getAnnotationValues(SpringApplicationContext annotation) {
-        if (annotation == null) {
-            return null;
-        }
         String[] locations = annotation.value();
         if (locations.length == 0 || (locations.length == 1 && StringUtils.isEmpty(locations[0]))) {
             return null;

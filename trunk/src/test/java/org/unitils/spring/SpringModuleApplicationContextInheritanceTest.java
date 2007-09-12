@@ -51,16 +51,29 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
 
 
     /**
-     * Tests creating the application context. First the context of the super class should be created, followed by
-     * the context of the subclass. The context of the superclass should have been set as parent of the subclass context.
+     * Tests creating the application context.
+     * Both super and sub class have annotations with values and custom create methods.
      */
-    public void testCreateApplicationContext() {
-        SpringTest1 springTest1 = new SpringTest1();
+    public void testCreateApplicationContext_overriden() {
+        SpringTestCustomCreate springTest1 = new SpringTestCustomCreate();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTest1);
 
         assertNotNull(applicationContext);
         assertFalse(springTest1.createMethod1Called);
         assertTrue(springTest1.createMethod2Called);
+    }
+
+
+    /**
+     * Tests creating the application context.
+     * Both super and sub class have annotations with values and but only super class has custom create method.
+     */
+    public void testCreateApplicationContext_overridenNoCustomCreateInSubClass() {
+        SpringTestNoCustomCreate springTestNoCustomCreate = new SpringTestNoCustomCreate();
+        ApplicationContext applicationContext = springModule.getApplicationContext(springTestNoCustomCreate);
+
+        assertNotNull(applicationContext);
+        assertTrue(springTestNoCustomCreate.createMethod1Called);
     }
 
 
@@ -106,20 +119,27 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
     }
 
     /**
-     * Test SpringTest sub-class.
+     * Test Spring sub-class with custom create.
      */
     @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
-    private class SpringTest1 extends SpringTestSuper {
+    private class SpringTestCustomCreate extends SpringTestSuper {
 
         protected boolean createMethod2Called = false;
 
         @SpringApplicationContext
         protected ApplicationContext createMethod2(List<String> locations) {
             createMethod2Called = true;
-            assertLenEquals(asList("classpath:org/unitils/spring/services-config.xml", "classpath:org/unitils/spring/services-config.xml"), locations);
+            assertLenEquals(asList("classpath:org/unitils/spring/services-config.xml"), locations);
             createMethod2Called = true;
             return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
         }
+    }
+
+    /**
+     * Test Spring sub-class without custom create.
+     */
+    @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
+    public class SpringTestNoCustomCreate extends SpringTestSuper {
     }
 
     /**
@@ -128,7 +148,6 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
     @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
     private class SpringTest2 extends SpringTestSuper {
     }
-
 
     /**
      * Test SpringTest sub-class without any context declaration.

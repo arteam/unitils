@@ -20,10 +20,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
-import static java.util.Arrays.asList;
 import java.util.List;
 import java.util.Properties;
 
@@ -107,14 +105,16 @@ public class SpringModuleApplicationContextTest extends TestCase {
 
 
     /**
-     * Tests creating an application context using class level annotation and 2 custom create methods.
+     * Tests for more than 1 annotation with values. An exception should have been raised.
      */
-    public void testGetApplicationContext_mixing() {
-        SpringTestMixing springTestMixing = new SpringTestMixing();
-        ApplicationContext applicationContext = springModule.getApplicationContext(springTestMixing);
-
-        assertNotNull(applicationContext);
-        assertTrue(springTestMixing.createMethodCalled);
+    public void testGetApplicationContext_multipleAnnotationsWithValues() {
+        SpringTestMultipleAnnotationsWithValues springTestMultipleAnnotationsWithValues = new SpringTestMultipleAnnotationsWithValues();
+        try {
+            springModule.getApplicationContext(springTestMultipleAnnotationsWithValues);
+            fail("Expected UnitilsException");
+        } catch (UnitilsException e) {
+            // expected
+        }
     }
 
 
@@ -136,7 +136,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
      * Tests getting an application context a second time, the same application context should be returned.
      */
     public void testGetApplicationContext_twice() {
-        SpringTestMixing springTestMixing = new SpringTestMixing();
+        SpringTest springTestMixing = new SpringTest();
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
         ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
 
@@ -149,7 +149,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
      * Tests invalidating a cached application context.
      */
     public void testInvalidateApplicationContext() {
-        SpringTestMixing springTestMixing = new SpringTestMixing();
+        SpringTest springTestMixing = new SpringTest();
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
         springModule.invalidateApplicationContext();
         ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
@@ -164,9 +164,9 @@ public class SpringModuleApplicationContextTest extends TestCase {
      * Tests invalidating a cached application context using the class name.
      */
     public void testInvalidateApplicationContext_classSpecified() {
-        SpringTestMixing springTestMixing = new SpringTestMixing();
+        SpringTest springTestMixing = new SpringTest();
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
-        springModule.invalidateApplicationContext(SpringTestMixing.class);
+        springModule.invalidateApplicationContext(SpringTest.class);
         ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
 
         assertNotNull(applicationContext1);
@@ -179,7 +179,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
      * Tests invalidating a cached application context using a wrong class name.
      */
     public void testInvalidateApplicationContext_otherClassSpecified() {
-        SpringTestMixing springTestMixing = new SpringTestMixing();
+        SpringTest springTestMixing = new SpringTest();
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
         springModule.invalidateApplicationContext(String.class, List.class);
         ApplicationContext applicationContext2 = springModule.getApplicationContext(springTestMixing);
@@ -206,7 +206,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context for an unknown location.
      */
-    public void testGetHibernateConfiguration_wrongLocation() {
+    public void testGetApplicationContext_wrongLocation() {
         SpringTestWrongLocation springTestWrongLocation = new SpringTestWrongLocation();
         try {
             springModule.getApplicationContext(springTestWrongLocation);
@@ -268,32 +268,16 @@ public class SpringModuleApplicationContextTest extends TestCase {
     }
 
     /**
-     * Test SpringTest class mixin class, field, setter and custom create methods.
-     * First the class level should be created, then a context for field1 with the class level as parent
-     * then for field2 with the previous a parent, then the setter context with the previous as parent
-     * and finally createMethod1 and createMethod2 should be called.
+     * Test SpringTest class mixing multiple annotations.
      */
     @SpringApplicationContext({"1"})
-    private class SpringTestMixing {
-
-        private boolean createMethodCalled = false;
+    private class SpringTestMultipleAnnotationsWithValues {
 
         @SpringApplicationContext({"2"})
         protected ApplicationContext field1;
 
         @SpringApplicationContext({"3"})
         protected ApplicationContext field2;
-
-        @SpringApplicationContext
-        protected ApplicationContext createMethod1(List<String> locations) {
-            assertLenEquals(asList("1", "2", "3", "4"), locations);
-            createMethodCalled = true;
-            return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
-        }
-
-        @SpringApplicationContext({"4"})
-        public void setField(ApplicationContext applicationContext) {
-        }
     }
 
     /**

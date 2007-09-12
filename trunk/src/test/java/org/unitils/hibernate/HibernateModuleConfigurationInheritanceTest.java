@@ -46,16 +46,30 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
 
     /**
      * Tests loading of a configuration location specified on class-level.
+     * Both super and sub class have annotations with values and custom create methods.
      */
-    public void testGetHibernateConfiguration() {
-        HibernateTest1 hibernateTest1 = new HibernateTest1();
+    public void testGetHibernateConfiguration_overriden() {
+        HibernateTestCustomCreate hibernateTest1 = new HibernateTestCustomCreate();
         Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTest1);
 
         assertNotNull(hibernateConfiguration);
-        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
-        assertEquals("overriden", hibernateConfiguration.getProperty("superValue"));
+        assertEquals("org/unitils/hibernate/hibernate-sub.cfg.xml", hibernateConfiguration.getProperty("name"));
         assertFalse(hibernateTest1.createMethod1Called);
         assertTrue(hibernateTest1.createMethod2Called);
+    }
+
+
+    /**
+     * Tests loading of a configuration location specified on class-level.
+     * Both super and sub class have annotations with values and but only super class has custom create method.
+     */
+    public void testGetHibernateConfiguration_overridenNoCustomCreateInSubClass() {
+        HibernateTestNoCustomCreate hibernateTest2 = new HibernateTestNoCustomCreate();
+        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTest2);
+
+        assertNotNull(hibernateConfiguration);
+        assertEquals("org/unitils/hibernate/hibernate-sub.cfg.xml", hibernateConfiguration.getProperty("name"));
+        assertTrue(hibernateTest2.createMethod1Called);
     }
 
 
@@ -106,10 +120,10 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
     }
 
     /**
-     * Test Hibernate sub-class.
+     * Test Hibernate sub-class with custom create.
      */
     @HibernateSessionFactory("org/unitils/hibernate/hibernate-sub.cfg.xml")
-    public class HibernateTest1 extends HibernateTestSuper {
+    public class HibernateTestCustomCreate extends HibernateTestSuper {
 
         protected boolean createMethod2Called = false;
 
@@ -122,6 +136,13 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
             }
             return config;
         }
+    }
+
+    /**
+     * Test Hibernate sub-class without custom create.
+     */
+    @HibernateSessionFactory("org/unitils/hibernate/hibernate-sub.cfg.xml")
+    public class HibernateTestNoCustomCreate extends HibernateTestSuper {
     }
 
     /**

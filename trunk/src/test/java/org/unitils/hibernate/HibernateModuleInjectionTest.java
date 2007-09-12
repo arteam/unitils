@@ -102,7 +102,6 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
         @HibernateSessionFactory
         private SessionFactory sessionFactoryField = null;
 
-        @SuppressWarnings("unused")
         private SessionFactory sessionFactorySetter;
 
         private boolean customInitializerCalled = false;

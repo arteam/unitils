@@ -15,29 +15,24 @@
  */
 package org.unitils.hibernate.util;
 
-import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import static org.hibernate.cfg.Environment.CURRENT_SESSION_CONTEXT_CLASS;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.util.AnnotatedInstanceManager;
+import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.unitils.core.UnitilsException;
-import org.unitils.core.util.AnnotatedInstanceManager;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
+import java.util.*;
+import static java.util.Arrays.asList;
 
 /**
  * A class for managing and creating Hibernate configurations and session factories.
@@ -167,15 +162,12 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * Hibernate will load the {@link HibernateConnectionProvider} as connection provider. This way we can make sure
      * that Hibernate will use the unitils datasource and thus connect to the unit test database.
      *
-     * @param testObject The test object, not null
-     * @param testClass  The level in the hierarchy
-     * @return The Hibernate configuration, not null
+     * @param configuration The Hibernate configuration, not null
+     * @param testObject    The test object, not null
+     * @param testClass     The level in the hierarchy
      */
     @Override
-    protected Configuration createInstance(Object testObject, Class<?> testClass) {
-        // create instance
-        Configuration configuration = super.createInstance(testObject, testClass);
-
+    protected void afterInstanceCreate(Configuration configuration, Object testObject, Class<?> testClass) {
         // invoke custom initialization method 
         invokeInitializationMethod(testObject, testClass, configuration);
 
@@ -195,7 +187,6 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
             unitilsHibernateProperties.setProperty(CURRENT_SESSION_CONTEXT_CLASS, currentSessionContextImplClassName);
         }
         configuration.addProperties(unitilsHibernateProperties);
-        return configuration;
     }
 
 
@@ -230,18 +221,14 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
 
 
     /**
-     * Gets the locations that are specified for the given {@link HibernateSessionFactory} annotation. If the
-     * annotation is null or if no locations were specified, null is returned. An array with 1 empty string is
-     * also be considered to be empty.
+     * Gets the locations that are specified for the given {@link HibernateSessionFactory} annotation. An array with
+     * 1 empty string should be considered to be empty and null should be returned.
      *
-     * @param annotation The annotation
+     * @param annotation The annotation, not null
      * @return The locations, null if no values were specified
      */
     @Override
     protected List<String> getAnnotationValues(HibernateSessionFactory annotation) {
-        if (annotation == null) {
-            return null;
-        }
         String[] locations = annotation.value();
         if (locations.length == 0 || (locations.length == 1 && isEmpty(locations[0]))) {
             return null;
