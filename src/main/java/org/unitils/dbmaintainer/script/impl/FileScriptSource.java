@@ -44,6 +44,7 @@ import java.util.*;
  */
 public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
 
+    /* Logger instance for this class */
     private static final Log logger = LogFactory.getLog(FileScriptSource.class);
 
     /**
@@ -55,7 +56,6 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * Property key for the directory in which the code script files are located
      */
     public static final String PROPKEY_CODESCRIPTFILES_LOCATIONS = "dbMaintainer.fileScriptSource.code.locations";
-
 
     /**
      * Property key for the directory in which the code script files are located
@@ -73,7 +73,10 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
     public static final String PROPKEY_CODESCRIPTFILES_FILEEXTENSIONS = "dbMaintainer.fileScriptSource.code.fileExtensions";
 
 
-    private ScriptFilesSpecification scriptFilesSpecification, codeScriptFilesSpecification, postProcessingCodeScriptFilesSpecification;
+    /**
+     * Descriptions of the locations and extensions of the script files
+     */
+    protected ScriptFilesSpecification scriptFilesSpecification, codeScriptFilesSpecification, postProcessingCodeScriptFilesSpecification;
 
 
     /**
@@ -88,8 +91,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
         final List<String> scriptFileLocations = getStringList(PROPKEY_SCRIPTFILES_LOCATIONS, configuration);
         verifyExistence(scriptFileLocations, PROPKEY_SCRIPTFILES_LOCATIONS);
         if (scriptFileLocations.isEmpty()) {
-            logger.warn("No directories or files are specificied using the property "
-                    + PROPKEY_SCRIPTFILES_LOCATIONS + ". The Unitils database maintainer won't do anyting");
+            logger.warn("No directories or files are specificied using the property " + PROPKEY_SCRIPTFILES_LOCATIONS + ". The Unitils database maintainer won't do anyting");
         }
         final List<String> scriptFileExtensions = getStringList(PROPKEY_SCRIPTFILES_FILEEXTENSIONS, configuration);
         verifyScriptFileExtionsions(scriptFileExtensions);

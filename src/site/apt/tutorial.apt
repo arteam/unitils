@@ -787,7 +787,7 @@ updateDataBaseSchema.enabled=true
     The directory in which the scripts are located can be set using following property:
     
 +-----+
-dbMaintainer.fileScriptSource.scripts.location=/myproject/dbscripts
+dbMaintainer.fileScriptSource.scripts.locations=/myproject/dbscripts
 +-----+
 
     If there are multiple directories they should be separated by commas. Subdirectories are also scanned for script files. All scripts are required to follow a 
@@ -1627,7 +1627,7 @@ void injectMock(Object mock, String name, Class type) {
     The directory(ies) containing script files with triggers, functions and stored procedures can be configured as follows:
     
 +-----+
-dbMaintainer.fileScriptSource.code.location=/myproject/dbscripts/procedures
+dbMaintainer.fileScriptSource.code.locations=/myproject/dbscripts/procedures
 +-----+
     
     Multiple directories can be configured by separating them with commas. Subdirectories are also scanned for script files. Since the sequence in which they are executed is in most 

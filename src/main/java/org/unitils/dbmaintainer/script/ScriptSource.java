@@ -40,7 +40,7 @@ public interface ScriptSource extends DatabaseTask {
      *
      * @return the current version of the scripts
      */
-    public Version getCurrentVersion();
+    Version getCurrentVersion();
 
     /**
      * This methods returns true if one or more scripts that have a version index equal to or lower than
