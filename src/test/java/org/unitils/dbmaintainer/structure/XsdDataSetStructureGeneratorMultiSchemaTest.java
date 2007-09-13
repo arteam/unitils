@@ -15,28 +15,26 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
-import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
 import org.unitils.core.dbsupport.SQLHandler;
+import static org.unitils.core.util.SQLUtils.executeUpdate;
+import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
+import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -83,7 +81,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
                     "   <xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />\n" +
                     "   <xsd:complexType name=\"TABLE_1__type\">\n" +
                     "       <xsd:attribute name=\"COLUMNC\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNA\" use=\"required\" />\n" +
+                    "       <xsd:attribute name=\"COLUMNA\" use=\"optional\" />\n" +
                     "       <xsd:attribute name=\"COLUMNB\" use=\"optional\" />\n" +
                     "   </xsd:complexType>\n" +
                     "   <xsd:complexType name=\"TABLE_2__type\">\n" +
@@ -102,7 +100,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
                     "   <xsd:element name=\"TABLE_3\" type=\"TABLE_3__type\" />\n" +
                     "   <xsd:complexType name=\"TABLE_1__type\">\n" +
                     "       <xsd:attribute name=\"COLUMNC\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNA\" use=\"required\" />\n" +
+                    "       <xsd:attribute name=\"COLUMNA\" use=\"optional\" />\n" +
                     "       <xsd:attribute name=\"COLUMNB\" use=\"optional\" />\n" +
                     "   </xsd:complexType>\n" +
                     "   <xsd:complexType name=\"TABLE_4__type\">\n" +
@@ -111,7 +109,7 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
                     "   </xsd:complexType>\n" +
                     "   <xsd:complexType name=\"TABLE_3__type\">\n" +
                     "       <xsd:attribute name=\"COLUMNC\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNA\" use=\"required\" />\n" +
+                    "       <xsd:attribute name=\"COLUMNA\" use=\"optional\" />\n" +
                     "       <xsd:attribute name=\"COLUMNB\" use=\"optional\" />\n" +
                     "   </xsd:complexType>\n" +
                     "</xsd:schema>";
