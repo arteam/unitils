@@ -90,7 +90,6 @@ public class ReflectionAssertPropertiesTest extends TestCase {
         try {
             assertPropertyRefEquals("stringProperty", "xxxxxx", testObject);
             fail("Expected AssertionFailedError");
-
         } catch (AssertionFailedError a) {
             // expected
         }
@@ -103,7 +102,6 @@ public class ReflectionAssertPropertiesTest extends TestCase {
         try {
             assertPropertyRefEquals("stringProperty", null, testObject);
             fail("Expected AssertionFailedError");
-
         } catch (AssertionFailedError a) {
             // expected
         }
@@ -118,7 +116,19 @@ public class ReflectionAssertPropertiesTest extends TestCase {
         try {
             assertPropertyRefEquals("stringProperty", "stringValue", testObject);
             fail("Expected AssertionFailedError");
+        } catch (AssertionFailedError a) {
+            // expected
+        }
+    }
 
+
+    /**
+     * Test case for null as actual object argument.
+     */
+    public void testAssertPropertyRefEquals_actualObjectNull() {
+        try {
+            assertPropertyRefEquals("aProperty", "aValue", null);
+            fail("Expected AssertionFailedError");
         } catch (AssertionFailedError a) {
             // expected
         }

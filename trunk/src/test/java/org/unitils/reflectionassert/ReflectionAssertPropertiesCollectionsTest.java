@@ -15,14 +15,13 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.List;
 
 /**
@@ -45,7 +44,7 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        list = Arrays.asList(new TestObject(1L, "el1"), new TestObject(2L, "el2"));
+        list = asList(new TestObject(1L, "el1"), new TestObject(2L, "el2"));
     }
 
 
@@ -53,7 +52,7 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      * Test for equal property values.
      */
     public void testAssertPropertyRefEquals() {
-        assertPropertyRefEquals("stringProperty", Arrays.asList("el1", "el2"), list);
+        assertPropertyRefEquals("stringProperty", asList("el1", "el2"), list);
     }
 
 
@@ -61,7 +60,7 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      * Test for equal property values but of different types (int versus long).
      */
     public void testAssertPropertyRefEquals_differentTypes() {
-        assertPropertyRefEquals("primitiveProperty", Arrays.asList(1L, 2L), list);
+        assertPropertyRefEquals("primitiveProperty", asList(1L, 2L), list);
     }
 
 
@@ -70,8 +69,8 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      */
     public void testAssertPropertyRefEquals_notEqualsDifferentValues() {
         try {
-            assertPropertyRefEquals("stringProperty", Arrays.asList("xxxxx", "xxxxx"), list);
-            Assert.fail("Expected AssertionFailedError");
+            assertPropertyRefEquals("stringProperty", asList("xxxxx", "xxxxx"), list);
+            fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError e) {
             // Expected
@@ -83,7 +82,7 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      * Test for property values with different order.
      */
     public void testAssertPropertyRefEquals_equalsDifferentOrder() {
-        assertPropertyRefEquals("stringProperty", Arrays.asList("el1", "el2"), list, LENIENT_ORDER);
+        assertPropertyRefEquals("stringProperty", asList("el1", "el2"), list, LENIENT_ORDER);
     }
 
 
@@ -91,7 +90,7 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      * Test for property values with different order.
      */
     public void testAssertPropertyLenEquals_equalsDifferentOrder() {
-        assertPropertyLenEquals("stringProperty", Arrays.asList("el1", "el2"), list);
+        assertPropertyLenEquals("stringProperty", asList("el1", "el2"), list);
     }
 
 
@@ -100,8 +99,8 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      */
     public void testAssertPropertyRefEquals_notEqualsDifferentOrder() {
         try {
-            assertPropertyRefEquals("stringProperty", Arrays.asList("el2", "el1"), list);
-            Assert.fail("Expected AssertionFailedError");
+            assertPropertyRefEquals("stringProperty", asList("el2", "el1"), list);
+            fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError e) {
             // Expected
@@ -113,7 +112,7 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      * Test for equal primitive property values. Using ints instead of longs.
      */
     public void testAssertPropertyRefEquals_equalsPrimitivesList() {
-        assertPropertyLenEquals("primitiveProperty", Arrays.asList(2, 1), list);
+        assertPropertyLenEquals("primitiveProperty", asList(2, 1), list);
     }
 
 
@@ -122,11 +121,23 @@ public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
      */
     public void testAssertPropertyRefEquals_notEqualsPrimitivesList() {
         try {
-            assertPropertyLenEquals("primitiveProperty", Arrays.asList(999, 1), list);
-            Assert.fail("Expected AssertionFailedError");
-
+            assertPropertyLenEquals("primitiveProperty", asList(999, 1), list);
+            fail("Expected AssertionFailedError");
         } catch (AssertionFailedError e) {
             // Expected
+        }
+    }
+
+
+    /**
+     * Test case for null as actual object argument.
+     */
+    public void testAssertPropertyRefEquals_actualObjectNull() {
+        try {
+            assertPropertyLenEquals("stringProperty", asList(1, 2), null);
+            fail("Expected AssertionFailedError");
+        } catch (AssertionFailedError a) {
+            // expected
         }
     }
 
