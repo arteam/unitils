@@ -144,10 +144,8 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseTask implements Da
                 writer.write("\t<xsd:complexType name=\"" + tableName + complexTypeSuffix + "\">\n");
 
                 Set<String> columnNames = dbSupport.getColumnNames(tableName);
-                Set<String> pkColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
                 for (String columnName : columnNames) {
-                    String use = pkColumnNames.contains(columnName) ? "required" : "optional";
-                    writer.write("\t\t<xsd:attribute name=\"" + columnName + "\" use=\"" + use + "\" />\n");
+                    writer.write("\t\t<xsd:attribute name=\"" + columnName + "\" use=\"optional\" />\n");
                 }
                 writer.write("\t</xsd:complexType>\n");
             }
