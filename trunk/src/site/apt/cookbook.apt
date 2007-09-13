@@ -194,26 +194,32 @@ public class UserDaoTest extends UnitilsJUnit4 {
 # test run, when creating the DataSource that provides access to the unit test database.
 updateDataBaseSchema.enabled=true
 
-# Directory in which the database update scripts are located.
-dbMaintainer.fileScriptSource.scripts.location=<Path to your database update script files>
+# Comma separated list of directories and files in which the database update scripts are located. Directories in this
+# list are recursively searched for files.
+dbMaintainer.fileScriptSource.scripts.locations=<Paths to your database update script files>
 
 # DbUnit database XSD directory
 dataSetStructureGenerator.xsd.dirName=<Path to your database XSD directory>
 
-# Comma separated list of table names. The tables in question will not be cleaned by the DBCleaner. Tables like these
-# Comma separated list of table names. The tables in question will not be cleaned by the DBCleaner. Tables like these
-# typically contain rather static, read only or type data. The database version table, indicated by the property
-# dbMaintainer.dbVersionSource.tableName, is preserved automatically, and doesn't have to be included in this list.
-# The tables in the list specified by dbMaintainer.cleardb.itemsToPreserve are also left untouched.  
-# Note that the DBClearer doesn't take this list into account. So when fromScratch is enabled
-# (dbMaintainer.fromScratch.enabled=true), these tables will be removed anyway. If you want some tables/views/sequences/...
-# to be preserved when creating the database from scratch, add them to dbMaintainer.cleardb.itemsToPreserve
-dbMaintainer.cleanDb.tablesToPreserve=<Optional list of tables from which the data should be preserved>
+# Comma separated list of database items that may not be dropped or cleared by the db maintainer when
+# updating the database from scratch (dbMaintainer.fromScratch.enabled=true).
+# Schemas can also be preserved as a whole. If identifiers are quoted (eg "" for oracle) they are considered
+# case sensitive. Items that do not have a schema prefix are considered to be in the default schema
+dbMaintainer.preserve.schemas=
+dbMaintainer.preserve.tables=
+dbMaintainer.preserve.views=
+dbMaintainer.preserve.synonyms=
+dbMaintainer.preserve.sequences=
 
-# Comma separated list of database items. These can be tables / views / sequences or trigger names. These items will not
-# be cleared by the DBClearer when updating the database from scratch (dbMaintainer.fromScratch.enabled=true). The tables
-# in this list will also not be cleaned by the DBCleaner.
-dbMaintainer.clearDb.itemsToPreserve=<Optional list of database items that shouldn't be dropped>
+# Comma separated list of table names. The tables listed here will not be emptied when the db maintainer performs a database
+# update. This can be used for Tables that contain rather static, read only or type data. The database version table
+# is preserved automatically.
+# Tables listed here will still be dropped when the db maintainer performs a from scratch update. If this is not desirable
+# you should add the tablename to the dbMaintainer.preserve.tables property instead
+# Schemas can also be preserved as a whole. If identifiers are quoted (eg "" for oracle) they are considered 
+# case sensitive. Items that do not have a schema prefix are considered to be in the default schema
+dbMaintainer.preserveDataOnly.schemas=
+dbMaintainer.preserveDataOnly.tables=
 +------+
 
     Every time an update DDL script is created, add it to the database scripts folder. The name of this script should
