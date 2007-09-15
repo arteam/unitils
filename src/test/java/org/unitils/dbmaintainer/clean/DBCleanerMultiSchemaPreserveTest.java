@@ -15,27 +15,23 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
-import static org.unitils.core.util.SQLUtils.isEmpty;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_DATA_SCHEMAS;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_DATA_TABLES;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
+import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_DATA_SCHEMAS;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_DATA_TABLES;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
-
 import java.util.Properties;
 
 /**
@@ -111,15 +107,15 @@ public class DBCleanerMultiSchemaPreserveTest extends UnitilsJUnit3 {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        assertFalse(isEmpty("TEST", dbSupport));
-        assertFalse(isEmpty("SCHEMA_A.TEST", dbSupport));
-        assertFalse(isEmpty("SCHEMA_B.TEST", dbSupport));
-        assertFalse(isEmpty("SCHEMA_C.TEST", dbSupport));
+        assertFalse(isEmpty("TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_B.TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_C.TEST", dataSource));
         dbCleaner.cleanSchemas();
-        assertFalse(isEmpty("TEST", dbSupport));
-        assertFalse(isEmpty("SCHEMA_A.TEST", dbSupport));
-        assertTrue(isEmpty("SCHEMA_B.TEST", dbSupport));
-        assertFalse(isEmpty("SCHEMA_C.TEST", dbSupport));
+        assertFalse(isEmpty("TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_A.TEST", dataSource));
+        assertTrue(isEmpty("SCHEMA_B.TEST", dataSource));
+        assertFalse(isEmpty("SCHEMA_C.TEST", dataSource));
     }
 
 

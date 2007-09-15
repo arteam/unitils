@@ -15,21 +15,17 @@
  */
 package org.unitils.dbunit;
 
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
-import static org.unitils.core.util.SQLUtils.getItemAsString;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
+import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
-
 import java.util.Properties;
 
 /**
@@ -160,11 +156,11 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
     @DataSet
     public class DataSetTest {
 
-    	@DataSet("DbUnitModuleDataSetMultiSchemaTest$DataSetTest.multiSchema.xml")
+        @DataSet("DbUnitModuleDataSetMultiSchemaTest$DataSetTest.multiSchema.xml")
         public void multiSchema() {
         }
 
-    	@DataSet("DbUnitModuleDataSetMultiSchemaTest$DataSetTest.multiSchemaNoDefault.xml")
+        @DataSet("DbUnitModuleDataSetMultiSchemaTest$DataSetTest.multiSchemaNoDefault.xml")
         public void multiSchemaNoDefault() {
         }
     }

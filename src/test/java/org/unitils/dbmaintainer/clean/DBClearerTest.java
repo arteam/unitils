@@ -23,7 +23,8 @@ import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
-import static org.unitils.core.util.SQLUtils.*;
+import static org.unitils.core.util.SQLTestUtils.*;
+import static org.unitils.database.SQLUnitils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
