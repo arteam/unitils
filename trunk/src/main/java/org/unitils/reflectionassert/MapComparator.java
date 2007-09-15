@@ -15,6 +15,10 @@
  */
 package org.unitils.reflectionassert;
 
+import static org.unitils.reflectionassert.ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
@@ -49,17 +53,40 @@ public class MapComparator extends ReflectionComparator {
             return new Difference("Different map sizes.", left, right, fieldStack);
         }
 
+        // Create copy from which we can remove elements.
+        Map<Object, Object> rightCopy = new HashMap<Object, Object>(rightMap);
+
         for (Map.Entry<?, ?> lhsEntry : leftMap.entrySet()) {
             Object lhsKey = lhsEntry.getKey();
-
-            fieldStack.push("" + lhsKey);
             Object lhsValue = lhsEntry.getValue();
-            Object rhsValue = rightMap.get(lhsKey);
-            Difference difference = rootComparator.getDifference(lhsValue, rhsValue, fieldStack, traversedInstancePairs);
-            if (difference != null) {
-                return difference;
+            fieldStack.push("" + lhsKey);
+
+            boolean found = false;
+            Iterator<Map.Entry<Object, Object>> rhsIterator = rightCopy.entrySet().iterator();
+            while (rhsIterator.hasNext()) {
+                Map.Entry<Object, Object> rhsEntry = rhsIterator.next();
+                Object rhsKey = rhsEntry.getKey();
+                Object rhsValue = rhsEntry.getValue();
+
+                // compare keys using strict reflection compare
+                boolean isKeyEqual = STRICT_COMPARATOR.isEqual(lhsKey, rhsKey);
+                if (isKeyEqual) {
+                    found = true;
+                    rhsIterator.remove();
+
+                    // compare values
+                    Difference difference = rootComparator.getDifference(lhsValue, rhsValue, fieldStack, traversedInstancePairs);
+                    if (difference != null) {
+                        return difference;
+                    }
+                    break;
+                }
             }
             fieldStack.pop();
+
+            if (!found) {
+                return new Difference("Left key not found in right map. Left key: " + lhsEntry.getKey(), left, right, fieldStack);
+            }
         }
         return null;
     }

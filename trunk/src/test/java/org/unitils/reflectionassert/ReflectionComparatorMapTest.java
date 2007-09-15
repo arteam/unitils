@@ -44,7 +44,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     /* Same as A and B but different key value for element 2 */
     private Map<String, Element> mapDifferentKey;
 
-    /* Test collection with inner map for element 2 */
+    /* Test map with inner map for element 2 */
     private Map<String, Element> mapInnerA;
 
     /* Same as innerA but different instance  */
@@ -52,6 +52,15 @@ public class ReflectionComparatorMapTest extends TestCase {
 
     /* Same as innerA and innerB but different string value for inner element 2 */
     private Map<String, Element> mapInnerDifferentValue;
+
+    /* Test map having a key type that returns false for equals() */
+    private Map<Element, Element> mapReflectionCompareKeyA;
+
+    /* Same as A but different instance */
+    private Map<Element, Element> mapReflectionCompareKeyB;
+
+    /* Same as A and B but with a different key value */
+    private Map<Element, Element> mapReflectionCompareDifferentKey;
 
     /* Class under test */
     private ReflectionComparator reflectionComparator;
@@ -71,6 +80,10 @@ public class ReflectionComparatorMapTest extends TestCase {
         mapInnerA = createMap("key 2", null, mapA);
         mapInnerB = createMap("key 2", null, mapB);
         mapInnerDifferentValue = createMap("key 2", null, mapDifferentValue);
+
+        mapReflectionCompareKeyA = createNotEqualsKeyMap("key 2");
+        mapReflectionCompareKeyB = createNotEqualsKeyMap("key 2");
+        mapReflectionCompareDifferentKey = createNotEqualsKeyMap("XXXXXX");
 
         reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
     }
@@ -139,15 +152,15 @@ public class ReflectionComparatorMapTest extends TestCase {
 
 
     /**
-     * Test for objects with inner maps that contain different keys.
+     * Test for maps that contain different keys.
      */
     public void testGetDifference_notEqualsDifferentKeys() {
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentKey);
 
         assertNotNull(result);
-        assertEquals("key 2", result.getFieldStack().get(0));
-        assertSame(mapA.get("key 2"), result.getLeftValue());
-        assertEquals(null, result.getRightValue());
+        assertTrue(result.getFieldStack().isEmpty());
+        assertSame(mapA, result.getLeftValue());
+        assertSame(mapDifferentKey, result.getRightValue());
     }
 
 
@@ -182,18 +195,56 @@ public class ReflectionComparatorMapTest extends TestCase {
 
 
     /**
+     * Tests for equal maps for which the keys are not equals() but are equal using reflection.
+     * The reflection comparator uses strict reflection compare on keys.
+     */
+    public void testGetDifference_equalsMapComparingKeysUsingReflection() {
+        Difference result = reflectionComparator.getDifference(mapReflectionCompareKeyA, mapReflectionCompareKeyB);
+        assertNull(result);
+    }
+
+
+    /**
+     * Tests for using reflection on key values with a different value for one of the keys.
+     * The reflection comparator uses strict reflection compare on keys.
+     */
+    public void testGetDifference_notEqualsMapComparingKeysUsingReflection() {
+        Difference result = reflectionComparator.getDifference(mapReflectionCompareKeyA, mapReflectionCompareDifferentKey);
+
+        assertNotNull(result);
+        assertTrue(result.getFieldStack().empty());
+        assertSame(mapReflectionCompareKeyA, result.getLeftValue());
+        assertSame(mapReflectionCompareDifferentKey, result.getRightValue());
+    }
+
+
+    /**
      * Creates a map.
      *
-     * @param keyElement2         the key for the 2nd element in the collection
-     * @param stringValueElement2 the value for the 2nd element in the collection
-     * @param innerElement2       the value for the inner array of the 2nd element in the collection
-     * @return the test collection
+     * @param keyElement2         the key for the 2nd element in the map
+     * @param stringValueElement2 the value for the 2nd element in the map
+     * @param innerElement2       the value for the inner array of the 2nd element in the map
+     * @return the test map
      */
-    private Map<String, Element> createMap(String keyElement2, String stringValueElement2, Map<?,?> innerElement2) {
+    private Map<String, Element> createMap(String keyElement2, String stringValueElement2, Map<?, ?> innerElement2) {
         Map<String, Element> map = new HashMap<String, Element>();
         map.put("key 1", new Element("test 1", null));
         map.put(keyElement2, new Element(stringValueElement2, innerElement2));
         map.put("key 3", new Element("test 3", null));
+        return map;
+    }
+
+
+    /**
+     * Creates a map.
+     *
+     * @param keyElement2 the key for the 2nd element in the map
+     * @return the test map
+     */
+    private Map<Element, Element> createNotEqualsKeyMap(String keyElement2) {
+        Map<Element, Element> map = new HashMap<Element, Element>();
+        map.put(new Element("key 1", null), new Element("test 1", null));
+        map.put(new Element(keyElement2, null), new Element("test 2", null));
         return map;
     }
 
@@ -207,7 +258,7 @@ public class ReflectionComparatorMapTest extends TestCase {
         private String string;
 
         /* An inner map */
-        private Map<?,?> inner;
+        private Map<?, ?> inner;
 
 
         /**
@@ -216,7 +267,7 @@ public class ReflectionComparatorMapTest extends TestCase {
          * @param string the string value
          * @param inner  the inner map
          */
-        public Element(String string, Map<?,?> inner) {
+        public Element(String string, Map<?, ?> inner) {
             this.string = string;
             this.inner = inner;
         }
@@ -235,7 +286,7 @@ public class ReflectionComparatorMapTest extends TestCase {
          *
          * @return the map
          */
-        public Map<?,?> getInner() {
+        public Map<?, ?> getInner() {
             return inner;
         }
 
