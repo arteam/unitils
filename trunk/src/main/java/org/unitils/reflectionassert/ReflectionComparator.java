@@ -17,9 +17,10 @@ package org.unitils.reflectionassert;
 
 import org.unitils.core.UnitilsException;
 
-import java.util.HashSet;
+import static java.lang.Boolean.TRUE;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 import java.util.Stack;
 
 
@@ -96,7 +97,7 @@ abstract public class ReflectionComparator {
      * @return the difference, null if there is no difference
      */
     public Difference getDifference(Object left, Object right) {
-        return getDifference(left, right, new Stack<String>(), new HashSet<TraversedInstancePair>());
+        return getDifference(left, right, new Stack<String>(), new HashMap<TraversedInstancePair, Boolean>());
     }
 
 
@@ -111,14 +112,16 @@ abstract public class ReflectionComparator {
      * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
      * @return The difference, null if there is no difference
      */
-    protected Difference getDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
-        if (isAlreadyTraversedInstancePair(left, right, traversedInstancePairs)) {
+    protected Difference getDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+        if (isTraversedInstancePairEqual(left, right, traversedInstancePairs)) {
             return null;
         }
 
         if (canHandle(left, right)) {
-            registerTraversedInstancePair(left, right, traversedInstancePairs);
-            return doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            registerTraversedInstancePair(left, right, true, traversedInstancePairs);
+            Difference difference = doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            registerTraversedInstancePair(left, right, (difference == null), traversedInstancePairs);
+            return difference;
         } else {
             if (chainedComparator == null) {
                 throw new UnitilsException("No ReflectionComparator found for objects " + left + " and" + right + " at " + fieldStack.toString());
@@ -142,7 +145,7 @@ abstract public class ReflectionComparator {
      * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
      * @return The difference, null if there is no difference
      */
-    abstract protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs);
+    abstract protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs);
 
 
     /**
@@ -163,34 +166,34 @@ abstract public class ReflectionComparator {
      * Registers the fact that the given left and right object have been compared, to make sure the same two objects
      * will not be compared again (to avoid infinite loops in case of circular references)
      *
-     * @param left                   the left instance
-     * @param right                  the right instance
-     * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
-     *                               same objects will not be compared again, in order to avoid infinite loops
+     * @param left                   The left instance
+     * @param right                  The right instance
+     * @param outcome                The outcome of the comparison
+     * @param traversedInstancePairs Map with pairs of objects that have been compared with each other.
      */
-    protected void registerTraversedInstancePair(Object left, Object right, Set<TraversedInstancePair> traversedInstancePairs) {
-        if (left != null && right != null) {
-            traversedInstancePairs.add(new TraversedInstancePair(left, right));
+    protected void registerTraversedInstancePair(Object left, Object right, boolean outcome, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+        if (left == null || right == null) {
+            return;
         }
+        traversedInstancePairs.put(new TraversedInstancePair(left, right), outcome);
     }
 
 
     /**
      * Checks whether the given left and right object have already been compared, according to the given set of
-     * traversedInstancePairs.
+     * traversedInstancePairs. If so, this will return the outcome of the comparison. False will be returned
+     * if the pair was not yet compared or is being compared.
      *
      * @param left                   the left instance
      * @param right                  the right instance
-     * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
-     *                               same objects will not be compared again, in order to avoid infinite loops
-     * @return true if the given left and right object have already been compared
+     * @param traversedInstancePairs Map with pairs of objects that have been compared with each other.
+     * @return true if already compared and equal, false otherwise
      */
-    protected boolean isAlreadyTraversedInstancePair(Object left, Object right, Set<TraversedInstancePair> traversedInstancePairs) {
+    protected boolean isTraversedInstancePairEqual(Object left, Object right, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         if (left == null || right == null) {
             return false;
-        } else {
-            return traversedInstancePairs.contains(new TraversedInstancePair(left, right));
         }
+        return traversedInstancePairs.get(new TraversedInstancePair(left, right)) == TRUE;
     }
 
 
@@ -296,15 +299,12 @@ abstract public class ReflectionComparator {
      */
     protected static class TraversedInstancePair {
 
-        /**
-         * The left object
-         */
+        /* The left object */
         private Object leftObject;
 
-        /**
-         * The right object
-         */
+        /* The right object */
         private Object rightObject;
+
 
         /**
          * Constructs a new instance with the given left and right object
