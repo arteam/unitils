@@ -15,20 +15,16 @@
  */
 package org.unitils.dbunit;
 
-import static org.unitils.core.util.SQLUtils.executeUpdate;
-import static org.unitils.core.util.SQLUtils.executeUpdateQuietly;
-import static org.unitils.core.util.SQLUtils.getItemAsString;
-
 import org.dbunit.dataset.IDataSet;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
+import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 
 import javax.sql.DataSource;
-
 import java.util.Properties;
 
 /**
