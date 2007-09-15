@@ -1,12 +1,23 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.reflectionassert;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import java.util.Stack;
-import java.util.Collection;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * todo javadoc
@@ -16,36 +27,22 @@ import java.util.Set;
  */
 public class CollectionComparator extends ReflectionComparator {
 
-    /**
-     * todo javadoc
-     * @param chainedComparator
-     */
+
+    // todo javadoc
     public CollectionComparator(ReflectionComparator chainedComparator) {
         super(chainedComparator);
     }
 
-    /**
-     * todo javadoc
-     *
-     * @param left
-     * @param right
-     * @return
-     */
+
+    // todo javadoc
     public boolean canHandle(Object left, Object right) {
-        return (left != null && right != null) &&
-                (left.getClass().isArray() || left instanceof Collection) && (right.getClass().isArray() || right instanceof Collection);
+        return (left != null && right != null) && (left.getClass().isArray() || left instanceof Collection) && (right.getClass().isArray() || right instanceof Collection);
     }
 
-    /**
-     * todo javadoc
-     * 
-     * @param left
-     * @param right
-     * @param fieldStack
-     * @param traversedInstancePairs
-     * @return
-     */
-    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
+
+    // todo javadoc
+    @Override
+    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         // Convert to list and compare as collection
         Collection<?> leftCollection = convertToCollection(left);
         Collection<?> rightCollection = convertToCollection(right);
@@ -68,6 +65,7 @@ public class CollectionComparator extends ReflectionComparator {
         }
         return null;
     }
+
 
     /**
      * Converts the given array or collection object (possibly primitive array) to type Collection

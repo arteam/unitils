@@ -1,3 +1,18 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.reflectionassert;
 
 import org.unitils.core.UnitilsException;
@@ -13,7 +28,7 @@ import java.util.Set;
  * This class functions as a factory for reflection comparator chains. A reflection comparator chain is a chain of
  * instances of {@link ReflectionComparator} subclasses. A reflection comparator chain will compare two objects with
  * each other using reflection, and returns a {@link ReflectionComparator.Difference} object. You can use a reflection
- * comparator chain by invoking {@link ReflectionComparator#getDifference(Object, Object)} on the root of the chain.
+ * comparator chain by invoking {@link ReflectionComparator#getDifference(Object,Object)} on the root of the chain.
  * <p/>
  * The {@link Object#equals} method is often used for business logic equality checking. The {@link Object#equals} method
  * can for example return true when the id fields of 2 instances have equal values, no matter what the values of the

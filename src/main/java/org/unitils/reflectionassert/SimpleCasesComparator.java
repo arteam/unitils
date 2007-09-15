@@ -1,7 +1,22 @@
+/*
+ * Copyright 2006 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.reflectionassert;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -12,38 +27,24 @@ import java.util.Stack;
  */
 public class SimpleCasesComparator extends ReflectionComparator {
 
-    /**
-     * todo javadoc
-     *
-     * @param chainedComparator
-     */
+
+    // todo javadoc
     public SimpleCasesComparator(ReflectionComparator chainedComparator) {
         super(chainedComparator);
     }
 
-    /**
-     * todo javadoc
-     *
-     * @param left
-     * @param right
-     * @return
-     */
+
+    // todo javadoc
     public boolean canHandle(Object left, Object right) {
         return left == right || left == null || right == null || left.getClass().getName().startsWith("java.lang") ||
                 (left instanceof Enum) && (right instanceof Enum) || (left instanceof Date) && (right instanceof Date) ||
                 ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number));
     }
 
-    /**
-     * todo javadoc
-     *
-     * @param left
-     * @param right
-     * @param fieldStack
-     * @param traversedInstancePairs
-     * @return
-     */
-    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Set<TraversedInstancePair> traversedInstancePairs) {
+
+    // todo javadoc
+    @Override
+    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         // check if the same instance is referenced
         if (left == right) {
             return null;
