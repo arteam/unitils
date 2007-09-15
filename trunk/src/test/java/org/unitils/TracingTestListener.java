@@ -16,7 +16,8 @@
 package org.unitils;
 
 import junit.framework.AssertionFailedError;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.rightPad;
 import org.unitils.core.TestListener;
 
 import java.lang.reflect.Method;
@@ -63,6 +64,17 @@ public class TracingTestListener extends TestListener {
     public List<String> getCallList() {
         return callList;
     }
+
+
+    public String getCallListAsString() {
+        StringBuffer result = new StringBuffer();
+        for (String call : callList) {
+            result.append(call);
+            result.append('\n');
+        }
+        return result.toString();
+    }
+
 
     public void setExceptionMethod(String exceptionMethod, boolean throwAssertionFailedError) {
         this.exceptionMethod = exceptionMethod;
@@ -146,12 +158,11 @@ public class TracingTestListener extends TestListener {
 
 
     private String formatString(String type, String invocation, String testClass, String testMethodName) {
-
-        String result = StringUtils.rightPad(type, 10);
-        result += StringUtils.rightPad(invocation, 17);
-        if (!StringUtils.isEmpty(testClass)) {
-            result += " - " + StringUtils.rightPad(testClass, 10);
-            if (!StringUtils.isEmpty(testMethodName)) {
+        String result = rightPad(type, 10);
+        result += rightPad(invocation, 17);
+        if (!isEmpty(testClass)) {
+            result += " - " + rightPad(testClass, 10);
+            if (!isEmpty(testMethodName)) {
                 result += " - " + testMethodName;
             }
         }

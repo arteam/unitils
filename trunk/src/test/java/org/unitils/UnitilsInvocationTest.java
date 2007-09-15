@@ -53,7 +53,6 @@ import java.util.Iterator;
  * @see UnitilsJUnit3Test_EmptyTestClass
  * @see UnitilsJUnit4Test_TestClass1
  * @see UnitilsJUnit4Test_TestClass2
- * @see UnitilsJUnit4Test_EmptyTestClass
  * @see UnitilsTestNGTest_TestClass1
  * @see UnitilsTestNGTest_TestClass2
  * @see UnitilsTestNGTest_EmptyTestClass
@@ -156,15 +155,11 @@ public class UnitilsInvocationTest {
 
         TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
         TestUnitilsJUnit4TestClassRunner testRunner2 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass2.class);
-        TestUnitilsJUnit4TestClassRunner testRunner3 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_EmptyTestClass.class);
         testRunner1.run(runNotifier);
         testRunner2.run(runNotifier);
-        testRunner3.run(runNotifier);
 
         assertInvocationOrder("JUnit4", tracingTestListener);
-        // EmptyTestClass has caused a failure
-        assertEquals(5, result.getRunCount());
-        assertEquals(1, result.getFailureCount());
+        assertEquals(4, result.getRunCount());
         assertEquals(1, result.getIgnoreCount());
     }
 
@@ -303,12 +298,6 @@ public class UnitilsInvocationTest {
             assertEquals("[Unitils] afterTestClass    - TestClass2", iterator.next());
         }
 
-        // EmptyTestClass has no tests and will not be run by TestNG and JUnit 3
-        if ("JUnit4".equals(type)) {
-            assertEquals("[Unitils] beforeTestClass   - EmptyTestClass", iterator.next());
-            assertEquals("[Unitils] afterTestClass    - EmptyTestClass", iterator.next());
-        }
-
         // For JUnit 3 and JUnit 4 afterAll will be called when the runtime exits
         if ("TestNG".equals(type)) {
             assertEquals("[Unitils] afterAll", iterator.next());
@@ -327,12 +316,12 @@ public class UnitilsInvocationTest {
         }
 
         @Override
-		protected Unitils getUnitils() {
+        protected Unitils getUnitils() {
 
             return new Unitils() {
 
                 @Override
-				public TestListener createTestListener() {
+                public TestListener createTestListener() {
                     return tracingTestListener;
                 }
             };
@@ -357,7 +346,7 @@ public class UnitilsInvocationTest {
             if (tracingTestListener != null) {
                 return new Unitils() {
 
-                	@Override
+                    @Override
                     public TestListener createTestListener() {
                         return tracingTestListener;
                     }

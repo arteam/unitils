@@ -17,11 +17,7 @@ package org.unitils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Ignore;
-import org.junit.internal.runners.InitializationError;
-import org.junit.internal.runners.TestClassMethodsRunner;
-import org.junit.internal.runners.TestClassRunner;
-import org.junit.internal.runners.TestMethodRunner;
+import org.junit.internal.runners.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -38,12 +34,12 @@ import java.lang.reflect.Method;
  * <p/>
  * NOTE: if a test fails, the error is logged as debug logging. This is a temporary work-around for
  * a problem with IntelliJ JUnit-4 runner that reports a 'Wrong test finished' error when something went wrong
- * in the before. [IDEA-12498] 
+ * in the before. [IDEA-12498]
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
+public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(UnitilsJUnit4TestClassRunner.class);
@@ -62,7 +58,7 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
      * @throws InitializationError
      */
     public UnitilsJUnit4TestClassRunner(Class<?> testClass) throws InitializationError {
-        super(testClass, new CustomTestClassMethodsRunner(testClass));
+        super(testClass);
 
         if (testListener == null) {
             testListener = getUnitils().createTestListener();
@@ -71,13 +67,9 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
     }
 
 
-    /**
-     * Overriden JUnit4 method to be able to call {@link TestListener#beforeAll}, {@link TestListener#beforeTestClass},
-     * {@link TestListener#afterTestClass}.
-     */
     @Override
-    public void run(RunNotifier notifier) {
-        // if this the first test, call beforeAll
+    public void run(final RunNotifier notifier) {
+        // if this is the first test, call beforeAll
         if (!beforeAllCalled) {
             try {
                 testListener.beforeAll();
@@ -85,63 +77,83 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
 
             } catch (Throwable t) {
                 logger.debug(getDescription(), t);
-                notifier.fireTestFailure(new Failure(getDescription(), t));
+                notifier.testAborted(getDescription(), t);
                 return;
             }
         }
 
-        try {
-            testListener.beforeTestClass(getTestClass());
-            super.run(notifier);
+        ClassRoadie classRoadie = new ClassRoadie(notifier, getTestClass(), getDescription(), new Runnable() {
+            public void run() {
+                runMethods(notifier);
+            }
+        });
 
+        Throwable throwable = null;
+        try {
+            testListener.beforeTestClass(getTestClass().getJavaClass());
+            classRoadie.runProtected();
         } catch (Throwable t) {
-            logger.debug(getDescription(), t);
             notifier.fireTestFailure(new Failure(getDescription(), t));
+            throwable = t;
         }
-
         try {
-            testListener.afterTestClass(getTestClass());
-
+            testListener.afterTestClass(getTestClass().getJavaClass());
         } catch (Throwable t) {
-            logger.debug(getDescription(), t);
-            notifier.fireTestFailure(new Failure(getDescription(), t));
+            // first exception is typically the most meaningful, so ignore second exception
+            if (throwable == null) {
+                notifier.fireTestFailure(new Failure(getDescription(), t));
+            }
         }
     }
 
 
     /**
-     * Custom runner that runs all test methods in the given class and invokes the unitils test listener methods
-     * at the apropriate moments.
+     * Overriden JUnit4 method to be able to create a CustomMethodRoadie that will invoke the
+     * unitils test listener methods at the apropriate moments.
      */
-    public static class CustomTestClassMethodsRunner extends TestClassMethodsRunner {
-
-        /* The current test instance */
-        private Object testObject;
-
-
-        /**
-         * Creates a runner for all test methods in the given class
-         *
-         * @param testClass the class, not null
-         */
-        public CustomTestClassMethodsRunner(Class<?> testClass) {
-            super(testClass);
+    protected void invokeTestMethod(Method method, RunNotifier notifier) {
+        Description description = methodDescription(method);
+        Object testObject;
+        try {
+            testObject = createTest();
+        } catch (InvocationTargetException e) {
+            notifier.testAborted(description, e.getCause());
+            return;
+        } catch (Exception e) {
+            notifier.testAborted(description, e);
+            return;
         }
+        TestMethod testMethod = wrapMethod(method);
+        new CustomMethodRoadie(testObject, method, testMethod, notifier, description).run();
+    }
+
+
+    /**
+     * Custom method roadie that invokes the unitils test listener methods at the apropriate moments.
+     */
+    public static class CustomMethodRoadie extends MethodRoadie {
+
+
+        /* Instance under test */
+        protected Object testObject;
+
+        /* Method under test */
+        protected Method testMethod;
 
 
         /**
-         * Overriden JUnit4 method to be able to call {@link TestListener#beforeTestSetUp}.
-         * This will also create a custom test method runner that enables us to call the before and after
-         * test methods.
+         * Creates a method roadie.
+         *
+         * @param testObject      The test instance, not null
+         * @param testMethod      The test method, not null
+         * @param jUnitTestMethod The JUnit test method
+         * @param notifier        The run listener, not null
+         * @param description     A test description
          */
-        @Override
-        protected TestMethodRunner createMethodRunner(Object test, Method method, RunNotifier notifier) {
-
-            if (!isIgnored(method)) {
-                testObject = test;   // store current test for afterTestTearDown
-                testListener.beforeTestSetUp(testObject);
-            }
-            return new CustomTestMethodRunner(test, method, notifier, methodDescription(method));
+        public CustomMethodRoadie(Object testObject, Method testMethod, TestMethod jUnitTestMethod, RunNotifier notifier, Description description) {
+            super(testObject, jUnitTestMethod, notifier, description);
+            this.testObject = testObject;
+            this.testMethod = testMethod;
         }
 
 
@@ -149,113 +161,42 @@ public class UnitilsJUnit4TestClassRunner extends TestClassRunner {
          * Overriden JUnit4 method to be able to call {@link TestListener#afterTestTearDown}.
          */
         @Override
-        protected void invokeTestMethod(Method method, RunNotifier notifier) {
-            boolean failed = false;
-            try {
-                super.invokeTestMethod(method, notifier);
-
-            } catch (Throwable t) {
-                logger.debug(getDescription(), t);
-                notifier.fireTestFailure(new Failure(getDescription(), t));
-                failed = true;
-            }
-
-            if (!isIgnored(method)) {
-                try {
-                    testListener.afterTestTearDown(testObject);
-
-                } catch (Throwable t) {
-                    // If a failure was already fired during the execution of the test method, firing
-                    // a failure again would replace that error. In most cases, the exception reported
-                    // during the method execution provides the most significant information, so we
-                    // don't want to replace it.
-                    if (!failed) {
-                        logger.debug(getDescription(), t);
-                        notifier.fireTestFailure(new Failure(getDescription(), t));
-                    }
-                }
-            }
-            testObject = null;
-        }
-
-
-        /**
-         * Checks whether the given test method should be skipped.
-         *
-         * @param testMethod the method, not null
-         * @return true if ignored
-         */
-        public boolean isIgnored(Method testMethod) {
-            return testMethod.getAnnotation(Ignore.class) != null;
-        }
-    }
-
-
-    /**
-     * Custom runner that runs the given test method and invokes the unitils test listener methods
-     * at the apropriate moments.
-     */
-    public static class CustomTestMethodRunner extends TestMethodRunner {
-
-        /* The test instance on which to invoke the test method */
-        private Object testObject;
-
-        /* The test method */
-        private Method testMethod;
-
-
-        /**
-         * Creates a runner for the given test method.
-         *
-         * @param testObject  the test instance on which to invoke the test method, not null
-         * @param testMethod  the test method, not null
-         * @param notifier    JUnits test listener, not null
-         * @param description the descriptor for the test, not null
-         */
-        public CustomTestMethodRunner(Object testObject, Method testMethod, RunNotifier notifier, Description description) {
-            super(testObject, testMethod, notifier, description);
-            this.testObject = testObject;
-            this.testMethod = testMethod;
-        }
-
-
-        /**
-         * Overriden JUnit4 method to be able to call {@link TestListener#beforeTestMethod} and
-         * {@link TestListener#afterTestMethod}.
-         */
-        @Override
-        protected void executeMethodBody() throws IllegalAccessException, InvocationTargetException {
+        public void runBeforesThenTestThenAfters(Runnable test) {
             Throwable throwable = null;
             try {
-                testListener.beforeTestMethod(testObject, testMethod);
-                super.executeMethodBody();
-
+                testListener.beforeTestSetUp(testObject);
+                super.runBeforesThenTestThenAfters(test);
             } catch (Throwable t) {
-                // hold exceptions until later, first call afterTestMethod
+                addFailure(t);
                 throwable = t;
             }
-
             try {
-                testListener.afterTestMethod(testObject, testMethod, throwable);
-
+                testListener.afterTestTearDown(testObject);
             } catch (Throwable t) {
                 // first exception is typically the most meaningful, so ignore second exception
                 if (throwable == null) {
-                    throwable = t;
+                    addFailure(t);
                 }
             }
+        }
 
-            if (throwable instanceof IllegalAccessException) {
-                throw (IllegalAccessException) throwable;
+
+        protected void runTestMethod() {
+            Throwable throwable = null;
+            try {
+                testListener.beforeTestMethod(testObject, testMethod);
+                super.runTestMethod();
+            } catch (Throwable t) {
+                addFailure(t);
+                throwable = t;
             }
-            if (throwable instanceof InvocationTargetException) {
-                throw (InvocationTargetException) throwable;
-            }
-            if (throwable instanceof RuntimeException) {
-                throw (RuntimeException) throwable;
-            }
-            if (throwable != null) {
-                throw new RuntimeException(throwable);
+            try {
+                testListener.afterTestMethod(testObject, testMethod, throwable);
+            } catch (Throwable t) {
+                // first exception is typically the most meaningful, so ignore second exception
+                if (throwable == null) {
+                    addFailure(t);
+                }
             }
         }
     }

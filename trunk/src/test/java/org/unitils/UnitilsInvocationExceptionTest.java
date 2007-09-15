@@ -32,7 +32,7 @@ import org.testng.TestNG;
 import static org.unitils.TracingTestListener.*;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.inject.util.InjectionUtils;
+import static org.unitils.inject.util.InjectionUtils.injectStatic;
 import org.unitils.util.ReflectionUtils;
 
 import java.util.Iterator;
@@ -72,8 +72,8 @@ public class UnitilsInvocationExceptionTest {
         oldTestListenerUnitilsJUnit3 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit3.class, "testListener", true));
         oldTestListenerUnitilsJUnit4 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit4TestClassRunner.class, "testListener", true));
 
-        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "testListener");
-        InjectionUtils.injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
+        injectStatic(null, UnitilsJUnit3.class, "testListener");
+        injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
 
         tracingTestListener = new TracingTestListener();
 
@@ -88,9 +88,8 @@ public class UnitilsInvocationExceptionTest {
      */
     @AfterClass
     public static void classTearDown() {
-
-        InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit3, UnitilsJUnit3.class, "testListener");
-        InjectionUtils.injectStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
+        injectStatic(oldTestListenerUnitilsJUnit3, UnitilsJUnit3.class, "testListener");
+        injectStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
     }
 
 
@@ -100,13 +99,12 @@ public class UnitilsInvocationExceptionTest {
      */
     @Before
     public void setUp() throws Exception {
-
         tracingTestListener.getCallList().clear();
 
         // clear state so that beforeAll is called
-        InjectionUtils.injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
-        InjectionUtils.injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
-        InjectionUtils.injectStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
+        injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
+        injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
+        injectStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
     }
 
 
@@ -117,7 +115,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_beforeAll_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(BEFORE_ALL, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -134,7 +131,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_beforeAll_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(BEFORE_ALL, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -151,12 +147,11 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_beforeAll() throws Exception {
-
         tracingTestListener.setExceptionMethod(BEFORE_ALL, false);
         Result result = performJUnit4Test();
 
         assertInvocationOrder_beforeAll("JUnit4", tracingTestListener);
-        assertEquals(0, result.getRunCount());
+        assertEquals(1, result.getRunCount());
         assertEquals(1, result.getFailureCount());
         assertEquals(0, result.getIgnoreCount());
     }
@@ -169,7 +164,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_beforeAll() throws Exception {
-
         tracingTestListener.setExceptionMethod(BEFORE_ALL, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -185,7 +179,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_beforeTestClass_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -202,7 +195,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_beforeTestClass_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -219,7 +211,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_beforeTestClass() throws Exception {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, false);
         Result result = performJUnit4Test();
 
@@ -237,7 +228,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_beforeTestClass() throws Exception {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_CLASS, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -254,7 +244,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_testBeforeClass() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_BEFORE_CLASS, false);
         Result result = performJUnit4Test();
 
@@ -272,7 +261,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_testBeforeClass() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_BEFORE_CLASS, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -288,7 +276,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_beforeTestSetUp_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -305,7 +292,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_beforeTestSetUp_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -322,12 +308,11 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_beforeTestSetUp() throws Exception {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, false);
         Result result = performJUnit4Test();
 
         assertInvocationOrder_beforeTestSetUp("JUnit4", tracingTestListener);
-        assertEquals(0, result.getRunCount());
+        assertEquals(2, result.getRunCount());
         assertEquals(2, result.getFailureCount());
         assertEquals(1, result.getIgnoreCount());
     }
@@ -340,7 +325,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_beforeTestSetUp() {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_SET_UP, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -356,7 +340,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_testSetUp_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(TEST_SET_UP, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -373,7 +356,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_testSetUp_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(TEST_SET_UP, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -390,7 +372,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_testSetUp() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_SET_UP, false);
         Result result = performJUnit4Test();
 
@@ -408,7 +389,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_testSetUp() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_SET_UP, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -424,7 +404,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_beforeTestMethod_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -441,7 +420,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_beforeTestMethod_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -458,7 +436,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_beforeTestMethod() throws Exception {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, false);
         Result result = performJUnit4Test();
 
@@ -476,7 +453,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_beforeTestMethod() {
-
         tracingTestListener.setExceptionMethod(BEFORE_TEST_METHOD, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -492,7 +468,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_testMethod_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(TEST_METHOD, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -509,7 +484,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_testMethod_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(TEST_METHOD, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -526,7 +500,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_testMethod() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_METHOD, false);
         Result result = performJUnit4Test();
 
@@ -544,7 +517,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_testMethod() {
-
         tracingTestListener.setExceptionMethod(TEST_METHOD, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -560,7 +532,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_afterTestMethod_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -577,7 +548,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_afterTestMethod_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -594,7 +564,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_afterTestMethod() throws Exception {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, false);
         Result result = performJUnit4Test();
 
@@ -612,7 +581,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_afterTestMethod() {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_METHOD, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -628,7 +596,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_testTearDown_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(TEST_TEAR_DOWN, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -645,7 +612,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_testTearDown_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(TEST_TEAR_DOWN, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -662,7 +628,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_testTearDown() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_TEAR_DOWN, false);
         Result result = performJUnit4Test();
 
@@ -680,7 +645,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_testTearDown() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_TEAR_DOWN, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -696,7 +660,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_afterTestTearDown_RuntimeException() {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -713,7 +676,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit3_afterTestTearDown_AssertionFailedError() {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, true);
         TestResult result = TestRunner.run(new TestSuite(UnitilsJUnit3Test_TestClass1.class));
 
@@ -730,7 +692,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_afterTestTearDown() throws Exception {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
         Result result = performJUnit4Test();
 
@@ -748,7 +709,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_afterTestTearDown() {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_TEAR_DOWN, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -765,7 +725,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_testAfterClass() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_AFTER_CLASS, false);
         Result result = performJUnit4Test();
 
@@ -783,7 +742,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_testAfterClass() throws Exception {
-
         tracingTestListener.setExceptionMethod(TEST_AFTER_CLASS, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -799,7 +757,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsJUnit4_afterTestClass() throws Exception {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_CLASS, false);
         Result result = performJUnit4Test();
 
@@ -817,7 +774,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_afterTestClass() {
-
         tracingTestListener.setExceptionMethod(AFTER_TEST_CLASS, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -833,7 +789,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @Test
     public void testUnitilsTestNG_afterAll() {
-
         tracingTestListener.setExceptionMethod(AFTER_ALL, false);
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
@@ -849,7 +804,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_beforeAll(String type, TracingTestListener tracingTestListener) {
-
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
@@ -875,7 +829,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_beforeTestClass(String type, TracingTestListener tracingTestListener) {
-
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
@@ -908,7 +861,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_testBeforeClass(String type, TracingTestListener tracingTestListener) {
-
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         // does not exist for JUnit3
@@ -944,7 +896,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_beforeTestSetUp(String type, TracingTestListener tracingTestListener) {
-
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
@@ -994,7 +945,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_testSetUp(String type, TracingTestListener tracingTestListener) {
-
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
@@ -1056,7 +1006,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_beforeTestMethod(String type, TracingTestListener tracingTestListener) {
-
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
@@ -1130,7 +1079,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
-
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
 
         if ("JUnit3".equals(type)) {
@@ -1210,7 +1158,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_testTearDown(String type, TracingTestListener tracingTestListener) {
-
         if ("JUnit3".equals(type) || "JUnit4".equals(type)) {
             assertInvocationOrder(type, tracingTestListener);
             return;
@@ -1249,7 +1196,6 @@ public class UnitilsInvocationExceptionTest {
      * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_afterTestTearDown(String type, TracingTestListener tracingTestListener) {
-
         if ("JUnit3".equals(type) || "JUnit4".equals(type)) {
             assertInvocationOrder(type, tracingTestListener);
             return;
@@ -1320,12 +1266,12 @@ public class UnitilsInvocationExceptionTest {
         }
 
         @Override
-		protected Unitils getUnitils() {
+        protected Unitils getUnitils() {
 
             return new Unitils() {
 
                 @Override
-				public TestListener createTestListener() {
+                public TestListener createTestListener() {
                     return tracingTestListener;
                 }
             };
