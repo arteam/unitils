@@ -45,8 +45,8 @@ public class LenientOrderCollectionComparator extends CollectionComparator {
 
         // Create copy from which we can remove elements.
         List<Object> rightCopy = new ArrayList<Object>(rightCollection);
-        for (Object lhsValue : leftCollection) {
 
+        for (Object lhsValue : leftCollection) {
             boolean found = false;
             Iterator<Object> rhsIterator = rightCopy.iterator();
             while (rhsIterator.hasNext()) {

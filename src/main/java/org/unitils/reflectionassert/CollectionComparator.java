@@ -48,8 +48,7 @@ public class CollectionComparator extends ReflectionComparator {
         Collection<?> rightCollection = convertToCollection(right);
 
         if (leftCollection.size() != rightCollection.size()) {
-            return new Difference("Different array/collection sizes. Left size: " + leftCollection.size() + ", right size: " +
-                    rightCollection.size(), left, right, fieldStack);
+            return new Difference("Different array/collection sizes. Left size: " + leftCollection.size() + ", right size: " + rightCollection.size(), left, right, fieldStack);
         }
 
         int i = 0;
