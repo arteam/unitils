@@ -159,7 +159,7 @@ public class UnitilsInvocationTest {
         testRunner2.run(runNotifier);
 
         assertInvocationOrder("JUnit4", tracingTestListener);
-        assertEquals(5, result.getRunCount());
+        assertEquals(4, result.getRunCount());
         assertEquals(1, result.getIgnoreCount());
     }
 
@@ -248,7 +248,6 @@ public class UnitilsInvocationTest {
      * @param tracingTestListener the listener, not null
      */
     private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
-        System.out.println("***** " + tracingTestListener.getCallListAsString());
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
 

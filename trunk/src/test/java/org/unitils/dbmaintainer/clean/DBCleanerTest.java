@@ -138,8 +138,8 @@ public class DBCleanerTest extends UnitilsJUnit3 {
      * Removes the test database tables
      */
     private void cleanupTestDatabase() {
-        dropTestTables(dbSupport, "TEST_TABLE", "TEST_TABLE_PRESERVE", dbSupport.quoted("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Table_Preserve"), versionTableName);
         dropTestViews(dbSupport, "TEST_VIEW");
+        dropTestTables(dbSupport, "TEST_TABLE", "TEST_TABLE_PRESERVE", dbSupport.quoted("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Table_Preserve"), versionTableName);
     }
 
 
