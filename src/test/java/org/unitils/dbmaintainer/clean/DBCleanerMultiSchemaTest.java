@@ -20,13 +20,13 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
 import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -74,9 +74,8 @@ public class DBCleanerMultiSchemaTest extends UnitilsJUnit3 {
         // configure 3 schemas
         configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
         SQLHandler sqlHandler = new SQLHandler(dataSource);
-        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
-        dbCleaner = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
-
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+        dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
 
         dropTestTables();
         createTestTables();

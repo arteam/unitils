@@ -43,6 +43,7 @@ import java.util.Properties;
  *
  * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Scott Prater
  */
 public class SequenceUpdaterTest extends UnitilsJUnit3 {
 
@@ -190,6 +191,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             createTestDatabasePostgreSql();
         } else if ("db2".equals(dialect)) {
             createTestDatabaseDb2();
+        } else if ("derby".equals(dialect)) {
+            createTestDatabaseDerby();
         } else {
             fail("This test is not implemented for current dialect: " + dialect);
         }
@@ -211,6 +214,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
             cleanupTestDatabasePostgreSql();
         } else if ("db2".equals(dialect)) {
             cleanupTestDatabaseDb2();
+        } else if ("derby".equals(dialect)) {
+            cleanupTestDatabaseDerby();
         }
     }
 
@@ -326,5 +331,25 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
         dropTestSequences(dbSupport, "test_sequence");
     }
 
+    //
+    // Database setup for Derby
+    //
 
+    /**
+     * Creates all test database structures
+     */
+    private void createTestDatabaseDerby() throws Exception {
+        // create table containing identity
+        executeUpdate("create table test_table1 (col1 int not null primary key generated always as identity, col2 varchar(12) not null)", dataSource);
+        // create table without identity
+        executeUpdate("create table test_table2 (col1 int not null primary key, col2 varchar(12) not null)", dataSource);
+    }
+
+
+    /**
+     * Drops all created test database structures
+     */
+    private void cleanupTestDatabaseDerby() throws Exception {
+        dropTestTables(dbSupport, "test_table1", "test_table2");
+    }
 }

@@ -56,7 +56,6 @@ public class SQLUnitils {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
             return statement.executeUpdate(sql);
-
         } catch (Exception e) {
             throw new UnitilsException("Error while executing statement: " + sql, e);
         } finally {

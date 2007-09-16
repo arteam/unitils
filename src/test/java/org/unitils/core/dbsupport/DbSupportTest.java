@@ -21,13 +21,12 @@ import org.hsqldb.Trigger;
 import org.unitils.UnitilsJUnit3;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
-import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
@@ -41,8 +40,9 @@ import java.util.Set;
  *
  * @author Tim Ducheyne
  * @author Filip Neven
+ * @author Scott Prater
  */
-public abstract class DbSupportTest extends UnitilsJUnit3 {
+public class DbSupportTest extends UnitilsJUnit3 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DbSupportTest.class);
@@ -56,26 +56,16 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
 
 
     /**
-     * Creates a new test for the given db support instance
-     *
-     * @param dbSupport The db support to test, not null
-     */
-    protected DbSupportTest(DbSupport dbSupport) {
-        this.dbSupport = dbSupport;
-    }
-
-
-    /**
      * Sets up the test fixture.
      */
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
-        Properties configuration = new ConfigurationLoader().loadConfiguration();
         // todo multiple schema names
-        String schemaName = PropertyUtils.getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
-        dbSupport.init(configuration, new SQLHandler(dataSource), schemaName);
+        Properties configuration = new ConfigurationLoader().loadConfiguration();
+        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -138,6 +128,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      */
     public void testGetTableNames_noFound() throws Exception {
         cleanupTestDatabase();
+
         Set<String> result = dbSupport.getTableNames();
         assertTrue(result.isEmpty());
     }
@@ -301,11 +292,13 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      * Tests dropping a table.
      */
     public void testDropTable() throws Exception {
-        if ("mysql".equals(dbSupport.getDatabaseDialect())) {
-            // Drop cascade does not work in MySQL. Therefore we first need to
-            // drop 'Test_CASE_Table' and only then test_table.
+        //Drop cascade does not work in MySQL and Derby. Therefore we first need to
+        // drop the views, next 'Test_CASE_Table' and then test_table.
+        if ("mysql".equals(dbSupport.getDatabaseDialect()) || "derby".equals(dbSupport.getDatabaseDialect())) {
+            dbSupport.dropView("Test_CASE_View");
+            dbSupport.dropView(dbSupport.toCorrectCaseIdentifier("test_view"));
             dbSupport.dropTable("Test_CASE_Table");
-            dbSupport.dropTable("test_table");
+            dbSupport.dropTable(dbSupport.toCorrectCaseIdentifier("test_table"));
         } else {
             Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {
@@ -314,7 +307,6 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         }
         Set<String> result = dbSupport.getTableNames();
         assertTrue(result.isEmpty());
-
     }
 
 
@@ -391,6 +383,7 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
      */
     public void testRemoveNotNullConstraint() throws Exception {
         dbSupport.removeNotNullConstraint(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), dbSupport.toCorrectCaseIdentifier("col2"));
+
         // should succeed now
         executeUpdate("insert into test_table (col1, col2) values (1, null)", dataSource);
     }
@@ -437,6 +430,8 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             createTestDatabasePostgreSql();
         } else if ("db2".equals(dialect)) {
             createTestDatabaseDb2();
+        } else if ("derby".equals(dialect)) {
+            createTestDatabaseDerby();
         } else {
             fail("This test is not implemented for current dialect: " + dialect);
         }
@@ -458,6 +453,8 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
             cleanupTestDatabasePostgreSql();
         } else if ("db2".equals(dialect)) {
             cleanupTestDatabaseDb2();
+        } else if ("derby".equals(dialect)) {
+            cleanupTestDatabaseDerby();
         }
     }
 
@@ -659,5 +656,38 @@ public abstract class DbSupportTest extends UnitilsJUnit3 {
         dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
     }
 
+    //
+    // Database setup for Derby
+    //
 
+    /**
+     * Creates all test database structures (view, tables...)
+     */
+    private void createTestDatabaseDerby() throws Exception {
+        // create tables
+        executeUpdate("create table \"TEST_TABLE\" (col1 int not null primary key generated by default as identity, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        // create views
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create synonyms
+        executeUpdate("create synonym test_synonym for test_table", dataSource);
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        // create triggers
+        executeUpdate("call SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('testKey', 'test')", dataSource);
+        executeUpdate("create trigger test_trigger no cascade before insert on \"Test_CASE_Table\" FOR EACH ROW MODE DB2SQL VALUES SYSCS_UTIL.SYSCS_GET_DATABASE_PROPERTY('testKey')", dataSource);
+        executeUpdate("create trigger \"Test_CASE_Trigger\" no cascade before insert on \"Test_CASE_Table\" FOR EACH ROW MODE DB2SQL VALUES SYSCS_UTIL.SYSCS_GET_DATABASE_PROPERTY('testKey')", dataSource);
+    }
+
+
+    /**
+     * Drops all created test database structures (views, tables...)
+     * First drop the views, since Derby doesn't support "drop table ... cascade" (yet, as of Derby 10.3)
+     */
+    private void cleanupTestDatabaseDerby() throws Exception {
+        dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTables(dbSupport, "\"Test_CASE_Table\"", "test_table");
+    }
 }
