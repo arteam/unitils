@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 the original author or authors.
+ * Copyright 2006-2007,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ public class UnitilsInvocationTest {
         testRunner2.run(runNotifier);
 
         assertInvocationOrder("JUnit4", tracingTestListener);
-        assertEquals(4, result.getRunCount());
+        assertEquals(5, result.getRunCount());
         assertEquals(1, result.getIgnoreCount());
     }
 
@@ -248,6 +248,7 @@ public class UnitilsInvocationTest {
      * @param tracingTestListener the listener, not null
      */
     private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
+        System.out.println("***** " + tracingTestListener.getCallListAsString());
         Iterator<?> iterator = tracingTestListener.getCallList().iterator();
         assertEquals("[Unitils] beforeAll", iterator.next());
 
