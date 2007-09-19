@@ -15,16 +15,12 @@
  */
 package org.unitils.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
+
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility methods that use reflection for instance creation or class inspection.
@@ -38,9 +34,8 @@ public class ReflectionUtils {
     /**
      * Creates an instance of the class with the given name.
      * The class's no argument constructor is used to create an instance.
-     * @param <T> 
      *
-     * @param className The name of the class, not null
+     * @param className           The name of the class, not null
      * @param bypassAccessibility If true, no exception is thrown if the parameterless constructor is not public
      * @return An instance of this class
      * @throws UnitilsException if the class could not be found or no instance could be created
@@ -69,8 +64,8 @@ public class ReflectionUtils {
     /**
      * Creates an instance of the given type
      *
-     * @param <T>  The type of the instance
-     * @param type The type of the instance
+     * @param <T>                 The type of the instance
+     * @param type                The type of the instance
      * @param bypassAccessibility If true, no exception is thrown if the parameterless constructor is not public
      * @return An instance of this type
      * @throws UnitilsException If an instance could not be created

@@ -31,11 +31,11 @@ import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
+import org.unitils.dbunit.datasetfactory.DataSetResolver;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
@@ -44,7 +44,7 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import javax.sql.DataSource;
-import java.io.InputStream;
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -173,43 +173,32 @@ public class DbUnitModule implements Module {
 
 
     /**
-     * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>,
+     * Inserts the test data coming from the given DbUnit dataset file
      * using the default {@link DataSetLoadStrategy} and {@link DataSetFactory} class.
      *
-     * @param inputStream The stream containing the test data set, not null
+     * @param dataSetFile The test data set, not null
      */
-    @SuppressWarnings("unchecked")
-    public void insertDataSet(InputStream inputStream) {
+    public void insertDataSet(File dataSetFile) {
         DataSetFactory dataSetFactory = getDefaultDataSetFactory();
         DataSetLoadStrategy dataSetLoadStrategy = getDefaultDataSetLoadStrategy();
-        insertDataSet(inputStream, dataSetFactory, dataSetLoadStrategy);
+
+        MultiSchemaDataSet multiSchemaDataSet = dataSetFactory.createDataSet(dataSetFile);
+        insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
     }
 
 
     /**
-     * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
+     * Inserts the test data coming from the given DbUnit dataset file.
      *
-     * @param inputStream              The stream containing the test data set, not null
+     * @param dataSetFile              The test data set, not null
      * @param dataSetFactoryClass      The class of the factory that must be used to read this dataset
      * @param dataSetLoadStrategyClass The class of the load strategy that must be used to load this dataset
      */
-    public void insertDataSet(InputStream inputStream, Class<? extends DataSetFactory> dataSetFactoryClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
+    public void insertDataSet(File dataSetFile, Class<? extends DataSetFactory> dataSetFactoryClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
         DataSetLoadStrategy dataSetLoadStrategy = createInstanceOfType(dataSetLoadStrategyClass, false);
-        DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        insertDataSet(inputStream, dataSetFactory, dataSetLoadStrategy);
-    }
+        DataSetFactory dataSetFactory = getDataSetFactory(dataSetFactoryClass);
 
-
-    /**
-     * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
-     *
-     * @param inputStream         The stream containing the test data set, not null
-     * @param dataSetFactory      The factory that must be used to read this dataset inputstream
-     * @param dataSetLoadStrategy The load strategy that must be used to load this dataset
-     */
-    protected void insertDataSet(InputStream inputStream, DataSetFactory dataSetFactory, DataSetLoadStrategy dataSetLoadStrategy) {
-        dataSetFactory.init(getDefaultDbSupport().getSchemaName());
-        MultiSchemaDataSet multiSchemaDataSet = dataSetFactory.createDataSet(inputStream);
+        MultiSchemaDataSet multiSchemaDataSet = dataSetFactory.createDataSet(dataSetFile);
         insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
     }
 
@@ -339,22 +328,14 @@ public class DbUnitModule implements Module {
      * @return The data set, null if the file does not exist
      */
     protected MultiSchemaDataSet getDataSet(Class<?> testClass, String[] dataSetFileNames, DataSetFactory dataSetFactory) {
-        List<InputStream> dataSetInputStreams = new ArrayList<InputStream>();
-        try {
-            for (String dataSetFileName : dataSetFileNames) {
-                InputStream dataSetInputStream = testClass.getResourceAsStream(dataSetFileName);
-                if (dataSetInputStream == null) {
-                    throw new UnitilsException("DataSet file with name " + dataSetFileName + " cannot be found");
-                }
-                dataSetInputStreams.add(dataSetInputStream);
-            }
-            return dataSetFactory.createDataSet(dataSetInputStreams.toArray(new InputStream[0]));
+        List<File> dataSetFiles = new ArrayList<File>();
 
-        } finally {
-            for (InputStream inputStream : dataSetInputStreams) {
-                closeQuietly(inputStream);
-            }
+        DataSetResolver dataSetResolver = getDataSetResolver();
+        for (String dataSetFileName : dataSetFileNames) {
+            File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
+            dataSetFiles.add(dataSetFile);
         }
+        return dataSetFactory.createDataSet(dataSetFiles.toArray(new File[0]));
     }
 
 
@@ -475,7 +456,7 @@ public class DbUnitModule implements Module {
      */
     protected DataSetFactory getDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
         DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        dataSetFactory.init(getDefaultDbSupport().getSchemaName());
+        dataSetFactory.init(configuration, getDefaultDbSupport().getSchemaName());
         return dataSetFactory;
     }
 
@@ -486,6 +467,16 @@ public class DbUnitModule implements Module {
     @SuppressWarnings("unchecked")
     protected DataSetLoadStrategy getDefaultDataSetLoadStrategy() {
         return createInstanceOfType((Class<? extends DataSetLoadStrategy>) getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "loadStrategy", configuration)), false);
+    }
+
+
+    /**
+     * @return The data set resolver, as configured in the Unitils configuration
+     */
+    protected DataSetResolver getDataSetResolver() {
+        DataSetResolver dataSetResolver = getConfiguredInstance(DataSetResolver.class, configuration);
+        dataSetResolver.init(configuration);
+        return dataSetResolver;
     }
 
 

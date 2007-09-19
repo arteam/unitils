@@ -42,5 +42,5 @@ public interface DataSetLoadStrategy {
      * @param dbUnitDatabaseConnection DbUnit class providing access to the database
      * @param dataSet                  The dbunit dataset
      */
-    public void execute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet);
+    void execute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet);
 }

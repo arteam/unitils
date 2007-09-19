@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.datasetloadstrategy;
+package org.unitils.dbunit.datasetloadstrategy.impl;
 
 import java.sql.SQLException;
 
@@ -21,15 +21,18 @@ import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
+import org.unitils.dbunit.datasetloadstrategy.impl.BaseDataSetLoadStrategy;
 
 /**
- * {@link DataSetLoadStrategy} that inserts the contents of the dataset into the database.
+ * {@link org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy} that 'refreshes' the contents of the database with the contents of the dataset. This means
+ * that data of existing rows is updated and non-existing rows are inserted. Any rows that are in the database but not
+ * in the dataset stay unaffected.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
- * @see DatabaseOperation#INSERT
+ * @see DatabaseOperation#REFRESH
  */
-public class InsertLoadStrategy extends BaseDataSetLoadStrategy {
+public class RefreshLoadStrategy extends BaseDataSetLoadStrategy {
 
     /**
      * Executes this DataSetLoadStrategy. This means the given dataset is inserted in the database using the given dbUnit
@@ -40,6 +43,6 @@ public class InsertLoadStrategy extends BaseDataSetLoadStrategy {
      */
     @Override
     public void doExecute(DbUnitDatabaseConnection dbUnitDatabaseConnection, IDataSet dataSet) throws DatabaseUnitException, SQLException {
-        DatabaseOperation.INSERT.execute(dbUnitDatabaseConnection, dataSet);
+        DatabaseOperation.REFRESH.execute(dbUnitDatabaseConnection, dataSet);
     }
 }

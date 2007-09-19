@@ -21,12 +21,12 @@ import org.unitils.core.UnitilsException;
 import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
-import org.unitils.dbunit.datasetfactory.MultiSchemaXmlDataSetFactory;
-import org.unitils.dbunit.datasetloadstrategy.CleanInsertLoadStrategy;
+import org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetFactory;
+import org.unitils.dbunit.datasetloadstrategy.impl.CleanInsertLoadStrategy;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 import javax.sql.DataSource;
-import java.io.InputStream;
+import java.io.File;
 import java.util.Properties;
 import java.util.Set;
 
@@ -61,7 +61,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
         dbUnitModule.init(configuration);
 
         dataSetFactory = new MultiSchemaXmlDataSetFactory();
-        dataSetFactory.init("PUBLIC");
+        dataSetFactory.init(configuration, "PUBLIC");
 
         dropTestTable();
         createTestTables();
@@ -146,8 +146,8 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * Test for a direct call to insertDataSet.
      */
     public void testInsertTestData_directCall() throws Exception {
-        InputStream dataSetIS = this.getClass().getResourceAsStream("CustomDataSet.xml");
-        dbUnitModule.insertDataSet(dataSetIS, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
+        File dataSetFile = new File(this.getClass().getResource("CustomDataSet.xml").getPath());
+        dbUnitModule.insertDataSet(dataSetFile, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
         assertLoadedDataSet("CustomDataSet.xml");
     }
 
@@ -158,8 +158,8 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit3 {
      * they should just be left null.
      */
     public void testInsertTestData_elementsWithDifferentColumns() throws Exception {
-        InputStream dataSetIS = this.getClass().getResourceAsStream("DifferentColumnsDataSet.xml");
-        dbUnitModule.insertDataSet(dataSetIS, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
+        File dataSetFile = new File(this.getClass().getResource("DifferentColumnsDataSet.xml").getPath());
+        dbUnitModule.insertDataSet(dataSetFile, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
         assertLenEquals(3, getItemAsLong("select count(1) from test", dataSource));
     }
 

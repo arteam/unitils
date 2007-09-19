@@ -17,7 +17,8 @@ package org.unitils.dbunit.datasetfactory;
 
 import org.unitils.dbunit.util.MultiSchemaDataSet;
 
-import java.io.InputStream;
+import java.io.File;
+import java.util.Properties;
 
 /**
  * Factory for creating DbUnit data sets.
@@ -31,18 +32,19 @@ public interface DataSetFactory {
     /**
      * Initializes this DataSetFactory
      *
+     * @param configuration     The configuration, not null
      * @param defaultSchemaName The name of the default schema of the test database, not null
      */
-    void init(String defaultSchemaName);
+    void init(Properties configuration, String defaultSchemaName);
 
 
     /**
-     * Creates a {@link MultiSchemaDataSet} using the given file. The file's contents are provided.
+     * Creates a {@link MultiSchemaDataSet} using the given file.
      *
-     * @param dataSetInputStreams The contents of the dataset files, not null
+     * @param dataSetFiles The dataset files, not null
      * @return A {@link MultiSchemaDataSet} containing the datasets per schema, not null
      */
-    MultiSchemaDataSet createDataSet(InputStream... dataSetInputStreams);
+    MultiSchemaDataSet createDataSet(File... dataSetFiles);
 
 
     /**
