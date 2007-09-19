@@ -21,10 +21,13 @@ import org.apache.commons.logging.LogFactory;
 import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.DataType;
 import org.unitils.core.UnitilsException;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.SAXParserFactory;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,27 +87,34 @@ public class MultiSchemaXmlDataSetReader {
 
 
     /**
-     * Parses the datasets from the given input streams.
+     * Parses the datasets from the given files.
      * Each schema is given its own dataset and each row is given its own table.
      *
-     * @param inputStreams the xml content streams, not null
+     * @param dataSetFiles The dataset files, not null
      * @return The read data set, not null
      */
-    public MultiSchemaDataSet readDataSetXml(InputStream... inputStreams) {
+    public MultiSchemaDataSet readDataSetXml(File... dataSetFiles) {
         try {
             DataSetContentHandler dataSetContentHandler = new DataSetContentHandler(defaultSchemaName);
             XMLReader xmlReader = createXMLReader();
             xmlReader.setContentHandler(dataSetContentHandler);
             xmlReader.setErrorHandler(dataSetContentHandler);
 
-            for (InputStream inputStream : inputStreams) {
-                xmlReader.parse(new InputSource(inputStream));
+            for (File dataSetFile : dataSetFiles) {
+                InputStream dataSetInputStream = null;
+                try {
+                    dataSetInputStream = new FileInputStream(dataSetFile);
+                    xmlReader.parse(new InputSource(dataSetInputStream));
+                } finally {
+                    closeQuietly(dataSetInputStream);
+                }
             }
             return dataSetContentHandler.getMultiSchemaDataSet();
 
         } catch (Exception e) {
             throw new UnitilsException("Unable to parse data set xml.", e);
         }
+
     }
 
 

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.datasetloadstrategy;
+package org.unitils.dbunit.datasetloadstrategy.impl;
 
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.dataset.IDataSet;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
+import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 
 import java.sql.SQLException;
 

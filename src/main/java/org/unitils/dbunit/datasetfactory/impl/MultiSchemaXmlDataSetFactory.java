@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbunit.datasetfactory;
+package org.unitils.dbunit.datasetfactory.impl;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
 import org.unitils.dbunit.util.MultiSchemaXmlDataSetReader;
 
-import java.io.InputStream;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * A data set factory that can handle data set definitions for multiple database schemas.
@@ -36,28 +39,28 @@ public class MultiSchemaXmlDataSetFactory implements DataSetFactory {
 
 
     /**
-     * Initializes the factory.
+     * Initializes this DataSetFactory
      *
-     * @param defaultSchemaName The default schema name to use, not null
+     * @param configuration     The configuration, not null
+     * @param defaultSchemaName The name of the default schema of the test database, not null
      */
-    public void init(String defaultSchemaName) {
+    public void init(Properties configuration, String defaultSchemaName) {
         this.defaultSchemaName = defaultSchemaName;
     }
 
 
     /**
-     * Creates a {@link MultiSchemaDataSet} using the given file. The file's contents are provided.
+     * Creates a {@link MultiSchemaDataSet} using the given file.
      *
-     * @param dataSetInputStreams The contents of the dataset files
-     * @return A {@link MultiSchemaDataSet} that represents the dataset
+     * @param dataSetFiles The dataset files, not null
+     * @return A {@link MultiSchemaDataSet} containing the datasets per schema, not null
      */
-    public MultiSchemaDataSet createDataSet(InputStream... dataSetInputStreams) {
+    public MultiSchemaDataSet createDataSet(File... dataSetFiles) {
         try {
             MultiSchemaXmlDataSetReader multiSchemaXmlDataSetReader = new MultiSchemaXmlDataSetReader(defaultSchemaName);
-            return multiSchemaXmlDataSetReader.readDataSetXml(dataSetInputStreams);
-
+            return multiSchemaXmlDataSetReader.readDataSetXml(dataSetFiles);
         } catch (Exception e) {
-            throw new UnitilsException("Unable to create DbUnit dataset for input streams.", e);
+            throw new UnitilsException("Unable to create DbUnit dataset for data set files: " + Arrays.toString(dataSetFiles), e);
         }
     }
 

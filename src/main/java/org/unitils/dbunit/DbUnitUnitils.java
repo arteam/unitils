@@ -19,7 +19,7 @@ import org.unitils.core.Unitils;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 
-import java.io.InputStream;
+import java.io.File;
 
 /**
  * Class providing access to the functionality of the dbunit module using static methods. Meant
@@ -50,25 +50,25 @@ public class DbUnitUnitils {
 
 
     /**
-     * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>,
+     * Inserts the test data coming from the given DbUnit dataset file,
      * using the default {@link DataSetLoadStrategy} and {@link DataSetFactory} class.
      *
-     * @param inputStream The stream containing the test data set, not null
+     * @param dataSetFile The test data set, not null
      */
-    public static void insertDataSet(InputStream inputStream) {
-        getDbUnitModule().insertDataSet(inputStream);
+    public static void insertDataSet(File dataSetFile) {
+        getDbUnitModule().insertDataSet(dataSetFile);
     }
 
 
     /**
-     * Inserts the test data coming from the DbUnit dataset file coming from the given <code>InputStream</code>
+     * Inserts the test data coming from the given DbUnit dataset file.
      *
-     * @param inputStream              The stream containing the test data set, not null
+     * @param dataSetFile              The test data set, not null
      * @param dataSetFactoryClass      The class of the factory that must be used to read this dataset
      * @param dataSetLoadStrategyClass The class of the load strategy that must be used to load this dataset
      */
-    public static void insertDataSet(InputStream inputStream, Class<? extends DataSetFactory> dataSetFactoryClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
-        getDbUnitModule().insertDataSet(inputStream, dataSetFactoryClass, dataSetLoadStrategyClass);
+    public static void insertDataSet(File dataSetFile, Class<? extends DataSetFactory> dataSetFactoryClass, Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClass) {
+        getDbUnitModule().insertDataSet(dataSetFile, dataSetFactoryClass, dataSetLoadStrategyClass);
     }
 
 

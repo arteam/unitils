@@ -13,26 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.util;
+package org.unitils.dbunit.datasetfactory;
 
-import org.unitils.core.dbsupport.SQLHandler;
-
+import java.io.File;
 import java.util.Properties;
 
 /**
- * Task that can be performed on a database.
+ * Resolves the location for a data set with a certain name.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
+ * @author Tuomas Jormola
  */
-public interface DatabaseTask {
+public interface DataSetResolver {
+
 
     /**
-     * Initializes the database operation class with the given {@link Properties}, {@link SQLHandler}.
+     * Initializes the resolver with the given configuration.
      *
      * @param configuration The configuration, not null
-     * @param sqlHandler    The sql handler, not null
      */
-    public void init(Properties configuration, SQLHandler sqlHandler);
+    void init(Properties configuration);
+
+
+    /**
+     * Resolves the location for a data set with a certain name.
+     * An exception is raised if the file could not be found.
+     *
+     * @param testClass   The test class, not null
+     * @param dataSetName The name of the data set, not null
+     * @return The data set file, not null
+     */
+    File resolve(Class<?> testClass, String dataSetName);
 
 }
