@@ -15,6 +15,15 @@
  */
 package org.unitils.database.transaction.impl;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -26,13 +35,7 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionalDataSource;
-import org.unitils.database.util.BaseConnectionProxy;
-import org.unitils.database.util.BaseDataSourceProxy;
 import org.unitils.spring.SpringModule;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Transaction manager that relies on Spring transaction management. When starting a Transaction, this transaction
@@ -65,7 +68,10 @@ public class SpringTransactionManager implements TransactionManager {
      * @return The transactional data source, not null
      */
     public TransactionalDataSource createTransactionalDataSource(DataSource dataSource) {
-        return new SpringTransactionalDataSource(dataSource);
+        return (TransactionalDataSource) Proxy.newProxyInstance(
+        		getClass().getClassLoader(), 
+        		new Class[] {TransactionalDataSource.class}, 
+        		new SpringTransactionalDataSourceProxyInvocationHandler(dataSource));
     }
 
 
@@ -159,61 +165,77 @@ public class SpringTransactionManager implements TransactionManager {
      * Proxy for a DataSource that makes the DataSource Spring transactional. Makes sure that connection are retrieved
      * and closed using Springs <code>DataSourceUtils</code>
      */
-    protected static class SpringTransactionalDataSource extends BaseDataSourceProxy implements TransactionalDataSource {
+    protected static class SpringTransactionalDataSourceProxyInvocationHandler implements InvocationHandler {
 
-
-        /**
-         * Creates a new instance without initializing the target <code>DataSource</code>. Make sure to call the method
-         * {@link #setTargetDataSource(javax.sql.DataSource)} before using this object.
-         */
-        public SpringTransactionalDataSource() {
-            super();
-        }
-
+    	
+    	private DataSource wrappedDataSource;
 
         /**
          * Creates a new instance that wraps the given <code>DataSource</code>
          *
          * @param wrappedDataSource the data source, not null
          */
-        public SpringTransactionalDataSource(DataSource wrappedDataSource) {
-            super(wrappedDataSource);
+        public SpringTransactionalDataSourceProxyInvocationHandler(DataSource wrappedDataSource) {
+            this.wrappedDataSource = wrappedDataSource;
         }
 
 
-        /**
+        public Object invoke(Object proxy, Method method, Object[] args)
+				throws Throwable {
+			if (method.getName().equals("getTransactionalConnection")) {
+				return getTransactionalConnection();
+			}
+			try {
+				return method.invoke(wrappedDataSource, args);
+			} catch (InvocationTargetException e) {
+				throw e.getTargetException();
+			}
+		}
+
+
+		/**
          * Retrieves a connection that can participate in a transaction.
          *
          * @return The connection, not null
          */
-        public Connection getTransactionalConnection() throws SQLException {
-            return new SpringConnectionProxy(DataSourceUtils.getConnection(this));
+        protected Connection getTransactionalConnection() throws SQLException {
+        	Connection connection = DataSourceUtils.getConnection(wrappedDataSource);
+			return (Connection) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {Connection.class}, new SpringConnectionProxyInvocationHandler(connection));
         }
 
 
         /**
-         * Connection proxy that intercepts the call to the close() method, to make sure
-         * the connection is only closed when the transaction ends.
+         * Invocation handler that can be used to create Connection proxy that intercepts the call to the close() method, and makes sure
+         * {@link DataSourceUtils#doReleaseConnection(Connection, DataSource)} is called instead of targetConnection.close().
          */
-        private class SpringConnectionProxy extends BaseConnectionProxy {
+        private class SpringConnectionProxyInvocationHandler implements InvocationHandler {
 
-            /**
-             * Constructs a new instance that proxies the given connection
+        	private Connection wrappedConnection;
+        	
+        	
+        	/**
+             * Constructs a new instance that delegates to the given connection
              *
              * @param wrappedConnection The connection to wrap, not null
              */
-            public SpringConnectionProxy(Connection wrappedConnection) {
-                super(wrappedConnection);
-            }
+            protected SpringConnectionProxyInvocationHandler(
+					Connection wrappedConnection) {
+				this.wrappedConnection = wrappedConnection;
+			}
 
 
-            /**
-             * Let spring close the connection. Only close when not in a transaction.
-             */
-            @Override
-            public void close() throws SQLException {
-                DataSourceUtils.doReleaseConnection(getTargetConnection(), SpringTransactionalDataSource.this);
-            }
+			public Object invoke(Object proxy, Method method, Object[] args)
+					throws Throwable {
+				if (method.getName().equals("close")) {
+					DataSourceUtils.doReleaseConnection(wrappedConnection, SpringTransactionalDataSourceProxyInvocationHandler.this.wrappedDataSource);
+					return null;
+				}
+				try {
+					return method.invoke(wrappedConnection, args);
+				} catch (InvocationTargetException e) {
+					throw e.getTargetException();
+				}
+			}
 
         }
     }

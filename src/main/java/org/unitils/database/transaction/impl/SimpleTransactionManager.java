@@ -15,6 +15,10 @@
  */
 package org.unitils.database.transaction.impl;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -25,8 +29,6 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionalDataSource;
-import org.unitils.database.util.BaseConnectionProxy;
-import org.unitils.database.util.BaseDataSourceProxy;
  
 /**
  * Default, simple implementation of {@link TransactionManager}. Implements transactions by wrapping the Unitils
@@ -66,7 +68,10 @@ public class SimpleTransactionManager implements TransactionManager {
         if (transactionalDataSource != null) {
             throw new UnitilsException("A DataSource has already been registered with this transaction manager");
         }
-        transactionalDataSource = new SimpleTransactionalDataSource(dataSource);
+        transactionalDataSource = (SimpleTransactionalDataSource) Proxy.newProxyInstance(
+        		getClass().getClassLoader(), 
+        		new Class[] {SimpleTransactionalDataSource.class}, 
+        		new SimpleTransactionalDataSourceProxyInvocationHandler(dataSource));
         
         // If startTransaction has been called before on this thread, a transaction is active. Since no DataSource
         // was available at the time of calling startTransaction, the transaction has not been initiated yet
@@ -137,6 +142,16 @@ public class SimpleTransactionManager implements TransactionManager {
         logger.debug("Rolling back transaction");
         transactionalDataSource.rollbackTransaction();
     }
+    
+    
+    protected static interface SimpleTransactionalDataSource extends TransactionalDataSource {
+    	
+    	void startTransaction();
+    	
+    	void commitTransaction();
+    	
+    	void rollbackTransaction();
+    }
 
 
     /**
@@ -144,8 +159,10 @@ public class SimpleTransactionManager implements TransactionManager {
      * is returned for a thread while a transaction is active, and that this connection is not closed while
      * the transaction is active.
      */
-    protected static class SimpleTransactionalDataSource extends BaseDataSourceProxy implements TransactionalDataSource {
+    protected static class SimpleTransactionalDataSourceProxyInvocationHandler implements InvocationHandler {
 
+    	protected DataSource wrappedDataSource;
+    	
         /**
          * ThreadLocal for storing the Connection associated to the treads using this DataSource
          */
@@ -153,30 +170,55 @@ public class SimpleTransactionManager implements TransactionManager {
 
 
         /**
-         * Creates a new instance without initializing the target <code>DataSource</code>. Make sure to call the method
-         * {@link #setTargetDataSource(javax.sql.DataSource)} before using this object.
-         */
-        public SimpleTransactionalDataSource() {
-            super();
-        }
-
-
-        /**
          * Creates a new instance that wraps the given <code>DataSource</code>
          *
          * @param wrappedDataSource the data source, not null
          */
-        public SimpleTransactionalDataSource(DataSource wrappedDataSource) {
-            super(wrappedDataSource);
+        public SimpleTransactionalDataSourceProxyInvocationHandler(DataSource wrappedDataSource) {
+            this.wrappedDataSource = wrappedDataSource;
         }
+        
+        
+        public Object invoke(Object proxy, Method method, Object[] args)
+				throws Throwable {
+			if (method.getName().equals("startTransaction")) {
+				startTransaction();
+				return null;
+			}
+			if (method.getName().equals("commitTransaction")) {
+				commitTransaction();
+				return null;
+			}
+			if (method.getName().equals("rollbackTransaction")) {
+				rollbackTransaction();
+				return null;
+			}
+			if (method.getName().equals("getTransactionalConnection")) {
+				return getTransactionalConnection();
+			}
+			if (method.getName().equals("getConnection")) {
+				if (args == null) {
+					return getConnection();
+				} else {
+					return getConnection((String) args[0], (String) args[1]);
+				}
+			}
+			try {
+				return method.invoke(wrappedDataSource, args);
+			} catch (InvocationTargetException e) {
+				throw e.getTargetException();
+			}
+			
+		}
 
 
+        // SimpleTransactionalDataSource methods
         /**
          * Starts a transaction for this current thread.
          *
          * @throws UnitilsException If a transaction was already associated with this thread
          */
-        public void startTransaction() {
+        protected void startTransaction() {
             if (connectionHolders.get() != null) {
                 throw new UnitilsException("A transaction was already associated with this thread");
             }
@@ -191,12 +233,12 @@ public class SimpleTransactionManager implements TransactionManager {
          *
          * @throws UnitilsException If no transaction was associated with this thread
          */
-        public void commitTransaction() {
+        protected void commitTransaction() {
             ConnectionHolder connectionHolder = connectionHolders.get();
             if (connectionHolder == null) {
                 throw new UnitilsException("Trying to commit transaction, but no transaction has been intiated on this thread");
             }
-            CloseSuppressingConnectionProxy conn = connectionHolder.getConnection();
+            CloseSuppressingConnection conn = connectionHolder.getConnection();
             if (conn != null) {
                 try {
                     conn.commit();
@@ -216,12 +258,12 @@ public class SimpleTransactionManager implements TransactionManager {
          *
          * @throws UnitilsException If no transaction was associated with this thread
          */
-        public void rollbackTransaction() {
+        protected void rollbackTransaction() {
             ConnectionHolder connectionHolder = connectionHolders.get();
             if (connectionHolder == null) {
                 throw new UnitilsException("Trying to rollback transaction, but no transaction has been intiated on this thread");
             }
-            CloseSuppressingConnectionProxy conn = connectionHolder.getConnection();
+            CloseSuppressingConnection conn = connectionHolder.getConnection();
             if (conn != null) {
                 try {
                     conn.rollback();
@@ -232,31 +274,32 @@ public class SimpleTransactionManager implements TransactionManager {
             }
             connectionHolders.remove();
         }
-
-
-        /**
-         * Returns the connection that has been associated with this thread. If no connection was associated yet,
-         * a connection is retrieved from the underlying DataSource and associated with the thread.
-         */
-        @Override
-        public Connection getConnection() throws SQLException {
-            return getConnection(new GetConnectionMethod() {
-
-                public Connection getConnection() throws SQLException {
-                    return getTargetDataSource().getConnection();
-                }
-            });
-        }
-
-
+        
+        
+        // TransactionalDataSource methods
         /**
          * Retrieves a connection that can participate in a transaction.
          * No special connection needed, same as {@link #getConnection()}
          *
          * @return The connection, not null
          */
-        public Connection getTransactionalConnection() throws SQLException {
+        protected Connection getTransactionalConnection() throws SQLException {
             return getConnection();
+        }
+
+
+        // DataSource methods
+        /**
+         * Returns the connection that has been associated with this thread. If no connection was associated yet,
+         * a connection is retrieved from the underlying DataSource and associated with the thread.
+         */
+        protected Connection getConnection() throws SQLException {
+            return getConnection(new GetConnectionMethod() {
+
+                public Connection getConnection() throws SQLException {
+                    return wrappedDataSource.getConnection();
+                }
+            });
         }
 
 
@@ -264,12 +307,11 @@ public class SimpleTransactionManager implements TransactionManager {
          * Returns the connection that has been associated with this thread. If no connection was associated yet,
          * a connection is retrieved from the underlying DataSource and associated with the thread.
          */
-        @Override
-        public Connection getConnection(final String username, final String password) throws SQLException {
+        protected Connection getConnection(final String username, final String password) throws SQLException {
             return getConnection(new GetConnectionMethod() {
 
                 public Connection getConnection() throws SQLException {
-                    return getTargetDataSource().getConnection(username, password);
+                    return wrappedDataSource.getConnection(username, password);
                 }
             });
         }
@@ -297,11 +339,11 @@ public class SimpleTransactionManager implements TransactionManager {
                 return connection;
             }
 
-            CloseSuppressingConnectionProxy connectionProxy = connectionHolder.getConnection();
+            CloseSuppressingConnection connectionProxy = connectionHolder.getConnection();
             if (connectionProxy == null) {
                 // First time that a Connection is requested during this transaction. Fetch a Connection and store it
                 // in the ConnectionHolder
-                connectionProxy = new CloseSuppressingConnectionProxy(getConnectionMethod.getConnection());
+                connectionProxy = getCloseSuppressingConnectionProxy(getConnectionMethod.getConnection());
                 // Switch to manual commit if necessary. This is very expensive in some JDBC drivers, so we don't want
                 // to do it unnecessarily
                 if (connectionProxy.getAutoCommit()) {
@@ -311,6 +353,22 @@ public class SimpleTransactionManager implements TransactionManager {
             }
             return connectionProxy;
         }
+        
+        
+        /**
+         * Returns a proxy that implements the {@link CloseSuppressingConnection} interface, that delegates to an actual {@link Connection}, 
+         * suppresses the {@link Connection#close()} method and implements the {@link CloseSuppressingConnection#doClose()} method which actually
+         * closes the target connection.
+         * 
+         * @param connection The wrapped connection to which is delegated
+         * @return A close suppressing connection
+         */
+        protected CloseSuppressingConnection getCloseSuppressingConnectionProxy(
+    			Connection connection) {
+    		CloseSuppressingConnection conn = (CloseSuppressingConnection) Proxy.newProxyInstance(getClass().getClassLoader(), 
+            		new Class[] {CloseSuppressingConnection.class}, new CloseSuppressionConnectionProxyInvocationHandler(connection));
+    		return conn;
+    	}
 
     }
 
@@ -321,13 +379,13 @@ public class SimpleTransactionManager implements TransactionManager {
     protected static class ConnectionHolder {
 
         /* The wrapped connection, which is a CloseSuppressingConnection */
-        protected CloseSuppressingConnectionProxy connection;
+        protected CloseSuppressingConnection connection;
 
 
         /**
          * @return The connection
          */
-        public CloseSuppressingConnectionProxy getConnection() {
+        public CloseSuppressingConnection getConnection() {
             return connection;
         }
 
@@ -337,39 +395,16 @@ public class SimpleTransactionManager implements TransactionManager {
          *
          * @param connection The connection, not null
          */
-        public void setConnection(CloseSuppressingConnectionProxy connection) {
+        public void setConnection(CloseSuppressingConnection connection) {
             this.connection = connection;
         }
     }
 
 
     /**
-     * Connection proxy that intercepts the call to the close() method, to make sure
-     * the connection is only closed when the transaction ends.
+     * Connection interface that defines an additional doClose() method.
      */
-    protected static class CloseSuppressingConnectionProxy extends BaseConnectionProxy {
-
-
-        /**
-         * Constructs a new instance that proxies the given connection
-         *
-         * @param wrappedConnection The connection to wrap, not null
-         */
-        public CloseSuppressingConnectionProxy(Connection wrappedConnection) {
-            super(wrappedConnection);
-        }
-
-
-        /**
-         * Supresses the call to the close method, to make sure the connection is only closed
-         * when the transaction ends.
-         *
-         * @see java.sql.Connection#close()
-         */
-        @Override
-        public void close() throws SQLException {
-            // Connection close is supressed
-        }
+    protected static interface CloseSuppressingConnection extends Connection {
 
 
         /**
@@ -377,9 +412,41 @@ public class SimpleTransactionManager implements TransactionManager {
          *
          * @throws SQLException If a problem occurs while closing the connection
          */
-        public void doClose() throws SQLException {
-            super.close();
-        }
+        public void doClose() throws SQLException;
+    }
+    
+    /**
+     * Invocation handler that can be used to implement a proxy implementing the {@link CloseSuppressingConnection} interface.
+     * The generated proxy delegates all method calls, unless the {@link Connection#close()} method, which is suppressed. 
+     * Actually closing the underlying {@link Connection} can be done using {@link CloseSuppressingConnection#doClose()}.
+     */
+    protected static class CloseSuppressionConnectionProxyInvocationHandler implements InvocationHandler {
+
+    	private Connection wrappedConnection;
+    	
+    	
+		protected CloseSuppressionConnectionProxyInvocationHandler(Connection wrappedConnection) {
+			this.wrappedConnection = wrappedConnection;
+		}
+
+
+		public Object invoke(Object proxy, Method method, Object[] args)
+				throws Throwable {
+			if (method.getName().equals("close")) {
+				// do nothing, connection close is suppressed
+				return null;
+			} 
+			if (method.getName().equals("doClose")) {
+				wrappedConnection.close();
+				return null;
+			}
+			try {
+				return method.invoke(wrappedConnection, args);
+			} catch (InvocationTargetException e) {
+				throw e.getTargetException();
+			}
+		}
+    	
     }
 
 
