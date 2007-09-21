@@ -149,7 +149,7 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + constraintName);
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + quoted(constraintName));
     }
 
 
@@ -162,7 +162,7 @@ public class MySqlDbSupport extends DbSupport {
     @Override
     public void removeNotNullConstraint(String tableName, String columnName) {
         String columnType = getSQLHandler().getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + columnName + "'");
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " change column " + columnName + " " + columnName + " " + columnType + " NULL ");
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " change column " + quoted(columnName) + " " + quoted(columnName) + " " + columnType + " NULL ");
     }
 
 

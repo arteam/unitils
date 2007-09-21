@@ -51,7 +51,7 @@ abstract public class DbSupport {
     /**
      * Property key for the default identifier quote string (empty value for not supported, auto)
      */
-    public static final String PROPKEY_IDENTIFIER_QUOTE_STRING = "database.indentifierQuoteString";
+    public static final String PROPKEY_IDENTIFIER_QUOTE_STRING = "database.identifierQuoteString";
 
 
     /* The name of the DBMS implementation that is supported by this implementation */
@@ -93,10 +93,10 @@ abstract public class DbSupport {
     public void init(Properties configuration, SQLHandler sqlHandler, String schemaName) {
         this.sqlHandler = sqlHandler;
 
-        String identifierQuoteString = PropertyUtils.getString(PROPKEY_IDENTIFIER_QUOTE_STRING + "." + getDatabaseDialect(), configuration);
+        String identifierQuoteStringProperty = PropertyUtils.getString(PROPKEY_IDENTIFIER_QUOTE_STRING + "." + getDatabaseDialect(), configuration);
         String storedIdentifierCaseValue = PropertyUtils.getString(PROPKEY_STORED_IDENTIFIER_CASE + "." + getDatabaseDialect(), configuration);
 
-        this.identifierQuoteString = determineIdentifierQuoteString(identifierQuoteString);
+        this.identifierQuoteString = determineIdentifierQuoteString(identifierQuoteStringProperty);
         this.storedIdentifierCase = determineStoredIdentifierCase(storedIdentifierCaseValue);
 
         this.schemaName = toCorrectCaseIdentifier(schemaName);
@@ -492,14 +492,14 @@ abstract public class DbSupport {
      * Determines the string used to quote identifiers to make them case-sensitive. This will use the connections
      * database metadata to determine the quote string.
      *
-     * @param identifierQuoteString The string to quote identifiers, 'none' if quoting is not supported, 'auto' for auto detection
+     * @param identifierQuoteStringProperty The string to quote identifiers, 'none' if quoting is not supported, 'auto' for auto detection
      * @return The quote string, null if quoting is not supported
      */
-    private String determineIdentifierQuoteString(String identifierQuoteString) {
-        if ("none".equals(identifierQuoteString)) {
+    private String determineIdentifierQuoteString(String identifierQuoteStringProperty) {
+        if ("none".equals(identifierQuoteStringProperty)) {
             return null;
-        } else if (!"auto".equals(identifierQuoteString)) {
-            return identifierQuoteString;
+        } else if (!"auto".equals(identifierQuoteStringProperty)) {
+            return identifierQuoteStringProperty;
         }
 
         Connection connection = null;

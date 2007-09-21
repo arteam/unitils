@@ -135,7 +135,7 @@ public class DbUnitModule implements Module {
                 // no dataset specified
                 return;
             }
-            DataSetLoadStrategy dataSetLoadStrategy = getDataSetOperation(testMethod, testObject.getClass());
+            DataSetLoadStrategy dataSetLoadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass());
 
             insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
         } catch (Exception e) {
@@ -258,9 +258,10 @@ public class DbUnitModule implements Module {
      * explicitly specified, these names will be used. Filenames that start with '/' are treated absolute. Filenames
      * that do not start with '/', are relative to the current class.
      * If an empty filename ("") is specified, this method will look for a file named 'classname'.xml.
+     * {@link #getDefaultDataSetFileName}).
      * <p/>
      * If a file is not found or could not be loaded (but was requested, because there is an annotation), an exception
-     * is raised.
+     * is thrown.
      *
      * @param testMethod The test method, not null
      * @param testObject The test object, not null
@@ -348,7 +349,7 @@ public class DbUnitModule implements Module {
      * @return The DbUnit operation, not null
      */
     @SuppressWarnings({"unchecked"})
-    protected DataSetLoadStrategy getDataSetOperation(Method testMethod, Class testClass) {
+    protected DataSetLoadStrategy getDataSetLoadStrategy(Method testMethod, Class testClass) {
         Class<? extends DataSetLoadStrategy> dataSetOperationClass = getMethodOrClassLevelAnnotationProperty(DataSet.class, "loadStrategy", DataSetLoadStrategy.class, testMethod, testClass);
         dataSetOperationClass = (Class<? extends DataSetLoadStrategy>) getClassValueReplaceDefault(DataSet.class, "loadStrategy", dataSetOperationClass, defaultAnnotationPropertyValues, DataSetLoadStrategy.class);
         return createInstanceOfType(dataSetOperationClass, false);
@@ -369,13 +370,13 @@ public class DbUnitModule implements Module {
 
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
-
-        /* Create DbUnits IDataTypeFactory, that handles dbms specific data type issues */
-        IDataTypeFactory dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
-
-        // Make sure correct dbms specific data types are used
         DatabaseConfig config = connection.getConfig();
+        
+        // Make sure that dbunit' correct IDataTypeFactory, that handles dbms specific data type issues, is used
+        IDataTypeFactory dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
         config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
+        // Make sure that table and column names are escaped using the dbms-specific identifier quote string
+        config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
         return connection;
     }
 
