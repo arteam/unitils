@@ -280,7 +280,7 @@ public class DbSupportTest extends UnitilsJUnit3 {
             return;
         }
 
-        dbSupport.incrementIdentityColumnToValue(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "col1", 30);
+        dbSupport.incrementIdentityColumnToValue(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "COL1", 30);
         executeUpdate("insert into test_table (col2) values ('xxxx')", dataSource);
 
         long result = getItemAsLong("select col1 from test_table", dataSource);

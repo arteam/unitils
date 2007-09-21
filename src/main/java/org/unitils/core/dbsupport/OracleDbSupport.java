@@ -200,7 +200,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName);
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
     }
 
 
@@ -213,7 +213,7 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public void removeNotNullConstraint(String tableName, String columnName) {
         String constraintName = getSQLHandler().getItemAsString("select con.CONSTRAINT_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and col.COLUMN_NAME = '" + columnName + "' and con.CONSTRAINT_TYPE = 'C' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME");
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + constraintName);
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
     }
 
 

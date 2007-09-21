@@ -205,7 +205,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + identityColumnName + " restart with " + identityValue);
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(identityColumnName) + " restart with " + identityValue);
     }
 
 
@@ -229,7 +229,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + constraintName);
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
     }
 
 
@@ -241,7 +241,7 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void removeNotNullConstraint(String tableName, String columnName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + columnName + " drop not null");
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " drop not null");
         getSQLHandler().executeUpdate("call SYSPROC.ADMIN_CMD('REORG TABLE " + qualified(tableName) + "')");
     }
 

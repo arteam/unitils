@@ -36,6 +36,7 @@ import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.TestedObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -114,7 +115,8 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
      * Tests incremental update of a database: No existing scripts are modified, but new ones are added. The database
      * is not cleared but the new scripts are executed on by one, incrementing the database version each time.
      */
-    public void testUpdateDatabase_incremental() throws Exception {
+    @SuppressWarnings("unchecked")
+	public void testUpdateDatabase_incremental() throws Exception {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
@@ -124,7 +126,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockVersionSource.setDbVersion(version1);
         mockScriptRunner.execute("Script 2");
         mockVersionSource.setDbVersion(version2);
-        expect(mockScriptSource.getAllPostProcessingCodeScripts()).andReturn(new ArrayList<Script>());
+        expect(mockScriptSource.getAllPostProcessingCodeScripts()).andReturn(Collections.EMPTY_LIST);
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDataSetStructureGenerator.generateDataSetStructure();
@@ -142,7 +144,8 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
      * Tests updating the database from scratch: Existing scripts have been modified. The database is cleared first
      * and all scripts are executed.
      */
-    public void testUpdateDatabase_fromScratch() throws Exception {
+    @SuppressWarnings("unchecked")
+	public void testUpdateDatabase_fromScratch() throws Exception {
         // Record behavior
         expect(mockVersionSource.getDbVersion()).andReturn(version0);
         expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
@@ -154,7 +157,7 @@ public class DBMaintainerTest extends UnitilsJUnit3 {
         mockVersionSource.setDbVersion(version1);
         mockScriptRunner.execute("Script 2");
         mockVersionSource.setDbVersion(version2);
-        expect(mockScriptSource.getAllPostProcessingCodeScripts()).andReturn(new ArrayList<Script>());
+        expect(mockScriptSource.getAllPostProcessingCodeScripts()).andReturn(Collections.EMPTY_LIST);
         mockConstraintsDisabler.disableConstraints();
         mockSequenceUpdater.updateSequences();
         mockDataSetStructureGenerator.generateDataSetStructure();

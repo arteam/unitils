@@ -69,7 +69,7 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseTask implements Da
 
     /**
      * Generates the DTD, and writes it to the file specified by the property {@link #PROPKEY_DTD_FILENAME}.
-     * The DTD will contain the structure of the dataabase. All tables will be written as optional elements and
+     * The DTD will contain the structure of the database. All tables will be written as optional elements and
      * all columns will be optional attributes.
      */
     public void generateDataSetStructure() {
