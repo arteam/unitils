@@ -262,7 +262,6 @@
                         <reports>
                             <report>license</report>
                             <report>scm</report>
-                            <report>issue-tracking</report>
                         </reports>
                     </reportSet>
                 </reportSets>
