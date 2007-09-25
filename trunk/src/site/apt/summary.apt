@@ -73,6 +73,11 @@ Summary
 
 * News
 ~~~~~~
+	<<2007-09-25 - Switched to JIRA>>
+	
+	We've migrated the issue and feature tracking to JIRA! Bugs and feature requests can now be reported 
+	at {{{http://jira.unitils.org}http://jira.unitils.org}}. 
+	
     <<2007-08-15 - Release of Unitils 1.0 rc 4>>
   
     Release candidate 4 for Unitils is available. It contains some important fixes, support for loading multiple data sets and easier access to 
