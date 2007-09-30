@@ -6,7 +6,6 @@ import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SCHEMAS;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SEQUENCES;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SYNONYMS;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_TABLES;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_VIEWS;
 
@@ -91,7 +90,6 @@ public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 		configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_TABLE"));
 		configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "test_view, " + "schema_a." + dbSupportSchemaA.quoted("TEST_VIEW"));
 		configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupportSchemaA.quoted("SCHEMA_A") + ".test_sequence");
-		configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "test_synonym, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_SYNONYM"));
 		// create clearer instance
 		defaultDbClearer = new DefaultDBClearer();
 		defaultDbClearer.init(configuration, sqlHandler);

@@ -87,8 +87,12 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
 		// configure items to preserve
 		configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupport.quoted("Test_CASE_Table"));
 		configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "test_view, " + dbSupport.quoted("Test_CASE_View"));
-		configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupport.quoted("Test_CASE_Sequence"));
-		configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "test_synonym, " + dbSupport.quoted("Test_CASE_Synonym"));
+		if (dbSupport.supportsSequences()) {
+			configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupport.quoted("Test_CASE_Sequence"));
+		}
+		if (dbSupport.supportsSynonyms()) {
+			configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "test_synonym, " + dbSupport.quoted("Test_CASE_Synonym"));
+		}
 		// create clearer instance
 		defaultDbClearer = new DefaultDBClearer();
 		defaultDbClearer.init(configuration, sqlHandler);
