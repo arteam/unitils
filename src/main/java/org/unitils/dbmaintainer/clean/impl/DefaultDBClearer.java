@@ -265,7 +265,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
 			for (String tableToPreserve : entry.getValue()) {
 				if (!tableNames.contains(tableToPreserve)) {
-					throw new UnitilsException("Table to preserve does not exist: " + tableToPreserve + ".\nUnitils cannot determine which tables need to be preserved. To assure nothing is dropped by mistake, no tables will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TABLES + " property.");
+					throw new UnitilsException("Table to preserve does not exist: " + tableToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which tables need to be preserved. To assure nothing is dropped by mistake, no tables will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TABLES + " property.");
 				}
 			}
 		}
@@ -290,7 +290,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
 			for (String viewToPreserve : entry.getValue()) {
 				if (!viewNames.contains(viewToPreserve)) {
-					throw new UnitilsException("View to preserve does not exist: " + viewToPreserve + ".\nUnitils cannot determine which views need to be preserved. To assure nothing is dropped by mistake, no views will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_VIEWS + " property.");
+					throw new UnitilsException("View to preserve does not exist: " + viewToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which views need to be preserved. To assure nothing is dropped by mistake, no views will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_VIEWS + " property.");
 				}
 			}
 		}
@@ -311,11 +311,17 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 		Map<String, Set<String>> sequencesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SEQUENCES, configuration);
 		for (Map.Entry<String, Set<String>> entry : sequencesToPreserve.entrySet()) {
 			String schemaName = entry.getKey();
-			Set<String> sequenceNames = getDbSupport(schemaName).getSequenceNames();
 
+			DbSupport dbSupport = getDbSupport(schemaName);
+			Set<String> sequenceNames;
+			if (!dbSupport.supportsSequences()) {
+				sequenceNames = new HashSet<String>();
+			} else {
+				sequenceNames = dbSupport.getSequenceNames();
+			}
 			for (String sequenceToPreserve : entry.getValue()) {
 				if (!sequenceNames.contains(sequenceToPreserve)) {
-					throw new UnitilsException("Sequence to preserve does not exist: " + sequenceToPreserve + ".\nUnitils cannot determine which sequences need to be preserved. To assure nothing is dropped by mistake, no sequences will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SEQUENCES + " property.");
+					throw new UnitilsException("Sequence to preserve does not exist: " + sequenceToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which sequences need to be preserved. To assure nothing is dropped by mistake, no sequences will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SEQUENCES + " property.");
 				}
 			}
 		}
@@ -336,11 +342,17 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 		Map<String, Set<String>> synonymsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SYNONYMS, configuration);
 		for (Map.Entry<String, Set<String>> entry : synonymsToPreserve.entrySet()) {
 			String schemaName = entry.getKey();
-			Set<String> synonymNames = getDbSupport(schemaName).getSynonymNames();
 
+			DbSupport dbSupport = getDbSupport(schemaName);
+			Set<String> synonymNames;
+			if (!dbSupport.supportsSynonyms()) {
+				synonymNames = new HashSet<String>();
+			} else {
+				synonymNames = dbSupport.getSynonymNames();
+			}
 			for (String synonymToPreserve : entry.getValue()) {
 				if (!synonymNames.contains(synonymToPreserve)) {
-					throw new UnitilsException("Synonym to preserve does not exist: " + synonymToPreserve + ".\nUnitils cannot determine which synonyms need to be preserved. To assure nothing is dropped by mistake, no synonyms will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SYNONYMS + " property.");
+					throw new UnitilsException("Synonym to preserve does not exist: " + synonymToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which synonyms need to be preserved. To assure nothing is dropped by mistake, no synonyms will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SYNONYMS + " property.");
 				}
 			}
 		}

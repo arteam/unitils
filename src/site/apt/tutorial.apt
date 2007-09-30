@@ -1383,7 +1383,7 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
     
 ** Mock creation
 ~~~~~~~~~~~~~~~~
-    %ocks can automatically be created by annotating a field with the <@Mock> annotation, Unitils will create a mock of the same type as the field and inject the instance 
+    Mocks can automatically be created by annotating a field with the <@Mock> annotation, Unitils will create a mock of the same type as the field and inject the instance 
     into that field. This mock creation and assignment is performed before the setup of your test. During the setup you can then do extra configuration and, for example, 
     install the mock so that it is used by your code during the test. Later-on we will show you how Unitils can help you perform this mock injection more easily.
     

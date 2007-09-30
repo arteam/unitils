@@ -15,128 +15,123 @@
  */
 package org.unitils.core.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 
 /**
  * Utilities for creating and dropping test tables, views....
- *
+ * 
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class SQLTestUtils {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(SQLTestUtils.class);
+
+	/**
+	 * Drops the test tables
+	 * 
+	 * @param dbSupport The db support, not null
+	 * @param tableNames The tables to drop
+	 */
+	public static void dropTestTables(DbSupport dbSupport, String... tableNames) {
+		for (String tableName : tableNames) {
+			try {
+				String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
+				dbSupport.dropTable(correctCaseTableName);
+			} catch (UnitilsException e) {
+				// Ignored
+			}
+		}
+	}
 
 
-    /**
-     * Drops the test tables
-     *
-     * @param dbSupport  The db support, not null
-     * @param tableNames The tables to drop
-     */
-    public static void dropTestTables(DbSupport dbSupport, String... tableNames) {
-        for (String tableName : tableNames) {
-            try {
-                String correctCaseTableName = dbSupport.toCorrectCaseIdentifier(tableName);
-                dbSupport.dropTable(correctCaseTableName);
-            } catch (UnitilsException e) {
-                // Ignored
-            }
-        }
-    }
+	/**
+	 * Drops the test views
+	 * 
+	 * @param dbSupport The db support, not null
+	 * @param viewNames The views to drop
+	 */
+	public static void dropTestViews(DbSupport dbSupport, String... viewNames) {
+		for (String viewName : viewNames) {
+			try {
+				String correctCaseViewName = dbSupport.toCorrectCaseIdentifier(viewName);
+				dbSupport.dropView(correctCaseViewName);
+			} catch (UnitilsException e) {
+				// Ignored
+			}
+		}
+	}
 
 
-    /**
-     * Drops the test views
-     *
-     * @param dbSupport The db support, not null
-     * @param viewNames The views to drop
-     */
-    public static void dropTestViews(DbSupport dbSupport, String... viewNames) {
-        for (String viewName : viewNames) {
-            try {
-                String correctCaseViewName = dbSupport.toCorrectCaseIdentifier(viewName);
-                dbSupport.dropView(correctCaseViewName);
-            } catch (UnitilsException e) {
-                // Ignored
-            }
-        }
-    }
+	/**
+	 * Drops the test synonyms
+	 * 
+	 * @param dbSupport The db support, not null
+	 * @param synonymNames The views to drop
+	 */
+	public static void dropTestSynonyms(DbSupport dbSupport, String... synonymNames) {
+		for (String synonymName : synonymNames) {
+			try {
+				String correctCaseSynonymName = dbSupport.toCorrectCaseIdentifier(synonymName);
+				dbSupport.dropSynonym(correctCaseSynonymName);
+			} catch (UnitilsException e) {
+				// Ignored
+			}
+		}
+	}
 
 
-    /**
-     * Drops the test synonyms
-     *
-     * @param dbSupport    The db support, not null
-     * @param synonymNames The views to drop
-     */
-    public static void dropTestSynonyms(DbSupport dbSupport, String... synonymNames) {
-        for (String synonymName : synonymNames) {
-            try {
-                String correctCaseSynonymName = dbSupport.toCorrectCaseIdentifier(synonymName);
-                dbSupport.dropSynonym(correctCaseSynonymName);
-            } catch (UnitilsException e) {
-                // Ignored
-            }
-        }
-    }
+	/**
+	 * Drops the test sequence
+	 * 
+	 * @param dbSupport The db support, not null
+	 * @param sequenceNames The sequences to drop
+	 */
+	public static void dropTestSequences(DbSupport dbSupport, String... sequenceNames) {
+		for (String sequenceName : sequenceNames) {
+			try {
+				String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier(sequenceName);
+				dbSupport.dropSequence(correctCaseSequenceName);
+			} catch (UnitilsException e) {
+				// Ignored
+			}
+		}
+	}
 
 
-    /**
-     * Drops the test sequence
-     *
-     * @param dbSupport     The db support, not null
-     * @param sequenceNames The sequences to drop
-     */
-    public static void dropTestSequences(DbSupport dbSupport, String... sequenceNames) {
-        for (String sequenceName : sequenceNames) {
-            try {
-                String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier(sequenceName);
-                dbSupport.dropSequence(correctCaseSequenceName);
-            } catch (UnitilsException e) {
-                // Ignored
-            }
-        }
-    }
+	/**
+	 * Drops the test triggers
+	 * 
+	 * @param dbSupport The db support, not null
+	 * @param triggerNames The triggers to drop
+	 */
+	public static void dropTestTriggers(DbSupport dbSupport, String... triggerNames) {
+		for (String triggerName : triggerNames) {
+			try {
+				String correctCaseTriggerName = dbSupport.toCorrectCaseIdentifier(triggerName);
+				dbSupport.dropTrigger(correctCaseTriggerName);
+			} catch (UnitilsException e) {
+				// Ignored
+			}
+		}
+	}
 
 
-    /**
-     * Drops the test triggers
-     *
-     * @param dbSupport    The db support, not null
-     * @param triggerNames The triggers to drop
-     */
-    public static void dropTestTriggers(DbSupport dbSupport, String... triggerNames) {
-        for (String triggerName : triggerNames) {
-            try {
-                String correctCaseTriggerName = dbSupport.toCorrectCaseIdentifier(triggerName);
-                dbSupport.dropTrigger(correctCaseTriggerName);
-            } catch (UnitilsException e) {
-                // Ignored
-            }
-        }
-    }
-
-
-    /**
-     * Drops the test types
-     *
-     * @param dbSupport The db support, not null
-     * @param typeNames The types to drop
-     */
-    public static void dropTestTypes(DbSupport dbSupport, String... typeNames) {
-        for (String typeName : typeNames) {
-            try {
-                String correctCaseTypeName = dbSupport.toCorrectCaseIdentifier(typeName);
-                dbSupport.dropType(correctCaseTypeName);
-            } catch (UnitilsException e) {
-                // Ignored
-            }
-        }
-    }
+	/**
+	 * Drops the test types
+	 * 
+	 * @param dbSupport The db support, not null
+	 * @param typeNames The types to drop
+	 */
+	public static void dropTestTypes(DbSupport dbSupport, String... typeNames) {
+		for (String typeName : typeNames) {
+			try {
+				String correctCaseTypeName = dbSupport.toCorrectCaseIdentifier(typeName);
+				dbSupport.dropType(correctCaseTypeName);
+			} catch (UnitilsException e) {
+				// Ignored
+			}
+		}
+	}
 
 }
