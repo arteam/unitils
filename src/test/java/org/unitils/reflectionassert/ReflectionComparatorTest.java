@@ -15,14 +15,14 @@
  */
 package org.unitils.reflectionassert;
 
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 
 import junit.framework.TestCase;
+
+import org.unitils.reflectionassert.ReflectionComparator.Difference;
 
 
 /**
@@ -232,7 +232,7 @@ public class ReflectionComparatorTest extends TestCase {
 	 */
 	public void testGetDifference_equalsIgnoredDefaultNoLazyLoading() {
 		// create a proxy, that will fail if is accessed
-		Collection<?> collection = (Collection) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { Collection.class }, new InvocationHandler() {
+		Collection<?> collection = (Collection<?>) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { Collection.class }, new InvocationHandler() {
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				fail("Should not be invoked");
 				return null;

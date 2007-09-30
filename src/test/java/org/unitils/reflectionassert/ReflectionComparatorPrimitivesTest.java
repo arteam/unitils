@@ -20,228 +20,224 @@ import org.unitils.reflectionassert.ReflectionComparator.Difference;
 
 
 /**
- * Test class for {@link ReflectionComparator}.
- * Contains tests with primitive types.
- *
+ * Test class for {@link ReflectionComparator}. Contains tests with primitive types.
+ * 
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class ReflectionComparatorPrimitivesTest extends TestCase {
 
-    /* Test object */
-    private Primitives primitivesA;
+	/* Test object */
+	private Primitives primitivesA;
 
-    /* Same as A but different instance */
-    private Primitives primitivesB;
+	/* Same as A but different instance */
+	private Primitives primitivesB;
 
-    /* Same as A and B but different int value for intValue2 */
-    private Primitives primitiveDifferentValue;
+	/* Same as A and B but different int value for intValue2 */
+	private Primitives primitiveDifferentValue;
 
-    /* Same as A and B but with 0 value for intValue2 */
-    private Primitives primitives0Value;
+	/* Same as A and B but with 0 value for intValue2 */
+	private Primitives primitives0Value;
 
-    /* Test object with inner object */
-    private Primitives primitivesInnerA;
+	/* Test object with inner object */
+	private Primitives primitivesInnerA;
 
-    /* Same as innerA but different instance */
-    private Primitives primitivesInnerB;
+	/* Same as innerA but different instance */
+	private Primitives primitivesInnerB;
 
-    /* Same as innerA and innerB but different int value for inner intValue2 */
-    private Primitives primitivesInnerDifferentValue;
+	/* Same as innerA and innerB but different int value for inner intValue2 */
+	private Primitives primitivesInnerDifferentValue;
 
-    /* Class under test */
-    private ReflectionComparator reflectionComparator;
-
-
-    /**
-     * Initializes the test fixture.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        primitivesA = new Primitives(1, 2, null);
-        primitivesB = new Primitives(1, 2, null);
-        primitiveDifferentValue = new Primitives(1, 9999, null);
-        primitives0Value = new Primitives(1, 0, null);
-
-        primitivesInnerA = new Primitives(0, 0, primitivesA);
-        primitivesInnerB = new Primitives(0, 0, primitivesB);
-        primitivesInnerDifferentValue = new Primitives(0, 0, primitiveDifferentValue);
-
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
-    }
+	/* Class under test */
+	private ReflectionComparator reflectionComparator;
 
 
-    /**
-     * Test for two equal primitives.
-     */
-    public void testGetDifference_equals() {
-        Difference result = reflectionComparator.getDifference(primitivesA, primitivesB);
-        assertNull(result);
-    }
+	/**
+	 * Initializes the test fixture.
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
+
+		primitivesA = new Primitives(1, 2, null);
+		primitivesB = new Primitives(1, 2, null);
+		primitiveDifferentValue = new Primitives(1, 9999, null);
+		primitives0Value = new Primitives(1, 0, null);
+
+		primitivesInnerA = new Primitives(0, 0, primitivesA);
+		primitivesInnerB = new Primitives(0, 0, primitivesB);
+		primitivesInnerDifferentValue = new Primitives(0, 0, primitiveDifferentValue);
+
+		reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+	}
 
 
-    /**
-     * Test for two equal autoboxing.
-     * An autoboxed primitive should be considered equals to the object version.
-     */
-    @SuppressWarnings({"UnnecessaryBoxing"})
-    public void testGetDifference_equalsAutoboxing() {
-        Difference result = reflectionComparator.getDifference(5L, new Long(5));
-        assertNull(result);
-    }
+	/**
+	 * Test for two equal primitives.
+	 */
+	public void testGetDifference_equals() {
+		Difference result = reflectionComparator.getDifference(primitivesA, primitivesB);
+		assertNull(result);
+	}
 
 
-    /**
-     * Test for two equal primitives as an inner field of an object.
-     */
-    public void testGetDifference_equalsInner() {
-        Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerB);
-        assertNull(result);
-    }
+	/**
+	 * Test for two equal autoboxing. An autoboxed primitive should be considered equals to the object version.
+	 */
+	public void testGetDifference_equalsAutoboxing() {
+		Difference result = reflectionComparator.getDifference(5L, new Long(5));
+		assertNull(result);
+	}
 
 
-    /**
-     * Test for two equal primitives but of different type (int vs long).
-     */
-    public void testGetDifference_differentTypes() {
-        Difference result = reflectionComparator.getDifference(5L, 5);
-        assertNull(result);
-    }
+	/**
+	 * Test for two equal primitives as an inner field of an object.
+	 */
+	public void testGetDifference_equalsInner() {
+		Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerB);
+		assertNull(result);
+	}
 
 
-    /**
-     * Test for two primitives that contain different values.
-     */
-    public void testGetDifference_notEqualsDifferentValues() {
-        Difference result = reflectionComparator.getDifference(primitivesA, primitiveDifferentValue);
-
-        assertNotNull(result);
-        assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(2, result.getLeftValue());
-        assertEquals(9999, result.getRightValue());
-    }
+	/**
+	 * Test for two equal primitives but of different type (int vs long).
+	 */
+	public void testGetDifference_differentTypes() {
+		Difference result = reflectionComparator.getDifference(5L, 5);
+		assertNull(result);
+	}
 
 
-    /**
-     * Test for two primitives with right value 0.
-     */
-    public void testGetDifference_notEqualsRight0() {
-        Difference result = reflectionComparator.getDifference(primitivesA, primitives0Value);
+	/**
+	 * Test for two primitives that contain different values.
+	 */
+	public void testGetDifference_notEqualsDifferentValues() {
+		Difference result = reflectionComparator.getDifference(primitivesA, primitiveDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(2, result.getLeftValue());
-        assertEquals(0, result.getRightValue());
-    }
-
-
-    /**
-     * Test for two primitives with left value 0.
-     */
-    public void testGetDifference_notEqualsLeft0() {
-        Difference result = reflectionComparator.getDifference(primitives0Value, primitivesA);
-
-        assertNotNull(result);
-        assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(0, result.getLeftValue());
-        assertEquals(2, result.getRightValue());
-    }
+		assertNotNull(result);
+		assertEquals("intValue2", result.getFieldStack().get(0));
+		assertEquals(2, result.getLeftValue());
+		assertEquals(9999, result.getRightValue());
+	}
 
 
-    /**
-     * Test for objects with inner primitives that contain different values.
-     */
-    public void testGetDifference_notEqualsInnerDifferentValues() {
-        Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerDifferentValue);
+	/**
+	 * Test for two primitives with right value 0.
+	 */
+	public void testGetDifference_notEqualsRight0() {
+		Difference result = reflectionComparator.getDifference(primitivesA, primitives0Value);
 
-        assertNotNull(result);
-        assertEquals("inner", result.getFieldStack().get(0));
-        assertEquals("intValue2", result.getFieldStack().get(1));
-        assertEquals(2, result.getLeftValue());
-        assertEquals(9999, result.getRightValue());
-    }
-
-
-    /**
-     * Tests for equality of two NaN values
-     */
-    public void testNaN() {
-        Difference result = reflectionComparator.getDifference(Double.NaN, Float.NaN);
-        assertNull(result);
-    }
+		assertNotNull(result);
+		assertEquals("intValue2", result.getFieldStack().get(0));
+		assertEquals(2, result.getLeftValue());
+		assertEquals(0, result.getRightValue());
+	}
 
 
-    /**
-     * Tests for equality of a NaN with a 0 value
-     */
-    public void testNaN_notEqual() {
-        Difference result = reflectionComparator.getDifference(Double.NaN, 0);
-        assertTrue(result.getFieldStack().isEmpty());
-        assertEquals(Double.NaN, result.getLeftValue());
-        assertEquals(0, result.getRightValue());
-    }
+	/**
+	 * Test for two primitives with left value 0.
+	 */
+	public void testGetDifference_notEqualsLeft0() {
+		Difference result = reflectionComparator.getDifference(primitives0Value, primitivesA);
+
+		assertNotNull(result);
+		assertEquals("intValue2", result.getFieldStack().get(0));
+		assertEquals(0, result.getLeftValue());
+		assertEquals(2, result.getRightValue());
+	}
 
 
-    /**
-     * Tests for equality of two NEGATIVE_INFINITY values
-     */
-    public void testInfinity() {
-        Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
-        assertNull(result);
-    }
+	/**
+	 * Test for objects with inner primitives that contain different values.
+	 */
+	public void testGetDifference_notEqualsInnerDifferentValues() {
+		Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerDifferentValue);
+
+		assertNotNull(result);
+		assertEquals("inner", result.getFieldStack().get(0));
+		assertEquals("intValue2", result.getFieldStack().get(1));
+		assertEquals(2, result.getLeftValue());
+		assertEquals(9999, result.getRightValue());
+	}
 
 
-    /**
-     * Tests for equality of a NEGATIVE_INFINITY with a POSITIVE_INFINITY value
-     */
-    public void testInfinity_notEqual() {
-        Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        assertTrue(result.getFieldStack().isEmpty());
-        assertEquals(Double.NEGATIVE_INFINITY, result.getLeftValue());
-        assertEquals(Double.POSITIVE_INFINITY, result.getRightValue());
-    }
+	/**
+	 * Tests for equality of two NaN values
+	 */
+	public void testNaN() {
+		Difference result = reflectionComparator.getDifference(Double.NaN, Float.NaN);
+		assertNull(result);
+	}
 
 
-    /**
-     * Test class with failing equals.
-     */
-    @SuppressWarnings("unused")
-    private static class Primitives {
-
-        /* A fist int value */
-        private int intValue1;
-
-        /* A second int value */
-        private int intValue2;
-
-        /* An inner object */
-        private Primitives inner;
+	/**
+	 * Tests for equality of a NaN with a 0 value
+	 */
+	public void testNaN_notEqual() {
+		Difference result = reflectionComparator.getDifference(Double.NaN, 0);
+		assertTrue(result.getFieldStack().isEmpty());
+		assertEquals(Double.NaN, result.getLeftValue());
+		assertEquals(0, result.getRightValue());
+	}
 
 
-        /**
-         * Creates and initializes the element.
-         *
-         * @param intValue1 the first int value
-         * @param intValue2 the second int value
-         * @param inner     the inner collection
-         */
-        public Primitives(int intValue1, int intValue2, Primitives inner) {
-            this.intValue1 = intValue1;
-            this.intValue2 = intValue2;
-            this.inner = inner;
-        }
+	/**
+	 * Tests for equality of two NEGATIVE_INFINITY values
+	 */
+	public void testInfinity() {
+		Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+		assertNull(result);
+	}
 
-        /**
-         * Always returns false
-         *
-         * @param o the object to compare to
-         */
-        @Override
-        public boolean equals(Object o) {
-            return false;
-        }
-    }
+
+	/**
+	 * Tests for equality of a NEGATIVE_INFINITY with a POSITIVE_INFINITY value
+	 */
+	public void testInfinity_notEqual() {
+		Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		assertTrue(result.getFieldStack().isEmpty());
+		assertEquals(Double.NEGATIVE_INFINITY, result.getLeftValue());
+		assertEquals(Double.POSITIVE_INFINITY, result.getRightValue());
+	}
+
+
+	/**
+	 * Test class with failing equals.
+	 */
+	@SuppressWarnings("unused")
+	private static class Primitives {
+
+		/* A fist int value */
+		private int intValue1;
+
+		/* A second int value */
+		private int intValue2;
+
+		/* An inner object */
+		private Primitives inner;
+
+
+		/**
+		 * Creates and initializes the element.
+		 * 
+		 * @param intValue1 the first int value
+		 * @param intValue2 the second int value
+		 * @param inner the inner collection
+		 */
+		public Primitives(int intValue1, int intValue2, Primitives inner) {
+			this.intValue1 = intValue1;
+			this.intValue2 = intValue2;
+			this.inner = inner;
+		}
+
+		/**
+		 * Always returns false
+		 * 
+		 * @param o the object to compare to
+		 */
+		@Override
+		public boolean equals(Object o) {
+			return false;
+		}
+	}
 
 }
-
