@@ -16,9 +16,14 @@
 package org.unitils.core.dbsupport;
 
 import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import org.unitils.util.PropertyUtils;
+import static org.unitils.util.PropertyUtils.getString;
+import static org.unitils.util.PropertyUtils.getStringList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * todo javadoc
@@ -28,14 +33,10 @@ import java.util.*;
 public class DbSupportFactory {
 
 
-    /**
-     * Property key of the SQL dialect of the underlying DBMS implementation
-     */
+    /** Property key of the SQL dialect of the underlying DBMS implementation */
     public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
-    /**
-     * Property key for the database schema names
-     */
+    /** Property key for the database schema names */
     public static final String PROPKEY_DATABASE_SCHEMA_NAMES = "database.schemaNames";
 
     /* Cache of created db support instance, per schema name */
@@ -51,7 +52,7 @@ public class DbSupportFactory {
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
     public static DbSupport getDefaultDbSupport(Properties configuration, SQLHandler sqlHandler) {
-        String defaultSchemaName = PropertyUtils.getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
+        String defaultSchemaName = getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true).get(0);
         return getDbSupport(configuration, sqlHandler, defaultSchemaName);
     }
 
@@ -71,7 +72,7 @@ public class DbSupportFactory {
             return dbSupport;
         }
         // create new instance
-        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
+        String databaseDialect = getString(PROPKEY_DATABASE_DIALECT, configuration);
         dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
         dbSupport.init(configuration, sqlHandler, schemaName);
         // add to cache
@@ -89,7 +90,7 @@ public class DbSupportFactory {
      */
     public static List<DbSupport> getDbSupports(Properties configuration, SQLHandler sqlHandler) {
         List<DbSupport> result = new ArrayList<DbSupport>();
-        List<String> schemaNames = PropertyUtils.getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true);
+        List<String> schemaNames = getStringList(PROPKEY_DATABASE_SCHEMA_NAMES, configuration, true);
         for (String schemaName : schemaNames) {
             DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
             result.add(dbSupport);
