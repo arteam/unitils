@@ -48,6 +48,12 @@ public class HibernateUnitils {
     }
     
     
+    /**
+     * Flushes all pending Hibernate updates to the database. This method is useful when the effect
+     * of updates needs to be checked directly on the database. For verifying updates using the
+     * Hibernate <code>Session</code> provided by the method #getCurrentSession, flushing is not
+     * needed.
+     */
     public static void flushDatabaseUpdates() {
     	Object testObject = getTestObject();
     	getHibernateModule().flushDatabaseUpdates(testObject);
