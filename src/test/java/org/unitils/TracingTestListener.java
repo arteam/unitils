@@ -162,9 +162,6 @@ public class TracingTestListener extends TestListener {
         result += rightPad(invocation, 17);
         if (!isEmpty(testClass)) {
             result += " - " + rightPad(testClass, 10);
-            if (!isEmpty(testMethodName)) {
-                result += " - " + testMethodName;
-            }
         }
         return result.trim();
     }

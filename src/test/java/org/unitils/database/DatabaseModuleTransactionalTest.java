@@ -15,16 +15,7 @@
  */
 package org.unitils.database;
 
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.reset;
-
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
+import static org.easymock.classextension.EasyMock.*;
 import org.junit.Before;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
@@ -32,93 +23,87 @@ import org.unitils.core.Unitils;
 import org.unitils.database.config.DataSourceFactory;
 import org.unitils.spring.SpringModule;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.Properties;
+
 /**
  * Base class for tests that verify the transactional behavior of the database module
- * 
- * todo javadoc
- * 
+ *
  * @author Flip Neven
  * @author Tim Ducheyne
  */
 abstract public class DatabaseModuleTransactionalTest extends UnitilsJUnit4 {
 
-	protected DatabaseModule databaseModule;
+    /**
+     * Test datasource that returns connection 1 and 2
+     */
+    protected static DataSource mockDataSource = createMock(DataSource.class);
 
-	protected static MockDataSource mockDataSource;
+    /**
+     * Test connection 1
+     */
+    protected static Connection mockConnection1 = createMock(Connection.class);
 
-	protected static Connection mockConnection1 = createMock(Connection.class);
+    /**
+     * Test connection 2
+     */
+    protected static Connection mockConnection2 = createMock(Connection.class);
 
-	protected static Connection mockConnection2 = createMock(Connection.class);
-
-	protected Properties configuration;
-
-
-	@Before
-	public void initialize() throws Exception {
-		mockDataSource = new MockDataSource();
-		reset(mockConnection1);
-		reset(mockConnection2);
-
-		configuration = new ConfigurationLoader().loadConfiguration();
-		configuration.setProperty("org.unitils.database.config.DataSourceFactory.implClassName", MockDataSourceFactory.class.getName());
-	}
+    /**
+     * The unitils configuration
+     */
+    protected Properties configuration;
 
 
-	/**
-	 * Mock DataSourceFactory, that returns the static mockDataSource
-	 */
-	public static class MockDataSourceFactory implements DataSourceFactory {
+    /**
+     * Initializes the mocked datasource and connections.
+     */
+    @Before
+    public void initialize() throws Exception {
+        reset(mockConnection1);
+        reset(mockConnection2);
+        reset(mockDataSource);
+        expect(mockDataSource.getConnection()).andReturn(mockConnection1);
+        expect(mockDataSource.getConnection()).andReturn(mockConnection2);
+        replay(mockDataSource);
 
-		public void init(Properties configuration) {
-		}
+        configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty("org.unitils.database.config.DataSourceFactory.implClassName", MockDataSourceFactory.class.getName());
+    }
 
-		public DataSource createDataSource() {
-			return mockDataSource;
-		}
-	}
 
-	/**
-	 * Mock DataSource, that returns connection1 when it is called the first time, and connection2 when it is called the
-	 * second time, in order to simulate a connection pool.
-	 */
-	public static class MockDataSource implements DataSource {
+    /**
+     * Mock DataSourceFactory, that returns the static mockDataSource
+     */
+    public static class MockDataSourceFactory implements DataSourceFactory {
 
-		boolean firstTime = true;
+        public void init(Properties configuration) {
+        }
 
-		public Connection getConnection() throws SQLException {
-			if (firstTime) {
-				firstTime = false;
-				return mockConnection1;
-			} else {
-				return mockConnection2;
-			}
-		}
+        public DataSource createDataSource() {
+            return mockDataSource;
+        }
+    }
 
-		public Connection getConnection(String arg0, String arg1) throws SQLException {
-			return null;
-		}
 
-		public PrintWriter getLogWriter() throws SQLException {
-			return null;
-		}
+    /**
+     * Utility method to retrieve the database module instance.
+     *
+     * @return The database module, not null
+     */
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
 
-		public int getLoginTimeout() throws SQLException {
-			return 0;
-		}
 
-		public void setLogWriter(PrintWriter arg0) throws SQLException {
-		}
-
-		public void setLoginTimeout(int arg0) throws SQLException {
-		}
-	}
-
-	protected DatabaseModule getDatabaseModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-	}
-
-	protected SpringModule getSpringModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
-	}
+    /**
+     * Utility method to retrieve the spring module instance.
+     *
+     * @return The spring module, not null
+     */
+    protected SpringModule getSpringModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
+    }
 
 }

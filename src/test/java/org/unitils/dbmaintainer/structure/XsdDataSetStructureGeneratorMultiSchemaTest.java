@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.UnitilsJUnit3;
@@ -53,67 +53,6 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorMultiSchemaTest.class);
-
-
-    /* Expected content of dataset.xsd */
-    private static final String DATASET_XSD_CONTENT =
-            "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns:dflt=\"PUBLIC\">\n" +
-                    "   <xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\" />\n" +
-                    "   <xsd:import namespace=\"SCHEMA_A\" schemaLocation=\"SCHEMA_A.xsd\" />\n" +
-                    "   <xsd:element name=\"dataset\">\n" +
-                    "       <xsd:complexType>\n" +
-                    "           <xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n" +
-                    "               <xsd:element name=\"TABLE_1\" type=\"dflt:TABLE_1__type\" />\n" +
-                    "               <xsd:element name=\"TABLE_2\" type=\"dflt:TABLE_2__type\" />\n" +
-                    "               <xsd:any namespace=\"PUBLIC\" />\n" +
-                    "           </xsd:choice>\n" +
-                    "       </xsd:complexType>\n" +
-                    "   </xsd:element>\n" +
-                    "</xsd:schema>";
-
-
-    /* Expected content of PUBLIC.xsd */
-    private static final String PUBLIC_SCHEMA_XSD_CONTENT =
-            "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"PUBLIC\" targetNamespace=\"PUBLIC\">\n" +
-                    "   <xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />\n" +
-                    "   <xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />\n" +
-                    "   <xsd:complexType name=\"TABLE_1__type\">\n" +
-                    "       <xsd:attribute name=\"COLUMNC\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNA\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNB\" use=\"optional\" />\n" +
-                    "   </xsd:complexType>\n" +
-                    "   <xsd:complexType name=\"TABLE_2__type\">\n" +
-                    "       <xsd:attribute name=\"COLUMN2\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMN1\" use=\"optional\" />\n" +
-                    "   </xsd:complexType>\n" +
-                    "</xsd:schema>";
-
-
-    /* Expected content of SCHEMA_A.xsd */
-    private static final String SCHEMA_A_XSD_CONTENT =
-            "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-                    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"SCHEMA_A\" targetNamespace=\"SCHEMA_A\">\n" +
-                    "   <xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />\n" +
-                    "   <xsd:element name=\"TABLE_4\" type=\"TABLE_4__type\" />\n" +
-                    "   <xsd:element name=\"TABLE_3\" type=\"TABLE_3__type\" />\n" +
-                    "   <xsd:complexType name=\"TABLE_1__type\">\n" +
-                    "       <xsd:attribute name=\"COLUMNC\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNA\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNB\" use=\"optional\" />\n" +
-                    "   </xsd:complexType>\n" +
-                    "   <xsd:complexType name=\"TABLE_4__type\">\n" +
-                    "       <xsd:attribute name=\"COLUMN2\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMN1\" use=\"optional\" />\n" +
-                    "   </xsd:complexType>\n" +
-                    "   <xsd:complexType name=\"TABLE_3__type\">\n" +
-                    "       <xsd:attribute name=\"COLUMNC\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNA\" use=\"optional\" />\n" +
-                    "       <xsd:attribute name=\"COLUMNB\" use=\"optional\" />\n" +
-                    "   </xsd:complexType>\n" +
-                    "</xsd:schema>";
-
 
     /* Tested object */
     private DataSetStructureGenerator dataSetStructureGenerator;
@@ -184,9 +123,34 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
         }
         dataSetStructureGenerator.generateDataSetStructure();
 
-        assertFileContent(DATASET_XSD_CONTENT, new File(xsdDirectory, "dataset.xsd"));
-        assertFileContent(PUBLIC_SCHEMA_XSD_CONTENT, new File(xsdDirectory, "PUBLIC.xsd"));
-        assertFileContent(SCHEMA_A_XSD_CONTENT, new File(xsdDirectory, "SCHEMA_A.xsd"));
+        // check content of general dataset xsd
+        File dataSetXsd = new File(xsdDirectory, "dataset.xsd");
+        assertFileContains("xmlns:dflt=\"PUBLIC\"", dataSetXsd);
+        assertFileContains("<xsd:import namespace=\"PUBLIC\" schemaLocation=\"PUBLIC.xsd\" />", dataSetXsd);
+        assertFileContains("<xsd:import namespace=\"SCHEMA_A\" schemaLocation=\"SCHEMA_A.xsd\" />", dataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"dflt:TABLE_1__type\" />", dataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_2\" type=\"dflt:TABLE_2__type\" />", dataSetXsd);
+        assertFileContains("<xsd:any namespace=\"PUBLIC\" />", dataSetXsd);
+
+        // check content of PUBLIC schema dataset xsd
+        File publicSchemaDataSetXsd = new File(xsdDirectory, "PUBLIC.xsd");
+        assertFileContains("xmlns=\"PUBLIC\"", publicSchemaDataSetXsd);
+        assertFileContains("targetNamespace=\"PUBLIC\"", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_1__type\">", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_2\" type=\"TABLE_2__type\" />", publicSchemaDataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_2__type\">", publicSchemaDataSetXsd);
+
+        // check content of PUBLIC schema dataset xsd
+        File schemaADataSetXsd = new File(xsdDirectory, "SCHEMA_A.xsd");
+        assertFileContains("xmlns=\"SCHEMA_A\"", schemaADataSetXsd);
+        assertFileContains("targetNamespace=\"SCHEMA_A\"", schemaADataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_1\" type=\"TABLE_1__type\" />", schemaADataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_1__type\">", schemaADataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_4\" type=\"TABLE_4__type\" />", schemaADataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_4__type\">", schemaADataSetXsd);
+        assertFileContains("<xsd:element name=\"TABLE_3\" type=\"TABLE_3__type\" />", schemaADataSetXsd);
+        assertFileContains("<xsd:complexType name=\"TABLE_3__type\">", schemaADataSetXsd);
     }
 
 
@@ -219,19 +183,19 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit3 {
 
 
     /**
-     * Asserts that the contents of the given file equals the given string.
+     * Asserts that the contents of the given file contains the given string.
      *
      * @param expectedContent The string, not null
      * @param file            The file, not null
      */
-    private void assertFileContent(String expectedContent, File file) throws Exception {
+    private void assertFileContains(String expectedContent, File file) throws Exception {
         Reader reader = null;
         try {
             assertTrue("Expected file does not exist. File name: " + file.getPath(), file.exists());
 
             reader = new BufferedReader(new FileReader(file));
             String content = IOUtils.toString(reader);
-            assertEquals(StringUtils.deleteWhitespace(expectedContent), StringUtils.deleteWhitespace(content));
+            assertTrue(content + "\ndid not contain\n" + expectedContent, deleteWhitespace(content).contains(deleteWhitespace(expectedContent)));
 
         } finally {
             closeQuietly(reader);
