@@ -17,6 +17,7 @@ package org.unitils.dbmaintainer.script;
 
 import junit.framework.TestCase;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.impl.FileScriptSource;
 import org.unitils.dbmaintainer.version.Version;
 import org.unitils.dbmaintainer.version.VersionScriptPair;
@@ -68,7 +69,7 @@ public class FileScriptSourceTest extends TestCase {
      * Cleans test directory and copies test files to it. Initializes test objects
      */
     @Override
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
 
         // Create test directory
@@ -105,8 +106,11 @@ public class FileScriptSourceTest extends TestCase {
      * @return the to file, not null
      */
     private File copyFile(String fileInClassPath, String systemPath) throws Exception {
-        InputStream is = getClass().getResourceAsStream(fileInClassPath);
         OutputStream os = new FileOutputStream(systemPath);
+        InputStream is = getClass().getResourceAsStream(fileInClassPath);
+        if (is == null) {
+            throw new UnitilsException("Unable to copy file. File not found in classpath: " + fileInClassPath);
+        }
         copy(is, os);
         is.close();
         os.close();

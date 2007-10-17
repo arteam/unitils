@@ -200,9 +200,9 @@ public class UnitilsInvocationTest {
         assertEquals("[Test]    testBeforeClass   - GroupsTest", iterator.next());
         assertEquals("[Unitils] beforeTestSetUp   - GroupsTest", iterator.next());
         assertEquals("[Test]    testSetUp         - GroupsTest", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - GroupsTest - test1", iterator.next());
-        assertEquals("[Test]    testMethod        - GroupsTest - test1", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - GroupsTest - test1", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - GroupsTest", iterator.next());
+        assertEquals("[Test]    testMethod        - GroupsTest", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - GroupsTest", iterator.next());
         assertEquals("[Test]    testTearDown      - GroupsTest", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - GroupsTest", iterator.next());
         assertEquals("[Test]    testAfterClass    - GroupsTest", iterator.next());
@@ -257,16 +257,16 @@ public class UnitilsInvocationTest {
         }
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
         assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test1", iterator.next());
-        assertEquals("[Test]    testMethod        - TestClass1 - test1", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - TestClass1 - test1", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - TestClass1", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - TestClass1", iterator.next());
         assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
         assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - TestClass1 - test2", iterator.next());
-        assertEquals("[Test]    testMethod        - TestClass1 - test2", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - TestClass1 - test2", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - TestClass1", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass1", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - TestClass1", iterator.next());
         assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
         if (!"JUnit3".equals(type)) {
@@ -280,16 +280,16 @@ public class UnitilsInvocationTest {
         }
         assertEquals("[Unitils] beforeTestSetUp   - TestClass2", iterator.next());
         assertEquals("[Test]    testSetUp         - TestClass2", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - TestClass2 - test1", iterator.next());
-        assertEquals("[Test]    testMethod        - TestClass2 - test1", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - TestClass2 - test1", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - TestClass2", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass2", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - TestClass2", iterator.next());
         assertEquals("[Test]    testTearDown      - TestClass2", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass2", iterator.next());
         assertEquals("[Unitils] beforeTestSetUp   - TestClass2", iterator.next());
         assertEquals("[Test]    testSetUp         - TestClass2", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - TestClass2 - test2", iterator.next());
-        assertEquals("[Test]    testMethod        - TestClass2 - test2", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - TestClass2 - test2", iterator.next());
+        assertEquals("[Unitils] beforeTestMethod  - TestClass2", iterator.next());
+        assertEquals("[Test]    testMethod        - TestClass2", iterator.next());
+        assertEquals("[Unitils] afterTestMethod   - TestClass2", iterator.next());
         assertEquals("[Test]    testTearDown      - TestClass2", iterator.next());
         assertEquals("[Unitils] afterTestTearDown - TestClass2", iterator.next());
         if (!"JUnit3".equals(type)) {
