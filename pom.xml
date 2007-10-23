@@ -30,10 +30,10 @@
         <url>http://sourceforge.net/tracker/?group_id=167201</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://svn.sourceforge.net/svnroot/unitils</connection>
-        <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/unitils</developerConnection>
+	  <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils</connection>
+        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils</developerConnection>
         <tag>HEAD</tag>
-        <url>https://svn.sourceforge.net/svnroot/unitils</url>
+        <url>http://unitils.svn.sourceforge.net/viewvc/unitils/</url>
     </scm>
 
 
