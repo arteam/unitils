@@ -1,0 +1,97 @@
+<document>
+  <properties>    
+    <title>Project Dependencies</title>
+  </properties>  
+  <body>
+    <section name="Project Dependencies">        
+    
+<p>This page describes the library dependencies of Unitils. Transitive dependencies are shown in italic.</p>
+
+
+
+<h3>Core dependencies</h3>
+
+<p>This is the minimal set of dependencies required by Unitils. These are all the dependencies needed for the reflection assert utilities and the injection module.</p>
+<p><table>
+    <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
+    <tr><td>commons-logging</td>        <td>commons-logging</td>            <td>1.1</td>                    <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>commons-lang</td>           <td>commons-lang</td>               <td>2.2</td>                    <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>commons-collections</td>    <td>commons-collections</td>        <td>3.2</td>                    <td></td>                           <td>jar</td>                 </tr>    
+    <tr><td>ognl</td>                   <td>ognl</td>                       <td>2.6.9</td>                  <td></td>                           <td>jar</td>                 </tr>
+</table></p>
+
+<p>Unitils provides services for JUnit3, JUnit4 and TestNG so one of following dependencies can be used as your unit test framework:</p>
+<p><table>
+    <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
+    <tr><td>junit</td>                  <td>junit</td>                      <td>3.8.1</td>                  <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>junit</td>                  <td>junit</td>                      <td>4.3.1</td>                  <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>org.testng</td>             <td>testng</td>                     <td>5.1</td>                    <td>jdk15</td>                      <td>jar</td>                 </tr>    
+</table></p>
+
+
+<br />
+<h3>Dependencies for database testing</h3>
+
+<p>If a connection to the test database is needed, you will also need to add following dependencies to your classpath:</p>
+<p><table>
+    <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
+    <tr><td>commons-dbcp</td>           <td>commons-dbcp</td>               <td>1.2.2</td>                  <td></td>                           <td>jar</td>                 </tr>    
+    <tr><td><i>commons-pool</i></td>    <td><i>commons-pool</i></td>        <td><i>1.2</i></td>             <td></td>                           <td><i>jar</i></td>          </tr>    
+</table></p>
+
+<p>If you want to use data sets for your test data, you will also need DbUnit:</p>
+<p><table>
+    <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
+    <tr><td>dbunit</td>                 <td>dbunit</td>                     <td>2.2</td>                    <td></td>                           <td>jar</td>                 </tr>        
+</table></p>
+
+<p>If you want to use test with Hibernate, you will ofcourse need Hibernate (hibernate-annotations is optional):</p>
+<p><table>
+    <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
+    <tr><td>org.hibernate</td>          <td>hibernate</td>                  <td>3.2.0.ga</td>               <td></td>                           <td>jar</td>                 </tr>
+    <tr><td><i>antlr</i></td>           <td><i>antlr</i></td>               <td><i>2.7.6</i></td>           <td></td>                           <td><i>jar</i></td>          </tr>
+    <tr><td><i>cglib</i></td>           <td><i>cglib</i></td>               <td><i>2.1_3</i></td>           <td></td>                           <td><i>jar</i></td>          </tr>    
+    <tr><td><i>dom4j</i></td>           <td><i>dom4j</i></td>               <td><i>1.6.1</i></td>           <td></td>                           <td><i>jar</i></td>          </tr>    
+    <tr><td><i>net.sf.ehcache</i></td>  <td><i>ehcache</i></td>             <td><i>1.2</i></td>             <td></td>                           <td><i>jar</i></td>          </tr>    
+    <tr><td><i>asm</i></td>             <td><i>asm-attrs</i></td>           <td><i>1.5.3</i></td>           <td></td>                           <td><i>jar</i></td>          </tr>    
+    <tr><td>org.hibernate</td>          <td>hibernate-annotations</td>      <td>3.2.0.ga</td>               <td></td>                           <td>jar</td>                 </tr>
+</table></p>
+
+
+<br />
+<h3>Dependencies for testing with mock objects</h3>
+
+<p>Next to the core dependencies you will also need to add following dependencies to your classpath when you want to use Unitils to create mocks object:</p>
+<p><table>
+    <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
+    <tr><td>org.easymock</td>           <td>easymock</td>                   <td>2.2</td>                    <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>org.easymock</td>           <td>easymockclassextension</td>     <td>2.2</td>                    <td></td>                           <td>jar</td>                 </tr>    
+    <tr><td><i>cglib</i></td>           <td><i>cglib</i></td>               <td><i>2.1_3</i></td>           <td></td>                           <td><i>jar</i></td>          </tr>    
+</table></p>
+
+
+<br />
+<h3>Dependencies for testing with Spring</h3>
+
+<p>If Spring support is needed, you will also need to add some spring libraries (or the full spring jar) to your classpath. Version 2.0 is shown in the table, but 
+version 1.2 can also be used. The spring-hibernate3 library is optional and can be left out if you don't use Hibernate.</p>
+<p><table>
+    <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
+    <tr><td>org.springframework</td>    <td>spring-beans</td>               <td>2.0.2</td>                  <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>org.springframework</td>    <td>spring-context</td>             <td>2.0.2</td>                  <td></td>                           <td>jar</td>                 </tr>
+    <tr><td><i>aopalliance</i></td>     <td><i>aopalliance</i></td>         <td><i>1.0</i></td>             <td></td>                           <td><i>jar</i></td>          </tr>    
+    <tr><td>org.springframework</td>    <td>spring-core</td>                <td>2.0.2</td>                  <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>org.springframework</td>    <td>spring-dao</td>                 <td>2.0.2</td>                  <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>org.springframework</td>    <td>spring-hibernate3</td>          <td>2.0.2</td>                  <td></td>                           <td>jar</td>                 </tr>    
+    <tr><td><i>org.springframework</i></td><td><i>spring-jdbc</i></td>      <td><i>2.0.2</i></td>           <td></td>                           <td><i>jar</i></td>          </tr>    
+</table></p>
+
+
+
+
+<br />
+<br />
+        
+    </section>
+  </body>
+</document>
