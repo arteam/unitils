@@ -73,19 +73,29 @@ Summary
 
 * News
 ~~~~~~
-	<<2007-09-25 - Switched to JIRA>>
 	
-	We've migrated the issue and feature tracking to JIRA! Bugs and feature requests can now be reported 
-	at {{{http://jira.unitils.org}http://jira.unitils.org}}. 
+    <<2007-10-23 - Release of Unitils 1.0 rc 5>>
+  
+    Release candidate 5 for Unitils is available. This will be the last release candidate before the 1.0 release. It contains some fixes, 
+    JUnit 4.4 support, extra utility methods for database testing, extra configuration for data set locations etc. 
+
+
+    <<2007-10-23 - Release of Unitils 1.0 rc 5>>
+
+    Video of the Unitils presentation given at Spring-One is available at {{{http://www.parleys.com/display/PARLEYS/Unitils+-+making+unit+testing+easy?showComments=true} Parleys}}.
+        
+    <<2007-09-25 - Switched to JIRA>>
+
+    We've migrated the issue and feature tracking to JIRA! Bugs and feature requests can now be reported 
+    at {{{http://jira.unitils.org}http://jira.unitils.org}}. 
+
 	
     <<2007-08-15 - Release of Unitils 1.0 rc 4>>
   
     Release candidate 4 for Unitils is available. It contains some important fixes, support for loading multiple data sets and easier access to 
     the behavior of the dbmaintainer. Note that this version is not fully backwards compatible with rc 3, there is a small 
     change in the default behavior of the @DataSet annotation. A migration path is available {{{migration.html} here}}.
-    
-    <<Important Note: Currenlty Unitils is not compatible with JUnit-4.4>>. There are some backwards incompatible changes to the TestRunner 
-    behavior in this new version. We will release a new version containing support for <JUnit-4.4> soon. Please use <JUnit-4.3.1> untill then.
+   
     
     <<2007-06-20 - Release of Unitils 1.0 rc 3>>
   
