@@ -17,7 +17,11 @@ package org.unitils.dbunit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.UnitilsJUnit3;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
@@ -34,7 +38,7 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
+public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DbUnitModuleDataSetMultiSchemaTest.class);
@@ -53,9 +57,8 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
         if (disabled) {
@@ -72,8 +75,8 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
     /**
      * Clean-up test database.
      */
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         if (disabled) {
             return;
         }
@@ -84,6 +87,7 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
     /**
      * Test for a data set containing multiple namespaces.
      */
+    @Test
     public void testDataSet_multiSchema() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
@@ -99,6 +103,7 @@ public class DbUnitModuleDataSetMultiSchemaTest extends UnitilsJUnit3 {
     /**
      * Test for a data set containing multiple namespaces.
      */
+    @Test
     public void testDataSet_multiSchemaNoDefault() throws Exception {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");

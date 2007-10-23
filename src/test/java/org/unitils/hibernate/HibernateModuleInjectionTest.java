@@ -18,7 +18,10 @@ package org.unitils.hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
-import org.unitils.UnitilsJUnit3;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 
@@ -30,7 +33,8 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
+@SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
+public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private HibernateModule hibernateModule;
@@ -39,9 +43,8 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         hibernateModule = new HibernateModule();
         hibernateModule.init(configuration);
@@ -51,6 +54,7 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
     /**
      * Tests hibernate session factory injection for a field and a setter method.
      */
+    @Test
     public void testInjectHibernateSessionFactory() {
         HibernateTestSessionFactory hibernateTestSessionFactory = new HibernateTestSessionFactory();
         hibernateModule.injectSessionFactory(hibernateTestSessionFactory);
@@ -64,6 +68,7 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit3 {
      * Tests mixing of hibernate session factory injection for a field and a setter method and the use of
      * a custom initializer and a custom create method.
      */
+    @Test
     public void testInjectHibernateSessionFactory_mixingWithCustomCreateAndInitializer() {
         HibernateTestSessionFactoryMixing hibernateTestSessionFactory = new HibernateTestSessionFactoryMixing();
         hibernateModule.injectSessionFactory(hibernateTestSessionFactory);

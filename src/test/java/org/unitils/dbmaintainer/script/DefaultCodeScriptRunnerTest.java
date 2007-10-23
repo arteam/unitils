@@ -15,7 +15,9 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.unitils.UnitilsJUnit3;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.dbmaintainer.script.impl.SQLCodeScriptRunner;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
@@ -28,7 +30,7 @@ import java.util.List;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultCodeScriptRunnerTest extends UnitilsJUnit3 {
+public class DefaultCodeScriptRunnerTest extends UnitilsJUnit4 {
 
     /* Tested instance  */
     private SQLCodeScriptRunner sqlCodeScriptRunner;
@@ -85,30 +87,34 @@ public class DefaultCodeScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Initialize test fixture
      */
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         sqlCodeScriptRunner = new SQLCodeScriptRunner();
     }
 
 
+    @Test
     public void testExecute() throws Exception {
         List<String> result = sqlCodeScriptRunner.parseStatements(NORMAL_SCRIPT);
         assertLenEquals(Arrays.asList("PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\nstatement1;\nstatement2;\nEND", "PROCEDURE TEST2 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\nstatement1;\nstatement2;\nEND;"), result);
     }
 
 
+    @Test
     public void testExecute_multilineComment() throws Exception {
         List<String> result = sqlCodeScriptRunner.parseStatements(SCRIPT_WITH_MULTILINE_COMMENT);
         assertLenEquals(Arrays.asList("/* multiline\n comment */PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\nstatement1;\nstatement2;\nEND;"), result);
     }
 
 
+    @Test
     public void testExecute_lineComment() throws Exception {
         List<String> result = sqlCodeScriptRunner.parseStatements(SCRIPT_WITH_LINE_COMMENT);
         assertLenEquals(Arrays.asList("-- line comment /\nPROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\nstatement1;\nstatement2;\nEND;"), result);
     }
 
 
+    @Test
     public void testExecute_scriptWithSlashInCode() throws Exception {
         List<String> result = sqlCodeScriptRunner.parseStatements(SCRIPT_WITH_SLASH_IN_CODE);
         assertLenEquals(Arrays.asList("PROCEDURE TEST1 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\n/statement1/;\nstatement2;\nEND;", "PROCEDURE TEST2 (param1 VARCHAR, param2 BLOB) IS\nBEGIN\n/statement1/\nstatement2;\nEND"), result);

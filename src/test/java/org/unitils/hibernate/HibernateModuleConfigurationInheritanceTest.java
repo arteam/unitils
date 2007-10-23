@@ -17,7 +17,10 @@ package org.unitils.hibernate;
 
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
-import org.unitils.UnitilsJUnit3;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.hibernate.util.SessionFactoryManager;
 
@@ -29,7 +32,7 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
+public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private SessionFactoryManager sessionFactoryManager;
@@ -38,8 +41,8 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         sessionFactoryManager = new SessionFactoryManager(AnnotationConfiguration.class.getName(), "org.unitils.hibernate.util.SimpleCurrentSessionContext");
     }
 
@@ -48,6 +51,7 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
      * Tests loading of a configuration location specified on class-level.
      * Both super and sub class have annotations with values and custom create methods.
      */
+    @Test
     public void testGetHibernateConfiguration_overriden() {
         HibernateTestCustomCreate hibernateTest1 = new HibernateTestCustomCreate();
         Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTest1);
@@ -63,6 +67,7 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
      * Tests loading of a configuration location specified on class-level.
      * Both super and sub class have annotations with values and but only super class has custom create method.
      */
+    @Test
     public void testGetHibernateConfiguration_overridenNoCustomCreateInSubClass() {
         HibernateTestNoCustomCreate hibernateTest2 = new HibernateTestNoCustomCreate();
         Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTest2);
@@ -77,6 +82,7 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
      * Tests creating the application context. No context creation is done in the sub-class, the context of the super
      * class should be used.
      */
+    @Test
     public void testGetHibernateConfiguration_onlyInSuperClass() {
         HibernateTestNoCreation1 hibernateTestNoCreation = new HibernateTestNoCreation1();
         Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestNoCreation);
@@ -90,6 +96,7 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit3 {
     /**
      * Test reusing a configuration of a super class.
      */
+    @Test
     public void testGetHibernateConfiguration_twice() {
         Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestNoCreation1());
         Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestNoCreation2());

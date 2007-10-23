@@ -15,7 +15,10 @@
  */
 package org.unitils.inject;
 
-import org.unitils.UnitilsJUnit3;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.inject.annotation.TestedObject;
 
 import java.util.AbstractList;
@@ -28,17 +31,27 @@ import java.util.List;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
+@SuppressWarnings({"UnusedDeclaration"})
+public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit4 {
 
     private InjectModule injectModule = new InjectModule();
 
-    private TestObject testObject = new TestObject();
-    private TestObject_TestedObjectWithInterfaceType testObject_TestedObjectWithInterfaceType = new TestObject_TestedObjectWithInterfaceType();
-    private TestObject_TestedObjectWithAbstractClassType testObject_TestedObjectWithAbstractClassType = new TestObject_TestedObjectWithAbstractClassType();
-    private TestObject_TestedObjectWithTypeThatHasNoDefaultConstructor testObject_TestedObjectWithTypeThatHasNoDefaultConstructor =
-            new TestObject_TestedObjectWithTypeThatHasNoDefaultConstructor();
+    private TestObject testObject;
+    private TestObject_TestedObjectWithInterfaceType testObject_TestedObjectWithInterfaceType;
+    private TestObject_TestedObjectWithAbstractClassType testObject_TestedObjectWithAbstractClassType;
+    private TestObject_TestedObjectWithTypeThatHasNoDefaultConstructor testObject_TestedObjectWithTypeThatHasNoDefaultConstructor;
 
 
+    @Before
+    public void setUp() throws Exception {
+        testObject = new TestObject();
+        testObject_TestedObjectWithInterfaceType = new TestObject_TestedObjectWithInterfaceType();
+        testObject_TestedObjectWithAbstractClassType = new TestObject_TestedObjectWithAbstractClassType();
+        testObject_TestedObjectWithTypeThatHasNoDefaultConstructor = new TestObject_TestedObjectWithTypeThatHasNoDefaultConstructor();
+    }
+
+
+    @Test
     public void testNotCreatedWhenNotNull() {
         testObject.setTestedObject("test");
         injectModule.createTestedObjectsIfNull(testObject);
@@ -47,6 +60,7 @@ public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
     }
 
 
+    @Test
     public void testCreatedWhenNull() {
         assertNull(testObject.getTestedObject());
         injectModule.createTestedObjectsIfNull(testObject);
@@ -55,6 +69,7 @@ public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
     }
 
 
+    @Test
     public void testNotCreatedWhenInterfaceType() {
 
         injectModule.createTestedObjectsIfNull(testObject_TestedObjectWithInterfaceType);
@@ -62,6 +77,7 @@ public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
     }
 
 
+    @Test
     public void testNotCreatedWhenAbstractClassType() {
 
         injectModule.createTestedObjectsIfNull(testObject_TestedObjectWithAbstractClassType);
@@ -69,6 +85,7 @@ public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
     }
 
 
+    @Test
     public void testNotCreatedWhenTypeThatHasNoDefaultConstructor() {
 
         injectModule.createTestedObjectsIfNull(testObject_TestedObjectWithTypeThatHasNoDefaultConstructor);
@@ -118,9 +135,9 @@ public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit3 {
     private class TestObject_TestedObjectWithTypeThatHasNoDefaultConstructor {
 
         @TestedObject
-        private EnumMap<?,?> testedObject;
+        private EnumMap<?, ?> testedObject;
 
-        public EnumMap<?,?> getTestedObject() {
+        public EnumMap<?, ?> getTestedObject() {
             return testedObject;
         }
 

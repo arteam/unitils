@@ -1,8 +1,26 @@
+/*
+ * Copyright 2006-2007,  Unitils.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.unitils.inject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.UnitilsJUnit3;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.inject.annotation.InjectIntoStaticByType;
@@ -14,7 +32,8 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUnit3 {
+@SuppressWarnings({"UnusedDeclaration"})
+public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUnit4 {
 
     private static final Log logger = LogFactory.getLog(InjectModuleInjectIntoStaticByTypeExceptionsTest.class);
 
@@ -26,13 +45,15 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
 
     private InjectModule injectModule = new InjectModule();
 
-    protected void setUp() throws Exception {
-        super.setUp();
 
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         injectModule.init(configuration);
     }
 
+
+    @Test
     public void testInjectIntoStaticByType_noPropertyOfType() {
         try {
             injectModule.injectObjects(testInjectIntoStaticByType_noPropertyOfType);
@@ -43,6 +64,8 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
         }
     }
 
+
+    @Test
     public void testInjectIntoStaticByType_moreThanOneFieldOfType() {
         try {
             injectModule.injectObjects(testInjectIntoStaticByType_moreThanOneFieldOfType);
@@ -53,6 +76,8 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
         }
     }
 
+
+    @Test
     public void testInjectIntoStaticByType_moreThanOneSetterOfType() {
         try {
             injectModule.injectObjects(testInjectIntoStaticByType_moreThanOneSetterOfType);
@@ -63,6 +88,8 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
         }
     }
 
+
+    @Test
     public void testInjectIntoStaticByType_moreThanOneFieldOfSuperType() {
         try {
             injectModule.injectObjects(testInjectIntoStaticByType_moreThanOneFieldOfSuperType);
@@ -73,6 +100,8 @@ public class InjectModuleInjectIntoStaticByTypeExceptionsTest extends UnitilsJUn
         }
     }
 
+
+    @Test
     public void testInjectIntoStaticByType_moreThanOneSetterOfSuperType() {
         try {
             injectModule.injectObjects(testInjectIntoStaticByType_moreThanOneSetterOfSuperType);
