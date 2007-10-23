@@ -815,18 +815,13 @@ dbscripts/ 001_initial.sql
     By default the database maintainer will store the current version of a database schema in a <DB_VERSION> table. This way, it can determine whether the database is 
     up to date or not. 
 
-    The db version is, by default, not created automatically. This is to make sure unitils does not clear a wrong database by accident. Suppose for example
+    This db version table is not created automatically. This is to make sure unitils does not clear a wrong database by accident. Suppose for example
     you have configured unitils to connect to your system test database. If you would enable the database maintainer it would see that the database is not in synch with 
     the scripts and as a result drop the whole database and recreate it from scratch. This is probably not the desired result.
-    Therefore a database can only be maintained if it's unitils enalbed, i.e. when it contains a version table.  
+    Therefore a database can only be maintained if it's unitils enabled, i.e. when it contains a version table.  
 
-    You can install the version table manually by executing following DDL statements. 
-
-+-----+
-+-----+
-
-    As an alternative, you can also copy the correct creation statements from the message of the exception that is thrown by unitils when it finds a database without
-    a version table. It is also possible to let unitils create the version table automatically by setting following property to true. Be sure your connection is configured properly. 
+    The database maintainer will throw an exception when it does not find a version table. The correct DDL statements for creating the version table will be 
+    displayed in the exception message. It is also possible to let unitils create the version table automatically by setting following property to true. 
 
 +-----+
 dbMaintainer.dbVersionSource.autoCreateVersionTable=true
