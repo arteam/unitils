@@ -17,7 +17,10 @@ package org.unitils.inject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.UnitilsJUnit3;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.inject.annotation.InjectIntoByType;
@@ -29,7 +32,8 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
+@SuppressWarnings({"UnusedDeclaration"})
+public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
 
     private static final Log logger = LogFactory.getLog(InjectModuleInjectIntoByTypeExceptionsTest.class);
 
@@ -44,13 +48,15 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
 
     private InjectModule injectModule = new InjectModule();
 
-    protected void setUp() throws Exception {
-        super.setUp();
 
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         injectModule.init(configuration);
     }
 
+
+    @Test
     public void testInject_targetIsNull() {
         try {
             injectModule.injectObjects(testInjectIntoByType_targetIsNull);
@@ -61,6 +67,8 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInjectIntoByType_targetDoesntExist() {
         try {
             injectModule.injectObjects(testInjectIntoByType_targetDoesntExist);
@@ -71,6 +79,8 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInjectIntoByType_noTargetSpecified() {
         try {
             injectModule.injectObjects(testInjectIntoByType_noTargetSpecified);
@@ -81,6 +91,8 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInjectIntoByType_noPropertyOfType() {
         try {
             injectModule.injectObjects(testInjectIntoByType_noPropertyOfType);
@@ -91,6 +103,8 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInjectIntoByType_moreThanOneFieldOfType() {
         try {
             injectModule.injectObjects(testInjectIntoByType_moreThanOneFieldOfType);
@@ -101,6 +115,8 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInjectIntoByType_moreThanOneSetterOfType() {
         try {
             injectModule.injectObjects(testInjectIntoByType_moreThanOneSetterOfType);
@@ -111,6 +127,8 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInjectIntoByType_moreThanOneFieldOfSuperType() {
         try {
             injectModule.injectObjects(testInjectIntoByType_moreThanOneFieldOfSuperType);
@@ -121,6 +139,8 @@ public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInjectIntoByType_moreThanOneSetterOfSuperType() {
         try {
             injectModule.injectObjects(testInjectIntoByType_moreThanOneSetterOfSuperType);

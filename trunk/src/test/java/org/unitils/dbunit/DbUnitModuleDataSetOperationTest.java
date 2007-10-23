@@ -16,7 +16,12 @@
 package org.unitils.dbunit;
 
 import org.dbunit.dataset.IDataSet;
-import org.unitils.UnitilsJUnit3;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
@@ -33,17 +38,16 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
+public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
 
     private DbUnitModule dbUnitModule;
 
     @TestDataSource
     private DataSource dataSource = null;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
 
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         dbUnitModule = new DbUnitModule();
         dbUnitModule.init(configuration);
@@ -54,22 +58,26 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit3 {
         MockDataSetLoadStrategy.operationExecuted = false;
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
 
+    @After
+    public void tearDown() throws Exception {
         dropTestTables();
     }
 
+
+    @Test
     public void testLoadDataSet_defaultDataSetOperation() throws Exception {
         dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethod1"), new DataSetTest());
         assertLoadedDataSet("DbUnitModuleDataSetOperationTest$DataSetTest.xml");
     }
 
+
+    @Test
     public void testLoadDataSet_customDataSetOperation() throws Exception {
         dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethodCustomDataSetOperation"), new DataSetTest());
         assertTrue(MockDataSetLoadStrategy.operationExecuted);
     }
+
 
     /**
      * Utility method to assert that the correct data set was loaded.

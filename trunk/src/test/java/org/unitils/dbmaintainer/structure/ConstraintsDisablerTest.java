@@ -15,7 +15,11 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.unitils.UnitilsJUnit3;
+import org.junit.After;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
@@ -36,7 +40,7 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class ConstraintsDisablerTest extends UnitilsJUnit3 {
+public class ConstraintsDisablerTest extends UnitilsJUnit4 {
 
     /* The tested object */
     private ConstraintsDisabler constraintsDisabler;
@@ -53,10 +57,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
      * Test fixture. Configures the ConstraintsDisabler with the implementation that matches the configured database
      * dialect
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new SQLHandler(dataSource);
         dbSupport = getDefaultDbSupport(configuration, sqlHandler);
@@ -70,9 +72,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     /**
      * Drops the test tables, to avoid influencing other tests
      */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         cleanupTestDatabase();
     }
 
@@ -80,6 +81,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     /**
      * Tests whether foreign key constraints are correctly disabled
      */
+    @Test
     public void testDisableConstraints_foreignKey() throws Exception {
         try {
             executeUpdate("insert into table2 (col1) values ('test')", dataSource);
@@ -96,6 +98,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit3 {
     /**
      * Tests whether not-null constraints are correctly disabled
      */
+    @Test
     public void testDisableConstraints_notNull() throws Exception {
         try {
             executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);

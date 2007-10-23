@@ -17,7 +17,12 @@ package org.unitils.dbmaintainer.structure;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.UnitilsJUnit3;
+import org.junit.After;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
@@ -45,7 +50,7 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Scott Prater
  */
-public class SequenceUpdaterTest extends UnitilsJUnit3 {
+public class SequenceUpdaterTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(SequenceUpdaterTest.class);
@@ -65,9 +70,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
      * Test fixture. Configures the implementation of the SequenceUpdater that matches the currenlty configured dialect.
      * Creates a test table and test sequence.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
 
@@ -83,8 +87,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
     /**
      * Clears the database, to avoid interference with other tests
      */
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         cleanupTestDatabase();
     }
 
@@ -92,6 +96,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
     /**
      * Tests the update sequences behavior
      */
+    @Test
     public void testUpdateSequences() throws Exception {
         if (!dbSupport.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
@@ -106,6 +111,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
     /**
      * Verifies that if a sequence has a value already high enough, the value is not being set to a lower value
      */
+    @Test
     public void testUpdateSequences_valueAlreadyHighEnough() throws Exception {
         if (!dbSupport.supportsSequences()) {
             logger.warn("Current dialect does not support sequences. Skipping test.");
@@ -122,6 +128,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
     /**
      * Tests the update identity columns behavior
      */
+    @Test
     public void testUpdateSequences_identityColumns() throws Exception {
         if (!dbSupport.supportsIdentityColumns()) {
             logger.warn("Current dialect does not support identity columns. Skipping test.");
@@ -136,6 +143,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit3 {
     /**
      * Verifies that if a identity columns has a value already high enough, the value is not being set to a lower value
      */
+    @Test
     public void testUpdateSequences_identityColumnsValueAlreadyHighEnough() throws Exception {
         if (!dbSupport.supportsIdentityColumns()) {
             logger.warn("Current dialect does not support identity columns. Skipping test.");

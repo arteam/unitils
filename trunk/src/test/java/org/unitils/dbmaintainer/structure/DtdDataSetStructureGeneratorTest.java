@@ -1,9 +1,23 @@
 package org.unitils.dbmaintainer.structure;
 
+import org.apache.commons.lang.StringUtils;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
 import static org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
@@ -11,24 +25,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.lang.StringUtils;
-import org.unitils.UnitilsJUnit3;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-
 /**
  * Test class for the FlatXmlDataSetDtdGenerator
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
+public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private DataSetStructureGenerator dataSetStructureGenerator;
@@ -46,9 +49,8 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
      * tableOne(columnA not null, columnB not null, columnC) and
      * tableTwo(column1, column2)
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         dtdFile = File.createTempFile("testDTD", ".dtd");
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
@@ -67,8 +69,8 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
     /**
      * Clean-up test database.
      */
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         dropTestTables();
     }
 
@@ -76,6 +78,7 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit3 {
     /**
      * Tests the generation of the DTD file.
      */
+    @Test
     public void testGenerateDtd() throws Exception {
         String expectedContent = "<!ELEMENT DATASET ( (TABLEONE | TABLETWO)*)> " +
                 "<!ELEMENT TABLEONE EMPTY>" +

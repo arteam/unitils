@@ -18,7 +18,10 @@ package org.unitils.dbunit.util;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ITableIterator;
-import org.unitils.UnitilsJUnit3;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
@@ -32,7 +35,7 @@ import static java.util.Arrays.asList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit3 {
+public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private MultiSchemaXmlDataSetReader multiSchemaXmlDataSetReader;
@@ -41,9 +44,8 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit3 {
     /**
      * Creates the test fixture.
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         multiSchemaXmlDataSetReader = new MultiSchemaXmlDataSetReader("SCHEMA_A");
     }
 
@@ -52,6 +54,7 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit3 {
      * Test the loading of a data set with 2 rows for a table, but the second
      * row has less columns than the first one.
      */
+    @Test
     public void testLoadDataSet_lessColumnsLast() throws Exception {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("LessColumnsLastDataSet.xml")));
 
@@ -86,6 +89,7 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit3 {
      * Test the loading of a data set with 2 rows for a table, but the first
      * row has less columns than the second one.
      */
+    @Test
     public void testLoadDataSet_lessColumnsFirst() throws Exception {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("LessColumnsFirstDataSet.xml")));
 
@@ -120,6 +124,7 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit3 {
      * Test the loading of a data set with 3 schemas:
      * schema D (overrides default schema A) contains 3 records for TABLE_A, schema B and C contain 2 records for TABLE_A.
      */
+    @Test
     public void testLoadDataSet_multiSchema() throws Exception {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("MultiSchemaDataSet.xml")));
 
@@ -144,6 +149,7 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit3 {
      * Test the loading of a data set with 3 schemas:
      * schema A (default) contains 3 records for TABLE_A, schema B and C contain 2 records for TABLE_A.
      */
+    @Test
     public void testLoadDataSet_multiSchemaNoDefault() throws Exception {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("MultiSchemaNoDefaultDataSet.xml")));
 
@@ -168,6 +174,7 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit3 {
      * Test the loading of a data set out of 2 files:
      * this will load the LessColumnsLastDataSet.xml and  LessColumnsFirstDataSet.xml dataset
      */
+    @Test
     public void testLoadDataSet_multiInputStreams() throws Exception {
         File file1 = toFile(getClass().getResource("LessColumnsLastDataSet.xml"));
         File file2 = toFile(getClass().getResource("LessColumnsFirstDataSet.xml"));

@@ -15,7 +15,10 @@
  */
 package org.unitils.easymock;
 
-import org.unitils.UnitilsJUnit3;
+import static org.junit.Assert.assertNotNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.easymock.annotation.Mock;
 
@@ -30,7 +33,7 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class EasyMockModuleTest extends UnitilsJUnit3 {
+public class EasyMockModuleTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private EasyMockModule easyMockModule;
@@ -38,9 +41,8 @@ public class EasyMockModuleTest extends UnitilsJUnit3 {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         easyMockModule = new EasyMockModule();
         easyMockModule.init(configuration);
@@ -50,6 +52,7 @@ public class EasyMockModuleTest extends UnitilsJUnit3 {
     /**
      * Test for creating a mock list.
      */
+    @Test
     public void testDataSet() throws Exception {
         MockTest mockTest = new MockTest();
         easyMockModule.createAndInjectMocksIntoTest(mockTest);

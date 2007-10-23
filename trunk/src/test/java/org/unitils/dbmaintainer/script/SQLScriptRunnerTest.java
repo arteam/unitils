@@ -15,7 +15,9 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.unitils.UnitilsJUnit3;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.dbmaintainer.script.impl.SQLScriptRunner;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
@@ -28,7 +30,7 @@ import java.util.List;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SQLScriptRunnerTest extends UnitilsJUnit3 {
+public class SQLScriptRunnerTest extends UnitilsJUnit4 {
 
 
     /* Tested instance  */
@@ -86,8 +88,8 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Initialize test fixture
      */
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         sqlScriptRunner = new SQLScriptRunner();
     }
 
@@ -95,6 +97,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Test a normal script, containing 2 statements and a blank line
      */
+    @Test
     public void testParseStatements() throws Exception {
         List<String> result = sqlScriptRunner.parseStatements(NORMAL_SCRIPT);
         assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))", "CREATE TABLE ROLE (ID INTEGER PRIMARY KEY, ROLENAME VARCHAR2(20))"), result);
@@ -104,6 +107,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Test a script that contains new lines and cariage returns, these should have been converted to spaces
      */
+    @Test
     public void testParseStatements_multiline() throws Exception {
         List<String> result = sqlScriptRunner.parseStatements(SCRIPT_MULTILINE);
         assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))", "CREATE TABLE ROLE (ID INTEGER PRIMARY KEY, ROLENAME VARCHAR2(20))", "INSERT INTO USERS(NAME) VALUES ('This is\na multiline\rvalue')"), result);
@@ -113,6 +117,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Test a script that contains line comments (these should have been ignored)
      */
+    @Test
     public void testParseStatements_lineComments() throws Exception {
         List<String> result = sqlScriptRunner.parseStatements(SCRIPT_LINE_COMMENTS);
         assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY, NAME VARCHAR2(50))"), result);
@@ -122,6 +127,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Test with block comment on a single line
      */
+    @Test
     public void testParseStatements_blockCommentsSameLine() throws Exception {
         List<String> result = sqlScriptRunner.parseStatements(SCRIPT_BLOCK_COMMENTS);
         assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,   NAME VARCHAR2(50))"), result);
@@ -131,6 +137,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Test with a block comment that spans multiple lines
      */
+    @Test
     public void testParseStatements_blockCommentsMultipleLines() throws Exception {
         List<String> result = sqlScriptRunner.parseStatements(SCRIPT_BLOCK_COMMENT_MULTIPLE_LINES);
         assertLenEquals(Arrays.asList("CREATE TABLE PERSON (ID INTEGER PRIMARY KEY,  NAME VARCHAR2(50))"), result);
@@ -140,6 +147,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Test with a statement that contains a ; within a ''
      */
+    @Test
     public void testParseStatements_semiColonInQuotes() throws Exception {
         List<String> result = sqlScriptRunner.parseStatements(SCRIPT_SEMI_COLON_IN_QUOTES);
         assertLenEquals(Arrays.asList("COMMENT ON TABLE PERSON IS 'This ; comment ; contains ; a semi-colon'"), result);
@@ -149,6 +157,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Test with a statement that contains escaped single and double quotes in quotes
      */
+    @Test
     public void testParseStatements_quotesInQuotes() throws Exception {
         List<String> result = sqlScriptRunner.parseStatements(SCRIPT_QUOTES_IN_QUOTES);
         assertLenEquals(Arrays.asList("COMMENT ON TABLE PERSON IS 'This \"comment\" '' contains quotes and double quotes'"), result);
@@ -158,6 +167,7 @@ public class SQLScriptRunnerTest extends UnitilsJUnit3 {
     /**
      * Test with a statement that contains single and double quotes
      */
+    @Test
     public void testParseStatements_commentsInQuotes() throws Exception {
         List<String> result = sqlScriptRunner.parseStatements(SCRIPT_COMMENT_IN_QUOTES);
         assertLenEquals(Arrays.asList("COMMENT ON TABLE PERSON IS 'This /* comment */ contains a block and -- line comment'"), result);

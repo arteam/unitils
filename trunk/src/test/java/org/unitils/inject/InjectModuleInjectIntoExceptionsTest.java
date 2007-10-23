@@ -17,7 +17,10 @@ package org.unitils.inject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.UnitilsJUnit3;
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.inject.annotation.InjectInto;
@@ -28,7 +31,8 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
+@SuppressWarnings({"UnusedDeclaration"})
+public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit4 {
 
     private static final Log logger = LogFactory.getLog(InjectModuleInjectIntoExceptionsTest.class);
 
@@ -40,13 +44,15 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
 
     private InjectModule injectModule = new InjectModule();
 
-    protected void setUp() throws Exception {
-        super.setUp();
 
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         injectModule.init(configuration);
     }
 
+
+    @Test
     public void testInject_targetIsNull() {
         try {
             injectModule.injectObjects(testInject_targetIsNull);
@@ -57,6 +63,8 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInject_targetDoesntExist() {
         try {
             injectModule.injectObjects(testInject_targetDoesntExist);
@@ -67,6 +75,8 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInject_noTargetSpecified() {
         try {
             injectModule.injectObjects(testInject_noTargetSpecified);
@@ -77,6 +87,8 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInject_invalidOGNLExpression() {
         try {
             injectModule.injectObjects(testInject_invalidOGNLExpression);
@@ -87,6 +99,8 @@ public class InjectModuleInjectIntoExceptionsTest extends UnitilsJUnit3 {
         }
     }
 
+
+    @Test
     public void testInject_NonExistingPropertyInOGNLExpression() {
         try {
             injectModule.injectObjects(testInject_nonExistingPropertyInOGNLExpression);
