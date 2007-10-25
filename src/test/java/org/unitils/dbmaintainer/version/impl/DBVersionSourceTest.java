@@ -36,6 +36,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.version.Version;
+import static org.unitils.dbmaintainer.version.impl.DBVersionSource.PROPKEY_AUTO_CREATE_VERSION_TABLE;
 
 /**
  * Test class for {@link org.unitils.dbmaintainer.version.impl.DBVersionSource}. The implementation is tested using a
@@ -67,7 +68,7 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
 		dbVersionSource = new DBVersionSource();
 		dbVersionSource.init(configuration, sqlHandler);
 
-		configuration.setProperty(DBVersionSource.PROPKEY_AUTO_CREATE_VERSION_TABLE, "true");
+		configuration.setProperty(PROPKEY_AUTO_CREATE_VERSION_TABLE, "true");
 		dbVersionSourceAutoCreate = new DBVersionSource();
 		dbVersionSourceAutoCreate.init(configuration, sqlHandler);
 
