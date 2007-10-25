@@ -80,7 +80,7 @@ Summary
     JUnit 4.4 support, extra utility methods for database testing, extra configuration for data set locations etc. 
 
 
-    <<2007-10-23 - Release of Unitils 1.0 rc 5>>
+    <<2007-10-23 - Unitils on Parleys>>
 
     Video of the Unitils presentation given at Spring-One is available at {{{http://www.parleys.com/display/PARLEYS/Unitils+-+making+unit+testing+easy?showComments=true} Parleys}}.
         
