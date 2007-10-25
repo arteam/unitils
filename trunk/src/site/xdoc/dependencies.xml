@@ -23,8 +23,7 @@
 <p>Unitils provides services for JUnit3, JUnit4 and TestNG so one of following dependencies can be used as your unit test framework:</p>
 <p><table>
     <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
-    <tr><td>junit</td>                  <td>junit</td>                      <td>3.8.1</td>                  <td></td>                           <td>jar</td>                 </tr>
-    <tr><td>junit</td>                  <td>junit</td>                      <td>4.3.1</td>                  <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>junit</td>                  <td>junit</td>                      <td>4.4</td>                    <td></td>                           <td>jar</td>                 </tr>
     <tr><td>org.testng</td>             <td>testng</td>                     <td>5.1</td>                    <td>jdk15</td>                      <td>jar</td>                 </tr>    
 </table></p>
 
