@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2006 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import org.unitils.spring.annotation.SpringApplicationContext;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@SpringApplicationContext("classpath:/eshop-config.xml")
 public abstract class BaseHibernateTest extends UnitilsJUnit4 {
 
-    @SpringApplicationContext
+    @SpringApplicationContext({"eshop-config.xml", "test-config.xml"})
     ApplicationContext springApplicationContext;
 
 }

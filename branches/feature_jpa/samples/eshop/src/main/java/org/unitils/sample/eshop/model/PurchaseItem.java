@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2006 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,21 @@
  */
 package org.unitils.sample.eshop.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Represents an amount of items of a certain Product that is contained in a certain Purchase
  */
 @Entity
 @Table(name = "PURCHASE_ITEM")
-@SequenceGenerator(name = "SEQUENCE1", sequenceName = "PURCHASE_ITEM_ID_SEQ")
 public class PurchaseItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE1")
     private Long id;
 
     @Column
@@ -44,7 +47,15 @@ public class PurchaseItem {
         this.amount = amount;
     }
 
-    public int getAmount() {
+    /**
+	 * Getter for id.
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	public int getAmount() {
         return amount;
     }
 

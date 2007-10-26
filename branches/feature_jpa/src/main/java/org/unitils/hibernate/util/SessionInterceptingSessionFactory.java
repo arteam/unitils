@@ -25,11 +25,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
-import org.unitils.database.DatabaseModule;
 
 /**
- * A wrapper for a Hibernate session factory that will intercept all opened session factories and
- * offers operations to get those opened session and close or flush them.
+ * A wrapper for a Hibernate session factory that intercepts all opened session. These sessions can
+ * later be retrieved for e.g. closing them or flushing their updates to the database.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -125,16 +124,6 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
 
 
     /**
-     * Gets all open intercepted sessions.
-     *
-     * @return The sessions, not null
-     */
-    public Set<org.hibernate.Session> getOpenedSessions() {
-        return sessions;
-    }
-
-
-    /**
      * Closes and clears all open sessions.
      */
     public void closeOpenSessions() {
@@ -144,7 +133,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
                 session.close();
             }
         }
-        sessions.clear();
+        clearInterceptedSessions();
     }
 
 
@@ -159,4 +148,13 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
             }
         }
     }
+    
+    
+    /**
+     * Removes all intercepted sessions
+     */
+    public void clearInterceptedSessions() {
+    	sessions.clear();
+    }
+
 }

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="dataset.xsd">
-
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:///C:/Projects/eshop/db/xsd/dataset.xsd">
+	
     <USER ID="1"/>
 
     <!-- purchase 1 -->
@@ -11,5 +11,6 @@
     <!-- purchase 2 -->
     <PURCHASE ID="2" USER_ID="1"/>
     <PURCHASE_ITEM ID="21" PURCHASE_ID="2" AMOUNT="15"/>
-
+    <PRODUCT ID="1"/>    
+	
 </dataset>

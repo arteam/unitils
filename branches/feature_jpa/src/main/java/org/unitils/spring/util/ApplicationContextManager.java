@@ -129,12 +129,12 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
      * Note: for this to work, the application context may not have been refreshed in the factory.
      * By registering the bean post processors before the refresh, we can intercept bean creation and bean wiring.
      * This is no longer possible if the context is already refreshed.
-     *
      * @param locations The locations where to find configuration files, not null
+     *
      * @return the context, not null
      */
     @Override
-    protected ApplicationContext createInstanceForValues(List<String> locations) {
+    protected ApplicationContext createInstanceForValues(Object testObject, Class<?> testClass, List<String> locations) {
         try {
             // create application context
             final ConfigurableApplicationContext applicationContext = applicationContextFactory.createApplicationContext(locations);
@@ -194,9 +194,6 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
     @Override
     protected List<String> getAnnotationValues(SpringApplicationContext annotation) {
         String[] locations = annotation.value();
-        if (locations.length == 0 || (locations.length == 1 && StringUtils.isEmpty(locations[0]))) {
-            return null;
-        }
         return asList(locations);
     }
 }

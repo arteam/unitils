@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2006 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,18 @@
 package org.unitils.sample.eshop.model;
 
 
-import javax.persistence.*;
-import java.util.ArrayList;
 import static java.util.Arrays.asList;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * Composite object that represents the price of a Product. Can be a simple price, or can consist of a price table
@@ -75,12 +83,10 @@ public class ProductPrice {
      * Represents a single line in a price table.
      */
     @Entity
-    @Table(name = "PRODUCT_PRICE_TABLE")
-    @SequenceGenerator(name = "SEQUENCE", sequenceName = "PRICE_TABLE_ITEM_SEQ")
+    @Table(name = "PRODUCT_PRICE")
     public static class PriceTableItem {
 
         @Id
-        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
         private Long id;
 
         @Column(name = "AMOUNT")
@@ -98,7 +104,15 @@ public class ProductPrice {
             this.price = price;
         }
 
-        public int getMinimalAmount() {
+        /**
+		 * Getter for id.
+		 * @return the id
+		 */
+		public Long getId() {
+			return id;
+		}
+
+		public int getMinimalAmount() {
             return minimalAmount;
         }
 

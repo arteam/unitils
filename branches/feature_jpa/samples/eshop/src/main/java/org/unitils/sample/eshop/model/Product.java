@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2006 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
 package org.unitils.sample.eshop.model;
 
 
-import javax.persistence.*;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Represents an eshop Product
  */
 @Entity
 @Table(name = "PRODUCT")
-@SequenceGenerator(name = "SEQUENCE", sequenceName = "PRODUCT_ID_SEQ")
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
     private Long id;
 
     @Embedded
@@ -36,7 +37,7 @@ public class Product {
     private String name;
 
     private int minimumAge;
-
+    
     /**
      * Empty constructor. Exists only to enable proxying.
      */
@@ -95,6 +96,7 @@ public class Product {
         return minimumAge;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -104,6 +106,7 @@ public class Product {
         return id.equals(product.id);
     }
 
+    @Override
     public int hashCode() {
         return id.hashCode();
     }

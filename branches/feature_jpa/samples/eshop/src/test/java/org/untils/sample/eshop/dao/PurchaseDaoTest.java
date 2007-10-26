@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2006 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,38 +15,36 @@
  */
 package org.untils.sample.eshop.dao;
 
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
-import org.unitils.dbunit.datasetloadstrategy.CleanInsertLoadStrategy;
-import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
-import org.unitils.dbunit.datasetloadstrategy.InsertLoadStrategy;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import org.unitils.dbunit.datasetloadstrategy.impl.InsertLoadStrategy;
+import org.unitils.hibernate.HibernateUnitils;
+import org.unitils.sample.eshop.dao.JPAPurchaseDao;
 import org.unitils.sample.eshop.dao.PurchaseDao;
 import org.unitils.sample.eshop.model.User;
 import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBean;
 
-import javax.sql.DataSource;
-
 /**
  * todo javadoc
- */
+ */ 
 @DataSet(loadStrategy = InsertLoadStrategy.class)
-@Transactional(TransactionMode.ROLLBACK)
 @SpringApplicationContext({"eshop-config.xml", "test-config.xml"})
+@Transactional(TransactionMode.ROLLBACK)
 public class PurchaseDaoTest extends UnitilsJUnit4 {
 
     /* Object under test */
-    @SpringBean("purchaseDao")
-    private PurchaseDao purchaseDao;
-
-    @TestDataSource
-    private DataSource dataSource;
+    //@SpringBean("purchaseDao")
+    private JPAPurchaseDao purchaseDao;
 
     /* Test user */
     private User testUser;
@@ -54,13 +52,24 @@ public class PurchaseDaoTest extends UnitilsJUnit4 {
 
     @Before
     public void initializeFixture() {
-        testUser = new User(1L);
+    	/*purchaseDao = new JPAPurchaseDao();
+    	EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("test");
+    	purchaseDao.setEntityManagerFactory(emFactory);*/
+    	
+        testUser = new User(1L, null, 0);
     }
 
     @Test
     public void testCalculateTotalPurchaseAmount() {
         Long totalAmount = purchaseDao.calculateTotalPurchaseAmount(testUser);
+        HibernateUnitils.flushDatabaseUpdates();
         assertLenEquals(30, totalAmount);
     }
-
+    
+    @Test
+    public void testCalculateTotalPurchaseAmount1() {
+        Long totalAmount = purchaseDao.calculateTotalPurchaseAmount(testUser);
+        assertLenEquals(30, totalAmount);
+    }
+    
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2006 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
  */
 package org.untils.sample.eshop.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.sample.eshop.exception.NotOldEnoughException;
@@ -41,8 +44,7 @@ public class PurchaseTest {
 
     @Before
     public void initFixture() {
-        user = new User(1L);
-        user.setAge(12);
+        user = new User(1L, null, 17);
         purchase = new Purchase(user);
         productInPurchase1 = new Product(1L, 10d, null, 0);
         productInPurchase2 = new Product(2L, 3d, null, 0);

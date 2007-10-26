@@ -5,12 +5,13 @@
 
     <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{ABSOLUTE} [%t] %-5p %-30c{1} %x - %m %n"/>
+            <!--param name="ConversionPattern" value="%d{ABSOLUTE} [%t] %-5p %-30c{1} %x - %m %n"/-->
+            <param name="ConversionPattern" value=" %m %n"/>
         </layout>
     </appender>
 
     <logger name="org.unitils">
-        <level value="DEBUG" />        
+        <level value="INFO" />        
     </logger>
 
     <root>

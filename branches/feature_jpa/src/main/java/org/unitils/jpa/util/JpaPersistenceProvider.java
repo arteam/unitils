@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 the original author or authors.
+ * Copyright 2006-2007,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.sample.eshop.dao;
+package org.unitils.jpa.util;
 
-import org.unitils.sample.eshop.model.Product;
+public interface JpaPersistenceProvider {
+	
+	
+	void assertMappingWithDatabaseConsistent(Object testObject, EntityManagerFactoryManager entityManagerFactoryManager);
 
-/**
- * DAO for the Product class
- */
-public class ProductDao extends HibernateCrudDao<Product> {
-
-    public ProductDao() {
-        super(Product.class);
-    }
 }

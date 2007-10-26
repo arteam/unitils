@@ -22,7 +22,6 @@
                 <value>org.unitils.sample.eshop.model.ProductPrice$PriceTableItem</value>
                 <value>org.unitils.sample.eshop.model.Purchase</value>
                 <value>org.unitils.sample.eshop.model.PurchaseItem</value>
-                <value>org.unitils.sample.eshop.model.PurchaseItem</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -40,6 +39,9 @@
         <property name="username" value="sa"/>
         <property name="password" value=""/>
     </bean>
-
+    
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource"/>
+    </bean>
 
 </beans>

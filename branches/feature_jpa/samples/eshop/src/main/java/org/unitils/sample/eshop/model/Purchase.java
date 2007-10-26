@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2006 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,27 @@
  */
 package org.unitils.sample.eshop.model;
 
-import org.unitils.sample.eshop.exception.NotOldEnoughException;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.unitils.sample.eshop.exception.NotOldEnoughException;
 
 /**
  * Represents a Purchase that a User makes. A Purchase consists of different PurchaseItems.
  */
 @Entity
 @Table(name = "PURCHASE")
-@SequenceGenerator(name = "SEQUENCE", sequenceName = "PURCHASE_ID_SEQ")
 public class Purchase {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQUENCE")
     private Long id;
 
     @ManyToOne
@@ -49,7 +53,15 @@ public class Purchase {
         this.user = user;
     }
 
-    public User getUser() {
+    /**
+	 * Getter for id.
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	public User getUser() {
         return user;
     }
 

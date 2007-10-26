@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007,  Unitils.org
+ * Copyright 2006 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,24 @@
  */
 package org.untils.sample.eshop;
 
-import org.unitils.hibernate.HibernateUnitils;
+import org.hibernate.SessionFactory;
 import org.junit.Test;
-import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.unitils.hibernate.HibernateUnitils;
+import org.unitils.hibernate.annotation.HibernateSessionFactory;
 
 /**
- * 
+ * Verfies if the mapping of domain objects is consistent with the database
  */
-public class HibernateMappingTest extends BaseHibernateTest {
+@RunWith(UnitilsJUnit4TestClassRunner.class)
+public class HibernateMappingTest {
 
-    // todo fix test
-    @Test
-    @Ignore
-    public void testMappingToDatabase() {
+	@HibernateSessionFactory({"hibernate.cfg.xml", "hibernate.cfg.xml"})
+	private SessionFactory sessionFactory;
+	
+	@Test
+    public void testMappingWithDatabase() {
         HibernateUnitils.assertMappingWithDatabaseConsistent();
     }
 
