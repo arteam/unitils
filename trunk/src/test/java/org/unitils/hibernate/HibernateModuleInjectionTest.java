@@ -126,7 +126,9 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
         @HibernateSessionFactory
         public Configuration createConfiguration() {
             createConfigurationCalled = true;
-            return new AnnotationConfiguration();
+            AnnotationConfiguration configuration = new AnnotationConfiguration();
+            configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+			return configuration;
         }
     }
 
