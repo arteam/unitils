@@ -68,7 +68,11 @@ public class SpringTransactionManager implements TransactionManager {
 	 * @return The transactional data source, not null
 	 */
 	public TransactionalDataSource createTransactionalDataSource(DataSource dataSource) {
-		return (TransactionalDataSource) newProxyInstance(getClass().getClassLoader(), new Class[] { TransactionalDataSource.class }, new SpringTransactionalDataSourceProxyInvocationHandler(dataSource));
+		SpringTransactionalDataSourceProxyInvocationHandler invocationHandler = new SpringTransactionalDataSourceProxyInvocationHandler(dataSource);
+		TransactionalDataSource transactionalDataSource = (TransactionalDataSource) newProxyInstance(getClass().getClassLoader(), 
+				new Class[] { TransactionalDataSource.class }, invocationHandler);
+		invocationHandler.setProxiedDataSource(transactionalDataSource);
+		return transactionalDataSource;
 	}
 
 
@@ -165,6 +169,7 @@ public class SpringTransactionManager implements TransactionManager {
 
 		private DataSource wrappedDataSource;
 
+		private DataSource proxiedDataSource;
 
 		/**
 		 * Creates a new instance that wraps the given <code>DataSource</code>
@@ -194,8 +199,17 @@ public class SpringTransactionManager implements TransactionManager {
 		 * @return The connection, not null
 		 */
 		protected Connection getTransactionalConnection() throws SQLException {
-			Connection connection = DataSourceUtils.getConnection(wrappedDataSource);
+			Connection connection = DataSourceUtils.getConnection(proxiedDataSource);
 			return (Connection) newProxyInstance(getClass().getClassLoader(), new Class[] { Connection.class }, new SpringConnectionProxyInvocationHandler(connection));
+		}
+		
+		/**
+		 * Sets the proxied DataSource, which is the dynamic proxy which makes use of this invocationhandler
+		 * 
+		 * @param proxiedDataSource The proxied DataSource. This DataSource must be the proxy that makes use of this invocationhandler!
+		 */
+		protected void setProxiedDataSource(DataSource proxiedDataSource) {
+			this.proxiedDataSource = proxiedDataSource;
 		}
 
 
@@ -221,7 +235,7 @@ public class SpringTransactionManager implements TransactionManager {
 
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				if (method.getName().equals("close")) {
-					DataSourceUtils.doReleaseConnection(wrappedConnection, SpringTransactionalDataSourceProxyInvocationHandler.this.wrappedDataSource);
+					DataSourceUtils.doReleaseConnection(wrappedConnection, SpringTransactionalDataSourceProxyInvocationHandler.this.proxiedDataSource);
 					return null;
 				}
 				try {
