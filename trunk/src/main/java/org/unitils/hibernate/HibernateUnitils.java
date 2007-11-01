@@ -19,8 +19,8 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 
 /**
- * Utility facade for handling Hibernate things such as asserting whether the mappings correspond to the actual
- * structure of the database and for invalidating a cached configuration.
+ * Utility facade for handling Hibernate related stuff such as asserting whether the mappings correspond to the actual
+ * structure of the database.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
