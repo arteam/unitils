@@ -91,7 +91,7 @@ public class DatabaseUnitils {
 
 
     /**
-     * Disables all foreigh key and not-null constraints on the configured schema's.
+     * Disables all foreign key and not-null constraints on the configured schema's.
      */
     public static void disableConstraints() {
         getDatabaseModule().disableConstraints();
