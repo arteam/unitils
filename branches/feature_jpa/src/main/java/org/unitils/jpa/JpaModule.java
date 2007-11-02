@@ -22,10 +22,13 @@ import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.commons.logging.Log;
@@ -127,6 +130,14 @@ public class JpaModule implements Module, Flushable {
      */
     public EntityManagerFactoryManager getEntityManagerFactoryManager() {
         return entityManagerFactoryManager;
+    }
+    
+    
+    public Set<EntityManager> getOpenEntityManagers(Object testObject) {
+    	if (!isEntityManagerFactoryConfiguredFor(testObject)) {
+    		return Collections.EMPTY_SET;
+    	}
+    	return getEntityManagerFactory(testObject).getOpenEntityManagers();
     }
 
 

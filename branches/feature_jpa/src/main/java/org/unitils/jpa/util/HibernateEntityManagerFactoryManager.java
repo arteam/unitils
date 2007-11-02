@@ -16,6 +16,7 @@
 package org.unitils.jpa.util;
 
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
+import static org.hibernate.cfg.Environment.TRANSACTION_STRATEGY;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 
@@ -33,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.unitils.core.UnitilsException;
 import org.unitils.hibernate.util.HibernateConnectionProvider;
+import org.unitils.hibernate.util.HibernateTransactionFactory;
 import org.unitils.hibernate.util.SessionFactoryManager;
 
 public class HibernateEntityManagerFactoryManager extends
@@ -109,6 +111,12 @@ public class HibernateEntityManagerFactoryManager extends
         }
         unitilsHibernateProperties.setProperty(CONNECTION_PROVIDER, HibernateConnectionProvider.class.getName());
 
+        // configure hibernate to use the unitils transaction manager
+        if (configuration.getProperties().getProperty(TRANSACTION_STRATEGY) != null) {
+        	logger.warn("The property " + TRANSACTION_STRATEGY + " is present in your Hibernate configuration. This property will be overwritten with Unitils own TransactionFactory implementation!");
+        }
+        unitilsHibernateProperties.setProperty(TRANSACTION_STRATEGY, HibernateTransactionFactory.class.getName());
+        
         // if enabled, configure hibernate's current session management
         configuration.addProperties(unitilsHibernateProperties);
     }
@@ -132,7 +140,7 @@ public class HibernateEntityManagerFactoryManager extends
         // Prepare the Configuration object to be used for testing purposes: connect to the test database, etc.
         postProcessConfiguration(configuration, testObject, testClass);
         
-        // Create a SessionFactory
+        // Create an EntityManagerFactory
         EntityManagerInterceptingEntityManagerFactory entityManagerFactory = new EntityManagerInterceptingEntityManagerFactory(configuration.buildEntityManagerFactory());
         
         // Make sure we can later retrieve the Configuration object by the SessionFactory object
@@ -158,7 +166,6 @@ public class HibernateEntityManagerFactoryManager extends
             }
             // There is exacltly one persistence unit config file
             configuration.configure(locations.get(0), new HashMap());
-            
             return configuration;
 
         } catch (Exception e) {

@@ -20,8 +20,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import static org.hibernate.cfg.Environment.CURRENT_SESSION_CONTEXT_CLASS;
+import static org.hibernate.cfg.Environment.TRANSACTION_STRATEGY;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
@@ -211,6 +214,13 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<SessionInter
             }
             unitilsHibernateProperties.setProperty(CURRENT_SESSION_CONTEXT_CLASS, currentSessionContextImplClassName);
         }
+        
+        // configure hibernate to use the unitils transaction manager
+        if (configuration.getProperty(TRANSACTION_STRATEGY) != null) {
+        	logger.warn("The property " + TRANSACTION_STRATEGY + " is present in your Hibernate configuration. This property will be overwritten with Unitils own TransactionFactory implementation!");
+        }
+        unitilsHibernateProperties.setProperty(TRANSACTION_STRATEGY, HibernateTransactionFactory.class.getName());
+        
         configuration.addProperties(unitilsHibernateProperties);
     }
 

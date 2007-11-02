@@ -91,6 +91,17 @@ public class EntityManagerInterceptingEntityManagerFactory implements EntityMana
 	public boolean isOpen() {
 		return targetEntityManagerFactory.isOpen();
 	}
+	
+	
+	public Set<EntityManager> getOpenEntityManagers() {
+		Set<EntityManager> openEntityManagers = new HashSet<EntityManager>();
+		for (EntityManager entityManager : entityManagers) {
+			if (entityManager.isOpen()) {
+				openEntityManagers.add(entityManager);
+			}
+		}
+		return openEntityManagers;
+	}
 
 
 	/**

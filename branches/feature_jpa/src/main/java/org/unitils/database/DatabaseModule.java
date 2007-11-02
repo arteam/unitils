@@ -279,11 +279,9 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
-        TransactionMode transactionMode = getTransactionMode(testObject);
-        if (transactionMode == DISABLED) {
-            return;
+        if (isTransactionsEnabled(testObject)) {
+        	getTransactionManager().startTransaction(testObject);
         }
-        getTransactionManager().startTransaction(testObject);
     }
 
 
@@ -294,17 +292,20 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     protected void endTransaction(Object testObject) {
-        TransactionMode transactionMode = getTransactionMode(testObject);
-        if (transactionMode == DISABLED) {
-            return;
-        }
-        TransactionManager transactionManager = getTransactionManager();
-        if (transactionMode == COMMIT) {
-            transactionManager.commit(testObject);
-        } else if (getTransactionMode(testObject) == ROLLBACK) {
-            transactionManager.rollback(testObject);
+        if (isTransactionsEnabled(testObject)) {
+	        if (getTransactionMode(testObject) == COMMIT) {
+	            getTransactionManager().commit(testObject);
+	        } else if (getTransactionMode(testObject) == ROLLBACK) {
+	            getTransactionManager().rollback(testObject);
+	        }
         }
     }
+
+
+	public boolean isTransactionsEnabled(Object testObject) {
+		TransactionMode transactionMode = getTransactionMode(testObject);
+        return transactionMode != DISABLED;
+	}
     
     
     /**

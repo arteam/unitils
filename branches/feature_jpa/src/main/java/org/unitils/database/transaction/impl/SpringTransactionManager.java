@@ -123,6 +123,11 @@ public class SpringTransactionManager implements TransactionManager {
 		getSpringTransactionManager(testObject).rollback(transactionStatus);
 		transactionStatusHolder.remove();
 	}
+	
+	
+	public boolean isActive(Object testObject) {
+		return transactionStatusHolder.get() != null;
+	}
 
 
 	/**
