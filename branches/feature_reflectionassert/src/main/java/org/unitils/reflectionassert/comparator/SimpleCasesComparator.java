@@ -16,8 +16,8 @@
 package org.unitils.reflectionassert.comparator;
 
 import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.util.Difference;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.Stack;
 
@@ -37,16 +37,8 @@ public class SimpleCasesComparator extends ReflectionComparator {
 
 
     // todo javadoc
-    public boolean canHandle(Object left, Object right) {
-        return left == right || left == null || right == null || left.getClass().getName().startsWith("java.lang") ||
-                (left instanceof Enum) && (right instanceof Enum) || (left instanceof Date) && (right instanceof Date) ||
-                ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number));
-    }
-
-
-    // todo javadoc
     @Override
-    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         // check if the same instance is referenced
         if (left == right) {
             return null;
@@ -68,11 +60,21 @@ public class SimpleCasesComparator extends ReflectionComparator {
             }
             return new Difference("Different primitive values.", left, right, fieldStack);
         }
-        // check if objects are equal
-        if (!left.equals(right)) {
+        // check if java objects are equal
+        if (left.getClass().getName().startsWith("java.lang")) {
+            if (left.equals(right)) {
+                return null;
+            }
             return new Difference("Different object values.", left, right, fieldStack);
         }
-        return null;
+        // check if enums are equal
+        if (left instanceof Enum && right instanceof Enum) {
+            if (left.equals(right)) {
+                return null;
+            }
+            return new Difference("Different enum values.", left, right, fieldStack);
+        }
+        return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
     }
 
 

@@ -16,6 +16,7 @@
 package org.unitils.reflectionassert.comparator;
 
 import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.util.Difference;
 
 import java.util.Map;
 import java.util.Stack;
@@ -36,15 +37,14 @@ public class LenientNumberComparator extends ReflectionComparator {
 
 
     // todo javadoc
-    public boolean canHandle(Object left, Object right) {
-        return (left != null && right != null) &&
-                (left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number);
-    }
-
-
-    // todo javadoc
     @Override
-    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+        if (left == null || right == null) {
+            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        }
+        if (!(left instanceof Character || left instanceof Number) || !(right instanceof Character || right instanceof Number)) {
+            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        }
         // check if right and left have same number value (including NaN and Infinity)
         Double leftDouble = getDoubleValue(left);
         Double rightDouble = getDoubleValue(right);

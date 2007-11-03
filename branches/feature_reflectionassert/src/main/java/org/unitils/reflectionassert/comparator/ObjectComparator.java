@@ -16,6 +16,7 @@
 package org.unitils.reflectionassert.comparator;
 
 import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.util.Difference;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -39,14 +40,12 @@ public class ObjectComparator extends ReflectionComparator {
 
 
     // todo javadoc
-    public boolean canHandle(Object left, Object right) {
-        return left != null && right != null;
-    }
-
-
-    // todo javadoc
     @Override
-    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+        if (left == null || right == null) {
+            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        }
+
         // check different class type
         Class<?> clazz = left.getClass();
         if (!clazz.equals(right.getClass())) {

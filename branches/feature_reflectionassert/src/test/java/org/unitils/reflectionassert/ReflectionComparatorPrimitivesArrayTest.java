@@ -15,9 +15,8 @@
  */
 package org.unitils.reflectionassert;
 
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
-
 import junit.framework.TestCase;
+import org.unitils.reflectionassert.util.Difference;
 
 
 /**

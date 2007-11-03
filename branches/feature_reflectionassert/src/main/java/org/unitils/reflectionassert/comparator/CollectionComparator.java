@@ -17,6 +17,7 @@ package org.unitils.reflectionassert.comparator;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.util.Difference;
 
 import java.util.*;
 
@@ -36,14 +37,15 @@ public class CollectionComparator extends ReflectionComparator {
 
 
     // todo javadoc
-    public boolean canHandle(Object left, Object right) {
-        return (left != null && right != null) && (left.getClass().isArray() || left instanceof Collection) && (right.getClass().isArray() || right instanceof Collection);
-    }
-
-
-    // todo javadoc
     @Override
-    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+        if (left == null || right == null) {
+            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        }
+        if (!(left.getClass().isArray() || left instanceof Collection) || !(right.getClass().isArray() || right instanceof Collection)) {
+            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        }
+
         // Convert to list and compare as collection
         Collection<?> leftCollection = convertToCollection(left);
         Collection<?> rightCollection = convertToCollection(right);

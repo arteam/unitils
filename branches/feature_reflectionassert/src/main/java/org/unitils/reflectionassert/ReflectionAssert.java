@@ -26,9 +26,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
-import static org.unitils.reflectionassert.util.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import org.unitils.reflectionassert.util.Difference;
 import org.unitils.reflectionassert.util.ReflectionComparatorMode;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.util.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;

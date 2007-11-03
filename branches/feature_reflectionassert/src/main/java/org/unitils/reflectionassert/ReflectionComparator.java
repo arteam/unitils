@@ -15,11 +15,10 @@
  */
 package org.unitils.reflectionassert;
 
-import org.unitils.core.UnitilsException;
+import org.unitils.reflectionassert.util.Difference;
 
 import static java.lang.Boolean.TRUE;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
@@ -77,18 +76,6 @@ abstract public class ReflectionComparator {
 
 
     /**
-     * Indicates whether this ReflectionComparator is able to check whether their is a difference in the given left
-     * and right objects or not.
-     *
-     * @param left  The left object
-     * @param right The right object
-     * @return true if this ReflectionComparator is able to check whether their is a difference in the given left
-     *         and right objects, false otherwise
-     */
-    abstract public boolean canHandle(Object left, Object right);
-
-
-    /**
      * Checks whether there is a difference between the left and right objects. Whether there is a difference, depends
      * on the concrete comparators in the chain.
      *
@@ -102,8 +89,7 @@ abstract public class ReflectionComparator {
 
 
     /**
-     * If this ReflectionComparator is able to check whether their is a difference in the given left
-     * and right objects (i.e. {@link #canHandle(Object,Object)} returns true), the objects are compared.
+     * todo javadoc
      *
      * @param left                   The left instance
      * @param right                  The right instance
@@ -117,26 +103,16 @@ abstract public class ReflectionComparator {
             return null;
         }
 
-        if (canHandle(left, right)) {
-            registerTraversedInstancePair(left, right, true, traversedInstancePairs);
-            Difference difference = doGetDifference(left, right, fieldStack, traversedInstancePairs);
-            registerTraversedInstancePair(left, right, (difference == null), traversedInstancePairs);
-            return difference;
-        } else {
-            if (chainedComparator == null) {
-                throw new UnitilsException("No ReflectionComparator found for objects " + left + " and" + right + " at " + fieldStack.toString());
-            } else {
-                return chainedComparator.getDifference(left, right, fieldStack, traversedInstancePairs);
-            }
-        }
+        registerTraversedInstancePair(left, right, true, traversedInstancePairs);
+        Difference difference = doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        registerTraversedInstancePair(left, right, (difference == null), traversedInstancePairs);
+        return difference;
     }
 
 
     /**
      * Abstract method that makes up the core of a reflection comparator. Implementations should return a concrete
-     * {@link Difference} object when left and right are different, or null otherwise. This method will only be called
-     * if {@link #canHandle(Object,Object)} returns true. An implementation doesn't have to take care of chaining or
-     * circular references.
+     * {@link Difference} object when left and right are different, or null otherwise.
      *
      * @param left                   The left instance
      * @param right                  The right instance
@@ -145,7 +121,7 @@ abstract public class ReflectionComparator {
      * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
      * @return The difference, null if there is no difference
      */
-    abstract protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs);
+    abstract public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs);
 
 
     /**
@@ -196,102 +172,101 @@ abstract public class ReflectionComparator {
         return traversedInstancePairs.get(new TraversedInstancePair(left, right)) == TRUE;
     }
 
-
-    /**
-     * A class for holding the difference between two objects.
-     */
-    public static class Difference {
-
-        /* A message describing the difference */
-        protected String message;
-
-        /* When isEquals is false this will contain the stack of the fieldnames where the difference was found. <br>
-         * The inner most field will be the top of the stack, eg "primitiveFieldInB", "fieldBinA", "fieldA". */
-        protected Stack<String> fieldStack;
-
-        /* When isEquals is false this will contain the left value of the field where the difference was found. */
-        protected Object leftValue;
-
-        /* When isEquals is false, this will contain the right value of the field where the difference was found. */
-        protected Object rightValue;
-
-
-        /**
-         * Creates a difference.
-         *
-         * @param message    a message describing the difference
-         * @param leftValue  the left instance
-         * @param rightValue the right instance
-         * @param fieldStack the current field names
-         */
-        public Difference(String message, Object leftValue, Object rightValue, Stack<String> fieldStack) {
-            this.message = message;
-            this.leftValue = leftValue;
-            this.rightValue = rightValue;
-            this.fieldStack = fieldStack;
-        }
-
-        /**
-         * Gets a string representation of the field stack.
-         * Eg primitiveFieldInB.fieldBinA.fieldA
-         * The top-level element is an empty string.
-         *
-         * @return the field names as sting
-         */
-        public String getFieldStackAsString() {
-            String result = "";
-            Iterator<?> iterator = fieldStack.iterator();
-            while (iterator.hasNext()) {
-                result += iterator.next();
-                if (iterator.hasNext()) {
-                    result += ".";
-                }
-            }
-            return result;
-        }
-
-
-        /**
-         * Gets the message indicating the kind of difference.
-         *
-         * @return the message
-         */
-        public String getMessage() {
-            return message;
-        }
-
-
-        /**
-         * Gets the stack of the fieldnames where the difference was found.
-         * The inner most field will be the top of the stack, eg "primitiveFieldInB", "fieldBinA", "fieldA".
-         * The top-level element has an empty stack.
-         *
-         * @return the stack of field names, not null
-         */
-        public Stack<String> getFieldStack() {
-            return fieldStack;
-        }
-
-
-        /**
-         * Gets the left value of the field where the difference was found.
-         *
-         * @return the value
-         */
-        public Object getLeftValue() {
-            return leftValue;
-        }
-
-
-        /**
-         * Gets the right value of the field where the difference was found.
-         *
-         * @return the value
-         */
-        public Object getRightValue() {
-            return rightValue;
-        }
-    }
+//    /**
+//     * A class for holding the difference between two objects.
+//     */
+//    public static class Difference {
+//
+//        /* A message describing the difference */
+//        protected String message;
+//
+//        /* When isEquals is false this will contain the stack of the fieldnames where the difference was found. <br>
+//         * The inner most field will be the top of the stack, eg "primitiveFieldInB", "fieldBinA", "fieldA". */
+//        protected Stack<String> fieldStack;
+//
+//        /* When isEquals is false this will contain the left value of the field where the difference was found. */
+//        protected Object leftValue;
+//
+//        /* When isEquals is false, this will contain the right value of the field where the difference was found. */
+//        protected Object rightValue;
+//
+//
+//        /**
+//         * Creates a difference.
+//         *
+//         * @param message    a message describing the difference
+//         * @param leftValue  the left instance
+//         * @param rightValue the right instance
+//         * @param fieldStack the current field names
+//         */
+//        public Difference(String message, Object leftValue, Object rightValue, Stack<String> fieldStack) {
+//            this.message = message;
+//            this.leftValue = leftValue;
+//            this.rightValue = rightValue;
+//            this.fieldStack = fieldStack;
+//        }
+//
+//        /**
+//         * Gets a string representation of the field stack.
+//         * Eg primitiveFieldInB.fieldBinA.fieldA
+//         * The top-level element is an empty string.
+//         *
+//         * @return the field names as sting
+//         */
+//        public String getFieldStackAsString() {
+//            String result = "";
+//            Iterator<?> iterator = fieldStack.iterator();
+//            while (iterator.hasNext()) {
+//                result += iterator.next();
+//                if (iterator.hasNext()) {
+//                    result += ".";
+//                }
+//            }
+//            return result;
+//        }
+//
+//
+//        /**
+//         * Gets the message indicating the kind of difference.
+//         *
+//         * @return the message
+//         */
+//        public String getMessage() {
+//            return message;
+//        }
+//
+//
+//        /**
+//         * Gets the stack of the fieldnames where the difference was found.
+//         * The inner most field will be the top of the stack, eg "primitiveFieldInB", "fieldBinA", "fieldA".
+//         * The top-level element has an empty stack.
+//         *
+//         * @return the stack of field names, not null
+//         */
+//        public Stack<String> getFieldStack() {
+//            return fieldStack;
+//        }
+//
+//
+//        /**
+//         * Gets the left value of the field where the difference was found.
+//         *
+//         * @return the value
+//         */
+//        public Object getLeftValue() {
+//            return leftValue;
+//        }
+//
+//
+//        /**
+//         * Gets the right value of the field where the difference was found.
+//         *
+//         * @return the value
+//         */
+//        public Object getRightValue() {
+//            return rightValue;
+//        }
+//    }
 
     /**
      * Value object that represents a pair of objects that have been compared with eachother. Two instances of this

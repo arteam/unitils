@@ -16,6 +16,7 @@
 package org.unitils.reflectionassert.comparator;
 
 import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.util.Difference;
 
 import java.util.Map;
 import java.util.Stack;
@@ -34,22 +35,25 @@ public class IgnoreDefaultsComparator extends ReflectionComparator {
         super(chainedComparator);
     }
 
-
-    // todo javadoc
-    public boolean canHandle(Object left, Object right) {
-        // object types
-        if (left == null) {
-            return true;
-        }
-
-        // primitive types
-        return (left instanceof Boolean && !(Boolean) left) || (left instanceof Character && (Character) left == 0) || (left instanceof Number && ((Number) left).doubleValue() == 0);
-    }
-
-
     // todo javadoc
     @Override
-    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
-        return null;
+    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+        // object types
+        if (left == null) {
+            return null;
+        }
+        // primitive boolean types
+        if (left instanceof Boolean && !(Boolean) left) {
+            return null;
+        }
+        // primitive character types
+        if (left instanceof Character && (Character) left == 0) {
+            return null;
+        }
+        // primitive int/long/double/float types
+        if (left instanceof Number && ((Number) left).doubleValue() == 0) {
+            return null;
+        }
+        return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
     }
 }

@@ -16,7 +16,7 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
+import org.unitils.reflectionassert.util.Difference;
 
 import java.util.HashMap;
 import java.util.Iterator;

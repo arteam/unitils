@@ -15,11 +15,10 @@
  */
 package org.unitils.reflectionassert;
 
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
+import junit.framework.TestCase;
+import org.unitils.reflectionassert.util.Difference;
 
 import java.util.Date;
-
-import junit.framework.TestCase;
 
 
 /**

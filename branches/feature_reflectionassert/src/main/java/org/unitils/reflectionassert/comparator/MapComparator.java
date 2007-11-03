@@ -15,8 +15,9 @@
  */
 package org.unitils.reflectionassert.comparator;
 
-import static org.unitils.reflectionassert.ReflectionComparatorChainFactory.STRICT_COMPARATOR;
 import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+import org.unitils.reflectionassert.util.Difference;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,16 +38,16 @@ public class MapComparator extends ReflectionComparator {
         super(chainedComparator);
     }
 
-
-    // todo javadoc
-    public boolean canHandle(Object left, Object right) {
-        return (left != null && right != null) && (left instanceof Map && right instanceof Map);
-    }
-
-
     // todo javadoc
     @Override
-    protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+        if (left == null || right == null) {
+            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        }
+        if (!(left instanceof Map && right instanceof Map)) {
+            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        }
+
         Map<?, ?> leftMap = (Map<?, ?>) left;
         Map<?, ?> rightMap = (Map<?, ?>) right;
 
