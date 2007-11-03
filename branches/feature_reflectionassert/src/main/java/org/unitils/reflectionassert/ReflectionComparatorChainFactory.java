@@ -16,7 +16,9 @@
 package org.unitils.reflectionassert;
 
 import org.unitils.core.UnitilsException;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.*;
+import org.unitils.reflectionassert.comparator.*;
+import org.unitils.reflectionassert.util.ReflectionComparatorMode;
 import static org.unitils.util.CollectionUtils.asSet;
 
 import java.util.HashMap;

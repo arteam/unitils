@@ -19,7 +19,7 @@ import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyRefEquals;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.LENIENT_ORDER;
 
 import static java.util.Arrays.asList;
 import java.util.List;

@@ -27,8 +27,9 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.reflectionassert.ReflectionComparator.Difference;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import org.unitils.reflectionassert.util.ReflectionComparatorMode;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,7 +64,7 @@ public class ReflectionAssert {
      * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
      * If they are not equal an AssertionFailedError is thrown.
      * <p/>
-     * This is identical to {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} with
+     * This is identical to {@link #assertRefEquals(Object,Object, org.unitils.reflectionassert.util.ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param expected the expected object
@@ -133,7 +134,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertRefEquals(Object,Object, org.unitils.reflectionassert.util.ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * This is identical to {@link #assertPropertyRefEquals(String,Object,Object,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
@@ -191,7 +192,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertRefEquals(Object,Object, org.unitils.reflectionassert.util.ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -217,7 +218,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertRefEquals(Object,Object, org.unitils.reflectionassert.util.ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * This is identical to {@link #assertPropertyRefEquals(String,Collection,Collection,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
@@ -284,7 +285,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertRefEquals(Object,Object, org.unitils.reflectionassert.util.ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *

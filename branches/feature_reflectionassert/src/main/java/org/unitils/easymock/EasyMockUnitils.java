@@ -20,9 +20,9 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.util.*;
-import org.unitils.reflectionassert.ReflectionComparatorMode;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import org.unitils.reflectionassert.util.ReflectionComparatorMode;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.LENIENT_ORDER;
 
 /**
  * Utility facade for handling EasyMock things such as replay or manually creating a mock.

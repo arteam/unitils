@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert;
+package org.unitils.reflectionassert.comparator;
 
 import static org.unitils.reflectionassert.ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+import org.unitils.reflectionassert.ReflectionComparator;
 
 import java.util.HashMap;
 import java.util.Iterator;

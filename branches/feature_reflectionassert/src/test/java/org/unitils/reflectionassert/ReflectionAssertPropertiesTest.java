@@ -19,7 +19,7 @@ import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyRefEquals;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.IGNORE_DEFAULTS;
 
 /**
  * Test class for {@link ReflectionAssert} tests for with assertProperty methods.

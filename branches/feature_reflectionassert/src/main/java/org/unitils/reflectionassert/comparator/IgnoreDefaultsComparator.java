@@ -13,37 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert;
+package org.unitils.reflectionassert.comparator;
 
-import java.util.Date;
+import org.unitils.reflectionassert.ReflectionComparator;
+
 import java.util.Map;
 import java.util.Stack;
 
 /**
+ * todo javadoc
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class LenientDatesComparator extends ReflectionComparator {
+public class IgnoreDefaultsComparator extends ReflectionComparator {
 
 
     // todo javadoc
-    public LenientDatesComparator(ReflectionComparator chainedComparator) {
+    public IgnoreDefaultsComparator(ReflectionComparator chainedComparator) {
         super(chainedComparator);
     }
 
 
     // todo javadoc
     public boolean canHandle(Object left, Object right) {
-        return (left == null || left instanceof Date) && (right == null || right instanceof Date);
+        // object types
+        if (left == null) {
+            return true;
+        }
+
+        // primitive types
+        return (left instanceof Boolean && !(Boolean) left) || (left instanceof Character && (Character) left == 0) || (left instanceof Number && ((Number) left).doubleValue() == 0);
     }
 
 
     // todo javadoc
     @Override
     protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
-        if ((right == null && left != null) || (right != null && left == null)) {
-            return new Difference("Lenient dates, but not both instantiated or both null.", left, right, fieldStack);
-        }
         return null;
     }
 }

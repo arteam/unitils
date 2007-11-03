@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert;
+package org.unitils.reflectionassert.comparator;
 
-import java.util.Date;
+import org.unitils.reflectionassert.ReflectionComparator;
+
 import java.util.Map;
 import java.util.Stack;
 
@@ -25,52 +26,32 @@ import java.util.Stack;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SimpleCasesComparator extends ReflectionComparator {
+public class LenientNumberComparator extends ReflectionComparator {
 
 
     // todo javadoc
-    public SimpleCasesComparator(ReflectionComparator chainedComparator) {
+    public LenientNumberComparator(ReflectionComparator chainedComparator) {
         super(chainedComparator);
     }
 
 
     // todo javadoc
     public boolean canHandle(Object left, Object right) {
-        return left == right || left == null || right == null || left.getClass().getName().startsWith("java.lang") ||
-                (left instanceof Enum) && (right instanceof Enum) || (left instanceof Date) && (right instanceof Date) ||
-                ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number));
+        return (left != null && right != null) &&
+                (left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number);
     }
 
 
     // todo javadoc
     @Override
     protected Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
-        // check if the same instance is referenced
-        if (left == right) {
+        // check if right and left have same number value (including NaN and Infinity)
+        Double leftDouble = getDoubleValue(left);
+        Double rightDouble = getDoubleValue(right);
+        if (leftDouble.equals(rightDouble)) {
             return null;
         }
-        // check if the left value is null
-        if (left == null) {
-            return new Difference("Left value null.", left, right, fieldStack);
-        }
-        // check if the right value is null
-        if (right == null) {
-            return new Difference("Right value null.", left, right, fieldStack);
-        }
-        // check if right and left have same number value (including NaN and Infinity)
-        if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
-            Double leftDouble = getDoubleValue(left);
-            Double rightDouble = getDoubleValue(right);
-            if (leftDouble.equals(rightDouble)) {
-                return null;
-            }
-            return new Difference("Different primitive values.", left, right, fieldStack);
-        }
-        // check if objects are equal
-        if (!left.equals(right)) {
-            return new Difference("Different object values.", left, right, fieldStack);
-        }
-        return null;
+        return new Difference("Different primitive values.", left, right, fieldStack);
     }
 
 
@@ -86,5 +67,4 @@ public class SimpleCasesComparator extends ReflectionComparator {
         }
         return (double) ((Character) object).charValue();
     }
-
 }

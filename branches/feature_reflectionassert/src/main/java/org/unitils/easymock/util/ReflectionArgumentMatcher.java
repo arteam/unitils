@@ -17,7 +17,7 @@ package org.unitils.easymock.util;
 
 import org.easymock.internal.matchers.Equals;
 import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.ReflectionComparatorMode;
+import org.unitils.reflectionassert.util.ReflectionComparatorMode;
 import org.unitils.reflectionassert.ReflectionComparatorChainFactory;
 
 

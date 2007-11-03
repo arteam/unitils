@@ -27,7 +27,7 @@ import org.easymock.internal.Invocation;
 import org.easymock.internal.LastControl;
 import org.easymock.internal.Range;
 import org.easymock.internal.RecordState;
-import org.unitils.reflectionassert.ReflectionComparatorMode;
+import org.unitils.reflectionassert.util.ReflectionComparatorMode;
 
 /**
  * An EasyMock mock control that uses the reflection argument matcher for all arguments of a method invocation.

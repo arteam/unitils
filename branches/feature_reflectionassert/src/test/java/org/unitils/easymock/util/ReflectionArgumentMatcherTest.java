@@ -19,8 +19,8 @@ import junit.framework.TestCase;
 import static org.easymock.EasyMock.*;
 import static org.unitils.easymock.EasyMockUnitils.lenEq;
 import static org.unitils.easymock.EasyMockUnitils.refEq;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.util.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;
 import java.util.List;

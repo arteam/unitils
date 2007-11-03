@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert;
+package org.unitils.reflectionassert.util;
 
 /**
  * Modes defining how to compare two values.

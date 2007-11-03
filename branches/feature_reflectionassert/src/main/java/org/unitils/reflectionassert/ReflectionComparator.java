@@ -112,7 +112,7 @@ abstract public class ReflectionComparator {
      * @param traversedInstancePairs Set with pairs of objects that have been compared with eachother. A pair of two
      * @return The difference, null if there is no difference
      */
-    protected Difference getDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+    public Difference getDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         if (isTraversedInstancePairEqual(left, right, traversedInstancePairs)) {
             return null;
         }
