@@ -18,6 +18,8 @@ package org.unitils.jpa.util;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManagerFactory;
@@ -53,11 +55,15 @@ abstract public class EntityManagerFactoryManager extends AnnotatedInstanceManag
      */
     @Override
     protected List<String> getAnnotationValues(JpaEntityManagerFactory annotation) {
-        String location = annotation.value();
-        if ("".equals(location)) { // This means no location was specified
-        	return asList();
+        String persistenceUnit = annotation.persistenceUnit();
+        String[] configFiles = annotation.configFiles();
+        if ("".equals(persistenceUnit) && configFiles.length == 0) {
+        	return Arrays.asList();
         }
-        return asList(location);
+        List<String> values = new ArrayList<String>();
+        values.add(persistenceUnit);
+        values.addAll(asList(configFiles));
+        return values;
     }
     
     

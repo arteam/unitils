@@ -38,8 +38,8 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface JpaEntityManagerFactory {
 
-	//todo javadoc
-
-    String value() default "";
+	String persistenceUnit() default "";
+	
+	String[] configFiles() default {};
     
 }

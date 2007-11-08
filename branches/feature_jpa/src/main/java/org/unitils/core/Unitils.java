@@ -19,6 +19,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
+import org.unitils.core.util.UnitilsClassLoader;
+
 /**
  * Core class of the Unitils library, and the main entry point that gives access to the {@link TestContext} and the
  * different {@link Module}s.
@@ -83,6 +85,8 @@ public class Unitils implements Module {
 
     /* Object keeping track of the unit test that is currently running */
     private TestContext testContext;
+    
+    private UnitilsClassLoader unitilsClassLoader;
 
 
     /**
@@ -90,6 +94,7 @@ public class Unitils implements Module {
      */
     public Unitils() {
         testContext = new TestContext();
+        initClassLoader();
     }
 
 
@@ -121,6 +126,12 @@ public class Unitils implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
+    }
+    
+    
+    protected void initClassLoader() {
+    	unitilsClassLoader = new UnitilsClassLoader();
+    	Thread.currentThread().setContextClassLoader(unitilsClassLoader);
     }
 
 
@@ -167,6 +178,14 @@ public class Unitils implements Module {
 
 
     /**
+     * @return The ClassLoader that is used to load classes in unitils
+     */
+    public UnitilsClassLoader getUnitilsClassLoader() {
+		return unitilsClassLoader;
+	}
+
+
+	/**
      * Configures all unitils modules using the given <code>Properties</code> object, and stores them in a {@link
      * ModulesRepository}. The configuration of the modules is delegated to a {@link ModulesLoader} instance.
      *

@@ -85,7 +85,7 @@ public class JpaModuleInjectionTest {
     /**
      * Test hibernate test for session factory injection.
      */
-    @JpaEntityManagerFactory("org/unitils/jpa/persistence-test.xml")
+    @JpaEntityManagerFactory(persistenceUnit = "unitils", configFiles = "org/unitils/jpa/persistence-test.xml")
     public class JpaTestEntityManager {
 
         @JpaEntityManagerFactory
@@ -104,7 +104,7 @@ public class JpaModuleInjectionTest {
      * Test hibernate test for session factory injection. It also contains a custom initializer and custom
      * create for testing the mixing of the HibernateSessionFactory annotation
      */
-    @JpaEntityManagerFactory("org/unitils/jpa/persistence-test.xml")
+    @JpaEntityManagerFactory(persistenceUnit = "unitils", configFiles = "org/unitils/jpa/persistence-test.xml")
     public class JpaTestEntityManagerMixing {
 
     	@JpaEntityManagerFactory

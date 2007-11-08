@@ -22,6 +22,7 @@ import static org.unitils.util.ReflectionUtils.invokeMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +30,17 @@ import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.ejb.Ejb3Configuration;
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.util.UnitilsClassLoader;
 import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.hibernate.util.HibernateTransactionFactory;
 import org.unitils.hibernate.util.SessionFactoryManager;
+import org.unitils.util.CollectionUtils;
 
 public class HibernateEntityManagerFactoryManager extends
 		EntityManagerFactoryManager {
@@ -151,21 +156,22 @@ public class HibernateEntityManagerFactoryManager extends
 
     protected Ejb3Configuration createConfigurationFromConfigFiles(List<String> locations) {
     	try {
-            // create instance
+    		String persistenceUnit = locations.get(0);
+    		List<String> configFiles = CollectionUtils.subList(locations, 1, locations.size());
+    		
+            // Create hibernate specific Ejb3Configuration object, that can used to assemble configuration
     		Ejb3Configuration configuration = new Ejb3Configuration();
 
-            // load default configuration if no locations were specified
-            if (locations.isEmpty()) {
-            	configuration.configure("META-INF/persistence.xml", new HashMap());
-                return configuration;
-            }
-            // load custom specified persistence unit configuration file. Only one such file is supported, since a hibernate EntityManager can only be configured using 
-            // one JPA standard persistence unit config files
-            if (locations.size() > 1) { // This normally never occurs
+            // No more than 1 configuration file may be specified
+            if (configFiles.size() > 1) { // This normally never occurs
             	throw new UnitilsException("Only one persistence unit config file can be specified");
             }
-            // There is exacltly one persistence unit config file
-            configuration.configure(locations.get(0), new HashMap());
+            // If the user specified a custom persistence unit config file, make sure it is used when creating the EntityManagerFactory,
+            // by tricking the ClassLoader into believing that this file is actually META-INF/persistence.xml
+            if (configFiles.size() == 1) {
+            	getUnitilsClassLoader().registerResourceTranslation("META-INF/persistence.xml", configFiles.get(0));
+            }
+            configuration.configure(persistenceUnit, new HashMap());
             return configuration;
 
         } catch (Exception e) {
@@ -174,7 +180,12 @@ public class HibernateEntityManagerFactoryManager extends
 	}
 
 
-    /**
+    protected UnitilsClassLoader getUnitilsClassLoader() {
+    	return Unitils.getInstance().getUnitilsClassLoader();
+	}
+
+
+	/**
      * Creates an instance by calling a custom create method (if there is one). Such a create method should have one of
      * following exact signatures:
      * <ul>
