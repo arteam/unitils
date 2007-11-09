@@ -93,4 +93,12 @@ version 1.2 can also be used. The spring-hibernate3 library is optional and can 
         
     </section>
   </body>
+  
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+    _uacct = "UA-2978532-1";
+    urchinTracker();
+  </script>
+
 </document>
