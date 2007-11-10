@@ -16,11 +16,14 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.util.Difference;
+import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.comparator.Difference;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import org.unitils.reflectionassert.comparator.ReflectionComparator;
 
 
 /**
- * Test class for {@link ReflectionComparator}.
+ * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}.
  * Contains tests with primitive array types.
  *
  * @author Tim Ducheyne
@@ -83,8 +86,8 @@ public class ReflectionComparatorPrimitivesArrayTest extends TestCase {
         arrayInnerDifferentValue = new Element(arrayDifferentValue);
         arrayInnerDifferentSize = new Element(arrayDifferentSize);
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
-        reflectionComparatorLenientOrder = ReflectionComparatorChainFactory.LENIENTORDER_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
+        reflectionComparatorLenientOrder = createRefectionComparator(LENIENT_ORDER);
     }
 
 

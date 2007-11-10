@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert.comparator.impl;
 
-import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.util.Difference;
-
-import java.util.Map;
-import java.util.Stack;
+import org.unitils.reflectionassert.comparator.Comparator;
+import org.unitils.reflectionassert.comparator.Comparison;
+import org.unitils.reflectionassert.comparator.Difference;
 
 /**
  * todo javadoc
@@ -27,23 +25,19 @@ import java.util.Stack;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class LenientNumberComparator extends ReflectionComparator {
+public class LenientNumberComparator implements Comparator {
 
 
     // todo javadoc
-    public LenientNumberComparator(ReflectionComparator chainedComparator) {
-        super(chainedComparator);
-    }
+    public Difference compare(Comparison comparison) {
+        Object left = comparison.getLeft();
+        Object right = comparison.getRight();
 
-
-    // todo javadoc
-    @Override
-    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         if (left == null || right == null) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
         if (!(left instanceof Character || left instanceof Number) || !(right instanceof Character || right instanceof Number)) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
         // check if right and left have same number value (including NaN and Infinity)
         Double leftDouble = getDoubleValue(left);
@@ -51,7 +45,7 @@ public class LenientNumberComparator extends ReflectionComparator {
         if (leftDouble.equals(rightDouble)) {
             return null;
         }
-        return new Difference("Different primitive values.", left, right, fieldStack);
+        return comparison.createDifference("Different primitive values.");
     }
 
 

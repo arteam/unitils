@@ -16,15 +16,18 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.util.Difference;
+import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.comparator.ReflectionComparator;
 
 /**
- * Test class for {@link ReflectionComparator}.
+ * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}.
  * Contains tests with enums.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+@SuppressWarnings({"FieldCanBeLocal"})
 public class ReflectionComparatorEnumsTest extends TestCase {
 
     /* Test object */
@@ -46,7 +49,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
 
         enumsA = new Enums(Enums.TestEnum.TEST1);
         enumsB = new Enums(Enums.TestEnum.TEST1);
@@ -85,7 +88,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
             TEST1, TEST2
         }
 
-        @SuppressWarnings("unused")
+        @SuppressWarnings({"UnusedDeclaration"})
         private TestEnum testEnumValue;
 
 
@@ -100,7 +103,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
          * @param o the object to compare to
          */
         @Override
-		public boolean equals(Object o) {
+        public boolean equals(Object o) {
             return false;
         }
     }

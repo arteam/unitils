@@ -1,7 +1,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.util.Difference;
+import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.comparator.ReflectionComparator;
 
 /**
  * @author Filip Neven
@@ -38,7 +40,7 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
 
         // Create circular reference
         circularReferenced.setRef2(circularReferenced);
@@ -76,7 +78,7 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
         assertNotNull(diff);
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "UnusedDeclaration"})
     private static class References {
 
         private String name;
@@ -103,12 +105,8 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-
-            final References that = (References) o;
-
-            if (!name.equals(that.name)) return false;
-
-            return true;
+            References that = (References) o;
+            return name.equals(that.name);
         }
 
         @Override

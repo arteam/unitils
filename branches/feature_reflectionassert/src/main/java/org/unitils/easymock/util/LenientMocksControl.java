@@ -27,7 +27,7 @@ import org.easymock.internal.Invocation;
 import org.easymock.internal.LastControl;
 import org.easymock.internal.Range;
 import org.easymock.internal.RecordState;
-import org.unitils.reflectionassert.util.ReflectionComparatorMode;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 /**
  * An EasyMock mock control that uses the reflection argument matcher for all arguments of a method invocation.
@@ -50,7 +50,7 @@ import org.unitils.reflectionassert.util.ReflectionComparatorMode;
  * @author Tim Ducheyne
  * @author Filip Neven
  * @see ReflectionComparatorMode
- * @see org.unitils.reflectionassert.ReflectionComparator
+ * @see org.unitils.reflectionassert.comparator.ReflectionComparator
  */
 @SuppressWarnings("deprecation")
 public class LenientMocksControl extends MocksClassControl {

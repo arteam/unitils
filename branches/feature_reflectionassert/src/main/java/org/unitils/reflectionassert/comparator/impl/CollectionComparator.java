@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert.comparator.impl;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.util.Difference;
+import org.unitils.reflectionassert.comparator.Comparator;
+import org.unitils.reflectionassert.comparator.Comparison;
+import org.unitils.reflectionassert.comparator.Difference;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * todo javadoc
@@ -27,23 +30,19 @@ import java.util.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class CollectionComparator extends ReflectionComparator {
+public class CollectionComparator implements Comparator {
 
 
     // todo javadoc
-    public CollectionComparator(ReflectionComparator chainedComparator) {
-        super(chainedComparator);
-    }
+    public Difference compare(Comparison comparison) {
+        Object left = comparison.getLeft();
+        Object right = comparison.getRight();
 
-
-    // todo javadoc
-    @Override
-    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         if (left == null || right == null) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
         if (!(left.getClass().isArray() || left instanceof Collection) || !(right.getClass().isArray() || right instanceof Collection)) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
 
         // Convert to list and compare as collection
@@ -51,19 +50,19 @@ public class CollectionComparator extends ReflectionComparator {
         Collection<?> rightCollection = convertToCollection(right);
 
         if (leftCollection.size() != rightCollection.size()) {
-            return new Difference("Different array/collection sizes. Left size: " + leftCollection.size() + ", right size: " + rightCollection.size(), left, right, fieldStack);
+            return comparison.createDifference("Different array/collection sizes. Left size: " + leftCollection.size() + ", right size: " + rightCollection.size());
         }
 
         int i = 0;
         Iterator<?> lhsIterator = leftCollection.iterator();
         Iterator<?> rhsIterator = rightCollection.iterator();
         while (lhsIterator.hasNext() && rhsIterator.hasNext()) {
-            fieldStack.push("" + i++);
-            Difference difference = rootComparator.getDifference(lhsIterator.next(), rhsIterator.next(), fieldStack, traversedInstancePairs);
+            comparison.getFieldStack().push("" + i++);
+            Difference difference = comparison.getInnerDifference(lhsIterator.next(), rhsIterator.next());
             if (difference != null) {
                 return difference;
             }
-            fieldStack.pop();
+            comparison.getFieldStack().pop();
         }
         return null;
     }

@@ -16,7 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.util.Difference;
+import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.comparator.ReflectionComparator;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -85,7 +87,7 @@ public class ReflectionComparatorMapTest extends TestCase {
         mapReflectionCompareKeyB = createNotEqualsKeyMap("key 2");
         mapReflectionCompareDifferentKey = createNotEqualsKeyMap("XXXXXX");
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
     }
 
 

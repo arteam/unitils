@@ -16,13 +16,17 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.util.Difference;
+import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.comparator.Difference;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
+import org.unitils.reflectionassert.comparator.ReflectionComparator;
 
 import java.util.Date;
 
 
 /**
- * Test class for {@link ReflectionComparator}.
+ * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}.
  * Contains tests for ignore defaults and lenient dates.
  *
  * @author Tim Ducheyne
@@ -50,7 +54,7 @@ public class ReflectionComparatorLenientTest extends TestCase {
 
     /* Class under test */
     private ReflectionComparator reflectionComparator, ignoreDefaultsReflectionComparator, lenientDatesReflectionComparator,
-        ignoreDefaultsLenientDatesComparator;
+            ignoreDefaultsLenientDatesComparator;
 
 
     /**
@@ -67,10 +71,10 @@ public class ReflectionComparatorLenientTest extends TestCase {
         elementNoDefaultsDifferentDate = new Element(true, 'c', (byte) 1, (short) 2, 3, 4l, 5.0f, 6.0, new Date(), "object");
         elementAllDefaults = new Element(false, (char) 0, (byte) 0, (short) 0, 0, 0l, 0.0f, 0.0, null, null);
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
-        ignoreDefaultsReflectionComparator = ReflectionComparatorChainFactory.IGNOREDEFAULTS_COMPARATOR;
-        lenientDatesReflectionComparator = ReflectionComparatorChainFactory.LENIENTDATES_COMPARATOR;
-        ignoreDefaultsLenientDatesComparator = ReflectionComparatorChainFactory.IGNOREDEFAULTS_LENIENTDATES_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
+        ignoreDefaultsReflectionComparator = createRefectionComparator(IGNORE_DEFAULTS);
+        lenientDatesReflectionComparator = createRefectionComparator(LENIENT_DATES);
+        ignoreDefaultsLenientDatesComparator = createRefectionComparator(IGNORE_DEFAULTS, LENIENT_DATES);
     }
 
 

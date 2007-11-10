@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert;
+package org.unitils.reflectionassert.comparator;
+
+import org.unitils.reflectionassert.comparator.Difference;
+
+import java.util.Stack;
 
 /**
  * todo javadoc
@@ -24,21 +28,24 @@ package org.unitils.reflectionassert;
 public interface Comparison {
 
 
-    public Object getLeft();
+    Object getLeft();
 
 
-    public Object getRight();
+    Object getRight();
 
 
-    public void foundEquality();
+    Stack<String> getFieldStack();
 
 
-    public void foundDifference(String message);
+    Difference createDifference(String message);
 
 
-    public void findFieldDifference(String fieldName, Object left, Object right);
+    Difference invokeNextComparator();
 
 
-    public void findElementDifference(String elementName, Object left, Object right);
+    Difference getInnerDifference(Object left, Object right);
+
+
+    Difference getNewDifference(Object left, Object right);
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.util;
+package org.unitils.reflectionassert;
 
 /**
  * Modes defining how to compare two values.
@@ -27,7 +27,7 @@ package org.unitils.reflectionassert.util;
  *
  * @author Tim Ducheyne
  * @author Filip Neven
- * @see org.unitils.reflectionassert.ReflectionComparator
+ * @see org.unitils.reflectionassert.comparator.ReflectionComparator
  */
 public enum ReflectionComparatorMode {
 

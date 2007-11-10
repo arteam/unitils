@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import static org.easymock.classextension.EasyMock.*;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
 import static org.unitils.easymock.EasyMockUnitils.refEq;
-import static org.unitils.reflectionassert.util.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 
 import java.util.ArrayList;
 import java.util.Arrays;

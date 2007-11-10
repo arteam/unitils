@@ -16,7 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.util.Difference;
+import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.comparator.ReflectionComparator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +27,7 @@ import java.util.LinkedList;
 
 
 /**
- * Test class for {@link ReflectionComparator}.
+ * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}.
  * Contains tests with collection types.
  *
  * @author Tim Ducheyne
@@ -73,7 +75,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
         collectionInnerB = createCollection(null, collectionB);
         collectionInnerDifferentValue = createCollection(null, collectionDifferentValue);
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
     }
 
 

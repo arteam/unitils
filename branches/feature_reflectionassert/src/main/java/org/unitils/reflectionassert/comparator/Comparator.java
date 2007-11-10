@@ -13,33 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.util;
+package org.unitils.reflectionassert.comparator;
 
-import static java.util.Arrays.asList;
-import java.util.HashSet;
-import java.util.Set;
+import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.comparator.Comparison;
 
 /**
- * Class containing collection related utilities
+ * todo javadoc
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
-public class CollectionUtils {
+public interface Comparator {
 
 
-    /**
-     * Converts the given array of elements to a set.
-     *
-     * @param elements The elements
-     * @return The elements as a set, empty if elements was null
-     */
-    public static <T> Set<T> asSet(T... elements) {
-        Set<T> result = new HashSet<T>();
-        if (elements == null) {
-            return result;
-        }
-        result.addAll(asList(elements));
-        return result;
-    }
+    // todo javadoc
+    // If this ReflectionComparator is able to check whether their is a difference in the given left
+    //and right objects (i.e. canHandle(Object,Object) returns true), the objects are compared.
+    Difference compare(Comparison comparison);
+
 }

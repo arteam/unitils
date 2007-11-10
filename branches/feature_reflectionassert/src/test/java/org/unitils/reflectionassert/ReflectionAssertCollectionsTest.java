@@ -20,7 +20,7 @@ import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
-import static org.unitils.reflectionassert.util.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;
 import java.util.List;

@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert.comparator.impl;
 
-import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.util.Difference;
+import org.unitils.reflectionassert.comparator.Comparison;
+import org.unitils.reflectionassert.comparator.Difference;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * todo javadoc
@@ -30,19 +33,16 @@ public class LenientOrderCollectionComparator extends CollectionComparator {
 
 
     // todo javadoc
-    public LenientOrderCollectionComparator(ReflectionComparator chainedComparator) {
-        super(chainedComparator);
-    }
-
-
-    // todo javadoc
     @Override
-    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+    public Difference compare(Comparison comparison) {
+        Object left = comparison.getLeft();
+        Object right = comparison.getRight();
+
         if (left == null || right == null) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
         if (!(left.getClass().isArray() || left instanceof Collection) || !(right.getClass().isArray() || right instanceof Collection)) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
 
         // Convert to list and compare as collection
@@ -50,7 +50,7 @@ public class LenientOrderCollectionComparator extends CollectionComparator {
         Collection<?> rightCollection = convertToCollection(right);
 
         if (leftCollection.size() != rightCollection.size()) {
-            return new Difference("Different array/collection sizes. Left size: " + leftCollection.size() + ", right size: " + rightCollection.size(), left, right, fieldStack);
+            return comparison.createDifference("Different array/collection sizes. Left size: " + leftCollection.size() + ", right size: " + rightCollection.size());
         }
 
         // Create copy from which we can remove elements.
@@ -63,7 +63,7 @@ public class LenientOrderCollectionComparator extends CollectionComparator {
                 Object rhsValue = rhsIterator.next();
 
                 // Compare values using reflection
-                Difference difference = rootComparator.getDifference(lhsValue, rhsValue, new Stack<String>(), traversedInstancePairs);
+                Difference difference = comparison.getNewDifference(lhsValue, rhsValue);
                 if (difference == null) {
                     rhsIterator.remove();
                     found = true;
@@ -72,7 +72,7 @@ public class LenientOrderCollectionComparator extends CollectionComparator {
             }
 
             if (!found) {
-                return new Difference("Left value not found in right collection/array. Left value: " + lhsValue, left, right, fieldStack);
+                return comparison.createDifference("Left value not found in right collection/array. Left value: " + lhsValue);
             }
         }
         return null;

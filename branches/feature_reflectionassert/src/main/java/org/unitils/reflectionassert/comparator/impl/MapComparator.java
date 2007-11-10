@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert.comparator.impl;
 
-import org.unitils.reflectionassert.ReflectionComparator;
-import static org.unitils.reflectionassert.ReflectionComparatorChainFactory.STRICT_COMPARATOR;
-import org.unitils.reflectionassert.util.Difference;
+import org.unitils.reflectionassert.comparator.Comparator;
+import org.unitils.reflectionassert.comparator.Comparison;
+import org.unitils.reflectionassert.comparator.Difference;
+import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  * todo javadoc
@@ -30,29 +30,26 @@ import java.util.Stack;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class MapComparator extends ReflectionComparator {
+public class MapComparator implements Comparator {
 
 
     // todo javadoc
-    public MapComparator(ReflectionComparator chainedComparator) {
-        super(chainedComparator);
-    }
+    public Difference compare(Comparison comparison) {
+        Object left = comparison.getLeft();
+        Object right = comparison.getRight();
 
-    // todo javadoc
-    @Override
-    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         if (left == null || right == null) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
         if (!(left instanceof Map && right instanceof Map)) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
 
         Map<?, ?> leftMap = (Map<?, ?>) left;
         Map<?, ?> rightMap = (Map<?, ?>) right;
 
         if (leftMap.size() != rightMap.size()) {
-            return new Difference("Different map sizes.", left, right, fieldStack);
+            return comparison.createDifference("Different map sizes.");
         }
 
         // Create copy from which we can remove elements.
@@ -61,7 +58,7 @@ public class MapComparator extends ReflectionComparator {
         for (Map.Entry<?, ?> lhsEntry : leftMap.entrySet()) {
             Object lhsKey = lhsEntry.getKey();
             Object lhsValue = lhsEntry.getValue();
-            fieldStack.push("" + lhsKey);
+            comparison.getFieldStack().push("" + lhsKey);
 
             boolean found = false;
             Iterator<Map.Entry<Object, Object>> rhsIterator = rightCopy.entrySet().iterator();
@@ -71,23 +68,23 @@ public class MapComparator extends ReflectionComparator {
                 Object rhsValue = rhsEntry.getValue();
 
                 // compare keys using strict reflection compare
-                boolean isKeyEqual = STRICT_COMPARATOR.isEqual(lhsKey, rhsKey);
+                boolean isKeyEqual = createRefectionComparator().isEqual(lhsKey, rhsKey);
                 if (isKeyEqual) {
                     found = true;
                     rhsIterator.remove();
 
                     // compare values
-                    Difference difference = rootComparator.getDifference(lhsValue, rhsValue, fieldStack, traversedInstancePairs);
+                    Difference difference = comparison.getInnerDifference(lhsValue, rhsValue);
                     if (difference != null) {
                         return difference;
                     }
                     break;
                 }
             }
-            fieldStack.pop();
+            comparison.getFieldStack().pop();
 
             if (!found) {
-                return new Difference("Left key not found in right map. Left key: " + lhsEntry.getKey(), left, right, fieldStack);
+                return comparison.createDifference("Left key not found in right map. Left key: " + lhsEntry.getKey());
             }
         }
         return null;

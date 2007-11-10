@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert.comparator.impl;
 
-import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.util.Difference;
-
-import java.util.Map;
-import java.util.Stack;
+import org.unitils.reflectionassert.comparator.Comparator;
+import org.unitils.reflectionassert.comparator.Comparison;
+import org.unitils.reflectionassert.comparator.Difference;
 
 /**
  * todo javadoc
@@ -27,17 +25,13 @@ import java.util.Stack;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class IgnoreDefaultsComparator extends ReflectionComparator {
+public class IgnoreDefaultsComparator implements Comparator {
 
 
     // todo javadoc
-    public IgnoreDefaultsComparator(ReflectionComparator chainedComparator) {
-        super(chainedComparator);
-    }
+    public Difference compare(Comparison comparison) {
+        Object left = comparison.getLeft();
 
-    // todo javadoc
-    @Override
-    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         // object types
         if (left == null) {
             return null;
@@ -54,6 +48,6 @@ public class IgnoreDefaultsComparator extends ReflectionComparator {
         if (left instanceof Number && ((Number) left).doubleValue() == 0) {
             return null;
         }
-        return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        return comparison.invokeNextComparator();
     }
 }

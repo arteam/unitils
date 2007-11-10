@@ -16,14 +16,17 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.util.Difference;
+import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.comparator.Difference;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import org.unitils.reflectionassert.comparator.ReflectionComparator;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 
 /**
- * Test class for {@link ReflectionComparator}.
+ * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}.
  * Contains tests with non-primitive array types.
  *
  * @author Tim Ducheyne
@@ -83,8 +86,8 @@ public class ReflectionComparatorArrayTest extends TestCase {
         arrayInnerDifferentValue = createArray(null, arrayDifferentValue, true);
         arrayInnerDifferentSize = createArray(null, arrayDifferentSize, true);
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
-        lenientOrderComparator = ReflectionComparatorChainFactory.LENIENTORDER_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
+        lenientOrderComparator = createRefectionComparator(LENIENT_ORDER);
     }
 
 

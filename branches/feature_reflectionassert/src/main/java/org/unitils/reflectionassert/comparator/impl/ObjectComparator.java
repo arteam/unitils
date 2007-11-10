@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert.comparator.impl;
 
-import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.util.Difference;
+import org.unitils.reflectionassert.comparator.Comparator;
+import org.unitils.reflectionassert.comparator.Comparison;
+import org.unitils.reflectionassert.comparator.Difference;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * todo javadoc
@@ -30,58 +29,53 @@ import java.util.Stack;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ObjectComparator extends ReflectionComparator {
+public class ObjectComparator implements Comparator {
 
 
     // todo javadoc
-    public ObjectComparator(ReflectionComparator chainedComparator) {
-        super(chainedComparator);
-    }
+    public Difference compare(Comparison comparison) {
+        Object left = comparison.getLeft();
+        Object right = comparison.getRight();
 
-
-    // todo javadoc
-    @Override
-    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         if (left == null || right == null) {
-            return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+            return comparison.invokeNextComparator();
         }
 
         // check different class type
         Class<?> clazz = left.getClass();
         if (!clazz.equals(right.getClass())) {
-            return new Difference("Different class types. Left: " + clazz + ", right: " + right.getClass(), left, right, fieldStack);
+            return comparison.createDifference("Different class types. Left: " + clazz + ", right: " + right.getClass());
         }
         // compare all fields of the object using reflection
-        return compareFields(left, right, clazz, fieldStack, traversedInstancePairs);
+        return compareFields(left, right, clazz, comparison);
     }
 
 
     /**
      * Compares the values of all fields in the given objects by use of reflection.
      *
-     * @param left                   the left object for the comparison, not null
-     * @param right                  the right object for the comparison, not null
-     * @param clazz                  the type of both objects
-     * @param fieldStack             the current field names
-     * @param traversedInstancePairs Map with pairs of objects that have been compared with each other.
+     * @param left       the left object for the comparison, not null
+     * @param right      the right object for the comparison, not null
+     * @param clazz      the type of both objects
+     * @param comparison the current comparison
      * @return the difference, null if there is no difference
      */
-    protected Difference compareFields(Object left, Object right, Class<?> clazz, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
+    protected Difference compareFields(Object left, Object right, Class<?> clazz, Comparison comparison) {
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
 
-        for (Field f : fields) {
-            fieldStack.push(f.getName());
+        for (Field field : fields) {
+            comparison.getFieldStack().push(field.getName());
 
             // skip transient and static fields
-            if (Modifier.isTransient(f.getModifiers()) || Modifier.isStatic(f.getModifiers())) {
-                fieldStack.pop();
+            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
+                comparison.getFieldStack().pop();
                 continue;
             }
             try {
 
                 // recursively check the value of the fields
-                Difference difference = rootComparator.getDifference(f.get(left), f.get(right), fieldStack, traversedInstancePairs);
+                Difference difference = comparison.getInnerDifference(field.get(left), field.get(right));
                 if (difference != null) {
                     return difference;
                 }
@@ -91,13 +85,13 @@ public class ObjectComparator extends ReflectionComparator {
                 // throw a runtime exception in case the impossible happens.
                 throw new InternalError("Unexpected IllegalAccessException");
             }
-            fieldStack.pop();
+            comparison.getFieldStack().pop();
         }
 
         // compare fields declared in superclass
         Class<?> superclazz = clazz.getSuperclass();
         while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
-            Difference difference = compareFields(left, right, superclazz, fieldStack, traversedInstancePairs);
+            Difference difference = compareFields(left, right, superclazz, comparison);
             if (difference != null) {
                 return difference;
             }

@@ -13,37 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert.comparator.impl;
 
-import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.util.Difference;
+import org.unitils.reflectionassert.comparator.Comparator;
+import org.unitils.reflectionassert.comparator.Comparison;
+import org.unitils.reflectionassert.comparator.Difference;
 
 import java.util.Date;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class LenientDatesComparator extends ReflectionComparator {
+public class LenientDatesComparator implements Comparator {
 
 
     // todo javadoc
-    public LenientDatesComparator(ReflectionComparator chainedComparator) {
-        super(chainedComparator);
-    }
+    public Difference compare(Comparison comparison) {
+        Object left = comparison.getLeft();
+        Object right = comparison.getRight();
 
-
-    // todo javadoc
-    @Override
-    public Difference doGetDifference(Object left, Object right, Stack<String> fieldStack, Map<TraversedInstancePair, Boolean> traversedInstancePairs) {
         if ((right == null && left instanceof Date) || (left == null && right instanceof Date)) {
-            return new Difference("Lenient dates, but not both instantiated or both null.", left, right, fieldStack);
+            return comparison.createDifference("Lenient dates, but not both instantiated or both null.");
         }
         if (right instanceof Date && left instanceof Date) {
             return null;
         }
-        return chainedComparator.doGetDifference(left, right, fieldStack, traversedInstancePairs);
+        return comparison.invokeNextComparator();
     }
 }

@@ -20,8 +20,8 @@ import junit.framework.TestCase;
 import junitx.framework.StringAssert;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
-import static org.unitils.reflectionassert.util.ReflectionComparatorMode.IGNORE_DEFAULTS;
-import static org.unitils.reflectionassert.util.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 import static java.util.Arrays.asList;
 

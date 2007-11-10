@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.util;
+package org.unitils.reflectionassert.comparator;
 
 import java.util.HashMap;
 import java.util.Iterator;
