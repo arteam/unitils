@@ -172,6 +172,7 @@ public class HibernateEntityManagerFactoryManager extends
             	getUnitilsClassLoader().registerResourceTranslation("META-INF/persistence.xml", configFiles.get(0));
             }
             configuration.configure(persistenceUnit, new HashMap());
+            getUnitilsClassLoader().unregisterResourceTranslation("META-INF/persistence.xml");
             return configuration;
 
         } catch (Exception e) {
