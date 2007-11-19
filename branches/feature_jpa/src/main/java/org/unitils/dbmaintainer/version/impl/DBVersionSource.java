@@ -453,7 +453,7 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
 	 */
 	protected boolean checkVersionRecord() {
 		// Check contains valid record
-		if (!isEmpty(versionTableName, sqlHandler.getDataSource())) {
+		if (!isEmpty(defaultDbSupport.qualified(versionTableName), sqlHandler.getDataSource())) {
 			return true;
 		}
 

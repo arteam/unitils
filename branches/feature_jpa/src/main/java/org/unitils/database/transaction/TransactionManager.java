@@ -36,6 +36,8 @@ public interface TransactionManager {
      * @return The transactional data source, not null
      */
     TransactionalDataSource createTransactionalDataSource(DataSource dataSource);
+    
+    //Connection getTransactionalConnection();
 
 
     /**
