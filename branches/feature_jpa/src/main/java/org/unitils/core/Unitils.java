@@ -77,6 +77,8 @@ public class Unitils implements Module {
     }
 
 
+    private TestListener testListener;
+    
     /* Repository for all modules that are currently active in Unitils */
     private ModulesRepository modulesRepository;
 
@@ -126,6 +128,7 @@ public class Unitils implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
+        testListener = new UnitilsTestListener();
     }
     
     
@@ -136,13 +139,13 @@ public class Unitils implements Module {
 
 
     /**
-     * Creates a new instance of {@link TestListener}. This instance provides hook callback methods that enable intervening
+     * Returns the single instance of {@link TestListener}. This instance provides hook callback methods that enable intervening
      * during the execution of unit tests.
      *
-     * @return A new instance of {@link TestListener}
+     * @return The single {@link TestListener}
      */
-    public TestListener createTestListener() {
-        return new UnitilsTestListener();
+    public TestListener getTestListener() {
+        return testListener;
     }
 
 

@@ -33,6 +33,7 @@ import org.unitils.database.util.TransactionMode;
 import static org.unitils.database.util.TransactionMode.*;
 
 import org.unitils.dbmaintainer.DBMaintainer;
+import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
@@ -320,7 +321,7 @@ public class DatabaseModule implements Module {
 	 * Cleans all configured schema's. I.e. removes all data from its database tables.
 	 */
 	public void cleanSchemas() {
-		getConfiguredDatabaseTaskInstance(DBClearer.class).clearSchemas();
+		getConfiguredDatabaseTaskInstance(DBCleaner.class).cleanSchemas();
 	}
 	
 	
@@ -371,7 +372,7 @@ public class DatabaseModule implements Module {
     /**
      * @return The {@link TestListener} associated with this module
      */
-    public TestListener createTestListener() {
+    public TestListener getTestListener() {
         return new DatabaseTestListener();
     }
 

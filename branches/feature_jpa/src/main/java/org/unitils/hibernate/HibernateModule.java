@@ -355,7 +355,7 @@ public class HibernateModule implements Module, Flushable {
     /**
      * @return The TestListener associated with this module
      */
-    public TestListener createTestListener() {
+    public TestListener getTestListener() {
         return new HibernateTestListener();
     }
 

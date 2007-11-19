@@ -196,7 +196,7 @@ public class ModuleUtilsTest extends TestCase {
         public void init(Properties configuration) {
         }
 
-        public TestListener createTestListener() {
+        public TestListener getTestListener() {
             return null;
         }
     }

@@ -32,9 +32,6 @@ import org.unitils.core.Unitils;
  */
 public abstract class UnitilsTestNG implements IHookable {
 
-    /* The main test listener, that hooks this test into unitils */
-    private static TestListener testListener;
-
     /* True if beforeTestClass was called */
     private static boolean beforeTestClassCalled = false;
 
@@ -48,8 +45,7 @@ public abstract class UnitilsTestNG implements IHookable {
      */
     @BeforeSuite(alwaysRun = true)
     protected void unitilsBeforeSuite() {
-        testListener = getUnitils().createTestListener();
-        testListener.beforeAll();
+        getTestListener().beforeAll();
     }
 
 
@@ -58,7 +54,7 @@ public abstract class UnitilsTestNG implements IHookable {
      */
     @AfterSuite(alwaysRun = true)
     protected void unitilsAfterSuite() {
-        testListener.afterAll();
+        getTestListener().afterAll();
     }
 
 
@@ -68,7 +64,7 @@ public abstract class UnitilsTestNG implements IHookable {
     @BeforeClass(alwaysRun = true)
     protected void unitilsBeforeClass() {
         beforeTestClassCalled = true;
-        testListener.beforeTestClass(getClass());
+        getTestListener().beforeTestClass(getClass());
     }
 
 
@@ -83,7 +79,7 @@ public abstract class UnitilsTestNG implements IHookable {
         // alwaysRun is enaled, extra test to ensure that unitilsBeforeClass was called
         if (beforeTestClassCalled) {
             beforeTestClassCalled = false;
-            testListener.afterTestClass(getClass());
+            getTestListener().afterTestClass(getClass());
         }
     }
 
@@ -94,7 +90,7 @@ public abstract class UnitilsTestNG implements IHookable {
     @BeforeMethod(alwaysRun = true)
     protected void unitilsBeforeTestSetUp() {
         beforeTestSetUpCalled = true;
-        testListener.beforeTestSetUp(this);
+        getTestListener().beforeTestSetUp(this);
     }
 
 
@@ -106,10 +102,10 @@ public abstract class UnitilsTestNG implements IHookable {
      */
     @AfterMethod(alwaysRun = true)
     protected void unitilsAfterTestTearDown() {
-        // alwaysRun is enaled, extra test to ensure that unitilsBeforeTestSetUp was called
+        // alwaysRun is enabled, extra test to ensure that unitilsBeforeTestSetUp was called
         if (beforeTestSetUpCalled) {
             beforeTestSetUpCalled = false;
-            testListener.afterTestTearDown(this);
+            getTestListener().afterTestTearDown(this);
         }
     }
 
@@ -124,7 +120,7 @@ public abstract class UnitilsTestNG implements IHookable {
     public void run(IHookCallBack callBack, ITestResult testResult) {
         RuntimeException firstRuntimeException = null;
         try {
-            testListener.beforeTestMethod(this, testResult.getMethod().getMethod());
+            getTestListener().beforeTestMethod(this, testResult.getMethod().getMethod());
             callBack.runTestMethod(testResult);
 
         } catch (RuntimeException e) {
@@ -133,7 +129,7 @@ public abstract class UnitilsTestNG implements IHookable {
         }
 
         try {
-            testListener.afterTestMethod(this, testResult.getMethod().getMethod(), firstRuntimeException);
+            getTestListener().afterTestMethod(this, testResult.getMethod().getMethod(), firstRuntimeException);
 
         } catch (RuntimeException e) {
             // first exception is typically the most meaningful, so ignore second exception
@@ -159,6 +155,10 @@ public abstract class UnitilsTestNG implements IHookable {
      */
     protected Unitils getUnitils() {
         return Unitils.getInstance();
+    }
+    
+    protected TestListener getTestListener() {
+    	return getUnitils().getTestListener();
     }
 
 }
