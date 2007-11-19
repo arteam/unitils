@@ -83,7 +83,7 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
     public ApplicationContext getApplicationContext(Object testObject) {
         ApplicationContext applicationContext = getInstance(testObject);
         if (applicationContext == null) {
-            throw new UnitilsException("No configuration found for creating an instance for test " + testObject.getClass() + ". Make sure that you either specify a value " +
+            throw new UnitilsException("No configuration found for creating an ApplicationContext for test " + testObject.getClass() + ". Make sure that you either specify a value " +
                     "for an @" + annotationClass.getSimpleName() + " annotation somewhere in the testclass or a superclass or that you specify a custom create method in the test class itself.");
         }
         return applicationContext;
