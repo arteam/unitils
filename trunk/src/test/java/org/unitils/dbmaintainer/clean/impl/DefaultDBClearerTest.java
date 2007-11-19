@@ -268,7 +268,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseMySql() throws Exception {
-        dropTestTables(dbSupport, "test_table", "`Test_CASE_Table`");
+        dropTestTables(dbSupport, "test_table", "`Test_CASE_Table`", versionTableName);
         dropTestViews(dbSupport, "test_view", "`Test_CASE_View`");
         dropTestTriggers(dbSupport, "test_trigger", "`Test_CASE_Trigger`");
     }
@@ -306,7 +306,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseOracle() throws Exception {
-        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"", versionTableName);
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
@@ -350,7 +350,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabasePostgreSql() throws Exception {
-        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"", versionTableName);
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
@@ -387,7 +387,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
      * Drops all created test database structures (views, tables...)
      */
     private void cleanupTestDatabaseDb2() throws Exception {
-        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
+        dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"", versionTableName);
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
@@ -427,6 +427,6 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
         dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        dropTestTables(dbSupport, "\"Test_CASE_Table\"", "TEST_TABLE");
+        dropTestTables(dbSupport, "\"Test_CASE_Table\"", "TEST_TABLE", versionTableName);
     }
 }
