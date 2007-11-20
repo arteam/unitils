@@ -1,6 +1,8 @@
 package org.unitils.core.util;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,11 +12,19 @@ public class UnitilsClassLoader extends ClassLoader {
 	
 	
 	@Override
-	protected URL findResource(String name) {
+	public Enumeration<URL> getResources(String name) throws IOException {
 		if (resourceTranslationMap.containsKey(name)) {
-			return super.findResource(resourceTranslationMap.get(name));
+			return super.getResources(resourceTranslationMap.get(name));
 		}
-		return super.findResource(name);
+		return super.getResources(name);
+	}
+
+	@Override
+	public URL getResource(String name) {
+		if (resourceTranslationMap.containsKey(name)) {
+			return super.getResource(resourceTranslationMap.get(name));
+		}
+		return super.getResource(name);
 	}
 
 	
