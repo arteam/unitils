@@ -8,7 +8,6 @@ import java.io.OutputStream;
 
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
-import org.unitils.integrationtest.UnitilsIntegrationTest;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 public class FileUtils {
@@ -17,7 +16,7 @@ public class FileUtils {
 		InputStream resourceInputStream = null;
 		OutputStream fileOutputStream = null;
 		try {
-			resourceInputStream = UnitilsIntegrationTest.class.getResourceAsStream(classPathResourceName);
+			resourceInputStream = FileUtils.class.getResourceAsStream(classPathResourceName);
 			String fileName = StringUtils.substringAfterLast(classPathResourceName, "/");
 			File fileSystemDirectory = new File(fileSystemDirectoryName);
 			fileSystemDirectory.mkdirs();
