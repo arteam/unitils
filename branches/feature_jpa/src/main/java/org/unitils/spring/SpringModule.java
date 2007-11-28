@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.transaction.impl.SpringResourceTransactionManagerTransactionalConnectionHandler;
 import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBean;
 import org.unitils.spring.annotation.SpringBeanByName;
@@ -39,9 +40,11 @@ import org.unitils.spring.util.ApplicationContextManager;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and
@@ -67,6 +70,8 @@ public class SpringModule implements Module {
 
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
+    
+    private Set<SpringResourceTransactionManagerTransactionalConnectionHandler> transactionalConnectionHandlers = new HashSet<SpringResourceTransactionManagerTransactionalConnectionHandler>();
 
 
     /**
@@ -329,9 +334,19 @@ public class SpringModule implements Module {
             return null;
         }
     }
+    
+    
+    public void registerSpringResourceTransactionManagerTransactionalConnectionHandler(SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler) {
+    	transactionalConnectionHandlers.add(transactionalConnectionHandler);
+    }
 
 
-    /**
+    public Set<SpringResourceTransactionManagerTransactionalConnectionHandler> getTransactionalConnectionHandlers() {
+		return transactionalConnectionHandlers;
+	}
+
+
+	/**
      * @return The {@link TestListener} for this module
      */
     public TestListener getTestListener() {
