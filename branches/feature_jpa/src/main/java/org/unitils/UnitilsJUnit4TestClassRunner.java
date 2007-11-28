@@ -44,13 +44,10 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(UnitilsJUnit4TestClassRunner.class);
 
-    /* True if this is the first unit test that is executed during this test run */
-    private static boolean firstTest = true;
-
-    private static boolean shutdownHookCreated;
+    private boolean shutdownHookCreated = false;
     
-    /* True if beforeAll was succesfully called */
-    private static boolean beforeAllCalled;
+    /* True if beforeAll was successfully called */
+    private boolean beforeAllCalled = false;
 
 
     /**
