@@ -139,7 +139,7 @@ public class SpringTransactionManager implements TransactionManager {
 	}
 	
 	
-	public boolean isActive(Object testObject) {
+	public boolean isTransactionActive(Object testObject) {
 		return transactionStatusHolder.get() != null;
 	}
 

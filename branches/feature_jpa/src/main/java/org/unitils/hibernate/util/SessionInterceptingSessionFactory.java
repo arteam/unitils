@@ -25,6 +25,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * A wrapper for a Hibernate session factory that intercepts all opened session. These sessions can
@@ -117,7 +118,7 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
      */
     @Override
     public Session getCurrentSession() throws HibernateException {
-        Session session = super.getCurrentSession();
+        Session session = (Session) SessionFactoryUtils.getSession(this, true);
         sessions.add(session);
         return session;
     }

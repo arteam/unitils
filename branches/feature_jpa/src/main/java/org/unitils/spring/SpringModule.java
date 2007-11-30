@@ -40,6 +40,7 @@ import org.unitils.spring.util.ApplicationContextManager;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -320,13 +321,25 @@ public class SpringModule implements Module {
     }
 
 
-    //todo javadoc
+    /**
+     * Register a type of bean post processor. An instance of this bean post processor type will be used
+     * when loading an application context
+     * 
+     * @param beanPostProcessorType
+     */
     public void registerBeanPostProcessorType(Class<? extends BeanPostProcessor> beanPostProcessorType) {
         applicationContextManager.addBeanPostProcessorType(beanPostProcessorType);
     }
 
 
-    //todo javadoc
+    /**
+     * @param <T> The bean post processor type
+     * @param testObject The test object
+     * @param beanPostProcessorType Type bean post processor type
+     * 
+     * @return The bean post processor of the given type that is associated with the application context that is
+     * in turn associated with the given test object
+     */
     public <T extends BeanPostProcessor> T getBeanPostProcessor(Object testObject, Class<T> beanPostProcessorType) {
         if (applicationContextManager.hasApplicationContext(testObject)) {
             return applicationContextManager.getBeanPostProcessor(getApplicationContext(testObject), beanPostProcessorType);
@@ -336,11 +349,21 @@ public class SpringModule implements Module {
     }
     
     
+    /**
+     * Registers a {@link SpringResourceTransactionManagerTransactionalConnectionHandler} that defines how to retrieve a
+     * <code>Connection</code>, given the fact that we use a specific resource factory type.
+     * 
+     * @param transactionalConnectionHandler
+     */
     public void registerSpringResourceTransactionManagerTransactionalConnectionHandler(SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler) {
     	transactionalConnectionHandlers.add(transactionalConnectionHandler);
     }
 
 
+    /**
+     * @return All {@link SpringResourceTransactionManagerTransactionalConnectionHandler}s that were registered using
+     * {@link #registerBeanPostProcessorType(Class)}
+     */
     public Set<SpringResourceTransactionManagerTransactionalConnectionHandler> getTransactionalConnectionHandlers() {
 		return transactionalConnectionHandlers;
 	}

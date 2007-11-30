@@ -49,7 +49,7 @@ public class HibernateTransactionFactory implements TransactionFactory {
 
 	public boolean isTransactionInProgress(JDBCContext jdbcContext,
 			Context transactionContext, Transaction transaction) {
-		return getDatabaseModule().getTransactionManager().isActive(getCurrentTestObject());
+		return getDatabaseModule().getTransactionManager().isTransactionActive(getCurrentTestObject());
 	}
 
 	public boolean isTransactionManagerRequired() {

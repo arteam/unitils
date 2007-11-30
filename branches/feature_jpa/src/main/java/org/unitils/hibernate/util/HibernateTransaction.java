@@ -45,7 +45,7 @@ public class HibernateTransaction implements Transaction {
 	}
 
 	public boolean isActive() throws HibernateException {
-		return getUnitilsTransactionManager().isActive(getCurrentTestObject());
+		return getUnitilsTransactionManager().isTransactionActive(getCurrentTestObject());
 	}
 
 	public void registerSynchronization(Synchronization synchronization)

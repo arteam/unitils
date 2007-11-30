@@ -141,7 +141,7 @@ public class SimpleTransactionManager implements TransactionManager {
 	}
 	
 	
-	public boolean isActive(Object testObject) {
+	public boolean isTransactionActive(Object testObject) {
 		return transactionActiveFor.get() != null;
 	}
 
