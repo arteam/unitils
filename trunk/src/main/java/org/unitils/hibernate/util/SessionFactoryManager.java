@@ -20,8 +20,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+
 import static org.hibernate.cfg.Environment.CONNECTION_PROVIDER;
 import static org.hibernate.cfg.Environment.CURRENT_SESSION_CONTEXT_CLASS;
+import static org.hibernate.cfg.Environment.TRANSACTION_STRATEGY;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
@@ -32,11 +35,11 @@ import static org.unitils.util.ReflectionUtils.invokeMethod;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+
 import static java.util.Arrays.asList;
 
 /**
  * A class for managing and creating Hibernate configurations and session factories.
- * todo javadoc
  * <p/>
  * Creating a new config is done following steps:
  * <ul>
@@ -50,7 +53,7 @@ import static java.util.Arrays.asList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SessionFactoryManager extends AnnotatedInstanceManager<Configuration, HibernateSessionFactory> {
+public class SessionFactoryManager extends AnnotatedInstanceManager<SessionInterceptingSessionFactory, HibernateSessionFactory> {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(SessionFactoryManager.class);
@@ -58,7 +61,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     /**
      * All created session factories per configuration
      */
-    protected Map<Configuration, SessionInterceptingSessionFactory> sessionFactories = new HashMap<Configuration, SessionInterceptingSessionFactory>();
+    protected Map<SessionInterceptingSessionFactory, Configuration> configurations = new HashMap<SessionInterceptingSessionFactory, Configuration>();
 
     /* The class name to use when creating a hibernate configuration */
     private String configurationImplClassName;
@@ -75,7 +78,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      *                                   The class name of the CurrentSessionContext, null for no context
      */
     public SessionFactoryManager(String configurationImplClassName, String currentSessionContextImplClassName) {
-        super(Configuration.class, HibernateSessionFactory.class);
+        super(SessionInterceptingSessionFactory.class, HibernateSessionFactory.class);
         this.configurationImplClassName = configurationImplClassName;
         this.currentSessionContextImplClassName = currentSessionContextImplClassName;
     }
@@ -89,24 +92,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @return The Hibernate session factory, not null
      */
     public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
-        // Check if a SessionFactory has been configured
-        Configuration configuration = getConfiguration(testObject);
-        if (configuration == null) {
-            return null;
-        }
-
-        // check whether a SessionFactory was already created before based on this hibernate Configuration
-        SessionInterceptingSessionFactory sessionFactory = sessionFactories.get(configuration);
-        if (sessionFactory != null) {
-            return sessionFactory;
-        }
-
-        // create session factory
-        sessionFactory = new SessionInterceptingSessionFactory(configuration.buildSessionFactory());
-
-        // store session factory
-        sessionFactories.put(configuration, sessionFactory);
-        return sessionFactory;
+    	return getInstance(testObject);
     }
 
 
@@ -118,17 +104,13 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @return The Hibernate configuration, not null
      */
     public Configuration getConfiguration(Object testObject) {
-        return getInstance(testObject);
-    }
-
-
-    /**
-     * Gets all existing hibernate session factories. This will not create any session factories.
-     *
-     * @return The Hibernate session factories, not null
-     */
-    public List<SessionInterceptingSessionFactory> getSessionFactories() {
-        return new ArrayList<SessionInterceptingSessionFactory>(sessionFactories.values());
+    	// Check if a SessionFactory has been configured
+        SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
+        if (sessionFactory == null) {
+            return null;
+        }
+        
+        return configurations.get(sessionFactory);
     }
 
 
@@ -142,12 +124,13 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     public void invalidateSessionFactory(Class<?>... classes) {
         // remove all session factories
         if (classes == null || classes.length == 0) {
-            sessionFactories.clear();
+            configurations.clear();
 
         } else {
             for (Class<?> clazz : classes) {
-                Configuration configuration = instances.get(clazz);
-                sessionFactories.remove(configuration);
+                SessionInterceptingSessionFactory sessionFactory = instances.get(clazz);
+                Configuration configuration = configurations.get(sessionFactory);
+                configurations.remove(configuration);
             }
         }
         // remove all configurations
@@ -155,6 +138,55 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     }
 
 
+    /**
+     * Creates a new configuration for the given locations. The configuration implementation class name provided at
+     * construction time, determines what type of instance will be created.
+     * @param locations The locations where to find configuration files, not null
+     *
+     * @return the configuration, not null
+     */
+    @Override
+    protected SessionInterceptingSessionFactory createInstanceForValues(Object testObject, Class<?> testClass, List<String> locations) {
+        // Create a hibernate Configuration object from the specfied configuration files
+    	Configuration configuration = createConfigurationFromConfigFiles(locations);
+    	
+        // invoke custom initialization method
+        invokeCustomInitializationMethod(testObject, testClass, configuration);
+        
+        // Prepare the Configuration object to be used for testing purposes: connect to the test database, etc.
+        postProcessConfiguration(configuration, testObject, testClass);
+        
+        // Create a SessionFactory
+        SessionInterceptingSessionFactory sessionFactory = new SessionInterceptingSessionFactory(configuration.buildSessionFactory());
+        
+        // Make sure we can later retrieve the Configuration object by the SessionFactory object
+        configurations.put(sessionFactory, configuration);
+        return sessionFactory;
+    }
+
+
+    protected Configuration createConfigurationFromConfigFiles(List<String> locations) {
+    	try {
+            // create instance
+            Configuration configuration = createInstanceOfType(configurationImplClassName, false);
+
+            // load default configuration if no locations were specified
+            if (locations.isEmpty()) {
+                configuration.configure();
+                return configuration;
+            }
+            // load specified configurations
+            for (String location : locations) {
+                configuration.configure(location);
+            }
+            return configuration;
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to create hibernate configuration for locations: " + locations, e);
+        }
+	}
+    
+    
     /**
      * Creates a configured Hibernate <code>Configuration</code> object.
      * <p/>
@@ -166,12 +198,8 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @param testObject    The test object, not null
      * @param testClass     The level in the hierarchy
      */
-    @Override
-    protected void afterInstanceCreate(Configuration configuration, Object testObject, Class<?> testClass) {
-        // invoke custom initialization method 
-        invokeInitializationMethod(testObject, testClass, configuration);
-
-        // configure hibernate to use unitils datasource
+    protected void postProcessConfiguration(Configuration configuration, Object testObject, Class<?> testClass) {
+        // configure hibernate to use the unitils datasource
         Properties unitilsHibernateProperties = new Properties();
         if (configuration.getProperty(CONNECTION_PROVIDER) != null) {
             logger.warn("The property " + CONNECTION_PROVIDER + " is present in your Hibernate configuration. This property will be overwritten with Unitils own ConnectionProvider implementation!");
@@ -186,41 +214,18 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
             }
             unitilsHibernateProperties.setProperty(CURRENT_SESSION_CONTEXT_CLASS, currentSessionContextImplClassName);
         }
+        
+        // configure hibernate to use the unitils transaction manager
+        if (configuration.getProperty(TRANSACTION_STRATEGY) != null) {
+        	logger.warn("The property " + TRANSACTION_STRATEGY + " is present in your Hibernate configuration. This property will be overwritten with Unitils own TransactionFactory implementation!");
+        }
+        unitilsHibernateProperties.setProperty(TRANSACTION_STRATEGY, HibernateTransactionFactory.class.getName());
+        
         configuration.addProperties(unitilsHibernateProperties);
     }
 
 
-    /**
-     * Creates a new configuration for the given locations. The configuration implementation class name provided at
-     * construction time, determines what type of instance will be created.
-     *
-     * @param locations The locations where to find configuration files, not null
-     * @return the configuration, not null
-     */
-    @Override
-    protected Configuration createInstanceForValues(List<String> locations) {
-        try {
-            // create instance
-            Configuration configuration = createInstanceOfType(configurationImplClassName, false);
-
-            // load default configuration if no locations were specified
-            if (locations == null || locations.isEmpty()) {
-                configuration.configure();
-                return configuration;
-            }
-            // load specified configurations
-            for (String location : locations) {
-                configuration.configure(location);
-            }
-            return configuration;
-
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to create hibernate configuration for locations: " + locations, e);
-        }
-    }
-
-
-    /**
+	/**
      * Gets the locations that are specified for the given {@link HibernateSessionFactory} annotation. An array with
      * 1 empty string should be considered to be empty and null should be returned.
      *
@@ -230,16 +235,11 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
     @Override
     protected List<String> getAnnotationValues(HibernateSessionFactory annotation) {
         String[] locations = annotation.value();
-        if (locations.length == 0 || (locations.length == 1 && isEmpty(locations[0]))) {
-            return null;
-        }
         return asList(locations);
     }
 
 
     /**
-     * todo javadoc
-     * <p/>
      * Creates an instance by calling a custom create method (if there is one). Such a create method should have one of
      * following exact signatures:
      * <ul>
@@ -255,7 +255,7 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
      * @param configuration The configuration to initialize, not null
      */
     @SuppressWarnings({"unchecked"})
-    protected void invokeInitializationMethod(Object testObject, Class<?> testClass, Configuration configuration) {
+    protected void invokeCustomInitializationMethod(Object testObject, Class<?> testClass, Configuration configuration) {
         // get all annotated methods from the given test class, superclasses included
         List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, true);
         for (Method method : methods) {
@@ -282,5 +282,27 @@ public class SessionFactoryManager extends AnnotatedInstanceManager<Configuratio
             }
         }
     }
+    
+    
+    @Override
+	protected SessionInterceptingSessionFactory createCustomCreatedInstanceFromCustomCreateMethodResult(
+			Object testObject, Class<?> testClass, Object customCreateMethodResult) {
+		
+    	Configuration configuration = (Configuration) customCreateMethodResult;
+    	invokeCustomInitializationMethod(testObject, testClass, configuration);
+    	SessionInterceptingSessionFactory sessionFactory = new SessionInterceptingSessionFactory(configuration.buildSessionFactory());
+    	configurations.put(sessionFactory, configuration);
+		return sessionFactory;
+	}
+
+
+	/**
+     * @return The hibernate <code>Configuration</code> type. This to make sure that a custom create method has to return
+     * an object of type <code>Configuration</code>, not of type <code>SessionFactory</code>
+     */
+	@Override
+	protected Class<?> getCustomCreateMethodReturnType() {
+		return Configuration.class;
+	}
 }
                          

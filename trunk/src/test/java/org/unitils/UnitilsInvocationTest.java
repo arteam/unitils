@@ -31,7 +31,7 @@ import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import static org.unitils.inject.util.InjectionUtils.injectStatic;
+import static org.unitils.inject.util.InjectionUtils.injectIntoStatic;
 import org.unitils.util.ReflectionUtils;
 
 import java.util.Iterator;
@@ -75,12 +75,6 @@ public class UnitilsInvocationTest {
      */
     @BeforeClass
     public static void classSetup() {
-        oldTestListenerUnitilsJUnit3 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit3.class, "testListener", true));
-        oldTestListenerUnitilsJUnit4 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit4TestClassRunner.class, "testListener", true));
-
-        injectStatic(null, UnitilsJUnit3.class, "testListener");
-        injectStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
-
         tracingTestListener = new TracingTestListener();
 
         UnitilsJUnit3Test_TestClass1.setTracingTestListener(tracingTestListener);
@@ -102,8 +96,6 @@ public class UnitilsInvocationTest {
      */
     @AfterClass
     public static void classTearDown() {
-        injectStatic(oldTestListenerUnitilsJUnit3, UnitilsJUnit3.class, "testListener");
-        injectStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
     }
 
 
@@ -116,9 +108,9 @@ public class UnitilsInvocationTest {
         tracingTestListener.getCallList().clear();
 
         // clear state so that beforeAll is called
-        injectStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
-        injectStatic(null, UnitilsJUnit3.class, "lastTestClass");
-        injectStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
+        injectIntoStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
+        injectIntoStatic(null, UnitilsJUnit3.class, "lastTestClass");
+        injectIntoStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
 
     }
 
@@ -321,7 +313,7 @@ public class UnitilsInvocationTest {
             return new Unitils() {
 
                 @Override
-                public TestListener createTestListener() {
+                public TestListener getTestListener() {
                     return tracingTestListener;
                 }
             };
@@ -347,7 +339,7 @@ public class UnitilsInvocationTest {
                 return new Unitils() {
 
                     @Override
-                    public TestListener createTestListener() {
+                    public TestListener getTestListener() {
                         return tracingTestListener;
                     }
                 };

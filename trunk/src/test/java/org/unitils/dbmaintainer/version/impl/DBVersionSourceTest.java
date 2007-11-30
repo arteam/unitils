@@ -65,6 +65,8 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
 	public void setUp() throws Exception {
 		Properties configuration = new ConfigurationLoader().loadConfiguration();
 		SQLHandler sqlHandler = new SQLHandler(dataSource);
+		
+		configuration.setProperty(PROPKEY_AUTO_CREATE_VERSION_TABLE, "false");
 		dbVersionSource = new DBVersionSource();
 		dbVersionSource.init(configuration, sqlHandler);
 

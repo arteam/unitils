@@ -1,0 +1,1 @@
+mvn install:install-file -DgroupId=org.hibernate -DartifactId=ejb3-persistence -Dversion=3.2 -Dpackaging=jar -Dfile=../lib/ejb3-persistence-3.2.jar
