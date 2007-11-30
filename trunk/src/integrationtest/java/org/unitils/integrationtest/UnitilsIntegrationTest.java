@@ -38,7 +38,6 @@ import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.SQLUnitils;
 import org.unitils.integrationtest.dao.hibernate.HibernateSpringTest;
 import org.unitils.integrationtest.dao.hibernate.HibernateTest;
-import org.unitils.integrationtest.dao.jpa.HibernateJpaTest;
 import org.unitils.util.FileUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -64,7 +63,7 @@ public class UnitilsIntegrationTest {
 		DatabaseUnitils.cleanSchemas();
 	}
 	
-	@Test
+	/*@Test
 	public void testJpa_Commit() throws Exception {
 		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
 		System.setProperty("transactionManager.type", "simple");
@@ -95,7 +94,7 @@ public class UnitilsIntegrationTest {
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateTest.class, "testPersist");
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
+	}*/
 	
 	@Test
 	public void testHibernate_Commit() throws Exception {
@@ -157,7 +156,7 @@ public class UnitilsIntegrationTest {
         RunNotifier runNotifier = new RunNotifier();
         runNotifier.addListener(result.createListener());
 	    
-        UnitilsJUnit4TestClassRunner jpaTestRunner = new UnitilsJUnit4TestClassRunner(testClass) {
+        UnitilsJUnit4TestClassRunner testRunner = new UnitilsJUnit4TestClassRunner(testClass) {
 
 			@Override
 			protected List<Method> getTestMethods() {
@@ -165,7 +164,7 @@ public class UnitilsIntegrationTest {
 			}
         	
         };
-        jpaTestRunner.run(runNotifier);
+        testRunner.run(runNotifier);
         
         for (Failure failure : result.getFailures()) {
         	logger.error("Failure exception", failure.getException());
