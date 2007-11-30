@@ -44,10 +44,10 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(UnitilsJUnit4TestClassRunner.class);
 
-    private boolean shutdownHookCreated = false;
+    private static boolean shutdownHookCreated = false;
     
     /* True if beforeAll was successfully called */
-    private boolean beforeAllCalled = false;
+    private static boolean beforeAllCalled = false;
 
 
     /**
@@ -253,7 +253,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 	 * @return The unitils test listener
 	 */
 	protected TestListener getTestListener() {
-		return Unitils.getInstance().getTestListener();
+		return getUnitils().getTestListener();
 	}
 }
 

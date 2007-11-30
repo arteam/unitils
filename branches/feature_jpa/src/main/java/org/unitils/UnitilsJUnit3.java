@@ -251,7 +251,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
 	 * @return The unitils test listener
 	 */
 	protected TestListener getTestListener() {
-		return Unitils.getInstance().getTestListener();
+		return getUnitils().getTestListener();
 	}
 
 }

@@ -69,12 +69,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @BeforeClass
     public static void classSetUp() {
-        oldTestListenerUnitilsJUnit3 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit3.class, "testListener", true));
-        oldTestListenerUnitilsJUnit4 = (TestListener) ReflectionUtils.getFieldValue(null, ReflectionUtils.getFieldWithName(UnitilsJUnit4TestClassRunner.class, "testListener", true));
-
-        injectIntoStatic(null, UnitilsJUnit3.class, "testListener");
-        injectIntoStatic(null, UnitilsJUnit4TestClassRunner.class, "testListener");
-
         tracingTestListener = new TracingTestListener();
 
         UnitilsJUnit3Test_TestClass1.setTracingTestListener(tracingTestListener);
@@ -88,8 +82,6 @@ public class UnitilsInvocationExceptionTest {
      */
     @AfterClass
     public static void classTearDown() {
-        injectIntoStatic(oldTestListenerUnitilsJUnit3, UnitilsJUnit3.class, "testListener");
-        injectIntoStatic(oldTestListenerUnitilsJUnit4, UnitilsJUnit4TestClassRunner.class, "testListener");
     }
 
 

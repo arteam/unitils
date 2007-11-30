@@ -15,6 +15,8 @@
  */
 package org.unitils.integrationtest;
 
+import static org.unitils.inject.util.InjectionUtils.injectIntoStatic;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +43,8 @@ import org.unitils.util.FileUtils;
 import org.unitils.util.ReflectionUtils;
 
 /**
+ * Integration tests that verify whether unitils behaves correctly in different test environment configurations.
+ * 
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -56,6 +60,7 @@ public class UnitilsIntegrationTest {
 	
 	@Before
 	public void cleanDatabase() {
+		injectIntoStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
 		DatabaseUnitils.cleanSchemas();
 	}
 	

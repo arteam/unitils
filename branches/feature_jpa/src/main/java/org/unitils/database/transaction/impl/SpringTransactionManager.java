@@ -227,42 +227,46 @@ public class SpringTransactionManager implements TransactionManager {
 		}
 		
 		protected Connection doGetConnection() {
-			PlatformTransactionManager springTransactionManager = getSpringTransactionManager(getTestObject());
-			if (springTransactionManager instanceof ResourceTransactionManager) {
-				Object resourceFactory = ((ResourceTransactionManager) springTransactionManager).getResourceFactory();
-				for (SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler : getSpringModule().getTransactionalConnectionHandlers()) {
-					if (transactionalConnectionHandler.getResourceFactoryType().isAssignableFrom(resourceFactory.getClass())) {
-						return transactionalConnectionHandler.getTransactionalConnection(resourceFactory);
+			if (isTransactionActive(getTestObject())) {
+				PlatformTransactionManager springTransactionManager = getSpringTransactionManager(getTestObject());
+				if (springTransactionManager instanceof ResourceTransactionManager) {
+					Object resourceFactory = ((ResourceTransactionManager) springTransactionManager).getResourceFactory();
+					for (SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler : getSpringModule().getTransactionalConnectionHandlers()) {
+						if (transactionalConnectionHandler.getResourceFactoryType().isAssignableFrom(resourceFactory.getClass())) {
+							return transactionalConnectionHandler.getTransactionalConnection(resourceFactory);
+						}
 					}
-				}
-				// TODO Externalize to hibernate JPA module, hibernate specific
-				if (resourceFactory instanceof EntityManagerFactory) {
-					return ((Session)EntityManagerFactoryUtils.getTransactionalEntityManager((EntityManagerFactory) resourceFactory).getDelegate()).connection();
-				}
-				if (!(resourceFactory instanceof DataSource)) {
-					throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
+					// TODO Externalize to hibernate JPA module, hibernate specific
+					if (resourceFactory instanceof EntityManagerFactory) {
+						return ((Session)EntityManagerFactoryUtils.getTransactionalEntityManager((EntityManagerFactory) resourceFactory).getDelegate()).connection();
+					}
+					if (!(resourceFactory instanceof DataSource)) {
+						throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
+					}
 				}
 			}
 			return DataSourceUtils.getConnection(proxiedDataSource);
 		}
 		
 		protected void doReleaseConnection(Connection connection) throws SQLException {
-			PlatformTransactionManager springTransactionManager = getSpringTransactionManager(getTestObject());
-			if (springTransactionManager instanceof ResourceTransactionManager) {
-				Object resourceFactory = ((ResourceTransactionManager) springTransactionManager).getResourceFactory();
-				for (SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler : getSpringModule().getTransactionalConnectionHandlers()) {
-					if (transactionalConnectionHandler.getResourceFactoryType().isAssignableFrom(resourceFactory.getClass())) {
-						transactionalConnectionHandler.releaseTransactionalConnection(connection);
+			if (isTransactionActive(getTestObject())) {
+				PlatformTransactionManager springTransactionManager = getSpringTransactionManager(getTestObject());
+				if (springTransactionManager instanceof ResourceTransactionManager) {
+					Object resourceFactory = ((ResourceTransactionManager) springTransactionManager).getResourceFactory();
+					for (SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler : getSpringModule().getTransactionalConnectionHandlers()) {
+						if (transactionalConnectionHandler.getResourceFactoryType().isAssignableFrom(resourceFactory.getClass())) {
+							transactionalConnectionHandler.releaseTransactionalConnection(connection);
+							return;
+						}
+					}
+					// TODO Externalize to hibernate JPA module, hibernate specific
+					if (resourceFactory instanceof EntityManagerFactory) {
+						connection.close();
 						return;
 					}
-				}
-				// TODO Externalize to hibernate JPA module, hibernate specific
-				if (resourceFactory instanceof EntityManagerFactory) {
-					connection.close();
-					return;
-				}
-				if (!(resourceFactory instanceof DataSource)) {
-					throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
+					if (!(resourceFactory instanceof DataSource)) {
+						throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
+					}
 				}
 			}
 			DataSourceUtils.releaseConnection(connection, proxiedDataSource);
