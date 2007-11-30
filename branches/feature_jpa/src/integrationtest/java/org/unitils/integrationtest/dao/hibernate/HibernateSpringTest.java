@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.database.annotations.Transactional;
+import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
@@ -32,7 +34,7 @@ public class HibernateSpringTest extends UnitilsJUnit4 {
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Person userFromDb = (Person) SessionFactoryUtils.getSession(sessionFactory, true).get(Person.class, 1L);
+    	Person userFromDb = (Person) sessionFactory.getCurrentSession().get(Person.class, 1L);
     	ReflectionAssert.assertLenEquals(person, userFromDb);
     }
 
@@ -40,7 +42,7 @@ public class HibernateSpringTest extends UnitilsJUnit4 {
     @DataSet("../datasets/NoPersons.xml")
     @ExpectedDataSet("../datasets/SinglePerson-result.xml")
     public void testPersist() {
-    	SessionFactoryUtils.getSession(sessionFactory, true).persist(person);
+    	sessionFactory.getCurrentSession().persist(person);
     }
 
 	

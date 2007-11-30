@@ -51,7 +51,7 @@ public class UnitilsIntegrationTest {
 	@BeforeClass
 	public static void initConfiguration() {
 		System.setProperty("unitils.configuration.customFileName", "org/unitils/integrationtest/unitils-integrationtest.properties");
-		FileUtils.copyClassPathResource("dbscripts/01_createPersonTable.sql", "C:/Temp/unitilsintegrationtests");
+		FileUtils.copyClassPathResource("dao/dbscripts/01_createPersonTable.sql", "C:/Temp/unitilsintegrationtests");
 	}
 	
 	@Before
@@ -82,6 +82,17 @@ public class UnitilsIntegrationTest {
 	}
 	
 	@Test
+	public void testHibernate_NoTransaction() throws Exception {
+		System.setProperty("DatabaseModule.Transactional.value.default", "disabled");
+		System.setProperty("transactionManager.type", "simple");
+		Unitils.initSingletonInstance();
+		runTest(HibernateTest.class, "testFindById");
+		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+		runTest(HibernateTest.class, "testPersist");
+		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+	}
+	
+	@Test
 	public void testHibernate_Commit() throws Exception {
 		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
 		System.setProperty("transactionManager.type", "simple");
@@ -101,6 +112,17 @@ public class UnitilsIntegrationTest {
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateTest.class, "testPersist");
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+	}
+	
+	@Test
+	public void testHibernateSpring_Disabled() throws Exception {
+		System.setProperty("DatabaseModule.Transactional.value.default", "disabled");
+		System.setProperty("transactionManager.type", "spring");
+		Unitils.initSingletonInstance();
+		runTest(HibernateSpringTest.class, "testFindById");
+		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+		runTest(HibernateSpringTest.class, "testPersist");
+		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 	}
 	
 	@Test
