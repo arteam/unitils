@@ -3,7 +3,7 @@
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils</artifactId>
-    <version>1.0-rc-5</version>
+    <version>1.1-alpha-1</version>
     <packaging>jar</packaging>
 
 
@@ -188,10 +188,34 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-annotations</artifactId>
-            <version>3.2.0.ga</version>
+            <version>3.3.0.ga</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
+		<dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-commons-annotations</artifactId>
+            <version>3.3.0.ga</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+		<dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>3.3.1.ga</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>ejb</artifactId>
+			<version>3.0-public_review</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.0.1B</version>
+		</dependency>
         <dependency>
             <groupId>hsqldb</groupId>
             <artifactId>hsqldb</artifactId>

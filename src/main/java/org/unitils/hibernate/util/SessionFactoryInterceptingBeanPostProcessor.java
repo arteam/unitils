@@ -88,6 +88,7 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
                 throw new UnitilsException("More than one SessionFactory is configured in the spring configuration. This is not supported in Unitils");
             }
             processedBeanName = beanName;
+            sessionFactory = wrapSessionFactory((SessionFactory) ((LocalSessionFactoryBean)bean).getObject());
             configuration = ((LocalSessionFactoryBean) bean).getConfiguration();
         }
         return bean;
