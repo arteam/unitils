@@ -15,15 +15,14 @@
  */
 package org.unitils.util;
 
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import junit.framework.TestCase;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,7 +43,7 @@ public class ModuleUtilsTest extends TestCase {
      * Initializes the test fixture.
      */
     @Override
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
 
         configuration.setProperty("ModuleUtilsTest.TestModule.ModuleUtilsTest.TestAnnotation1.testEnum.default", "VALUE1");

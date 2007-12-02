@@ -186,19 +186,18 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-		<dependency>
+	  <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-commons-annotations</artifactId>
             <version>3.3.0.ga</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-			<version>1.0.1B</version>
-		</dependency>
-
+	  <dependency>
+		<groupId>javax.transaction</groupId>
+		<artifactId>jta</artifactId>
+		<version>1.0.1B</version>
+	  </dependency>
         <dependency>
             <groupId>hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
