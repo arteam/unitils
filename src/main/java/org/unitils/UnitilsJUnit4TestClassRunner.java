@@ -44,10 +44,11 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(UnitilsJUnit4TestClassRunner.class);
 
-    private static boolean shutdownHookCreated = false;
-    
-    /* True if beforeAll was successfully called */
-    private static boolean beforeAllCalled = false;
+    /* The main test listener, that hooks this test into unitils */
+    private static TestListener testListener;
+
+    /* True if beforeAll was succesfully called */
+    private static boolean beforeAllCalled;
 
 
     /**
@@ -59,9 +60,9 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
     public UnitilsJUnit4TestClassRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
 
-        if (!shutdownHookCreated) {
+        if (testListener == null) {
+            testListener = getUnitils().createTestListener();
             createShutdownHook();
-            shutdownHookCreated = true;
         }
     }
 
@@ -71,7 +72,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         // if this is the first test, call beforeAll
         if (!beforeAllCalled) {
             try {
-                getTestListener().beforeAll();
+                testListener.beforeAll();
                 beforeAllCalled = true;
 
             } catch (Throwable t) {
@@ -89,14 +90,14 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
         Throwable throwable = null;
         try {
-        	getTestListener().beforeTestClass(getTestClass().getJavaClass());
+            testListener.beforeTestClass(getTestClass().getJavaClass());
             classRoadie.runProtected();
         } catch (Throwable t) {
             notifier.fireTestFailure(new Failure(getDescription(), t));
             throwable = t;
         }
         try {
-        	getTestListener().afterTestClass(getTestClass().getJavaClass());
+            testListener.afterTestClass(getTestClass().getJavaClass());
         } catch (Throwable t) {
             // first exception is typically the most meaningful, so ignore second exception
             if (throwable == null) {
@@ -123,32 +124,14 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
             return;
         }
         TestMethod testMethod = wrapMethod(method);
-        getMethodRoadie(method, notifier, description, testObject, testMethod).run();
+        new CustomMethodRoadie(testObject, method, testMethod, notifier, description).run();
     }
-
-
-    /**
-     * Returns the JUnit 4 MethodRoadie object that is used to execute the test method
-     * 
-     * @param method
-     * @param notifier
-     * @param description
-     * @param testObject
-     * @param testMethod
-     * @return An implementation of <code>org.junit.internal.runners.MethodRoadie</code>
-     */
-	protected MethodRoadie getMethodRoadie(Method method,
-			RunNotifier notifier, Description description, Object testObject,
-			TestMethod testMethod) {
-		
-		return new TestListenerInvokingMethodRoadie(testObject, method, testMethod, notifier, description);
-	}
 
 
     /**
      * Custom method roadie that invokes the unitils test listener methods at the apropriate moments.
      */
-    protected class TestListenerInvokingMethodRoadie extends MethodRoadie {
+    public static class CustomMethodRoadie extends MethodRoadie {
 
 
         /* Instance under test */
@@ -167,7 +150,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
          * @param notifier        The run listener, not null
          * @param description     A test description
          */
-        public TestListenerInvokingMethodRoadie(Object testObject, Method testMethod, TestMethod jUnitTestMethod, RunNotifier notifier, Description description) {
+        public CustomMethodRoadie(Object testObject, Method testMethod, TestMethod jUnitTestMethod, RunNotifier notifier, Description description) {
             super(testObject, jUnitTestMethod, notifier, description);
             this.testObject = testObject;
             this.testMethod = testMethod;
@@ -181,14 +164,14 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         public void runBeforesThenTestThenAfters(Runnable test) {
             Throwable throwable = null;
             try {
-            	getTestListener().beforeTestSetUp(testObject);
+                testListener.beforeTestSetUp(testObject);
                 super.runBeforesThenTestThenAfters(test);
             } catch (Throwable t) {
                 addFailure(t);
                 throwable = t;
             }
             try {
-            	getTestListener().afterTestTearDown(testObject);
+                testListener.afterTestTearDown(testObject);
             } catch (Throwable t) {
                 // first exception is typically the most meaningful, so ignore second exception
                 if (throwable == null) {
@@ -201,14 +184,14 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         protected void runTestMethod() {
             Throwable throwable = null;
             try {
-            	getTestListener().beforeTestMethod(testObject, testMethod);
+                testListener.beforeTestMethod(testObject, testMethod);
                 super.runTestMethod();
             } catch (Throwable t) {
                 addFailure(t);
                 throwable = t;
             }
             try {
-            	getTestListener().afterTestMethod(testObject, testMethod, throwable);
+                testListener.afterTestMethod(testObject, testMethod, throwable);
             } catch (Throwable t) {
                 // first exception is typically the most meaningful, so ignore second exception
                 if (throwable == null) {
@@ -242,18 +225,11 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                if (getTestListener() != null) {
-                	getTestListener().afterAll();
+                if (testListener != null) {
+                    testListener.afterAll();
                 }
             }
         });
     }
-    
-    /**
-	 * @return The unitils test listener
-	 */
-	protected TestListener getTestListener() {
-		return getUnitils().getTestListener();
-	}
 }
 

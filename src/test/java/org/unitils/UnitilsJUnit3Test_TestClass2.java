@@ -89,7 +89,7 @@ public class UnitilsJUnit3Test_TestClass2 extends UnitilsJUnit3 {
             return new Unitils() {
 
             	@Override
-                public TestListener getTestListener() {
+                public TestListener createTestListener() {
                     return tracingTestListener;
                 }
             };

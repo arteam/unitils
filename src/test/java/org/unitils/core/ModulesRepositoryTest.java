@@ -151,7 +151,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 		public void init(Properties configuration) {
 		}
 
-		public TestListener getTestListener() {
+		public TestListener createTestListener() {
 			return new TestListener1();
 		}
 
@@ -166,7 +166,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 	private static class TestModule2 extends TestModule1 implements Module {
 
 		@Override
-		public TestListener getTestListener() {
+		public TestListener createTestListener() {
 			return new TestListener2();
 		}
 

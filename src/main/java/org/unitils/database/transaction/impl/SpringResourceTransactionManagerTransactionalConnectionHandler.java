@@ -21,7 +21,8 @@ import java.sql.SQLException;
 /**
  * Specifies contract for implementations that retrieve and release a <code>java.sql.Connection</code> that takes
  * part in the current transaction, given the fact that a spring <code>ResourceTransactionManager</code> is used 
- * for test transaction management.
+ * for transaction management. A transactional connection can be retrieved using {@link #getTransactionalConnection(Object)}
+ * This Connection can be returned to the connection pool by invoking Connection.close(). 
  *  
  * @author Filip Neven
  * @author Tim Ducheyne

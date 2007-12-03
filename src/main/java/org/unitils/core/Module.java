@@ -20,7 +20,7 @@ import java.util.Properties;
 /**
  * A type for modules that offer services to tests.
  * Before a module is used, {@link #init} will be called so that it can initialize itself. After initialization,
- * {@link #getTestListener()} will be called, so that the module can create a callback that can plug into
+ * {@link #createTestListener()} will be called, so that the module can create a callback that can plug into
  * the test exucution sequence. See {@link TestListener} javadoc for more info.
  *
  * @author Tim Ducheyne
@@ -42,7 +42,7 @@ public interface Module {
      *
      * @return The test listener, not null
      */
-    public TestListener getTestListener();
+    public TestListener createTestListener();
 
 
 }
