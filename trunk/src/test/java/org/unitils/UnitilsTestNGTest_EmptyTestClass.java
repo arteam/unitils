@@ -51,7 +51,7 @@ public class UnitilsTestNGTest_EmptyTestClass extends UnitilsTestNG {
             return new Unitils() {
 
             	@Override
-                public TestListener getTestListener() {
+                public TestListener createTestListener() {
                     return tracingTestListener;
                 }
             };

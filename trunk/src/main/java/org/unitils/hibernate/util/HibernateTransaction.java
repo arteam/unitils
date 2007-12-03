@@ -24,62 +24,119 @@ import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.TransactionManager;
 
 /**
+ * Implementation of a hibernate <code>org.hibernate.Transaction</code>. Couples calls to the 
+ * hibernate transaction API to the transaction system used in Unitils.
+ * <p>
+ * This means that, if a transaction is started using Hibernate's transaction API, a transaction
+ * is started on the Unitils transaction manager under the hoods, and that Hibernate obtains 
+ * Connections that are unit test transaction scoped.
+ * 
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class HibernateTransaction implements Transaction {
 
+	/**
+	 * Is the current transaction was committed?
+	 */
 	boolean committed;
 	
+	/**
+	 * Is the current transaction was rollbacked?
+	 */
 	boolean rollbacked;
 	
+	
+	/**
+	 * Starts a Unitils transaction
+	 */
 	public void begin() throws HibernateException {
 		getUnitilsTransactionManager().startTransaction(getCurrentTestObject());
 		committed = false;
 		rollbacked = false;
 	}
 
+	
+	/**
+	 * Commits a Unitils transaction
+	 */
 	public void commit() throws HibernateException {
 		getUnitilsTransactionManager().commit(getCurrentTestObject());
 		committed = true;
 	}
 
+	
+	/**
+	 * Verifies whether a transaction is currently active
+	 */
 	public boolean isActive() throws HibernateException {
 		return getUnitilsTransactionManager().isTransactionActive(getCurrentTestObject());
 	}
 
+	
+	/**
+	 * Has no effect in Unitils, not supported
+	 */
 	public void registerSynchronization(Synchronization synchronization)
 			throws HibernateException {
 		
 		// Not supported
 	}
 
+	
+	/**
+	 * Rollbacks the current Unitils transaction
+	 */
 	public void rollback() throws HibernateException {
 		getUnitilsTransactionManager().rollback(getCurrentTestObject());
 		rollbacked = true;
 	}
 
+	
+	/**
+	 * Has no effect in Unitils, not supported
+	 */
 	public void setTimeout(int seconds) {
 		
 		// Not supported
 	}
 
+	
+	/**
+	 * @return If the current transaction was committed
+	 */
 	public boolean wasCommitted() throws HibernateException {
 		return committed;
 	}
 
+	
+	/**
+	 * @return @return If the current transaction was rollbacked
+	 */
 	public boolean wasRolledBack() throws HibernateException {
 		return rollbacked;
 	}
 	
+	
+	/**
+	 * @return The underlying Unitils transaction manager
+	 */
 	protected TransactionManager getUnitilsTransactionManager() {
 		return getDatabaseModule().getTransactionManager();
 	}
 	
+	
+	/**
+	 * @return The current test objects
+	 */
 	protected Object getCurrentTestObject() {
 		return Unitils.getInstance().getTestContext().getTestObject();
 	}
 	
+	
+	/**
+	 * @return The {@link DatabaseModule}
+	 */
 	protected DatabaseModule getDatabaseModule() {
 		return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
 	}

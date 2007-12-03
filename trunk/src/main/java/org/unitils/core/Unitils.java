@@ -19,8 +19,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
-import org.unitils.core.util.UnitilsClassLoader;
-
 /**
  * Core class of the Unitils library, and the main entry point that gives access to the {@link TestContext} and the
  * different {@link Module}s.
@@ -77,8 +75,6 @@ public class Unitils implements Module {
     }
 
 
-    private TestListener testListener;
-    
     /* Repository for all modules that are currently active in Unitils */
     private ModulesRepository modulesRepository;
 
@@ -87,8 +83,6 @@ public class Unitils implements Module {
 
     /* Object keeping track of the unit test that is currently running */
     private TestContext testContext;
-    
-    private UnitilsClassLoader unitilsClassLoader;
 
 
     /**
@@ -96,7 +90,6 @@ public class Unitils implements Module {
      */
     public Unitils() {
         testContext = new TestContext();
-        initClassLoader();
     }
 
 
@@ -128,24 +121,17 @@ public class Unitils implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
-        testListener = new UnitilsTestListener();
-    }
-    
-    
-    protected void initClassLoader() {
-    	unitilsClassLoader = new UnitilsClassLoader();
-    	Thread.currentThread().setContextClassLoader(unitilsClassLoader);
     }
 
 
     /**
-     * Returns the single instance of {@link TestListener}. This instance provides hook callback methods that enable intervening
+     * Creates a new instance of {@link TestListener}. This instance provides hook callback methods that enable intervening
      * during the execution of unit tests.
      *
-     * @return The single {@link TestListener}
+     * @return A new instance of {@link TestListener}
      */
-    public TestListener getTestListener() {
-        return testListener;
+    public TestListener createTestListener() {
+        return new UnitilsTestListener();
     }
 
 
@@ -181,14 +167,6 @@ public class Unitils implements Module {
 
 
     /**
-     * @return The ClassLoader that is used to load classes in unitils
-     */
-    public UnitilsClassLoader getUnitilsClassLoader() {
-		return unitilsClassLoader;
-	}
-
-
-	/**
      * Configures all unitils modules using the given <code>Properties</code> object, and stores them in a {@link
      * ModulesRepository}. The configuration of the modules is delegated to a {@link ModulesLoader} instance.
      *

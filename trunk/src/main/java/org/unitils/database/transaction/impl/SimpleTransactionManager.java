@@ -139,14 +139,6 @@ public class SimpleTransactionManager implements TransactionManager {
 		logger.debug("Rolling back transaction");
 		transactionalDataSource.rollbackTransaction();
 	}
-	
-	
-	public boolean isTransactionActive(Object testObject) {
-		return transactionActiveFor.get() != null;
-	}
-
-
-
 
 
 	// todo javadoc
@@ -337,7 +329,8 @@ public class SimpleTransactionManager implements TransactionManager {
 				// No transaction has been initiated. Simply return a connection from the underlying DataSource
 				Connection connection = getConnectionMethod.getConnection();
 				// Switch to auto commit if necessary. This is very expensive in some JDBC drivers, so we don't want to
-				// do it unnecessarily
+				// do
+				// it unnecessarily
 				if (!connection.getAutoCommit()) {
 					connection.setAutoCommit(true);
 				}

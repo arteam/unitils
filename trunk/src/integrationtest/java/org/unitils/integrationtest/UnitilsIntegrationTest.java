@@ -97,6 +97,17 @@ public class UnitilsIntegrationTest {
 	}*/
 	
 	@Test
+	public void testHibernate_Disabled() throws Exception {
+		System.setProperty("DatabaseModule.Transactional.value.default", "disabled");
+		System.setProperty("transactionManager.type", "simple");
+		Unitils.initSingletonInstance();
+		runTest(HibernateTest.class, "testFindById");
+		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+		runTest(HibernateTest.class, "testPersist");
+		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+	}
+	
+	@Test
 	public void testHibernate_Commit() throws Exception {
 		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
 		System.setProperty("transactionManager.type", "simple");

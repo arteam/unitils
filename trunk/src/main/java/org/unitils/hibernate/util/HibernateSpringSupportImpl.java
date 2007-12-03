@@ -41,7 +41,6 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
         LocalSessionFactoryBean.class.getName();
         // Register the BeanPostProcessor that intercepts SessionFactory creation
         getSpringModule().registerBeanPostProcessorType(SessionFactoryInterceptingBeanPostProcessor.class);
-        getSpringModule().registerSpringResourceTransactionManagerTransactionalConnectionHandler(new HibernateTransactionManagerTransactionalConnectionHandler());
     }
 
 

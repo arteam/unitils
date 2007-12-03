@@ -280,9 +280,11 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
-        if (isTransactionsEnabled(testObject)) {
-        	getTransactionManager().startTransaction(testObject);
+        TransactionMode transactionMode = getTransactionMode(testObject);
+        if (transactionMode == DISABLED) {
+            return;
         }
+        getTransactionManager().startTransaction(testObject);
     }
 
 
@@ -293,20 +295,17 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     protected void endTransaction(Object testObject) {
-        if (isTransactionsEnabled(testObject)) {
-	        if (getTransactionMode(testObject) == COMMIT) {
-	            getTransactionManager().commit(testObject);
-	        } else if (getTransactionMode(testObject) == ROLLBACK) {
-	            getTransactionManager().rollback(testObject);
-	        }
+        TransactionMode transactionMode = getTransactionMode(testObject);
+        if (transactionMode == DISABLED) {
+            return;
+        }
+        TransactionManager transactionManager = getTransactionManager();
+        if (transactionMode == COMMIT) {
+            transactionManager.commit(testObject);
+        } else if (getTransactionMode(testObject) == ROLLBACK) {
+            transactionManager.rollback(testObject);
         }
     }
-
-
-	public boolean isTransactionsEnabled(Object testObject) {
-		TransactionMode transactionMode = getTransactionMode(testObject);
-        return transactionMode != DISABLED;
-	}
     
     
     /**
@@ -372,7 +371,7 @@ public class DatabaseModule implements Module {
     /**
      * @return The {@link TestListener} associated with this module
      */
-    public TestListener getTestListener() {
+    public TestListener createTestListener() {
         return new DatabaseTestListener();
     }
 

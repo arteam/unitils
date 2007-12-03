@@ -40,7 +40,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
 
     private DatabaseModule databaseModule;
 
-    private TransactionsDisabledTest noApplicationContextTest;
+    private NoApplicationContextTest noApplicationContextTest;
 
     private RollbackTest rollbackTest;
 
@@ -55,7 +55,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         Unitils.getInstance().init(configuration);
         databaseModule = getDatabaseModule();
 
-        noApplicationContextTest = new TransactionsDisabledTest();
+        noApplicationContextTest = new NoApplicationContextTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
     }
@@ -75,7 +75,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * associated with the test.
      */
     @Test
-    public void testTransactionsDisabled() throws Exception {
+    public void testNoSpringTransactionManagerConfigured() throws Exception {
         mockConnection1.close();
         mockConnection2.close();
         replay(mockConnection1, mockConnection2);
@@ -142,9 +142,8 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * Class that plays the role of a unit test, with transaction rollback enabled, but no spring application context
      * configured, so no transaction will be started
      */
-    @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
     @Transactional(DISABLED)
-    public static class TransactionsDisabledTest {
+    public static class NoApplicationContextTest {
 
         public void test() {
         }
@@ -153,7 +152,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
 
     /**
      * Class that plays the role of a unit test, with a TransactionManager configured in a spring application context,
-     * with transaction rollback enabled
+     * with transaction rollback enabled (=default, so no
      *
      * @Transactional annotation required
      */

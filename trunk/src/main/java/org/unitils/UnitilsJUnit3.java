@@ -40,9 +40,10 @@ public abstract class UnitilsJUnit3 extends TestCase {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(UnitilsJUnit3.class);
 
-    private static boolean shutdownHookCreated;
-    
-    /* True if this is the first unit test that is executed during this test run */
+    /* The main test listener, that hooks this test into unitils */
+    private static TestListener testListener;
+
+    /* True if beforeAll was succesfully called */
     private static boolean beforeAllCalled;
 
     /* The class to which the last test belonged to */
@@ -65,9 +66,9 @@ public abstract class UnitilsJUnit3 extends TestCase {
     public UnitilsJUnit3(String name) {
         super(name);
 
-        if (!shutdownHookCreated) {
-        	createShutdownHook();
-        	shutdownHookCreated = true;
+        if (testListener == null) {
+            testListener = getUnitils().createTestListener();
+            createShutdownHook();
         }
     }
 
@@ -82,7 +83,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
         try {
             // if this the first test, call beforeAll
             if (!beforeAllCalled) {
-                getTestListener().beforeAll();
+                testListener.beforeAll();
                 beforeAllCalled = true;
             }
         } catch (AssertionFailedError e) {
@@ -121,19 +122,19 @@ public abstract class UnitilsJUnit3 extends TestCase {
         if (lastTestClass != testClass) {
             if (lastTestClass != null) {
                 try {
-                    getTestListener().afterTestClass(lastTestClass);
+                    testListener.afterTestClass(lastTestClass);
 
                 } catch (Throwable e) {
                     logger.error("An exception occured during afterTestClass.", e);
                 }
             }
-            getTestListener().beforeTestClass(testClass);
+            testListener.beforeTestClass(testClass);
             lastTestClass = testClass;
         }
 
         Throwable firstThrowable = null;
         try {
-            getTestListener().beforeTestSetUp(this);
+            testListener.beforeTestSetUp(this);
             super.runBare();
 
         } catch (Throwable t) {
@@ -142,7 +143,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
         }
 
         try {
-            getTestListener().afterTestTearDown(this);
+            testListener.afterTestTearDown(this);
 
         } catch (Throwable t) {
             // first exception is typically the most meaningful, so ignore second exception
@@ -166,7 +167,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
     protected void runTest() throws Throwable {
         Throwable firstThrowable = null;
         try {
-            getTestListener().beforeTestMethod(this, getCurrentTestMethod());
+            testListener.beforeTestMethod(this, getCurrentTestMethod());
             super.runTest();
 
         } catch (Throwable t) {
@@ -175,7 +176,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
         }
 
         try {
-            getTestListener().afterTestMethod(this, getCurrentTestMethod(), firstThrowable);
+            testListener.afterTestMethod(this, getCurrentTestMethod(), firstThrowable);
 
         } catch (Throwable t) {
             // first exception is typically the most meaningful, so ignore second exception
@@ -236,22 +237,14 @@ public abstract class UnitilsJUnit3 extends TestCase {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                if (getTestListener() != null) {
+                if (testListener != null) {
                     if (lastTestClass != null) {
-                        getTestListener().afterTestClass(lastTestClass);
+                        testListener.afterTestClass(lastTestClass);
                     }
-                    getTestListener().afterAll();
+                    testListener.afterAll();
                 }
             }
         });
     }
-    
-    
-    /**
-	 * @return The unitils test listener
-	 */
-	protected TestListener getTestListener() {
-		return getUnitils().getTestListener();
-	}
 
 }

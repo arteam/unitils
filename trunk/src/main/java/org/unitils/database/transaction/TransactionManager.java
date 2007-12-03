@@ -29,6 +29,7 @@ public interface TransactionManager {
 
     /**
      * Makes the given data source a transactional datasource.
+     * If no action needs to be performed, the given data source should be returned.
      * <p/>
      * This could for example be used to wrap the given data source for intercepting the creation of connections.
      *
@@ -62,12 +63,6 @@ public interface TransactionManager {
      * @param testObject The test instance, not null
      */
     void rollback(Object testObject);
-    
-    
-    /**
-     * @param testObject The test instance, not null
-     * @return Whether or not a transaction has been started, and hasn't been committed nor rollbacked yet
-     */
-    boolean isTransactionActive(Object testObject);
+
 
 }

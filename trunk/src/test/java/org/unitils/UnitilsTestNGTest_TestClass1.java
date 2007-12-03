@@ -109,7 +109,7 @@ public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNG {
             return new Unitils() {
 
                 @Override
-                public TestListener getTestListener() {
+                public TestListener createTestListener() {
                     return tracingTestListener;
                 }
             };

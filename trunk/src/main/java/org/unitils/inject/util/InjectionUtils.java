@@ -52,7 +52,7 @@ public class InjectionUtils {
      * @param property       The OGNL expression that defines where the object will be injected, not null
      * @return The object that was replaced by the injection
      */
-    public static Object injectInto(Object objectToInject, Object target, String property) {
+    public static Object inject(Object objectToInject, Object target, String property) {
         if (target == null) {
             throw new UnitilsException("Target for injection should not be null");
         }
@@ -86,7 +86,7 @@ public class InjectionUtils {
      * @param property       The OGNL expression that defines where the object will be injected, not null
      * @return The object that was replaced by the injection
      */
-    public static Object injectIntoStatic(Object objectToInject, Class<?> targetClass, String property) {
+    public static Object injectStatic(Object objectToInject, Class<?> targetClass, String property) {
         String staticProperty = StringUtils.substringBefore(property, ".");
         if (property.equals(staticProperty)) {
             // Simple property: directly set value on this property
@@ -105,7 +105,7 @@ public class InjectionUtils {
             Object objectToInjectInto = getValueStatic(targetClass, staticProperty);
             String remainingPropertyPart = StringUtils.substringAfter(property, ".");
             try {
-                return injectInto(objectToInject, objectToInjectInto, remainingPropertyPart);
+                return inject(objectToInject, objectToInjectInto, remainingPropertyPart);
 
             } catch (UnitilsException e) {
                 throw new UnitilsException("Property named " + remainingPropertyPart + " not found on " + objectToInjectInto.getClass().getSimpleName(), e);
@@ -124,14 +124,14 @@ public class InjectionUtils {
      * @param propertyAccess     Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
-    public static Object injectIntoByType(Object objectToInject, Class<?> objectToInjectType, Object target, PropertyAccess propertyAccess) {
+    public static Object autoInject(Object objectToInject, Class<?> objectToInjectType, Object target, PropertyAccess propertyAccess) {
         if (target == null) {
             throw new UnitilsException("Target for injection should not be null");
         }
         if (propertyAccess == PropertyAccess.FIELD) {
-            return injectIntoFieldByType(objectToInject, objectToInjectType, target, target.getClass(), false);
+            return autoInjectToField(objectToInject, objectToInjectType, target, target.getClass(), false);
         }
-        return injectIntoSetterByType(objectToInject, objectToInjectType, target, target.getClass(), false);
+        return autoInjectToSetter(objectToInject, objectToInjectType, target, target.getClass(), false);
     }
 
 
@@ -145,11 +145,11 @@ public class InjectionUtils {
      * @param propertyAccess     Defines if field or setter injection is used
      * @return The object that was replaced by the injection
      */
-    public static Object injectIntoStaticByType(Object objectToInject, Class<?> objectToInjectType, Class<?> targetClass, PropertyAccess propertyAccess) {
+    public static Object autoInjectStatic(Object objectToInject, Class<?> objectToInjectType, Class<?> targetClass, PropertyAccess propertyAccess) {
         if (propertyAccess == PropertyAccess.FIELD) {
-            return injectIntoFieldByType(objectToInject, objectToInjectType, null, targetClass, true);
+            return autoInjectToField(objectToInject, objectToInjectType, null, targetClass, true);
         }
-        return injectIntoSetterByType(objectToInject, objectToInjectType, null, targetClass, true);
+        return autoInjectToSetter(objectToInject, objectToInjectType, null, targetClass, true);
     }
 
 
@@ -167,7 +167,7 @@ public class InjectionUtils {
      * @param isStatic           Indicates wether injection should be performed on the target object or on the target class
      * @return The object that was replaced by the injection
      */
-    private static Object injectIntoFieldByType(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
+    private static Object autoInjectToField(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
         // Try to find a field with an exact matching type
         Field fieldToInjectTo = null;
         List<Field> fieldsWithExactType = ReflectionUtils.getFieldsOfType(targetClass, objectToInjectType, isStatic);
@@ -234,7 +234,7 @@ public class InjectionUtils {
      * @param isStatic           Indicates wether injection should be performed on the target object or on the target class
      * @return The object that was replaced by the injection
      */
-    private static Object injectIntoSetterByType(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
+    private static Object autoInjectToSetter(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
         // Try to find a method with an exact matching type
         Method setterToInjectTo = null;
         List<Method> settersWithExactType = getSettersOfType(targetClass, objectToInjectType, isStatic);
