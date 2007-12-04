@@ -232,6 +232,18 @@ public class HibernateModule implements Module, Flushable {
             sessionFactory.closeOpenSessions();
         }
     }
+    
+    
+    /**
+     * Removes all Hibernate sessions that were intercepted during this unit test.
+     */
+    public void clearInterceptedSessions(Object testObject) {
+    	if (isSessionFactoryConfiguredFor(testObject)) {
+            SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
+            // close all open sessions
+            sessionFactory.clearInterceptedSessions();
+        }
+    }
 
 
     /**
@@ -367,7 +379,10 @@ public class HibernateModule implements Module, Flushable {
         public void afterTestTearDown(Object testObject) {
         	if (autoCloseSessionsAfterTest) {
         		closeSessions(testObject);
+        	} else {
+        		clearInterceptedSessions(testObject);
         	}
         }
+
     }
 }

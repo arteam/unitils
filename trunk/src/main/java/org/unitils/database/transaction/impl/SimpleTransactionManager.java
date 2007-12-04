@@ -139,6 +139,15 @@ public class SimpleTransactionManager implements TransactionManager {
 		logger.debug("Rolling back transaction");
 		transactionalDataSource.rollbackTransaction();
 	}
+	
+
+	/**
+	 * @return Whether a transaction is currently active
+	 */
+	public boolean isTransactionActive(Object testObject) {
+		return transactionActiveFor.get() != null;
+	}
+
 
 
 	// todo javadoc

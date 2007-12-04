@@ -482,5 +482,17 @@ public class ReflectionUtils {
             throw new UnitilsException("Could not load class with name " + className, t);
         }
     }
+    
+    
+    public static Method getMethodWithName(Class<?> clazz, String methodName) {
+		try {
+			return clazz.getMethod(methodName);
+		} catch (SecurityException e) {
+			throw new UnitilsException(e);
+		} catch (NoSuchMethodException e) {
+			throw new UnitilsException(e);
+		}
+	}
+
 
 }
