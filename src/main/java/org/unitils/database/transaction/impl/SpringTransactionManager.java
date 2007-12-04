@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -32,6 +33,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.ResourceTransactionManager;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
@@ -127,6 +129,11 @@ public class SpringTransactionManager implements TransactionManager {
 		getSpringTransactionManager(testObject).rollback(transactionStatus);
 		transactionStatusHolder.remove();
 	}
+	
+	
+	public boolean isTransactionActive(Object testObject) {
+		return transactionStatusHolder.get() != null;
+	}
 
 
 	/**
@@ -165,7 +172,7 @@ public class SpringTransactionManager implements TransactionManager {
 	 * Proxy for a DataSource that makes the DataSource Spring transactional. Makes sure that connection are retrieved
 	 * and closed using Springs <code>DataSourceUtils</code>
 	 */
-	protected static class SpringTransactionalDataSourceProxyInvocationHandler implements InvocationHandler {
+	protected class SpringTransactionalDataSourceProxyInvocationHandler implements InvocationHandler {
 
 		private DataSource wrappedDataSource;
 
@@ -199,7 +206,7 @@ public class SpringTransactionManager implements TransactionManager {
 		 * @return The connection, not null
 		 */
 		protected Connection getTransactionalConnection() throws SQLException {
-			Connection connection = DataSourceUtils.getConnection(proxiedDataSource);
+			Connection connection = doGetConnection();
 			return (Connection) newProxyInstance(getClass().getClassLoader(), new Class[] { Connection.class }, new SpringConnectionProxyInvocationHandler(connection));
 		}
 		
@@ -211,7 +218,52 @@ public class SpringTransactionManager implements TransactionManager {
 		protected void setProxiedDataSource(DataSource proxiedDataSource) {
 			this.proxiedDataSource = proxiedDataSource;
 		}
-
+		
+		protected Connection doGetConnection() {
+			if (isTransactionActive(getTestObject())) {
+				PlatformTransactionManager springTransactionManager = getSpringTransactionManager(getTestObject());
+				if (springTransactionManager instanceof ResourceTransactionManager) {
+					Object resourceFactory = ((ResourceTransactionManager) springTransactionManager).getResourceFactory();
+					for (SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler : getSpringModule().getTransactionalConnectionHandlers()) {
+						if (transactionalConnectionHandler.getResourceFactoryType().isAssignableFrom(resourceFactory.getClass())) {
+							return transactionalConnectionHandler.getTransactionalConnection(resourceFactory);
+						}
+					}
+					if (!(resourceFactory instanceof DataSource)) {
+						throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
+					}
+				}
+			}
+			return DataSourceUtils.getConnection(proxiedDataSource);
+		}
+		
+		protected void doReleaseConnection(Connection connection) throws SQLException {
+			if (isTransactionActive(getTestObject())) {
+				PlatformTransactionManager springTransactionManager = getSpringTransactionManager(getTestObject());
+				if (springTransactionManager instanceof ResourceTransactionManager) {
+					Object resourceFactory = ((ResourceTransactionManager) springTransactionManager).getResourceFactory();
+					for (SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler : getSpringModule().getTransactionalConnectionHandlers()) {
+						if (transactionalConnectionHandler.getResourceFactoryType().isAssignableFrom(resourceFactory.getClass())) {
+							transactionalConnectionHandler.releaseTransactionalConnection(connection);
+							return;
+						}
+					}
+					// TODO Externalize to hibernate JPA module, hibernate specific
+					if (resourceFactory instanceof EntityManagerFactory) {
+						connection.close();
+						return;
+					}
+					if (!(resourceFactory instanceof DataSource)) {
+						throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
+					}
+				}
+			}
+			DataSourceUtils.releaseConnection(connection, proxiedDataSource);
+		}
+		
+		protected Object getTestObject() {
+			return Unitils.getInstance().getTestContext().getTestObject();
+		}
 
 		/**
 		 * Invocation handler that can be used to create Connection proxy that intercepts the call to the close()
@@ -235,7 +287,7 @@ public class SpringTransactionManager implements TransactionManager {
 
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				if (method.getName().equals("close")) {
-					DataSourceUtils.doReleaseConnection(wrappedConnection, SpringTransactionalDataSourceProxyInvocationHandler.this.proxiedDataSource);
+					doReleaseConnection(wrappedConnection);
 					return null;
 				}
 				try {

@@ -1,6 +1,5 @@
 package org.unitils.integrationtest.dao.hibernate;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;

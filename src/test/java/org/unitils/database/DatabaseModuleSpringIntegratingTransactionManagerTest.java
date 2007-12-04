@@ -40,7 +40,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
 
     private DatabaseModule databaseModule;
 
-    private NoApplicationContextTest noApplicationContextTest;
+    private TransactionsDisabledTest transactionsDisabledTest;
 
     private RollbackTest rollbackTest;
 
@@ -55,7 +55,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         Unitils.getInstance().init(configuration);
         databaseModule = getDatabaseModule();
 
-        noApplicationContextTest = new NoApplicationContextTest();
+        transactionsDisabledTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
     }
@@ -80,13 +80,13 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         mockConnection2.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransaction(noApplicationContextTest);
+        databaseModule.startTransaction(transactionsDisabledTest);
         Connection conn1 = getConnection(databaseModule.getDataSource());
         Connection conn2 = getConnection(databaseModule.getDataSource());
         assertNotSame(conn1, conn2);
         releaseConnection(conn1, databaseModule.getDataSource());
         releaseConnection(conn2, databaseModule.getDataSource());
-        databaseModule.endTransaction(noApplicationContextTest);
+        databaseModule.endTransaction(transactionsDisabledTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -142,12 +142,14 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * Class that plays the role of a unit test, with transaction rollback enabled, but no spring application context
      * configured, so no transaction will be started
      */
+    @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
     @Transactional(DISABLED)
-    public static class NoApplicationContextTest {
+    public static class TransactionsDisabledTest {
 
         public void test() {
         }
     }
+
 
 
     /**
