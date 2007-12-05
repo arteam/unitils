@@ -25,7 +25,7 @@ Summary
 
         * Automatic maintenance and constraints disabling of unit test databases
         
-           * Support for Oracle, Hsqldb and MySql (DB2 support is upcoming)
+           * Support for Oracle, Hsqldb, MySql, DB2, Postgresql and Derby 
 
         * Simplify unit test database connection setup
 
@@ -34,6 +34,8 @@ Summary
         * Simplify Hibernate session management for unit testing
 
         * Automatically test the mapping of Hibernate mapped objects with the database
+
+        * Manage transactions during unit testing
 
     []
 
@@ -73,7 +75,12 @@ Summary
 
 * News
 ~~~~~~
-	
+
+    <<2007-12-05 - Release of Unitils 1.0>>
+
+    The Unitils team is proud to announce the release of Unitils 1.0. Big thanks to everyone who has helped to make this possible!
+
+
     <<2007-10-23 - Release of Unitils 1.0 rc 5>>
   
     Release candidate 5 for Unitils is available. This will be the last release candidate before the 1.0 release. It contains some fixes, 
@@ -89,7 +96,7 @@ Summary
     We've migrated the issue and feature tracking to JIRA! Bugs and feature requests can now be reported 
     at {{{http://jira.unitils.org}http://jira.unitils.org}}. 
 
-	
+
     <<2007-08-15 - Release of Unitils 1.0 rc 4>>
   
     Release candidate 4 for Unitils is available. It contains some important fixes, support for loading multiple data sets and easier access to 
