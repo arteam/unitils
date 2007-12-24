@@ -16,6 +16,7 @@
 package org.unitils.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.junit.internal.runners.TestClass;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.*;
@@ -482,9 +483,9 @@ public class ReflectionUtils {
             throw new UnitilsException("Could not load class with name " + className, t);
         }
     }
-    
-    
-    public static Method getMethodWithName(Class<?> clazz, String methodName) {
+
+
+	public static Method getMethodWithName(Class<?> clazz, String methodName) {
 		try {
 			return clazz.getMethod(methodName);
 		} catch (SecurityException e) {
@@ -493,6 +494,5 @@ public class ReflectionUtils {
 			throw new UnitilsException(e);
 		}
 	}
-
 
 }

@@ -15,10 +15,8 @@
  */
 package org.unitils.hibernate.util;
 
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.classic.Session;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
@@ -126,8 +124,8 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
 
 
     /**
-     * Proxy for a SessionFactory that makes sure that getCurrentSession returns the correct Session and that 
-     * sessions are not closed when they are participating in a Spring transaction.
+     * Proxy for a SessionFactory that makes sure that sessions are not closed when they are participating in a
+     * Spring transaction.
      */
     protected static class SpringSessionInterceptingSessionFactory extends SessionInterceptingSessionFactory {
 
@@ -141,19 +139,6 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
             super(sessionFactory);
         }
 
-        
-        /**
-         * Gets the current session if <code>CurrentSessionContext</code> is configured.
-         *
-         * @return The current session
-         */
-        @Override
-        public Session getCurrentSession() throws HibernateException {
-            Session session = (Session) SessionFactoryUtils.getSession(this, true);
-            sessions.add(session);
-            return session;
-        }
-        
 
         /**
          * Closes and clears all open sessions.
@@ -172,7 +157,6 @@ public class SessionFactoryInterceptingBeanPostProcessor implements BeanPostProc
             }
             sessions.clear();
         }
-        
     }
 
 }

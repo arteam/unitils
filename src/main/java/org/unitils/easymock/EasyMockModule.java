@@ -96,7 +96,7 @@ public class EasyMockModule implements Module {
      *
      * @return the listener
      */
-    public TestListener createTestListener() {
+    public TestListener getTestListener() {
         return new EasyMockTestListener();
     }
 

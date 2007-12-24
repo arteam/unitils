@@ -439,7 +439,7 @@ public class InjectModule implements Module {
     /**
      * @return The {@link TestListener} for this module
      */
-    public TestListener createTestListener() {
+    public TestListener getTestListener() {
         return new InjectTestListener();
     }
 
