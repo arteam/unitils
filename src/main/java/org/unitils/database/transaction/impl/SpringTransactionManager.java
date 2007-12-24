@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -249,10 +248,10 @@ public class SpringTransactionManager implements TransactionManager {
 						}
 					}
 					// TODO Externalize to hibernate JPA module, hibernate specific
-					if (resourceFactory instanceof EntityManagerFactory) {
+					/*if (resourceFactory instanceof EntityManagerFactory) {
 						connection.close();
 						return;
-					}
+					}*/
 					if (!(resourceFactory instanceof DataSource)) {
 						throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
 					}
