@@ -172,7 +172,7 @@ public class UnitilsIntegrationTest {
 
 			@Override
 			protected List<Method> getTestMethods() {
-				return Arrays.asList(ReflectionUtils.getMethodWithName(getTestClass().getJavaClass(), testMethodName));
+				return Arrays.asList(ReflectionUtils.getMethod(getTestClass().getJavaClass(), testMethodName));
 			}
         	
         };
