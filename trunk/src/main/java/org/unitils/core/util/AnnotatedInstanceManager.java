@@ -223,14 +223,14 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
         // invoke custom create method, if there is one
         if (customCreateMethod != null) {
-            instance = invokeCustomCreateMethod(customCreateMethod, testObject, annotationValues);
+            instance = createCustomCreatedInstance(customCreateMethod, testObject, testClass, annotationValues);
         } else if (!annotationValues.isEmpty()) {
             customCreateMethod = getCustomCreateMethod(testClass, true);
             if (customCreateMethod != null) {
                 // if there are values but no custom create method, use default creation mechanism
-                instance = invokeCustomCreateMethod(customCreateMethod, testObject, annotationValues);
+                instance = createCustomCreatedInstance(customCreateMethod, testObject, testClass, annotationValues);
             } else {
-                instance = createInstanceForValues(annotationValues);
+                instance = createInstanceForValues(testObject, testClass, annotationValues);
             }
         }
 
@@ -272,7 +272,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         // check class level annotation values
         List<A> annotations = new ArrayList<A>();
         A annotation = testClass.getAnnotation(annotationClass);
-        if (annotation != null && getAnnotationValues(annotation) != null) {
+        if (annotation != null && !getAnnotationValues(annotation).isEmpty()) {
             annotations.add(annotation);
         }
 
@@ -280,7 +280,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         List<Field> fields = getFieldsAnnotatedWith(testClass, annotationClass);
         for (Field field : fields) {
             annotation = field.getAnnotation(annotationClass);
-            if (annotation != null && getAnnotationValues(annotation) != null) {
+            if (annotation != null && !getAnnotationValues(annotation).isEmpty()) {
                 annotations.add(annotation);
             }
         }
@@ -289,7 +289,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
         for (Method method : methods) {
             annotation = method.getAnnotation(annotationClass);
-            if (annotation != null && getAnnotationValues(annotation) != null) {
+            if (annotation != null && !getAnnotationValues(annotation).isEmpty()) {
                 annotations.add(annotation);
             }
         }
@@ -354,7 +354,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         // found exactly 1 custom create method ==> check correct signature
         Method customCreateMethod = customCreateMethods.get(0);
         if (!isCustomCreateMethod(customCreateMethod)) {
-            throw new UnitilsException("Custom create method annotated with @" + annotationClass.getSimpleName() + " should have following signature: " + instanceClass.getName() + " myMethod( List<String> locations ) or " + instanceClass.getName() + " myMethod()");
+            throw new UnitilsException("Custom create method annotated with @" + annotationClass.getSimpleName() + " should have following signature: " + getCustomCreateMethodReturnType().getName() + " myMethod( List<String> locations ) or " + getCustomCreateMethodReturnType().getName() + " myMethod()");
         }
         return customCreateMethod;
     }
@@ -378,11 +378,17 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         if (argumentTypes.length == 1 && argumentTypes[0] != List.class) {
             return false;
         }
-        return instanceClass.isAssignableFrom(method.getReturnType());
+        return getCustomCreateMethodReturnType().isAssignableFrom(method.getReturnType());
+    }
+    
+    
+    protected T createCustomCreatedInstance(Method customCreateMethod, Object testObject, Class<?> testClass, List<String> annotationValues) {
+    	Object customCreateMethodResult = invokeCustomCreateMethod(customCreateMethod, testObject, annotationValues);
+    	return createCustomCreatedInstanceFromCustomCreateMethodResult(testObject, testClass, customCreateMethodResult);
     }
 
 
-    /**
+	/**
      * Creates an instance by calling a custom create method (if there is one). Such a create method should have one of
      * following exact signatures:
      * <ul>
@@ -397,14 +403,14 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
      * @return The instance, null if no create method was found
      */
     @SuppressWarnings({"unchecked"})
-    protected T invokeCustomCreateMethod(Method customCreateMethod, Object testObject, List<String> annotationValues) {
-        T result;
+    protected Object invokeCustomCreateMethod(Method customCreateMethod, Object testObject, List<String> annotationValues) {
+    	Object result;
         try {
             // call method
             if (customCreateMethod.getParameterTypes().length == 0) {
-                result = (T) invokeMethod(testObject, customCreateMethod);
+                result = invokeMethod(testObject, customCreateMethod);
             } else {
-                result = (T) invokeMethod(testObject, customCreateMethod, annotationValues);
+                result = invokeMethod(testObject, customCreateMethod, annotationValues);
             }
         } catch (InvocationTargetException e) {
             throw new UnitilsException("Method " + testObject.getClass().getSimpleName() + "." + customCreateMethod + " (annotated with " + annotationClass.getSimpleName() + ") has thrown an exception", e.getCause());
@@ -415,6 +421,23 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         }
         return result;
     }
+    
+    
+    @SuppressWarnings("unchecked")
+	protected T createCustomCreatedInstanceFromCustomCreateMethodResult(
+			Object testObject, Class<?> testClass, Object customCreateMethodResult) {
+		return (T) customCreateMethodResult;
+	}
+    
+    
+    /**
+     * @return The return type of a custom create method. By default, this is the type of the managed instance.
+     * Subclasses that override this method are themselves responsible for making sure that the returned object
+     * can be used for creating an instance of the managed class.
+     */
+	protected Class<?> getCustomCreateMethodReturnType() {
+		return instanceClass;
+	}
 
 
     /**
@@ -429,9 +452,11 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
 
     /**
      * Creates an instance for the given values.
-     *
+     * @param testObject TODO
+     * @param testClass TODO
      * @param values The values, not null
+     *
      * @return The instance, not null
      */
-    abstract protected T createInstanceForValues(List<String> values);
+    abstract protected T createInstanceForValues(Object testObject, Class<?> testClass, List<String> values);
 }

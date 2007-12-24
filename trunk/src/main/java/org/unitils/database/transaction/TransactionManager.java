@@ -36,7 +36,7 @@ public interface TransactionManager {
      * @return The transactional data source, not null
      */
     TransactionalDataSource createTransactionalDataSource(DataSource dataSource);
-
+    
 
     /**
      * Starts a transaction.
@@ -62,12 +62,12 @@ public interface TransactionManager {
      * @param testObject The test instance, not null
      */
     void rollback(Object testObject);
-
+    
+    
     /**
      * @param testObject The test instance, not null
      * @return Whether or not a transaction has been started, and hasn't been committed nor rollbacked yet
      */
     boolean isTransactionActive(Object testObject);
-
 
 }

@@ -502,7 +502,7 @@ public class DbUnitModule implements Module {
     /**
      * @return The TestListener object that implements Unitils' DbUnit support
      */
-    public TestListener createTestListener() {
+    public TestListener getTestListener() {
         return new DbUnitListener();
     }
 

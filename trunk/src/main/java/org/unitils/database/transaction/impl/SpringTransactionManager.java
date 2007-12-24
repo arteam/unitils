@@ -22,12 +22,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Set;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -38,6 +44,10 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.spring.SpringModule;
+
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
+
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
  * Transaction manager that relies on Spring transaction management. When starting a Transaction, this transaction
@@ -58,8 +68,7 @@ public class SpringTransactionManager implements TransactionManager {
 	 * ThreadLocal for holding the TransactionStatus as used by spring's transaction management
 	 */
 	protected ThreadLocal<TransactionStatus> transactionStatusHolder = new ThreadLocal<TransactionStatus>();
-
-
+	
 	/**
 	 * Makes the given data source a transactional datasource. If no action needs to be performed, the given data source
 	 * should be returned. <p/> This could for example be used to wrap the given data source for intercepting the
@@ -137,14 +146,13 @@ public class SpringTransactionManager implements TransactionManager {
 
 	/**
 	 * Returns a <code>TransactionDefinition</code> object containing the necessary transaction parameters. Simply
-	 * returns a default <code>DefaultTransactionDefinition</code> object without specifying any custom properties on
-	 * it.
+	 * returns a default <code>DefaultTransactionDefinition</code> object with the 'propagation required' attribute
 	 * 
 	 * @param testObject The test object, not null
 	 * @return The default TransactionDefinition
 	 */
 	protected TransactionDefinition createTransactionDefinition(Object testObject) {
-		return new DefaultTransactionDefinition();
+		return new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRED);
 	}
 
 
@@ -228,6 +236,10 @@ public class SpringTransactionManager implements TransactionManager {
 							return transactionalConnectionHandler.getTransactionalConnection(resourceFactory);
 						}
 					}
+					// TODO Externalize to hibernate JPA module, hibernate specific
+					if (resourceFactory instanceof EntityManagerFactory) {
+						return ((Session)EntityManagerFactoryUtils.getTransactionalEntityManager((EntityManagerFactory) resourceFactory).getDelegate()).connection();
+					}
 					if (!(resourceFactory instanceof DataSource)) {
 						throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
 					}
@@ -248,10 +260,10 @@ public class SpringTransactionManager implements TransactionManager {
 						}
 					}
 					// TODO Externalize to hibernate JPA module, hibernate specific
-					/*if (resourceFactory instanceof EntityManagerFactory) {
+					if (resourceFactory instanceof EntityManagerFactory) {
 						connection.close();
 						return;
-					}*/
+					}
 					if (!(resourceFactory instanceof DataSource)) {
 						throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
 					}
@@ -263,6 +275,7 @@ public class SpringTransactionManager implements TransactionManager {
 		protected Object getTestObject() {
 			return Unitils.getInstance().getTestContext().getTestObject();
 		}
+
 
 		/**
 		 * Invocation handler that can be used to create Connection proxy that intercepts the call to the close()

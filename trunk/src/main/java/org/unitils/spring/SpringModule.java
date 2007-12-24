@@ -40,6 +40,7 @@ import org.unitils.spring.util.ApplicationContextManager;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class SpringModule implements Module {
 
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
-
+    
     private Set<SpringResourceTransactionManagerTransactionalConnectionHandler> transactionalConnectionHandlers = new HashSet<SpringResourceTransactionManagerTransactionalConnectionHandler>();
 
 
@@ -368,10 +369,10 @@ public class SpringModule implements Module {
 	}
 
 
-    /**
+	/**
      * @return The {@link TestListener} for this module
      */
-    public TestListener createTestListener() {
+    public TestListener getTestListener() {
         return new SpringTestListener();
     }
 

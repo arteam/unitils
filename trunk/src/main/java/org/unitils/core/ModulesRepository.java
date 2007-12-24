@@ -163,7 +163,7 @@ public class ModulesRepository {
     private Map<Module, TestListener> createTestListeners(List<Module> moduleList) {
         Map<Module, TestListener> result = new HashMap<Module, TestListener>(moduleList.size());
         for (Module module : moduleList) {
-            result.put(module, module.createTestListener());
+            result.put(module, module.getTestListener());
         }
         return result;
     }

@@ -38,6 +38,7 @@ import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.SQLUnitils;
 import org.unitils.integrationtest.dao.hibernate.HibernateSpringTest;
 import org.unitils.integrationtest.dao.hibernate.HibernateTest;
+import org.unitils.integrationtest.dao.jpa.HibernateJpaTest;
 import org.unitils.util.FileUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -63,7 +64,7 @@ public class UnitilsIntegrationTest {
 		DatabaseUnitils.cleanSchemas();
 	}
 	
-	/*@Test
+	@Test
 	public void testJpa_Commit() throws Exception {
 		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
 		System.setProperty("transactionManager.type", "simple");
@@ -94,14 +95,13 @@ public class UnitilsIntegrationTest {
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateTest.class, "testPersist");
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}*/
+	}
 	
 	@Test
 	public void testHibernate_Disabled() throws Exception {
 		System.setProperty("DatabaseModule.Transactional.value.default", "disabled");
 		System.setProperty("transactionManager.type", "simple");
 		Unitils.initSingletonInstance();
-		injectIntoStatic(Unitils.getInstance().createTestListener(), UnitilsJUnit4TestClassRunner.class, "testListener");
 		runTest(HibernateTest.class, "testFindById");
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateTest.class, "testPersist");
@@ -113,7 +113,6 @@ public class UnitilsIntegrationTest {
 		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
 		System.setProperty("transactionManager.type", "simple");
 		Unitils.initSingletonInstance();
-		injectIntoStatic(Unitils.getInstance().createTestListener(), UnitilsJUnit4TestClassRunner.class, "testListener");
 		runTest(HibernateTest.class, "testFindById");
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateTest.class, "testPersist");
@@ -125,7 +124,6 @@ public class UnitilsIntegrationTest {
 		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
 		System.setProperty("transactionManager.type", "simple");
 		Unitils.initSingletonInstance();
-		injectIntoStatic(Unitils.getInstance().createTestListener(), UnitilsJUnit4TestClassRunner.class, "testListener");
 		runTest(HibernateTest.class, "testFindById");
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateTest.class, "testPersist");
@@ -137,7 +135,6 @@ public class UnitilsIntegrationTest {
 		System.setProperty("DatabaseModule.Transactional.value.default", "disabled");
 		System.setProperty("transactionManager.type", "spring");
 		Unitils.initSingletonInstance();
-		injectIntoStatic(Unitils.getInstance().createTestListener(), UnitilsJUnit4TestClassRunner.class, "testListener");
 		runTest(HibernateSpringTest.class, "testFindById");
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateSpringTest.class, "testPersist");
@@ -149,7 +146,6 @@ public class UnitilsIntegrationTest {
 		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
 		System.setProperty("transactionManager.type", "spring");
 		Unitils.initSingletonInstance();
-		injectIntoStatic(Unitils.getInstance().createTestListener(), UnitilsJUnit4TestClassRunner.class, "testListener");
 		runTest(HibernateSpringTest.class, "testFindById");
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateSpringTest.class, "testPersist");
@@ -161,7 +157,6 @@ public class UnitilsIntegrationTest {
 		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
 		System.setProperty("transactionManager.type", "spring");
 		Unitils.initSingletonInstance();
-		injectIntoStatic(Unitils.getInstance().createTestListener(), UnitilsJUnit4TestClassRunner.class, "testListener");
 		runTest(HibernateSpringTest.class, "testFindById");
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateSpringTest.class, "testPersist");

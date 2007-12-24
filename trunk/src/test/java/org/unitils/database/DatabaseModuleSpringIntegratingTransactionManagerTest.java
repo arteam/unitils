@@ -40,7 +40,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
 
     private DatabaseModule databaseModule;
 
-    private TransactionsDisabledTest transactionsDisabledTest;
+    private TransactionsDisabledTest noApplicationContextTest;
 
     private RollbackTest rollbackTest;
 
@@ -55,7 +55,7 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         Unitils.getInstance().init(configuration);
         databaseModule = getDatabaseModule();
 
-        transactionsDisabledTest = new TransactionsDisabledTest();
+        noApplicationContextTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
     }
@@ -75,18 +75,18 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * associated with the test.
      */
     @Test
-    public void testNoSpringTransactionManagerConfigured() throws Exception {
+    public void testTransactionsDisabled() throws Exception {
         mockConnection1.close();
         mockConnection2.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransaction(transactionsDisabledTest);
+        databaseModule.startTransaction(noApplicationContextTest);
         Connection conn1 = getConnection(databaseModule.getDataSource());
         Connection conn2 = getConnection(databaseModule.getDataSource());
         assertNotSame(conn1, conn2);
         releaseConnection(conn1, databaseModule.getDataSource());
         releaseConnection(conn2, databaseModule.getDataSource());
-        databaseModule.endTransaction(transactionsDisabledTest);
+        databaseModule.endTransaction(noApplicationContextTest);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -151,10 +151,9 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
     }
 
 
-
     /**
      * Class that plays the role of a unit test, with a TransactionManager configured in a spring application context,
-     * with transaction rollback enabled (=default, so no
+     * with transaction rollback enabled
      *
      * @Transactional annotation required
      */
