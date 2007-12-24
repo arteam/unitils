@@ -93,10 +93,10 @@ public class ReflectionUtils {
      * @return The value of the given field in the given object
      * @throws UnitilsException if the field could not be accessed
      */
-    public static Object getFieldValue(Object object, Field field) {
+    public static <T> T getFieldValue(Object object, Field field) {
         try {
             field.setAccessible(true);
-            return field.get(object);
+            return (T) field.get(object);
 
         } catch (IllegalArgumentException e) {
             throw new UnitilsException("Error while trying to access field " + field, e);
@@ -190,6 +190,15 @@ public class ReflectionUtils {
         } catch (IllegalAccessException e) {
             throw new UnitilsException("Error while invoking method " + method, e);
         }
+    }
+    
+    
+    public static <T> T invokeMethodSilent(Object target, Method method, Object... arguments) {
+    	try {
+			return invokeMethod(target, method, arguments);
+		} catch (InvocationTargetException e) {
+			throw new UnitilsException(e);
+		}
     }
 
 
@@ -483,11 +492,11 @@ public class ReflectionUtils {
             throw new UnitilsException("Could not load class with name " + className, t);
         }
     }
-
-
-	public static Method getMethodWithName(Class<?> clazz, String methodName) {
+    
+    
+	public static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
 		try {
-			return clazz.getMethod(methodName);
+			return clazz.getDeclaredMethod(methodName, parameterTypes);
 		} catch (SecurityException e) {
 			throw new UnitilsException(e);
 		} catch (NoSuchMethodException e) {

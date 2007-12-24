@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.util.UnitilsClassLoader;
+import org.unitils.core.util.ResourceTranslatingClassLoader;
 import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.hibernate.util.HibernateTransactionFactory;
 import org.unitils.hibernate.util.SessionFactoryManager;
@@ -168,11 +168,16 @@ public class HibernateEntityManagerFactoryManager extends
             }
             // If the user specified a custom persistence unit config file, make sure it is used when creating the EntityManagerFactory,
             // by tricking the ClassLoader into believing that this file is actually META-INF/persistence.xml
+            ClassLoader originalContextClassLoader = null;
             if (configFiles.size() == 1) {
-            	getUnitilsClassLoader().registerResourceTranslation("META-INF/persistence.xml", configFiles.get(0));
+            	originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+            	ClassLoader persistenceXmlTranslatingClassLoader = new ResourceTranslatingClassLoader("META-INF/persistence.xml", configFiles.get(0));
+            	Thread.currentThread().setContextClassLoader(persistenceXmlTranslatingClassLoader);
             }
             configuration.configure(persistenceUnit, new HashMap());
-            getUnitilsClassLoader().unregisterResourceTranslation("META-INF/persistence.xml");
+            if (configFiles.size() == 1) {
+            	Thread.currentThread().setContextClassLoader(originalContextClassLoader);
+            }
             return configuration;
 
         } catch (Exception e) {
@@ -181,7 +186,7 @@ public class HibernateEntityManagerFactoryManager extends
 	}
 
 
-    protected UnitilsClassLoader getUnitilsClassLoader() {
+    protected ResourceTranslatingClassLoader getUnitilsClassLoader() {
     	return Unitils.getInstance().getUnitilsClassLoader();
 	}
 
