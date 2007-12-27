@@ -15,15 +15,16 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-import junitx.framework.StringAssert;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
-
-import static java.util.Arrays.asList;
+import junit.framework.AssertionFailedError;
+import junitx.framework.StringAssert;
 
 
 /**
@@ -32,7 +33,7 @@ import static java.util.Arrays.asList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertTest extends TestCase {
+public class ReflectionAssertTest {
 
     /* Test object */
     private TestObject testObjectA;
@@ -47,9 +48,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    public void setUp() throws Exception {
         testObjectA = new TestObject("test 1", "test 2");
         testObjectB = new TestObject("test 1", "test 2");
         testObjectDifferentValue = new TestObject("test 1", "XXXXXX");

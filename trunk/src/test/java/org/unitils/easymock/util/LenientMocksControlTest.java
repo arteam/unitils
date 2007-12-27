@@ -15,9 +15,13 @@
  */
 package org.unitils.easymock.util;
 
-import junit.framework.TestCase;
-import static org.easymock.classextension.EasyMock.*;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.verify;
 import static org.easymock.internal.MocksControl.MockType.DEFAULT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.unitils.easymock.EasyMockUnitils.refEq;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 
@@ -25,13 +29,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
+
 /**
  * A test for {@link LenientMocksControl}.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class LenientMocksControlTest extends TestCase {
+public class LenientMocksControlTest {
 
     /* Class under test, with mock type LENIENT and ignore defaults */
     private LenientMocksControl lenientMocksControl;
@@ -40,9 +47,8 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         lenientMocksControl = new LenientMocksControl(DEFAULT, IGNORE_DEFAULTS);
     }
 
@@ -50,6 +56,7 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for a mocked method call that is invoked with the expected arguments.
      */
+    @Test
     public void testLenientMocksControl_equals() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
@@ -66,6 +73,7 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for a mocked method call that has no arguments.
      */
+    @Test
     public void testLenientMocksControl_equalsNoArguments() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
@@ -81,6 +89,7 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for a invoking a mocked method call more than once.
      */
+    @Test
     public void testLenientMocksControl_equalsDoubleInvocation() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
@@ -100,6 +109,7 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for ignoring a default value for an argument.
      */
+    @Test
     public void testLenientMocksControl_equalsIgnoreDefaults() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
@@ -116,6 +126,7 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for a mocked method that is expected but was never called.
      */
+    @Test
     public void testLenientMocksControl_notEqualsNotCalled() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
@@ -134,6 +145,7 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for a mocked method call that is invoked with the different arguments.
      */
+    @Test
     public void testLenientMocksControl_notEqualsDifferentArguments() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
@@ -152,6 +164,7 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for using argument matchers (refEq and EasyMocks eq).
      */
+    @Test
     public void testLenientMocksControl_mixingArgumentMatchers() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);
@@ -168,6 +181,7 @@ public class LenientMocksControlTest extends TestCase {
     /**
      * Test for a invoking a mocked method call with a enum argument.
      */
+    @Test
     public void testLenientMocksControl_equalsEnumArgument() {
 
         MockedClass mock = lenientMocksControl.createMock(MockedClass.class);

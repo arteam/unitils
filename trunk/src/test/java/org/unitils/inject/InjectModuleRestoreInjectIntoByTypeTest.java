@@ -15,14 +15,18 @@
  */
 package org.unitils.inject;
 
-import junit.framework.TestCase;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.inject.annotation.InjectIntoStaticByType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.unitils.inject.util.PropertyAccess.FIELD;
 import static org.unitils.inject.util.PropertyAccess.SETTER;
-import org.unitils.inject.util.Restore;
 
 import java.util.Properties;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.inject.annotation.InjectIntoStaticByType;
+import org.unitils.inject.util.Restore;
 
 /**
  * Test for restoring values that where replaced during the static auto injection of the {@link InjectModule} after
@@ -31,19 +35,17 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-@SuppressWarnings({"UnusedDeclaration"})
-public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
+public class InjectModuleRestoreInjectIntoByTypeTest {
 
     /* Tested object */
-    private InjectModule injectModule;
+    InjectModule injectModule;
 
 
     /**
      * Initializes the test and test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         injectModule = new InjectModule();
         injectModule.init(configuration);
@@ -58,6 +60,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Tests the default restore (=old value).
      */
+    @Test
     public void testRestore_defaultRestore() {
         injectModule.injectObjects(new TestStaticSetterDefaultRestore());
         injectModule.restoreStaticInjectedObjects();
@@ -69,6 +72,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Tests the no restore.
      */
+    @Test
     public void testRestore_restoreNothing() {
         injectModule.injectObjects(new TestStaticSetterRestoreNothing());
         injectModule.restoreStaticInjectedObjects();
@@ -80,6 +84,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Tests restoring the old value.
      */
+    @Test
     public void testRestore_restoreOldValue() {
         injectModule.injectObjects(new TestStaticSetterRestoreOldValue());
         injectModule.restoreStaticInjectedObjects();
@@ -90,6 +95,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Tests restoring a null object value.
      */
+    @Test
     public void testRestore_restoreNull() {
         injectModule.injectObjects(new TestStaticSetterRestoreNull());
         injectModule.restoreStaticInjectedObjects();
@@ -101,6 +107,7 @@ public class InjectModuleRestoreInjectIntoByTypeTest extends TestCase {
     /**
      * Tests restoring a 0 primitive value.
      */
+    @Test
     public void testRestore_restore0() {
         injectModule.injectObjects(new TestStaticSetterRestore0());
         injectModule.restoreStaticInjectedObjects();
