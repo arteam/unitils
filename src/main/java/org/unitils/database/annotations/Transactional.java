@@ -16,6 +16,7 @@
 package org.unitils.database.annotations;
 
 import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.unitils.database.util.TransactionMode.DEFAULT;
 import org.unitils.database.util.TransactionMode;
@@ -28,8 +29,9 @@ import java.lang.annotation.Target;
  * Annotation enabling to specify if tests should be run in a transaction and, if yes, whether at the end of the test,
  * the transaction should be <i>committed</i> or <i>rollbacked</i>.
  * <p/>
- * This annotation can be specified on a class, and is valid for all tests in the annotated class and its subclasses. A
- * class level annotation overrides the settings of a superclass annotation.
+ * If this annotation is specified at class-level, it is valid for all tests in the annotated class and its subclasses. A
+ * class level annotation overrides the settings of a superclass annotation. It can also be specified at method level, to
+ * specify method specific transactional behavior.
  * <p/>
  * The value attribute defines whether the annotated test(s) run in a transaction and, if yes, what will be the
  * commit/rollback behavior. The default behavior is defined by the unitils property
@@ -41,7 +43,7 @@ import java.lang.annotation.Target;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@Target({TYPE})
+@Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Inherited
 public @interface Transactional {

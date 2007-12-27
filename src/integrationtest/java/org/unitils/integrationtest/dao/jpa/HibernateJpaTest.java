@@ -14,7 +14,6 @@ import org.unitils.integrationtest.sampleproject.model.Person;
 import org.unitils.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
-@Transactional(TransactionMode.COMMIT)
 public class HibernateJpaTest extends UnitilsJUnit4 {
 
 	@JpaEntityManagerFactory(persistenceUnit = "test", configFiles = {"org/unitils/integrationtest/dao/jpa/persistence-test.xml"})

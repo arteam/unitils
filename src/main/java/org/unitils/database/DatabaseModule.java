@@ -263,10 +263,11 @@ public class DatabaseModule implements Module {
 
     /**
      * @param testObject The test object, not null
+     * @param testMethod TODO
      * @return The {@link TransactionMode} for the given object
      */
-    protected TransactionMode getTransactionMode(Object testObject) {
-        TransactionMode transactionMode = getClassLevelAnnotationProperty(Transactional.class, "value", DEFAULT, testObject.getClass());
+    protected TransactionMode getTransactionMode(Object testObject, Method testMethod) {
+        TransactionMode transactionMode = getMethodOrClassLevelAnnotationProperty(Transactional.class, "value", DEFAULT, testMethod, testObject.getClass());
         transactionMode = getEnumValueReplaceDefault(Transactional.class, "value", transactionMode, defaultAnnotationPropertyValues);
         return transactionMode;
     }
@@ -278,9 +279,10 @@ public class DatabaseModule implements Module {
      * test, the transaction will be started immediately after loading the DataSource.
      *
      * @param testObject The test object, not null
+     * @param testMethod The test method, not null
      */
-    public void startTransaction(Object testObject) {
-        if (isTransactionsEnabled(testObject)) {
+    public void startTransaction(Object testObject, Method testMethod) {
+        if (isTransactionsEnabled(testObject, testMethod)) {
         	getTransactionManager().startTransaction(testObject);
         }
     }
@@ -291,20 +293,26 @@ public class DatabaseModule implements Module {
      * active for the given testObject
      *
      * @param testObject The test object, not null
+     * @param testMethod The test method, not null
      */
-    protected void endTransaction(Object testObject) {
-        if (isTransactionsEnabled(testObject)) {
-	        if (getTransactionMode(testObject) == COMMIT) {
+    protected void endTransaction(Object testObject, Method testMethod) {
+        if (isTransactionsEnabled(testObject, testMethod)) {
+	        if (getTransactionMode(testObject, testMethod) == COMMIT) {
 	            getTransactionManager().commit(testObject);
-	        } else if (getTransactionMode(testObject) == ROLLBACK) {
+	        } else if (getTransactionMode(testObject, testMethod) == ROLLBACK) {
 	            getTransactionManager().rollback(testObject);
 	        }
         }
     }
 
 
-	public boolean isTransactionsEnabled(Object testObject) {
-		TransactionMode transactionMode = getTransactionMode(testObject);
+    /**
+     * @param testObject The test object, not null
+     * @param testMethod The test method, not null
+     * @return Whether transactions are enabled for the given test method and test object
+     */
+	public boolean isTransactionsEnabled(Object testObject, Method testMethod) {
+		TransactionMode transactionMode = getTransactionMode(testObject, testMethod);
         return transactionMode != DISABLED;
 	}
     
@@ -385,12 +393,12 @@ public class DatabaseModule implements Module {
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             injectDataSource(testObject);
-            startTransaction(testObject);
+            startTransaction(testObject, testMethod);
         }
 
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
-            endTransaction(testObject);
+            endTransaction(testObject, testMethod);
         }
     }
 }
