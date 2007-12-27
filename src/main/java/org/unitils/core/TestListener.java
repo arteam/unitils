@@ -76,8 +76,9 @@ public abstract class TestListener {
      * This can be overriden to for example initialize the test-fixture.
      *
      * @param testObject The test instance, not null
+     * @param testMethod TODO
      */
-    public void beforeTestSetUp(Object testObject) {
+    public void beforeTestSetUp(Object testObject, Method testMethod) {
         // empty
     }
 
@@ -114,8 +115,9 @@ public abstract class TestListener {
      * This can be overriden to for example peform extra cleanup after the test.
      *
      * @param testObject The test instance, not null
+     * @param testMethod TODO
      */
-    public void afterTestTearDown(Object testObject) {
+    public void afterTestTearDown(Object testObject, Method testMethod) {
         // empty
     }
 

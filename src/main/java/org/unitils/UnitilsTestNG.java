@@ -15,6 +15,8 @@
  */
 package org.unitils;
 
+import java.lang.reflect.Method;
+
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
@@ -88,9 +90,9 @@ public abstract class UnitilsTestNG implements IHookable {
      * Called before all test setup. This is where {@link TestListener#beforeTestSetUp} is called.
      */
     @BeforeMethod(alwaysRun = true)
-    protected void unitilsBeforeTestSetUp() {
+    protected void unitilsBeforeTestSetUp(Method testMethod) {
         beforeTestSetUpCalled = true;
-        getTestListener().beforeTestSetUp(this);
+        getTestListener().beforeTestSetUp(this, testMethod);
     }
 
 
@@ -101,11 +103,11 @@ public abstract class UnitilsTestNG implements IHookable {
      * {@link #unitilsBeforeTestSetUp}.
      */
     @AfterMethod(alwaysRun = true)
-    protected void unitilsAfterTestTearDown() {
+    protected void unitilsAfterTestTearDown(Method testMethod) {
         // alwaysRun is enabled, extra test to ensure that unitilsBeforeTestSetUp was called
         if (beforeTestSetUpCalled) {
             beforeTestSetUpCalled = false;
-            getTestListener().afterTestTearDown(this);
+            getTestListener().afterTestTearDown(this, testMethod);
         }
     }
 

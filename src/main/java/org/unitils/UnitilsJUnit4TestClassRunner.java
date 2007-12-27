@@ -181,14 +181,14 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         public void runBeforesThenTestThenAfters(Runnable test) {
             Throwable throwable = null;
             try {
-            	getTestListener().beforeTestSetUp(testObject);
+            	getTestListener().beforeTestSetUp(testObject, testMethod);
                 super.runBeforesThenTestThenAfters(test);
             } catch (Throwable t) {
                 addFailure(t);
                 throwable = t;
             }
             try {
-            	getTestListener().afterTestTearDown(testObject);
+            	getTestListener().afterTestTearDown(testObject, testMethod);
             } catch (Throwable t) {
                 // first exception is typically the most meaningful, so ignore second exception
                 if (throwable == null) {

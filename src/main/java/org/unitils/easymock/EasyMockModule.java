@@ -294,7 +294,7 @@ public class EasyMockModule implements Module {
          * create and inject all mocks on the class.
          */
         @Override
-        public void beforeTestSetUp(Object testObject) {
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
             // Clear all previously created mocks controls
             mocksControls.clear();
 

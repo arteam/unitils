@@ -383,13 +383,13 @@ public class DatabaseModule implements Module {
     protected class DatabaseTestListener extends TestListener {
 
         @Override
-        public void beforeTestSetUp(Object testObject) {
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
             injectDataSource(testObject);
             startTransaction(testObject);
         }
 
         @Override
-        public void afterTestTearDown(Object testObject) {
+        public void afterTestTearDown(Object testObject, Method testMethod) {
             endTransaction(testObject);
         }
     }

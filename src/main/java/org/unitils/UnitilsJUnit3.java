@@ -133,7 +133,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
         Throwable firstThrowable = null;
         try {
-            getTestListener().beforeTestSetUp(this);
+            getTestListener().beforeTestSetUp(this, getCurrentTestMethod());
             super.runBare();
 
         } catch (Throwable t) {
@@ -142,7 +142,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
         }
 
         try {
-            getTestListener().afterTestTearDown(this);
+            getTestListener().afterTestTearDown(this, getCurrentTestMethod());
 
         } catch (Throwable t) {
             // first exception is typically the most meaningful, so ignore second exception

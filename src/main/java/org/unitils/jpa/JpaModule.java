@@ -238,12 +238,12 @@ public class JpaModule implements Module, Flushable {
     protected class JpaTestListener extends TestListener {
 
         @Override
-        public void beforeTestSetUp(Object testObject) {
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
             injectEntityManagerFactory(testObject);
         }
 
         @Override
-        public void afterTestTearDown(Object testObject) {
+        public void afterTestTearDown(Object testObject, Method testMethod) {
         	if (autoCloseEntityManagersAfterTest) {
         		closeEntityManagers(testObject);
         	} else {

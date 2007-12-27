@@ -195,7 +195,8 @@ public class ReflectionUtils {
     
     public static <T> T invokeMethodSilent(Object target, Method method, Object... arguments) {
     	try {
-			return invokeMethod(target, method, arguments);
+			T result = (T) invokeMethod(target, method, arguments);
+			return result;
 		} catch (InvocationTargetException e) {
 			throw new UnitilsException(e);
 		}

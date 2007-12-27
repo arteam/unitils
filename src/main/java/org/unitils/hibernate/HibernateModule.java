@@ -371,12 +371,12 @@ public class HibernateModule implements Module, Flushable {
         }
 
         @Override
-        public void beforeTestSetUp(Object testObject) {
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
             injectSessionFactory(testObject);
         }
 
         @Override
-        public void afterTestTearDown(Object testObject) {
+        public void afterTestTearDown(Object testObject, Method testMethod) {
         	if (autoCloseSessionsAfterTest) {
         		closeSessions(testObject);
         	} else {
