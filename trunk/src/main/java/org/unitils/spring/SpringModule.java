@@ -383,7 +383,7 @@ public class SpringModule implements Module {
     protected class SpringTestListener extends TestListener {
 
         @Override
-        public void beforeTestSetUp(Object testObject) {
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
             injectApplicationContext(testObject);
             assignSpringBeans(testObject);
             assignSpringBeansByType(testObject);

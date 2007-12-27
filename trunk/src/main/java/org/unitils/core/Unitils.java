@@ -239,7 +239,7 @@ public class Unitils implements Module {
 
 
         @Override
-        public void beforeTestSetUp(Object testObject) {
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
@@ -247,7 +247,7 @@ public class Unitils implements Module {
 
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
-                modulesRepository.getTestListener(module).beforeTestSetUp(testObject);
+                modulesRepository.getTestListener(module).beforeTestSetUp(testObject, testMethod);
             }
         }
 
@@ -281,7 +281,7 @@ public class Unitils implements Module {
 
 
         @Override
-        public void afterTestTearDown(Object testObject) {
+        public void afterTestTearDown(Object testObject, Method testMethod) {
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
@@ -289,7 +289,7 @@ public class Unitils implements Module {
 
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
-                modulesRepository.getTestListener(module).afterTestTearDown(testObject);
+                modulesRepository.getTestListener(module).afterTestTearDown(testObject, testMethod);
             }
         }
 

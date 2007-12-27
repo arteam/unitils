@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -30,9 +29,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -44,10 +41,6 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.TransactionManager;
 import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.spring.SpringModule;
-
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
  * Transaction manager that relies on Spring transaction management. When starting a Transaction, this transaction

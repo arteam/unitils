@@ -83,56 +83,56 @@ public class TracingTestListener extends TestListener {
 
 
     public void addTestInvocation(String invocation, Object test, String testMethodName) {
-        callList.add(formatString(TEST, invocation, getClassName(test), testMethodName));
+        callList.add(formatListenerCallAsString(TEST, invocation, getClassName(test), testMethodName));
         throwExceptionIfRequested(invocation);
     }
 
 
     @Override
     public void beforeAll() {
-        callList.add(formatString(UNITILS, BEFORE_ALL, null, null));
+        callList.add(formatListenerCallAsString(UNITILS, BEFORE_ALL, null, null));
         throwExceptionIfRequested(BEFORE_ALL);
     }
 
     @Override
     public void beforeTestClass(Class<?> testClass) {
-        callList.add(formatString(UNITILS, BEFORE_TEST_CLASS, getClassName(testClass), null));
+        callList.add(formatListenerCallAsString(UNITILS, BEFORE_TEST_CLASS, getClassName(testClass), null));
         throwExceptionIfRequested(BEFORE_TEST_CLASS);
     }
 
     @Override
-    public void beforeTestSetUp(Object testObject) {
-        callList.add(formatString(UNITILS, BEFORE_TEST_SET_UP, getClassName(testObject), null));
+    public void beforeTestSetUp(Object testObject, Method testMethod) {
+        callList.add(formatListenerCallAsString(UNITILS, BEFORE_TEST_SET_UP, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(BEFORE_TEST_SET_UP);
     }
 
     @Override
     public void beforeTestMethod(Object testObject, Method testMethod) {
-        callList.add(formatString(UNITILS, BEFORE_TEST_METHOD, getClassName(testObject), testMethod.getName()));
+        callList.add(formatListenerCallAsString(UNITILS, BEFORE_TEST_METHOD, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(BEFORE_TEST_METHOD);
     }
 
     @Override
     public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
-        callList.add(formatString(UNITILS, AFTER_TEST_METHOD, getClassName(testObject), testMethod.getName()));
+        callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_METHOD, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(AFTER_TEST_METHOD);
     }
 
     @Override
-    public void afterTestTearDown(Object testObject) {
-        callList.add(formatString(UNITILS, AFTER_TEST_TEAR_DOWN, getClassName(testObject), null));
+    public void afterTestTearDown(Object testObject, Method testMethod) {
+        callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_TEAR_DOWN, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(AFTER_TEST_TEAR_DOWN);
     }
 
     @Override
     public void afterTestClass(Class<?> testClass) {
-        callList.add(formatString(UNITILS, AFTER_TEST_CLASS, getClassName(testClass), null));
+        callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_CLASS, getClassName(testClass), null));
         throwExceptionIfRequested(AFTER_TEST_CLASS);
     }
 
     @Override
     public void afterAll() {
-        callList.add(formatString(UNITILS, AFTER_ALL, null, null));
+        callList.add(formatListenerCallAsString(UNITILS, AFTER_ALL, null, null));
         throwExceptionIfRequested(AFTER_ALL);
     }
 
@@ -157,7 +157,7 @@ public class TracingTestListener extends TestListener {
     }
 
 
-    private String formatString(String type, String invocation, String testClass, String testMethodName) {
+    private String formatListenerCallAsString(String type, String invocation, String testClass, String testMethodName) {
         String result = rightPad(type, 10);
         result += rightPad(invocation, 17);
         if (!isEmpty(testClass)) {
