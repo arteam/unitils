@@ -160,7 +160,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder_beforeAll("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(2, testListenerAdapter.getSkippedTests().size());
     }
 
 
@@ -224,7 +224,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder_beforeTestClass("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(2, testListenerAdapter.getSkippedTests().size());
     }
 
     // no JUnit 3 versions of testBeforeClass (does not exist for JUnit3)
@@ -257,7 +257,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder_testBeforeClass("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(2, testListenerAdapter.getSkippedTests().size());
     }
 
 
@@ -321,7 +321,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder_beforeTestSetUp("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(2, testListenerAdapter.getSkippedTests().size());
     }
 
 
@@ -385,7 +385,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder_testSetUp("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(2, testListenerAdapter.getSkippedTests().size());
     }
 
 
@@ -641,7 +641,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder_testTearDown("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(1, testListenerAdapter.getConfigurationFailures().size());
     }
 
 
@@ -705,7 +705,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder_afterTestTearDown("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(1, testListenerAdapter.getConfigurationFailures().size());
     }
 
     // no JUnit 3 versions of testAfterClass (does not exist for JUnit3)
@@ -738,7 +738,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(1, testListenerAdapter.getConfigurationFailures().size());
     }
 
 
@@ -770,7 +770,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(1, testListenerAdapter.getConfigurationFailures().size());
     }
 
 
@@ -785,7 +785,7 @@ public class UnitilsInvocationExceptionTest {
         TestListenerAdapter testListenerAdapter = performTestNGTest();
 
         assertInvocationOrder("TestNG", tracingTestListener);
-        assertEquals(1, testListenerAdapter.getFailedTests().size());
+        assertEquals(1, testListenerAdapter.getConfigurationFailures().size());
     }
 
 
