@@ -24,10 +24,12 @@ import org.junit.Test;
 import static org.springframework.jdbc.datasource.DataSourceUtils.getConnection;
 import static org.springframework.jdbc.datasource.DataSourceUtils.releaseConnection;
 import org.unitils.core.Unitils;
+import org.unitils.database.DatabaseModuleSimpleTransactionManagerTest.TransactionsDisabledTest;
 import org.unitils.database.annotations.Transactional;
 import static org.unitils.database.util.TransactionMode.*;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 
 /**
@@ -80,13 +82,14 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         mockConnection2.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransaction(noApplicationContextTest);
+        Method testMethod = TransactionsDisabledTest.class.getMethod("test", new Class[] {});
+        databaseModule.startTransaction(noApplicationContextTest, testMethod);
         Connection conn1 = getConnection(databaseModule.getDataSource());
         Connection conn2 = getConnection(databaseModule.getDataSource());
         assertNotSame(conn1, conn2);
         releaseConnection(conn1, databaseModule.getDataSource());
         releaseConnection(conn2, databaseModule.getDataSource());
-        databaseModule.endTransaction(noApplicationContextTest);
+        databaseModule.endTransaction(noApplicationContextTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -103,13 +106,14 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransaction(rollbackTest);
+        Method testMethod = RollbackTest.class.getMethod("test", new Class[] {});
+        databaseModule.startTransaction(rollbackTest, testMethod);
         Connection conn1 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         Connection conn2 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.endTransaction(rollbackTest);
+        databaseModule.endTransaction(rollbackTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -126,13 +130,14 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransaction(commitTest);
+        Method testMethod = CommitTest.class.getMethod("test", new Class[] {});
+        databaseModule.startTransaction(commitTest, testMethod);
         Connection conn1 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         Connection conn2 = getConnection(databaseModule.getDataSource());
         releaseConnection(conn1, databaseModule.getDataSource());
         assertSame(conn1, conn2);
-        databaseModule.endTransaction(commitTest);
+        databaseModule.endTransaction(commitTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -143,9 +148,10 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * configured, so no transaction will be started
      */
     @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
-    @Transactional(DISABLED)
+    @Transactional(COMMIT)
     public static class TransactionsDisabledTest {
 
+    	@Transactional(DISABLED)
         public void test() {
         }
     }
@@ -158,9 +164,10 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * @Transactional annotation required
      */
     @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
-    @Transactional(ROLLBACK)
+    @Transactional(DISABLED)
     public static class RollbackTest {
 
+    	@Transactional(ROLLBACK)
         public void test() {
         }
     }
@@ -171,9 +178,10 @@ public class DatabaseModuleSpringIntegratingTransactionManagerTest extends Datab
      * with transaction commit enabled
      */
     @SpringApplicationContext("org/unitils/database/TransactionManagerApplicationContext.xml")
-    @Transactional(COMMIT)
+    @Transactional(ROLLBACK)
     public static class CommitTest {
 
+    	@Transactional(COMMIT)
         public void test() {
         }
     }

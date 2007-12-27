@@ -26,6 +26,8 @@ import org.unitils.database.annotations.Transactional;
 import static org.unitils.database.util.TransactionMode.*;
 
 import javax.sql.DataSource;
+
+import java.lang.reflect.Method;
 import java.sql.Connection;
 
 /**
@@ -80,13 +82,14 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection2.close();
         replay(mockConnection1, mockConnection2);
 
-        databaseModule.startTransaction(transactionsDisabledTest);
+        Method testMethod = TransactionsDisabledTest.class.getMethod("test", new Class[] {});
+        databaseModule.startTransaction(transactionsDisabledTest, testMethod);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
-        databaseModule.endTransaction(transactionsDisabledTest);
+        databaseModule.endTransaction(transactionsDisabledTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -103,14 +106,15 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
+        Method testMethod = RollbackTest.class.getMethod("test", new Class[] {});
         DataSource dataSource = databaseModule.getDataSource();
-        databaseModule.startTransaction(rollbackTest);
+        databaseModule.startTransaction(rollbackTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         connection1.close();
         Connection connection2 = dataSource.getConnection();
         connection2.close();
         assertSame(connection1, connection2);
-        databaseModule.endTransaction(rollbackTest);
+        databaseModule.endTransaction(rollbackTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -127,14 +131,15 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         mockConnection1.close();
         replay(mockConnection1, mockConnection2);
 
+        Method testMethod = CommitTest.class.getMethod("test", new Class[] {});
         DataSource dataSource = databaseModule.getDataSource();
-        databaseModule.startTransaction(commitTest);
+        databaseModule.startTransaction(commitTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         connection1.close();
         Connection connection2 = dataSource.getConnection();
         connection2.close();
         assertSame(connection1, connection2);
-        databaseModule.endTransaction(commitTest);
+        databaseModule.endTransaction(commitTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
