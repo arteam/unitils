@@ -22,6 +22,9 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Before;
+import org.junit.Test;
+
 /**
  * Test class for {@link ReflectionAssert} tests for cyclic dependencies between collections.
  * <p/>
@@ -30,21 +33,20 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertCyclicCollectionTest extends TestCase {
+public class ReflectionAssertCyclicCollectionTest {
 
     /* Test object containing a collection that contains a loop */
-    private TestObject testObjectA;
+    TestObject testObjectA;
 
     /* Same as testObjectA but different instance */
-    private TestObject testObjectB;
+    TestObject testObjectB;
 
 
     /**
      * Initializes the test fixture.
      */
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
-
         testObjectA = createTestObject();
         testObjectB = createTestObject();
     }
@@ -54,6 +56,7 @@ public class ReflectionAssertCyclicCollectionTest extends TestCase {
      * Tests the comparison of objects containing the cyclic dependency.
      * This should pass and should not cause a StackOverflow.
      */
+    @Test
     public void testAssertRefEquals_infiniteLoop() {
         assertRefEquals(testObjectA, testObjectB);
     }
@@ -63,6 +66,7 @@ public class ReflectionAssertCyclicCollectionTest extends TestCase {
      * Tests the comparison of objects containing the cyclic dependency.
      * This should pass and should not cause a StackOverflow.
      */
+    @Test
     public void testAssertLenEquals_infiniteLoop() {
         assertLenEquals(testObjectA, testObjectB);
     }

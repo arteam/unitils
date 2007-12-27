@@ -15,12 +15,8 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import junit.framework.TestCase;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.script.impl.FileScriptSource;
-import org.unitils.dbmaintainer.version.Version;
-import org.unitils.dbmaintainer.version.VersionScriptPair;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDeleteOnExit;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.copy;
@@ -32,13 +28,21 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Properties;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.script.impl.FileScriptSource;
+import org.unitils.dbmaintainer.version.Version;
+import org.unitils.dbmaintainer.version.VersionScriptPair;
+
 /**
  * Tests the FileScriptSource
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class FileScriptSourceTest extends TestCase {
+public class FileScriptSourceTest {
 
     /* Temp dir where test script files are put during the tests */
     private static final String DBCHANGE_FILE_DIRECTORY = System.getProperty("java.io.tmpdir") + "/FileScriptSourceTest/";
@@ -68,11 +72,10 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Cleans test directory and copies test files to it. Initializes test objects
      */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
 
-        // Create test directory
+    	// Create test directory
         File testDir = new File(DBCHANGE_FILE_DIRECTORY);
         testDir.mkdirs();
         forceDeleteOnExit(testDir);
@@ -122,6 +125,7 @@ public class FileScriptSourceTest extends TestCase {
      * Tests wether the FileScriptSource indicates that no existing scripts are modified when the current version is
      * one of the existing file versions, containing the existing file's timestamps.
      */
+    @Test
     public void testExistingScriptsModfied_notModified() {
         assertFalse(fileScriptSource.existingScriptsModified(versionIndex0));
         assertFalse(fileScriptSource.existingScriptsModified(versionIndex1));
@@ -133,6 +137,7 @@ public class FileScriptSourceTest extends TestCase {
      * Tests wether the FileScriptSource indicates that one or more existing script are modified when the current version
      * has a timestamp older than the scripts
      */
+    @Test
     public void testExistingScriptsModfied_modified() {
         assertTrue(fileScriptSource.existingScriptsModified(versionTimestampOld));
     }
@@ -141,6 +146,7 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Tests that script 1 and script 2 are returned when the current version is version 0
      */
+    @Test
     public void testGetNewScripts_fromVersionIndex0() {
         List<VersionScriptPair> scripts = fileScriptSource.getNewScripts(versionIndex0); // Should load script1.sql and script2.sql
         checkScript1(scripts.get(0));
@@ -151,6 +157,7 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Tests that script 2 is returned when the current version is version 1
      */
+    @Test
     public void testGetNewScripts_fromVersionIndex1() {
         List<VersionScriptPair> scripts = fileScriptSource.getNewScripts(versionIndex1); // Should load script2.sql
         checkScript2(scripts.get(0));
@@ -160,6 +167,7 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Verifies that nothing is returned when the current version is version 2
      */
+    @Test
     public void testGetNewScripts_noMoreChanges() {
         List<VersionScriptPair> scripts = fileScriptSource.getNewScripts(versionIndex2); // There is no script2.sql, should return null
         assertTrue(scripts.isEmpty());
@@ -169,6 +177,7 @@ public class FileScriptSourceTest extends TestCase {
     /**
      * Verifies that script 1 and script 2 are returned when requesting all scripts
      */
+    @Test
     public void testGetAllScripts() {
         List<VersionScriptPair> scripts = fileScriptSource.getAllScripts();
         checkScript1(scripts.get(0));

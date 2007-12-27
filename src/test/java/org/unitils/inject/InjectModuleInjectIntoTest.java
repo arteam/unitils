@@ -16,37 +16,43 @@
 package org.unitils.inject;
 
 import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.TestedObject;
 
 import java.util.Properties;
 
+import static org.junit.Assert.*;
+
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class InjectModuleInjectIntoTest extends TestCase {
+public class InjectModuleInjectIntoTest {
 
-    private InjectModule injectModule;
+    InjectModule injectModule;
 
-    private TestInjectIntoExplicitTarget testInjectIntoExplicitTarget = new TestInjectIntoExplicitTarget();
-    private TestInjectIntoAnnotatedTarget testInjectIntoAnnotatedTarget = new TestInjectIntoAnnotatedTarget();
+    TestInjectIntoExplicitTarget testInjectIntoExplicitTarget = new TestInjectIntoExplicitTarget();
+    TestInjectIntoAnnotatedTarget testInjectIntoAnnotatedTarget = new TestInjectIntoAnnotatedTarget();
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
 
         injectModule = new InjectModule();
         injectModule.init(configuration);
     }
 
+    @Test
     public void testInjectInto_explicitTarget() {
         injectModule.injectObjects(testInjectIntoExplicitTarget);
         assertSame(testInjectIntoExplicitTarget.getToInject(), testInjectIntoExplicitTarget.getInjectOn().getTestObject1());
     }
 
+    @Test
     public void testInjectInto_annotatedTargets() {
         injectModule.injectObjects(testInjectIntoAnnotatedTarget);
         assertSame(testInjectIntoAnnotatedTarget.getToInject(), testInjectIntoAnnotatedTarget.getInjectOn1().getTestObject1());

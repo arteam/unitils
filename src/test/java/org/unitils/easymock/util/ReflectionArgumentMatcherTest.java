@@ -25,10 +25,14 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * Test for {@link org.unitils.easymock.util.ReflectionArgumentMatcher}.
  */
-public class ReflectionArgumentMatcherTest extends TestCase {
+public class ReflectionArgumentMatcherTest {
 
 
     /* A test mock instance */
@@ -38,9 +42,8 @@ public class ReflectionArgumentMatcherTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         testMock = createMock(TestMock.class);
     }
 
@@ -48,6 +51,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
     /**
      * Tests the refEq argument matcher with strict mode and equal values.
      */
+    @Test
     public void testRefEq() {
 
         testMock.method(refEq("stringValue"), refEq(3), refEq("objectValue1"), refEq("objectValue2"));
@@ -61,6 +65,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
     /**
      * Tests the refEq argument matcher with strict mode and different values.
      */
+    @Test
     public void testRefEq_notEquals() {
 
         testMock.method(refEq("stringValue"), refEq(3), refEq("objectValue1"), refEq("objectValue2"));
@@ -80,6 +85,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
     /**
      * Tests the refEq argument matcher with strict mode and different vararg values.
      */
+    @Test
     public void testRefEq_notEqualsVarArgs() {
 
         testMock.method(refEq("stringValue"), refEq(3), refEq("objectValue1"), refEq("objectValue2"));
@@ -98,6 +104,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
     /**
      * Tests the refEq argument matcher with lenient order mode and lists having a different order.
      */
+    @Test
     public void testRefEq_equalsLenientOrder() {
 
         testMock.method(refEq(Arrays.asList("element1", "element2", "element3"), LENIENT_ORDER));
@@ -112,6 +119,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
      * Tests the lenEq argument matcher with lists having a different order.
      * This should be the same as refEq with lenient order and ignore defaults.
      */
+    @Test
     public void testLenEq() {
 
         testMock.method(lenEq(Arrays.asList("element1", "element2", "element3")));
@@ -125,6 +133,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
     /**
      * Tests the refEq argument matcher with strict order mode and lists having a different order.
      */
+    @Test
     public void testRefEq_notEqualsStrictOrder() {
 
         testMock.method(refEq(Arrays.asList("element1", "element2", "element3")));
@@ -143,6 +152,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
     /**
      * Tests the refEq argument matcher with ignore defaults mode and null default value.
      */
+    @Test
     public void testRefEq_equalsIgnoreDefaults() {
 
         testMock.method(refEq((List<String>) null, IGNORE_DEFAULTS));
@@ -156,6 +166,7 @@ public class ReflectionArgumentMatcherTest extends TestCase {
     /**
      * Tests the refEq argument matcher without ignore defaults mode and null default value.
      */
+    @Test
     public void testRefEq_notEqualsNoIgnoreDefaults() {
 
         testMock.method(refEq((List<String>) null));

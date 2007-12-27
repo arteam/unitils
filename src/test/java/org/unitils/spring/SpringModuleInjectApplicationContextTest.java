@@ -15,13 +15,18 @@
  */
 package org.unitils.spring;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+import java.util.Properties;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.spring.annotation.SpringApplicationContext;
-
-import java.util.Properties;
 
 /**
  * Test for the application context injection in the {@link SpringModule}.
@@ -29,18 +34,17 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SpringModuleInjectApplicationContextTest extends TestCase {
+public class SpringModuleInjectApplicationContextTest {
 
     /* Tested object */
-    private SpringModule springModule;
+    SpringModule springModule;
 
 
     /**
      * Initializes the test and test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         springModule = new SpringModule();
         springModule.init(configuration);
@@ -50,6 +54,7 @@ public class SpringModuleInjectApplicationContextTest extends TestCase {
     /**
      * Tests assigning an application context to a field and a setter.
      */
+    @Test
     public void testInjectApplicationContext() {
         SpringTest springTest = new SpringTest();
         springModule.injectApplicationContext(springTest);
@@ -62,6 +67,7 @@ public class SpringModuleInjectApplicationContextTest extends TestCase {
     /**
      * Tests assigning an application context but no context was created.
      */
+    @Test
     public void testInjectApplicationContext_noContextCreated() {
         SpringTestNoContextCreated springTestNoContextCreated = new SpringTestNoContextCreated();
         try {
@@ -76,6 +82,7 @@ public class SpringModuleInjectApplicationContextTest extends TestCase {
     /**
      * Tests assigning an application context that was created in the super class.
      */
+    @Test
     public void testInjectApplicationContext_contextCreatedInSuperClass() {
         SpringTestContextCreatedInSuperClass springTestContextCreatedInSuperClass = new SpringTestContextCreatedInSuperClass();
         springModule.injectApplicationContext(springTestContextCreatedInSuperClass);

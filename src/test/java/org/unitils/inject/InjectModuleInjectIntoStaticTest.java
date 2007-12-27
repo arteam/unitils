@@ -16,10 +16,14 @@
 package org.unitils.inject;
 
 import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.inject.annotation.InjectIntoStatic;
 
 import java.util.Properties;
+import static org.junit.Assert.*;
 
 /**
  * Test for the static injection behavior of the {@link InjectModule}
@@ -27,46 +31,49 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class InjectModuleInjectIntoStaticTest extends TestCase {
+public class InjectModuleInjectIntoStaticTest {
 
     /* Tested object */
-    private InjectModule injectModule;
+    InjectModule injectModule;
 
-    private TestInjectIntoStatic_simpleSetter testInjectIntoStatic_simpleSetter = new TestInjectIntoStatic_simpleSetter();
-    private TestInjectIntoStatic_simpleField testInjectIntoStatic_simpleField = new TestInjectIntoStatic_simpleField();
-    private TestInjectIntoStatic_compositeSetter testInjectIntoStatic_compositeSetter = new TestInjectIntoStatic_compositeSetter();
-    private TestInjectIntoStatic_compositeField testInjectIntoStatic_compositeField = new TestInjectIntoStatic_compositeField();
+    TestInjectIntoStatic_simpleSetter testInjectIntoStatic_simpleSetter = new TestInjectIntoStatic_simpleSetter();
+    TestInjectIntoStatic_simpleField testInjectIntoStatic_simpleField = new TestInjectIntoStatic_simpleField();
+    TestInjectIntoStatic_compositeSetter testInjectIntoStatic_compositeSetter = new TestInjectIntoStatic_compositeSetter();
+    TestInjectIntoStatic_compositeField testInjectIntoStatic_compositeField = new TestInjectIntoStatic_compositeField();
 
 
     /**
      * Initializes the test and test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         injectModule = new InjectModule();
         injectModule.init(configuration);
     }
 
 
+    @Test
     public void testInject_simpleSetter() {
         injectModule.injectObjects(testInjectIntoStatic_simpleSetter);
         assertSame(testInjectIntoStatic_simpleSetter.toInject, InjectOnStatic.getToInject());
     }
 
 
+    @Test
     public void testInject_simpleField() {
         injectModule.injectObjects(testInjectIntoStatic_simpleField);
         assertSame(testInjectIntoStatic_simpleField.toInject, InjectOnStatic.getToInjectField());
     }
 
+    @Test
     public void testInject_compositeSetter() {
         injectModule.injectObjects(testInjectIntoStatic_compositeSetter);
         assertSame(testInjectIntoStatic_compositeSetter.toInject, InjectOnStatic.getTestObject().getToInject());
     }
 
 
+    @Test
     public void testInject_compositeField() {
         injectModule.injectObjects(testInjectIntoStatic_compositeField);
         assertSame(testInjectIntoStatic_compositeField.toInject, InjectOnStatic.getTestObjectField().getToInject());

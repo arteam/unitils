@@ -15,15 +15,22 @@
  */
 package org.unitils.spring;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.List;
+import java.util.Properties;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.spring.annotation.SpringApplicationContext;
-
-import java.util.List;
-import java.util.Properties;
 
 /**
  * Test for ApplicationContext creation in the {@link SpringModule}.
@@ -31,18 +38,17 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SpringModuleApplicationContextTest extends TestCase {
+public class SpringModuleApplicationContextTest {
 
     /* Tested object */
-    private SpringModule springModule;
+    SpringModule springModule;
 
 
     /**
      * Initializes the test and test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         springModule = new SpringModule();
         springModule.init(configuration);
@@ -52,6 +58,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context using SpringApplicationContext on class level
      */
+    @Test
     public void testGetApplicationContext() {
         SpringTest springTest = new SpringTest();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTest);
@@ -63,6 +70,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context using SpringApplicationContext on field level
      */
+    @Test
     public void testGetApplicationContext_field() {
         SpringTestField springTestField = new SpringTestField();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestField);
@@ -74,6 +82,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context using SpringApplicationContext on field level
      */
+    @Test
     public void testGetApplicationContext_setter() {
         SpringTestSetter springTestSetter = new SpringTestSetter();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestSetter);
@@ -85,6 +94,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context using a custom create method.
      */
+    @Test
     public void testGetApplicationContext_customCreate() {
         SpringTestCreateMethod springTestCreateMethod = new SpringTestCreateMethod();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestCreateMethod);
@@ -96,6 +106,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context using a custom create method with an application context argument.
      */
+    @Test
     public void testGetApplicationContext_customCreateWithApplicationContext() {
         SpringTestCreateMethodWithApplicationContext springTestCreateMethod = new SpringTestCreateMethodWithApplicationContext();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestCreateMethod);
@@ -107,6 +118,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests for more than 1 annotation with values. An exception should have been raised.
      */
+    @Test
     public void testGetApplicationContext_multipleAnnotationsWithValues() {
         SpringTestMultipleAnnotationsWithValues springTestMultipleAnnotationsWithValues = new SpringTestMultipleAnnotationsWithValues();
         try {
@@ -121,6 +133,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests for more than 1 custom create methods. An exception should have been raised.
      */
+    @Test
     public void testGetApplicationContext_twoCustomCreateMethods() {
         SpringTestTwoCreateMethods springTestTwoCreateMethods = new SpringTestTwoCreateMethods();
         try {
@@ -135,6 +148,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests getting an application context a second time, the same application context should be returned.
      */
+    @Test
     public void testGetApplicationContext_twice() {
         SpringTest springTestMixing = new SpringTest();
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
@@ -148,6 +162,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests invalidating a cached application context.
      */
+    @Test
     public void testInvalidateApplicationContext() {
         SpringTest springTestMixing = new SpringTest();
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
@@ -163,6 +178,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests invalidating a cached application context using the class name.
      */
+    @Test
     public void testInvalidateApplicationContext_classSpecified() {
         SpringTest springTestMixing = new SpringTest();
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
@@ -178,6 +194,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests invalidating a cached application context using a wrong class name.
      */
+    @Test
     public void testInvalidateApplicationContext_otherClassSpecified() {
         SpringTest springTestMixing = new SpringTest();
         ApplicationContext applicationContext1 = springModule.getApplicationContext(springTestMixing);
@@ -192,6 +209,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context using a custom create method with a wrong signature.
      */
+    @Test
     public void testGetApplicationContext_customCreateWrongSignature() {
         SpringTestCreateMethodWrongSignature springTestCreateMethodWrongSignature = new SpringTestCreateMethodWrongSignature();
         try {
@@ -206,6 +224,7 @@ public class SpringModuleApplicationContextTest extends TestCase {
     /**
      * Tests creating an application context for an unknown location.
      */
+    @Test
     public void testGetApplicationContext_wrongLocation() {
         SpringTestWrongLocation springTestWrongLocation = new SpringTestWrongLocation();
         try {

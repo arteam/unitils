@@ -15,16 +15,22 @@
  */
 package org.unitils.spring;
 
-import junit.framework.TestCase;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+
+import java.util.List;
+import java.util.Properties;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.unitils.core.ConfigurationLoader;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import org.unitils.spring.annotation.SpringApplicationContext;
-
-import static java.util.Arrays.asList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * Test for ApplicationContext creation in a test class hierarchy for the {@link SpringModule}.
@@ -32,18 +38,17 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SpringModuleApplicationContextInheritanceTest extends TestCase {
+public class SpringModuleApplicationContextInheritanceTest {
 
     /* Tested object */
-    private SpringModule springModule;
+    SpringModule springModule;
 
 
     /**
      * Initializes the test and test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         springModule = new SpringModule();
         springModule.init(configuration);
@@ -54,6 +59,7 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
      * Tests creating the application context.
      * Both super and sub class have annotations with values and custom create methods.
      */
+    @Test
     public void testCreateApplicationContext_overriden() {
         SpringTestCustomCreate springTest1 = new SpringTestCustomCreate();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTest1);
@@ -68,6 +74,7 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
      * Tests creating the application context.
      * Both super and sub class have annotations with values and but only super class has custom create method.
      */
+    @Test
     public void testCreateApplicationContext_overridenNoCustomCreateInSubClass() {
         SpringTestNoCustomCreate springTestNoCustomCreate = new SpringTestNoCustomCreate();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestNoCustomCreate);
@@ -81,6 +88,7 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
      * Test creating an application context for 2 subclasses of the same superclass. The context of the
      * superclass (parent) should have been reused.
      */
+    @Test
     public void testCreateApplicationContext_twice() {
         ApplicationContext applicationContext1 = springModule.getApplicationContext(new SpringTestNoCreation1());
         ApplicationContext applicationContext2 = springModule.getApplicationContext(new SpringTestNoCreation2());
@@ -94,6 +102,7 @@ public class SpringModuleApplicationContextInheritanceTest extends TestCase {
      * Tests creating the application context. No context creation is done in the sub-class, the context of the super
      * class should be used.
      */
+    @Test
     public void testCreateApplicationContext_onlyInSuperClass() {
         SpringTestNoCreation1 springTestNoCreation = new SpringTestNoCreation1();
         ApplicationContext applicationContext = springModule.getApplicationContext(springTestNoCreation);

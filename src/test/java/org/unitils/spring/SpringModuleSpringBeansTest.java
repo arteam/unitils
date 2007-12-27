@@ -15,7 +15,17 @@
  */
 package org.unitils.spring;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.spring.annotation.SpringApplicationContext;
@@ -23,18 +33,13 @@ import org.unitils.spring.annotation.SpringBean;
 import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 /**
  * Test for the {@link SpringModule}.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class SpringModuleSpringBeansTest extends TestCase {
+public class SpringModuleSpringBeansTest {
 
     /* Tested object */
     private SpringModule springModule;
@@ -43,9 +48,8 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Initializes the test and test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         springModule = new SpringModule();
         springModule.init(configuration);
@@ -55,6 +59,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Tests assigning a spring bean using its name.
      */
+    @Test
     public void testAssignSpringBeans() {
         SpringTest springTest = new SpringTest();
         springModule.assignSpringBeans(springTest);
@@ -67,6 +72,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Tests assigning a spring bean by declared type of field and setter.
      */
+    @Test
     public void testAssignSpringBeansByType() {
         SpringTestByType springTestByType = new SpringTestByType();
         springModule.assignSpringBeansByType(springTestByType);
@@ -79,6 +85,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Tests assigning a spring bean by name of field.
      */
+    @Test
     public void testAssignSpringBeansByName() {
         SpringTestByName springTestByName = new SpringTestByName();
         springModule.assignSpringBeansByName(springTestByName);
@@ -90,6 +97,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Tests assigning a spring bean by name of setter.
      */
+    @Test
     public void testAssignSpringBeansByName_setter() {
         SpringTestByNameSetter springTestByNameSetter = new SpringTestByNameSetter();
         springModule.assignSpringBeansByName(springTestByNameSetter);
@@ -101,6 +109,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Tests assigning a spring bean using an unexisting name.
      */
+    @Test
     public void testAssignSpringBeans_notFound() {
         SpringTestNotFound springTestNotFound = new SpringTestNotFound();
         try {
@@ -116,6 +125,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Tests assigning a spring bean using an unexisting type.
      */
+    @Test
     public void testAssignSpringBeansByType_notFound() {
         SpringTestByTypeNotFound springTestByTypeNotFound = new SpringTestByTypeNotFound();
         try {
@@ -131,6 +141,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Tests assigning a spring bean using an ambiguous type (TreeSet, HashSet).
      */
+    @Test
     public void testAssignSpringBeansByType_ambiguous() {
         SpringTestByTypeAmbiguous springTestByTypeAmbiguous = new SpringTestByTypeAmbiguous();
         try {
@@ -146,6 +157,7 @@ public class SpringModuleSpringBeansTest extends TestCase {
     /**
      * Tests assigning a spring bean using an unexisting field name.
      */
+    @Test
     public void testAssignSpringBeansByName_notFound() {
         SpringTestByNameNotFound springTestByNameNotFound = new SpringTestByNameNotFound();
         try {

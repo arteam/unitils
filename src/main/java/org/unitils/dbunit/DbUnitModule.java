@@ -513,7 +513,7 @@ public class DbUnitModule implements Module {
     protected class DbUnitListener extends TestListener {
 
         @Override
-        public void beforeTestMethod(Object testObject, Method testMethod) {
+        public void beforeTestSetUp(Object testObject, Method testMethod) {
             insertDataSet(testMethod, testObject);
         }
 

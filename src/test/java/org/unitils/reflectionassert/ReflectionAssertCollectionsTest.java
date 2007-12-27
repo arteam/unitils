@@ -25,42 +25,44 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
+
 /**
  * Test class for {@link ReflectionAssert} tests for with assertProperty methods with collection arguments.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertCollectionsTest extends TestCase {
+public class ReflectionAssertCollectionsTest {
 
     /* A test collection */
-    private List<String> listA;
+    List<String> listA;
 
     /* Same as listA but different instance */
-    private List<String> listB;
+    List<String> listB;
 
     /* Same as listA but with a different order */
-    private List<String> listDifferentOrder;
+    List<String> listDifferentOrder;
 
     /* A list having same size as listA but containing different values */
-    private List<String> listDifferentValues;
+    List<String> listDifferentValues;
 
     /* A list containing 1 extra element as listA, a double of another element */
-    private List<String> listDuplicateElement;
+    List<String> listDuplicateElement;
 
     /* A list with one element less than listA */
-    private List<String> listOneElementLess;
+    List<String> listOneElementLess;
 
     /* A list with one element more than listA */
-    private List<String> listOneElementMore;
+    List<String> listOneElementMore;
 
 
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         listA = Arrays.asList("el1", "el2");
         listB = Arrays.asList("el1", "el2");
         listDifferentOrder = Arrays.asList("el2", "el1");
@@ -74,6 +76,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two equal collections.
      */
+    @Test
     public void testAssertRefEquals() {
         assertRefEquals(listA, listB);
     }
@@ -82,6 +85,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two equal collections but with different order.
      */
+    @Test
     public void testAssertRefEquals_notEqualsDifferentOrder() {
         try {
             assertRefEquals(listA, listDifferentOrder);
@@ -96,6 +100,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two equal collections but with different order.
      */
+    @Test
     public void testAssertRefEquals_equalsDifferentOrder() {
         assertRefEquals(listA, listDifferentOrder, LENIENT_ORDER);
     }
@@ -104,6 +109,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two equal collections but with different order.
      */
+    @Test
     public void testAssertLenEquals_equalsDifferentOrder() {
         assertLenEquals(listA, listDifferentOrder);
     }
@@ -112,6 +118,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for two collections with different elements.
      */
+    @Test
     public void testAssertEquals_differentListSameSize() {
         try {
             assertRefEquals(listA, listDifferentValues);
@@ -126,6 +133,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for a collection with a duplicate element.
      */
+    @Test
     public void testAssertEquals_duplicateElement() {
         try {
             assertRefEquals(listA, listDuplicateElement);
@@ -140,6 +148,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for with a collection that has one element less.
      */
+    @Test
     public void testAssertEquals_oneElementLess() {
         try {
             assertRefEquals(listA, listOneElementLess);
@@ -154,6 +163,7 @@ public class ReflectionAssertCollectionsTest extends TestCase {
     /**
      * Test for with a collection that has one element more.
      */
+    @Test
     public void testAssertEquals_oneElementMore() {
         try {
             assertRefEquals(listA, listOneElementMore);
