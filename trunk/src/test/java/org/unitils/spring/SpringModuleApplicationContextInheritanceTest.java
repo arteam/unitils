@@ -151,12 +151,6 @@ public class SpringModuleApplicationContextInheritanceTest {
     public class SpringTestNoCustomCreate extends SpringTestSuper {
     }
 
-    /**
-     * Test SpringTest sub-class.
-     */
-    @SpringApplicationContext({"classpath:org/unitils/spring/services-config.xml"})
-    private class SpringTest2 extends SpringTestSuper {
-    }
 
     /**
      * Test SpringTest sub-class without any context declaration.
