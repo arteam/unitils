@@ -115,7 +115,7 @@ database.url=<my database connection url>
 
 # This property specifies the underlying DBMS implementation. Supported values are 'oracle', 'db2', 'mysql' and 'hsqldb'.
 # The value of this property defines which vendor specific implementations of DbSupport and ConstraintsDisabler are chosen.
-database.dialect=<my databasa dialect>
+database.dialect=<my database dialect>
 +------+
 
     Next, create a file <unitils-\<myproject\>-local.properties> and put this file in the local user home directory. The file 
@@ -342,10 +342,10 @@ public class UserDaoTest extends UnitilsJUnit4 {
 <beans>
 
     <bean id="userDao" class="org.unitils.cookbook.UserDao">
-        <property name="sessionFactory" ref="sessionFactoryBean"/>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <bean id="sessionFactoryBean" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="annotatedClasses">
             <list>
@@ -359,7 +359,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
         </property>
     </bean>
 
-    <bean id="dataSource" class="org.unitils.database.UnitilsDataSource" />
+    <bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
   
 </beans>
 +-----+
@@ -372,7 +372,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     
     * the configured <UnitilsDataSource> will connect to the unit test database as configured in <unitils.properties> and <unitils-\<myproject\>-local.properties>
     
-    * Spring wires the <userDao> Spring bean with a <SessionFactory> that uses the <UnitilsDataSource> 
+    * Spring wires the <userDao> Spring bean with a <SessionFactory> that uses the DataSource supplied by Unitils 
     
     * the Spring bean named <userDao> is retrieved from the application context and injected in the <userDao> field    
     
