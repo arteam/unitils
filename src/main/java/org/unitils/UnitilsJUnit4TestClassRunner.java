@@ -107,8 +107,8 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
 
     /**
-     * Overriden JUnit4 method to be able to create a CustomMethodRoadie that will invoke the
-     * unitils test listener methods at the apropriate moments.
+     * Overridden JUnit4 method to be able to create a CustomMethodRoadie that will invoke the
+     * unitils test listener methods at the appropriate moments.
      */
     protected void invokeTestMethod(Method method, RunNotifier notifier) {
         Description description = methodDescription(method);
@@ -220,19 +220,6 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
 
     /**
-     * This will return the default singleton instance by calling {@link Unitils#getInstance()}.
-     * <p/>
-     * You can override this method to let it create and set your own singleton instance. For example, you
-     * can let it create an instance of your own Unitils subclass and set it by using {@link Unitils#setInstance}.
-     *
-     * @return the unitils core instance, not null
-     */
-    protected Unitils getUnitils() {
-        return Unitils.getInstance();
-    }
-
-
-    /**
      * Creates a hook that will call {@link TestListener#afterAll} during the shutdown of the VM.
      * <p/>
      * This seems te be the only way in JUnit4 to this, since there is no way to
@@ -255,5 +242,18 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 	protected TestListener getTestListener() {
 		return getUnitils().getTestListener();
 	}
+	
+	
+	/**
+     * This will return the default singleton instance by calling {@link Unitils#getInstance()}.
+     * <p/>
+     * You can override this method to let it create and set your own singleton instance. For example, you
+     * can let it create an instance of your own Unitils subclass and set it by using {@link Unitils#setInstance}.
+     *
+     * @return the unitils core instance, not null
+     */
+    protected Unitils getUnitils() {
+        return Unitils.getInstance();
+    }
 }
 
