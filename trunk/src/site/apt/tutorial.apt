@@ -5,14 +5,12 @@
 
 Tutorial
 ~~~~~~~~
-    Unit testing should be easy and intuitively... at least in theory. Real-life projects typically span multiple layers, are data-driven and use middleware technologies 
-    such as EJB and Hibernate.
+    Unit testing should be easy and intuitively... at least in theory. Real-life projects typically span multiple layers, are data-driven and use middleware technologies such as EJB and Hibernate.
 
     Unitils originated out of an attempt to get a more pragmatic view on unit testing that involves some typical unit testing frameworks such as DbUnit and EasyMock. 
     It started as a set of guidelines and eventually resulted in an open source library containing utilities that facilitate the application of these guidelines.
 
-    This tutorial will show you, using examples, what Unitils can do for your projects. It is merely an introduction to Unitils, more in-depth documentation can be found 
-    in the {{{apidocs/index.html}javadoc}} of the modules. The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}. 
+    This tutorial will show you, using examples, what Unitils can do for your projects. The testing guidelines that are behind the features can be found on the {{{guidelines.html}guidelines page}}. 
     If you want to learn how you can setup Unitils to get started quickly, read the {{{cookbook.html}cookbook}}.
 
 
@@ -897,6 +895,8 @@ database.dialect=oracle
     * <<PostgreSQL>> - Tested with version 8.2
     
     * <<DB2>> - Tested with version 9
+	
+	* <<Derby>>
 
     []
  
@@ -1055,7 +1055,7 @@ public class UserDaoTest extends BaseDaoTest {
 public class BaseDaoTest extends UnitilsJUnit4 {
 }
 
-@HibernateSessionFactory("user-mapped-classes.cfg.xml")
+@HibernateSessionFactory({"hibernate.cfg.xml", "user-mapped-classes.cfg.xml"})
 public class UserDaoTest extends BaseDaoTest {
      
     @HibernateSessionFactory
@@ -1065,14 +1065,13 @@ public class UserDaoTest extends BaseDaoTest {
     
     This will create a new configuration for UserDAOTest class, first loading the <hibernate.cfg.xml> followed by the <user-mapped-classes.cfg.xml>. 
     The configuration is then used to create a <SessionFactory> instance. Note that there is a performance implication. By adding this new 
-    configuration file in the subclass, a new session factory had to be created. In the previous example, no extra configuration was added and 
-    the session factory could be reused. Session factory creation is a heavy operation, so try to reuse them as much as possible. This will 
-    greatly improve the performance of your tests.
+    configuration file in the subclass, a new session factory has to be created. In the previous example, no extra configuration is added and 
+    the session factory can be reused. Session factory creation is a heavy operation, so try to reuse them as much as possible.
    
    
 *** Programmatic configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Performing programmatic configuration is also supported. You can do this by annotating a custom initialization or custom create method with 
+    Performing programmatic configuration is also supported. You can use it by annotating a custom initialization method with 
     the <@HibernateSessionFactory> annotation. A custom initialization method has 1 parameter of a <Configuration> (sub-)type and a void return 
     type. It can be used to further configure the <Configuration> instance that was created by Unitils. You could for example load extra 
     configuration files or register mapped classes:    
@@ -1089,24 +1088,21 @@ protected void initializeConfiguration(AnnotationConfiguration configuration) {
 }   
 +-----+
 
-    If you need full control over the creation of the <Configuration>, you can also annotate a custom create method with the the <@HibernateSessionFactory> 
-    annotation. This method has a single <List\<String\>> type parameter and returns a <Configuration> instance. If such a method is found, Unitils will 
-    call this method for creating the configuration instead of creating it itself. The list of configuration files that were specified as values in
-    the annotations that would otherwise be used by Unitils to load the configuration, will be passed in the list parameter. Following is an example of a 
-    custom create method:
+    If you need full control over the creation of the <Configuration>, you can use a custom create method. Simply annotate a method with the <@HibernateSessionFactory> 
+    annotation, and make this method return a <Configuration> instance. Following is an example of a custom create method:
 
 +-----+
 @HibernateSessionFactory
-protected Configuration createConfiguration(List<String> locations) {
+protected Configuration createConfiguration() {
     AnnotationConfiguration configuration = new AnnotationConfiguration();
-    for (String location : locations){
-        configuration.loadConfig(location);
-    }
-    configuration.loadConfig("hibernate.cfg.xml");
-    return configuration;
-}   
+    Properties properties = getCustomProperties();
+	configuration.addProperties(customProperties);
+	for (Class mappedClass : getMappedClasses()) {
+		configuration.addMappedClass(mappedClass);
+	}
+}
 +-----+
-    
+  
     
 ** {Hibernate Session management}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1130,24 +1126,19 @@ public abstract class BaseDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    Unitils manages all sessions created by these session factories. It will for example flush sessions before checking the state of a database and 
-    closes sessions after a unit test was finished.
+    Unitils manages all sessions created by these session factories. It will for flush the session before checking the state of a database and 
+    close the session after a unit test was finished.
+	
+	Unitils also provides what we call a 'test-bound session context'. This means that, for the duration of a test, every call to <SessionFactory.getCurrentSession()>
+	will return the same hibernate session.
+	
     
-    An implementation of Hibernate's <CurrentSessionContext> is also provided. By default, the <SimpleCurrentSessionContext> will be added to the Hibernate 
-    configuration, enabling you to use <SessionFactory.getCurrentSession()> in your tested code without having to do any extra configuration. This implementation 
-    will create a new <Session> the first time <SessionFactory.getCurrentSession()> is called and returns this same session for the duration of the test.
-    After the test has finished the <Session> is automatically closed.
-    
-    
-    
-    
-** Testing the mapping
+** Hibernate mapping test
 ~~~~~~~~~~~~~~~~~~~~~~
-    Unitils is shipped with a ready-to-use unit test that verifies whether the mapping of all your mapped classes is consistent with the database 
-    structure. The method <HibernateUnitils.assertMappingWithDatabaseConsistent()> checks if any updates are required to the database to make it 
-    consistent with the Hibernate mapping. If yes, the test fails and the DDL statements that should be issued to the database that will make the 
-    mapping consistent are shown in the error message. This test is not automatically executed, you should write a unit test that looks like the 
-    following:
+    Unitils is shipped with a unit test that verifies if the mapping of all your mapped classes is consistent with the database 
+    structure. <HibernateUnitils.assertMappingWithDatabaseConsistent()> checks if any updates are required to the database to make it 
+    consistent with the Hibernate mapping. If yes, the test fails showing all DDL statements that should be issued to the database. 
+	This test is not automatically executed, you have to write a unit test yourself like follows:
     
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
@@ -1160,12 +1151,7 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    This test will first load a hibernate configuration from the specified <hibernate.cfg.xml> and compare the hibernate setup with the current state of the 
-    unit-test database. The test will fail if the state of the database is not consistent with the mapping and will report the inconsistencies in the 
-    error message.
-    
-    As a simple example, suppose the Person class has a lastName field that does not exist in the PERSON table and a barCode field that does not 
-    exist in the PRODUCT table you would get following error message:
+    An example error message could be:
     
 +-----+
 Found mismatches between Java objects and database tables. Applying following DDL statements to the database should resolve the problem:
@@ -1174,8 +1160,51 @@ alter table PRODUCT add column barCode varchar(255);
 +-----+
 
 
+* {Testing with JPA / Hibernate}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    Since the release 1.1, Unitils provides support for JPA using Hibernate as persistence provider (using the 
+    {{{http://www.hibernate.org/hib_docs/entitymanager/reference/en/html_single}Hibernate EntityManager}}).
+	
+	The JPA integration is analogeous to the hibernate integration. As defined in the JPA specification, a persistence unit is
+	by default configured by loading the file <META-INF/persistence.xml>. The JPA specification also requires you to give a name to your persistence unit.
+	If we called our persistence unit 'pu', an test can be written as follows:
+	
++-----+
+public class UserDaoTest extends UnitilsJUnit4 {
+    
+    @JpaEntityManagerFactory(persistenceUnit = "pu")
+    EntityManagerFactory entityManagerFactory;
++-----+
 
+    Unitils will initialize a hibernate <EntityManagerFactory>, load the persistence unit named 'pu', and inject it into the field annotated with 
+	<@JpaEntityManagerFactory>.
+	
+	It's also possible to use a different configuration file than <META-INF/persistence.xml> for testing, using the configFiles attribute, e.g.:
+	
++-----+
+public class UserDaoTest extends UnitilsJUnit4 {
+    
+    @JpaEntityManagerFactory(persistenceUnit = "pu", configFiles = "persistence-test.xml")
+    EntityManagerFactory entityManagerFactory;
++-----+
+
+    Unitils also supports custom configuration and custom create methods, just like when configuring a hibernate <SessionFactory>. An <org.hibernate.ejb.Ejb3Configuration>
+    must be taken as parameter for a custom configuration method or returned by a custom create method.
+	
+	Just as when using hibernate directly, you can create a test that verifies the mapping of the entities with the database. An implementation looks as follows:
+	
++-----+
+@JpaEntityManagerFactory(persistenceUnit = "pu", configFiles = "persistence-test.xml")
+public class JpaMappingTest extends UnitilsJUnit4 {
+    
+    @Test
+    public void testMappingToDatabase() {
+        JpaUnitils.assertMappingWithDatabaseConsistent();
+    }
+}
++-----+ 
+	
 * {Testing with Spring}
 ~~~~~~~~~~~~~~~~~~~~~~~
     Unitils also offers features for unit testing when working with {{{http://www.springframework.org}Spring}}. One of the basic principles of Spring is that 
@@ -1186,21 +1215,23 @@ alter table PRODUCT add column barCode varchar(255);
     
     * Management of <ApplicationContext> configuration
     
-    * Simple injection of Spring beans in unit tests
+    * Injection of Spring beans in unit tests
     
-    * Enable testing DAO's that make use of a Hibernate <SessionFactory> configured in Spring
+    * Make use of a Hibernate <SessionFactory> configured in Spring
+	
+	* Reference the Unitils DataSource in Spring configuration
 
 
 
 
 ** ApplicationContext configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Loading application contexts can easily be achieved by annotating a class, method or field with a <@SpringApplicationContext> annotation and specifying the 
-    configuration files that need to be loaded as a parameter. If you annotate a field or method with this annotation, the application context will also be 
-    injected in this field or method. For example:
+    Loading an application context can easily be achieved by annotating a class, method or field with a <@SpringApplicationContext> annotation, 
+	and specifying the spring config files as attribute. 
+	The resulting application context is injected into fields or methods annotated with <@SpringApplicationContext>. For example:
     
 +-----+
-@SpringApplicationContext({"spring-beans.xml", "extra-spring-beans.xml"})
+@SpringApplicationContext({"spring-config.xml", "spring-test-config.xml"})
 public class UserServiceTest extends UnitilsJUnit4 {
 
     @SpringApplicationContext
@@ -1212,10 +1243,10 @@ public class UserServiceTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    This will create a new <ApplicationContext> loading the <spring-beans.xml> and <extra-spring-beans.xml> files and will inject it into the annotated field 
+    This will create a new <ApplicationContext> loading the config files <spring-config.xml> and <spring-test-config.xml> and will inject it into the annotated field 
     and setter method. 
     
-    Superclasses will also be scanned for the presence of <@SpringApplicationContext> annotations. If found, these configuration files are loaded before the 
+    Superclasses are also scanned for the presence of <@SpringApplicationContext> annotations. If found, these configuration files are loaded before the 
     configuration files specified in subclasses. This makes it possible to override configuration settings or to add extra configuration specific for the test. 
     For example:
     
@@ -1289,8 +1320,8 @@ public ConfigurableApplicationContext createApplicationContext() {
 
 ** Injection of Spring beans
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Once you've configured an ApplicationContext, Spring beans can be retrieved using the <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>
-    annotations. Dollowing example shows 3 ways to get a <UserService> bean instance from the application context:
+    Once you've configured an ApplicationContext, Spring beans are injected into fields / setters annotated with <@SpringBean>, <@SpringBeanByType> or <@SpringBeanByName>. 
+	Following example shows 3 ways to get a <UserService> bean instance from the application context:
     
 +-----+
 @SpringBean("userService")
@@ -1303,15 +1334,12 @@ private UserService userService;
 private UserService userService;
 +-----+
 
-    The first one, <@SpringBean>, allows you to get a Spring bean from the application context by explicitly specifying the name of the bean. In this case, 
-    this will look up the <userService> bean and inject it into the field. The second one, <@SpringBeanByName>, has the same effect. It uses the name of the 
-    field, again <userService>, as name for the bean to get from the application context
+    With <@SpringBean>, you can get a Spring bean from the application context by explicitly specifying the name of the bean. <@SpringBeanByName>, has the same effect, but now the name of the field is used to identify the bean.
     
-    When using the last one, <@SpringBeanByType>, the application context will be queried for a bean having a type that is assignable to the field, in this case,
-    a bean that is of type <UserService> or one of its sub-types. If no such bean exists or if there is more than one possible candidate, a <UnitilsException> 
-    will be thrown.     
+    When using <@SpringBeanByType>, the application context is queried for a bean having a type assignable to the field. In this case, this is
+    a bean of type <UserService> or one of its sub-types. If no such bean exists or if there is more than one possible candidate, an exception is thrown.
     
-    The above examples where for field injection, the same annotations can also be used on setter methods. For example:
+    The same annotations can be used on setter methods. For example:
      
 +-----+
 @SpringBeanByType
@@ -1326,8 +1354,8 @@ public void setUserService(UserService userService) {
 ** Connecting to the test database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     In the {{{#Database testing}Database testing}} section we explained you how to obtain and install a datasource for your test. The 
-    {{{#Testing with Hibernate}Testing with Hibernate}} section described how to setup hibernate for your test. In Spring all this wiring is typically done in a Spring 
-    configuration file. Suppose, for example, that your application contains following <application-config.xml> configuration file:
+    {{{#Testing with Hibernate}Testing with Hibernate}} section describes how to setup hibernate for your test. In Spring all this wiring is typically done in a Spring 
+    config file. Suppose, for example, that your application contains following <application-config.xml> file:
     
 +-----+
 <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
@@ -1353,27 +1381,21 @@ public void setUserService(UserService userService) {
 </bean>
 +-----+
 
-    The first bean defines the data source that will connect to the application database. The second bean configures hibernate to make use of this data source 
-    and to add <User> as mapped hibernate class.
+    The first bean defines the data source that connects to the application database. The second bean configures a hibernate <SessionFactory> that 
+	connects with this <DataSource>.
     
-    Database testing ofcourse requires a connection to the test database. A typical way to do this is to write a <test-ds-config.xml>.
+    In our tests we need a connection to the test database. Typically, a test-specific spring configuration file is written with for example following contents:
     
 +-----+
-<bean id="dataSource" class="org.unitils.database.UnitilsDataSource" />
+<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
 +-----+
 
-    This configuration defines a <UnitilsDataSource> as dataSource. It is a pooled datasource that connects to the unit-test database as configured in Unitils. 
-    You could for example create a <unitils-local.properties> that lets Unitils connect to the developers own unit-test database:
+    With this configuration, Spring will make use of the DataSource configured in Unitils. Refer to {{{Configuration}the configuration chapter}} for more information
+	on how to configure a test DataSource.
+    
 
-+-----+
-database.schemaNames=UNIT_TEST_JOHN
-database.userName=john
-database.password=1234
-+-----+    
-
-    Session factory configuration is automatically detected by Unitils. If you configure a <SessionFactory> in a Spring application context, you do not need to 
-    use the <@HibernateSessionFactory> to setup hibernate for your test. As an example, suppose that we want to write a test that checks whether the mapping of 
-    the <User> class is consistent with the structure of the database. Using the above configuration files, you could write this as follows:
+    Unitils automatically detects the SessionFactory configured in Spring: all integration features Unitils offers for Hibernate also work when using Spring. The
+	{{{Hibernate mapping test}hibernate mapping test}} will therefore also work as follows:
     
 +-----+
 @SpringApplicationContext({"application-config.xml", "test-ds-config.xml"})
@@ -1385,11 +1407,6 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
     }
 }
 +-----+
-
-
-
-
-
 
 * {Testing with mock objects}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1658,10 +1675,10 @@ databasecode/ 01_compileAll.sql
        
 +----+
 
-    Unitils will first execute the non-indexed scripts. This will make sure the stored procedures in <dropAllInactiveUsers.sql> and <collectivePayRaise.sql> are created in the database. 
+    Unitils will first execute the non-indexed scripts. This will make sure the stored procedures in <dropAllInactiveUsers.sql> and <collectivePayRaise.sql> are created in the database.
     Next, the indexed files are executed in proper sequence. This will make sure the <script 01_compileAll.sql> is executed that compiles all stored procedures in the database.
     
-    Code script files can contain multiple function, stored procedure... definitions. If that is the case, the different definitions should always be separated by a '/' sign that is 
+    Code script files can contain multiple function, stored procedure... definitions. If this is the case, the different definitions should always be separated by a '/' sign that is 
     put on a separate line. 
     
 +-----+
