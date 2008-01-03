@@ -83,13 +83,13 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = TransactionsDisabledTest.class.getMethod("test", new Class[] {});
-        databaseModule.startTransaction(transactionsDisabledTest, testMethod);
+        databaseModule.startTransactionForTestMethod(transactionsDisabledTest, testMethod);
         Connection conn1 = databaseModule.getDataSource().getConnection();
         conn1.close();
         Connection conn2 = databaseModule.getDataSource().getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
-        databaseModule.endTransaction(transactionsDisabledTest, testMethod);
+        databaseModule.endTransactionForTestMethod(transactionsDisabledTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -108,13 +108,13 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
 
         Method testMethod = RollbackTest.class.getMethod("test", new Class[] {});
         DataSource dataSource = databaseModule.getDataSource();
-        databaseModule.startTransaction(rollbackTest, testMethod);
+        databaseModule.startTransactionForTestMethod(rollbackTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         connection1.close();
         Connection connection2 = dataSource.getConnection();
         connection2.close();
         assertSame(connection1, connection2);
-        databaseModule.endTransaction(rollbackTest, testMethod);
+        databaseModule.endTransactionForTestMethod(rollbackTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }
@@ -133,13 +133,13 @@ public class DatabaseModuleSimpleTransactionManagerTest extends DatabaseModuleTr
 
         Method testMethod = CommitTest.class.getMethod("test", new Class[] {});
         DataSource dataSource = databaseModule.getDataSource();
-        databaseModule.startTransaction(commitTest, testMethod);
+        databaseModule.startTransactionForTestMethod(commitTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         connection1.close();
         Connection connection2 = dataSource.getConnection();
         connection2.close();
         assertSame(connection1, connection2);
-        databaseModule.endTransaction(commitTest, testMethod);
+        databaseModule.endTransactionForTestMethod(commitTest, testMethod);
 
         verify(mockConnection1, mockConnection2);
     }

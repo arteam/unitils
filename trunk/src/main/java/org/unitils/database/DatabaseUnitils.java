@@ -48,9 +48,33 @@ public class DatabaseUnitils {
      * making sure that these updates are flushed, to be able to check the effect of these updates
      * using plain old JDBC.
      */
-    public void flushDatabaseUpdates() {
-        Object testObject = Unitils.getInstance().getTestContext().getTestObject();
-        getDatabaseModule().flushDatabaseUpdates(testObject);
+    public static void flushDatabaseUpdates() {
+        getDatabaseModule().flushDatabaseUpdates(getTestObject());
+    }
+
+
+    /**
+     * Starts a new transaction on the transaction manager configured in unitils
+     */
+    public static void startTransaction() {
+        getDatabaseModule().startTransaction(getTestObject());
+    }
+    
+    
+    /**
+     * Commits the current unitils transaction
+     */
+    public static void commitTransaction() {
+        getDatabaseModule().commitTransaction(getTestObject());
+    }
+    
+    
+    /**
+     * Performs a rollback of the current unitils transaction
+     *
+     */
+    public static void rollbackTransaction() {
+        getDatabaseModule().rollbackTransaction(getTestObject());
     }
 
 
@@ -69,7 +93,7 @@ public class DatabaseUnitils {
      * the database version is not yet set to the current one. This method can also be useful for example for
      * reinitializing the database after having reorganized the scripts folder.
      */
-    public void setDatabaseToCurrentVersion() {
+    public static void setDatabaseToCurrentVersion() {
         getDatabaseModule().setDatabaseToCurrentVersion();
     }
 
@@ -125,5 +149,13 @@ public class DatabaseUnitils {
      */
     private static DatabaseModule getDatabaseModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
+    
+    /**
+     * @return The current test object
+     */
+    private static Object getTestObject() {
+        Object testObject = Unitils.getInstance().getTestContext().getTestObject();
+        return testObject;
     }
 }

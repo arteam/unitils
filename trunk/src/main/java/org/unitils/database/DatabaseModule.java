@@ -146,7 +146,7 @@ public class DatabaseModule implements Module {
      * be checked directly on the database.
      * <p/>
      * This will look for modules that implement {@link Flushable} and call flushDatabaseUpdates on these module.
-     * @param testObject TODO
+     * @param testObject The test object, not null
      */
     public void flushDatabaseUpdates(Object testObject) {
         logger.info("Flushing database updates.");
@@ -281,9 +281,9 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      * @param testMethod The test method, not null
      */
-    public void startTransaction(Object testObject, Method testMethod) {
+    protected void startTransactionForTestMethod(Object testObject, Method testMethod) {
         if (isTransactionsEnabled(testObject, testMethod)) {
-        	getTransactionManager().startTransaction(testObject);
+        	startTransaction(testObject);
         }
     }
 
@@ -295,14 +295,44 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      * @param testMethod The test method, not null
      */
-    protected void endTransaction(Object testObject, Method testMethod) {
+    protected void endTransactionForTestMethod(Object testObject, Method testMethod) {
         if (isTransactionsEnabled(testObject, testMethod)) {
 	        if (getTransactionMode(testObject, testMethod) == COMMIT) {
-	            getTransactionManager().commit(testObject);
+	            commitTransaction(testObject);
 	        } else if (getTransactionMode(testObject, testMethod) == ROLLBACK) {
-	            getTransactionManager().rollback(testObject);
+	            rollbackTransaction(testObject);
 	        }
         }
+    }
+    
+    
+    /**
+     * Starts a new transaction on the transaction manager configured in unitils
+     * 
+     * @param testObject The test object, not null
+     */
+    public void startTransaction(Object testObject) {
+        getTransactionManager().startTransaction(testObject);
+    }
+
+
+    /**
+     * Commits the current transaction.
+     * 
+     * @param testObject The test object, not null
+     */
+    public void commitTransaction(Object testObject) {
+        getTransactionManager().commit(testObject);
+    }
+    
+    
+    /**
+     * Performs a rollback of the current transaction
+     * 
+     * @param testObject The test object, not null
+     */
+    public void rollbackTransaction(Object testObject) {
+        getTransactionManager().rollback(testObject);
     }
 
 
@@ -393,12 +423,12 @@ public class DatabaseModule implements Module {
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             injectDataSource(testObject);
-            startTransaction(testObject, testMethod);
+            startTransactionForTestMethod(testObject, testMethod);
         }
 
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
-            endTransaction(testObject, testMethod);
+            endTransactionForTestMethod(testObject, testMethod);
         }
     }
 }
