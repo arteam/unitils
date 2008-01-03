@@ -322,6 +322,7 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     public void commitTransaction(Object testObject) {
+        flushDatabaseUpdates(testObject);
         getTransactionManager().commit(testObject);
     }
     
@@ -332,6 +333,7 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     public void rollbackTransaction(Object testObject) {
+        flushDatabaseUpdates(testObject);
         getTransactionManager().rollback(testObject);
     }
 
