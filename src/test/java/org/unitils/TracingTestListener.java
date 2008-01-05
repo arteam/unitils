@@ -16,10 +16,14 @@
 package org.unitils;
 
 import junit.framework.AssertionFailedError;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.rightPad;
 import org.unitils.core.TestListener;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +58,17 @@ public class TracingTestListener extends TestListener {
     private String exceptionMethod;
 
     private boolean throwAssertionFailedError;
+    
+    /*
+     * Test method that is currently executing
+     */
+    private Method currentTestMethod;
+    
+    /*
+     * Exception that was thrown during the test method that is currently executing.
+     * Is reset in beforeTestSetUp
+     */
+    private Throwable currentThrowable;
 
 
     public TracingTestListener() {
@@ -102,25 +117,38 @@ public class TracingTestListener extends TestListener {
 
     @Override
     public void beforeTestSetUp(Object testObject, Method testMethod) {
+    	assertNotNull(testMethod);
+    	currentTestMethod = testMethod;
+    	currentThrowable = null;
+    	
         callList.add(formatListenerCallAsString(UNITILS, BEFORE_TEST_SET_UP, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(BEFORE_TEST_SET_UP);
     }
 
     @Override
     public void beforeTestMethod(Object testObject, Method testMethod) {
+    	assertEquals(currentTestMethod, testMethod);
+    	
         callList.add(formatListenerCallAsString(UNITILS, BEFORE_TEST_METHOD, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(BEFORE_TEST_METHOD);
     }
 
     @Override
     public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
-        callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_METHOD, getClassName(testObject), testMethod.getName()));
+    	assertEquals(currentTestMethod, testMethod);
+    	if (currentThrowable != null) {
+    		assertEquals(currentThrowable, throwable);
+    	}
+    	
+    	callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_METHOD, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(AFTER_TEST_METHOD);
     }
 
     @Override
     public void afterTestTearDown(Object testObject, Method testMethod) {
-        callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_TEAR_DOWN, getClassName(testObject), testMethod.getName()));
+    	assertEquals(currentTestMethod, testMethod);
+    	
+    	callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_TEAR_DOWN, getClassName(testObject), testMethod.getName()));
         throwExceptionIfRequested(AFTER_TEST_TEAR_DOWN);
     }
 
@@ -141,7 +169,7 @@ public class TracingTestListener extends TestListener {
         if (object == null) {
             return null;
         }
-        String className = (object instanceof Class) ? ((Class) object).getName() : object.getClass().getName();
+        String className = (object instanceof Class) ? ((Class<?>) object).getName() : object.getClass().getName();
         return className.substring(className.lastIndexOf('_') + 1);
     }
 
@@ -151,9 +179,13 @@ public class TracingTestListener extends TestListener {
             return;
         }
         if (throwAssertionFailedError) {
-            throw new AssertionFailedError(exceptionMethod);
+            AssertionFailedError error = new AssertionFailedError(exceptionMethod);
+            currentThrowable = error;
+            throw error;
         }
-        throw new RuntimeException(exceptionMethod);
+        RuntimeException exception = new RuntimeException(exceptionMethod);
+        currentThrowable = exception;
+		throw exception;
     }
 
 

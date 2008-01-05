@@ -156,6 +156,8 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
         /* Method under test */
         protected Method testMethod;
+        
+        protected Throwable throwable;
 
 
         /**
@@ -179,13 +181,13 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
          */
         @Override
         public void runBeforesThenTestThenAfters(Runnable test) {
-            Throwable throwable = null;
             try {
             	getTestListener().beforeTestSetUp(testObject, testMethod);
-                super.runBeforesThenTestThenAfters(test);
             } catch (Throwable t) {
                 addFailure(t);
-                throwable = t;
+            }
+            if (throwable == null) {
+            	super.runBeforesThenTestThenAfters(test);
             }
             try {
             	getTestListener().afterTestTearDown(testObject, testMethod);
@@ -198,24 +200,32 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         }
 
 
+        @Override
         protected void runTestMethod() {
-            Throwable throwable = null;
             try {
             	getTestListener().beforeTestMethod(testObject, testMethod);
-                super.runTestMethod();
             } catch (Throwable t) {
                 addFailure(t);
-                throwable = t;
+            }
+            if (throwable == null) {
+            	super.runTestMethod();
             }
             try {
             	getTestListener().afterTestMethod(testObject, testMethod, throwable);
             } catch (Throwable t) {
                 // first exception is typically the most meaningful, so ignore second exception
-                if (throwable == null) {
-                    addFailure(t);
-                }
+                addFailure(t);
             }
         }
+        
+        
+        @Override
+        protected void addFailure(Throwable e) {
+        	if (throwable == null) {
+        		throwable = e;
+        		super.addFailure(e);
+        	}
+    	}
     }
 
 
