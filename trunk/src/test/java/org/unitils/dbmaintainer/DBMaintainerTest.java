@@ -26,6 +26,7 @@ import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.clean.DBCodeClearer;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
+import org.unitils.dbmaintainer.script.impl.SQLCodeScriptRunner;
 import org.unitils.dbmaintainer.script.impl.SQLScriptRunner;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
@@ -35,6 +36,7 @@ import org.unitils.dbmaintainer.version.VersionScriptPair;
 import org.unitils.dbmaintainer.version.VersionSource;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.util.Calls;
 import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.TestedObject;
 
@@ -50,46 +52,44 @@ import java.util.List;
  */
 public class DBMaintainerTest extends UnitilsJUnit4 {
 
-    @Mock
-    @InjectIntoByType
-    private VersionSource mockVersionSource = null;
+    @Mock @InjectIntoByType
+    VersionSource mockVersionSource;
 
-    @Mock
-    @InjectIntoByType
-    private ScriptSource mockScriptSource = null;
+    @Mock @InjectIntoByType
+    ScriptSource mockScriptSource;
 
-    @Mock
-    @InjectIntoByType
-    private SQLScriptRunner mockScriptRunner = null;
+    @Mock @InjectIntoByType
+    SQLScriptRunner mockScriptRunner;
+    
+    @Mock @InjectIntoByType
+    SQLCodeScriptRunner mockCodeScriptRunner;
 
-    @Mock
-    @InjectIntoByType
-    private DBClearer mockDbClearer = null;
+    @Mock @InjectIntoByType
+    DBClearer mockDbClearer;
 
-    @Mock
-    @InjectIntoByType
-    private DBCodeClearer mockDbCodeClearer = null;
+    @Mock @InjectIntoByType
+    DBCodeClearer mockDbCodeClearer;
 
-    @Mock
-    @InjectIntoByType
-    private ConstraintsDisabler mockConstraintsDisabler = null;
+    @Mock(calls = Calls.LENIENT) @InjectIntoByType
+    ConstraintsDisabler mockConstraintsDisabler;
 
-    @Mock
-    @InjectIntoByType
-    private SequenceUpdater mockSequenceUpdater = null;
+    @Mock(calls = Calls.LENIENT) @InjectIntoByType
+    SequenceUpdater mockSequenceUpdater;
 
-    @Mock
-    @InjectIntoByType
-    private DataSetStructureGenerator mockDataSetStructureGenerator = null;
+    @Mock(calls = Calls.LENIENT) @InjectIntoByType
+    DataSetStructureGenerator mockDataSetStructureGenerator;
 
     @TestedObject
-    private DBMaintainer dbMaintainer;
+    DBMaintainer dbMaintainer;
 
     /* Test database update scripts */
-    private List<VersionScriptPair> versionScriptPairs;
+    List<VersionScriptPair> versionScriptPairs;
 
     /* Test database versions */
-    private Version version0, version1, version2;
+    Version version0, version1, version2;
+    
+    /* Test code scripts */
+    List<Script> codeScripts;
 
 
     /**
@@ -110,6 +110,24 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         version2 = new Version(2L, 2L);
         versionScriptPairs.add(new VersionScriptPair(version1, new Script("script1.sql", "Script 1")));
         versionScriptPairs.add(new VersionScriptPair(version2, new Script("script2.sql", "Script 2")));
+        
+        codeScripts = new ArrayList<Script>();
+        codeScripts.add(new Script("codescript1.sql", "Codescript 1"));
+        codeScripts.add(new Script("codescript2.sql", "Codescript 2"));
+    }
+    
+    
+    @Test
+    public void testNoUpdateNeeded() {
+    	// Set database version and available script expectations
+    	expectNoScriptModifications();
+    	expectPostProcessingCodeScripts(codeScripts);
+    	expectNoCodeScriptModifications();
+    	
+    	// No expected behavior
+    	replay();
+    	
+    	dbMaintainer.updateDatabase();
     }
 
 
@@ -119,23 +137,17 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void testUpdateDatabase_incremental() throws Exception {
-        // Record behavior
-        expect(mockVersionSource.getDbVersion()).andReturn(version0);
-        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(true);
-        expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
-        mockScriptRunner.execute("Script 1");
-        mockVersionSource.setDbVersion(version1);
-        mockScriptRunner.execute("Script 2");
-        mockVersionSource.setDbVersion(version2);
-        expect(mockScriptSource.getAllPostProcessingCodeScripts()).andReturn(Collections.EMPTY_LIST);
-        mockConstraintsDisabler.disableConstraints();
-        mockSequenceUpdater.updateSequences();
-        mockDataSetStructureGenerator.generateDataSetStructure();
-        expect(mockVersionSource.isLastCodeUpdateSucceeded()).andReturn(true);
-        expect(mockScriptSource.getCodeScriptsTimestamp()).andReturn(0L);
-        expect(mockVersionSource.getCodeScriptsTimestamp()).andReturn(0L);
+    public void testUpdateDatabase_Incremental() throws Exception {
+        // Set database version and available script expectations
+    	expectNewScriptsAdded();
+    	expectNoPostProcessingCodeScripts();
+    	expectNoCodeScriptModifications();
+
+    	// Record expected behavior
+    	mockVersionSource.setUpdateSucceeded(false);
+        expectExecuteScriptsAndSetDbVersion();
+        mockVersionSource.setUpdateSucceeded(true);
+
         replay();
 
         // Execute test
@@ -143,29 +155,57 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     }
 
 
-    /**
+	/**
      * Tests updating the database from scratch: Existing scripts have been modified. The database is cleared first
      * and all scripts are executed.
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void testUpdateDatabase_fromScratch() throws Exception {
-        // Record behavior
-        expect(mockVersionSource.getDbVersion()).andReturn(version0);
-        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
-        mockConstraintsDisabler.disableConstraints();
+    public void testUpdateDatabase_FromScratch() throws Exception {
+    	// Set database version and available script expectations
+    	expectExistingScriptModified();
+    	expectPostProcessingCodeScripts(codeScripts);
+    	expectNoCodeScriptModifications();
+
+    	// Record expected behavior
+    	mockVersionSource.setUpdateSucceeded(false);
         mockDbClearer.clearSchemas();
         mockDbCodeClearer.clearSchemasCode();
-        expect(mockScriptSource.getAllScripts()).andReturn(versionScriptPairs);
-        mockScriptRunner.execute("Script 1");
-        mockVersionSource.setDbVersion(version1);
-        mockScriptRunner.execute("Script 2");
-        mockVersionSource.setDbVersion(version2);
-        expect(mockScriptSource.getAllPostProcessingCodeScripts()).andReturn(Collections.EMPTY_LIST);
-        mockConstraintsDisabler.disableConstraints();
-        mockSequenceUpdater.updateSequences();
-        mockDataSetStructureGenerator.generateDataSetStructure();
-        expect(mockScriptSource.getAllCodeScripts()).andReturn(new ArrayList<Script>());
+        expectExecuteScriptsAndSetDbVersion();
+        expectExecuteCodeScripts();
+        mockVersionSource.setUpdateSucceeded(true);
+        
+        mockVersionSource.setCodeUpdateSucceeded(false);
+        expectExecuteCodeScripts();
+        expectSetCodeScriptsVersion();
+        mockVersionSource.setCodeUpdateSucceeded(true);
+        
+        replay();
+
+        // Execute test
+        dbMaintainer.updateDatabase();
+    }
+    
+    @Test
+    public void testUpdateDatabase_LastUpdateFailed() {
+    	// Set database version and available script expectations
+    	expectLastUpdateFailed();
+    	expectPostProcessingCodeScripts(codeScripts);
+    	expectNoCodeScriptModifications();
+    	
+    	// Record expected behavior
+    	mockVersionSource.setUpdateSucceeded(false);
+        mockDbClearer.clearSchemas();
+        mockDbCodeClearer.clearSchemasCode();
+        expectExecuteScriptsAndSetDbVersion();
+        expectExecuteCodeScripts();
+        mockVersionSource.setUpdateSucceeded(true);
+        
+        mockVersionSource.setCodeUpdateSucceeded(false);
+        expectExecuteCodeScripts();
+        expectSetCodeScriptsVersion();
+        mockVersionSource.setCodeUpdateSucceeded(true);
+        
         replay();
 
         // Execute test
@@ -178,50 +218,90 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
      * database version must not org incremented and a StatementHandlerException must be thrown.
      */
     @Test
-    public void testUpdateDatabase_errorInScript() throws Exception {
-        expect(mockVersionSource.getDbVersion()).andReturn(version0).anyTimes();
-        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(true);
-        expect(mockScriptSource.getNewScripts(version0)).andReturn(versionScriptPairs);
-        mockScriptRunner.execute("Script 1");
-        expectLastCall().andThrow(new UnitilsException("Test exception"));
+    public void testUpdateDatabase_ErrorInScript() throws Exception {
+    	expectNewScriptsAdded();
+    	expectNoPostProcessingCodeScripts();
+    	expectNoCodeScriptModifications();
+    	
+    	// Record expected behavior
+    	mockVersionSource.setUpdateSucceeded(false);
+    	mockScriptRunner.execute("Script 1"); expectLastCall().andThrow(new UnitilsException("Test exception"));
         mockVersionSource.setDbVersion(version1);
-        mockVersionSource.registerUpdateSucceeded(false);
         replay();
 
         try {
             dbMaintainer.updateDatabase();
-            fail("A StatementHandlerException should have been thrown");
+            fail("A UnitilsException should have been thrown");
         } catch (UnitilsException e) {
             // Expected
         }
     }
-
-
-    /**
-     * Tests checking from scratch update but no scripts modified and last update was successful.
-     */
+    
     @Test
-    public void testCheckUpdateDatabaseFromScratch_notNeeded() throws Exception {
-        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(true);
-        replay();
-
-        boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
-        assertFalse(result);
+    public void testUpdateDatabase_PostProcessingCodeScriptsAvailable() {
+    	expectNewScriptsAdded();
+    	expectPostProcessingCodeScripts(codeScripts);
+    	expectNoCodeScriptModifications();
+    	
+    	mockVersionSource.setUpdateSucceeded(false);
+    	expectExecuteScriptsAndSetDbVersion();
+    	expectExecuteCodeScripts();
+    	mockVersionSource.setUpdateSucceeded(true);
+    	replay();
+    	
+    	dbMaintainer.updateDatabase();
     }
-
-
-    /**
-     * Tests checking from scratch update. Needed because scripts were modified.
-     */
+    
     @Test
-    public void testCheckUpdateDatabaseFromScratch_modifiedScripts() throws Exception {
-        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(true);
-        replay();
+    public void testUpdateDatabase_ErrorInPostProcessingCodeScripts() {
+    	expectNewScriptsAdded();
+    	expectPostProcessingCodeScripts(codeScripts);
+    	
+    	mockVersionSource.setUpdateSucceeded(false);
+    	expectExecuteScriptsAndSetDbVersion();
+    	mockCodeScriptRunner.execute("Codescript 1"); expectLastCall().andThrow(new UnitilsException("Test exception"));
+    	replay();
+    	
+    	try {
+            dbMaintainer.updateDatabase();
+            fail("A UnitilsException should have been thrown");
+        } catch (UnitilsException e) {
+            // Expected
+        }
+    }
+    
+    @Test
+    public void testUpdateDatabase_CodeScriptsUpdated() {
+    	expectNoScriptModifications();
+    	expectNoPostProcessingCodeScripts();
+    	expectCodeScriptsModified();
+    	
+    	mockVersionSource.setCodeUpdateSucceeded(false);
+    	expectExecuteCodeScripts();
+    	mockVersionSource.setCodeScriptsTimestamp(1L);
+    	mockVersionSource.setCodeUpdateSucceeded(true);
+    	
+    	replay();
+    	
+    	dbMaintainer.updateDatabase();
+    }
+    
+    @Test
+    public void testUpdateDatabase_ErrorInCodeScripts() {
+    	expectNoScriptModifications();
+    	expectNoPostProcessingCodeScripts();
+    	expectCodeScriptsModified();
 
-        boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
-        assertTrue(result);
+    	mockVersionSource.setCodeUpdateSucceeded(false);
+    	mockCodeScriptRunner.execute("Codescript 1"); expectLastCall().andThrow(new UnitilsException("Test exception"));
+    	replay();
+    	
+    	try {
+            dbMaintainer.updateDatabase();
+            fail("A UnitilsException should have been thrown");
+        } catch (UnitilsException e) {
+            // Expected
+        }
     }
 
 
@@ -230,7 +310,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
      */
     @Test
     public void testCheckUpdateDatabaseFromScratch_lastUpdateFailed() throws Exception {
-        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockScriptSource.isExistingScriptsModified(version0)).andReturn(false);
         expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(false);
         replay();
 
@@ -246,12 +326,116 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     @Test
     public void testCheckUpdateDatabaseFromScratch_lastUpdateFailedButIgnored() throws Exception {
         dbMaintainer.keepRetryingAfterError = false;
-        expect(mockScriptSource.existingScriptsModified(version0)).andReturn(false);
+        expect(mockScriptSource.isExistingScriptsModified(version0)).andReturn(false);
         expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(false);
         replay();
 
         boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
         assertFalse(result);
     }
+    
+	private void expectNoScriptModifications() {
+		expectDbVersion(version0);
+    	expectLastUpdateSucceeded(true);
+    	expectModifiedScripts(false);
+    	expectNewScripts(Collections.EMPTY_LIST);
+	}
+
+	private void expectNewScriptsAdded() {
+		expectDbVersion(version0);
+    	expectLastUpdateSucceeded(true);
+    	expectModifiedScripts(false);
+    	expectNewScripts(versionScriptPairs);
+	}
+	
+	private void expectLastUpdateFailed() {
+		expectDbVersion(version0);
+    	expectLastUpdateSucceeded(false);
+    	expectModifiedScripts(false);
+    	expectAllScripts(versionScriptPairs);
+	}
+	
+	private void expectNoPostProcessingCodeScripts() {
+		expectPostProcessingCodeScripts(Collections.EMPTY_LIST);
+	}
+
+	private void expectNoCodeScriptModifications() {
+		expectDbCodeVersion(0L);
+    	expectLastCodeUpdateSucceeded(true);
+    	expectCodeScriptsTimestamp(0L);
+    	expectAllCodeScripts(codeScripts);
+	}
+	
+	private void expectCodeScriptsModified() {
+		expectDbCodeVersion(0L);
+    	expectLastCodeUpdateSucceeded(true);
+    	expectCodeScriptsTimestamp(1L);
+    	expectAllCodeScripts(codeScripts);
+	}
+	
+	private void expectExistingScriptModified() {
+		expectDbVersion(version0);
+    	expectLastUpdateSucceeded(true);
+    	expectModifiedScripts(true);
+    	expectAllScripts(versionScriptPairs);
+	}
+	
+	private void expectExecuteScriptsAndSetDbVersion() {
+		mockScriptRunner.execute("Script 1");
+        mockVersionSource.setDbVersion(version1);
+        mockScriptRunner.execute("Script 2");
+        mockVersionSource.setDbVersion(version2);
+	}
+	
+	private void expectExecuteCodeScripts() {
+		mockCodeScriptRunner.execute("Codescript 1");
+		mockCodeScriptRunner.execute("Codescript 2");
+	}
+	
+	private void expectSetCodeScriptsVersion() {
+		mockVersionSource.setCodeScriptsTimestamp(0L);
+	}
+    
+    
+    private void expectNewScripts(List<VersionScriptPair> versionScriptPairs) {
+		expect(mockScriptSource.getNewScripts(null)).andStubReturn(versionScriptPairs);
+	}
+
+
+    private void expectDbVersion(Version dbVersion) {
+    	expect(mockVersionSource.getDbVersion()).andStubReturn(dbVersion);
+	}
+    
+    private void expectLastUpdateSucceeded(boolean lastUpdateSucceeded) {
+    	expect(mockVersionSource.isLastUpdateSucceeded()).andStubReturn(lastUpdateSucceeded);
+    }
+	
+    private void expectDbCodeVersion(long dbCodeTimestamp) {
+    	expect(mockVersionSource.getCodeScriptsTimestamp()).andStubReturn(dbCodeTimestamp);
+	}
+    
+    private void expectLastCodeUpdateSucceeded(boolean lastCodeUpdateSucceeded) {
+    	expect(mockVersionSource.isLastCodeUpdateSucceeded()).andStubReturn(lastCodeUpdateSucceeded);
+    }
+	
+    private void expectModifiedScripts(boolean modifiedScripts) {
+		expect(mockScriptSource.isExistingScriptsModified(null)).andStubReturn(modifiedScripts);
+	}
+	
+    private void expectPostProcessingCodeScripts(List<Script> postProcessingCodeScripts) {
+		expect(mockScriptSource.getAllPostProcessingCodeScripts()).andStubReturn(postProcessingCodeScripts);
+	}
+	
+    private void expectCodeScriptsTimestamp(long codeScriptsTimestamp) {
+		expect(mockScriptSource.getCodeScriptsTimestamp()).andStubReturn(codeScriptsTimestamp);
+	}
+    
+    private void expectAllCodeScripts(List<Script> allCodeScripts) {
+		expect(mockScriptSource.getAllCodeScripts()).andStubReturn(allCodeScripts);
+	}
+
+	private void expectAllScripts(List<VersionScriptPair> versionScriptPairs) {
+		expect(mockScriptSource.getAllScripts()).andReturn(versionScriptPairs);
+	}
 
 }

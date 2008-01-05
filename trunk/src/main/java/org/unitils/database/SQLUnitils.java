@@ -37,7 +37,7 @@ public class SQLUnitils {
 
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(SQLUnitils.class);
+    private static final Log logger = LogFactory.getLog(SQLUnitils.class);
 
 
     /**

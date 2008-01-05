@@ -50,7 +50,7 @@ public interface ScriptSource extends DatabaseTask {
      * @param currentVersion The current database version, not null
      * @return True if an existing script has been modified, false otherwise
      */
-    boolean existingScriptsModified(Version currentVersion);
+    boolean isExistingScriptsModified(Version currentVersion);
 
 
     /**
@@ -71,7 +71,7 @@ public interface ScriptSource extends DatabaseTask {
     /**
      * @return The highest timestamp of all the code scripts that are currently available
      */
-    long getCodeScriptsTimestamp();
+    public long getCodeScriptsTimestamp();
 
 
     /**

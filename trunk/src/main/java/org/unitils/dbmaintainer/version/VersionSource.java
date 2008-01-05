@@ -56,7 +56,7 @@ public interface VersionSource extends DatabaseTask {
      *
      * @param succeeded True for success
      */
-    void registerUpdateSucceeded(boolean succeeded);
+    void setUpdateSucceeded(boolean succeeded);
 
 
     /**
@@ -72,7 +72,7 @@ public interface VersionSource extends DatabaseTask {
      *
      * @param succeeded True for success
      */
-    void registerCodeUpdateSucceeded(boolean succeeded);
+    void setCodeUpdateSucceeded(boolean succeeded);
 
 
     /**
