@@ -180,7 +180,7 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
 	 * Notifies the VersionSource of the fact that the lastest version update has succeeded or not. The version table
 	 * will be created (or altered) if needed.
 	 */
-	public void registerUpdateSucceeded(boolean succeeded) {
+	public void setUpdateSucceeded(boolean succeeded) {
 		try {
 			registerUpdateSucceededImpl(succeeded);
 
@@ -218,7 +218,7 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
 	 * 
 	 * @param succeeded True for success
 	 */
-	public void registerCodeUpdateSucceeded(boolean succeeded) {
+	public void setCodeUpdateSucceeded(boolean succeeded) {
 		try {
 			registerCodeUpdateSucceededImpl(succeeded);
 
@@ -370,7 +370,7 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
 	 * @param timestamp The new timestamp
 	 */
 	protected void setCodeScriptsTimestampImpl(long timestamp) {
-		int updateCount = sqlHandler.executeCodeUpdate("update " + defaultDbSupport.qualified(versionTableName) + " set " + codeScriptsTimestampColumnName + " = " + timestamp + ", " + lastCodeUpdateSucceededColumnName + " = 1");
+		int updateCount = sqlHandler.executeCodeUpdate("update " + defaultDbSupport.qualified(versionTableName) + " set " + codeScriptsTimestampColumnName + " = " + timestamp);
 
 		if (updateCount != 1 && sqlHandler.isDoExecuteUpdates()) {
 			throw new UnitilsException("Error while setting database version. There should be exactly 1 version record, found " + updateCount);

@@ -74,34 +74,34 @@ public class DBMaintainer {
     /* Property indicating if deleting all data from all tables before updating is enabled */
     public static final String PROPKEY_DB_CLEANER_ENABLED = "dbMaintainer.cleanDb.enabled";
 
-    /* Property key indicating if updating the database from scratch is enabled */
+    /* Property indicating if updating the database from scratch is enabled */
     public static final String PROPKEY_FROM_SCRATCH_ENABLED = "dbMaintainer.fromScratch.enabled";
 
     /*
-     * Property key indicating if database code should be cleared before installing a new version of
+     * Property indicating if database code should be cleared before installing a new version of
      * the code or when updating the database from scratch
      */
     public static final String PROPKEY_CLEAR_DB_CODE_ENABLED = "dbMaintainer.clearDbCode.enabled";
 
     /*
-     * Property key indicating if an retry of an update should only be performed when changes to
+     * Property indicating if an retry of an update should only be performed when changes to
      * script files were made
      */
     public static final String PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED = "dbMaintainer.keepRetryingAfterError.enabled";
 
     /*
-     * Property key indicating if the database constraints should org disabled after updating the
+     * Property indicating if the database constraints should org disabled after updating the
      * database
      */
     public static final String PROPKEY_DISABLE_CONSTRAINTS_ENABLED = "dbMaintainer.disableConstraints.enabled";
 
     /*
-     * Property key indicating if the database constraints should org disabled after updating the
+     * Property indicating if the database constraints should org disabled after updating the
      * database
      */
     public static final String PROPKEY_UPDATE_SEQUENCES_ENABLED = "dbMaintainer.updateSequences.enabled";
 
-    /* Property key that indicates if a data set DTD or XSD is to be generated or not */
+    /* Property that indicates if a data set DTD or XSD is to be generated or not */
     public static final String PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED = "dbMaintainer.generateDataSetStructure.enabled";
 
     /* Provider of the current version of the database, and means to increment it */
@@ -229,6 +229,11 @@ public class DBMaintainer {
         // Check whether there are new scripts
         if (!versionScriptPairs.isEmpty()) {
             logger.info("Database update scripts have been found and will be executed on the database");
+            
+            // We register the update as being not successful. If anything goes wrong or if the update is
+            // interrupted before being completed, this will be the final state and the DbMaintainer will
+            // do a from-scratch update the next time
+            versionSource.setUpdateSucceeded(false);
 
             // Remove data from the database, that could cause errors when executing scripts. Such
             // as for example when added a not null column.
@@ -240,7 +245,7 @@ public class DBMaintainer {
             executeScripts(versionScriptPairs);
 
             // Execute postprocessing code scripts, if any
-            executeCodeScripts(scriptSource.getAllPostProcessingCodeScripts());
+            executePostProcessingCodeScripts(scriptSource.getAllPostProcessingCodeScripts());
 
             // Disable FK and not null constraints, if enabled
             if (disableConstraintsEnabled) {
@@ -254,6 +259,9 @@ public class DBMaintainer {
             if (dataSetStructureGenerator != null) {
                 dataSetStructureGenerator.generateDataSetStructure();
             }
+            
+            // Processing has finished, we regard the db update as being successful
+            versionSource.setUpdateSucceeded(true);
         }
 
         // If the database structure was recreated from scratch, also recreate the database code
@@ -265,16 +273,25 @@ public class DBMaintainer {
 
             List<Script> codeScripts = scriptSource.getAllCodeScripts();
             if (!codeScripts.isEmpty()) {
+            	// We register the code update as being not successful. If anything goes wrong or if the update is
+                // interrupted before being completed, this will be the final state and the DbMaintainer will
+                // do a new code update the next time
+                versionSource.setCodeUpdateSucceeded(false);
+            	
                 // If updateDatabaseFromScratch == true, the schema code has already been cleared.
                 if (clearDbCodeEnabled && !updateDatabaseFromScratch) {
                     dbCodeClearer.clearSchemasCode();
                 }
                 executeCodeScripts(codeScripts);
+                
+                // Processing has finished, we regard the code update as being successful
+                versionSource.setCodeUpdateSucceeded(true);
             }
         }
     }
 
-    /**
+
+	/**
      * Checks whether the database should be updated from scratch or just incrementally. The
      * database needs to be rebuild in following cases:
      * <ul>
@@ -290,7 +307,7 @@ public class DBMaintainer {
      * @return True if a from scratch rebuild is needed, false otherwise
      */
     protected boolean updateDatabaseFromScratch(Version currentVersion) {
-        if (scriptSource.existingScriptsModified(currentVersion)) {
+        if (scriptSource.isExistingScriptsModified(currentVersion)) {
             if (!fromScratchEnabled) {
                 logger.warn("Existing database update scripts have been modified, but updating from scratch is disabled. The updated scripts are not executed again!!");
                 return false;
@@ -344,9 +361,7 @@ public class DBMaintainer {
                     logger.info("Database version incremented to " + versionScriptPair.getVersion());
                 }
 
-                // mark the db update as unsuccessful
                 logger.error("Current database version is " + versionSource.getDbVersion());
-                versionSource.registerUpdateSucceeded(false);
                 throw e;
             }
 
@@ -375,7 +390,6 @@ public class DBMaintainer {
             } catch (UnitilsException e) {
 
                 logger.error("Error while executing code script " + codeScript.getFileName(), e);
-                versionSource.registerCodeUpdateSucceeded(false);
                 throw e;
             }
         }
@@ -383,6 +397,32 @@ public class DBMaintainer {
         // successful
         versionSource.setCodeScriptsTimestamp(scriptSource.getCodeScriptsTimestamp());
     }
+    
+    
+    /**
+     * Executes the given post processing code scripts on the database. If not successful, the scripts update
+     * is registered as not successful, so that an update from scratch will be triggered the next time.
+     * 
+     * @param postProcessingCodeScripts
+     */
+    protected void executePostProcessingCodeScripts(
+			List<Script> postProcessingCodeScripts) {
+    	if (postProcessingCodeScripts.isEmpty()) {
+            // nothing to do
+            return;
+        }
+
+        for (Script codeScript : postProcessingCodeScripts) {
+            try {
+                codeScriptRunner.execute(codeScript.getScriptContent());
+
+            } catch (UnitilsException e) {
+
+                logger.error("Error while executing post processing code script " + codeScript.getFileName(), e);
+                throw e;
+            }
+        }
+	}
 
     /**
      * Updates the database version to the current version of the update scripts, without changing

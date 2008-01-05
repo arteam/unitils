@@ -196,7 +196,7 @@ public class FileScriptSource extends BaseDatabaseTask implements ScriptSource {
      * @param currentVersion The current database version, not null
      * @return true if an existing script has been modified, false otherwise
      */
-    public boolean existingScriptsModified(Version currentVersion) {
+    public boolean isExistingScriptsModified(Version currentVersion) {
         Long scriptsTimestamp = getTimestampOfAlreadyExecutedScripts(currentVersion);
         return (scriptsTimestamp > currentVersion.getTimeStamp());
     }

@@ -127,9 +127,9 @@ public class FileScriptSourceTest {
      */
     @Test
     public void testExistingScriptsModfied_notModified() {
-        assertFalse(fileScriptSource.existingScriptsModified(versionIndex0));
-        assertFalse(fileScriptSource.existingScriptsModified(versionIndex1));
-        assertFalse(fileScriptSource.existingScriptsModified(versionIndex2));
+        assertFalse(fileScriptSource.isExistingScriptsModified(versionIndex0));
+        assertFalse(fileScriptSource.isExistingScriptsModified(versionIndex1));
+        assertFalse(fileScriptSource.isExistingScriptsModified(versionIndex2));
     }
 
 
@@ -139,7 +139,7 @@ public class FileScriptSourceTest {
      */
     @Test
     public void testExistingScriptsModfied_modified() {
-        assertTrue(fileScriptSource.existingScriptsModified(versionTimestampOld));
+        assertTrue(fileScriptSource.isExistingScriptsModified(versionTimestampOld));
     }
 
 

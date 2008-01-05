@@ -142,7 +142,7 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
 	 */
 	@Test
 	public void testRegisterUpdateSucceeded_succeeded() throws Exception {
-		dbVersionSource.registerUpdateSucceeded(true);
+		dbVersionSource.setUpdateSucceeded(true);
 		boolean result = dbVersionSource.isLastUpdateSucceeded();
 
 		assertTrue(result);
@@ -154,7 +154,7 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
 	 */
 	@Test
 	public void testRegisterUpdateSucceeded_notSucceeded() throws Exception {
-		dbVersionSource.registerUpdateSucceeded(false);
+		dbVersionSource.setUpdateSucceeded(false);
 		boolean result = dbVersionSource.isLastUpdateSucceeded();
 
 		assertFalse(result);
