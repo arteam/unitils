@@ -15,6 +15,7 @@
  */
 package org.unitils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.testng.IHookCallBack;
@@ -120,29 +121,45 @@ public abstract class UnitilsTestNG implements IHookable {
      * @param testResult the TestNG test result, not null
      */
     public void run(IHookCallBack callBack, ITestResult testResult) {
-        RuntimeException firstRuntimeException = null;
+        Throwable firstException = null;
         try {
             getTestListener().beforeTestMethod(this, testResult.getMethod().getMethod());
-            callBack.runTestMethod(testResult);
-
-        } catch (RuntimeException e) {
+        
+        } catch (Throwable e) {
             // hold exception until later, first call afterTestMethod
-            firstRuntimeException = e;
+            firstException = e;
+        }
+        
+        if (firstException == null) {
+        	callBack.runTestMethod(testResult);
+        	Throwable testMethodException = testResult.getThrowable();
+			if (testMethodException != null) {
+				// The exception was wrapped in an InvocationTargetException, since the test method is
+				// invoked using reflection
+        		if (testMethodException instanceof InvocationTargetException) {
+        			testMethodException = ((InvocationTargetException) testMethodException).getCause();
+        		}
+        		firstException = testMethodException;
+        	}
         }
 
         try {
-            getTestListener().afterTestMethod(this, testResult.getMethod().getMethod(), firstRuntimeException);
+            getTestListener().afterTestMethod(this, testResult.getMethod().getMethod(), firstException);
 
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             // first exception is typically the most meaningful, so ignore second exception
-            if (firstRuntimeException == null) {
-                firstRuntimeException = e;
+            if (firstException == null) {
+                firstException = e;
             }
         }
 
         // if there were exceptions, throw the first one
-        if (firstRuntimeException != null) {
-            throw firstRuntimeException;
+        if (firstException != null) {
+            if (firstException instanceof RuntimeException) {
+            	throw (RuntimeException) firstException;
+            } else {
+            	throw new RuntimeException(firstException);
+            }
         }
     }
 

@@ -17,9 +17,27 @@ package org.unitils;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static org.unitils.TracingTestListener.AFTER_ALL;
+import static org.unitils.TracingTestListener.AFTER_TEST_CLASS;
+import static org.unitils.TracingTestListener.AFTER_TEST_METHOD;
+import static org.unitils.TracingTestListener.AFTER_TEST_TEAR_DOWN;
+import static org.unitils.TracingTestListener.BEFORE_ALL;
+import static org.unitils.TracingTestListener.BEFORE_TEST_CLASS;
+import static org.unitils.TracingTestListener.BEFORE_TEST_METHOD;
+import static org.unitils.TracingTestListener.BEFORE_TEST_SET_UP;
+import static org.unitils.TracingTestListener.TEST_AFTER_CLASS;
+import static org.unitils.TracingTestListener.TEST_BEFORE_CLASS;
+import static org.unitils.TracingTestListener.TEST_METHOD;
+import static org.unitils.TracingTestListener.TEST_SET_UP;
+import static org.unitils.TracingTestListener.TEST_TEAR_DOWN;
+import static org.unitils.inject.util.InjectionUtils.injectIntoStatic;
+
+import java.util.Iterator;
+
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,13 +47,8 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
-import static org.unitils.TracingTestListener.*;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import static org.unitils.inject.util.InjectionUtils.injectIntoStatic;
-import org.unitils.util.ReflectionUtils;
-
-import java.util.Iterator;
 
 /**
  * Test for the flows in case an exception occurs in one of the listener or test methods for JUnit3 ({@link UnitilsJUnit3}),
@@ -56,10 +69,10 @@ public class UnitilsInvocationExceptionTest {
     /* Listener that records all method invocations during the tests */
     private static TracingTestListener tracingTestListener;
 
-    /* Temporary holder so that the test listener that was replaced during the test can be place back */
+    /* Temporary holder so that the test listener that was replaced during the test can be placed back */
     private static TestListener oldTestListenerUnitilsJUnit3;
 
-    /* Temporary holder so that the test listener that was replaced during the test can be place back */
+    /* Temporary holder so that the test listener that was replaced during the test can be placed back */
     private static TestListener oldTestListenerUnitilsJUnit4;
 
 

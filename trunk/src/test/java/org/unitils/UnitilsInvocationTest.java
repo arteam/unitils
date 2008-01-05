@@ -62,13 +62,6 @@ public class UnitilsInvocationTest {
     /* Listener that records all method invocations during the tests */
     private static TracingTestListener tracingTestListener;
 
-    /* Temporary holder so that the test listener that was replaced during the test can be place back */
-    private static TestListener oldTestListenerUnitilsJUnit3;
-
-    /* Temporary holder so that the test listener that was replaced during the test can be place back */
-    private static TestListener oldTestListenerUnitilsJUnit4;
-
-
     /**
      * Sets up the test by installing the tracing test listener that will record all method invocations during the test.
      * The current test listeners are stored so that they can be restored during the class tear down.
