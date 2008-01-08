@@ -296,7 +296,7 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
 	 * @param version The new version that the database should be updated to
 	 */
 	protected void setDbVersionImpl(Version version) {
-		int updateCount = sqlHandler.executeUpdate("update " + defaultDbSupport.qualified(versionTableName) + " set " + versionIndexColumnName + " = " + version.getIndex() + ", " + versionTimestampColumnName + " = " + version.getTimeStamp() + ", " + lastUpdateSucceededColumnName + " = 1");
+		int updateCount = sqlHandler.executeUpdate("update " + defaultDbSupport.qualified(versionTableName) + " set " + versionIndexColumnName + " = " + version.getIndex() + ", " + versionTimestampColumnName + " = " + version.getTimeStamp());
 
 		if (updateCount != 1 && sqlHandler.isDoExecuteUpdates()) {
 			throw new UnitilsException("Error while setting database version. There should be exactly 1 version record, found " + updateCount);
