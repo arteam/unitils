@@ -15,24 +15,32 @@
  */
 package org.unitils.dbunit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.database.SQLUnitils.getItemAsLong;
+import static org.unitils.database.SQLUnitils.getItemAsString;
+import static org.unitils.database.SQLUnitils.getItemsAsStringSet;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+
+import java.io.File;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import static org.unitils.database.SQLUnitils.*;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.impl.CleanInsertLoadStrategy;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
-
-import javax.sql.DataSource;
-import java.io.File;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Test class for loading of data sets using the {@link DbUnitModule}.
@@ -139,6 +147,14 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
     public void testInsertTestData_customClassDataSet() throws Exception {
         dbUnitModule.insertDataSet(DataSetTestCustomClassLevel.class.getMethod("testMethod1"), new DataSetTestCustomClassLevel());
         assertLoadedDataSet("CustomDataSet.xml");
+    }
+    
+    @Test
+    public void testInsertTestData_defaultPackageDataSet() throws Exception {
+    	Class<?> defaultPackageDataSetTestClass = Class.forName("DefaultPackageDataSetTest");
+    	Object testInstance = defaultPackageDataSetTestClass.newInstance();
+    	dbUnitModule.insertDataSet(defaultPackageDataSetTestClass.getMethod("testMethod1"), testInstance);
+    	assertLoadedDataSet("DefaultPackageDataSetTest.xml");
     }
 
 

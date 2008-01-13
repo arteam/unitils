@@ -139,7 +139,12 @@ public class DefaultDataSetResolver implements DataSetResolver {
 
     protected String prefixPackageNameFilePath(Class<?> testClass, String dataSetName) {
         String className = testClass.getName();
-        String packageName = className.substring(0, className.lastIndexOf('.')).replace('.', '/');
+        int indexOfLastDot = className.lastIndexOf('.');
+        if (indexOfLastDot == -1) {
+        	return dataSetName;
+        }
+    
+        String packageName = indexOfLastDot == -1 ? "" : className.substring(0, indexOfLastDot).replace('.', '/');
         return packageName + '/' + dataSetName;
     }
 
