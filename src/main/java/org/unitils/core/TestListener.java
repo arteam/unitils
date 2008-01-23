@@ -50,33 +50,24 @@ import java.lang.reflect.Method;
  */
 public abstract class TestListener {
 
-
-    /**
-     * Invoked before any of the tests are run.
-     * This can be overriden to for example add general initialisation.
-     */
-    public void beforeAll() {
-        // empty
-    }
-
-
+    
     /**
      * Invoked before any of the test in a test class are run.
-     * This can be overriden to for example add test-class initialisation.
+     * This can be overridden to for example add test-class initialization.
      *
-     * @param testClass The test class, not null
+     * @param testObject The test class, not null
      */
-    public void beforeTestClass(Class<?> testClass) {
+    public void afterCreateTestObject(Object testObject) {
         // empty
     }
 
 
     /**
      * Invoked before the test setup (eg @Before) is run.
-     * This can be overriden to for example initialize the test-fixture.
+     * This can be overridden to for example initialize the test-fixture.
      *
      * @param testObject The test instance, not null
-     * @param testMethod TODO
+     * @param testMethod The test method, not null
      */
     public void beforeTestSetUp(Object testObject, Method testMethod) {
         // empty
@@ -85,7 +76,7 @@ public abstract class TestListener {
 
     /**
      * Invoked before the test but after the test setup (eg @Before) is run.
-     * This can be overriden to for example further initialize the test-fixture using values that were set during
+     * This can be overridden to for example further initialize the test-fixture using values that were set during
      * the test setup.
      *
      * @param testObject The test instance, not null
@@ -97,8 +88,8 @@ public abstract class TestListener {
 
 
     /**
-     * Invoked after the test run but before the test tear down (eg @After).
-     * This can be overriden to for example add assertions for testing the result of the test.
+     * Invoked after the test run but before the test tear down (e.g. @After).
+     * This can be overridden to for example add assertions for testing the result of the test.
      * It the before method or the test raised an exception, this exception will be passed to the method.
      *
      * @param testObject    The test instance, not null
@@ -112,33 +103,14 @@ public abstract class TestListener {
 
     /**
      * Invoked after the test tear down (eg @After).
-     * This can be overriden to for example peform extra cleanup after the test.
+     * This can be overridden to for example perform extra cleanup after the test.
      *
      * @param testObject The test instance, not null
-     * @param testMethod TODO
+     * @param testMethod The test method, not null
      */
     public void afterTestTearDown(Object testObject, Method testMethod) {
         // empty
     }
-
-
-    /**
-     * Invoked after all tests of a test class have run.
-     * This can be overriden to for example peform extra cleanup after the test.
-     *
-     * @param testClass The test class, not null
-     */
-    public void afterTestClass(Class<?> testClass) {
-        // empty
-    }
-
-
-    /**
-     * Invoked after all of the tests have run.
-     * This can be overriden to for example add general finalisation.
-     */
-    public void afterAll() {
-        // empty
-    }
+    
 
 }

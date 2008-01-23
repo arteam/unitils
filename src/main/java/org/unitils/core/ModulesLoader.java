@@ -133,15 +133,15 @@ public class ModulesLoader {
     protected List<Module> createAndInitializeModules(List<String> moduleNameList, Properties configuration) {
         List<Module> result = new ArrayList<Module>();
         for (String moduleName : moduleNameList) {
-            // get core class name
+            // get module class name
             String className = getString(PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_CLASS_NAME, configuration);
             try {
-                // create core instance
+                // create module instance
                 Object module = createInstanceOfType(className, true);
                 if (!(module instanceof Module)) {
                     throw new UnitilsException("Unable to load core. Module class is not of type UnitilsModule: " + className);
                 }
-                // run initializer
+                // initialize module
                 ((Module) module).init(configuration);
                 result.add((Module) module);
 

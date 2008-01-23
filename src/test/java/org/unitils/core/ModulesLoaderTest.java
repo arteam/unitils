@@ -223,7 +223,9 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 	public static class TestModuleA implements Module {
 
 		public void init(Properties configuration) {
-			// do nothing
+		}
+
+		public void afterInit() {
 		}
 
 		public TestListener getTestListener() {
@@ -237,7 +239,9 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 	public static class TestModuleB implements Module {
 
 		public void init(Properties configuration) {
-			// do nothing
+		}
+
+		public void afterInit() {
 		}
 
 		public TestListener getTestListener() {
@@ -251,7 +255,9 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 	public static class TestModuleC implements Module {
 
 		public void init(Properties configuration) {
-			// do nothing
+		}
+
+		public void afterInit() {
 		}
 
 		public TestListener getTestListener() {
@@ -265,7 +271,9 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 	public static class TestModuleD implements Module {
 
 		public void init(Properties configuration) {
-			// do nothing
+		}
+		
+		public void afterInit() {
 		}
 
 		public TestListener getTestListener() {
@@ -280,7 +288,9 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 	public static class TestModulePrivate implements Module {
 
 		public void init(Properties configuration) {
-			// do nothing
+		}
+		
+		public void afterInit() {
 		}
 
 		private TestModulePrivate() {

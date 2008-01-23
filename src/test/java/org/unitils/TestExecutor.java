@@ -15,25 +15,16 @@
  */
 package org.unitils;
 
-import static org.unitils.TracingTestListener.TestInvocation.TEST_METHOD;
-
-/**
- * JUnit 3 test class containing 2 test methods. This test test-class is used in the
- * {@link UnitilsInvocationTest} tests.
- *
- * @author Tim Ducheyne
- * @author Filip Neven
- */
-public class UnitilsJUnit3Test_TestClass2 extends UnitilsJUnit3Test {
-
-	public void test1() {
-        registerTestInvocation(TEST_METHOD, "test1");
-    }
-
-
-    public void test2() {
-        registerTestInvocation(TEST_METHOD, "test2");
-    }
+interface TestExecutor {
+	
+	void runTests(Class<?>... testClasses) throws Exception;
+	
+	void runTests(String testGroup, Class<?>...testClasses) throws Exception;
+	
+	int getRunCount();
+	
+	int getFailureCount();
+	
+	int getIgnoreCount();
 	
 }
-

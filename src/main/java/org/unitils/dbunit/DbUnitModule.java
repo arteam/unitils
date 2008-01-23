@@ -102,7 +102,11 @@ public class DbUnitModule implements Module {
     }
 
 
-    /**
+    public void afterInit() {
+	}
+
+
+	/**
      * Gets the DbUnit connection or creates one if it does not exist yet.
      *
      * @param schemaName The schema name, not null

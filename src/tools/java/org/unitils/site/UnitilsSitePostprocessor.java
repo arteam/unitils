@@ -71,7 +71,7 @@ public class UnitilsSitePostprocessor {
 		Matcher m = p.matcher(content);
 		StringBuffer newContentBuffer = new StringBuffer();
 		if (m.find()) {
-			m.appendReplacement(newContentBuffer, "</body>\n\n" + GOOGLE_ANALYTICS_JAVASCRIPT);
+			m.appendReplacement(newContentBuffer, "\n\n" + GOOGLE_ANALYTICS_JAVASCRIPT + "\n</body>");
 			m.appendTail(newContentBuffer);
 			FileUtils.writeStringToFile(file, newContentBuffer.toString());
 		} else {

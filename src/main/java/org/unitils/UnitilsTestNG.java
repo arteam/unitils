@@ -35,30 +35,8 @@ import org.unitils.core.Unitils;
  */
 public abstract class UnitilsTestNG implements IHookable {
 
-    /* True if beforeTestClass was called */
-    private static boolean beforeTestClassCalled = false;
-
     /* True if beforeTestSetUp was called */
-    private static boolean beforeTestSetUpCalled = false;
-
-
-    /**
-     * Called at the beginning of the test run. This will initialize unitils and the test listener
-     * and call {@link TestListener#beforeAll}.
-     */
-    @BeforeSuite(alwaysRun = true)
-    protected void unitilsBeforeSuite() {
-        getTestListener().beforeAll();
-    }
-
-
-    /**
-     * Called at the end of the test run. This is where {@link TestListener#afterAll} is called.
-     */
-    @AfterSuite(alwaysRun = true)
-    protected void unitilsAfterSuite() {
-        getTestListener().afterAll();
-    }
+    private boolean beforeTestSetUpCalled = false;
 
 
     /**
@@ -66,24 +44,7 @@ public abstract class UnitilsTestNG implements IHookable {
      */
     @BeforeClass(alwaysRun = true)
     protected void unitilsBeforeClass() {
-        beforeTestClassCalled = true;
-        getTestListener().beforeTestClass(getClass());
-    }
-
-
-    /**
-     * Called after all tests of a test class were run. This is where {@link TestListener#afterTestClass} is called.
-     * <p/>
-     * NOTE: alwaysRun is enabled to be sure that this method is called even when an exception occurs during
-     * {@link #unitilsBeforeClass}.
-     */
-    @AfterClass(alwaysRun = true)
-    protected void unitilsAfterClass() {
-        // alwaysRun is enaled, extra test to ensure that unitilsBeforeClass was called
-        if (beforeTestClassCalled) {
-            beforeTestClassCalled = false;
-            getTestListener().afterTestClass(getClass());
-        }
+        getTestListener().afterCreateTestObject(this);
     }
 
 
@@ -121,63 +82,73 @@ public abstract class UnitilsTestNG implements IHookable {
      * @param testResult the TestNG test result, not null
      */
     public void run(IHookCallBack callBack, ITestResult testResult) {
-        Throwable firstException = null;
+        Throwable beforeTestMethodException = null;
         try {
             getTestListener().beforeTestMethod(this, testResult.getMethod().getMethod());
         
         } catch (Throwable e) {
             // hold exception until later, first call afterTestMethod
-            firstException = e;
+            beforeTestMethodException = e;
         }
         
-        if (firstException == null) {
+        Throwable testMethodException = null;
+        if (beforeTestMethodException == null) {
         	callBack.runTestMethod(testResult);
-        	Throwable testMethodException = testResult.getThrowable();
-			if (testMethodException != null) {
-				// The exception was wrapped in an InvocationTargetException, since the test method is
-				// invoked using reflection
-        		if (testMethodException instanceof InvocationTargetException) {
-        			testMethodException = ((InvocationTargetException) testMethodException).getCause();
-        		}
-        		firstException = testMethodException;
+        	testMethodException = testResult.getThrowable();
+        	// Since TestNG calls the method using reflection, the exception is wrapped in an InvocationTargetException
+        	if (testMethodException != null && testMethodException instanceof InvocationTargetException) {
+        		testMethodException = ((InvocationTargetException) testMethodException).getTargetException();
         	}
         }
 
+        Throwable afterTestMethodException = null;
         try {
-            getTestListener().afterTestMethod(this, testResult.getMethod().getMethod(), firstException);
+            getTestListener().afterTestMethod(this, testResult.getMethod().getMethod(), 
+            		beforeTestMethodException != null ? beforeTestMethodException : testMethodException);
 
         } catch (Throwable e) {
-            // first exception is typically the most meaningful, so ignore second exception
-            if (firstException == null) {
-                firstException = e;
-            }
+            afterTestMethodException = e;
         }
 
-        // if there were exceptions, throw the first one
-        if (firstException != null) {
-            if (firstException instanceof RuntimeException) {
-            	throw (RuntimeException) firstException;
-            } else {
-            	throw new RuntimeException(firstException);
-            }
+        // if there were exceptions, make sure the exception that occurred first is reported by TestNG
+        if (beforeTestMethodException != null) {
+            throwException(beforeTestMethodException);
+        } else {
+        	// We don't throw the testMethodException, it is already registered by TestNG and will be reported
+        	// to the user
+        	if (testMethodException == null && afterTestMethodException != null) {
+        		throwException(afterTestMethodException);
+        	}
         }
     }
+
+
+	private void throwException(Throwable exception) {
+		if (exception instanceof RuntimeException) {
+			throw (RuntimeException) exception;
+		} else if (exception instanceof Error) {
+			throw (Error) exception;
+		} else {
+			throw new RuntimeException(exception);
+		}
+	}
 
 
     /**
-     * This will return the default singleton instance by calling {@link Unitils#getInstance()}.
-     * <p/>
-     * You can override this method to let it create and set your own singleton instance. For example, you
-     * can let it create an instance of your own Unitils subclass and set it by using {@link Unitils#setInstance}.
+	 * @return The Unitils test listener
+	 */
+	protected TestListener getTestListener() {
+		return getUnitils().getTestListener();
+	}
+	
+	
+	/**
+     * Returns the default singleton instance of Unitils
      *
-     * @return the unitils core instance, not null
+     * @return the Unitils instance, not null
      */
     protected Unitils getUnitils() {
         return Unitils.getInstance();
-    }
-    
-    protected TestListener getTestListener() {
-    	return getUnitils().getTestListener();
     }
 
 }

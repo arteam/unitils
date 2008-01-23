@@ -15,17 +15,19 @@
  */
 package org.unitils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.internal.runners.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.junit.internal.runners.ClassRoadie;
+import org.junit.internal.runners.InitializationError;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.internal.runners.MethodRoadie;
+import org.junit.internal.runners.TestMethod;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Custom test runner that will Unitils-enable your test. This will make sure that the
@@ -41,15 +43,6 @@ import java.lang.reflect.Method;
  */
 public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(UnitilsJUnit4TestClassRunner.class);
-
-    private static boolean shutdownHookCreated = false;
-    
-    /* True if beforeAll was successfully called */
-    private static boolean beforeAllCalled = false;
-
-
     /**
      * Creates a test runner that runs all test methods in the given class.
      *
@@ -58,50 +51,21 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
      */
     public UnitilsJUnit4TestClassRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
-
-        if (!shutdownHookCreated) {
-            createShutdownHook();
-            shutdownHookCreated = true;
-        }
     }
 
 
     @Override
     public void run(final RunNotifier notifier) {
-        // if this is the first test, call beforeAll
-        if (!beforeAllCalled) {
-            try {
-                getTestListener().beforeAll();
-                beforeAllCalled = true;
-
-            } catch (Throwable t) {
-                logger.debug(getDescription(), t);
-                notifier.testAborted(getDescription(), t);
-                return;
-            }
-        }
-
         ClassRoadie classRoadie = new ClassRoadie(notifier, getTestClass(), getDescription(), new Runnable() {
             public void run() {
                 runMethods(notifier);
             }
         });
 
-        Throwable throwable = null;
         try {
-        	getTestListener().beforeTestClass(getTestClass().getJavaClass());
-            classRoadie.runProtected();
+        	classRoadie.runProtected();
         } catch (Throwable t) {
             notifier.fireTestFailure(new Failure(getDescription(), t));
-            throwable = t;
-        }
-        try {
-        	getTestListener().afterTestClass(getTestClass().getJavaClass());
-        } catch (Throwable t) {
-            // first exception is typically the most meaningful, so ignore second exception
-            if (throwable == null) {
-                notifier.fireTestFailure(new Failure(getDescription(), t));
-            }
         }
     }
 
@@ -123,6 +87,9 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
             return;
         }
         TestMethod testMethod = wrapMethod(method);
+        if (!testMethod.isIgnored()) {
+        	getTestListener().afterCreateTestObject(testObject);
+        }
         getMethodRoadie(method, notifier, description, testObject, testMethod).run();
     }
 
@@ -230,23 +197,6 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 
 
     /**
-     * Creates a hook that will call {@link TestListener#afterAll} during the shutdown of the VM.
-     * <p/>
-     * This seems te be the only way in JUnit4 to this, since there is no way to
-     * able to know when all tests have run.
-     */
-    protected void createShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                if (getTestListener() != null) {
-                	getTestListener().afterAll();
-                }
-            }
-        });
-    }
-    
-    /**
 	 * @return The unitils test listener
 	 */
 	protected TestListener getTestListener() {
@@ -255,12 +205,9 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
 	
 	
 	/**
-     * This will return the default singleton instance by calling {@link Unitils#getInstance()}.
-     * <p/>
-     * You can override this method to let it create and set your own singleton instance. For example, you
-     * can let it create an instance of your own Unitils subclass and set it by using {@link Unitils#setInstance}.
+     * Returns the default singleton instance of Unitils
      *
-     * @return the unitils core instance, not null
+     * @return the Unitils instance, not null
      */
     protected Unitils getUnitils() {
         return Unitils.getInstance();

@@ -60,7 +60,6 @@ public class UnitilsIntegrationTest {
 	
 	@Before
 	public void cleanDatabase() {
-		injectIntoStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
 		DatabaseUnitils.cleanSchemas();
 	}
 	

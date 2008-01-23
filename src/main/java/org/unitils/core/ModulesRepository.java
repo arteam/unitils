@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * A class for holding and retrieving modules.
@@ -167,5 +168,12 @@ public class ModulesRepository {
         }
         return result;
     }
+
+
+	public void initModules(Properties configuration) {
+        for (Module module : modules) {
+            ((Module) module).init(configuration);
+        }
+	}
 
 }

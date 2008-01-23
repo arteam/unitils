@@ -15,17 +15,14 @@
  */
 package org.unitils;
 
-import junit.framework.AssertionFailedError;
+import java.lang.reflect.Method;
+
 import junit.framework.TestCase;
-import junit.framework.TestResult;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-
-import java.lang.reflect.Method;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
@@ -37,19 +34,8 @@ import java.lang.reflect.Method;
  */
 public abstract class UnitilsJUnit3 extends TestCase {
 
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(UnitilsJUnit3.class);
 
-    private static boolean shutdownHookCreated;
-    
-    /* True if this is the first unit test that is executed during this test run */
-    private static boolean beforeAllCalled;
-
-    /* The class to which the last test belonged to */
-    private static Class<?> lastTestClass;
-
-
-    /**
+	/**
      * Creates a test without a name. Be sure to call {@link TestCase#setName} afterwards.
      */
     public UnitilsJUnit3() {
@@ -64,40 +50,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
      */
     public UnitilsJUnit3(String name) {
         super(name);
-
-        if (!shutdownHookCreated) {
-        	createShutdownHook();
-        	shutdownHookCreated = true;
-        }
-    }
-
-
-    /**
-     * Overriden JUnit3 method to be able to call {@link TestListener#beforeAll}
-     *
-     * @param testResult junits test result, not null
-     */
-    @Override
-    public void run(TestResult testResult) {
-        try {
-            // if this the first test, call beforeAll
-            if (!beforeAllCalled) {
-                getTestListener().beforeAll();
-                beforeAllCalled = true;
-            }
-        } catch (AssertionFailedError e) {
-            testResult.addFailure(this, e);
-            testResult.stop(); // stop the test
-            return;
-
-        } catch (Exception e) {
-            testResult.addError(this, e);
-            testResult.stop(); // stop the test
-            return;
-        }
-
-        // run the test
-        super.run(testResult);
     }
 
 
@@ -113,23 +65,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
      */
     @Override
     public void runBare() throws Throwable {
-        // simulate class level methods
-        // if this is the first test of a test class (previous test was of a different test class),
-        // first finalize the previous test class by calling afterTestClass, then call beforeTestClass
-        // to start the new one
-        Class<?> testClass = getClass();
-        if (lastTestClass != testClass) {
-            if (lastTestClass != null) {
-                try {
-                    getTestListener().afterTestClass(lastTestClass);
-
-                } catch (Throwable e) {
-                    logger.error("An exception occured during afterTestClass.", e);
-                }
-            }
-            getTestListener().beforeTestClass(testClass);
-            lastTestClass = testClass;
-        }
+        getTestListener().afterCreateTestObject(this);
 
         Throwable firstThrowable = null;
         try {
@@ -184,7 +120,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
             }
         }
 
-        // if there were exceptions, throw the first one
+        // if an exception occured during beforeTestMethod, the test or afterTestMethod, throw it
         if (firstThrowable != null) {
             throw firstThrowable;
         }
@@ -222,28 +158,6 @@ public abstract class UnitilsJUnit3 extends TestCase {
         } catch (NoSuchMethodException e) {
             throw new UnitilsException("Unable to find current test method. Test name: " + getName() + " , test class: " + getClass(), e);
         }
-    }
-
-
-    /**
-     * Creates a hook that will call {@link TestListener#afterTestClass} of the last test class and
-     * {@link TestListener#afterAll} during the shutdown of the VM.
-     * <p/>
-     * This seems te be the only way in JUnit3 to this, since there is no way (without writing a custom test runner) to
-     * able to know when all test (of a class or in total) have run.
-     */
-    protected void createShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                if (getTestListener() != null) {
-                    if (lastTestClass != null) {
-                        getTestListener().afterTestClass(lastTestClass);
-                    }
-                    getTestListener().afterAll();
-                }
-            }
-        });
     }
     
     

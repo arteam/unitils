@@ -34,7 +34,14 @@ public interface Module {
      *
      * @param configuration The config, not null
      */
-    public void init(Properties configuration);
+    void init(Properties configuration);
+    
+    
+    /**
+     * Gives the module the opportunity to performs initialization that
+     * can only work after all other modules have been initialized  
+     */
+    void afterInit();
 
 
     /**
@@ -42,7 +49,7 @@ public interface Module {
      *
      * @return The test listener, not null
      */
-    public TestListener getTestListener();
+    TestListener getTestListener();
 
 
 }

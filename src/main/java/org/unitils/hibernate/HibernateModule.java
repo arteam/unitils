@@ -127,6 +127,13 @@ public class HibernateModule implements Module, Flushable {
         
         autoCloseSessionsAfterTest = PropertyUtils.getBoolean(PROPKEY_AUTOCLOSESESSIONSAFTERTEST_ENABLED, configuration);
     }
+    
+    /**
+     * 
+     */
+    public void afterInit() {
+        createSpringHibernateSupport();
+    }
 
 
     /**
@@ -364,11 +371,6 @@ public class HibernateModule implements Module, Flushable {
      * The {@link TestListener} for this module
      */
     protected class HibernateTestListener extends TestListener {
-
-        @Override
-        public void beforeAll() {
-            createSpringHibernateSupport();
-        }
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
