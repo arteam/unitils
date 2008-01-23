@@ -19,7 +19,7 @@
         
         <links>
             <item name="SF.net project page" href="http://sourceforge.net/projects/unitils/" />
-            <item name="Ordina J-Technologies" href="http://www.j-technologies.be/"/>        
+            <item name="Ordina" href="http://www.ordina.be/"/>        
         </links>
 
         <menu name="Unitils">
@@ -38,7 +38,8 @@
             <item name="&lt;span class=&quot;externalLink&quot;&gt;Team Members&lt;/span&gt;" href="http://sourceforge.net/project/memberlist.php?group_id=167201"/>
             <item name="&lt;span class=&quot;externalLink&quot;&gt;Issue Tracking&lt;/span&gt;" href="http://jira.unitils.org"/>
             <item name="Source Repository" href="source-repository.html"/>
-            <item name="Acknowledgements" href="acknowledgements.html"/>                       
+            <item name="Acknowledgements" href="acknowledgements.html"/>
+			<item name="&lt;span class=&quot;externalLink&quot;&gt;Filip's weblog&lt;/span&gt;" href="http://filipneven.blogspot.com"/>
         </menu>
         
     </body>
