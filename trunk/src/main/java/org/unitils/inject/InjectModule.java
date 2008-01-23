@@ -95,7 +95,11 @@ public class InjectModule implements Module {
     }
 
 
-    /**
+    public void afterInit() {
+	}
+
+
+	/**
      * For all fields annotated with {@link TestedObject} that are still null after the test fixture, an object is
      * created of the field's declared type and assigned to the field. If the field's declared type is an interface or
      * abstract class, or if the type doesn't have a default constructor, a warning is produced.

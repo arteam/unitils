@@ -16,7 +16,11 @@
 package org.unitils;
 
 import org.testng.annotations.*;
-import static org.unitils.TracingTestListener.*;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_BEFORE_CLASS; 
+import static org.unitils.TracingTestListener.TestInvocation.TEST_SET_UP;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_METHOD;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_TEAR_DOWN; 
+import static org.unitils.TracingTestListener.TestInvocation.TEST_AFTER_CLASS;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 
@@ -91,9 +95,9 @@ public class UnitilsTestNGTest_GroupsTest extends UnitilsTestNG {
      * @param invocation     the invocation type, not null
      * @param testMethodName the actual test name, null if not applicable
      */
-    private void addTestInvocation(String invocation, String testMethodName) {
+    private void addTestInvocation(TracingTestListener.TestInvocation invocation, String testMethodName) {
         if (tracingTestListener != null) {
-            tracingTestListener.addTestInvocation(invocation, this, testMethodName);
+            tracingTestListener.registerTestInvocation(invocation, this.getClass(), testMethodName);
         }
     }
 

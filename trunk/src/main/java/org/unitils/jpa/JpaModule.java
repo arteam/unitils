@@ -82,8 +82,12 @@ public class JpaModule implements Module, Flushable {
         
         autoCloseEntityManagersAfterTest = PropertyUtils.getBoolean(PROPKEY_AUTOCLOSEENTITYMANAGERSAFTERTEST_ENABLED, configuration);
     }
+    
 
-    /**
+    public void afterInit() {
+	}
+
+	/**
      * Checks if the mapping of the managed objects with the database is still correct.
      *
      * @param testObject The test instance, not null

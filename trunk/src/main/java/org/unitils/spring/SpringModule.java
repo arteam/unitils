@@ -87,7 +87,11 @@ public class SpringModule implements Module {
     }
 
 
-    /**
+    public void afterInit() {
+	}
+
+
+	/**
      * Gets the spring bean with the given name. The given test instance, by using {@link SpringApplicationContext},
      * determines the application context in which to look for the bean.
      * <p/>

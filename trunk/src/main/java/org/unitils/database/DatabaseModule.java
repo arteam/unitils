@@ -114,7 +114,11 @@ public class DatabaseModule implements Module {
     }
 
 
-    /**
+    public void afterInit() {
+	}
+
+
+	/**
      * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
      *

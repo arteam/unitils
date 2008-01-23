@@ -16,25 +16,37 @@
 package org.unitils;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import static org.junit.Assume.assumeTrue;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_CREATE_TEST_OBJECT;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_METHOD;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_TEARDOWN;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_BEFORE_TEST_METHOD;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_BEFORE_TEST_SET_UP;
+import static org.unitils.TracingTestListener.TestFramework.JUNIT3;
+import static org.unitils.TracingTestListener.TestFramework.JUNIT4;
+import static org.unitils.TracingTestListener.TestFramework.TESTNG;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_AFTER_CLASS;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_BEFORE_CLASS;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_METHOD;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_SET_UP;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
-import org.junit.internal.runners.InitializationError;
-import org.junit.runner.Result;
-import org.junit.runner.notification.RunNotifier;
-import org.testng.TestListenerAdapter;
-import org.testng.TestNG;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.unitils.TracingTestListener.TestFramework;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import static org.unitils.inject.util.InjectionUtils.injectIntoStatic;
-import org.unitils.util.ReflectionUtils;
-
-import java.util.Iterator;
+import org.unitils.spring.SpringUnitilsJUnit38Test_TestClass1;
+import org.unitils.spring.SpringUnitilsJUnit38Test_TestClass2;
+import org.unitils.spring.SpringUnitilsJUnit4Test_TestClass1;
+import org.unitils.spring.SpringUnitilsJUnit4Test_TestClass2;
+import org.unitils.spring.SpringUnitilsTestNGTest_TestClass1;
+import org.unitils.spring.SpringUnitilsTestNGTest_TestClass2;
 
 /**
  * Test for the main flow of the unitils test listeners for JUnit3 ({@link UnitilsJUnit3}),
@@ -57,143 +69,108 @@ import java.util.Iterator;
  * @see UnitilsTestNGTest_TestClass2
  * @see UnitilsTestNGTest_EmptyTestClass
  */
-public class UnitilsInvocationTest {
-
-    /* Listener that records all method invocations during the tests */
-    private static TracingTestListener tracingTestListener;
-
-    /**
-     * Sets up the test by installing the tracing test listener that will record all method invocations during the test.
-     * The current test listeners are stored so that they can be restored during the class tear down.
-     */
-    @BeforeClass
-    public static void classSetup() {
-        tracingTestListener = new TracingTestListener();
-
-        UnitilsJUnit3Test_TestClass1.setTracingTestListener(tracingTestListener);
-        UnitilsJUnit3Test_TestClass2.setTracingTestListener(tracingTestListener);
-        UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(tracingTestListener);
-
-        UnitilsJUnit4Test_TestClass1.setTracingTestListener(tracingTestListener);
-        UnitilsJUnit4Test_TestClass2.setTracingTestListener(tracingTestListener);
-
-        UnitilsTestNGTest_TestClass1.setTracingTestListener(tracingTestListener);
-        UnitilsTestNGTest_TestClass2.setTracingTestListener(tracingTestListener);
-        UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(tracingTestListener);
-        UnitilsTestNGTest_GroupsTest.setTracingTestListener(tracingTestListener);
-    }
-
-
-    /**
-     * This will put back the old test listeners that were replaced by the tracing test listener.
-     */
-    @AfterClass
-    public static void classTearDown() {
-    }
-
-
-    /**
-     * Sets up the test by clearing the previous recorded method invocations. This will also re-initiliaze
-     * the base-classes so that, for example beforeAll() will be called another time.
-     */
-    @Before
-    public void setUp() throws Exception {
-        tracingTestListener.getCallList().clear();
-
-        // clear state so that beforeAll is called
-        injectIntoStatic(false, UnitilsJUnit3.class, "beforeAllCalled");
-        injectIntoStatic(null, UnitilsJUnit3.class, "lastTestClass");
-        injectIntoStatic(false, UnitilsJUnit4TestClassRunner.class, "beforeAllCalled");
-
-    }
-
-
-    /**
-     * Tests the correct invocation sequence of listener methods for a JUnit3 test.
-     */
+@RunWith(Parameterized.class)
+public class UnitilsInvocationTest extends BaseUnitilsInvocationTest {
+    
+    Class<?> testClass1, testClass2;
+    
+	public UnitilsInvocationTest(TestFramework testFramework, TestExecutor testExecutor, Class<?> testClass1, Class<?> testClass2) {
+		super(testFramework, testExecutor);
+		this.testClass1 = testClass1;
+		this.testClass2 = testClass2;
+	}
+	
+	@Parameters
+	public static Collection<Object[]> testData() {
+		return Arrays.asList(new Object[][] {
+				{JUNIT3, new JUnit3TestExecutor(), UnitilsJUnit3Test_TestClass1.class, UnitilsJUnit3Test_TestClass2.class},
+				{JUNIT4, new JUnit4TestExecutor(), UnitilsJUnit4Test_TestClass1.class, UnitilsJUnit4Test_TestClass2.class},
+				{TESTNG, new TestNGTestExecutor(), UnitilsTestNGTest_TestClass1.class, UnitilsTestNGTest_TestClass2.class},
+				{JUNIT3, new JUnit3TestExecutor(), SpringUnitilsJUnit38Test_TestClass1.class, SpringUnitilsJUnit38Test_TestClass2.class},
+				{JUNIT4, new JUnit4TestExecutor(), SpringUnitilsJUnit4Test_TestClass1.class, SpringUnitilsJUnit4Test_TestClass2.class},
+				{TESTNG, new TestNGTestExecutor(), SpringUnitilsTestNGTest_TestClass1.class, SpringUnitilsTestNGTest_TestClass2.class},
+		});
+	}
+	
+	
+    
     @Test
-    public void testUnitilsJUnit3() {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(UnitilsJUnit3Test_TestClass1.class);
-        suite.addTestSuite(UnitilsJUnit3Test_TestClass2.class);
-        suite.addTestSuite(UnitilsJUnit3Test_EmptyTestClass.class);
+    public void testSuccessfulRun() throws Exception {
+    	testExecutor.runTests(testClass1, testClass2);
+    	
+    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass1, TESTNG);
+    	assertInvocation(TEST_BEFORE_CLASS,        	        testClass1, JUNIT4, TESTNG);
+    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass1, JUNIT3, JUNIT4);
+    	// testClass 1, testMethod 1
+    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass1);
+    	assertInvocation(TEST_SET_UP,                       testClass1);
+    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass1);
+    	assertInvocation(TEST_METHOD,                       testClass1);
+    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass1);
+        assertInvocation(TEST_TEAR_DOWN,                    testClass1);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass1);
+        // testClass 1, testMethod 2
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass1, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass1);
+    	assertInvocation(TEST_SET_UP,                       testClass1);
+    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass1);
+    	assertInvocation(TEST_METHOD,                       testClass1);
+    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass1);
+        assertInvocation(TEST_TEAR_DOWN,                    testClass1);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass1);
+		assertInvocation(TEST_AFTER_CLASS,         			testClass1, JUNIT4, TESTNG);
+        
+        // testClass 2, testMethod 1
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass2, TESTNG);
+		assertInvocation(TEST_BEFORE_CLASS,        			testClass2, JUNIT4, TESTNG);
+		assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass2, JUNIT3, JUNIT4);
+    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,  		testClass2);
+    	assertInvocation(TEST_SET_UP,                  		testClass2);
+    	assertInvocation(LISTENER_BEFORE_TEST_METHOD, 	 	testClass2);
+    	assertInvocation(TEST_METHOD,                  		testClass2);
+    	assertInvocation(LISTENER_AFTER_TEST_METHOD,   		testClass2);
+        assertInvocation(TEST_TEAR_DOWN,               		testClass2);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, 		testClass2);
+        // testClass 2, testMethod 2
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass2, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP,  		testClass2);
+    	assertInvocation(TEST_SET_UP,                  		testClass2);
+    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,  		testClass2);
+    	assertInvocation(TEST_METHOD,                  		testClass2);
+    	assertInvocation(LISTENER_AFTER_TEST_METHOD,   		testClass2);
+        assertInvocation(TEST_TEAR_DOWN,               		testClass2);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, 		testClass2);
+    	assertInvocation(TEST_AFTER_CLASS,         			testClass2, JUNIT4, TESTNG);
+    	assertNoMoreInvocations();
 
-        TestRunner testRunner = new TestRunner();
-        TestResult testResult = testRunner.doRun(suite);
-
-        assertInvocationOrder("JUnit3", tracingTestListener);
-        // EmptyTestClass has caused a failure and will not be run
-        assertEquals(0, testResult.errorCount());
-        assertEquals(1, testResult.failureCount());
+        assertEquals(4, testExecutor.getRunCount());
+    	assertEquals(0, testExecutor.getFailureCount());
     }
 
 
-    /**
-     * Tests the correct invocation sequence of listener methods for a JUnit4 test.
-     */
-    @Test
-    public void testUnitilsJUnit4() throws Exception {
-
-        Result result = new Result();
-        RunNotifier runNotifier = new RunNotifier();
-        runNotifier.addListener(result.createListener());
-
-        TestUnitilsJUnit4TestClassRunner testRunner1 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass1.class);
-        TestUnitilsJUnit4TestClassRunner testRunner2 = new TestUnitilsJUnit4TestClassRunner(UnitilsJUnit4Test_TestClass2.class);
-        testRunner1.run(runNotifier);
-        testRunner2.run(runNotifier);
-
-        assertInvocationOrder("JUnit4", tracingTestListener);
-        assertEquals(4, result.getRunCount());
-        assertEquals(1, result.getIgnoreCount());
-    }
-
-
-    /**
-     * Tests the correct invocation sequence of listener methods for a TestNG test.
-     */
-    @Test
-    public void testUnitilsTestNG() {
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
-
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_TestClass1.class, UnitilsTestNGTest_TestClass2.class, UnitilsTestNGTest_EmptyTestClass.class});
-        testng.addListener(testListenerAdapter);
-        testng.run();
-
-        assertInvocationOrder("TestNG", tracingTestListener);
-        assertEquals(0, testListenerAdapter.getFailedTests().size());
-    }
-
-
-    /**
+	/**
      * Tests the correct invocation sequence of listener methods for a TestNG test that defines a test group.
      */
     @Test
-    public void testUnitilsTestNG_group() {
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
+    public void testUnitilsTestNG_group() throws Exception {
+    	assumeTrue(TESTNG.equals(testFramework));
+    	
+        testExecutor.runTests("testGroup", UnitilsTestNGTest_GroupsTest.class);
 
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_GroupsTest.class});
-        testng.setGroups("testGroup");
-        testng.addListener(testListenerAdapter);
-        testng.run();
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, UnitilsTestNGTest_GroupsTest.class);
+        assertInvocation(TEST_BEFORE_CLASS,        	        UnitilsTestNGTest_GroupsTest.class);
+    	
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       UnitilsTestNGTest_GroupsTest.class);
+    	assertInvocation(TEST_SET_UP,                       UnitilsTestNGTest_GroupsTest.class);
+    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       UnitilsTestNGTest_GroupsTest.class);
+    	assertInvocation(TEST_METHOD,                       UnitilsTestNGTest_GroupsTest.class);
+    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        UnitilsTestNGTest_GroupsTest.class);
+        assertInvocation(TEST_TEAR_DOWN,                    UnitilsTestNGTest_GroupsTest.class);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      UnitilsTestNGTest_GroupsTest.class);
+        assertInvocation(TEST_AFTER_CLASS,         			UnitilsTestNGTest_GroupsTest.class);
+        assertNoMoreInvocations();
 
-        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
-        assertEquals("[Unitils] beforeAll", iterator.next());
-        assertEquals("[Unitils] beforeTestClass   - GroupsTest", iterator.next());
-        assertEquals("[Test]    testBeforeClass   - GroupsTest", iterator.next());
-        assertEquals("[Unitils] beforeTestSetUp   - GroupsTest", iterator.next());
-        assertEquals("[Test]    testSetUp         - GroupsTest", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - GroupsTest", iterator.next());
-        assertEquals("[Test]    testMethod        - GroupsTest", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - GroupsTest", iterator.next());
-        assertEquals("[Test]    testTearDown      - GroupsTest", iterator.next());
-        assertEquals("[Unitils] afterTestTearDown - GroupsTest", iterator.next());
-        assertEquals("[Test]    testAfterClass    - GroupsTest", iterator.next());
-        assertEquals("[Unitils] afterTestClass    - GroupsTest", iterator.next());
-        assertEquals("[Unitils] afterAll", iterator.next());
-        assertEquals(0, testListenerAdapter.getFailedTests().size());
+        assertEquals(0, testExecutor.getFailureCount());
     }
 
 
@@ -201,120 +178,18 @@ public class UnitilsInvocationTest {
      * Tests the correct invocation sequence of listener methods for a TestNG test that defines an unknown test group.
      */
     @Test
-    public void testUnitilsTestNG_unknownGroup() {
-        TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
-
-        TestNG testng = new TestNG();
-        testng.setTestClasses(new Class[]{UnitilsTestNGTest_GroupsTest.class});
-        testng.setGroups("xxxx");
-        testng.addListener(testListenerAdapter);
-        testng.run();
-
-        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
-        assertEquals("[Unitils] beforeAll", iterator.next());
-        assertEquals("[Unitils] afterAll", iterator.next());
-        assertEquals(0, testListenerAdapter.getFailedTests().size());
+    public void testUnitilsTestNG_unknownGroup() throws Exception {
+    	assumeTrue(TESTNG.equals(testFramework));
+    	
+    	testExecutor.runTests("xxxx", UnitilsTestNGTest_GroupsTest.class);
+        
+    	assertNoMoreInvocations();
+    	
+        assertEquals(0, testExecutor.getFailureCount());
     }
-
-
-    /**
-     * Asserts that the given listener recorded the correct invocation sequence. Except for some minor difference, the
-     * sequence should be equal for  all test frameworks.
-     * <p/>
-     * Following difference are allowed:<ul>
-     * <li>beforeTestClass and afterTestClass no not exist in JUnit 3 (the Unitils versions will be called however)</li>
-     * <li>empty tests are not run at all in JUnit3 and TestNG, in JUnit 4 the beforeTestClass and afterTestClass will be called</li>
-     * </ul>
-     * For JUnit3 and JUnit4 afterAll will be called during the runtime exit and can therefore not be asserted here.
-     * The same is true for the last afterTestClass method of JUnit3 tests. This is because you cannot determine which test
-     * is going to be the last test in the class
-     *
-     * @param type                JUnit3, JUnit4 or TestNG
-     * @param tracingTestListener the listener, not null
-     */
-    private void assertInvocationOrder(String type, TracingTestListener tracingTestListener) {
-        Iterator<?> iterator = tracingTestListener.getCallList().iterator();
-        assertEquals("[Unitils] beforeAll", iterator.next());
-
-        assertEquals("[Unitils] beforeTestClass   - TestClass1", iterator.next());
-        if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    testBeforeClass   - TestClass1", iterator.next());
-        }
-        assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - TestClass1", iterator.next());
-        assertEquals("[Test]    testMethod        - TestClass1", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - TestClass1", iterator.next());
-        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
-        assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
-        assertEquals("[Unitils] beforeTestSetUp   - TestClass1", iterator.next());
-        assertEquals("[Test]    testSetUp         - TestClass1", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - TestClass1", iterator.next());
-        assertEquals("[Test]    testMethod        - TestClass1", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - TestClass1", iterator.next());
-        assertEquals("[Test]    testTearDown      - TestClass1", iterator.next());
-        assertEquals("[Unitils] afterTestTearDown - TestClass1", iterator.next());
-        if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    testAfterClass    - TestClass1", iterator.next());
-        }
-        assertEquals("[Unitils] afterTestClass    - TestClass1", iterator.next());
-
-        assertEquals("[Unitils] beforeTestClass   - TestClass2", iterator.next());
-        if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    testBeforeClass   - TestClass2", iterator.next());
-        }
-        assertEquals("[Unitils] beforeTestSetUp   - TestClass2", iterator.next());
-        assertEquals("[Test]    testSetUp         - TestClass2", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - TestClass2", iterator.next());
-        assertEquals("[Test]    testMethod        - TestClass2", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - TestClass2", iterator.next());
-        assertEquals("[Test]    testTearDown      - TestClass2", iterator.next());
-        assertEquals("[Unitils] afterTestTearDown - TestClass2", iterator.next());
-        assertEquals("[Unitils] beforeTestSetUp   - TestClass2", iterator.next());
-        assertEquals("[Test]    testSetUp         - TestClass2", iterator.next());
-        assertEquals("[Unitils] beforeTestMethod  - TestClass2", iterator.next());
-        assertEquals("[Test]    testMethod        - TestClass2", iterator.next());
-        assertEquals("[Unitils] afterTestMethod   - TestClass2", iterator.next());
-        assertEquals("[Test]    testTearDown      - TestClass2", iterator.next());
-        assertEquals("[Unitils] afterTestTearDown - TestClass2", iterator.next());
-        if (!"JUnit3".equals(type)) {
-            assertEquals("[Test]    testAfterClass    - TestClass2", iterator.next());
-            // last afterTestClass (TestClass2) will be called when the runtime exits
-            assertEquals("[Unitils] afterTestClass    - TestClass2", iterator.next());
-        }
-
-        // For JUnit 3 and JUnit 4 afterAll will be called when the runtime exits
-        if ("TestNG".equals(type)) {
-            assertEquals("[Unitils] afterAll", iterator.next());
-        }
-        assertFalse(iterator.hasNext());
-    }
-
-
-    /**
-     * Overridden test class runner to be able to use the {@link TracingTestListener} as test listener.
-     */
-    private class TestUnitilsJUnit4TestClassRunner extends UnitilsJUnit4TestClassRunner {
-
-        public TestUnitilsJUnit4TestClassRunner(Class<?> testClass) throws InitializationError {
-            super(testClass);
-        }
-
-        @Override
-        protected Unitils getUnitils() {
-
-            return new Unitils() {
-
-                @Override
-                public TestListener getTestListener() {
-                    return tracingTestListener;
-                }
-            };
-        }
-    }
-
-
-    /**
+    
+    
+	/**
      * JUnit 3 test class without any tests. Inner class to avoid a failing test.
      */
     protected static class UnitilsJUnit3Test_EmptyTestClass extends UnitilsJUnit3 {
@@ -340,4 +215,5 @@ public class UnitilsInvocationTest {
             return super.getUnitils();
         }
     }
+	
 }

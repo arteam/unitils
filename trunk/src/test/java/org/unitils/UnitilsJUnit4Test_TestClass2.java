@@ -16,7 +16,12 @@
 package org.unitils;
 
 import org.junit.*;
-import static org.unitils.TracingTestListener.*;
+
+import static org.unitils.TracingTestListener.TestInvocation.TEST_BEFORE_CLASS; 
+import static org.unitils.TracingTestListener.TestInvocation.TEST_SET_UP;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_METHOD;
+import static org.unitils.TracingTestListener.TestInvocation.TEST_TEAR_DOWN; 
+import static org.unitils.TracingTestListener.TestInvocation.TEST_AFTER_CLASS;
 
 
 /**
@@ -24,69 +29,41 @@ import static org.unitils.TracingTestListener.*;
  *
  * @author Tim Ducheyne
  */
-public class UnitilsJUnit4Test_TestClass2 extends UnitilsJUnit4 {
+public class UnitilsJUnit4Test_TestClass2 extends UnitilsJUnit4Test {
 
 
-    /* Test listener that will record all invocations */
-    private static TracingTestListener tracingTestListener;
-
-
-    /**
-     * Sets the tracing test listener that will record all invocations.
-     *
-     * @param testListener the listener
-     */
-    public static void setTracingTestListener(TracingTestListener testListener) {
-        tracingTestListener = testListener;
-    }
-
-
-    @BeforeClass
+	@BeforeClass
     public static void beforeClass() {
-        addTestInvocation(TEST_BEFORE_CLASS, UnitilsJUnit4Test_TestClass2.class, null);
+        registerTestInvocation(TEST_BEFORE_CLASS, UnitilsJUnit4Test_TestClass2.class, null);
     }
 
 
     @AfterClass
     public static void afterClass() {
-        addTestInvocation(TEST_AFTER_CLASS, UnitilsJUnit4Test_TestClass2.class, null);
+        registerTestInvocation(TEST_AFTER_CLASS, UnitilsJUnit4Test_TestClass2.class, null);
     }
 
 
     @Before
     public void setUp() {
-        addTestInvocation(TEST_SET_UP, this, null);
+        registerTestInvocation(TEST_SET_UP, this.getClass(), null);
     }
-
-
+    
     @After
     public void tearDown() {
-        addTestInvocation(TEST_TEAR_DOWN, this, null);
+        registerTestInvocation(TEST_TEAR_DOWN, this.getClass(), null);
     }
 
-
+	
     @Test
     public void test1() {
-        addTestInvocation(TEST_METHOD, this, "test1");
+        registerTestInvocation(TEST_METHOD, this.getClass(), "test1");
     }
 
 
     @Test
     public void test2() {
-        addTestInvocation(TEST_METHOD, this, "test2");
+        registerTestInvocation(TEST_METHOD, this.getClass(), "test2");
     }
 
-
-    /**
-     * Records an invocation.
-     *
-     * @param invocation     the invocation type, not null
-     * @param test           the test instance or class, not null
-     * @param testMethodName the actual test name, null if not applicable
-     */
-    private static void addTestInvocation(String invocation, Object test, String testMethodName) {
-        if (tracingTestListener != null) {
-            tracingTestListener.addTestInvocation(invocation, test, testMethodName);
-        }
-    }
 }

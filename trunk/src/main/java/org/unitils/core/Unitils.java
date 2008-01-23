@@ -37,7 +37,7 @@ import org.unitils.core.util.ResourceTranslatingClassLoader;
  * Unitils itself is also implemented as a module. In fact, an instance of Unitils behaves like a module who's behaviour
  * is defined by the added behaviour of all modules.
  */
-public class Unitils implements Module {
+public class Unitils {
 
 
     /* The singleton instance */
@@ -96,11 +96,10 @@ public class Unitils implements Module {
      */
     public Unitils() {
         testContext = new TestContext();
-        initClassLoader();
     }
 
 
-    /**
+	/**
      * Initializes unitils with the configuration files.
      */
     public void init() {
@@ -129,12 +128,14 @@ public class Unitils implements Module {
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
         testListener = new UnitilsTestListener();
+        afterInitModules();
     }
     
     
-    protected void initClassLoader() {
-    	unitilsClassLoader = new ResourceTranslatingClassLoader();
-    	Thread.currentThread().setContextClassLoader(unitilsClassLoader);
+    protected void afterInitModules() {
+    	for (Module module : modulesRepository.getModules()) {
+    		module.afterInit();
+    	}
     }
 
 
@@ -211,34 +212,6 @@ public class Unitils implements Module {
     private class UnitilsTestListener extends TestListener {
 
         @Override
-        public void beforeAll() {
-            TestContext testContext = getTestContext();
-            testContext.setTestClass(null);
-            testContext.setTestObject(null);
-            testContext.setTestMethod(null);
-
-            List<Module> modules = modulesRepository.getModules();
-            for (Module module : modules) {
-                modulesRepository.getTestListener(module).beforeAll();
-            }
-        }
-
-
-        @Override
-        public void beforeTestClass(Class<?> testClass) {
-            TestContext testContext = getTestContext();
-            testContext.setTestClass(testClass);
-            testContext.setTestObject(null);
-            testContext.setTestMethod(null);
-
-            List<Module> modules = modulesRepository.getModules();
-            for (Module module : modules) {
-                modulesRepository.getTestListener(module).beforeTestClass(testClass);
-            }
-        }
-
-
-        @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
@@ -292,34 +265,7 @@ public class Unitils implements Module {
                 modulesRepository.getTestListener(module).afterTestTearDown(testObject, testMethod);
             }
         }
-
-
-        @Override
-        public void afterTestClass(Class<?> testClass) {
-            TestContext testContext = getTestContext();
-            testContext.setTestClass(testClass);
-            testContext.setTestObject(null);
-            testContext.setTestMethod(null);
-
-            List<Module> modules = modulesRepository.getModules();
-            for (Module module : modules) {
-                modulesRepository.getTestListener(module).afterTestClass(testClass);
-            }
-        }
-
-
-        @Override
-        public void afterAll() {
-            TestContext testContext = getTestContext();
-            testContext.setTestClass(null);
-            testContext.setTestObject(null);
-            testContext.setTestMethod(null);
-
-            List<Module> modules = modulesRepository.getModules();
-            for (Module module : modules) {
-                modulesRepository.getTestListener(module).afterAll();
-            }
-        }
+        
     }
 
 }

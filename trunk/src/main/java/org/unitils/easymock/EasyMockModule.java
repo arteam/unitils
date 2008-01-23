@@ -91,7 +91,11 @@ public class EasyMockModule implements Module {
     }
 
 
-    /**
+    public void afterInit() {
+	}
+
+
+	/**
      * Creates the listener for plugging in the behavior of this module into the test runs.
      *
      * @return the listener

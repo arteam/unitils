@@ -15,47 +15,66 @@
  */
 package org.unitils;
 
-import junit.framework.AssertionFailedError;
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.apache.commons.lang.StringUtils.rightPad;
-import org.unitils.core.TestListener;
+import static org.unitils.TracingTestListener.InvocationSource.TEST;
+import static org.unitils.TracingTestListener.InvocationSource.UNITILS;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_CREATE_TEST_OBJECT;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_METHOD;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_TEARDOWN;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_BEFORE_TEST_METHOD;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_BEFORE_TEST_SET_UP;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.AssertionFailedError;
+
+import org.unitils.core.TestListener;
+
 /**
  * Test listener that records all method invocations.
+ * 
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class TracingTestListener extends TestListener {
 
-    public static final String BEFORE_ALL = "beforeAll";
-    public static final String BEFORE_TEST_CLASS = "beforeTestClass";
-    public static final String BEFORE_TEST_SET_UP = "beforeTestSetUp";
-    public static final String BEFORE_TEST_METHOD = "beforeTestMethod";
-    public static final String AFTER_TEST_METHOD = "afterTestMethod";
-    public static final String AFTER_TEST_TEAR_DOWN = "afterTestTearDown";
-    public static final String AFTER_TEST_CLASS = "afterTestClass";
-    public static final String AFTER_ALL = "afterAll";
+	public static enum TestFramework {
+		JUNIT3, 
+		JUNIT4, 
+		TESTNG
+	}
+	
+	public interface Invocation {}
 
-    public static final String TEST_BEFORE_CLASS = "testBeforeClass";
-    public static final String TEST_SET_UP = "testSetUp";
-    public static final String TEST_METHOD = "testMethod";
-    public static final String TEST_TEAR_DOWN = "testTearDown";
-    public static final String TEST_AFTER_CLASS = "testAfterClass";
+	public static enum ListenerInvocation implements Invocation {
+		LISTENER_AFTER_CREATE_TEST_OBJECT, 
+		LISTENER_BEFORE_TEST_SET_UP, 
+		LISTENER_BEFORE_TEST_METHOD,
+		LISTENER_AFTER_TEST_METHOD, 
+		LISTENER_AFTER_TEST_TEARDOWN
+	}
+	
+	public static enum TestInvocation implements Invocation {
+		TEST_BEFORE_CLASS, 
+		TEST_SET_UP,
+		TEST_METHOD,
+		TEST_TEAR_DOWN, 
+		TEST_AFTER_CLASS
+	}
+	
+	public static enum InvocationSource {
+		TEST, 
+		UNITILS
+	}
 
-    private static final String TEST = "[Test]";
-    private static final String UNITILS = "[Unitils]";
-
-
+	
     /* List that will contain a string representation of each method call */
-    private List<String> callList;
+    private List<Call> callList;
 
-    private String exceptionMethod;
+    private Invocation exceptionMethod;
 
     private boolean throwAssertionFailedError;
     
@@ -72,18 +91,18 @@ public class TracingTestListener extends TestListener {
 
 
     public TracingTestListener() {
-        this.callList = new ArrayList<String>();
+        this.callList = new ArrayList<Call>();
     }
 
 
-    public List<String> getCallList() {
+    public List<Call> getCallList() {
         return callList;
     }
 
 
     public String getCallListAsString() {
         StringBuffer result = new StringBuffer();
-        for (String call : callList) {
+        for (Call call : callList) {
             result.append(call);
             result.append('\n');
         }
@@ -91,112 +110,170 @@ public class TracingTestListener extends TestListener {
     }
 
 
-    public void setExceptionMethod(String exceptionMethod, boolean throwAssertionFailedError) {
+    public void expectExceptionInMethod(Invocation exceptionMethod, boolean throwAssertionFailedError) {
         this.exceptionMethod = exceptionMethod;
         this.throwAssertionFailedError = throwAssertionFailedError;
     }
-
-
-    public void addTestInvocation(String invocation, Object test, String testMethodName) {
-        callList.add(formatListenerCallAsString(TEST, invocation, getClassName(test), testMethodName));
+    
+    
+    public void registerTestInvocation(TestInvocation invocation, Class<?> testClass, String methodName) {
+        callList.add(new Call(invocation, testClass, methodName));
         throwExceptionIfRequested(invocation);
     }
-
-
-    @Override
-    public void beforeAll() {
-        callList.add(formatListenerCallAsString(UNITILS, BEFORE_ALL, null, null));
-        throwExceptionIfRequested(BEFORE_ALL);
+    
+    
+    public void registerListenerInvocation(ListenerInvocation listenerInvocation, Object test, Method testMethod, Throwable throwable) {
+    	callList.add(new Call(listenerInvocation, test.getClass(), testMethod == null ? null : testMethod.getName(), throwable));
     }
 
+
     @Override
-    public void beforeTestClass(Class<?> testClass) {
-        callList.add(formatListenerCallAsString(UNITILS, BEFORE_TEST_CLASS, getClassName(testClass), null));
-        throwExceptionIfRequested(BEFORE_TEST_CLASS);
+    public void afterCreateTestObject(Object testObject) {
+        registerListenerInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testObject, null, null);
+        throwExceptionIfRequested(LISTENER_AFTER_CREATE_TEST_OBJECT);
     }
 
     @Override
     public void beforeTestSetUp(Object testObject, Method testMethod) {
-    	assertNotNull(testMethod);
     	currentTestMethod = testMethod;
     	currentThrowable = null;
     	
-        callList.add(formatListenerCallAsString(UNITILS, BEFORE_TEST_SET_UP, getClassName(testObject), testMethod.getName()));
-        throwExceptionIfRequested(BEFORE_TEST_SET_UP);
+        registerListenerInvocation(LISTENER_BEFORE_TEST_SET_UP, testObject, testMethod, null);
+        throwExceptionIfRequested(LISTENER_BEFORE_TEST_SET_UP);
     }
 
     @Override
     public void beforeTestMethod(Object testObject, Method testMethod) {
     	assertEquals(currentTestMethod, testMethod);
     	
-        callList.add(formatListenerCallAsString(UNITILS, BEFORE_TEST_METHOD, getClassName(testObject), testMethod.getName()));
-        throwExceptionIfRequested(BEFORE_TEST_METHOD);
+        registerListenerInvocation(LISTENER_BEFORE_TEST_METHOD, testObject, testMethod, null);
+        throwExceptionIfRequested(LISTENER_BEFORE_TEST_METHOD);
     }
 
     @Override
     public void afterTestMethod(Object testObject, Method testMethod, Throwable throwable) {
     	assertEquals(currentTestMethod, testMethod);
-    	if (currentThrowable != null) {
-    		assertEquals(currentThrowable, throwable);
-    	}
+    	assertTrue(throwable == null || (currentThrowable != null && currentThrowable.equals(throwable)));
     	
-    	callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_METHOD, getClassName(testObject), testMethod.getName()));
-        throwExceptionIfRequested(AFTER_TEST_METHOD);
+    	registerListenerInvocation(LISTENER_AFTER_TEST_METHOD, testObject, testMethod, throwable);
+        throwExceptionIfRequested(LISTENER_AFTER_TEST_METHOD);
     }
 
     @Override
     public void afterTestTearDown(Object testObject, Method testMethod) {
-    	assertEquals(currentTestMethod, testMethod);
-    	
-    	callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_TEAR_DOWN, getClassName(testObject), testMethod.getName()));
-        throwExceptionIfRequested(AFTER_TEST_TEAR_DOWN);
+    	registerListenerInvocation(LISTENER_AFTER_TEST_TEARDOWN, testObject, testMethod, null);
+        throwExceptionIfRequested(LISTENER_AFTER_TEST_TEARDOWN);
     }
 
-    @Override
-    public void afterTestClass(Class<?> testClass) {
-        callList.add(formatListenerCallAsString(UNITILS, AFTER_TEST_CLASS, getClassName(testClass), null));
-        throwExceptionIfRequested(AFTER_TEST_CLASS);
-    }
-
-    @Override
-    public void afterAll() {
-        callList.add(formatListenerCallAsString(UNITILS, AFTER_ALL, null, null));
-        throwExceptionIfRequested(AFTER_ALL);
-    }
-
-
-    private String getClassName(Object object) {
-        if (object == null) {
-            return null;
-        }
-        String className = (object instanceof Class) ? ((Class<?>) object).getName() : object.getClass().getName();
-        return className.substring(className.lastIndexOf('_') + 1);
-    }
-
-
-    private void throwExceptionIfRequested(String exceptionMethod) {
+    private void throwExceptionIfRequested(Invocation exceptionMethod) {
         if (this.exceptionMethod == null || !this.exceptionMethod.equals(exceptionMethod)) {
             return;
         }
         if (throwAssertionFailedError) {
-            AssertionFailedError error = new AssertionFailedError(exceptionMethod);
+            AssertionFailedError error = new AssertionFailedError(exceptionMethod.toString());
             currentThrowable = error;
             throw error;
         }
-        RuntimeException exception = new RuntimeException(exceptionMethod);
+        RuntimeException exception = new RuntimeException(exceptionMethod.toString());
         currentThrowable = exception;
 		throw exception;
     }
+    
+    public Throwable getCurrentThrowable() {
+		return currentThrowable;
+	}
+    
 
+	public static class Call {
+    	
+    	private InvocationSource invocationSource;
+    	
+    	private Invocation invocation;
+    	
+    	private Class<?> testClass;
+    	
+    	private String testMethod;
+    	
+    	private Throwable throwable;
 
-    private String formatListenerCallAsString(String type, String invocation, String testClass, String testMethodName) {
-        String result = rightPad(type, 10);
-        result += rightPad(invocation, 17);
-        if (!isEmpty(testClass)) {
-            result += " - " + rightPad(testClass, 10);
-        }
-        return result.trim();
+    	
+    	public Call(Invocation invocation, Class<?> testClass) {
+    		this(invocation, testClass, null);
+    	}
+    	
+    	
+		public Call(Invocation invocation, Class<?> testClass, String testMethod) {
+			this(invocation, testClass, testMethod, null);
+		}
+
+		
+		public Call(Invocation invocation, Class<?> testClass, String testMethod, Throwable throwable) {
+			if (invocation instanceof TestInvocation) {
+				this.invocationSource = TEST;
+			} else {
+				this.invocationSource = UNITILS;
+			}
+			this.invocation = invocation;
+			this.testClass = testClass;
+			this.testMethod = testMethod;
+			this.throwable = throwable;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((invocation == null) ? 0 : invocation.hashCode());
+			result = prime
+					* result
+					+ ((invocationSource == null) ? 0 : invocationSource
+							.hashCode());
+			result = prime * result
+					+ ((testClass == null) ? 0 : testClass.hashCode());
+			result = prime * result
+					+ ((testMethod == null) ? 0 : testMethod.hashCode());
+			result = prime * result
+					+ ((throwable == null) ? 0 : throwable.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			final Call other = (Call) obj;
+			if (invocation == null) {
+				if (other.invocation != null)
+					return false;
+			} else if (!invocation.equals(other.invocation))
+				return false;
+			if (invocationSource == null) {
+				if (other.invocationSource != null)
+					return false;
+			} else if (!invocationSource.equals(other.invocationSource))
+				return false;
+			if (testClass == null) {
+				if (other.testClass != null)
+					return false;
+			} else if (!testClass.equals(other.testClass))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return invocationSource + " " + invocation + " " + testClass.getSimpleName() + 
+				(testMethod == null ? "" : " " + testMethod) + 
+				(throwable == null ? "" : " " + throwable);
+		}
+    	
     }
+	
 }
 
 

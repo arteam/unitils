@@ -151,6 +151,9 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 		public void init(Properties configuration) {
 		}
 
+		public void afterInit() {
+		}
+
 		public TestListener getTestListener() {
 			return new TestListener1();
 		}
