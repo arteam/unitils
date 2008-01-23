@@ -110,7 +110,7 @@ public class UserServiceTest extends UnitilsJUnit4 {
 unitils.configuration.localFileName=unitils-<myproject>-local.properties
 
 # Properties for the PropertiesDataSourceFactory
-dataSource.driverClassName=<my driver classname>
+database.driverClassName=<my driver classname>
 database.url=<my database connection url>
 
 # This property specifies the underlying DBMS implementation. Supported values are 'oracle', 'db2', 'mysql' and 'hsqldb'.
@@ -193,6 +193,13 @@ public class UserDaoTest extends UnitilsJUnit4 {
 # If set to true, the DBMaintainer will be used to update the unit test database schema. This is done once for each
 # test run, when creating the DataSource that provides access to the unit test database.
 updateDataBaseSchema.enabled=true
+
+# Set to true if the db version table should be created automatically if it does not exist yet.
+# If false, an exception is thrown the it does not exist yet, showing how to create the version table manually. 
+# This is set to false by default to be sure that no non-unit test schema is dropped by accident. If a 
+# version table is available, we assume it to be a unit-test schema, if not, you should manually add a version table 
+# to indicate that it is a unit-test schema.
+dbMaintainer.dbVersionSource.autoCreateVersionTable=true
 
 # Comma separated list of directories and files in which the database update scripts are located. Directories in this
 # list are recursively searched for files.
@@ -298,7 +305,8 @@ public class UserDaoTest extends UnitilsJUnit4 {
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
 public class HibernateMappingTest extends UnitilsJUnit4 {
-
+    
+    @Test
     public void testMappingToDatabase() {        
         HibernateUnitils.assertMappingWithDatabaseConsistent();
     }
