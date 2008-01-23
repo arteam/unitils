@@ -219,6 +219,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
      */
     @Test
     public void testUpdateDatabase_ErrorInScript() throws Exception {
+    	// Set database version and available script expectations
     	expectNewScriptsAdded();
     	expectNoPostProcessingCodeScripts();
     	expectNoCodeScriptModifications();
@@ -239,6 +240,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     
     @Test
     public void testUpdateDatabase_PostProcessingCodeScriptsAvailable() {
+    	// Set database version and available script expectations
     	expectNewScriptsAdded();
     	expectPostProcessingCodeScripts(codeScripts);
     	expectNoCodeScriptModifications();
@@ -254,6 +256,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     
     @Test
     public void testUpdateDatabase_ErrorInPostProcessingCodeScripts() {
+    	// Set database version and available script expectations
     	expectNewScriptsAdded();
     	expectPostProcessingCodeScripts(codeScripts);
     	
@@ -272,6 +275,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     
     @Test
     public void testUpdateDatabase_CodeScriptsUpdated() {
+    	// Set database version and available script expectations
     	expectNoScriptModifications();
     	expectNoPostProcessingCodeScripts();
     	expectCodeScriptsModified();
@@ -288,6 +292,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     
     @Test
     public void testUpdateDatabase_ErrorInCodeScripts() {
+    	// Set database version and available script expectations
     	expectNoScriptModifications();
     	expectNoPostProcessingCodeScripts();
     	expectCodeScriptsModified();
@@ -304,36 +309,6 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         }
     }
 
-
-    /**
-     * Tests checking from scratch update. Needed because last update failed.
-     */
-    @Test
-    public void testCheckUpdateDatabaseFromScratch_lastUpdateFailed() throws Exception {
-        expect(mockScriptSource.isExistingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(false);
-        replay();
-
-        boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
-        assertTrue(result);
-    }
-
-
-    /**
-     * Tests checking from scratch update. Last update failed but no scripts were modified and
-     * keepRetryingAfterError is true.
-     */
-    @Test
-    public void testCheckUpdateDatabaseFromScratch_lastUpdateFailedButIgnored() throws Exception {
-        dbMaintainer.keepRetryingAfterError = false;
-        expect(mockScriptSource.isExistingScriptsModified(version0)).andReturn(false);
-        expect(mockVersionSource.isLastUpdateSucceeded()).andReturn(false);
-        replay();
-
-        boolean result = dbMaintainer.updateDatabaseFromScratch(version1);
-        assertFalse(result);
-    }
-    
 	private void expectNoScriptModifications() {
 		expectDbVersion(version0);
     	expectLastUpdateSucceeded(true);
