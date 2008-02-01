@@ -4,10 +4,12 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+import org.unitils.spring.SpringModule;
 
 public class SpringUnitilsAdaptorTestExecutionListener implements TestExecutionListener {
 
 	public void prepareTestInstance(TestContext testContext) throws Exception {
+		registerTestContext(testContext);
 		getTestListener().afterCreateTestObject(testContext.getTestInstance());
 	}
 	
@@ -32,6 +34,16 @@ public class SpringUnitilsAdaptorTestExecutionListener implements TestExecutionL
 	}
 	
 	
+	private void registerTestContext(TestContext testContext) {
+		getSpringModule().registerTestContext(testContext);
+	}
+
+	
+	private SpringModule getSpringModule() {
+		return getUnitils().getModulesRepository().getModuleOfType(SpringModule.class);
+	}
+
+
 	/**
 	 * @return The Unitils test listener
 	 */

@@ -161,9 +161,9 @@ public class AnnotationUtils {
     }
 
 
-    public static <T> T getAnnotationPropertyValue(Method annotationProperty, Annotation annotation) {
+    @SuppressWarnings("unchecked")
+	public static <T> T getAnnotationPropertyValue(Method annotationProperty, Annotation annotation) {
         try {
-            //noinspection unchecked
             return (T) annotationProperty.invoke(annotation);
         } catch (IllegalAccessException e) {
             throw new UnitilsException("Error retrieving value of property " + annotationProperty.getName() +

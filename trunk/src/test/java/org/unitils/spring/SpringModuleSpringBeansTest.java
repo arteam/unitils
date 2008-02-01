@@ -62,7 +62,7 @@ public class SpringModuleSpringBeansTest {
     @Test
     public void testAssignSpringBeans() {
         SpringTest springTest = new SpringTest();
-        springModule.assignSpringBeans(springTest);
+        springModule.injectSpringBeans(springTest);
 
         assertNotNull(springTest.testBean);
         assertNotNull(springTest.testBeanSetter);
@@ -75,7 +75,7 @@ public class SpringModuleSpringBeansTest {
     @Test
     public void testAssignSpringBeansByType() {
         SpringTestByType springTestByType = new SpringTestByType();
-        springModule.assignSpringBeansByType(springTestByType);
+        springModule.injectSpringBeansByType(springTestByType);
 
         assertNotNull(springTestByType.testBean);
         assertNotNull(springTestByType.testBeanSetter);
@@ -88,7 +88,7 @@ public class SpringModuleSpringBeansTest {
     @Test
     public void testAssignSpringBeansByName() {
         SpringTestByName springTestByName = new SpringTestByName();
-        springModule.assignSpringBeansByName(springTestByName);
+        springModule.injectSpringBeansByName(springTestByName);
 
         assertNotNull(springTestByName.testBeanByName);
     }
@@ -100,7 +100,7 @@ public class SpringModuleSpringBeansTest {
     @Test
     public void testAssignSpringBeansByName_setter() {
         SpringTestByNameSetter springTestByNameSetter = new SpringTestByNameSetter();
-        springModule.assignSpringBeansByName(springTestByNameSetter);
+        springModule.injectSpringBeansByName(springTestByNameSetter);
 
         assertNotNull(springTestByNameSetter.testBeanByName);
     }
@@ -113,7 +113,7 @@ public class SpringModuleSpringBeansTest {
     public void testAssignSpringBeans_notFound() {
         SpringTestNotFound springTestNotFound = new SpringTestNotFound();
         try {
-            springModule.assignSpringBeans(springTestNotFound);
+            springModule.injectSpringBeans(springTestNotFound);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -129,7 +129,7 @@ public class SpringModuleSpringBeansTest {
     public void testAssignSpringBeansByType_notFound() {
         SpringTestByTypeNotFound springTestByTypeNotFound = new SpringTestByTypeNotFound();
         try {
-            springModule.assignSpringBeansByType(springTestByTypeNotFound);
+            springModule.injectSpringBeansByType(springTestByTypeNotFound);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -145,7 +145,7 @@ public class SpringModuleSpringBeansTest {
     public void testAssignSpringBeansByType_ambiguous() {
         SpringTestByTypeAmbiguous springTestByTypeAmbiguous = new SpringTestByTypeAmbiguous();
         try {
-            springModule.assignSpringBeansByType(springTestByTypeAmbiguous);
+            springModule.injectSpringBeansByType(springTestByTypeAmbiguous);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected
@@ -161,7 +161,7 @@ public class SpringModuleSpringBeansTest {
     public void testAssignSpringBeansByName_notFound() {
         SpringTestByNameNotFound springTestByNameNotFound = new SpringTestByNameNotFound();
         try {
-            springModule.assignSpringBeansByName(springTestByNameNotFound);
+            springModule.injectSpringBeansByName(springTestByNameNotFound);
             fail("Expected UnitilsException");
         } catch (UnitilsException e) {
             // expected

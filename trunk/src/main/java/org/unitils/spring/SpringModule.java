@@ -23,9 +23,20 @@ import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.isSetter;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
@@ -36,16 +47,7 @@ import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 import org.unitils.spring.util.ApplicationContextFactory;
 import org.unitils.spring.util.ApplicationContextManager;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import org.unitils.util.AnnotationUtils;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and
@@ -72,6 +74,9 @@ public class SpringModule implements Module {
     /* Manager for storing and creating spring application contexts */
     private ApplicationContextManager applicationContextManager;
     
+    /* TestContext used by the spring testcontext framework*/
+    private TestContext testContext;
+    
     private Set<SpringResourceTransactionManagerTransactionalConnectionHandler> transactionalConnectionHandlers = new HashSet<SpringResourceTransactionManagerTransactionalConnectionHandler>();
 
 
@@ -87,6 +92,9 @@ public class SpringModule implements Module {
     }
 
 
+    /**
+     * No after initialization needed for this module
+     */
     public void afterInit() {
 	}
 
@@ -136,6 +144,7 @@ public class SpringModule implements Module {
      * @return Whether an ApplicationContext has been configured for the given testObject
      */
     public boolean isApplicationContextConfiguredFor(Object testObject) {
+    	checkForIncompatibleUse(testObject);
         return applicationContextManager.hasApplicationContext(testObject);
     }
 
@@ -160,8 +169,45 @@ public class SpringModule implements Module {
      * @return The application context, not null
      */
     public ApplicationContext getApplicationContext(Object testObject) {
-        return applicationContextManager.getApplicationContext(testObject);
+    	// Verify if the spring testcontext framework is used, and if an ApplicationContext has been configured 
+    	// using @ContextConfiguration. If yes, any unitils specific configured ApplicationContext is ignored
+    	checkForIncompatibleUse(testObject);
+    	if (isContextConfigurationAnnotationAvailable(testObject)) {
+	    	try {
+				return testContext.getApplicationContext();
+			} catch (Exception e) {
+				throw new UnitilsException(e);
+			}
+    	}
+    	return applicationContextManager.getApplicationContext(testObject);
     }
+
+
+    /**
+     * Verify that the spring testcontext framework and unitils are not used together in an incompatible
+     * way: Check if not using the unitils core module system, and spring's @ContextConfiguration annotation for 
+     * configuring the applicationcontext
+     * 
+     * @param testObject The test instance, not null
+     */
+	protected void checkForIncompatibleUse(Object testObject) {
+		if (isContextConfigurationAnnotationAvailable(testObject) && testContext == null) {
+    		throw new UnitilsException("You've annotated your class with @" + ContextConfiguration.class.getSimpleName()
+    				+ " but you're not using one of spring's base classes to execute your test");
+    	}
+	}
+
+
+	/**
+	 * @param testObject The test instance, not null
+	 * 
+	 * @return Whether an @ContextConfiguration annotation can be found somewhere in the hierarchy
+	 */
+	protected boolean isContextConfigurationAnnotationAvailable(Object testObject) {
+		ContextConfiguration contextConfigurationAnnotation = AnnotationUtils.getClassLevelAnnotation(
+    			ContextConfiguration.class, testObject.getClass());
+		return contextConfigurationAnnotation != null;
+	}
 
 
     /**
@@ -213,11 +259,11 @@ public class SpringModule implements Module {
 
 
     /**
-     * Gets the spring beans for all fields that are annotated with {@link SpringBean}.
+     * Injects spring beans into all fields that are annotated with {@link SpringBean}.
      *
      * @param testObject The test instance, not null
      */
-    public void assignSpringBeans(Object testObject) {
+    public void injectSpringBeans(Object testObject) {
         // assign to fields
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBean.class);
         for (Field field : fields) {
@@ -252,11 +298,11 @@ public class SpringModule implements Module {
 
 
     /**
-     * Gets the spring beans for all fields methods that are annotated with {@link SpringBeanByType}.
+     * Injects spring beans into all fields methods that are annotated with {@link SpringBeanByType}.
      *
      * @param testObject The test instance, not null
      */
-    public void assignSpringBeansByType(Object testObject) {
+    public void injectSpringBeansByType(Object testObject) {
         // assign to fields
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
         for (Field field : fields) {
@@ -289,11 +335,11 @@ public class SpringModule implements Module {
 
 
     /**
-     * Gets the spring beans for all fields that are annotated with {@link SpringBeanByName}.
+     * Injects spring beans into all fields that are annotated with {@link SpringBeanByName}.
      *
      * @param testObject The test instance, not null
      */
-    public void assignSpringBeansByName(Object testObject) {
+    public void injectSpringBeansByName(Object testObject) {
         // assign to fields
         List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
         for (Field field : fields) {
@@ -323,34 +369,6 @@ public class SpringModule implements Module {
             }
         }
     }
-
-
-    /**
-     * Register a type of bean post processor. An instance of this bean post processor type will be used
-     * when loading an application context
-     * 
-     * @param beanPostProcessorType
-     */
-    public void registerBeanPostProcessorType(Class<? extends BeanPostProcessor> beanPostProcessorType) {
-        applicationContextManager.addBeanPostProcessorType(beanPostProcessorType);
-    }
-
-
-    /**
-     * @param <T> The bean post processor type
-     * @param testObject The test object
-     * @param beanPostProcessorType Type bean post processor type
-     * 
-     * @return The bean post processor of the given type that is associated with the application context that is
-     * in turn associated with the given test object
-     */
-    public <T extends BeanPostProcessor> T getBeanPostProcessor(Object testObject, Class<T> beanPostProcessorType) {
-        if (applicationContextManager.hasApplicationContext(testObject)) {
-            return applicationContextManager.getBeanPostProcessor(getApplicationContext(testObject), beanPostProcessorType);
-        } else {
-            return null;
-        }
-    }
     
     
     /**
@@ -366,10 +384,15 @@ public class SpringModule implements Module {
 
     /**
      * @return All {@link SpringResourceTransactionManagerTransactionalConnectionHandler}s that were registered using
-     * {@link #registerBeanPostProcessorType(Class)}
+     * {@link #registerSpringResourceTransactionManagerTransactionalConnectionHandler}
      */
     public Set<SpringResourceTransactionManagerTransactionalConnectionHandler> getTransactionalConnectionHandlers() {
 		return transactionalConnectionHandlers;
+	}
+    
+    
+    public void registerTestContext(TestContext testContext) {
+    	this.testContext = testContext;
 	}
 
 
@@ -389,9 +412,10 @@ public class SpringModule implements Module {
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             injectApplicationContext(testObject);
-            assignSpringBeans(testObject);
-            assignSpringBeansByType(testObject);
-            assignSpringBeansByName(testObject);
+            injectSpringBeans(testObject);
+            injectSpringBeansByType(testObject);
+            injectSpringBeansByName(testObject);
         }
     }
+
 }
