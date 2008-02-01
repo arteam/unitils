@@ -15,10 +15,17 @@
  */
 package org.unitils.hibernate.util;
 
+import java.util.Collection;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate3.SessionHolder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.unitils.core.Unitils;
+import org.unitils.hibernate.HibernateModule;
 import org.unitils.spring.SpringModule;
 
 /**
@@ -39,9 +46,13 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
     public HibernateSpringSupportImpl() {
         // Make sure Spring is in the classpath
         LocalSessionFactoryBean.class.getName();
-        // Register the BeanPostProcessor that intercepts SessionFactory creation
-        getSpringModule().registerBeanPostProcessorType(SessionFactoryInterceptingBeanPostProcessor.class);
+        // TODO Needed to verify if a HibernateTransactionManager is used in spring first?
         getSpringModule().registerSpringResourceTransactionManagerTransactionalConnectionHandler(new HibernateTransactionManagerTransactionalConnectionHandler());
+    }
+    
+    
+    public boolean isSessionFactoryConfiguredInSpring(Object testObject) {
+        return getSessionFactoryBean(testObject) != null;
     }
 
 
@@ -52,12 +63,13 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
      * @return The <code>SessionFactory</code> configured in spring for the given testObject, null if no such
      *         <code>SessionFactory</code> was configured.
      */
-    public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
-        SessionFactoryInterceptingBeanPostProcessor beanPostProcessor = getSessionFactoryWrappingBeanPostProcessor(testObject);
-        if (beanPostProcessor == null) {
+    public SessionFactory getSessionFactory(Object testObject) {
+        LocalSessionFactoryBean sessionFactoryBean = getSessionFactoryBean(testObject);
+        if (sessionFactoryBean == null) {
             return null;
         }
-        return beanPostProcessor.getInterceptedSessionFactory();
+        
+        return (SessionFactory) sessionFactoryBean.getObject();
     }
 
 
@@ -69,23 +81,31 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
      *         <code>Configuration</code> was configured.
      */
     public Configuration getConfiguration(Object testObject) {
-        SessionFactoryInterceptingBeanPostProcessor beanPostProcessor = getSessionFactoryWrappingBeanPostProcessor(testObject);
-        if (beanPostProcessor == null) {
+        LocalSessionFactoryBean sessionFactoryBean = getSessionFactoryBean(testObject);
+        if (sessionFactoryBean == null) {
             return null;
         }
-        return beanPostProcessor.getInterceptedHibernateConfiguration();
+        
+        return sessionFactoryBean.getConfiguration();
     }
-
-
+    
+    
     /**
-     * Gets the registered SessionFactoryInterceptingBeanPostProcessor.
-     *
-     * @param testObject The test instance, not null
-     * @return The session factory bean post processor, null if not found
+	 * @param testObject The test instance, not null
+     * @return The currently active hibernate session, managed by spring
      */
-    protected SessionFactoryInterceptingBeanPostProcessor getSessionFactoryWrappingBeanPostProcessor(Object testObject) {
-        BeanPostProcessor beanPostProcessor = getSpringModule().getBeanPostProcessor(testObject, SessionFactoryInterceptingBeanPostProcessor.class);
-        return (SessionFactoryInterceptingBeanPostProcessor) beanPostProcessor;
+    public Session getActiveSession(Object testObject) {
+    	SessionFactory sessionFactory = getSessionFactory(testObject);
+    	if (sessionFactory == null) {
+    		return null;
+    	}
+    	
+    	SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
+    	if (sessionHolder == null) {
+    		return null;
+    	}
+    	// TODO Make sure we obtain all sessions currently active
+    	return sessionHolder.getAnySession();
     }
 
 
@@ -93,10 +113,26 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
      * Ensures that the spring application context is loaded. This could be not the case since the application context
      * is lazily loaded
      *
-     * @param testObject The test inst null not null
+     * @param testObject The test instance, not null
      */
-    protected void ensureApplicationContextLoaded(Object testObject) {
-        getSpringModule().getApplicationContext(testObject);
+    protected ApplicationContext getApplicationContext(Object testObject) {
+        return getSpringModule().getApplicationContext(testObject);
+    }
+    
+    
+    /**
+     * @param testObject
+     * @return Instance of {@link LocalSessionFactoryBean} that wraps the configuration of hibernate in spring
+     */
+    protected LocalSessionFactoryBean getSessionFactoryBean(Object testObject) {
+        if (!getSpringModule().isApplicationContextConfiguredFor(testObject)) {
+            return null;
+        }
+        Collection<?> sessionFactoryBeans = getSpringModule().getApplicationContext(testObject).getBeansOfType(LocalSessionFactoryBean.class).values();
+        if (sessionFactoryBeans.size() == 0) {
+            return null;
+        }
+        return (LocalSessionFactoryBean) sessionFactoryBeans.iterator().next();
     }
 
 

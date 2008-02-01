@@ -118,39 +118,20 @@ public class SessionInterceptingSessionFactory extends BaseSessionInterceptingSe
      */
     @Override
     public Session getCurrentSession() throws HibernateException {
-        Session session = (Session) SessionFactoryUtils.getSession(this, true);
+        Session session = super.getCurrentSession();
         sessions.add(session);
         return session;
     }
-
-
+    
+    
     /**
-     * Closes and clears all open sessions.
+     * @return All sessions that were intercepted
      */
-    public void closeOpenSessions() {
-        for (org.hibernate.Session session : sessions) {
-            if (session.isOpen()) {
-            	logger.info("Closing hibernate session " + session);
-                session.close();
-            }
-        }
-        clearInterceptedSessions();
+    public Set<org.hibernate.Session> getActiveSessions() {
+        return sessions;
     }
 
 
-    /**
-     * Flushes all open sessions.
-     */
-    public void flushOpenSessions() {
-        for (org.hibernate.Session session : sessions) {
-            if (session.isOpen()) {
-            	logger.info("Flushing hibernate session " + session);
-                session.flush();
-            }
-        }
-    }
-    
-    
     /**
      * Removes all intercepted sessions
      */

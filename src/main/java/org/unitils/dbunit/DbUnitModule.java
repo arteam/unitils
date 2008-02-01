@@ -102,6 +102,9 @@ public class DbUnitModule implements Module {
     }
 
 
+    /**
+     * No after initialization needed for this module
+     */
     public void afterInit() {
 	}
 

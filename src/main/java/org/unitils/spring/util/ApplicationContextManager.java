@@ -15,23 +15,15 @@
  */
 package org.unitils.spring.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import static java.util.Arrays.asList;
+
+import java.util.List;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.AnnotatedInstanceManager;
 import org.unitils.spring.annotation.SpringApplicationContext;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
-import java.util.ArrayList;
-import static java.util.Arrays.asList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A class for managing and creating Spring application contexts.
@@ -48,15 +40,6 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
      */
     protected ApplicationContextFactory applicationContextFactory;
 
-    /**
-     * List of registered BeanPostProcessor types. For each ApplicationContext that is created, a BeanPostProcessor of
-     * each of these types is associated with the ApplicationContext
-     */
-    protected List<Class<? extends BeanPostProcessor>> beanPostProcessorTypes;
-
-    // todo javadoc
-    protected Map<ApplicationContext, Map<Class<? extends BeanPostProcessor>, BeanPostProcessor>> beanPostProcessors;
-
 
     /**
      * Creates a new instance, using the given {@link ApplicationContextFactory}. The given list of
@@ -68,8 +51,6 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
     public ApplicationContextManager(ApplicationContextFactory applicationContextFactory) {
         super(ApplicationContext.class, SpringApplicationContext.class);
         this.applicationContextFactory = applicationContextFactory;
-        this.beanPostProcessorTypes = new ArrayList<Class<? extends BeanPostProcessor>>();
-        this.beanPostProcessors = new HashMap<ApplicationContext, Map<Class<? extends BeanPostProcessor>, BeanPostProcessor>>();
     }
 
 
@@ -115,12 +96,6 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
     }
 
 
-    // todo javadoc
-    public void addBeanPostProcessorType(Class<? extends BeanPostProcessor> beanPostProcessorType) {
-        beanPostProcessorTypes.add(beanPostProcessorType);
-    }
-
-
     /**
      * Creates a new application context for the given locations. The application context factory is used to create
      * the instance. After creating the context, this will also register all <code>BeanPostProcessor</code>s and
@@ -138,19 +113,6 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
         try {
             // create application context
             final ConfigurableApplicationContext applicationContext = applicationContextFactory.createApplicationContext(locations);
-
-            // register post processors
-            if (!beanPostProcessorTypes.isEmpty()) {
-                applicationContext.addBeanFactoryPostProcessor(new BeanFactoryPostProcessor() {
-                    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-                        for (Class<? extends BeanPostProcessor> beanPostProcessorType : beanPostProcessorTypes) {
-                            BeanPostProcessor beanPostProcessor = createInstanceOfType(beanPostProcessorType, false);
-                            registerBeanPostProcessor(applicationContext, beanPostProcessorType, beanPostProcessor);
-                            beanFactory.addBeanPostProcessor(beanPostProcessor);
-                        }
-                    }
-                });
-            }
             // load application context
             applicationContext.refresh();
             return applicationContext;
@@ -159,30 +121,7 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
             throw new UnitilsException("Unable to create application context for locations " + locations, t);
         }
     }
-
-
-    // todo javadoc
-    protected void registerBeanPostProcessor(ConfigurableApplicationContext applicationContext, Class<? extends BeanPostProcessor> beanPostProcessorType, BeanPostProcessor beanPostProcessor) {
-        Map<Class<? extends BeanPostProcessor>, BeanPostProcessor> beanPostProcessorMap = beanPostProcessors.get(applicationContext);
-        if (beanPostProcessorMap == null) {
-            beanPostProcessorMap = new HashMap<Class<? extends BeanPostProcessor>, BeanPostProcessor>();
-            beanPostProcessors.put(applicationContext, beanPostProcessorMap);
-        }
-        beanPostProcessorMap.put(beanPostProcessorType, beanPostProcessor);
-    }
-
-
-    // todo javadoc
-    @SuppressWarnings("unchecked")
-    public <T extends BeanPostProcessor> T getBeanPostProcessor(ApplicationContext applicationContext, Class<T> beanPostProcessorType) {
-        Map<Class<? extends BeanPostProcessor>, ? extends BeanPostProcessor> beanPostProcessorMap = beanPostProcessors.get(applicationContext);
-        if (beanPostProcessorMap == null) {
-            return null;
-        } else {
-            return (T) beanPostProcessorMap.get(beanPostProcessorType);
-        }
-    }
-
+   
 
     /**
      * Gets the locations that are specified for the given {@link SpringApplicationContext} annotation. An array with
