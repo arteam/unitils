@@ -40,6 +40,7 @@ import org.unitils.hibernate.util.HibernateConnectionProvider;
 import org.unitils.hibernate.util.HibernateSpringSupport;
 import org.unitils.hibernate.util.SessionFactoryManager;
 import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
+import org.unitils.util.CollectionUtils;
 import org.unitils.util.PropertyUtils;
 
 import java.lang.reflect.Field;
@@ -47,6 +48,7 @@ import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * todo javadoc
@@ -129,10 +131,39 @@ public class HibernateModule implements Module, Flushable {
     }
     
     /**
-     * 
+     * Initializes integration support with spring
      */
     public void afterInit() {
-        createSpringHibernateSupport();
+        initSpringHibernateSupport();
+    }
+    
+    
+    /**
+     * Injects the Hibernate <code>SessionFactory</code> into all fields and methods that are
+     * annotated with {@link HibernateSessionFactory}
+     *
+     * @param testObject The test object, not null
+     */
+    public void injectSessionFactory(Object testObject) {
+        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
+        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
+
+        // filter out methods with session factory argument
+        Iterator<Method> iterator = methods.iterator();
+        while (iterator.hasNext()) {
+            Class<?>[] parameterTypes = iterator.next().getParameterTypes();
+            if (parameterTypes.length == 0 || !SessionFactory.class.isAssignableFrom(parameterTypes[0])) {
+                iterator.remove();
+            }
+        }
+        if (fields.isEmpty() && methods.isEmpty()) {
+            // Nothing to do. Jump out to make sure that we don't try to instantiate the
+            // SessionFactory
+            return;
+        }
+
+        SessionFactory sessionFactory = getSessionFactory(testObject);
+        setFieldAndSetterValue(testObject, fields, methods, sessionFactory);
     }
 
 
@@ -160,12 +191,12 @@ public class HibernateModule implements Module, Flushable {
      * @param testObject The test instance, not null
      * @return The Hibernate <code>SessionFactory</code>, not null
      */
-    public SessionInterceptingSessionFactory getSessionFactory(Object testObject) {
-        SessionInterceptingSessionFactory springModuleConfigured = null;
+    public SessionFactory getSessionFactory(Object testObject) {
+        SessionFactory springModuleConfigured = null;
         if (hibernateSpringSupport != null) {
             springModuleConfigured = hibernateSpringSupport.getSessionFactory(testObject);
         }
-        SessionInterceptingSessionFactory hibernateModuleConfigured = getSessionFactoryManager().getSessionFactory(testObject);
+        SessionFactory hibernateModuleConfigured = getSessionFactoryManager().getSessionFactory(testObject);
         if (springModuleConfigured != null && hibernateModuleConfigured != null) {
             throw new UnitilsException("A SessionFactory configuration was found in both the spring configuration and by use of a " + HibernateSessionFactory.class.getSimpleName() + " annotation. One of them should be removed");
         }
@@ -209,7 +240,7 @@ public class HibernateModule implements Module, Flushable {
      * @return true if a <code>SessionFactory</code> has been configured, false otherwise
      */
     public boolean isSessionFactoryConfiguredFor(Object testObject) {
-        SessionInterceptingSessionFactory springModuleConfigured = null;
+        SessionFactory springModuleConfigured = null;
         if (hibernateSpringSupport != null) {
             springModuleConfigured = hibernateSpringSupport.getSessionFactory(testObject);
         }
@@ -225,6 +256,23 @@ public class HibernateModule implements Module, Flushable {
     public SessionFactoryManager getSessionFactoryManager() {
         return sessionFactoryManager;
     }
+    
+    
+    /**
+     * Flushes all pending Hibernate updates to the database. This method is useful when the effect
+     * of updates needs to be checked directly on the database. For verifying updates using the
+     * Hibernate <code>Session</code> provided by the method #getCurrentSession, flushing is not
+     * needed.
+     */
+    public void flushDatabaseUpdates(Object testObject) {
+    	Set<Session> activeSessions = getActiveSessions(testObject);
+        for (Session activeSession : activeSessions) {
+        	if (activeSession.isOpen()) {
+            	logger.info("Flushing hibernate session " + activeSession);
+                activeSession.flush();
+            }
+        }
+    }
 
 
     /**
@@ -233,10 +281,12 @@ public class HibernateModule implements Module, Flushable {
      * @param testObject The test instance, not null
      */
     public void closeSessions(Object testObject) {
-        if (isSessionFactoryConfiguredFor(testObject)) {
-            SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
-            // close all open sessions
-            sessionFactory.closeOpenSessions();
+        Set<Session> activeSessions = getActiveSessions(testObject);
+        for (Session activeSession : activeSessions) {
+        	if (activeSession.isOpen()) {
+            	logger.info("Closing hibernate session " + activeSession);
+                activeSession.close();
+            }
         }
     }
     
@@ -246,13 +296,14 @@ public class HibernateModule implements Module, Flushable {
      */
     public void clearInterceptedSessions(Object testObject) {
     	if (isSessionFactoryConfiguredFor(testObject)) {
-            SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
-            // close all open sessions
-            sessionFactory.clearInterceptedSessions();
+            SessionFactory sessionFactory = getSessionFactory(testObject);
+            if (sessionFactory instanceof SessionInterceptingSessionFactory) {
+                ((SessionInterceptingSessionFactory)sessionFactory).clearInterceptedSessions();
+            }
         }
     }
 
-
+    
     /**
      * Forces the reloading of the hibernate configurations the next time that it is requested. If
      * classes are given only hibernate configurations that are linked to those classes will be
@@ -263,48 +314,27 @@ public class HibernateModule implements Module, Flushable {
     public void invalidateConfiguration(Class<?>... classes) {
         getSessionFactoryManager().invalidateSessionFactory(classes);
     }
-
-
-    /**
-     * Flushes all pending Hibernate updates to the database. This method is useful when the effect
-     * of updates needs to be checked directly on the database. For verifying updates using the
-     * Hibernate <code>Session</code> provided by the method #getCurrentSession, flushing is not
-     * needed.
-     */
-    public void flushDatabaseUpdates(Object testObject) {
-    	if (isSessionFactoryConfiguredFor(testObject)) {
-	        SessionInterceptingSessionFactory sessionFactory = getSessionFactory(testObject);
-	    	sessionFactory.flushOpenSessions();
+    
+    
+    protected Set<Session> getActiveSessions(Object testObject) {
+    	// If no sessionfactory was configured in unitils, there are no open sessions
+    	if (!isSessionFactoryConfiguredFor(testObject)) {
+    		return CollectionUtils.asSet();
     	}
-    }
 
-
-    /**
-     * Injects the Hibernate <code>SessionFactory</code> into all fields and methods that are
-     * annotated with {@link HibernateSessionFactory}
-     *
-     * @param testObject The test object, not null
-     */
-    public void injectSessionFactory(Object testObject) {
-        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
-        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
-
-        // filter out methods with session factory argument
-        Iterator<Method> iterator = methods.iterator();
-        while (iterator.hasNext()) {
-            Class<?>[] parameterTypes = iterator.next().getParameterTypes();
-            if (parameterTypes.length == 0 || !SessionFactory.class.isAssignableFrom(parameterTypes[0])) {
-                iterator.remove();
-            }
-        }
-        if (fields.isEmpty() && methods.isEmpty()) {
-            // Nothing to do. Jump out to make sure that we don't try to instantiate the
-            // SessionFactory
-            return;
-        }
-
-        SessionFactory sessionFactory = getSessionFactory(testObject);
-        setFieldAndSetterValue(testObject, fields, methods, sessionFactory);
+    	// If the SessionFactory was configured in unitils, all opened session were intercepted
+    	SessionFactory sessionFactory = getSessionFactory(testObject);
+		if (sessionFactory instanceof SessionInterceptingSessionFactory) {
+			return ((SessionInterceptingSessionFactory) sessionFactory)
+					.getActiveSessions();
+		}
+		
+		// If we got here, this means the session factory was configured using spring
+		Session activeSession = hibernateSpringSupport.getActiveSession(testObject);
+		if (activeSession == null) {
+			return CollectionUtils.asSet();
+		}
+		return CollectionUtils.asSet(activeSession);
     }
 
 
@@ -335,7 +365,7 @@ public class HibernateModule implements Module, Flushable {
      * could not be found in the classpath, the instance is not loaded and the
      * SpringHibernateSupport is not enabled.
      */
-    protected void createSpringHibernateSupport() {
+    protected void initSpringHibernateSupport() {
         if (!isSpringModuleEnabled()) {
             return;
         }
@@ -381,9 +411,8 @@ public class HibernateModule implements Module, Flushable {
         public void afterTestTearDown(Object testObject, Method testMethod) {
         	if (autoCloseSessionsAfterTest) {
         		closeSessions(testObject);
-        	} else {
-        		clearInterceptedSessions(testObject);
         	}
+    		clearInterceptedSessions(testObject);
         }
     }
 }

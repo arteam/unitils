@@ -15,6 +15,8 @@
  */
 package org.unitils.hibernate.util;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 /**
@@ -25,6 +27,8 @@ import org.hibernate.cfg.Configuration;
  */
 public interface HibernateSpringSupport {
 
+    boolean isSessionFactoryConfiguredInSpring(Object testObject);
+    
     /**
      * Returns the hibernate <code>SessionFactory</code> that was configured in spring for the given testObject, if any
      *
@@ -32,7 +36,7 @@ public interface HibernateSpringSupport {
      * @return The <code>SessionFactory</code> configured in spring for the given testObject, null if no such
      *         <code>SessionFactory</code> was configured.
      */
-    SessionInterceptingSessionFactory getSessionFactory(Object testObject);
+    SessionFactory getSessionFactory(Object testObject);
 
     /**
      * Returns the hibernate <code>Configuration</code> that was configured in spring for the given testObject, if any
@@ -42,5 +46,7 @@ public interface HibernateSpringSupport {
      *         <code>Configuration</code> was configured.
      */
     Configuration getConfiguration(Object testObject);
+
+	Session getActiveSession(Object testObject);
 
 }

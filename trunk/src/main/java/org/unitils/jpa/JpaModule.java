@@ -31,8 +31,6 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
@@ -54,9 +52,6 @@ public class JpaModule implements Module, Flushable {
      * need to be closed */
     public static final String PROPKEY_AUTOCLOSEENTITYMANAGERSAFTERTEST_ENABLED = "JpaModule.autoCloseEntityManagersAfterTest.enabled";
 	
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(JpaModule.class);
-    
     protected JpaPersistenceProvider jpaPersistenceProvider;
     
     /**
@@ -84,6 +79,9 @@ public class JpaModule implements Module, Flushable {
     }
     
 
+    /**
+     * No after initialization needed for this module
+     */
     public void afterInit() {
 	}
 

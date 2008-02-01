@@ -15,8 +15,6 @@
  */
 package org.unitils.integrationtest;
 
-import static org.unitils.inject.util.InjectionUtils.injectIntoStatic;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +52,9 @@ public class UnitilsIntegrationTest {
 	
 	@BeforeClass
 	public static void initConfiguration() {
+		// Make sure we use unitils-integrationtest.properties as configuration file
 		System.setProperty("unitils.configuration.customFileName", "org/unitils/integrationtest/unitils-integrationtest.properties");
+		// Copy the db creation scripts to the temp directory
 		FileUtils.copyClassPathResource("/org/unitils/integrationtest/dao/dbscripts/01_createPersonTable.sql", "C:/Temp/unitilsintegrationtests");
 	}
 	
@@ -127,17 +127,6 @@ public class UnitilsIntegrationTest {
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateTest.class, "testPersist");
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
-	
-	@Test
-	public void testHibernateSpring_Disabled() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "disabled");
-		System.setProperty("transactionManager.type", "spring");
-		Unitils.initSingletonInstance();
-		runTest(HibernateSpringTest.class, "testFindById");
-		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateSpringTest.class, "testPersist");
-		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 	}
 	
 	@Test

@@ -106,7 +106,8 @@ public class DatabaseModule implements Module {
      *
      * @param configuration the config, not null
      */
-    public void init(Properties configuration) {
+    @SuppressWarnings("unchecked")
+	public void init(Properties configuration) {
         this.configuration = configuration;
 
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
@@ -114,6 +115,9 @@ public class DatabaseModule implements Module {
     }
 
 
+    /**
+     * No after initialization needed for this module
+     */
     public void afterInit() {
 	}
 

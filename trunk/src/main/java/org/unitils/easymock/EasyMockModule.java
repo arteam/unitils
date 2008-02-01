@@ -84,13 +84,17 @@ public class EasyMockModule implements Module {
     /**
      * Initializes the module
      */
-    public void init(Properties configuration) {
+    @SuppressWarnings("unchecked")
+	public void init(Properties configuration) {
         mocksControls = new ArrayList<MocksControl>();
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(EasyMockModule.class, configuration, RegularMock.class, Mock.class);
         autoVerifyAfterTestEnabled = PropertyUtils.getBoolean(PROPKEY_AUTO_VERIFY_AFTER_TEST_ENABLED, configuration);
     }
 
 
+    /**
+     * No after initialization needed for this module
+     */
     public void afterInit() {
 	}
 
