@@ -93,44 +93,11 @@ public class EntityManagerInterceptingEntityManagerFactory implements EntityMana
 	}
 	
 	
-	public Set<EntityManager> getOpenEntityManagers() {
-		Set<EntityManager> openEntityManagers = new HashSet<EntityManager>();
-		for (EntityManager entityManager : entityManagers) {
-			if (entityManager.isOpen()) {
-				openEntityManagers.add(entityManager);
-			}
-		}
-		return openEntityManagers;
+	public Set<EntityManager> getActiveEntityManagers() {
+		return entityManagers;
 	}
 
-
-	/**
-     * Closes and clears all open sessions.
-     */
-    public void closeOpenEntityManagers() {
-        for (EntityManager entityManager : entityManagers) {
-            if (entityManager.isOpen()) {
-            	logger.info("Closing JPA entity manager " + entityManager);
-            	entityManager.close();
-            }
-        }
-        clearInterceptedEntityManagers();
-    }
-
-
-    /**
-     * Flushes all open sessions.
-     */
-    public void flushOpenEntityManagers() {
-        for (EntityManager entityManager : entityManagers) {
-            if (entityManager.isOpen()) {
-            	logger.info("Flushing JPA entity manager " + entityManager);
-            	entityManager.flush();
-            }
-        }
-    }
-
-    
+	
     /**
      * Removes all intercepted entity managers
      */

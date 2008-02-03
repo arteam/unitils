@@ -15,9 +15,15 @@
  */
 package org.unitils.jpa.util;
 
+import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+
 public interface JpaPersistenceProvider {
 	
 	
 	void assertMappingWithDatabaseConsistent(Object testObject, EntityManagerFactoryManager entityManagerFactoryManager);
+
+	Connection getJdbcConnection(EntityManager entityManager);
 
 }

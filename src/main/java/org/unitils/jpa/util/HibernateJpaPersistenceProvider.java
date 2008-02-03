@@ -17,6 +17,8 @@ package org.unitils.jpa.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
+import java.sql.Connection;
+
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
@@ -43,6 +45,13 @@ public class HibernateJpaPersistenceProvider implements JpaPersistenceProvider {
 	}
 	
 	
+	@SuppressWarnings("deprecation")
+	public Connection getJdbcConnection(EntityManager entityManager) {
+		Session session = (Session) entityManager.getDelegate();
+		return session.connection();
+	}
+
+
 	/**
      * Gets the database dialect from the Hibernate <code>Configuration</code.
      *

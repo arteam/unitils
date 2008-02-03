@@ -107,7 +107,7 @@ public class HibernateModule implements Module, Flushable {
     protected SessionFactoryManager sessionFactoryManager;
 
     /**
-     * The spring hibernate support, null if spring is not available
+     * The hibernate spring support, null if the spring module is not enabled
      */
     protected HibernateSpringSupport hibernateSpringSupport;
     
@@ -134,7 +134,7 @@ public class HibernateModule implements Module, Flushable {
      * Initializes integration support with spring
      */
     public void afterInit() {
-        initSpringHibernateSupport();
+        initHibernateSpringSupport();
     }
     
     
@@ -365,7 +365,7 @@ public class HibernateModule implements Module, Flushable {
      * could not be found in the classpath, the instance is not loaded and the
      * SpringHibernateSupport is not enabled.
      */
-    protected void initSpringHibernateSupport() {
+    protected void initHibernateSpringSupport() {
         if (!isSpringModuleEnabled()) {
             return;
         }
@@ -379,7 +379,7 @@ public class HibernateModule implements Module, Flushable {
 
     /**
      * Verifies whether the SpringModule is enabled. If not, this means that either the property unitils.modules doesn't
-     * include spring, or unitils.module.spring.enabled, or that the module could not be loaded because spring is not
+     * include spring, or unitils.module.spring.enabled = false, or that the module could not be loaded because spring is not
      * in the classpath.
      *
      * @return true if the SpringModule is enabled, false otherwise

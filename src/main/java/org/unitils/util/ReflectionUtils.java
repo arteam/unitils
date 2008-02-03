@@ -15,13 +15,16 @@
  */
 package org.unitils.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.internal.runners.TestClass;
-import org.unitils.core.UnitilsException;
-
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
 
 /**
  * Utility methods that use reflection for instance creation or class inspection.

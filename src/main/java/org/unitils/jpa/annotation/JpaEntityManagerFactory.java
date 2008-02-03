@@ -24,12 +24,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
  * <p/>
- * Annotation indicating that this field or method should be initialized with the Hibernate<code>SessionFactory</code> object
- * that can be used to create Hibernate <code>Session</code> object that provide a connection to the unit test database.
- * If a field is annotated, it should be of type <code>org.hibernate.SessionFactory</code>. If a method is annotated,
- * the method should have following signature: void myMethod(org.hibernate.SessionFactory sessionFactory)
+ * Annotation indicating that this field or method should be initialized with the <code>EntityManagerFactory</code> object
+ * that can be used to create <code>EntityManager</code> objects that provide a connection to the unit test database.
+ * If a field is annotated, it should be of type <code>javax.persistence.EntityManagerFactory</code>. If a method is annotated,
+ * the method should have following signature: void myMethod(javax.persistence.EntityManagerFactory entityManagerFactory)
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -38,8 +37,15 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface JpaEntityManagerFactory {
 
+	/**
+	 * The name of the persistence unit, defined in peristence.xml, that has to be used
+	 */
 	String persistenceUnit() default "";
 	
+	/**
+	 * The persistence xml files that have to be loaded for configuring the EntityManagerFactory.
+	 * If omitted, the default META-INF/persistence.xml file is loaded.
+	 */
 	String[] configFiles() default {};
     
 }

@@ -20,14 +20,23 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 /**
- * A support class that enables configuring hibernate sessionFactories in Spring configuration.
+ * Interface for {@link HibernateSpringSupportImpl} containing Hibernate and {@link HibernateModule} related actions 
+ * for the {@link SpringModule}. This interface doesn't refer to spring interfaces, so that there is no
+ * classloading problem when loading the {@link HibernateModule} when spring is not in the classpath.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public interface HibernateSpringSupport {
 
+	
+	/**
+	 * @param testObject The test instance, not null
+	 * @return true if a SessionFactory is configured in the spring ApplicationContext that is associated
+	 * with the given testObject
+	 */
     boolean isSessionFactoryConfiguredInSpring(Object testObject);
+    
     
     /**
      * Returns the hibernate <code>SessionFactory</code> that was configured in spring for the given testObject, if any
@@ -38,6 +47,7 @@ public interface HibernateSpringSupport {
      */
     SessionFactory getSessionFactory(Object testObject);
 
+    
     /**
      * Returns the hibernate <code>Configuration</code> that was configured in spring for the given testObject, if any
      *
@@ -47,6 +57,11 @@ public interface HibernateSpringSupport {
      */
     Configuration getConfiguration(Object testObject);
 
+    
+    /**
+     * @param testObject The test instance, not null
+     * @return The hibernate that's currently active, if any
+     */
 	Session getActiveSession(Object testObject);
 
 }

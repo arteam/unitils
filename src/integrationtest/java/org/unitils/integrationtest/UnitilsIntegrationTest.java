@@ -36,6 +36,7 @@ import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.SQLUnitils;
 import org.unitils.integrationtest.dao.hibernate.HibernateSpringTest;
 import org.unitils.integrationtest.dao.hibernate.HibernateTest;
+import org.unitils.integrationtest.dao.jpa.HibernateJpaSpringTest;
 import org.unitils.integrationtest.dao.jpa.HibernateJpaTest;
 import org.unitils.util.FileUtils;
 import org.unitils.util.ReflectionUtils;
@@ -82,6 +83,28 @@ public class UnitilsIntegrationTest {
 		runTest(HibernateJpaTest.class, "testFindById");
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(HibernateJpaTest.class, "testPersist");
+		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+	}
+	
+	@Test
+	public void testJpaSpring_Commit() throws Exception {
+		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
+		System.setProperty("transactionManager.type", "spring");
+		Unitils.initSingletonInstance();
+		runTest(HibernateJpaSpringTest.class, "testFindById");
+		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+		runTest(HibernateJpaSpringTest.class, "testPersist");
+		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+	}
+	
+	@Test
+	public void testJpaSpring_Rollback() throws Exception {
+		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
+		System.setProperty("transactionManager.type", "spring");
+		Unitils.initSingletonInstance();
+		runTest(HibernateJpaSpringTest.class, "testFindById");
+		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+		runTest(HibernateJpaSpringTest.class, "testPersist");
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 	}
 	
