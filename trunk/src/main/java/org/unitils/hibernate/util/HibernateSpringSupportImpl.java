@@ -29,10 +29,11 @@ import org.unitils.hibernate.HibernateModule;
 import org.unitils.spring.SpringModule;
 
 /**
- * A support class containing Hibernate and {@link HibernateModule} related actions for the spring module.
+ * A support class containing Hibernate and {@link HibernateModule} related actions for the {@link SpringModule}.
  * <p/>
- * By encapsulating these operations, we can remove the strong dependency to Hibernate and the HibernateModule from
- * the SpringModule. This way, the SpringModule will still function if Hibernate is not used.
+ * This support class is only loaded if both the {@link HibernateModule} and {@link SpringModule} are loaded.
+ * By encapsulating these operations, we remove the strong dependency to spring and the {@link SpringModule} from
+ * the {@link HibernateModule}. This way, the {@link HibernateModule} will still function if spring is not used.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -41,7 +42,8 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
 
 
     /**
-     * Creates a new support instance.
+     * Creates a new instance. It attempts to load a class of spring's hibernate support, to make
+     * sure the necessary libraries are in the classpath
      */
     public HibernateSpringSupportImpl() {
         // Make sure Spring is in the classpath
@@ -50,7 +52,11 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
         getSpringModule().registerSpringResourceTransactionManagerTransactionalConnectionHandler(new HibernateTransactionManagerTransactionalConnectionHandler());
     }
     
-    
+
+    /**
+     * @return true if a <code>LocalSessionFactoryBean</code> can be found in the applicationcontext
+     * configured for the given testobject
+     */
     public boolean isSessionFactoryConfiguredInSpring(Object testObject) {
         return getSessionFactoryBean(testObject) != null;
     }
@@ -137,8 +143,6 @@ public class HibernateSpringSupportImpl implements HibernateSpringSupport {
 
 
     /**
-     * Looks up the Spring module instance.
-     *
      * @return The Spring module, not null
      */
     protected SpringModule getSpringModule() {

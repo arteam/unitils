@@ -18,6 +18,7 @@ package org.unitils.hibernate.util;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.unitils.database.transaction.impl.SpringResourceTransactionManagerTransactionalConnectionHandler;
@@ -43,8 +44,10 @@ public class HibernateTransactionManagerTransactionalConnectionHandler
 	/**
 	 * @return The Connection that is in use by the current hibernate Session
 	 */
+	@SuppressWarnings("deprecation")
 	public Connection getTransactionalConnection(Object resourceFactory) {
-		return SessionFactoryUtils.getSession((SessionFactory) resourceFactory, true).connection();
+		Session session = SessionFactoryUtils.getSession((SessionFactory) resourceFactory, true);
+		return session.connection();
 	}
 
 	/**

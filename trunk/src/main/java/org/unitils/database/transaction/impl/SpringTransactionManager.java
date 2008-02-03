@@ -28,9 +28,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -228,10 +226,6 @@ public class SpringTransactionManager implements TransactionManager {
 						if (transactionalConnectionHandler.getResourceFactoryType().isAssignableFrom(resourceFactory.getClass())) {
 							return transactionalConnectionHandler.getTransactionalConnection(resourceFactory);
 						}
-					}
-					// TODO Externalize to hibernate JPA module, hibernate specific
-					if (resourceFactory instanceof EntityManagerFactory) {
-						return ((Session)EntityManagerFactoryUtils.getTransactionalEntityManager((EntityManagerFactory) resourceFactory).getDelegate()).connection();
 					}
 					if (!(resourceFactory instanceof DataSource)) {
 						throw new UnitilsException("Unitils doesn't support a spring PlatformTransactionManager of type " + springTransactionManager.getClass().getName());
