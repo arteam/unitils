@@ -17,11 +17,11 @@ package org.unitils.reflectionassert;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import junitx.framework.StringAssert;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.util.CollectionUtils.asSet;
 
 import static java.util.Arrays.asList;
 
@@ -35,13 +35,19 @@ import static java.util.Arrays.asList;
 public class ReflectionAssertTest extends TestCase {
 
     /* Test object */
-    private TestObject testObjectA;
+    private TestObjectString testObjectAString;
 
     /* Same as A but different instance */
-    private TestObject testObjectB;
+    private TestObjectString testObjectBString;
 
     /* Same as A and B but different string value for stringValue2 */
-    private TestObject testObjectDifferentValue;
+    private TestObjectString testObjectDifferentValueString;
+
+    /* Test object */
+    private TestObjectIntString testObjectAIntString;
+
+    /* Same as A but different instance */
+    private TestObjectIntString testObjectBIntString;
 
 
     /**
@@ -50,9 +56,11 @@ public class ReflectionAssertTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        testObjectA = new TestObject("test 1", "test 2");
-        testObjectB = new TestObject("test 1", "test 2");
-        testObjectDifferentValue = new TestObject("test 1", "XXXXXX");
+        testObjectAString = new TestObjectString("test 1", "test 2");
+        testObjectBString = new TestObjectString("test 1", "test 2");
+        testObjectDifferentValueString = new TestObjectString("test 1", "XXXXXX");
+        testObjectAIntString = new TestObjectIntString(1, "test");
+        testObjectBIntString = new TestObjectIntString(1, "test");
     }
 
 
@@ -60,7 +68,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal objects.
      */
     public void testAssertRefEquals_equals() {
-        assertRefEquals(testObjectA, testObjectB);
+        assertRefEquals(testObjectAString, testObjectBString);
     }
 
 
@@ -68,7 +76,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal objects (message version).
      */
     public void testAssertRefEquals_equalsMessage() {
-        assertRefEquals("a message", testObjectA, testObjectB);
+        assertRefEquals("a message", testObjectAString, testObjectBString);
     }
 
 
@@ -76,7 +84,7 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal objects.
      */
     public void testAssertLenEquals_equals() {
-        assertLenEquals(testObjectA, testObjectB);
+        assertLenEquals(testObjectAString, testObjectBString);
     }
 
 
@@ -84,26 +92,25 @@ public class ReflectionAssertTest extends TestCase {
      * Test for two equal objects (message version).
      */
     public void testAssertLenEquals_equalsMessage() {
-        assertLenEquals("a message", testObjectA, testObjectB);
+        assertLenEquals("a message", testObjectAString, testObjectBString);
     }
 
 
     /**
      * Test for two objects that contain different values.
+     * <p/>
+     * todo implement
      */
     public void testAssertRefEquals_notEqualsDifferentValues() {
         String message = null;
         try {
-            assertRefEquals(testObjectA, testObjectDifferentValue);
+            assertRefEquals(testObjectAString, testObjectDifferentValueString);
 
         } catch (AssertionFailedError a) {
             message = a.getMessage();
         }
 
         assertNotNull("An assertion exception should have been thrown", message);
-        StringAssert.assertContains("string2", message);
-        StringAssert.assertContains("XXXXXX", message);
-        StringAssert.assertContains("test 2", message);
     }
 
 
@@ -112,7 +119,7 @@ public class ReflectionAssertTest extends TestCase {
      */
     public void testAssertRefEquals_leftNull() {
         try {
-            assertRefEquals(null, testObjectA);
+            assertRefEquals(null, testObjectAString);
             fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError a) {
@@ -126,7 +133,7 @@ public class ReflectionAssertTest extends TestCase {
      */
     public void testAssertRefEquals_rightNull() {
         try {
-            assertRefEquals(testObjectA, null);
+            assertRefEquals(testObjectAString, null);
             fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError a) {
@@ -152,6 +159,14 @@ public class ReflectionAssertTest extends TestCase {
 
 
     /**
+     * Test for two equal sets but with different order.
+     */
+    public void testAssertRefEquals_equalsLenientOrderSet() {
+        assertRefEquals(asSet(testObjectAString, testObjectAIntString), asSet(testObjectBIntString, testObjectBString), LENIENT_ORDER, IGNORE_DEFAULTS);
+    }
+
+
+    /**
      * Test for two equal collections but with different order.
      */
     public void testAssertLenEquals_equalsLenientOrder() {
@@ -163,10 +178,10 @@ public class ReflectionAssertTest extends TestCase {
      * Test for ignored default left value.
      */
     public void testAssertRefEquals_equalsIgnoredDefault() {
-        testObjectA.setString1(null);
-        testObjectB.setString1("xxxxxx");
+        testObjectAString.setString1(null);
+        testObjectBString.setString1("xxxxxx");
 
-        assertRefEquals(testObjectA, testObjectB, IGNORE_DEFAULTS);
+        assertRefEquals(testObjectAString, testObjectBString, IGNORE_DEFAULTS);
     }
 
 
@@ -174,10 +189,10 @@ public class ReflectionAssertTest extends TestCase {
      * Test for ignored default left value.
      */
     public void testAssertLenEquals_equalsIgnoredDefault() {
-        testObjectA.setString1(null);
-        testObjectB.setString1("xxxxxx");
+        testObjectAString.setString1(null);
+        testObjectBString.setString1("xxxxxx");
 
-        assertLenEquals(testObjectA, testObjectB);
+        assertLenEquals(testObjectAString, testObjectBString);
     }
 
 
@@ -196,15 +211,15 @@ public class ReflectionAssertTest extends TestCase {
 
 
     /**
-     * Test class with failing equals.
+     * Test class with 2 string fields and a failing equals.
      */
-    private class TestObject {
+    private class TestObjectString {
 
         private String string1;
 
         private String string2;
 
-        public TestObject(String stringValue1, String stringValue2) {
+        public TestObjectString(String stringValue1, String stringValue2) {
             this.string1 = stringValue1;
             this.string2 = stringValue2;
         }
@@ -233,6 +248,23 @@ public class ReflectionAssertTest extends TestCase {
         @Override
         public boolean equals(Object o) {
             return false;
+        }
+    }
+
+
+    /**
+     * Test class with int and string field.
+     */
+    @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
+    private class TestObjectIntString {
+
+        private int intValue;
+
+        private String stringValue;
+
+        public TestObjectIntString(int intValue, String stringValue) {
+            this.intValue = intValue;
+            this.stringValue = stringValue;
         }
     }
 

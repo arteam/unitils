@@ -16,8 +16,8 @@
 package org.unitils.easymock.util;
 
 import org.easymock.internal.matchers.Equals;
-import org.unitils.reflectionassert.comparator.ReflectionComparator;
-import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 
@@ -33,7 +33,7 @@ import org.unitils.reflectionassert.ReflectionComparatorMode;
  *
  * @author Tim Ducheyne
  * @author Filip Neven
- * @see ReflectionComparator
+ * @see org.unitils.reflectionassert.ReflectionComparator
  * @see ReflectionComparatorMode
  */
 public class ReflectionArgumentMatcher<T> extends Equals {

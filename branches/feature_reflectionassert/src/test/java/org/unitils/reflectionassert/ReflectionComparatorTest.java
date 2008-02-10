@@ -16,11 +16,12 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
-import org.unitils.reflectionassert.comparator.Difference;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
-import org.unitils.reflectionassert.comparator.ReflectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
+import static java.lang.Boolean.FALSE;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -28,7 +29,7 @@ import java.util.Collection;
 
 
 /**
- * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}.
+ * Test class for {@link ReflectionComparator}.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -103,7 +104,7 @@ public class ReflectionComparatorTest extends TestCase {
 
 
     /**
-     * * Test for two equal objects as an inner field of an object.
+     * Test for two equal objects as an inner field of an object.
      */
     public void testGetDifference_equalsInner() {
         Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerB);
@@ -126,10 +127,9 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(objectsA, objectsDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("string2", result.getFieldStack().get(0));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = result.getInnerDifference("string2");
+        assertEquals("test 2", difference.getLeftValue());
+        assertEquals("XXXXXX", difference.getRightValue());
     }
 
 
@@ -139,10 +139,9 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_notEqualsRightNull() {
         Difference result = reflectionComparator.getDifference(objectsA, objectsNullValue);
 
-        assertNotNull(result);
-        assertEquals("string2", result.getFieldStack().get(0));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals(null, result.getRightValue());
+        Difference difference = result.getInnerDifference("string2");
+        assertEquals("test 2", difference.getLeftValue());
+        assertEquals(null, difference.getRightValue());
     }
 
 
@@ -152,10 +151,9 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_notEqualsLeftNull() {
         Difference result = reflectionComparator.getDifference(objectsNullValue, objectsA);
 
-        assertNotNull(result);
-        assertEquals("string2", result.getFieldStack().get(0));
-        assertEquals(null, result.getLeftValue());
-        assertEquals("test 2", result.getRightValue());
+        Difference difference = result.getInnerDifference("string2");
+        assertEquals(null, difference.getLeftValue());
+        assertEquals("test 2", difference.getRightValue());
     }
 
 
@@ -165,11 +163,9 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("inner", result.getFieldStack().get(0));
-        assertEquals("string2", result.getFieldStack().get(1));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = result.getInnerDifference("inner").getInnerDifference("string2");
+        assertEquals("test 2", difference.getLeftValue());
+        assertEquals("XXXXXX", difference.getRightValue());
     }
 
 
@@ -179,8 +175,6 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_leftNull() {
         Difference result = reflectionComparator.getDifference(null, objectsA);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
         assertEquals(null, result.getLeftValue());
         assertSame(objectsA, result.getRightValue());
     }
@@ -192,8 +186,6 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_rightNull() {
         Difference result = reflectionComparator.getDifference(objectsA, null);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
         assertSame(objectsA, result.getLeftValue());
         assertEquals(null, result.getRightValue());
     }
@@ -218,17 +210,6 @@ public class ReflectionComparatorTest extends TestCase {
 
 
     /**
-     * Test case for getting the field stack as a string.
-     */
-    public void testGetDifferenceFieldStackAsString() {
-        Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerDifferentValue);
-        String differenceFieldString = result.getFieldStackAsString();
-
-        assertEquals("inner.string2", differenceFieldString);
-    }
-
-
-    /**
      * Test for ignored default left value and to check that the right value is not being evaluated (causing a lazy
      * loading).
      */
@@ -236,6 +217,12 @@ public class ReflectionComparatorTest extends TestCase {
         // create a proxy, that will fail if is accessed
         Collection<?> collection = (Collection<?>) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Collection.class}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                if ("equals".equals(method.getName())) {
+                    return FALSE;
+                }
+                if ("hashCode".equals(method.getName())) {
+                    return -1;
+                }
                 fail("Should not be invoked");
                 return null;
             }
@@ -243,6 +230,50 @@ public class ReflectionComparatorTest extends TestCase {
 
         Difference result = ignoreDefaultReflectionComparator.getDifference(new CollectionWrapper(null), new CollectionWrapper(collection));
         assertNull(result);
+    }
+
+
+    /**
+     * Test for two equal objects.
+     */
+    public void testGetAllDifferences_equals() {
+        Difference result = reflectionComparator.getAllDifferences(objectsA, objectsB);
+        assertNull(result);
+    }
+
+
+    /**
+     * Test for two objects that contain different values.
+     */
+    //todo implement
+    public void testGetAllDifference_notEqualsDifferentValues() {
+        Difference result = reflectionComparator.getAllDifferences(objectsA, objectsDifferentValue);
+
+        //assertEquals(1, result.size());
+        //Difference difference = result.get(0);
+        //assertEquals("string2", difference.getFieldStack().get(0));
+        //assertEquals("test 2", difference.getLeftValue());
+        //assertEquals("XXXXXX", difference.getRightValue());
+    }
+
+
+    /**
+     * Test for two objects that contain different values.
+     */
+    //todo implement
+    public void testGetAllDifference_notEqualsMultipleDifferentValues() {
+        objectsDifferentValue.string1 = "YYYYYY";
+        Difference result = reflectionComparator.getAllDifferences(objectsA, objectsDifferentValue);
+
+        //assertEquals(2, result.size());
+        //Difference difference1 = result.get(0);
+        //assertEquals("string1", difference1.getFieldStack().get(0));
+        //assertEquals("test 1", difference1.getLeftValue());
+        //assertEquals("YYYYYY", difference1.getRightValue());
+        //Difference difference2 = result.get(1);
+        //assertEquals("string2", difference2.getFieldStack().get(0));
+        //assertEquals("test 2", difference2.getLeftValue());
+        //assertEquals("XXXXXX", difference2.getRightValue());
     }
 
 
@@ -336,10 +367,10 @@ public class ReflectionComparatorTest extends TestCase {
          *
          * @param innerCollection The collection
          */
-		public CollectionWrapper(Collection<?> innerCollection) {
-			this.innerCollection = innerCollection;
-		}
-	}
+        public CollectionWrapper(Collection<?> innerCollection) {
+            this.innerCollection = innerCollection;
+        }
+    }
 
 
 }

@@ -13,39 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert.formatter;
 
-import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.difference.*;
 
-import java.util.Stack;
 
 /**
- * todo javadoc
- *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface Comparison {
+public interface DifferenceFormatter {
 
 
-    Object getLeft();
+    String format(String fieldName, Difference difference);
 
+    String format(String fieldName, ObjectDifference objectDifference);
 
-    Object getRight();
+    String format(String fieldName, MapDifference objectDifference);
 
+    String format(String fieldName, CollectionDifference collectionDifference);
 
-    Stack<String> getFieldStack();
-
-
-    Difference createDifference(String message);
-
-
-    Difference invokeNextComparator();
-
-
-    Difference getInnerDifference(Object left, Object right);
-
-
-    Difference getNewDifference(Object left, Object right);
+    String format(String fieldName, UnorderedCollectionDifference unorderedCollectionDifference);
 
 }

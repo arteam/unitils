@@ -15,9 +15,9 @@
  */
 package org.unitils.reflectionassert.comparator.impl;
 
+import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
-import org.unitils.reflectionassert.comparator.Comparison;
-import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.difference.Difference;
 
 /**
  * todo javadoc
@@ -28,24 +28,25 @@ import org.unitils.reflectionassert.comparator.Difference;
 public class LenientNumberComparator implements Comparator {
 
 
-    // todo javadoc
-    public Difference compare(Comparison comparison) {
-        Object left = comparison.getLeft();
-        Object right = comparison.getRight();
-
+    public boolean canCompare(Object left, Object right) {
         if (left == null || right == null) {
-            return comparison.invokeNextComparator();
+            return false;
         }
-        if (!(left instanceof Character || left instanceof Number) || !(right instanceof Character || right instanceof Number)) {
-            return comparison.invokeNextComparator();
+        if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
+            return true;
         }
+        return false;
+    }
+
+    // todo javadoc
+    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // check if right and left have same number value (including NaN and Infinity)
         Double leftDouble = getDoubleValue(left);
         Double rightDouble = getDoubleValue(right);
-        if (leftDouble.equals(rightDouble)) {
-            return null;
+        if (!leftDouble.equals(rightDouble)) {
+            return new Difference("Different primitive values", left, right);
         }
-        return comparison.createDifference("Different primitive values.");
+        return null;
     }
 
 

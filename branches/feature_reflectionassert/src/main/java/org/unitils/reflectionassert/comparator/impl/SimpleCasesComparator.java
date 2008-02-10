@@ -15,9 +15,9 @@
  */
 package org.unitils.reflectionassert.comparator.impl;
 
+import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
-import org.unitils.reflectionassert.comparator.Comparison;
-import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.difference.Difference;
 
 /**
  * todo javadoc
@@ -28,22 +28,39 @@ import org.unitils.reflectionassert.comparator.Difference;
 public class SimpleCasesComparator implements Comparator {
 
 
-    // todo javadoc
-    public Difference compare(Comparison comparison) {
-        Object left = comparison.getLeft();
-        Object right = comparison.getRight();
+    public boolean canCompare(Object left, Object right) {
+        if (left == right) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return true;
+        }
+        if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
+            return true;
+        }
+        // todo also check right for java.lang
+        if (left.getClass().getName().startsWith("java.lang")) {
+            return true;
+        }
+        if (left instanceof Enum && right instanceof Enum) {
+            return true;
+        }
+        return false;
+    }
 
+    // todo javadoc
+    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // check if the same instance is referenced
         if (left == right) {
             return null;
         }
         // check if the left value is null
         if (left == null) {
-            return comparison.createDifference("Left value null.");
+            return new Difference("Left value null", left, right);
         }
         // check if the right value is null
         if (right == null) {
-            return comparison.createDifference("Right value null.");
+            return new Difference("Right value null", left, right);
         }
         // check if right and left have same number value (including NaN and Infinity)
         if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
@@ -52,23 +69,23 @@ public class SimpleCasesComparator implements Comparator {
             if (leftDouble.equals(rightDouble)) {
                 return null;
             }
-            return comparison.createDifference("Different primitive values.");
+            return new Difference("Different primitive values", left, right);
         }
         // check if java objects are equal
         if (left.getClass().getName().startsWith("java.lang")) {
             if (left.equals(right)) {
                 return null;
             }
-            return comparison.createDifference("Different object values.");
+            return new Difference("Different object values", left, right);
         }
         // check if enums are equal
         if (left instanceof Enum && right instanceof Enum) {
             if (left.equals(right)) {
                 return null;
             }
-            return comparison.createDifference("Different enum values.");
+            return new Difference("Different enum values", left, right);
         }
-        return comparison.invokeNextComparator();
+        return null;
     }
 
 

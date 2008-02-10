@@ -16,9 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
-import org.unitils.reflectionassert.comparator.Difference;
-import org.unitils.reflectionassert.comparator.ReflectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -115,27 +115,23 @@ public class ReflectionComparatorMapTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("key 2", result.getFieldStack().get(0));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = result.getInnerDifference("key 2").getInnerDifference("string");
+        assertEquals("test 2", difference.getLeftValue());
+        assertEquals("XXXXXX", difference.getRightValue());
     }
 
 
     /**
-     * Test for two maps that have a different size.
+     * Test for two maps that have a different size. The first element was removed from the right map
      */
-    public void testGetDifference_notEqualsDifferentSize() {
-        Iterator<?> iterator = mapB.entrySet().iterator();
-        iterator.next();
-        iterator.remove();
+    public void testGetDifference_notEqualsRightElementRemoved() {
+        mapB.remove("key 1");
 
         Difference result = reflectionComparator.getDifference(mapA, mapB);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
-        assertSame(mapA, result.getLeftValue());
-        assertSame(mapB, result.getRightValue());
+        Difference difference = result.getInnerDifference("key 1");
+        assertEquals("test 1", ((Element) difference.getLeftValue()).getString());
+        assertEquals(null, difference.getRightValue());
     }
 
 
@@ -145,11 +141,10 @@ public class ReflectionComparatorMapTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("key 2", result.getFieldStack().get(0));
-        assertEquals("inner", result.getFieldStack().get(1));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = result.getInnerDifference("key 2").getInnerDifference("inner");
+        Difference innerDifference = difference.getInnerDifference("key 2").getInnerDifference("string");
+        assertEquals("test 2", innerDifference.getLeftValue());
+        assertEquals("XXXXXX", innerDifference.getRightValue());
     }
 
 
@@ -159,8 +154,6 @@ public class ReflectionComparatorMapTest extends TestCase {
     public void testGetDifference_notEqualsDifferentKeys() {
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentKey);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
         assertSame(mapA, result.getLeftValue());
         assertSame(mapDifferentKey, result.getRightValue());
     }
@@ -176,10 +169,9 @@ public class ReflectionComparatorMapTest extends TestCase {
 
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerB);
 
-        assertNotNull(result);
-        assertEquals("key 2", result.getFieldStack().get(0));
-        assertSame(mapA, result.getLeftValue());
-        assertSame(mapB, result.getRightValue());
+        Difference difference = result.getInnerDifference("key 2").getInnerDifference("inner");
+        assertSame(mapA, difference.getLeftValue());
+        assertSame(mapB, difference.getRightValue());
     }
 
 
@@ -189,8 +181,6 @@ public class ReflectionComparatorMapTest extends TestCase {
     public void testGetDifference_notEqualsRightNotMap() {
         Difference result = reflectionComparator.getDifference(mapA, "Test string");
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().empty());
         assertSame(mapA, result.getLeftValue());
         assertEquals("Test string", result.getRightValue());
     }
@@ -213,8 +203,6 @@ public class ReflectionComparatorMapTest extends TestCase {
     public void testGetDifference_notEqualsMapComparingKeysUsingReflection() {
         Difference result = reflectionComparator.getDifference(mapReflectionCompareKeyA, mapReflectionCompareDifferentKey);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().empty());
         assertSame(mapReflectionCompareKeyA, result.getLeftValue());
         assertSame(mapReflectionCompareDifferentKey, result.getRightValue());
     }

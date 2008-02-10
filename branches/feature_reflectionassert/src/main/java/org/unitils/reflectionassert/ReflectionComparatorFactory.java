@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.comparator;
+package org.unitils.reflectionassert;
 
 import org.unitils.reflectionassert.comparator.impl.*;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.ReflectionComparatorMode;
+import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
 import static org.unitils.util.CollectionUtils.asSet;
 
@@ -30,7 +31,7 @@ import java.util.Set;
  * <p/>
  * This class functions as a factory for reflection comparator chains. A reflection comparator chain is a chain of
  * instances of {@link ReflectionComparator} subclasses. A reflection comparator chain will compare two objects with
- * each other using reflection, and returns a {@link Difference} object. You can use a reflection
+ * each other using reflection, and returns a {@link org.unitils.reflectionassert.difference.Difference} object. You can use a reflection
  * comparator chain by invoking {@link ReflectionComparator#getDifference(Object,Object)} on the root of the chain.
  * <p/>
  * The {@link Object#equals} method is often used for business logic equality checking. The {@link Object#equals} method

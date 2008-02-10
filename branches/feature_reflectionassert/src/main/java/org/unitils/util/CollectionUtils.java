@@ -15,7 +15,11 @@
  */
 package org.unitils.util;
 
+import org.apache.commons.lang.ArrayUtils;
+
+import java.util.Arrays;
 import static java.util.Arrays.asList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,5 +45,61 @@ public class CollectionUtils {
         }
         result.addAll(asList(elements));
         return result;
+    }
+
+
+    /**
+     * Converts the given array or collection object (possibly primitive array) to type Collection
+     *
+     * @param object The array or collection
+     * @return The object collection
+     */
+    public static Collection<?> convertToCollection(Object object) {
+        if (object instanceof Collection<?>) {
+            return (Collection<?>) object;
+        }
+
+        // If needed convert primitive array to object array
+        Object[] objectArray = convertToObjectArray(object);
+
+        // Convert array to collection
+        return Arrays.asList(objectArray);
+    }
+
+
+    /**
+     * Converts the given array object (possibly primitive array) to type Object[]
+     *
+     * @param object The array
+     * @return The object array
+     */
+    public static Object[] convertToObjectArray(Object object) {
+        if (object instanceof byte[]) {
+            return ArrayUtils.toObject((byte[]) object);
+
+        } else if (object instanceof short[]) {
+            return ArrayUtils.toObject((short[]) object);
+
+        } else if (object instanceof int[]) {
+            return ArrayUtils.toObject((int[]) object);
+
+        } else if (object instanceof long[]) {
+            return ArrayUtils.toObject((long[]) object);
+
+        } else if (object instanceof char[]) {
+            return ArrayUtils.toObject((char[]) object);
+
+        } else if (object instanceof float[]) {
+            return ArrayUtils.toObject((float[]) object);
+
+        } else if (object instanceof double[]) {
+            return ArrayUtils.toObject((double[]) object);
+
+        } else if (object instanceof boolean[]) {
+            return ArrayUtils.toObject((boolean[]) object);
+
+        } else {
+            return (Object[]) object;
+        }
     }
 }

@@ -16,8 +16,9 @@
 package org.unitils.reflectionassert.comparator.impl;
 
 import org.unitils.reflectionassert.comparator.Comparator;
-import org.unitils.reflectionassert.comparator.Comparison;
-import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.difference.ObjectDifference;
+import org.unitils.reflectionassert.ReflectionComparator;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -32,52 +33,55 @@ import java.lang.reflect.Modifier;
 public class ObjectComparator implements Comparator {
 
 
-    // todo javadoc
-    public Difference compare(Comparison comparison) {
-        Object left = comparison.getLeft();
-        Object right = comparison.getRight();
-
+    public boolean canCompare(Object left, Object right) {
         if (left == null || right == null) {
-            return comparison.invokeNextComparator();
+            return false;
         }
+        return true;
+    }
 
+
+    // todo javadoc
+    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // check different class type
         Class<?> clazz = left.getClass();
         if (!clazz.equals(right.getClass())) {
-            return comparison.createDifference("Different class types. Left: " + clazz + ", right: " + right.getClass());
+            return new Difference("Different class types. Left: " + clazz + ", right: " + right.getClass(), left, right);
         }
         // compare all fields of the object using reflection
-        return compareFields(left, right, clazz, comparison);
+        ObjectDifference difference = new ObjectDifference("Different field values", left, right);
+        compareFields(left, right, clazz, difference, reflectionComparator);
+
+        if (difference.getFieldDifferences().isEmpty()) {
+            return null;
+        }
+        return difference;
     }
 
 
     /**
      * Compares the values of all fields in the given objects by use of reflection.
      *
-     * @param left       the left object for the comparison, not null
-     * @param right      the right object for the comparison, not null
-     * @param clazz      the type of both objects
-     * @param comparison the current comparison
-     * @return the difference, null if there is no difference
+     * @param left                 the left object for the comparison, not null
+     * @param right                the right object for the comparison, not null
+     * @param clazz                the type of both objects, not null
+     * @param difference           root difference, not null
+     * @param reflectionComparator the reflection comparator, not null
      */
-    protected Difference compareFields(Object left, Object right, Class<?> clazz, Comparison comparison) {
+    protected void compareFields(Object left, Object right, Class<?> clazz, ObjectDifference difference, ReflectionComparator reflectionComparator) {
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
 
         for (Field field : fields) {
-            comparison.getFieldStack().push(field.getName());
-
             // skip transient and static fields
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
-                comparison.getFieldStack().pop();
                 continue;
             }
             try {
-
                 // recursively check the value of the fields
-                Difference difference = comparison.getInnerDifference(field.get(left), field.get(right));
-                if (difference != null) {
-                    return difference;
+                Difference innerDifference = reflectionComparator.getAllDifferences(field.get(left), field.get(right));
+                if (innerDifference != null) {
+                    difference.addFieldDifference(field.getName(), innerDifference);
                 }
 
             } catch (IllegalAccessException e) {
@@ -85,18 +89,15 @@ public class ObjectComparator implements Comparator {
                 // throw a runtime exception in case the impossible happens.
                 throw new InternalError("Unexpected IllegalAccessException");
             }
-            comparison.getFieldStack().pop();
         }
 
         // compare fields declared in superclass
         Class<?> superclazz = clazz.getSuperclass();
         while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
-            Difference difference = compareFields(left, right, superclazz, comparison);
-            if (difference != null) {
-                return difference;
-            }
+            compareFields(left, right, superclazz, difference, reflectionComparator);
             superclazz = superclazz.getSuperclass();
         }
-        return null;
     }
+
+
 }

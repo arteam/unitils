@@ -16,8 +16,8 @@
 package org.unitils.reflectionassert.comparator.impl;
 
 import org.unitils.reflectionassert.comparator.Comparator;
-import org.unitils.reflectionassert.comparator.Comparison;
-import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.ReflectionComparator;
 
 /**
  * todo javadoc
@@ -28,26 +28,30 @@ import org.unitils.reflectionassert.comparator.Difference;
 public class IgnoreDefaultsComparator implements Comparator {
 
 
-    // todo javadoc
-    public Difference compare(Comparison comparison) {
-        Object left = comparison.getLeft();
-
+    public boolean canCompare(Object left, Object right) {
         // object types
         if (left == null) {
-            return null;
+            return true;
         }
         // primitive boolean types
         if (left instanceof Boolean && !(Boolean) left) {
-            return null;
+            return true;
         }
         // primitive character types
         if (left instanceof Character && (Character) left == 0) {
-            return null;
+            return true;
         }
         // primitive int/long/double/float types
         if (left instanceof Number && ((Number) left).doubleValue() == 0) {
-            return null;
+            return true;
         }
-        return comparison.invokeNextComparator();
+        return false;
+    }
+
+
+    // todo javadoc
+    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+        // ignore
+        return null;
     }
 }

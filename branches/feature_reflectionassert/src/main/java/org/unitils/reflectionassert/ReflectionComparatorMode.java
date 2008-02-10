@@ -27,7 +27,7 @@ package org.unitils.reflectionassert;
  *
  * @author Tim Ducheyne
  * @author Filip Neven
- * @see org.unitils.reflectionassert.comparator.ReflectionComparator
+ * @see ReflectionComparator
  */
 public enum ReflectionComparatorMode {
 

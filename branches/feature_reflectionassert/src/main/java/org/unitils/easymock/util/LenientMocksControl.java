@@ -50,7 +50,7 @@ import org.unitils.reflectionassert.ReflectionComparatorMode;
  * @author Tim Ducheyne
  * @author Filip Neven
  * @see ReflectionComparatorMode
- * @see org.unitils.reflectionassert.comparator.ReflectionComparator
+ * @see org.unitils.reflectionassert.ReflectionComparator
  */
 @SuppressWarnings("deprecation")
 public class LenientMocksControl extends MocksClassControl {

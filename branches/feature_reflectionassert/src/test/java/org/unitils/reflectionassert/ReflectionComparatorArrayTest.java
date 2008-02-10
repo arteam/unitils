@@ -16,17 +16,18 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
-import org.unitils.reflectionassert.comparator.Difference;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
-import org.unitils.reflectionassert.comparator.ReflectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 
 /**
- * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}.
+ * Test class for {@link ReflectionComparator}.
  * Contains tests with non-primitive array types.
  *
  * @author Tim Ducheyne
@@ -115,10 +116,9 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("1", result.getFieldStack().get(0));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = result.getInnerDifference("1").getInnerDifference("string");
+        assertEquals("test 2", difference.getLeftValue());
+        assertEquals("XXXXXX", difference.getRightValue());
     }
 
 
@@ -128,8 +128,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsDifferentSize() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentSize);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
         assertSame(arrayA, result.getLeftValue());
         assertSame(arrayDifferentSize, result.getRightValue());
     }
@@ -141,11 +139,10 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("1", result.getFieldStack().get(0));
-        assertEquals("inner", result.getFieldStack().get(1));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = result.getInnerDifference("1").getInnerDifference("inner");
+        Difference innerDifference = difference.getInnerDifference("1").getInnerDifference("string");
+        assertEquals("test 2", innerDifference.getLeftValue());
+        assertEquals("XXXXXX", innerDifference.getRightValue());
     }
 
 
@@ -155,10 +152,9 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentSize() {
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentSize);
 
-        assertNotNull(result);
-        assertEquals("1", result.getFieldStack().get(0));
-        assertSame(arrayA, result.getLeftValue());
-        assertSame(arrayDifferentSize, result.getRightValue());
+        Difference difference = result.getInnerDifference("1").getInnerDifference("inner");
+        assertSame(arrayA, difference.getLeftValue());
+        assertSame(arrayDifferentSize, difference.getRightValue());
     }
 
 
@@ -168,10 +164,13 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsDifferentOrderNotLenient() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentOrder);
 
-        assertNotNull(result);
-        assertEquals("0", result.getFieldStack().get(0));
-        assertEquals("test 1", result.getLeftValue());
-        assertEquals("test 3", result.getRightValue());
+        Difference difference1 = result.getInnerDifference("0").getInnerDifference("string");
+        assertEquals("test 1", difference1.getLeftValue());
+        assertEquals("test 3", difference1.getRightValue());
+
+        Difference difference2 = result.getInnerDifference("2").getInnerDifference("string");
+        assertEquals("test 3", difference2.getLeftValue());
+        assertEquals("test 1", difference2.getRightValue());
     }
 
 
@@ -190,8 +189,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsDifferentOrderLenientDifferentValues() {
         Difference result = lenientOrderComparator.getDifference(arrayA, arrayDifferentOrderDifferentValue);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
         assertSame(arrayA, result.getLeftValue());
         assertSame(arrayDifferentOrderDifferentValue, result.getRightValue());
     }
@@ -203,8 +200,6 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsRightNotArray() {
         Difference result = reflectionComparator.getDifference(arrayA, "Test string");
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().empty());
         assertSame(arrayA, result.getLeftValue());
         assertEquals("Test string", result.getRightValue());
     }
@@ -232,10 +227,9 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsCollectionDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayA, Arrays.asList(arrayDifferentValue));
 
-        assertNotNull(result);
-        assertEquals("1", result.getFieldStack().get(0));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = result.getInnerDifference("1").getInnerDifference("string");
+        assertEquals("test 2", difference.getLeftValue());
+        assertEquals("XXXXXX", difference.getRightValue());
     }
 
 
@@ -246,10 +240,48 @@ public class ReflectionComparatorArrayTest extends TestCase {
         Collection<?> collectionDifferentSize = Arrays.asList(arrayDifferentSize);
         Difference result = reflectionComparator.getDifference(arrayA, collectionDifferentSize);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
         assertSame(arrayA, result.getLeftValue());
         assertSame(collectionDifferentSize, result.getRightValue());
+    }
+
+
+    /**
+     * Tests for objects with inner arrays that have a element order but with lenient order checking.
+     */
+    public void testGetAllDifferences_equalsDifferentOrderLenient() {
+        Difference result = lenientOrderComparator.getAllDifferences(arrayA, arrayDifferentOrder);
+        assertNull(result);
+    }
+
+
+    /**
+     * Tests for objects with inner arrays that have a element order but with lenient order checking.
+     */
+    //todo implement
+    public void testGetAllDifferences_notEqualsDifferentOrderLenientDifferentValues() {
+        Difference result = lenientOrderComparator.getAllDifferences(arrayA, arrayDifferentOrderDifferentValue);
+
+        //  assertEquals(1, result.size());
+        // Difference difference = result.get(0);
+        // assertTrue(difference.getFieldStack().isEmpty());
+        // assertSame(arrayA, difference.getLeftValue());
+        // assertSame(arrayDifferentOrderDifferentValue, difference.getRightValue());
+    }
+
+
+    /**
+     * Tests for objects with inner arrays that have a element order but with lenient order checking.
+     */
+    //todo implement
+    public void testGetAllDifferences_notEqualsDifferentOrderLenientMultipleDifferentValues() {
+        arrayDifferentOrderDifferentValue[0].string = "YYYYYY";
+        Difference result = lenientOrderComparator.getAllDifferences(arrayA, arrayDifferentOrderDifferentValue);
+
+        // assertEquals(1, result.size());
+        // Difference difference1 = result.get(0);
+        // assertTrue(difference1.getFieldStack().isEmpty());
+        // assertSame(arrayA, difference1.getLeftValue());
+        // assertSame(arrayDifferentOrderDifferentValue, difference1.getRightValue());
     }
 
 

@@ -16,8 +16,8 @@
 package org.unitils.reflectionassert.comparator.impl;
 
 import org.unitils.reflectionassert.comparator.Comparator;
-import org.unitils.reflectionassert.comparator.Comparison;
-import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.ReflectionComparator;
 
 import java.util.Date;
 
@@ -28,17 +28,25 @@ import java.util.Date;
 public class LenientDatesComparator implements Comparator {
 
 
-    // todo javadoc
-    public Difference compare(Comparison comparison) {
-        Object left = comparison.getLeft();
-        Object right = comparison.getRight();
-
-        if ((right == null && left instanceof Date) || (left == null && right instanceof Date)) {
-            return comparison.createDifference("Lenient dates, but not both instantiated or both null.");
+    public boolean canCompare(Object left, Object right) {
+        if (right == null && left == null) {
+            return true;
         }
         if (right instanceof Date && left instanceof Date) {
-            return null;
+            return true;
         }
-        return comparison.invokeNextComparator();
+        if ((right == null && left instanceof Date) || (left == null && right instanceof Date)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    // todo javadoc
+    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+        if ((right == null && left instanceof Date) || (left == null && right instanceof Date)) {
+            return new Difference("Lenient dates, but not both instantiated or both null", left, right);
+        }
+        return null;
     }
 }

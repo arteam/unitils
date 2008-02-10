@@ -15,12 +15,12 @@
  */
 package org.unitils.reflectionassert.comparator.impl;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
-import org.unitils.reflectionassert.comparator.Comparison;
-import org.unitils.reflectionassert.comparator.Difference;
+import org.unitils.reflectionassert.difference.CollectionDifference;
+import org.unitils.reflectionassert.difference.Difference;
+import static org.unitils.util.CollectionUtils.convertToCollection;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -33,93 +33,53 @@ import java.util.Iterator;
 public class CollectionComparator implements Comparator {
 
 
-    // todo javadoc
-    public Difference compare(Comparison comparison) {
-        Object left = comparison.getLeft();
-        Object right = comparison.getRight();
-
+    public boolean canCompare(Object left, Object right) {
         if (left == null || right == null) {
-            return comparison.invokeNextComparator();
+            return false;
         }
-        if (!(left.getClass().isArray() || left instanceof Collection) || !(right.getClass().isArray() || right instanceof Collection)) {
-            return comparison.invokeNextComparator();
+        if ((left.getClass().isArray() || left instanceof Collection) && (right.getClass().isArray() || right instanceof Collection)) {
+            return true;
         }
+        return false;
+    }
 
+
+    // todo javadoc
+    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // Convert to list and compare as collection
         Collection<?> leftCollection = convertToCollection(left);
         Collection<?> rightCollection = convertToCollection(right);
 
-        if (leftCollection.size() != rightCollection.size()) {
-            return comparison.createDifference("Different array/collection sizes. Left size: " + leftCollection.size() + ", right size: " + rightCollection.size());
-        }
+        int elementIndex = -1;
+        CollectionDifference difference = new CollectionDifference("Different elements", left, right);
 
-        int i = 0;
-        Iterator<?> lhsIterator = leftCollection.iterator();
-        Iterator<?> rhsIterator = rightCollection.iterator();
-        while (lhsIterator.hasNext() && rhsIterator.hasNext()) {
-            comparison.getFieldStack().push("" + i++);
-            Difference difference = comparison.getInnerDifference(lhsIterator.next(), rhsIterator.next());
-            if (difference != null) {
-                return difference;
+        Iterator<?> leftIterator = leftCollection.iterator();
+        Iterator<?> rightIterator = rightCollection.iterator();
+        while (leftIterator.hasNext() && rightIterator.hasNext()) {
+            elementIndex++;
+
+            Difference elementDifference = reflectionComparator.getAllDifferences(leftIterator.next(), rightIterator.next());
+            if (elementDifference != null) {
+                difference.addElementDifference(elementIndex, elementDifference);
             }
-            comparison.getFieldStack().pop();
-        }
-        return null;
-    }
-
-
-    /**
-     * Converts the given array or collection object (possibly primitive array) to type Collection
-     *
-     * @param object the array or collection
-     * @return the object collection
-     */
-    protected Collection<?> convertToCollection(Object object) {
-        if (object instanceof Collection<?>) {
-            return (Collection<?>) object;
         }
 
-        // If needed convert primitive array to object array
-        Object[] objectArray = convertToObjectArray(object);
-
-        // Convert array to collection
-        return Arrays.asList(objectArray);
-    }
-
-
-    /**
-     * Converts the given array object (possibly primitive array) to type Object[]
-     *
-     * @param object the array
-     * @return the object array
-     */
-    protected Object[] convertToObjectArray(Object object) {
-        if (object instanceof byte[]) {
-            return ArrayUtils.toObject((byte[]) object);
-
-        } else if (object instanceof short[]) {
-            return ArrayUtils.toObject((short[]) object);
-
-        } else if (object instanceof int[]) {
-            return ArrayUtils.toObject((int[]) object);
-
-        } else if (object instanceof long[]) {
-            return ArrayUtils.toObject((long[]) object);
-
-        } else if (object instanceof char[]) {
-            return ArrayUtils.toObject((char[]) object);
-
-        } else if (object instanceof float[]) {
-            return ArrayUtils.toObject((float[]) object);
-
-        } else if (object instanceof double[]) {
-            return ArrayUtils.toObject((double[]) object);
-
-        } else if (object instanceof boolean[]) {
-            return ArrayUtils.toObject((boolean[]) object);
-
-        } else {
-            return (Object[]) object;
+        int leftElementIndex = elementIndex;
+        while (leftIterator.hasNext()) {
+            leftElementIndex++;
+            difference.addElementDifference(leftElementIndex, new Difference("Left element not found in right collection", leftIterator.next(), null));
         }
+
+        int rightElementIndex = elementIndex;
+        while (rightIterator.hasNext()) {
+            rightElementIndex++;
+            difference.addElementDifference(rightElementIndex, new Difference("Right element not found in left collection", null, rightIterator.next()));
+        }
+
+        if (difference.getElementDifferences().isEmpty()) {
+            return null;
+        }
+        return difference;
     }
+
 }

@@ -16,13 +16,13 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
-import org.unitils.reflectionassert.comparator.Difference;
-import org.unitils.reflectionassert.comparator.ReflectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 
 /**
- * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}. Contains tests with primitive types.
+ * Test class for {@link ReflectionComparator}. Contains tests with primitive types.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -116,10 +116,9 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(primitivesA, primitiveDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(2, result.getLeftValue());
-        assertEquals(9999, result.getRightValue());
+        Difference difference = result.getInnerDifference("intValue2");
+        assertEquals(2, difference.getLeftValue());
+        assertEquals(9999, difference.getRightValue());
     }
 
 
@@ -129,10 +128,9 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     public void testGetDifference_notEqualsRight0() {
         Difference result = reflectionComparator.getDifference(primitivesA, primitives0Value);
 
-        assertNotNull(result);
-        assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(2, result.getLeftValue());
-        assertEquals(0, result.getRightValue());
+        Difference difference = result.getInnerDifference("intValue2");
+        assertEquals(2, difference.getLeftValue());
+        assertEquals(0, difference.getRightValue());
     }
 
 
@@ -142,10 +140,9 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     public void testGetDifference_notEqualsLeft0() {
         Difference result = reflectionComparator.getDifference(primitives0Value, primitivesA);
 
-        assertNotNull(result);
-        assertEquals("intValue2", result.getFieldStack().get(0));
-        assertEquals(0, result.getLeftValue());
-        assertEquals(2, result.getRightValue());
+        Difference difference = result.getInnerDifference("intValue2");
+        assertEquals(0, difference.getLeftValue());
+        assertEquals(2, difference.getRightValue());
     }
 
 
@@ -155,11 +152,9 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("inner", result.getFieldStack().get(0));
-        assertEquals("intValue2", result.getFieldStack().get(1));
-        assertEquals(2, result.getLeftValue());
-        assertEquals(9999, result.getRightValue());
+        Difference difference2 = result.getInnerDifference("inner").getInnerDifference("intValue2");
+        assertEquals(2, difference2.getLeftValue());
+        assertEquals(9999, difference2.getRightValue());
     }
 
 
@@ -177,7 +172,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      */
     public void testNaN_notEqual() {
         Difference result = reflectionComparator.getDifference(Double.NaN, 0);
-        assertTrue(result.getFieldStack().isEmpty());
         assertEquals(Double.NaN, result.getLeftValue());
         assertEquals(0, result.getRightValue());
     }
@@ -197,7 +191,6 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
      */
     public void testInfinity_notEqual() {
         Difference result = reflectionComparator.getDifference(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        assertTrue(result.getFieldStack().isEmpty());
         assertEquals(Double.NEGATIVE_INFINITY, result.getLeftValue());
         assertEquals(Double.POSITIVE_INFINITY, result.getRightValue());
     }

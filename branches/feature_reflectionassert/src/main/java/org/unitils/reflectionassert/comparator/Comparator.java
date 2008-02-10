@@ -15,8 +15,8 @@
  */
 package org.unitils.reflectionassert.comparator;
 
-import org.unitils.reflectionassert.comparator.Difference;
-import org.unitils.reflectionassert.comparator.Comparison;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.ReflectionComparator;
 
 /**
  * todo javadoc
@@ -27,9 +27,11 @@ import org.unitils.reflectionassert.comparator.Comparison;
 public interface Comparator {
 
 
+    boolean canCompare(Object left, Object right);
+
     // todo javadoc
     // If this ReflectionComparator is able to check whether their is a difference in the given left
     //and right objects (i.e. canHandle(Object,Object) returns true), the objects are compared.
-    Difference compare(Comparison comparison);
+    Difference compare(Object left, Object right, ReflectionComparator reflectionComparator);
 
 }

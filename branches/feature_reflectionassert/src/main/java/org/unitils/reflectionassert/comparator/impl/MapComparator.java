@@ -15,10 +15,11 @@
  */
 package org.unitils.reflectionassert.comparator.impl;
 
+import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
-import org.unitils.reflectionassert.comparator.Comparison;
-import org.unitils.reflectionassert.comparator.Difference;
-import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.difference.MapDifference;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,66 +28,73 @@ import java.util.Map;
 /**
  * todo javadoc
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class MapComparator implements Comparator {
 
 
-    // todo javadoc
-    public Difference compare(Comparison comparison) {
-        Object left = comparison.getLeft();
-        Object right = comparison.getRight();
-
+    public boolean canCompare(Object left, Object right) {
         if (left == null || right == null) {
-            return comparison.invokeNextComparator();
+            return false;
         }
-        if (!(left instanceof Map && right instanceof Map)) {
-            return comparison.invokeNextComparator();
+        if ((left instanceof Map && right instanceof Map)) {
+            return true;
         }
+        return false;
+    }
 
+
+    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         Map<?, ?> leftMap = (Map<?, ?>) left;
         Map<?, ?> rightMap = (Map<?, ?>) right;
-
-        if (leftMap.size() != rightMap.size()) {
-            return comparison.createDifference("Different map sizes.");
-        }
 
         // Create copy from which we can remove elements.
         Map<Object, Object> rightCopy = new HashMap<Object, Object>(rightMap);
 
-        for (Map.Entry<?, ?> lhsEntry : leftMap.entrySet()) {
-            Object lhsKey = lhsEntry.getKey();
-            Object lhsValue = lhsEntry.getValue();
-            comparison.getFieldStack().push("" + lhsKey);
+        ReflectionComparator keyReflectionComparator = createRefectionComparator();
+        MapDifference difference = new MapDifference("Different elements", left, right);
+
+        for (Map.Entry<?, ?> leftEntry : leftMap.entrySet()) {
+            Object leftKey = leftEntry.getKey();
+            Object leftValue = leftEntry.getValue();
 
             boolean found = false;
-            Iterator<Map.Entry<Object, Object>> rhsIterator = rightCopy.entrySet().iterator();
-            while (rhsIterator.hasNext()) {
-                Map.Entry<Object, Object> rhsEntry = rhsIterator.next();
-                Object rhsKey = rhsEntry.getKey();
-                Object rhsValue = rhsEntry.getValue();
+            Iterator<Map.Entry<Object, Object>> rightIterator = rightCopy.entrySet().iterator();
+            while (rightIterator.hasNext()) {
+                Map.Entry<Object, Object> rightEntry = rightIterator.next();
+                Object rightKey = rightEntry.getKey();
+                Object rightValue = rightEntry.getValue();
 
                 // compare keys using strict reflection compare
-                boolean isKeyEqual = createRefectionComparator().isEqual(lhsKey, rhsKey);
+                boolean isKeyEqual = keyReflectionComparator.isEqual(leftKey, rightKey);
                 if (isKeyEqual) {
                     found = true;
-                    rhsIterator.remove();
+                    rightIterator.remove();
 
                     // compare values
-                    Difference difference = comparison.getInnerDifference(lhsValue, rhsValue);
-                    if (difference != null) {
-                        return difference;
+                    Difference elementDifference = reflectionComparator.getAllDifferences(leftValue, rightValue);
+                    if (elementDifference != null) {
+                        difference.addValueDifference(leftKey, elementDifference);
                     }
                     break;
                 }
             }
-            comparison.getFieldStack().pop();
 
             if (!found) {
-                return comparison.createDifference("Left key not found in right map. Left key: " + lhsEntry.getKey());
+                difference.addValueDifference(leftKey, new Difference("Left element not found in right map", leftValue, null));
             }
         }
-        return null;
+
+        for (Map.Entry<?, ?> rightEntry : rightCopy.entrySet()) {
+            Object rightKey = rightEntry.getKey();
+            Object rightValue = rightEntry.getValue();
+            difference.addValueDifference(rightKey, new Difference("Right element not found in left map", null, rightValue));
+        }
+
+        if (difference.getValueDifferences().isEmpty()) {
+            return null;
+        }
+        return difference;
     }
 }

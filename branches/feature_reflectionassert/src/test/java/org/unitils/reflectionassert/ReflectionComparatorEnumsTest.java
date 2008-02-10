@@ -16,12 +16,12 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.comparator.ReflectionComparatorFactory.createRefectionComparator;
-import org.unitils.reflectionassert.comparator.Difference;
-import org.unitils.reflectionassert.comparator.ReflectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 /**
- * Test class for {@link org.unitils.reflectionassert.comparator.ReflectionComparator}.
+ * Test class for {@link ReflectionComparator}.
  * Contains tests with enums.
  *
  * @author Tim Ducheyne
@@ -73,9 +73,9 @@ public class ReflectionComparatorEnumsTest extends TestCase {
         Difference result = reflectionComparator.getDifference(enumsA, enumsDifferentValue);
 
         assertNotNull(result);
-        assertEquals("testEnumValue", result.getFieldStack().get(0));
-        assertEquals(Enums.TestEnum.TEST1, result.getLeftValue());
-        assertEquals(Enums.TestEnum.TEST2, result.getRightValue());
+        Difference difference = result.getInnerDifference("testEnumValue");
+        assertEquals(Enums.TestEnum.TEST1, difference.getLeftValue());
+        assertEquals(Enums.TestEnum.TEST2, difference.getRightValue());
     }
 
 
