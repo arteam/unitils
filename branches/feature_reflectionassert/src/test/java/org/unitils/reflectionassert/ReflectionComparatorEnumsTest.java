@@ -16,9 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 /**
  * Test class for {@link ReflectionComparator}.
@@ -73,7 +73,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
         Difference result = reflectionComparator.getDifference(enumsA, enumsDifferentValue);
 
         assertNotNull(result);
-        Difference difference = result.getInnerDifference("testEnumValue");
+        Difference difference = getInnerDifference("testEnumValue", result);
         assertEquals(Enums.TestEnum.TEST1, difference.getLeftValue());
         assertEquals(Enums.TestEnum.TEST2, difference.getRightValue());
     }

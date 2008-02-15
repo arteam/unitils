@@ -15,24 +15,24 @@
  */
 package org.unitils.reflectionassert.formatter;
 
-import org.unitils.reflectionassert.difference.*;
+import org.unitils.reflectionassert.difference.Difference;
 
 
 /**
+ * An interface for classes that can create a string representation of a Difference.
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public interface DifferenceFormatter {
 
 
-    String format(String fieldName, Difference difference);
-
-    String format(String fieldName, ObjectDifference objectDifference);
-
-    String format(String fieldName, MapDifference objectDifference);
-
-    String format(String fieldName, CollectionDifference collectionDifference);
-
-    String format(String fieldName, UnorderedCollectionDifference unorderedCollectionDifference);
+    /**
+     * Creates a string representation of the given difference tree.
+     *
+     * @param difference The root difference, not null
+     * @return The string representation, not null
+     */
+    String format(Difference difference);
 
 }

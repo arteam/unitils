@@ -15,17 +15,17 @@
  */
 package org.unitils.reflectionassert.comparator.impl;
 
+import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.ObjectDifference;
-import org.unitils.reflectionassert.ReflectionComparator;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 /**
- * todo javadoc
+ * Comparator for objects. This will compare all corresponding field values.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -33,6 +33,13 @@ import java.lang.reflect.Modifier;
 public class ObjectComparator implements Comparator {
 
 
+    /**
+     * Returns true if both objects are not null
+     *
+     * @param left  The left object
+     * @param right The right object
+     * @return True if not null
+     */
     public boolean canCompare(Object left, Object right) {
         if (left == null || right == null) {
             return false;
@@ -41,7 +48,17 @@ public class ObjectComparator implements Comparator {
     }
 
 
-    // todo javadoc
+    /**
+     * Compares the given objects by iterating over the fields and comparing the corresponding values.
+     * If both objects are of a different type, a difference is returned.
+     * The fields of the superclasses are also compared. Fields of java.lang classes are ignored. So for example
+     * fields of the Object class are not compared
+     *
+     * @param left                 The left object, not null
+     * @param right                The right object, not null
+     * @param reflectionComparator The root comparator for inner comparisons, not null
+     * @return A ObjectDifference or null if both maps are equal
+     */
     public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // check different class type
         Class<?> clazz = left.getClass();

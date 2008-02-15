@@ -15,11 +15,9 @@
  */
 package org.unitils.reflectionassert;
 
-import org.unitils.reflectionassert.comparator.impl.*;
-import org.unitils.reflectionassert.comparator.Comparator;
-import org.unitils.reflectionassert.ReflectionComparatorMode;
-import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.*;
+import org.unitils.reflectionassert.comparator.Comparator;
+import org.unitils.reflectionassert.comparator.impl.*;
 import static org.unitils.util.CollectionUtils.asSet;
 
 import java.util.ArrayList;
@@ -70,21 +68,21 @@ public class ReflectionComparatorFactory {
 
 
     // todo javadoc
-    public static final Comparator LENIENT_DATES_COMPARATOR = new LenientDatesComparator();
+    protected static final Comparator LENIENT_DATES_COMPARATOR = new LenientDatesComparator();
 
-    public static final Comparator IGNORE_DEFAULTS_COMPARATOR = new IgnoreDefaultsComparator();
+    protected static final Comparator IGNORE_DEFAULTS_COMPARATOR = new IgnoreDefaultsComparator();
 
-    public static final Comparator LENIENT_NUMBER_COMPARATOR = new LenientNumberComparator();
+    protected static final Comparator LENIENT_NUMBER_COMPARATOR = new LenientNumberComparator();
 
-    public static final Comparator SIMPLE_CASES_COMPARATOR = new SimpleCasesComparator();
+    protected static final Comparator SIMPLE_CASES_COMPARATOR = new SimpleCasesComparator();
 
-    public static final Comparator LENIENT_ORDER_COMPARATOR = new LenientOrderCollectionComparator();
+    protected static final Comparator LENIENT_ORDER_COMPARATOR = new LenientOrderCollectionComparator();
 
-    public static final Comparator COLLECTION_COMPARATOR = new CollectionComparator();
+    protected static final Comparator COLLECTION_COMPARATOR = new CollectionComparator();
 
-    public static final Comparator MAP_COMPARATOR = new MapComparator();
+    protected static final Comparator MAP_COMPARATOR = new MapComparator();
 
-    public static final Comparator OBJECT_COMPARATOR = new ObjectComparator();
+    protected static final Comparator OBJECT_COMPARATOR = new ObjectComparator();
 
 
     // todo javadoc
@@ -95,7 +93,7 @@ public class ReflectionComparatorFactory {
 
 
     // todo javadoc
-    public static List<Comparator> getComparatorChain(Set<ReflectionComparatorMode> modes) {
+    protected static List<Comparator> getComparatorChain(Set<ReflectionComparatorMode> modes) {
         List<Comparator> comparatorChain = new ArrayList<Comparator>();
         if (modes.contains(LENIENT_DATES)) {
             comparatorChain.add(LENIENT_DATES_COMPARATOR);

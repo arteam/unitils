@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * todo javadoc
+ * Comparator for maps. This will compare all values with corresponding keys.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -34,6 +34,13 @@ import java.util.Map;
 public class MapComparator implements Comparator {
 
 
+    /**
+     * Returns true when both values are not null and instance of Map
+     *
+     * @param left  The left object
+     * @param right The right object
+     * @return True for maps
+     */
     public boolean canCompare(Object left, Object right) {
         if (left == null || right == null) {
             return false;
@@ -45,6 +52,15 @@ public class MapComparator implements Comparator {
     }
 
 
+    /**
+     * Compares the given maps by looping over the keys and comparing their values.
+     * The key values are compared using a strict reflection comparison.
+     *
+     * @param left                 The left map, not null
+     * @param right                The right map, not null
+     * @param reflectionComparator The root comparator for inner comparisons, not null
+     * @return A MapDifference or null if both maps are equal
+     */
     public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         Map<?, ?> leftMap = (Map<?, ?>) left;
         Map<?, ?> rightMap = (Map<?, ?>) right;

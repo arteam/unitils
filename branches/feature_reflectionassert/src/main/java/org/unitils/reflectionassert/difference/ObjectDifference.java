@@ -15,9 +15,6 @@
  */
 package org.unitils.reflectionassert.difference;
 
-import org.unitils.reflectionassert.formatter.DifferenceFormatter;
-import org.unitils.reflectionassert.difference.Difference;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +26,7 @@ import java.util.Map;
  */
 public class ObjectDifference extends Difference {
 
+    /* The differences per field name */
     private Map<String, Difference> fieldDifferences = new HashMap<String, Difference>();
 
 
@@ -43,28 +41,39 @@ public class ObjectDifference extends Difference {
         super(message, leftValue, rightValue);
     }
 
-    @Override
-    public int getInnerDifferenceCount() {
-        return fieldDifferences.size();
-    }
 
-    @Override
-    public Difference getInnerDifference(String name) {
-        return fieldDifferences.get(name);
-    }
-
+    /**
+     * Adds a difference for the field with the given name.
+     *
+     * @param fieldName  The field name, not null
+     * @param difference The difference, not null
+     */
     public void addFieldDifference(String fieldName, Difference difference) {
         fieldDifferences.put(fieldName, difference);
     }
 
+
+    /**
+     * Gets all differences per field name.
+     *
+     * @return The differences, not null
+     */
     public Map<String, Difference> getFieldDifferences() {
         return fieldDifferences;
     }
 
-    @Override
-    public String format(String fieldName, DifferenceFormatter differenceFormatter) {
-        return differenceFormatter.format(fieldName, this);
-    }
 
+    /**
+     * Double dispatch method. Dispatches back to the given visitor.
+     * <p/>
+     * All subclasses should copy this method in their own class body.
+     *
+     * @param visitor  The visitor, not null
+     * @param argument An optional argument for the visitor, null if not applicable
+     * @return The result
+     */
+    public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
+        return visitor.visit(this, argument);
+    }
 
 }

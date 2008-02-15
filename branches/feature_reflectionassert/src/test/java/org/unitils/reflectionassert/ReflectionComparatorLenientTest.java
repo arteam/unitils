@@ -16,11 +16,11 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.ReflectionComparator;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.Date;
 
@@ -159,7 +159,7 @@ public class ReflectionComparatorLenientTest extends TestCase {
     public void testGetDifference_notEqualsNoIgnoreDefaults() {
         Difference result = reflectionComparator.getDifference(elementAllDefaults, elementNoDefaultsB);
 
-        Difference difference = result.getInnerDifference("booleanValue");
+        Difference difference = getInnerDifference("booleanValue", result);
         assertEquals(Boolean.FALSE, difference.getLeftValue());
         assertEquals(Boolean.TRUE, difference.getRightValue());
     }
@@ -171,7 +171,7 @@ public class ReflectionComparatorLenientTest extends TestCase {
     public void testGetDifference_notEqualsIgnoreDefaultsButDefaultsRight() {
         Difference result = ignoreDefaultsReflectionComparator.getDifference(elementNoDefaultsB, elementAllDefaults);
 
-        Difference difference = result.getInnerDifference("booleanValue");
+        Difference difference = getInnerDifference("booleanValue", result);
         assertEquals(Boolean.TRUE, difference.getLeftValue());
         assertEquals(Boolean.FALSE, difference.getRightValue());
     }
@@ -183,7 +183,7 @@ public class ReflectionComparatorLenientTest extends TestCase {
     public void testGetDifference_notEqualsLenientDatesRightDateNull() {
         Difference result = lenientDatesReflectionComparator.getDifference(elementNoDefaultsDifferentDate, elementNoDefaultsNullDateA);
 
-        Difference difference = result.getInnerDifference("dateValue");
+        Difference difference = getInnerDifference("dateValue", result);
         assertEquals(elementNoDefaultsDifferentDate.getDateValue(), difference.getLeftValue());
         assertNull(difference.getRightValue());
     }
@@ -195,7 +195,7 @@ public class ReflectionComparatorLenientTest extends TestCase {
     public void testGetDifference_notEqualsLenientDatesLeftDateNull() {
         Difference result = lenientDatesReflectionComparator.getDifference(elementNoDefaultsNullDateA, elementNoDefaultsDifferentDate);
 
-        Difference difference = result.getInnerDifference("dateValue");
+        Difference difference = getInnerDifference("dateValue", result);
         assertNull(difference.getLeftValue());
         assertEquals(elementNoDefaultsDifferentDate.getDateValue(), difference.getRightValue());
     }
@@ -207,7 +207,7 @@ public class ReflectionComparatorLenientTest extends TestCase {
     public void testGetDifference_notEqualsLenientDatesAndIgnoreDefaultsWithLeftDateNull() {
         Difference result = ignoreDefaultsLenientDatesComparator.getDifference(elementNoDefaultsNullDateA, elementNoDefaultsDifferentDate);
 
-        Difference difference = result.getInnerDifference("dateValue");
+        Difference difference = getInnerDifference("dateValue", result);
         assertNull(difference.getLeftValue());
         assertEquals(elementNoDefaultsDifferentDate.getDateValue(), difference.getRightValue());
     }

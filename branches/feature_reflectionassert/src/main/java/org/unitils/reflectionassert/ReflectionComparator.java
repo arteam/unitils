@@ -15,6 +15,7 @@
  */
 package org.unitils.reflectionassert;
 
+import org.unitils.core.UnitilsException;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 
@@ -76,10 +77,11 @@ public class ReflectionComparator {
 
     // todo javadoc
     public Difference getAllDifferences(Object left, Object right) {
-
+        // check whether difference is avaible in cache
         Map<Object, Difference> cachedResult = cachedResults.get(left);
         if (cachedResult != null) {
             if (cachedResult.containsKey(right)) {
+                // found difference in cache, return cached value
                 return cachedResult.get(right);
             }
         } else {
@@ -88,14 +90,23 @@ public class ReflectionComparator {
         }
         cachedResult.put(right, null);
 
+        // perform actual comparison by iterating over the comparators
+        boolean compared = false;
         Difference result = null;
         for (Comparator comparator : comparators) {
             if (comparator.canCompare(left, right)) {
                 result = comparator.compare(left, right, this);
+                compared = true;
                 break;
             }
         }
 
+        // check whether a suitable comparator was found
+        if (!compared) {
+            throw new UnitilsException("Could not determine differences. No comparator found that is able to compare the values. Left: " + left + ", right " + right);
+        }
+
+        // register outcome in cache
         cachedResult.put(right, result);
         return result;
     }

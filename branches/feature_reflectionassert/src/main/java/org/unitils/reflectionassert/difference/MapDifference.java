@@ -15,20 +15,18 @@
  */
 package org.unitils.reflectionassert.difference;
 
-import org.unitils.reflectionassert.formatter.DifferenceFormatter;
-import org.unitils.reflectionassert.difference.Difference;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
- * A class for holding the difference between two objects.
+ * A class for holding the difference between two collections or arrays.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class MapDifference extends Difference {
 
+    /* The differences per key */
     private Map<Object, Difference> valueDifferences = new IdentityHashMap<Object, Difference>();
 
 
@@ -43,28 +41,39 @@ public class MapDifference extends Difference {
         super(message, leftValue, rightValue);
     }
 
-    @Override
-    public int getInnerDifferenceCount() {
-        return valueDifferences.size();
-    }
 
-    @Override
-    public Difference getInnerDifference(String name) {
-        return valueDifferences.get(name);
-    }
-
+    /**
+     * Adds a difference for the element at the given key.
+     *
+     * @param key        The key
+     * @param difference The difference, not null
+     */
     public void addValueDifference(Object key, Difference difference) {
         valueDifferences.put(key, difference);
     }
 
+
+    /**
+     * Gets all element differences per key.
+     *
+     * @return The differences, not null
+     */
     public Map<Object, Difference> getValueDifferences() {
         return valueDifferences;
     }
 
-    @Override
-    public String format(String fieldName, DifferenceFormatter differenceFormatter) {
-        return differenceFormatter.format(fieldName, this);
-    }
 
+    /**
+     * Double dispatch method. Dispatches back to the given visitor.
+     * <p/>
+     * All subclasses should copy this method in their own class body.
+     *
+     * @param visitor  The visitor, not null
+     * @param argument An optional argument for the visitor, null if not applicable
+     * @return The result
+     */
+    public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
+        return visitor.visit(this, argument);
+    }
 
 }

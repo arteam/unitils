@@ -22,12 +22,13 @@ import org.unitils.reflectionassert.formatter.DifferenceReport;
 
 import java.util.Arrays;
 import java.util.List;
+import static java.util.Arrays.asList;
 
 
 /**
  * Test class for {@link ReflectionComparator}.
  * Contains tests for lenient order.
- *                                                  
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
@@ -52,14 +53,55 @@ public class ReflectionComparatorLenientOrderTest extends TestCase {
      * todo implement
      */
     public void testGetDifference_equals() {
-        List list1 = Arrays.asList(Arrays.asList("111", Arrays.asList("aa", "bb")), Arrays.asList("222", Arrays.asList("aa", "bb")));
-        List list2 = Arrays.asList(Arrays.asList("222", Arrays.asList("ac", "bb")), Arrays.asList("111", Arrays.asList("aa", "***")));
-        Difference result = reflectionComparator.getDifference(list1, list2);
-        //Difference result = reflectionComparator.getDifference(Arrays.asList(1, 2), Arrays.asList(2, 1, 4, 2));
-       // Difference result = reflectionComparator.getDifference(1, 2);
+        Primitives primitives1 = new Primitives("test1", "test2", asList(new Primitives("innerTest1", "innerTest2", null)));
+        Primitives primitives2 = new Primitives("test1dd", "test2", asList(new Primitives("innerTest1", "innerTest2", null)));
+
+        List list1 = asList(asList("222", asList("+++", "bb")), asList("111", asList("ac", "***")));
+        List list2 = asList(asList("111", asList("ac", "bb")), asList("222", asList("aa", "bb")));
+        //Difference result = reflectionComparator.getDifference(list1, list2);
+        //Difference result = reflectionComparator.getDifference(Arrays.asList("test", "222"), Arrays.asList("222", "test 33"));
+        Difference result = reflectionComparator.getDifference(primitives1, primitives2);
+        //Difference result = reflectionComparator.getDifference(1, 2);
         System.out.println(DifferenceReport.createReport(null, result));
         //assertNull(result);
+        //Assert.fail(DifferenceReport.createReport(null, result));
     }
 
+
+    private static class Primitives {
+
+        /* A fist int value */
+        private String intValue1;
+
+        /* A second int value */
+        private String intValue2;
+
+        /* An inner object */
+        private Object inner;
+
+
+        /**
+         * Creates and initializes the element.
+         *
+         * @param intValue1 the first int value
+         * @param intValue2 the second int value
+         * @param inner     the inner collection
+         */
+        public Primitives(String intValue1, String intValue2, Object inner) {
+            this.intValue1 = intValue1;
+            this.intValue2 = intValue2;
+            this.inner = inner;
+        }
+
+        /**
+         * Always returns false
+         *
+         * @param o the object to compare to
+         */
+        @Override
+        public boolean equals(Object o) {
+            return false;
+        }
+    }
 
 }

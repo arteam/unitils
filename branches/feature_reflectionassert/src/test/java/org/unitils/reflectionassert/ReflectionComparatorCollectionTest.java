@@ -16,9 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -112,7 +112,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentValue);
 
-        Difference difference = result.getInnerDifference("1").getInnerDifference("string");
+        Difference difference = getInnerDifference("string", getInnerDifference("1", result));
         assertEquals("test 2", difference.getLeftValue());
         assertEquals("XXXXXX", difference.getRightValue());
     }
@@ -128,15 +128,15 @@ public class ReflectionComparatorCollectionTest extends TestCase {
 
         Difference result = reflectionComparator.getDifference(collectionA, collectionB);
 
-        Difference difference1 = result.getInnerDifference("0").getInnerDifference("string");
+        Difference difference1 = getInnerDifference("string", getInnerDifference("0", result));
         assertEquals("test 1", difference1.getLeftValue());
         assertEquals("test 2", difference1.getRightValue());
 
-        Difference difference2 = result.getInnerDifference("1").getInnerDifference("string");
+        Difference difference2 = getInnerDifference("string", getInnerDifference("1", result));
         assertEquals("test 2", difference2.getLeftValue());
         assertEquals("test 3", difference2.getRightValue());
 
-        Difference difference3 = result.getInnerDifference("2");
+        Difference difference3 = getInnerDifference("2", result);
         assertEquals("test 3", ((Element) difference3.getLeftValue()).getString());
         assertEquals(null, difference3.getRightValue());
     }
@@ -152,15 +152,15 @@ public class ReflectionComparatorCollectionTest extends TestCase {
 
         Difference result = reflectionComparator.getDifference(collectionA, collectionB);
 
-        Difference difference1 = result.getInnerDifference("0").getInnerDifference("string");
+        Difference difference1 = getInnerDifference("string", getInnerDifference("0", result));
         assertEquals("test 2", difference1.getLeftValue());
         assertEquals("test 1", difference1.getRightValue());
 
-        Difference difference2 = result.getInnerDifference("1").getInnerDifference("string");
+        Difference difference2 = getInnerDifference("string", getInnerDifference("1", result));
         assertEquals("test 3", difference2.getLeftValue());
         assertEquals("test 2", difference2.getRightValue());
 
-        Difference difference3 = result.getInnerDifference("2");
+        Difference difference3 = getInnerDifference("2", result);
         assertEquals(null, difference3.getLeftValue());
         assertEquals("test 3", ((Element) difference3.getRightValue()).getString());
     }
@@ -172,8 +172,8 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerDifferentValue);
 
-        Difference difference = result.getInnerDifference("1").getInnerDifference("inner");
-        Difference innerDifference = difference.getInnerDifference("1").getInnerDifference("string");
+        Difference difference = getInnerDifference("inner", getInnerDifference("1", result));
+        Difference innerDifference = getInnerDifference("string", getInnerDifference("1", difference));
         assertEquals("test 2", innerDifference.getLeftValue());
         assertEquals("XXXXXX", innerDifference.getRightValue());
     }
@@ -189,7 +189,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
 
         Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerB);
 
-        Difference difference = result.getInnerDifference("1").getInnerDifference("inner");
+        Difference difference = getInnerDifference("inner", getInnerDifference("1", result));
         assertSame(collectionA, difference.getLeftValue());
         assertSame(collectionB, difference.getRightValue());
     }

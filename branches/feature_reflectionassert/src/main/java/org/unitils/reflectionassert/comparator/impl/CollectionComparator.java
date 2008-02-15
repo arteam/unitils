@@ -25,7 +25,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * todo javadoc
+ * Comparator for collections and arrays.
+ * All elements are compared in the same order, i.e. element 1 of the left collection with element 1 of the
+ * right collection and so on.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -33,6 +35,13 @@ import java.util.Iterator;
 public class CollectionComparator implements Comparator {
 
 
+    /**
+     * Returns true when both objects are arrays or collections.
+     *
+     * @param left  The left object
+     * @param right The right object
+     * @return True in case of arrays/collections
+     */
     public boolean canCompare(Object left, Object right) {
         if (left == null || right == null) {
             return false;
@@ -44,7 +53,14 @@ public class CollectionComparator implements Comparator {
     }
 
 
-    // todo javadoc
+    /**
+     * Compared the given collections/arrays.
+     *
+     * @param left                 The left collection/array, not null
+     * @param right                The right collection/array, not null
+     * @param reflectionComparator The root comparator for inner comparisons, not null
+     * @return A CollectionDifference or null if both collections are equal
+     */
     public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // Convert to list and compare as collection
         Collection<?> leftCollection = convertToCollection(left);

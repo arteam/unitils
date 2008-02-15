@@ -16,9 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 
 /**
@@ -116,7 +116,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(primitivesA, primitiveDifferentValue);
 
-        Difference difference = result.getInnerDifference("intValue2");
+        Difference difference = getInnerDifference("intValue2", result);
         assertEquals(2, difference.getLeftValue());
         assertEquals(9999, difference.getRightValue());
     }
@@ -128,7 +128,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     public void testGetDifference_notEqualsRight0() {
         Difference result = reflectionComparator.getDifference(primitivesA, primitives0Value);
 
-        Difference difference = result.getInnerDifference("intValue2");
+        Difference difference = getInnerDifference("intValue2", result);
         assertEquals(2, difference.getLeftValue());
         assertEquals(0, difference.getRightValue());
     }
@@ -140,7 +140,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     public void testGetDifference_notEqualsLeft0() {
         Difference result = reflectionComparator.getDifference(primitives0Value, primitivesA);
 
-        Difference difference = result.getInnerDifference("intValue2");
+        Difference difference = getInnerDifference("intValue2", result);
         assertEquals(0, difference.getLeftValue());
         assertEquals(2, difference.getRightValue());
     }
@@ -152,7 +152,7 @@ public class ReflectionComparatorPrimitivesTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(primitivesInnerA, primitivesInnerDifferentValue);
 
-        Difference difference2 = result.getInnerDifference("inner").getInnerDifference("intValue2");
+        Difference difference2 = getInnerDifference("intValue2", getInnerDifference("inner", result));
         assertEquals(2, difference2.getLeftValue());
         assertEquals(9999, difference2.getRightValue());
     }

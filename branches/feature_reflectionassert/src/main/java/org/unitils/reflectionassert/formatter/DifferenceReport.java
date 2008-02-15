@@ -38,11 +38,13 @@ public class DifferenceReport {
         }
 
         result += "Found following differences:\n\n";
-        result += difference.format(null, new DefaultDifferenceFormatter()) + "\n\n";
-        result += "****************************\n";
-        result += "** Difference Object Tree **\n";
-        result += "****************************\n\n";
-        result += difference.format(null, new TreeDifferenceFormatter());
+        result += new DefaultDifferenceFormatter().format(difference);
+        if (!Difference.class.equals(difference.getClass())) {
+            result += "****************************\n";
+            result += "** Difference Object Tree **\n";
+            result += "****************************\n\n";
+            result += new TreeDifferenceFormatter().format(difference);
+        }
         return result;
 
     }

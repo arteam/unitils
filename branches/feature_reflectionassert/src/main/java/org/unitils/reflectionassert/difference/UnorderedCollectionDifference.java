@@ -15,22 +15,18 @@
  */
 package org.unitils.reflectionassert.difference;
 
-import org.unitils.reflectionassert.formatter.DifferenceFormatter;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * A class for holding the difference between two objects.
+ * A class for holding the difference between all elements of two collections.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class UnorderedCollectionDifference extends Difference {
 
-
+    /* The differences per left-index and right-index */
     private Map<Integer, Map<Integer, Difference>> elementDifferences = new HashMap<Integer, Map<Integer, Difference>>();
 
 
@@ -46,6 +42,13 @@ public class UnorderedCollectionDifference extends Difference {
     }
 
 
+    /**
+     * Adds a difference or a match for the elements at the given left and right index.
+     *
+     * @param leftIndex  The index of the left element
+     * @param rightIndex The index of the right element
+     * @param difference The difference, null for a match
+     */
     public void addElementDifference(int leftIndex, int rightIndex, Difference difference) {
         Map<Integer, Difference> rightDifferences = elementDifferences.get(leftIndex);
         if (rightDifferences == null) {
@@ -56,100 +59,28 @@ public class UnorderedCollectionDifference extends Difference {
     }
 
 
+    /**
+     * Gets all element differences per left index and right index.
+     * A null difference means a match.
+     *
+     * @return The differences, not null
+     */
     public Map<Integer, Map<Integer, Difference>> getElementDifferences() {
         return elementDifferences;
     }
 
 
-    //todo implement
-    public int getInnerDifferenceCount() {
-        List<Integer> rightIndexMatches = new ArrayList<Integer>();
-        int totalMatchingScore = 0;
-        for (Map<Integer, Difference> differences : elementDifferences.values()) {
-            int bestMatchingScore = Integer.MAX_VALUE;
-
-            for (Map.Entry<Integer, Difference> rightDifferences : differences.entrySet()) {
-                Integer rightIndex = rightDifferences.getKey();
-                Difference difference = rightDifferences.getValue();
-
-                if (difference == null) {
-                    bestMatchingScore = -1;
-                    rightIndexMatches.add(rightIndex);
-                    break;
-                }
-
-                if (rightIndexMatches.contains(rightIndex)) {
-                    continue;
-                }
-
-                int matchingScore = difference.getInnerDifferenceCount();
-                if (matchingScore < bestMatchingScore) {
-                    bestMatchingScore = matchingScore;
-                }
-            }
-            totalMatchingScore += bestMatchingScore;
-        }
-        return totalMatchingScore;
-    }
-
-
-    @Override
-    public Difference getInnerDifference(String name) {
-        Integer index;
-        try {
-            index = new Integer(name);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-
-        Map<Integer, Difference> differences = elementDifferences.get(index);
-        if (differences == null || differences.isEmpty()) {
-            return null;
-        }
-        return differences.values().iterator().next();
-    }
-
-
-    @Override
-    public String format(String fieldName, DifferenceFormatter differenceFormatter) {
-        return differenceFormatter.format(fieldName, this);
-    }
-
-
-    public Map<Integer, Map<Integer, Difference>> getBestMatchingElementDifferences() {
-        List<Integer> rightIndexMatches = new ArrayList<Integer>();
-
-        Map<Integer, Map<Integer, Difference>> result = new HashMap<Integer, Map<Integer, Difference>>();
-        for (Map.Entry<Integer, Map<Integer, Difference>> leftDifferences : elementDifferences.entrySet()) {
-            Integer leftIndex = leftDifferences.getKey();
-
-            int bestMatchingScore = Integer.MAX_VALUE;
-            for (Map.Entry<Integer, Difference> rightDifferences : leftDifferences.getValue().entrySet()) {
-                Integer rightIndex = rightDifferences.getKey();
-                Difference difference = rightDifferences.getValue();
-
-                int matchingScore;
-                if (difference == null) {
-                    matchingScore = 0;
-                    rightIndexMatches.add(rightIndex);
-                } else {
-                    matchingScore = difference.getInnerDifferenceCount();
-                }
-
-                if (difference != null && rightIndexMatches.contains(rightIndex)) {
-                    continue;
-                }
-
-                if (matchingScore < bestMatchingScore) {
-                    bestMatchingScore = matchingScore;
-
-                    Map<Integer, Difference> resultDifference = new HashMap<Integer, Difference>();
-                    resultDifference.put(rightIndex, difference);
-                    result.put(leftIndex, resultDifference);
-                }
-            }
-        }
-        return result;
+    /**
+     * Double dispatch method. Dispatches back to the given visitor.
+     * <p/>
+     * All subclasses should copy this method in their own class body.
+     *
+     * @param visitor  The visitor, not null
+     * @param argument An optional argument for the visitor, null if not applicable
+     * @return The result
+     */
+    public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
+        return visitor.visit(this, argument);
     }
 
 }

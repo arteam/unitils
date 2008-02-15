@@ -18,6 +18,7 @@ package org.unitils.reflectionassert.formatter.impl;
 import static org.apache.commons.lang.StringUtils.repeat;
 import org.unitils.reflectionassert.difference.*;
 import org.unitils.reflectionassert.formatter.DifferenceFormatter;
+import org.unitils.reflectionassert.formatter.util.BestMatchFinder;
 import org.unitils.reflectionassert.formatter.util.ObjectFormatter;
 
 import java.util.Map;
@@ -30,11 +31,41 @@ import java.util.Map;
  */
 public class TreeDifferenceFormatter implements DifferenceFormatter {
 
-
+    /**
+     * Formatter for object values.
+     */
     protected ObjectFormatter objectFormatter = new ObjectFormatter();
 
+    /**
+     * The visitor for visiting the difference tree
+     */
+    protected TreeDifferenceFormatterVisitor treeDifferenceFormatterVisitor = new TreeDifferenceFormatterVisitor();
 
-    public String format(String fieldName, Difference difference) {
+    /**
+     * A best match finder for unordered collection differences.
+     */
+    protected BestMatchFinder bestMatchFinder = new BestMatchFinder();
+
+
+    /**
+     * Creates a string representation of the given difference tree.
+     *
+     * @param difference The root difference, not null
+     * @return The string representation, not null
+     */
+    public String format(Difference difference) {
+        return difference.accept(treeDifferenceFormatterVisitor, null);
+    }
+
+
+    /**
+     * Creates a string representation of a simple difference.
+     *
+     * @param difference The difference, not null
+     * @param fieldName  The current fieldName, null for root
+     * @return The string representation, not null
+     */
+    protected String formatDifference(Difference difference, String fieldName) {
         String fieldNameString = "";
         if (fieldName != null) {
             fieldNameString = fieldName + "   ";
@@ -45,25 +76,81 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
     }
 
 
-    public String format(String fieldName, CollectionDifference collectionDifference) {
-        String result = format(fieldName, (Difference) collectionDifference);
+    /**
+     * Creates a string representation of an object difference.
+     *
+     * @param objectDifference The difference, not null
+     * @param fieldName        The current fieldName, null for root
+     * @return The string representation, not null
+     */
+    protected String formatDifference(ObjectDifference objectDifference, String fieldName) {
+        String result = formatDifference((Difference) objectDifference, fieldName);
+
+        for (Map.Entry<String, Difference> fieldDifference : objectDifference.getFieldDifferences().entrySet()) {
+            String innerFieldName = fieldDifference.getKey();
+            if (fieldName != null) {
+                innerFieldName = fieldName + "." + innerFieldName;
+            }
+            result += fieldDifference.getValue().accept(treeDifferenceFormatterVisitor, innerFieldName);
+        }
+        return result;
+    }
+
+
+    /**
+     * Creates a string representation of a collection difference.
+     *
+     * @param collectionDifference The difference, not null
+     * @param fieldName            The current fieldName, null for root
+     * @return The string representation, not null
+     */
+    protected String formatDifference(CollectionDifference collectionDifference, String fieldName) {
+        String result = formatDifference((Difference) collectionDifference, fieldName);
 
         for (Map.Entry<Integer, Difference> elementDifferences : collectionDifference.getElementDifferences().entrySet()) {
             String innerFieldName = "[" + elementDifferences.getKey() + "]";
             if (fieldName != null) {
                 innerFieldName = fieldName + innerFieldName;
             }
-
-            result += elementDifferences.getValue().format(innerFieldName, this);
+            result += elementDifferences.getValue().accept(treeDifferenceFormatterVisitor, innerFieldName);
         }
         return result;
     }
 
 
-    public String format(String fieldName, UnorderedCollectionDifference unorderedCollectionDifference) {
-        String result = format(fieldName, (Difference) unorderedCollectionDifference);
+    /**
+     * Creates a string representation of a map difference.
+     *
+     * @param mapDifference The difference, not null
+     * @param fieldName     The current fieldName, null for root
+     * @return The string representation, not null
+     */
+    protected String formatDifference(MapDifference mapDifference, String fieldName) {
+        String result = formatDifference((Difference) mapDifference, fieldName);
 
-        for (Map.Entry<Integer, Map<Integer, Difference>> leftDifferences : unorderedCollectionDifference.getBestMatchingElementDifferences().entrySet()) {
+        for (Map.Entry<Object, Difference> valueDifference : mapDifference.getValueDifferences().entrySet()) {
+            String innerFieldName = objectFormatter.format(valueDifference.getKey());
+            if (fieldName != null) {
+                innerFieldName = fieldName + "." + innerFieldName;
+            }
+            result += valueDifference.getValue().accept(treeDifferenceFormatterVisitor, innerFieldName);
+        }
+        return result;
+    }
+
+
+    /**
+     * Creates a string representation of an unorder collection difference.
+     *
+     * @param unorderedCollectionDifference The difference, not null
+     * @param fieldName                     The current fieldName, null for root
+     * @return The string representation, not null
+     */
+    protected String formatDifference(UnorderedCollectionDifference unorderedCollectionDifference, String fieldName) {
+        String result = formatDifference((Difference) unorderedCollectionDifference, fieldName);
+
+        Map<Integer, Map<Integer, Difference>> bestMatchingElementDifferences = bestMatchFinder.getBestMatches(unorderedCollectionDifference);
+        for (Map.Entry<Integer, Map<Integer, Difference>> leftDifferences : bestMatchingElementDifferences.entrySet()) {
             int leftIndex = leftDifferences.getKey();
             for (Map.Entry<Integer, Difference> rightDifferences : leftDifferences.getValue().entrySet()) {
                 int rightIndex = rightDifferences.getKey();
@@ -75,7 +162,7 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
                 }
 
                 if (difference != null) {
-                    result += difference.format(innerFieldName, this);
+                    result += difference.accept(treeDifferenceFormatterVisitor, innerFieldName);
                 }
             }
         }
@@ -83,32 +170,29 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
     }
 
 
-    public String format(String fieldName, ObjectDifference objectDifference) {
-        String result = format(fieldName, (Difference) objectDifference);
+    /**
+     * The visitor for visiting the difference tree.
+     */
+    protected class TreeDifferenceFormatterVisitor implements DifferenceVisitor<String, String> {
 
-        for (Map.Entry<String, Difference> fieldDifference : objectDifference.getFieldDifferences().entrySet()) {
-            String innerFieldName = fieldDifference.getKey();
-            if (fieldName != null) {
-                innerFieldName = fieldName + "." + innerFieldName;
-            }
-            result += fieldDifference.getValue().format(innerFieldName, this);
+        public String visit(Difference difference, String fieldName) {
+            return formatDifference(difference, fieldName);
         }
-        return result;
-    }
 
-
-    public String format(String fieldName, MapDifference mapDifference) {
-        String result = format(fieldName, (Difference) mapDifference);
-
-        for (Map.Entry<Object, Difference> valueDifference : mapDifference.getValueDifferences().entrySet()) {
-            String innerFieldName = objectFormatter.format(valueDifference.getKey());
-            if (fieldName != null) {
-                innerFieldName = fieldName + "." + innerFieldName;
-            }
-            result += valueDifference.getValue().format(innerFieldName, this);
+        public String visit(ObjectDifference objectDifference, String fieldName) {
+            return formatDifference(objectDifference, fieldName);
         }
-        return result;
+
+        public String visit(MapDifference mapDifference, String fieldName) {
+            return formatDifference(mapDifference, fieldName);
+        }
+
+        public String visit(CollectionDifference collectionDifference, String fieldName) {
+            return formatDifference(collectionDifference, fieldName);
+        }
+
+        public String visit(UnorderedCollectionDifference unorderedCollectionDifference, String fieldName) {
+            return formatDifference(unorderedCollectionDifference, fieldName);
+        }
     }
-
-
 }

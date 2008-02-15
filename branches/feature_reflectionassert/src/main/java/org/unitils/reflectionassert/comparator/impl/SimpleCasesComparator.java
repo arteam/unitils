@@ -20,7 +20,10 @@ import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 
 /**
- * todo javadoc
+ * Comparator for simple cases.
+ * Following cases are handled: left and right are the same instance, left or right have a null value,
+ * left or right are enumerations, left or right are java.lang classes and
+ * left or right are of type Character or Number
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -28,6 +31,14 @@ import org.unitils.reflectionassert.difference.Difference;
 public class SimpleCasesComparator implements Comparator {
 
 
+    /**
+     * Returns true if both object are the same instance, have a null value, are an Enum/Number/Character or
+     * are a java.lang type.
+     *
+     * @param left  The left object
+     * @param right The right object
+     * @return True for simple cases
+     */
     public boolean canCompare(Object left, Object right) {
         if (left == right) {
             return true;
@@ -38,8 +49,7 @@ public class SimpleCasesComparator implements Comparator {
         if ((left instanceof Character || left instanceof Number) && (right instanceof Character || right instanceof Number)) {
             return true;
         }
-        // todo also check right for java.lang
-        if (left.getClass().getName().startsWith("java.lang")) {
+        if (left.getClass().getName().startsWith("java.lang") || right.getClass().getName().startsWith("java.lang")) {
             return true;
         }
         if (left instanceof Enum && right instanceof Enum) {
@@ -48,7 +58,15 @@ public class SimpleCasesComparator implements Comparator {
         return false;
     }
 
-    // todo javadoc
+
+    /**
+     * Compares the given values.
+     *
+     * @param left                 The left value
+     * @param right                The right value
+     * @param reflectionComparator The root comparator for inner comparisons, not null
+     * @return A Difference if both values are different, null otherwise
+     */
     public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // check if the same instance is referenced
         if (left == right) {
@@ -72,7 +90,7 @@ public class SimpleCasesComparator implements Comparator {
             return new Difference("Different primitive values", left, right);
         }
         // check if java objects are equal
-        if (left.getClass().getName().startsWith("java.lang")) {
+        if (left.getClass().getName().startsWith("java.lang") || right.getClass().getName().startsWith("java.lang")) {
             if (left.equals(right)) {
                 return null;
             }

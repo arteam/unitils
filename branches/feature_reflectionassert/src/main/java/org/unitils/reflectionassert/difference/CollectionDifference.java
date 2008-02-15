@@ -15,8 +15,6 @@
  */
 package org.unitils.reflectionassert.difference;
 
-import org.unitils.reflectionassert.formatter.DifferenceFormatter;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,45 +64,16 @@ public class CollectionDifference extends Difference {
 
 
     /**
-     * Gets the number of element differences.
+     * Double dispatch method. Dispatches back to the given visitor.
+     * <p/>
+     * All subclasses should copy this method in their own class body.
      *
-     * @return The count
+     * @param visitor  The visitor, not null
+     * @param argument An optional argument for the visitor, null if not applicable
+     * @return The result
      */
-    @Override
-    public int getInnerDifferenceCount() {
-        return elementDifferences.size();
-    }
-
-
-    /**
-     * Gets the difference at the given index.
-     *
-     * @param name The index as a string
-     * @return The difference, null if there is no difference.
-     */
-    @Override
-    public Difference getInnerDifference(String name) {
-        Integer index;
-        try {
-            index = new Integer(name);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-
-        return elementDifferences.get(index);
-    }
-
-
-    /**
-     * Double dispatch method. Dispatches back to the given difference formatter.
-     *
-     * @param fieldName           The current field, null for top-level
-     * @param differenceFormatter The formatter, not null
-     * @return The formatted result
-     */
-    @Override
-    public String format(String fieldName, DifferenceFormatter differenceFormatter) {
-        return differenceFormatter.format(fieldName, this);
+    public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
+        return visitor.visit(this, argument);
     }
 
 }

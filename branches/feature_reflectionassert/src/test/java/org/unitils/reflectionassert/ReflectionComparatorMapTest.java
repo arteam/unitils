@@ -16,9 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -115,7 +115,7 @@ public class ReflectionComparatorMapTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(mapA, mapDifferentValue);
 
-        Difference difference = result.getInnerDifference("key 2").getInnerDifference("string");
+        Difference difference = getInnerDifference("string", getInnerDifference("key 2", result));
         assertEquals("test 2", difference.getLeftValue());
         assertEquals("XXXXXX", difference.getRightValue());
     }
@@ -129,7 +129,7 @@ public class ReflectionComparatorMapTest extends TestCase {
 
         Difference result = reflectionComparator.getDifference(mapA, mapB);
 
-        Difference difference = result.getInnerDifference("key 1");
+        Difference difference = getInnerDifference("key 1", result);
         assertEquals("test 1", ((Element) difference.getLeftValue()).getString());
         assertEquals(null, difference.getRightValue());
     }
@@ -141,8 +141,8 @@ public class ReflectionComparatorMapTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerDifferentValue);
 
-        Difference difference = result.getInnerDifference("key 2").getInnerDifference("inner");
-        Difference innerDifference = difference.getInnerDifference("key 2").getInnerDifference("string");
+        Difference difference = getInnerDifference("inner", getInnerDifference("key 2", result));
+        Difference innerDifference = getInnerDifference("string", getInnerDifference("key 2", difference));
         assertEquals("test 2", innerDifference.getLeftValue());
         assertEquals("XXXXXX", innerDifference.getRightValue());
     }
@@ -169,7 +169,7 @@ public class ReflectionComparatorMapTest extends TestCase {
 
         Difference result = reflectionComparator.getDifference(mapInnerA, mapInnerB);
 
-        Difference difference = result.getInnerDifference("key 2").getInnerDifference("inner");
+        Difference difference = getInnerDifference("inner", getInnerDifference("key 2", result));
         assertSame(mapA, difference.getLeftValue());
         assertSame(mapB, difference.getRightValue());
     }

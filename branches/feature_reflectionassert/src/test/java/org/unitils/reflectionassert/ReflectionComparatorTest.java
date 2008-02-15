@@ -16,10 +16,10 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.ReflectionComparator;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 import static java.lang.Boolean.FALSE;
 import java.lang.reflect.InvocationHandler;
@@ -127,7 +127,7 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(objectsA, objectsDifferentValue);
 
-        Difference difference = result.getInnerDifference("string2");
+        Difference difference = getInnerDifference("string2", result);
         assertEquals("test 2", difference.getLeftValue());
         assertEquals("XXXXXX", difference.getRightValue());
     }
@@ -139,7 +139,7 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_notEqualsRightNull() {
         Difference result = reflectionComparator.getDifference(objectsA, objectsNullValue);
 
-        Difference difference = result.getInnerDifference("string2");
+        Difference difference = getInnerDifference("string2", result);
         assertEquals("test 2", difference.getLeftValue());
         assertEquals(null, difference.getRightValue());
     }
@@ -151,7 +151,7 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_notEqualsLeftNull() {
         Difference result = reflectionComparator.getDifference(objectsNullValue, objectsA);
 
-        Difference difference = result.getInnerDifference("string2");
+        Difference difference = getInnerDifference("string2", result);
         assertEquals(null, difference.getLeftValue());
         assertEquals("test 2", difference.getRightValue());
     }
@@ -163,7 +163,7 @@ public class ReflectionComparatorTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(objectsInnerA, objectsInnerDifferentValue);
 
-        Difference difference = result.getInnerDifference("inner").getInnerDifference("string2");
+        Difference difference = getInnerDifference("string2", getInnerDifference("inner", result));
         assertEquals("test 2", difference.getLeftValue());
         assertEquals("XXXXXX", difference.getRightValue());
     }

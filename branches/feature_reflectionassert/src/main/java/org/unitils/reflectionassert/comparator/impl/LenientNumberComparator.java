@@ -20,7 +20,8 @@ import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 
 /**
- * todo javadoc
+ * A comparator that compares primitive types by value and not by type.
+ * You can for example compare a double with an integer value.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -28,6 +29,13 @@ import org.unitils.reflectionassert.difference.Difference;
 public class LenientNumberComparator implements Comparator {
 
 
+    /**
+     * Returns true if both objects are not null and instances of Number or Character.
+     *
+     * @param left  The left object
+     * @param right The right object
+     * @return True for Numbers and Charaters
+     */
     public boolean canCompare(Object left, Object right) {
         if (left == null || right == null) {
             return false;
@@ -38,7 +46,14 @@ public class LenientNumberComparator implements Comparator {
         return false;
     }
 
-    // todo javadoc
+    /**
+     * Compares the two values by converting them to a double and comparing these double values.
+     *
+     * @param left                 The left Number or Character, not null
+     * @param right                The right Number or Character, not null
+     * @param reflectionComparator The root comparator for inner comparisons, not null
+     * @return A difference if the values are different, null otherwise
+     */
     public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // check if right and left have same number value (including NaN and Infinity)
         Double leftDouble = getDoubleValue(left);

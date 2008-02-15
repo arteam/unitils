@@ -34,14 +34,14 @@ import java.util.Map;
  */
 public class ObjectFormatter {
 
-    private int maxDepth = 5;
+    private int maxDepth;
 
 
     /**
      * Creates a formatter with a maximum recursion depth of 5.
      */
     public ObjectFormatter() {
-        this(5);
+        this(3);
     }
 
 

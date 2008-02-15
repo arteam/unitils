@@ -16,11 +16,10 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.ReflectionComparator;
-import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
-import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -116,7 +115,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentValue);
 
-        Difference difference = result.getInnerDifference("1").getInnerDifference("string");
+        Difference difference = getInnerDifference("string", getInnerDifference("1", result));
         assertEquals("test 2", difference.getLeftValue());
         assertEquals("XXXXXX", difference.getRightValue());
     }
@@ -139,8 +138,8 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentValue);
 
-        Difference difference = result.getInnerDifference("1").getInnerDifference("inner");
-        Difference innerDifference = difference.getInnerDifference("1").getInnerDifference("string");
+        Difference difference = getInnerDifference("inner", getInnerDifference("1", result));
+        Difference innerDifference = getInnerDifference("string", getInnerDifference("1", difference));
         assertEquals("test 2", innerDifference.getLeftValue());
         assertEquals("XXXXXX", innerDifference.getRightValue());
     }
@@ -152,7 +151,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsInnerDifferentSize() {
         Difference result = reflectionComparator.getDifference(arrayInnerA, arrayInnerDifferentSize);
 
-        Difference difference = result.getInnerDifference("1").getInnerDifference("inner");
+        Difference difference = getInnerDifference("inner", getInnerDifference("1", result));
         assertSame(arrayA, difference.getLeftValue());
         assertSame(arrayDifferentSize, difference.getRightValue());
     }
@@ -164,11 +163,11 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsDifferentOrderNotLenient() {
         Difference result = reflectionComparator.getDifference(arrayA, arrayDifferentOrder);
 
-        Difference difference1 = result.getInnerDifference("0").getInnerDifference("string");
+        Difference difference1 = getInnerDifference("string", getInnerDifference("0", result));
         assertEquals("test 1", difference1.getLeftValue());
         assertEquals("test 3", difference1.getRightValue());
 
-        Difference difference2 = result.getInnerDifference("2").getInnerDifference("string");
+        Difference difference2 = getInnerDifference("string", getInnerDifference("2", result));
         assertEquals("test 3", difference2.getLeftValue());
         assertEquals("test 1", difference2.getRightValue());
     }
@@ -227,7 +226,7 @@ public class ReflectionComparatorArrayTest extends TestCase {
     public void testGetDifference_notEqualsCollectionDifferentValues() {
         Difference result = reflectionComparator.getDifference(arrayA, Arrays.asList(arrayDifferentValue));
 
-        Difference difference = result.getInnerDifference("1").getInnerDifference("string");
+        Difference difference = getInnerDifference("string", getInnerDifference("1", result));
         assertEquals("test 2", difference.getLeftValue());
         assertEquals("XXXXXX", difference.getRightValue());
     }

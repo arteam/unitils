@@ -15,12 +15,14 @@
  */
 package org.unitils.reflectionassert.comparator.impl;
 
+import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.ReflectionComparator;
 
 /**
- * todo javadoc
+ * A comparator that filters out java-defaults.
+ * If the left object is null, false or 0, both objects are considered equal.
+ * This implements the IGNORE_DEFAULTS comparison mode.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -28,6 +30,13 @@ import org.unitils.reflectionassert.ReflectionComparator;
 public class IgnoreDefaultsComparator implements Comparator {
 
 
+    /**
+     * Returns true if the left object is a java default
+     *
+     * @param left  The left object
+     * @param right The right object
+     * @return True if left is null, false or 0
+     */
     public boolean canCompare(Object left, Object right) {
         // object types
         if (left == null) {
@@ -49,7 +58,14 @@ public class IgnoreDefaultsComparator implements Comparator {
     }
 
 
-    // todo javadoc
+    /**
+     * Always returns null: both objects are equal.
+     *
+     * @param left                 The left object
+     * @param right                The right object
+     * @param reflectionComparator The root comparator for inner comparisons, not null
+     * @return null
+     */
     public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
         // ignore
         return null;

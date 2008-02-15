@@ -15,8 +15,6 @@
  */
 package org.unitils.reflectionassert.difference;
 
-import org.unitils.reflectionassert.formatter.DifferenceFormatter;
-
 /**
  * A class for holding the difference between two objects.
  *
@@ -80,38 +78,16 @@ public class Difference {
 
 
     /**
-     * Gets the number of inner differences.
-     * This number is used as a matching score to determine the best matching difference.
-     *
-     * @return 0, since there are no inner differences
-     */
-    public int getInnerDifferenceCount() {
-        return 0;
-    }
-
-
-    /**
-     * Gets the inner difference for the given key.
-     *
-     * @param key A key
-     * @return null, since there are no inner differences
-     */
-    public Difference getInnerDifference(String key) {
-        return null;
-    }
-
-
-    /**
-     * Double dispatch method. Dispatches back to the given difference formatter.
+     * Double dispatch method. Dispatches back to the given visitor.
      * <p/>
      * All subclasses should copy this method in their own class body.
      *
-     * @param fieldName           The current field, null for top-level
-     * @param differenceFormatter The formatter, not null
-     * @return The formatted result
+     * @param visitor  The visitor, not null
+     * @param argument An optional argument for the visitor, null if not applicable
+     * @return The result
      */
-    public String format(String fieldName, DifferenceFormatter differenceFormatter) {
-        return differenceFormatter.format(fieldName, this);
+    public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
+        return visitor.visit(this, argument);
     }
 
 
