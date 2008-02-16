@@ -177,10 +177,9 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
                 indent++;
                 result += "\n" + difference.accept(differenceFormatterVisitor, null);
                 indent--;
-
+                outputtingUnorderedCollectionDifference = false;
             }
         }
-        outputtingUnorderedCollectionDifference = false;
         return result;
     }
 

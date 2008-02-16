@@ -98,8 +98,6 @@ public class ReflectionAssertTest extends TestCase {
 
     /**
      * Test for two objects that contain different values.
-     * <p/>
-     * todo implement
      */
     public void testAssertRefEquals_notEqualsDifferentValues() {
         String message = null;

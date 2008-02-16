@@ -97,7 +97,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test for two equal objects.
      */
-    public void testGetDifference_equals() {
+    public void testGetAllDifferences_equals() {
         Difference result = reflectionComparator.getAllDifferences(objectsA, objectsB);
         assertNull(result);
     }
@@ -106,7 +106,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test for two equal objects as an inner field of an object.
      */
-    public void testGetDifference_equalsInner() {
+    public void testGetAllDifferences_equalsInner() {
         Difference result = reflectionComparator.getAllDifferences(objectsInnerA, objectsInnerB);
         assertNull(result);
     }
@@ -115,7 +115,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for 2 equal objects that contain a circular reference. This may not cause an infinite loop.
      */
-    public void testGetDifference_equalsCircularDependency() {
+    public void testGetAllDifferences_equalsCircularDependency() {
         Difference result = reflectionComparator.getAllDifferences(objectsCircularDependencyA, objectsCircularDependencyB);
         assertNull(result);
     }
@@ -124,7 +124,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test for two objects that contain different values.
      */
-    public void testGetDifference_notEqualsDifferentValues() {
+    public void testGetAllDifferences_notEqualsDifferentValues() {
         Difference result = reflectionComparator.getAllDifferences(objectsA, objectsDifferentValue);
 
         Difference difference = getInnerDifference("string2", result);
@@ -136,7 +136,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for 2 objects with a right value null.
      */
-    public void testGetDifference_notEqualsRightNull() {
+    public void testGetAllDifferences_notEqualsRightNull() {
         Difference result = reflectionComparator.getAllDifferences(objectsA, objectsNullValue);
 
         Difference difference = getInnerDifference("string2", result);
@@ -148,7 +148,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for 2 objects with a left value null.
      */
-    public void testGetDifference_notEqualsLeftNull() {
+    public void testGetAllDifferences_notEqualsLeftNull() {
         Difference result = reflectionComparator.getAllDifferences(objectsNullValue, objectsA);
 
         Difference difference = getInnerDifference("string2", result);
@@ -160,7 +160,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test for objects with inner objects that contain different values.
      */
-    public void testGetDifference_notEqualsInnerDifferentValues() {
+    public void testGetAllDifferences_notEqualsInnerDifferentValues() {
         Difference result = reflectionComparator.getAllDifferences(objectsInnerA, objectsInnerDifferentValue);
 
         Difference difference = getInnerDifference("string2", getInnerDifference("inner", result));
@@ -172,7 +172,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for a null left-argument.
      */
-    public void testGetDifference_leftNull() {
+    public void testGetAllDifferences_leftNull() {
         Difference result = reflectionComparator.getAllDifferences(null, objectsA);
 
         assertEquals(null, result.getLeftValue());
@@ -183,7 +183,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for a null right-argument.
      */
-    public void testGetDifference_rightNull() {
+    public void testGetAllDifferences_rightNull() {
         Difference result = reflectionComparator.getAllDifferences(objectsA, null);
 
         assertSame(objectsA, result.getLeftValue());
@@ -194,7 +194,7 @@ public class ReflectionComparatorTest extends TestCase {
     /**
      * Test case for both null arguments.
      */
-    public void testGetDifference_null() {
+    public void testGetAllDifferences_null() {
         Difference result = reflectionComparator.getAllDifferences(null, null);
         assertNull(result);
     }
@@ -213,7 +213,7 @@ public class ReflectionComparatorTest extends TestCase {
      * Test for ignored default left value and to check that the right value is not being evaluated (causing a lazy
      * loading).
      */
-    public void testGetDifference_equalsIgnoredDefaultNoLazyLoading() {
+    public void testGetAllDifferences_equalsIgnoredDefaultNoLazyLoading() {
         // create a proxy, that will fail if is accessed
         Collection<?> collection = (Collection<?>) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{Collection.class}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -234,46 +234,19 @@ public class ReflectionComparatorTest extends TestCase {
 
 
     /**
-     * Test for two equal objects.
-     */
-    public void testGetAllDifferences_equals() {
-        Difference result = reflectionComparator.getAllDifferences(objectsA, objectsB);
-        assertNull(result);
-    }
-
-
-    /**
      * Test for two objects that contain different values.
      */
-    //todo implement
-    public void testGetAllDifference_notEqualsDifferentValues() {
-        Difference result = reflectionComparator.getAllDifferences(objectsA, objectsDifferentValue);
-
-        //assertEquals(1, result.size());
-        //Difference difference = result.get(0);
-        //assertEquals("string2", difference.getFieldStack().get(0));
-        //assertEquals("test 2", difference.getLeftValue());
-        //assertEquals("XXXXXX", difference.getRightValue());
-    }
-
-
-    /**
-     * Test for two objects that contain different values.
-     */
-    //todo implement
     public void testGetAllDifference_notEqualsMultipleDifferentValues() {
         objectsDifferentValue.string1 = "YYYYYY";
         Difference result = reflectionComparator.getAllDifferences(objectsA, objectsDifferentValue);
 
-        //assertEquals(2, result.size());
-        //Difference difference1 = result.get(0);
-        //assertEquals("string1", difference1.getFieldStack().get(0));
-        //assertEquals("test 1", difference1.getLeftValue());
-        //assertEquals("YYYYYY", difference1.getRightValue());
-        //Difference difference2 = result.get(1);
-        //assertEquals("string2", difference2.getFieldStack().get(0));
-        //assertEquals("test 2", difference2.getLeftValue());
-        //assertEquals("XXXXXX", difference2.getRightValue());
+        Difference difference1 = getInnerDifference("string1", result);
+        assertEquals("test 1", difference1.getLeftValue());
+        assertEquals("YYYYYY", difference1.getRightValue());
+
+        Difference difference2 = getInnerDifference("string2", result);
+        assertEquals("test 2", difference2.getLeftValue());
+        assertEquals("XXXXXX", difference2.getRightValue());
     }
 
 

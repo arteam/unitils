@@ -256,31 +256,29 @@ public class ReflectionComparatorArrayTest extends TestCase {
     /**
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
-    //todo implement
     public void testGetAllDifferences_notEqualsDifferentOrderLenientDifferentValues() {
         Difference result = lenientOrderComparator.getAllDifferences(arrayA, arrayDifferentOrderDifferentValue);
 
-        //  assertEquals(1, result.size());
-        // Difference difference = result.get(0);
-        // assertTrue(difference.getFieldStack().isEmpty());
-        // assertSame(arrayA, difference.getLeftValue());
-        // assertSame(arrayDifferentOrderDifferentValue, difference.getRightValue());
+        Difference innerDifference = getInnerDifference("string", getInnerDifference("1", result));
+        assertEquals("test 2", innerDifference.getLeftValue());
+        assertEquals("XXXXXX", innerDifference.getRightValue());
     }
 
 
     /**
      * Tests for objects with inner arrays that have a element order but with lenient order checking.
      */
-    //todo implement
     public void testGetAllDifferences_notEqualsDifferentOrderLenientMultipleDifferentValues() {
-        arrayDifferentOrderDifferentValue[0].string = "YYYYYY";
+        arrayDifferentOrderDifferentValue[0].string = "XXXXXX";
         Difference result = lenientOrderComparator.getAllDifferences(arrayA, arrayDifferentOrderDifferentValue);
 
-        // assertEquals(1, result.size());
-        // Difference difference1 = result.get(0);
-        // assertTrue(difference1.getFieldStack().isEmpty());
-        // assertSame(arrayA, difference1.getLeftValue());
-        // assertSame(arrayDifferentOrderDifferentValue, difference1.getRightValue());
+        Difference innerDifference1 = getInnerDifference("string", getInnerDifference("1", result));
+        assertEquals("test 2", innerDifference1.getLeftValue());
+        assertEquals("XXXXXX", innerDifference1.getRightValue());
+
+        Difference innerDifference2 = getInnerDifference("string", getInnerDifference("2", result));
+        assertEquals("test 3", innerDifference2.getLeftValue());
+        assertEquals("XXXXXX", innerDifference2.getRightValue());
     }
 
 

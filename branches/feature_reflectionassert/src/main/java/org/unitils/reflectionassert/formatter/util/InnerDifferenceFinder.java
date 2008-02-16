@@ -31,11 +31,14 @@ public class InnerDifferenceFinder {
     /**
      * Gets the difference at the given element/field/key (depending on the type of the given difference)
      *
-     * @param fieldName  The name of the element/field/key, not null
+     * @param fieldName  The name of the element/field/key
      * @param difference The difference, not null
      * @return The difference, null if there is no difference
      */
     public static Difference getInnerDifference(String fieldName, Difference difference) {
+        if (difference == null) {
+            return null;
+        }
         return difference.accept(new InnerDifferenceVisitor(), fieldName);
     }
 
