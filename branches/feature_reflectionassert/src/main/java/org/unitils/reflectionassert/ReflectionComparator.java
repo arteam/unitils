@@ -22,17 +22,21 @@ import org.unitils.reflectionassert.difference.Difference;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 
 /**
- * Abstract superclass that defines a template for sub implementations that can compare objects of a certain kind.
- * Different instances of different subtypes will be chained to obtain a reflection comparator chain. This chain
- * will compare two objects with eachother through reflection. Depending on the composition of the chain, a number
- * of 'leniency levels' are in operation.
+ * A comparator for comparing two values by reflection.
  * <p/>
- * If the check indicates that both objects are not equal, the first (and only the first!) found difference is returned.
- * The actual difference can then be retrieved by the fieldStack, leftValue and rightValue properties.
+ * The actual comparison of the values is implemented as a comparator chain. The chain is passed as an argument
+ * during the construction. Each of the comparators in the chain is able to compare some types of values. E.g.
+ * a CollectionComparator is able to compare collections, simple values such as integers are compared by the
+ * SimpleCasesComparator...  A number of 'leniency levels' can also be added to the chain: e.g. the
+ * LenientOrderCollectionComparator ignores the actual ordering of 2 collections.
+ * <p/>
+ * The preferred way of creating new instances is by using the ReflectionComparatorFactory. This factory will make
+ * sure that a correct comparator chain is assembled.
+ * <p/>
+ * A readable report differences can be created using the DifferenceReport.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -44,17 +48,16 @@ public class ReflectionComparator {
      */
     protected List<Comparator> comparators;
 
-    protected Stack<String> fieldStack = new Stack<String>();
-
+    /**
+     * A cache of results, so that comparisons are only performed once and infinite loops because of cycles are avoided
+     */
     protected Map<Object, Map<Object, Difference>> cachedResults = new IdentityHashMap<Object, Map<Object, Difference>>();
 
 
     /**
-     * Constructs a new instance, with the given comparator as the next element in the chain. Makes sure that this
-     * instance is registered as root comparator of the given chained comparator. Setting the root comparator gets
-     * propagated to all elements in the chain. This way, all comparators share the same root at all times.
+     * Creates a comparator that will use the given chain.
      *
-     * @param comparators The comparator chain
+     * @param comparators The comparator chain, not null
      */
     public ReflectionComparator(List<Comparator> comparators) {
         this.comparators = comparators;
@@ -62,21 +65,53 @@ public class ReflectionComparator {
 
 
     /**
-     * Checks whether there is a difference between the left and right objects. Whether there is a difference, depends
-     * on the concrete comparators in the chain.
+     * Checks whether there is a difference between the left and right objects. If more than one difference exist,
+     * only the first difference is returned.
      *
      * @param left  the left instance
      * @param right the right instance
      * @return the difference, null if there is no difference
      */
     public Difference getDifference(Object left, Object right) {
-        // todo implement
-        return getAllDifferences(left, right);
+        return getDifferenceImpl(left, right, true);
     }
 
 
-    // todo javadoc
+    /**
+     * Checks whether there are differences between the left and right objects. This will return the root difference
+     * of the whole difference tree containing all the differences between the objects.
+     *
+     * @param left  the left instance
+     * @param right the right instance
+     * @return the root difference, null if there is no difference
+     */
     public Difference getAllDifferences(Object left, Object right) {
+        return getDifferenceImpl(left, right, false);
+    }
+
+
+    /**
+     * Checks whether there is no difference between the left and right objects.
+     *
+     * @param left  the left instance
+     * @param right the right instance
+     * @return true if there is no difference, false otherwise
+     */
+    public boolean isEqual(Object left, Object right) {
+        Difference difference = getDifferenceImpl(left, right, true);
+        return difference == null;
+    }
+
+
+    /**
+     * Actual implementation of the difference checking.
+     *
+     * @param left                the left instance
+     * @param right               the right instance
+     * @param onlyFirstDifference True if only the first difference should be returned
+     * @return the root difference, null if there is no difference
+     */
+    protected Difference getDifferenceImpl(Object left, Object right, boolean onlyFirstDifference) {
         // check whether difference is avaible in cache
         Map<Object, Difference> cachedResult = cachedResults.get(left);
         if (cachedResult != null) {
@@ -95,7 +130,7 @@ public class ReflectionComparator {
         Difference result = null;
         for (Comparator comparator : comparators) {
             if (comparator.canCompare(left, right)) {
-                result = comparator.compare(left, right, this);
+                result = comparator.compare(left, right, onlyFirstDifference, this);
                 compared = true;
                 break;
             }
@@ -110,19 +145,4 @@ public class ReflectionComparator {
         cachedResult.put(right, result);
         return result;
     }
-
-
-    /**
-     * Checks whether there is no difference between the left and right objects. The meaning of no difference is
-     * determined by the set comparator modes. See class javadoc for more info.
-     *
-     * @param left  the left instance
-     * @param right the right instance
-     * @return true if there is no difference, false otherwise
-     */
-    public boolean isEqual(Object left, Object right) {
-        Difference difference = getDifference(left, right);
-        return difference == null;
-    }
-
 }

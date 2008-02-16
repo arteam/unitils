@@ -58,10 +58,11 @@ public class LenientDatesComparator implements Comparator {
      *
      * @param left                 The left date
      * @param right                The right date
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return A difference if one of the dates is null and the other one not, else null
      */
-    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+    public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         if ((right == null && left instanceof Date) || (left == null && right instanceof Date)) {
             return new Difference("Lenient dates, but not both instantiated or both null", left, right);
         }

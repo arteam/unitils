@@ -54,13 +54,13 @@ public class ReflectionComparatorLenientOrderTest extends TestCase {
      */
     public void testGetDifference_equals() {
         Primitives primitives1 = new Primitives("test1", "test2", asList(new Primitives("innerTest1", "innerTest2", null)));
-        Primitives primitives2 = new Primitives("test1dd", "test2", asList(new Primitives("innerTest1", "innerTest2", null)));
+        Primitives primitives2 = new Primitives("test1dd", "test2", asList(new Primitives("innerTekst1", "innerTest2", null)));
 
         List list1 = asList(asList("222", asList("+++", "bb")), asList("111", asList("ac", "***")));
         List list2 = asList(asList("111", asList("ac", "bb")), asList("222", asList("aa", "bb")));
         //Difference result = reflectionComparator.getDifference(list1, list2);
         //Difference result = reflectionComparator.getDifference(Arrays.asList("test", "222"), Arrays.asList("222", "test 33"));
-        Difference result = reflectionComparator.getDifference(primitives1, primitives2);
+        Difference result = reflectionComparator.getAllDifferences(primitives1, primitives2);
         //Difference result = reflectionComparator.getDifference(1, 2);
         System.out.println(DifferenceReport.createReport(null, result));
         //assertNull(result);

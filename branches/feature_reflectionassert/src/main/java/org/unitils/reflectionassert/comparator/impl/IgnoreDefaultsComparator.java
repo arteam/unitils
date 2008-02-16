@@ -63,10 +63,11 @@ public class IgnoreDefaultsComparator implements Comparator {
      *
      * @param left                 The left object
      * @param right                The right object
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return null
      */
-    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+    public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // ignore
         return null;
     }

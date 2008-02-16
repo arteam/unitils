@@ -56,10 +56,11 @@ public class ObjectComparator implements Comparator {
      *
      * @param left                 The left object, not null
      * @param right                The right object, not null
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return A ObjectDifference or null if both maps are equal
      */
-    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+    public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // check different class type
         Class<?> clazz = left.getClass();
         if (!clazz.equals(right.getClass())) {
@@ -67,7 +68,7 @@ public class ObjectComparator implements Comparator {
         }
         // compare all fields of the object using reflection
         ObjectDifference difference = new ObjectDifference("Different field values", left, right);
-        compareFields(left, right, clazz, difference, reflectionComparator);
+        compareFields(left, right, clazz, difference, onlyFirstDifference, reflectionComparator);
 
         if (difference.getFieldDifferences().isEmpty()) {
             return null;
@@ -83,9 +84,10 @@ public class ObjectComparator implements Comparator {
      * @param right                the right object for the comparison, not null
      * @param clazz                the type of both objects, not null
      * @param difference           root difference, not null
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator the reflection comparator, not null
      */
-    protected void compareFields(Object left, Object right, Class<?> clazz, ObjectDifference difference, ReflectionComparator reflectionComparator) {
+    protected void compareFields(Object left, Object right, Class<?> clazz, ObjectDifference difference, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
 
@@ -99,6 +101,9 @@ public class ObjectComparator implements Comparator {
                 Difference innerDifference = reflectionComparator.getAllDifferences(field.get(left), field.get(right));
                 if (innerDifference != null) {
                     difference.addFieldDifference(field.getName(), innerDifference);
+                    if (onlyFirstDifference) {
+                        return;
+                    }
                 }
 
             } catch (IllegalAccessException e) {
@@ -111,7 +116,7 @@ public class ObjectComparator implements Comparator {
         // compare fields declared in superclass
         Class<?> superclazz = clazz.getSuperclass();
         while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
-            compareFields(left, right, superclazz, difference, reflectionComparator);
+            compareFields(left, right, superclazz, difference, onlyFirstDifference, reflectionComparator);
             superclazz = superclazz.getSuperclass();
         }
     }

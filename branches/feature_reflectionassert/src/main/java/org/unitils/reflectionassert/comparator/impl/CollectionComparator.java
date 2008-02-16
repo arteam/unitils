@@ -58,10 +58,11 @@ public class CollectionComparator implements Comparator {
      *
      * @param left                 The left collection/array, not null
      * @param right                The right collection/array, not null
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return A CollectionDifference or null if both collections are equal
      */
-    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+    public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // Convert to list and compare as collection
         Collection<?> leftCollection = convertToCollection(left);
         Collection<?> rightCollection = convertToCollection(right);
@@ -77,6 +78,9 @@ public class CollectionComparator implements Comparator {
             Difference elementDifference = reflectionComparator.getAllDifferences(leftIterator.next(), rightIterator.next());
             if (elementDifference != null) {
                 difference.addElementDifference(elementIndex, elementDifference);
+                if (onlyFirstDifference) {
+                    return difference;
+                }
             }
         }
 

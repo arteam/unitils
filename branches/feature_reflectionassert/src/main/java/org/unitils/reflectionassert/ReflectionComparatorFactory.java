@@ -25,29 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * todo review javadoc
- * <p/>
- * This class functions as a factory for reflection comparator chains. A reflection comparator chain is a chain of
- * instances of {@link ReflectionComparator} subclasses. A reflection comparator chain will compare two objects with
- * each other using reflection, and returns a {@link org.unitils.reflectionassert.difference.Difference} object. You can use a reflection
- * comparator chain by invoking {@link ReflectionComparator#getDifference(Object,Object)} on the root of the chain.
- * <p/>
- * The {@link Object#equals} method is often used for business logic equality checking. The {@link Object#equals} method
- * can for example return true when the id fields of 2 instances have equal values, no matter what the values of the
- * other fields are. A reflection comparator chain offers another way to check equality of objects.
- * <p/>
- * A reflection comparator chain will use reflection to get and compare the values of all fields in
- * the objects. If field contains another object, the same reflection comparison will be done recursively on these inner
- * objects. All fields in superclasses will also be compared using reflection. Static and transient fields will be ignored.
- * <p/>
- * As an exception, the {@link Object#equals} method will be called instead of using reflection on all
- * java.lang.* type field values. Eg a field of type java.lang.Integer will be compared using its equals method. No
- * superclass comparison is done on java.lang.* type classes. Eg the java.lang.Object class fields will not be compared.
- * <p/>
- * If an object is an array or a collection, all its elements will be traversed and compared with the other array or
- * collection in the same way using reflection. The actual type of collection or whether a collection is compared with
- * an array is not important. It will only go through the array or collection and compare the elements. For example, an
- * Arraylist can be compared with an array or a LinkedList.
+ * A factory for creating a reflection comparator.
+ * This will assemble the apropriate comparator chain and constructs a reflection comparator.
  * <p/>
  * By default, a strict comparison is performed, but if needed, some leniency can be configured by setting one or more
  * comparator modes: <ul>
@@ -58,41 +37,74 @@ import java.util.Set;
  * with value 2-2-2006 they would still be considered equal.</li>
  * <li>lenient order: only check whether both collections or arrays contain the same value, the actual order of the
  * values is not compared. Eg. if the left object is int[]{ 1, 2} and the right value is int[]{2, 1} they would still
- * be considered equal.</li>
- * </ul>
+ * be considered equal.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ReflectionComparatorFactory {
 
-
-    // todo javadoc
+    /**
+     * The LenientDatesComparator singleton insance
+     */
     protected static final Comparator LENIENT_DATES_COMPARATOR = new LenientDatesComparator();
 
+    /**
+     * The IgnoreDefaultsComparator singleton insance
+     */
     protected static final Comparator IGNORE_DEFAULTS_COMPARATOR = new IgnoreDefaultsComparator();
 
+    /**
+     * The LenientNumberComparator singleton insance
+     */
     protected static final Comparator LENIENT_NUMBER_COMPARATOR = new LenientNumberComparator();
 
+    /**
+     * The SimpleCasesComparatorsingleton insance
+     */
     protected static final Comparator SIMPLE_CASES_COMPARATOR = new SimpleCasesComparator();
 
+    /**
+     * The LenientOrderCollectionComparator singleton insance
+     */
     protected static final Comparator LENIENT_ORDER_COMPARATOR = new LenientOrderCollectionComparator();
 
+    /**
+     * The CollectionComparator singleton insance
+     */
     protected static final Comparator COLLECTION_COMPARATOR = new CollectionComparator();
 
+    /**
+     * The MapComparator singleton insance
+     */
     protected static final Comparator MAP_COMPARATOR = new MapComparator();
 
+    /**
+     * The ObjectComparator singleton insance
+     */
     protected static final Comparator OBJECT_COMPARATOR = new ObjectComparator();
 
 
-    // todo javadoc
+    /**
+     * Creates a reflection comparator for the given modes.
+     * If no mode is given, a strict comparator will be created.
+     *
+     * @param modes The modes, null for strict comparison
+     * @return The reflection comparator, not null
+     */
     public static ReflectionComparator createRefectionComparator(ReflectionComparatorMode... modes) {
         List<Comparator> comparators = getComparatorChain(asSet(modes));
         return new ReflectionComparator(comparators);
     }
 
 
-    // todo javadoc
+    /**
+     * Creates a comparator chain for the given modes.
+     * If no mode is given, a strict comparator will be created.
+     *
+     * @param modes The modes, null for strict comparison
+     * @return The comparator chain, not null
+     */
     protected static List<Comparator> getComparatorChain(Set<ReflectionComparatorMode> modes) {
         List<Comparator> comparatorChain = new ArrayList<Comparator>();
         if (modes.contains(LENIENT_DATES)) {

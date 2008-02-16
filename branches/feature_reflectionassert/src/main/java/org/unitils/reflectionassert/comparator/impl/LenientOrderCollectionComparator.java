@@ -61,10 +61,11 @@ public class LenientOrderCollectionComparator implements Comparator {
      *
      * @param left                 The left array/collection, not null
      * @param right                The right array/collection, not null
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return An UnorderedCollectionDifference or null if both collections are equal
      */
-    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+    public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // Convert to list and compare as collection
         ArrayList<Object> leftList = new ArrayList<Object>(convertToCollection(left));
         ArrayList<Object> rightList = new ArrayList<Object>(convertToCollection(right));
@@ -78,6 +79,9 @@ public class LenientOrderCollectionComparator implements Comparator {
 
         // no match found, determine all differences
         UnorderedCollectionDifference difference = new UnorderedCollectionDifference("Collections/arrays are different", left, right);
+        if (onlyFirstDifference) {
+            return difference;
+        }
         getAllDifferences(leftList, rightList, difference, reflectionComparator);
         return difference;
     }

@@ -21,12 +21,23 @@ import org.unitils.reflectionassert.formatter.impl.DefaultDifferenceFormatter;
 import org.unitils.reflectionassert.formatter.impl.TreeDifferenceFormatter;
 
 /**
- * todo javadoc
+ * Creates a report of the given differences. This will first output the differences using the default difference
+ * formatter. If the difference is not a simple difference, this will also output the difference tree using the
+ * difference tree formatter.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class DifferenceReport {
 
 
-    // todo javadoc
+    /**
+     * Creates a report.
+     *
+     * @param message    An optional message
+     * @param difference The difference to output, null for a match
+     * @return The report, not null
+     */
     public static String createReport(String message, Difference difference) {
         if (difference == null) {
             return "Found no differences.";
@@ -40,14 +51,10 @@ public class DifferenceReport {
         result += "Found following differences:\n\n";
         result += new DefaultDifferenceFormatter().format(difference);
         if (!Difference.class.equals(difference.getClass())) {
-            result += "****************************\n";
-            result += "** Difference Object Tree **\n";
-            result += "****************************\n\n";
+            result += "\nDifference object tree:\n\n";
             result += new TreeDifferenceFormatter().format(difference);
         }
         return result;
-
     }
-
 
 }

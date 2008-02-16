@@ -53,9 +53,10 @@ public interface Comparator {
      *
      * @param left                 The left object
      * @param right                The right object
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return The difference, null if a match is found
      */
-    Difference compare(Object left, Object right, ReflectionComparator reflectionComparator);
+    Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator);
 
 }

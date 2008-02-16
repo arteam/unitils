@@ -51,10 +51,11 @@ public class LenientNumberComparator implements Comparator {
      *
      * @param left                 The left Number or Character, not null
      * @param right                The right Number or Character, not null
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return A difference if the values are different, null otherwise
      */
-    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+    public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // check if right and left have same number value (including NaN and Infinity)
         Double leftDouble = getDoubleValue(left);
         Double rightDouble = getDoubleValue(right);

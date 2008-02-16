@@ -64,10 +64,11 @@ public class SimpleCasesComparator implements Comparator {
      *
      * @param left                 The left value
      * @param right                The right value
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return A Difference if both values are different, null otherwise
      */
-    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+    public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // check if the same instance is referenced
         if (left == right) {
             return null;

@@ -58,10 +58,11 @@ public class MapComparator implements Comparator {
      *
      * @param left                 The left map, not null
      * @param right                The right map, not null
+     * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator The root comparator for inner comparisons, not null
      * @return A MapDifference or null if both maps are equal
      */
-    public Difference compare(Object left, Object right, ReflectionComparator reflectionComparator) {
+    public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         Map<?, ?> leftMap = (Map<?, ?>) left;
         Map<?, ?> rightMap = (Map<?, ?>) right;
 
@@ -92,6 +93,9 @@ public class MapComparator implements Comparator {
                     Difference elementDifference = reflectionComparator.getAllDifferences(leftValue, rightValue);
                     if (elementDifference != null) {
                         difference.addValueDifference(leftKey, elementDifference);
+                        if (onlyFirstDifference) {
+                            return difference;
+                        }
                     }
                     break;
                 }

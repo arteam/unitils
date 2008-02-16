@@ -24,7 +24,8 @@ import org.unitils.reflectionassert.formatter.util.ObjectFormatter;
 import java.util.Map;
 
 /**
- * todo javadoc
+ * Formatter that will output all objects in the difference tree. For an unordered collection difference,
+ * the best matching differences are taken.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -66,10 +67,7 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(Difference difference, String fieldName) {
-        String fieldNameString = "";
-        if (fieldName != null) {
-            fieldNameString = fieldName + "   ";
-        }
+        String fieldNameString = fieldName == null ? "" : (fieldName + "   ");
         String result = fieldNameString + "[L] " + objectFormatter.format(difference.getLeftValue()) + "\n";
         result += repeat(" ", fieldNameString.length()) + "[R] " + objectFormatter.format(difference.getRightValue()) + "\n";
         return result;
@@ -87,10 +85,7 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
         String result = formatDifference((Difference) objectDifference, fieldName);
 
         for (Map.Entry<String, Difference> fieldDifference : objectDifference.getFieldDifferences().entrySet()) {
-            String innerFieldName = fieldDifference.getKey();
-            if (fieldName != null) {
-                innerFieldName = fieldName + "." + innerFieldName;
-            }
+            String innerFieldName = createFieldName(fieldName, fieldDifference.getKey(), true);
             result += fieldDifference.getValue().accept(treeDifferenceFormatterVisitor, innerFieldName);
         }
         return result;
@@ -108,10 +103,7 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
         String result = formatDifference((Difference) collectionDifference, fieldName);
 
         for (Map.Entry<Integer, Difference> elementDifferences : collectionDifference.getElementDifferences().entrySet()) {
-            String innerFieldName = "[" + elementDifferences.getKey() + "]";
-            if (fieldName != null) {
-                innerFieldName = fieldName + innerFieldName;
-            }
+            String innerFieldName = createFieldName(fieldName, "[" + elementDifferences.getKey() + "]", false);
             result += elementDifferences.getValue().accept(treeDifferenceFormatterVisitor, innerFieldName);
         }
         return result;
@@ -129,10 +121,7 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
         String result = formatDifference((Difference) mapDifference, fieldName);
 
         for (Map.Entry<Object, Difference> valueDifference : mapDifference.getValueDifferences().entrySet()) {
-            String innerFieldName = objectFormatter.format(valueDifference.getKey());
-            if (fieldName != null) {
-                innerFieldName = fieldName + "." + innerFieldName;
-            }
+            String innerFieldName = createFieldName(fieldName, objectFormatter.format(valueDifference.getKey()), true);
             result += valueDifference.getValue().accept(treeDifferenceFormatterVisitor, innerFieldName);
         }
         return result;
@@ -154,19 +143,37 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
             int leftIndex = leftDifferences.getKey();
             for (Map.Entry<Integer, Difference> rightDifferences : leftDifferences.getValue().entrySet()) {
                 int rightIndex = rightDifferences.getKey();
+
                 Difference difference = rightDifferences.getValue();
-
-                String innerFieldName = "[" + leftIndex + "," + rightIndex + "]";
-                if (fieldName != null) {
-                    innerFieldName = fieldName + innerFieldName;
+                if (difference == null) {
+                    continue;
                 }
 
-                if (difference != null) {
-                    result += difference.accept(treeDifferenceFormatterVisitor, innerFieldName);
-                }
+                String innerFieldName = createFieldName(fieldName, "[" + leftIndex + "," + rightIndex + "]", false);
+                result += difference.accept(treeDifferenceFormatterVisitor, innerFieldName);
             }
         }
         return result;
+    }
+
+
+    /**
+     * Adds the inner field name to the given field name.
+     *
+     * @param fieldName      The field
+     * @param innerFieldName The field to append, not null
+     * @param includePoint   True if a point should be added
+     * @return The field name
+     */
+    protected String createFieldName(String fieldName, String innerFieldName, boolean includePoint) {
+        if (fieldName == null) {
+            return innerFieldName;
+        }
+        String result = fieldName;
+        if (includePoint) {
+            result += ".";
+        }
+        return result + innerFieldName;
     }
 
 

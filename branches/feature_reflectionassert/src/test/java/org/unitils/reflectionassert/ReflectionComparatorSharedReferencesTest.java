@@ -64,33 +64,33 @@ public class ReflectionComparatorSharedReferencesTest extends TestCase {
     }
 
     public void testDoubleReferenced_equal() {
-        Difference diff = reflectionComparator.getDifference(doubleReferenced, equalToDoubleReferenced);
+        Difference diff = reflectionComparator.getAllDifferences(doubleReferenced, equalToDoubleReferenced);
         assertNull(diff);
     }
 
     public void testDoubleReferenced_notEqual() {
-        Difference diff = reflectionComparator.getDifference(doubleReferenced, notEqualToDoubleReferenced);
+        Difference diff = reflectionComparator.getAllDifferences(doubleReferenced, notEqualToDoubleReferenced);
         assertNotNull(diff);
     }
 
     public void testNestedDoubleReferenced_equal() {
-        Difference diff = reflectionComparator.getDifference(nestedDoubleReferenced, equalToNestedDoubleReferenced);
+        Difference diff = reflectionComparator.getAllDifferences(nestedDoubleReferenced, equalToNestedDoubleReferenced);
         assertNull(diff);
     }
 
     public void testNestedDoubleReferenced_notEqual() {
-        Difference diff = reflectionComparator.getDifference(nestedDoubleReferenced, notEqualToNestedDoubleReferenced1);
+        Difference diff = reflectionComparator.getAllDifferences(nestedDoubleReferenced, notEqualToNestedDoubleReferenced1);
         // todo failing test, failing statement commented out
         assertNotNull(diff);
     }
 
     public void testCircularReferenced_equal() {
-        Difference diff = reflectionComparator.getDifference(circularReferenced, equalToCircularReferenced);
+        Difference diff = reflectionComparator.getAllDifferences(circularReferenced, equalToCircularReferenced);
         assertNull(diff);
     }
 
     public void testCircularReferenced_notEqual() {
-        Difference diff = reflectionComparator.getDifference(circularReferenced, nestedDoubleReferenced);
+        Difference diff = reflectionComparator.getAllDifferences(circularReferenced, nestedDoubleReferenced);
         // todo failing test, failing statement commented out
         assertNotNull(diff);
     }
