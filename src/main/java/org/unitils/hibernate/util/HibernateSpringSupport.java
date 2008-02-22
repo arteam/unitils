@@ -15,53 +15,76 @@
  */
 package org.unitils.hibernate.util;
 
+import java.util.Collection;
+
+import javax.persistence.EntityManagerFactory;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate3.SessionHolder;
+import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
+import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.unitils.core.Unitils;
+import org.unitils.hibernate.HibernateModule;
+import org.unitils.jpa.JpaModule;
+import org.unitils.orm.spring.OrmSpringSupport;
+import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.spring.SpringModule;
 
 /**
- * Interface for {@link HibernateSpringSupportImpl} containing Hibernate and {@link HibernateModule} related actions 
- * for the {@link SpringModule}. This interface doesn't refer to spring interfaces, so that there is no
- * classloading problem when loading the {@link HibernateModule} when spring is not in the classpath.
+ * A support class containing Hibernate and {@link HibernateModule} related actions for the {@link SpringModule}.
+ * <p/>
+ * This support class is only loaded if both the {@link HibernateModule} and {@link SpringModule} are loaded.
+ * By encapsulating these operations, we remove the strong dependency to spring and the {@link SpringModule} from
+ * the {@link HibernateModule}. This way, the {@link HibernateModule} will still function if spring is not used.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface HibernateSpringSupport {
+public class HibernateSpringSupport implements OrmSpringSupport<SessionFactory, Configuration> {
 
+
+	public boolean isPersistenceUnitConfiguredInSpring(Object testObject) {
+		return getSessionFactoryBean(testObject) != null;
+	}
 	
-	/**
-	 * @param testObject The test instance, not null
-	 * @return true if a SessionFactory is configured in the spring ApplicationContext that is associated
-	 * with the given testObject
-	 */
-    boolean isSessionFactoryConfiguredInSpring(Object testObject);
-    
-    
-    /**
-     * Returns the hibernate <code>SessionFactory</code> that was configured in spring for the given testObject, if any
-     *
-     * @param testObject The test instance, not null
-     * @return The <code>SessionFactory</code> configured in spring for the given testObject, null if no such
-     *         <code>SessionFactory</code> was configured.
-     */
-    SessionFactory getSessionFactory(Object testObject);
+	
+	@Override
+	public ConfiguredOrmPersistenceUnit<SessionFactory, Configuration> getConfiguredPersistenceUnit(Object testObject) {
+		LocalSessionFactoryBean factoryBean = getSessionFactoryBean(testObject);
+		SessionFactory entityManagerFactory = (SessionFactory) factoryBean.getObject();
+		Configuration hibernateConfiguration = factoryBean.getConfiguration();
+		
+		return new ConfiguredOrmPersistenceUnit<SessionFactory, Configuration>(entityManagerFactory, hibernateConfiguration);
+	}
 
     
     /**
-     * Returns the hibernate <code>Configuration</code> that was configured in spring for the given testObject, if any
-     *
-     * @param testObject The test instance, not null
-     * @return The <code>Configuration</code> configured in spring for the given testObject, null if no such
-     *         <code>Configuration</code> was configured.
+     * @param testObject
+     * @return Instance of {@link LocalSessionFactoryBean} that wraps the configuration of hibernate in spring
      */
-    Configuration getConfiguration(Object testObject);
-
+    protected LocalSessionFactoryBean getSessionFactoryBean(Object testObject) {
+        if (!getSpringModule().isApplicationContextConfiguredFor(testObject)) {
+            return null;
+        }
+        Collection<?> entityManagerFactoryBeans = getSpringModule().getApplicationContext(testObject).getBeansOfType(
+        		LocalSessionFactoryBean.class).values();
+        if (entityManagerFactoryBeans.size() == 0) {
+            return null;
+        }
+        return (LocalSessionFactoryBean) entityManagerFactoryBeans.iterator().next();
+    }
     
-    /**
-     * @param testObject The test instance, not null
-     * @return The hibernate that's currently active, if any
-     */
-	Session getActiveSession(Object testObject);
 
+    /**
+     * @return The Spring module, not null
+     */
+    protected SpringModule getSpringModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
+    }
+    
 }

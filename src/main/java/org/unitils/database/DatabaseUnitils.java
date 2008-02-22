@@ -38,6 +38,18 @@ public class DatabaseUnitils {
     public static DataSource getDataSource() {
         return getDatabaseModule().getDataSource();
     }
+    
+    
+    /**
+     * Returns the DataSource that connects to the test database. If applicable for the
+     * type of transaction management configured for the current test object, the DataSource
+     * is wrapped in a transactional proxy.
+     *
+     * @return The DataSource that connects to the test database
+     */
+    public static DataSource getTransactionalDataSource() {
+        return getDatabaseModule().getTransactionalDataSource(getTestObject());
+    }
 
 
     /**

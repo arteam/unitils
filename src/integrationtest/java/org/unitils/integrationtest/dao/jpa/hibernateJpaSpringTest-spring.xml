@@ -4,6 +4,10 @@
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
+        <property name="jpaVendorAdapter">
+        	<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
+        <property name="persistenceProviderClass" value="org.unitils.jpa.util.hibernate.UnitilsHibernatePersistenceProvider"/>
         <property name="persistenceXmlLocation" value="org/unitils/integrationtest/dao/jpa/persistence-test.xml"/>
     </bean>
 

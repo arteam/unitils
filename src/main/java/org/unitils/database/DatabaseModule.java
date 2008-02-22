@@ -15,6 +15,30 @@
  */
 package org.unitils.database;
 
+import static org.unitils.database.util.TransactionMode.COMMIT;
+import static org.unitils.database.util.TransactionMode.DEFAULT;
+import static org.unitils.database.util.TransactionMode.DISABLED;
+import static org.unitils.database.util.TransactionMode.ROLLBACK;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -25,13 +49,11 @@ import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
-import org.unitils.database.transaction.TransactionManager;
-import org.unitils.database.transaction.TransactionManagerFactory;
-import org.unitils.database.transaction.TransactionalDataSource;
+import org.unitils.database.transaction.UnitilsTransactionManager;
+import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
-import static org.unitils.database.util.TransactionMode.*;
-
+import org.unitils.database.util.spring.DatabaseSpringSupport;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
@@ -40,21 +62,7 @@ import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.dbmaintainer.util.DatabaseTask;
-
-import static org.unitils.util.AnnotationUtils.*;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import javax.sql.DataSource;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * todo add javadoc explaining transaction behavior.
@@ -89,7 +97,7 @@ public class DatabaseModule implements Module {
     private Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
     /* The datasource instance */
-    private TransactionalDataSource dataSource;
+    private DataSource dataSource;
 
     /* The configuration of Unitils */
     private Properties configuration;
@@ -98,7 +106,12 @@ public class DatabaseModule implements Module {
     private boolean updateDatabaseSchemaEnabled;
 
     /* The transaction manager */
-    private TransactionManager transactionManager;
+    private UnitilsTransactionManager transactionManager;
+
+	private Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations 
+				= new HashSet<UnitilsTransactionManagementConfiguration>();
+	
+	private DatabaseSpringSupport databaseSpringSupport;
 
 
     /**
@@ -119,20 +132,34 @@ public class DatabaseModule implements Module {
      * No after initialization needed for this module
      */
     public void afterInit() {
+    	initDatabaseSpringSupport();
 	}
 
 
 	/**
      * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
-     *
-     * @return The <code>DataSource</code>
+	 * @return The <code>DataSource</code>
      */
-    public TransactionalDataSource getDataSource() {
+    public DataSource getDataSource() {
         if (dataSource == null) {
             dataSource = createDataSource();
         }
         return dataSource;
+    }
+    
+    
+    /**
+     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
+     * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
+	 * Depending on the type of transaction management that is in place (using spring or by wrapping it in a transactional
+	 * proxy), the <code>DataSource</code> is wrapped in a proxy. 
+	 * 
+     * @param testObject The test instance, not null
+     * @return The <code>DataSource</code>
+     */
+    public DataSource getTransactionalDataSource(Object testObject) {
+    	return getTransactionManager().createTransactionalDataSource(getDataSource(), testObject);
     }
 
 
@@ -141,9 +168,10 @@ public class DatabaseModule implements Module {
      *
      * @return The transaction manager, not null
      */
-    public TransactionManager getTransactionManager() {
+    public UnitilsTransactionManager getTransactionManager() {
         if (transactionManager == null) {
-            transactionManager = createTransactionManager();
+            transactionManager = getConfiguredInstance(UnitilsTransactionManager.class, configuration);
+            transactionManager.init(configuration, transactionManagementConfigurations, databaseSpringSupport );
         }
         return transactionManager;
     }
@@ -153,7 +181,7 @@ public class DatabaseModule implements Module {
      * Flushes all pending updates to the database. This method is useful when the effect of updates needs to
      * be checked directly on the database.
      * <p/>
-     * This will look for modules that implement {@link Flushable} and call flushDatabaseUpdates on these module.
+     * Will look for modules that implement {@link Flushable} and call flushDatabaseUpdates on these modules.
      * @param testObject The test object, not null
      */
     public void flushDatabaseUpdates(Object testObject) {
@@ -226,46 +254,31 @@ public class DatabaseModule implements Module {
      * @param testObject The test instance, not null
      */
     public void injectDataSource(Object testObject) {
-        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
-        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+    	Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         if (fields.isEmpty() && methods.isEmpty()) {
             // Nothing to do. Jump out to make sure that we don't try to instantiate the DataSource
             return;
         }
-        setFieldAndSetterValue(testObject, fields, methods, getDataSource());
+        setFieldAndSetterValue(testObject, fields, methods, getTransactionalDataSource(testObject));
     }
 
 
     /**
      * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
-     *
      * @return the datasource
      */
-    protected TransactionalDataSource createDataSource() {
+    protected DataSource createDataSource() {
         // Get the factory for the data source and create it
         DataSourceFactory dataSourceFactory = getConfiguredInstance(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
         DataSource dataSource = dataSourceFactory.createDataSource();
 
-        // Make data source transactional
-        TransactionalDataSource transactionalDataSource = getTransactionManager().createTransactionalDataSource(dataSource);
-
         // Call the database maintainer if enabled
         if (updateDatabaseSchemaEnabled) {
-            updateDatabase(new SQLHandler(transactionalDataSource));
+            updateDatabase(new SQLHandler(dataSource));
         }
-        return transactionalDataSource;
-    }
-
-
-    /**
-     * @return An instance of the transactionManager, as configured in the Unitils configuration
-     */
-    protected TransactionManager createTransactionManager() {
-        // Get the factory for the transaction manager
-        TransactionManagerFactory transactionManagerFactory = getConfiguredInstance(TransactionManagerFactory.class, configuration);
-        transactionManagerFactory.init(configuration);
-        return transactionManagerFactory.createTransactionManager();
+        return dataSource;
     }
 
 
@@ -415,6 +428,37 @@ public class DatabaseModule implements Module {
 	protected SQLHandler getDefaultSqlHandler() {
 		return new SQLHandler(getDataSource());
 	}
+	
+	
+	public void registerTransactionManagementConfiguration(UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
+		transactionManagementConfigurations.add(transactionManagementConfiguration);
+	}
+	
+	
+   /**
+    * Creates an instance of {@link org.unitils.database.util.spring.DatabaseSpringSupportImpl}, that
+    * implements the dependency to the {@link org.unitils.spring.SpringModule}. If the
+    * {@link org.unitils.spring.SpringModule} is not active, the instance is not loaded and the spring 
+    * support is not enabled
+    */
+   protected void initDatabaseSpringSupport() {
+       if (!isSpringModuleEnabled()) {
+           return;
+       }
+       databaseSpringSupport = createInstanceOfType("org.unitils.database.util.spring.DatabaseSpringSupportImpl", false);
+   }
+
+
+   /**
+    * Verifies whether the SpringModule is enabled. If not, this means that either the property unitils.modules doesn't
+    * include spring, or unitils.module.spring.enabled = false, or that the module could not be loaded because spring is not
+    * in the classpath.
+    *
+    * @return true if the SpringModule is enabled, false otherwise
+    */
+   protected boolean isSpringModuleEnabled() {
+       return Unitils.getInstance().getModulesRepository().isModuleEnabled("org.unitils.spring.SpringModule");
+   }
 
 
     /**

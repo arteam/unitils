@@ -24,11 +24,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
+ * Annotation that can be used for configuring a JPA <code>EntityManagerFactory</code> on a test class. Such a 
+ * <code>EntityManagerFactory</code> will connect to the unitils configured test datasource. 
  * <p/>
- * Annotation indicating that this field or method should be initialized with the <code>EntityManagerFactory</code> object
- * that can be used to create <code>EntityManager</code> objects that provide a connection to the unit test database.
- * If a field is annotated, it should be of type <code>javax.persistence.EntityManagerFactory</code>. If a method is annotated,
- * the method should have following signature: void myMethod(javax.persistence.EntityManagerFactory entityManagerFactory)
+ * This annotation can be used at class, method or field level. If at field level, the <code>EntityManagerFactory</code>
+ * associated with this test object is injected. If put on a method with a single argument of type <code>EntityManagerFactory</code>,
+ * the method is invoked with the <code>EntityManagerFactory</code> as argument.
+ * <p/>
+ * This annotation can also be used to identify a custom configuration method. Such a method takes as single parameter a 
+ * spring <code>org.springframework.orm.jpa.AbstractEntityManagerFactoryBean</code> object, on which any specified 
+ * configuration file was already loaded.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -38,14 +43,14 @@ import java.lang.annotation.Target;
 public @interface JpaEntityManagerFactory {
 
 	/**
-	 * The name of the persistence unit, defined in peristence.xml, that has to be used
+	 * The name of the persistence unit, defined in the specific persistence config file
 	 */
 	String persistenceUnit() default "";
 	
 	/**
-	 * The persistence xml files that have to be loaded for configuring the EntityManagerFactory.
+	 * The persistence xml file that has to be loaded for configuring the EntityManagerFactory.
 	 * If omitted, the default META-INF/persistence.xml file is loaded.
 	 */
-	String[] configFiles() default {};
+	String configFile() default "";
     
 }

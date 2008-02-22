@@ -33,7 +33,6 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-@SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
 public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
 
     /* Tested object */
@@ -57,7 +56,7 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
     @Test
     public void testInjectHibernateSessionFactory() {
         HibernateTestSessionFactory hibernateTestSessionFactory = new HibernateTestSessionFactory();
-        hibernateModule.injectSessionFactory(hibernateTestSessionFactory);
+        hibernateModule.injectOrmPersistenceUnitIntoTestObject(hibernateTestSessionFactory);
 
         assertNotNull(hibernateTestSessionFactory.sessionFactoryField);
         assertSame(hibernateTestSessionFactory.sessionFactoryField, hibernateTestSessionFactory.sessionFactorySetter);
@@ -71,11 +70,10 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
     @Test
     public void testInjectHibernateSessionFactory_mixingWithCustomCreateAndInitializer() {
         HibernateTestSessionFactoryMixing hibernateTestSessionFactory = new HibernateTestSessionFactoryMixing();
-        hibernateModule.injectSessionFactory(hibernateTestSessionFactory);
+        hibernateModule.injectOrmPersistenceUnitIntoTestObject(hibernateTestSessionFactory);
 
         assertNotNull(hibernateTestSessionFactory.sessionFactoryField);
         assertTrue(hibernateTestSessionFactory.customInitializerCalled);
-        assertTrue(hibernateTestSessionFactory.createConfigurationCalled);
     }
 
 
@@ -111,8 +109,6 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
 
         private boolean customInitializerCalled = false;
 
-        private boolean createConfigurationCalled = false;
-
         @HibernateSessionFactory
         public void setSessionFactorySetter(SessionFactory sessionFactorySetter) {
             this.sessionFactorySetter = sessionFactorySetter;
@@ -123,13 +119,6 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
             customInitializerCalled = true;
         }
 
-        @HibernateSessionFactory
-        public Configuration createConfiguration() {
-            createConfigurationCalled = true;
-            AnnotationConfiguration configuration = new AnnotationConfiguration();
-            configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-			return configuration;
-        }
     }
 
 

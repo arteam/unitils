@@ -15,11 +15,18 @@
  */
 package org.unitils.dbunit.util;
 
-import org.dbunit.database.AbstractDatabaseConnection;
-import org.unitils.database.transaction.TransactionalDataSource;
+import static java.lang.reflect.Proxy.newProxyInstance;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.dbunit.database.AbstractDatabaseConnection;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
 /**
  * Implementation of DBUnits <code>IDatabaseConnection</code> interface. This implementation returns connections from
@@ -32,7 +39,7 @@ import java.sql.SQLException;
 public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
 
     /* DataSource that provides access to JDBC connections */
-    private TransactionalDataSource dataSource;
+    private DataSource dataSource;
 
     /* Name of the database schema */
     private String schemaName;
@@ -48,7 +55,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      * @param dataSource The data source, not null
      * @param schemaName The database schema, not null
      */
-    public DbUnitDatabaseConnection(TransactionalDataSource dataSource, String schemaName) {
+    public DbUnitDatabaseConnection(DataSource dataSource, String schemaName) {
         this.dataSource = dataSource;
         this.schemaName = schemaName;
     }
@@ -60,6 +67,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      */
     @Override
     public void close() throws SQLException {
+    	System.out.println("close");
         // Nothing to be done. Connections are closed (i.e. returned to the pool) after every dbUnit operation
     }
 
@@ -83,10 +91,55 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     @Override
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
-            currentlyUsedConnection = dataSource.getTransactionalConnection();
+            Connection connection = DataSourceUtils.getConnection(dataSource);
+			currentlyUsedConnection = connection;
         }
         return currentlyUsedConnection;
     }
+    
+    
+    // TODO move to utility class
+    
+    /**
+	 * Returns a proxy that implements the {@link CloseSuppressingConnection} interface, that delegates to an actual
+	 * {@link Connection}, suppresses the {@link Connection#close()} method and implements the
+	 * {@link CloseSuppressingConnection#doClose()} method which actually closes the target connection.
+	 * 
+	 * @param connection The wrapped connection to which is delegated
+	 * @return A close suppressing connection
+	 */
+	protected Connection getCloseSuppressingConnectionProxy(Connection connection) {
+		return (Connection) newProxyInstance(getClass().getClassLoader(), new Class[] { Connection.class }, new CloseSuppressionConnectionProxyInvocationHandler(connection));
+	}
+    
+    
+	/**
+	 * Invocation handler that can be used to implement a proxy implementing the {@link CloseSuppressingConnection}
+	 * interface. The generated proxy delegates all method calls, unless the {@link Connection#close()} method, which is
+	 * suppressed. Actually closing the underlying {@link Connection} can be done using
+	 * {@link CloseSuppressingConnection#doClose()}.
+	 */
+	protected static class CloseSuppressionConnectionProxyInvocationHandler implements InvocationHandler {
+
+		private Connection wrappedConnection;
+
+		protected CloseSuppressionConnectionProxyInvocationHandler(Connection wrappedConnection) {
+			this.wrappedConnection = wrappedConnection;
+		}
+
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			if (method.getName().equals("close")) {
+				// do nothing, connection close is suppressed
+				return null;
+			}
+			try {
+				return method.invoke(wrappedConnection, args);
+			} catch (InvocationTargetException e) {
+				throw e.getTargetException();
+			}
+		}
+
+	}
 
 
     /**
@@ -96,7 +149,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      */
     public void closeJdbcConnection() throws SQLException {
         if (currentlyUsedConnection != null) {
-            currentlyUsedConnection.close();
+            DataSourceUtils.releaseConnection(currentlyUsedConnection, dataSource);
             currentlyUsedConnection = null;
         }
     }

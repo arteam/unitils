@@ -16,11 +16,11 @@
 package org.unitils.hibernate;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getString;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,318 +28,167 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
+import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.SessionHolder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
+import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
+import org.unitils.hibernate.util.HibernateAnnotationConfigLoader;
 import org.unitils.hibernate.util.HibernateAssert;
-import org.unitils.hibernate.util.HibernateConnectionProvider;
-import org.unitils.hibernate.util.HibernateSpringSupport;
-import org.unitils.hibernate.util.SessionFactoryManager;
-import org.unitils.hibernate.util.SessionInterceptingSessionFactory;
-import org.unitils.util.CollectionUtils;
-import org.unitils.util.PropertyUtils;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import org.unitils.hibernate.util.HibernateSessionFactoryLoader;
+import org.unitils.orm.OrmModule;
+import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.util.OrmConfig;
+import org.unitils.orm.util.OrmPersistenceUnitLoader;
+import org.unitils.util.AnnotationUtils;
+import org.unitils.util.ReflectionUtils;
 
 /**
- * todo javadoc
+ * Module providing support for unit tests for code that uses Hibernate. It offers an easy way of loading hibernate 
+ * SessionFactories and having them injected them into the test. It also offers a test to check whether the hibernate 
+ * mapping is consistent with the structure of the database. 
  * <p/>
- * Module providing support for unit tests for code that uses Hibernate. It offers an easy way of loading hibernate
- * configuration files, creating Sessions and SessionFactories and injecting them in the test. It also offers a test
- * to check whether the hibernate mappings are consistent with the structure of the database.
- * <p/>
- * A Hibernate <code>Session</code> is created when requested and can be injected into the test by annotating a field
- * or setter method with the HibernateSession annotation. The same is true for the <code>SessionFactory</code>,
- * it will lazily be created and can be injected by annotating a field or setter method with the {@link HibernateSessionFactory}
- * annotation.
- * <p/>
- * All created session will be tracked during a test and automatically closed after the test's teardown.
- * The {@link #PROPKEY_CURRENTSESSIONCONTEXT_CLASS_NAME} property determines which <code>CurrentSessionContext</code> is
- * used for the session factory. If this is null no CurrentSessionContext is installed. If this is set to a valid value, the
- * current session will also be available during your test using {@link SessionFactory#getCurrentSession()}.
- * <p/>
- * This module also manages the hibernate configurations that need to be loaded for the tests. Configurations will be reused
- * when possible by caching them on class level. If a superclass loads a configuration and a test-subclass does not define
- * its own, the cached configuration of the superclass will be used. The {@link #invalidateConfiguration}
- * method can be used to force a reloading of a configuration if needed. What and how a hibernate configuration is loaded,
- * is specified by using {@link HibernateSessionFactory} annotations. See the annotation javadoc for more information.
- * <p/>
- * Once a configuration is loaded, the property 'hibernate.connection.provider_class' will be overwritten so that Hibernate
- * will load the {@link HibernateConnectionProvider} as provider. This way we can make sure that Hibernate will use
- * the unitils datasource and thus connect to the unit test database.
+ * A Hibernate <code>SessionFactory</code> is created when requested and injected into all fields or methods of the test 
+ * annotated with {@link HibernateSessionFactory}. 
  * <p/>
  * It is highly recommended to write a unit test that invokes {@link HibernateUnitils#assertMappingWithDatabaseConsistent()},
- * This is a very powerful test that verifies whether the mapping of all your Hibernate mapped objects still corresponds
- * to the actual state of the database.
- * <p/>
- * This module depends on the {@link DatabaseModule}, for managing connections to a unit test database.
+ * This is a very useful test that verifies whether the mapping of all your Hibernate mapped objects still corresponds
+ * with the actual structure of the database.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class HibernateModule implements Module, Flushable {
+public class HibernateModule extends OrmModule<SessionFactory, Session, Configuration, HibernateSessionFactory, OrmConfig, HibernateAnnotationConfigLoader> implements Module, Flushable {
 
-    /* Property key of the class name of the hibernate configuration */
+    /* Property that defines the class name of the hibernate configuration */
     public static final String PROPKEY_CONFIGURATION_CLASS_NAME = "HibernateModule.configuration.implClassName";
-
-    /* Property key of the class name of the CurrentSessionContext to use, null for no context */
-    public static final String PROPKEY_CURRENTSESSIONCONTEXT_CLASS_NAME = "HibernateModule.currentsessioncontext.implClassName";
-    
-    /* Key of property that indicates whether after each test, hibernate sessions that are still open
-     * need to be closed */
-    public static final String PROPKEY_AUTOCLOSESESSIONSAFTERTEST_ENABLED = "HibernateModule.autoCloseSessionsAfterTest.enabled";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(HibernateModule.class);
-
-    /**
-     * Manager for storing and creating hibernate session factories
-     */
-    protected SessionFactoryManager sessionFactoryManager;
-
-    /**
-     * The hibernate spring support, null if the spring module is not enabled
-     */
-    protected HibernateSpringSupport hibernateSpringSupport;
     
     /**
-     * boolean indicating if after each test, hibernate sessions that are still open need to be closed
+     * Subclass of org.hibernate.cfg.Configuration that is used for configuring hibernate
      */
-    protected boolean autoCloseSessionsAfterTest;
+    private Class<? extends Configuration> configurationObjectClass;
 
     /**
-     * Initializes the module.
-     *
      * @param configuration The Unitils configuration, not null
      */
     public void init(Properties configuration) {
+    	super.init(configuration);
+    	
         String configurationImplClassName = getString(PROPKEY_CONFIGURATION_CLASS_NAME, configuration);
-
-        String currentSessionContextImplClassName = getString(PROPKEY_CURRENTSESSIONCONTEXT_CLASS_NAME, configuration);
-        this.sessionFactoryManager = new SessionFactoryManager(configurationImplClassName, currentSessionContextImplClassName);
-        
-        autoCloseSessionsAfterTest = PropertyUtils.getBoolean(PROPKEY_AUTOCLOSESESSIONSAFTERTEST_ENABLED, configuration);
+        configurationObjectClass = ReflectionUtils.getClassWithName(configurationImplClassName);
     }
     
-    /**
-     * Initializes integration support with spring
-     */
     public void afterInit() {
-        initHibernateSpringSupport();
+    	super.afterInit();
+    	
+    	// Make sure that a spring HibernateTransactionManager is used for transaction management in the database module, if the
+    	// current test object defines a hibernate SessionFactory
+    	getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+    		
+    		public boolean isApplicableFor(Object testObject) {
+    			return AnnotationUtils.hasClassMethodOrFieldLevelAnnotation(testObject.getClass(), HibernateSessionFactory.class);
+			}
+    		
+			public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+				SessionFactory sessionFactory = getPersistenceUnit(testObject);
+				HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(sessionFactory);
+				hibernateTransactionManager.setDataSource(getDataSource());
+				return hibernateTransactionManager;
+			}
+    		
+    	});
     }
     
     
-    /**
-     * Injects the Hibernate <code>SessionFactory</code> into all fields and methods that are
-     * annotated with {@link HibernateSessionFactory}
-     *
-     * @param testObject The test object, not null
-     */
-    public void injectSessionFactory(Object testObject) {
-        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
-        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), HibernateSessionFactory.class);
-
-        // filter out methods with session factory argument
-        Iterator<Method> iterator = methods.iterator();
-        while (iterator.hasNext()) {
-            Class<?>[] parameterTypes = iterator.next().getParameterTypes();
-            if (parameterTypes.length == 0 || !SessionFactory.class.isAssignableFrom(parameterTypes[0])) {
-                iterator.remove();
-            }
-        }
-        if (fields.isEmpty() && methods.isEmpty()) {
-            // Nothing to do. Jump out to make sure that we don't try to instantiate the
-            // SessionFactory
-            return;
-        }
-
-        SessionFactory sessionFactory = getSessionFactory(testObject);
-        setFieldAndSetterValue(testObject, fields, methods, sessionFactory);
+    @Override
+    protected HibernateAnnotationConfigLoader createOrmConfigLoader() {
+    	return new HibernateAnnotationConfigLoader();
+    }
+    
+    
+    @Override
+    protected Class<HibernateSessionFactory> getPersistenceUnitConfigAnnotationClass() {
+    	return HibernateSessionFactory.class;
     }
 
+    
+    @Override
+    protected Class<SessionFactory> getPersistenceUnitClass() {
+    	return SessionFactory.class;
+    }
 
+    
+    @Override
+	protected OrmPersistenceUnitLoader<SessionFactory, Configuration, OrmConfig> createOrmPersistenceUnitLoader() {
+		return new HibernateSessionFactoryLoader();
+	}
+
+    
+	@Override
+    protected String getOrmSpringSupportImplClassName() {
+		return "org.unitils.hibernate.util.HibernateSpringSupport";
+	}
+	
+	
+    @Override
+    protected Session doGetPersistenceContext(Object testObject) {
+		return SessionFactoryUtils.getSession(getPersistenceUnit(testObject), true);
+	}
+    
+    
+    @Override
+    protected Session doGetActivePersistenceContext(Object testObject) {
+		SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager.getResource(getPersistenceUnit(testObject));
+    	if (sessionHolder != null && sessionHolder.getSession() != null && sessionHolder.getSession().isOpen()) {
+    		return sessionHolder.getSession();
+    	}
+    	return null;
+	}
+    
+    
+    @Override
+    protected void flushOrmPersistenceContext(Session activeSession) {
+		logger.info("Flushing session " + activeSession);
+		activeSession.flush();
+	}
+    
+    
     /**
-     * Checks if the mapping of the Hibernate managed objects with the database is still correct.
+     * Checks if the mapping of the Hibernate managed objects with the database is correct.
      *
      * @param testObject The test instance, not null
      */
     public void assertMappingWithDatabaseConsistent(Object testObject) {
-        Configuration configuration = getHibernateConfiguration(testObject);
-        Session session = getSessionFactory(testObject).openSession();
+    	ConfiguredOrmPersistenceUnit<SessionFactory, Configuration> configuredPersistenceUnit = getConfiguredPersistenceUnit(testObject);
+        Configuration configuration = configuredPersistenceUnit.getOrmConfigurationObject();
+        Session session = getPersistenceContext(testObject);
         Dialect databaseDialect = getDatabaseDialect(configuration);
 
         HibernateAssert.assertMappingWithDatabaseConsistent(configuration, session, databaseDialect);
     }
-
-
-    /**
-     * Gets a configured hibernate <code>SessionFactory</code> for the given test object. This
-     * <code>SessionFactory</code> can be either configured in a Spring
-     * <code>ApplicationContext</code> or using {@link HibernateSessionFactory} annotations. An
-     * exception is thrown if no <code>SessionFactory</code> could be returned. If possible, a
-     * cached instance is returned that was created during a previous test.
-     *
-     * @param testObject The test instance, not null
-     * @return The Hibernate <code>SessionFactory</code>, not null
-     */
-    public SessionFactory getSessionFactory(Object testObject) {
-        SessionFactory springModuleConfigured = null;
-        if (hibernateSpringSupport != null) {
-            springModuleConfigured = hibernateSpringSupport.getSessionFactory(testObject);
-        }
-        SessionFactory hibernateModuleConfigured = getSessionFactoryManager().getSessionFactory(testObject);
-        if (springModuleConfigured != null && hibernateModuleConfigured != null) {
-            throw new UnitilsException("A SessionFactory configuration was found in both the spring configuration and by use of a " + HibernateSessionFactory.class.getSimpleName() + " annotation. One of them should be removed");
-        }
-        if (springModuleConfigured == null && hibernateModuleConfigured == null) {
-            throw new UnitilsException("No SessionFactory configuration was found for class " + testObject.getClass().getSimpleName());
-        }
-        return springModuleConfigured == null ? hibernateModuleConfigured : springModuleConfigured;
-    }
-
-
-    /**
-     * Gets a configured hibernate <code>Configuration</code> for the given test object. This
-     * <code>Configuration</code> can be either configured in a Spring
-     * <code>ApplicationContext</code> or using {@link HibernateSessionFactory} annotations. An
-     * exception is thrown if no <code>Configuration</code> could be returned. If possible, a
-     * cached instance is returned that was created during a previous test.
-     *
-     * @param testObject The test instance, not null
-     * @return The configuration, not null
-     */
-    public Configuration getHibernateConfiguration(Object testObject) {
-        Configuration springModuleConfigured = null;
-        if (hibernateSpringSupport != null) {
-            springModuleConfigured = hibernateSpringSupport.getConfiguration(testObject);
-        }
-        Configuration hibernateModuleConfigured = getSessionFactoryManager().getConfiguration(testObject);
-        if (springModuleConfigured != null && hibernateModuleConfigured != null) {
-            throw new UnitilsException("A SessionFactory configuration was found in both the spring configuration and by use of a " + HibernateSessionFactory.class.getSimpleName() + " annotation. One of them should be removed");
-        }
-        if (springModuleConfigured == null && hibernateModuleConfigured == null) {
-            throw new UnitilsException("No SessionFactory configuration was found for class " + testObject.getClass().getSimpleName());
-        }
-        return springModuleConfigured == null ? hibernateModuleConfigured : springModuleConfigured;
-    }
-
-
-    /**
-     * Indicates whether a hibernate <code>SessionFactory</code> has been configured in some way for the given testObject
-     *
-     * @param testObject The test instance, not null
-     * @return true if a <code>SessionFactory</code> has been configured, false otherwise
-     */
-    public boolean isSessionFactoryConfiguredFor(Object testObject) {
-        SessionFactory springModuleConfigured = null;
-        if (hibernateSpringSupport != null) {
-            springModuleConfigured = hibernateSpringSupport.getSessionFactory(testObject);
-        }
-        return springModuleConfigured != null || getSessionFactoryManager().getSessionFactory(testObject) != null;
-    }
-
-
-    /**
-     * Gets the manager for session factories and hibernate configurations.
-     *
-     * @return The manager, not null
-     */
-    public SessionFactoryManager getSessionFactoryManager() {
-        return sessionFactoryManager;
-    }
     
     
     /**
-     * Flushes all pending Hibernate updates to the database. This method is useful when the effect
-     * of updates needs to be checked directly on the database. For verifying updates using the
-     * Hibernate <code>Session</code> provided by the method #getCurrentSession, flushing is not
-     * needed.
+     * @return The subclass of <code>org.hibernate.cfg.Configuration</code> that is used for configuring hibernate
      */
-    public void flushDatabaseUpdates(Object testObject) {
-    	Set<Session> activeSessions = getActiveSessions(testObject);
-        for (Session activeSession : activeSessions) {
-        	if (activeSession.isOpen()) {
-            	logger.info("Flushing hibernate session " + activeSession);
-                activeSession.flush();
-            }
-        }
-    }
-
-
-    /**
-     * Closes all open Hibernate session.
-     *
-     * @param testObject The test instance, not null
-     */
-    public void closeSessions(Object testObject) {
-        Set<Session> activeSessions = getActiveSessions(testObject);
-        for (Session activeSession : activeSessions) {
-        	if (activeSession.isOpen()) {
-            	logger.info("Closing hibernate session " + activeSession);
-                activeSession.close();
-            }
-        }
-    }
+    public Class<? extends Configuration> getConfigurationObjectClass() {
+		return configurationObjectClass;
+	}
     
     
     /**
-     * Removes all Hibernate sessions that were intercepted during this unit test.
-     */
-    public void clearInterceptedSessions(Object testObject) {
-    	if (isSessionFactoryConfiguredFor(testObject)) {
-            SessionFactory sessionFactory = getSessionFactory(testObject);
-            if (sessionFactory instanceof SessionInterceptingSessionFactory) {
-                ((SessionInterceptingSessionFactory)sessionFactory).clearInterceptedSessions();
-            }
-        }
-    }
-
-    
-    /**
-     * Forces the reloading of the hibernate configurations the next time that it is requested. If
-     * classes are given only hibernate configurations that are linked to those classes will be
-     * reset. If no classes are given, all cached hibernate configurations will be reset.
-     *
-     * @param classes The classes for which to reset the configs
-     */
-    public void invalidateConfiguration(Class<?>... classes) {
-        getSessionFactoryManager().invalidateSessionFactory(classes);
-    }
-    
-    
-    protected Set<Session> getActiveSessions(Object testObject) {
-    	// If no sessionfactory was configured in unitils, there are no open sessions
-    	if (!isSessionFactoryConfiguredFor(testObject)) {
-    		return CollectionUtils.asSet();
-    	}
-
-    	// If the SessionFactory was configured in unitils, all opened session were intercepted
-    	SessionFactory sessionFactory = getSessionFactory(testObject);
-		if (sessionFactory instanceof SessionInterceptingSessionFactory) {
-			return ((SessionInterceptingSessionFactory) sessionFactory)
-					.getActiveSessions();
-		}
-		
-		// If we got here, this means the session factory was configured using spring
-		Session activeSession = hibernateSpringSupport.getActiveSession(testObject);
-		if (activeSession == null) {
-			return CollectionUtils.asSet();
-		}
-		return CollectionUtils.asSet(activeSession);
-    }
-
-
-    /**
-     * Gets the database dialect from the Hibernate <code>Configuration</code.
+     * Gets the database dialect from the given Hibernate <code>Configuration</code.
      *
      * @param configuration The hibernate config, not null
      * @return the database Dialect, not null
@@ -357,38 +206,15 @@ public class HibernateModule implements Module, Flushable {
     }
 
 
-    /**
-     * Creates an instance of {@link org.unitils.hibernate.util.HibernateSpringSupportImpl}, that
-     * implements the dependency to the {@link org.unitils.spring.SpringModule}. If the
-     * {@link org.unitils.spring.SpringModule} is not
-     * active, or if a dependency of {@link org.unitils.hibernate.util.HibernateSpringSupportImpl}
-     * could not be found in the classpath, the instance is not loaded and the
-     * SpringHibernateSupport is not enabled.
-     */
-    protected void initHibernateSpringSupport() {
-        if (!isSpringModuleEnabled()) {
-            return;
-        }
-        try {
-            hibernateSpringSupport = createInstanceOfType("org.unitils.hibernate.util.HibernateSpringSupportImpl", false);
-        } catch (UnitilsException e) {
-            logger.warn("The HibernateSpringSupportImpl could not be loaded, probably due to a missing dependency", e);
-        }
+    protected DatabaseModule getDatabaseModule() {
+		return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+	}
+    
+    
+    protected DataSource getDataSource() {
+    	return getDatabaseModule().getDataSource();
     }
-
-
-    /**
-     * Verifies whether the SpringModule is enabled. If not, this means that either the property unitils.modules doesn't
-     * include spring, or unitils.module.spring.enabled = false, or that the module could not be loaded because spring is not
-     * in the classpath.
-     *
-     * @return true if the SpringModule is enabled, false otherwise
-     */
-    protected boolean isSpringModuleEnabled() {
-        return Unitils.getInstance().getModulesRepository().isModuleEnabled("org.unitils.spring.SpringModule");
-    }
-
-
+    
     /**
      * @return The TestListener associated with this module
      */
@@ -400,19 +226,8 @@ public class HibernateModule implements Module, Flushable {
     /**
      * The {@link TestListener} for this module
      */
-    protected class HibernateTestListener extends TestListener {
-
-        @Override
-        public void beforeTestSetUp(Object testObject, Method testMethod) {
-            injectSessionFactory(testObject);
-        }
-
-        @Override
-        public void afterTestTearDown(Object testObject, Method testMethod) {
-        	if (autoCloseSessionsAfterTest) {
-        		closeSessions(testObject);
-        	}
-    		clearInterceptedSessions(testObject);
-        }
+    protected class HibernateTestListener extends OrmTestListener {
     }
+
+   
 }

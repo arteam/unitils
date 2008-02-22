@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Module for testing with mock objects using EasyMock.
@@ -236,7 +237,7 @@ public class EasyMockModule implements Module {
      * @param testObject the test, not null
      */
     protected void createAndInjectRegularMocksIntoTest(Object testObject) {
-        List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), RegularMock.class);
+        Set<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), RegularMock.class);
         for (Field mockField : mockFields) {
 
             Class<?> mockType = mockField.getType();
@@ -252,7 +253,7 @@ public class EasyMockModule implements Module {
 
     //todo javadoc
     protected void createAndInjectMocksIntoTest(Object testObject) {
-        List<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
+    	Set<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
         for (Field mockField : mockFields) {
 
             Class<?> mockType = mockField.getType();
@@ -277,7 +278,7 @@ public class EasyMockModule implements Module {
      * @param type       the field(=mock) type
      */
     protected void callAfterCreateMockMethods(Object testObject, Object mockObject, String name, Class<?> type) {
-        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
+    	Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
                 invokeMethod(testObject, method, mockObject, name, type);

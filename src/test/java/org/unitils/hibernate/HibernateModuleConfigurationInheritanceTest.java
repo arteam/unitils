@@ -15,16 +15,19 @@
  */
 package org.unitils.hibernate;
 
-import org.hibernate.cfg.AnnotationConfiguration;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Properties;
+
 import org.hibernate.cfg.Configuration;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.hibernate.util.SessionFactoryManager;
-
-import java.util.List;
 
 /**
  * Test class for the loading of the configuration in a test class hierarchy for the HibernateModule
@@ -32,18 +35,19 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit4 {
+public class HibernateModuleConfigurationInheritanceTest {
 
-    /* Tested object */
-    private SessionFactoryManager sessionFactoryManager;
-
+	HibernateModule hibernateModule;
 
     /**
      * Initializes the test fixture.
      */
     @Before
     public void setUp() throws Exception {
-        sessionFactoryManager = new SessionFactoryManager(AnnotationConfiguration.class.getName(), "org.unitils.hibernate.util.SimpleCurrentSessionContext");
+    	hibernateModule = new HibernateModule();
+    	Properties properties = new Properties();
+    	properties.put(HibernateModule.PROPKEY_CONFIGURATION_CLASS_NAME, Configuration.class.getName());
+		hibernateModule.init(properties);
     }
 
 
@@ -53,13 +57,13 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetHibernateConfiguration_overriden() {
-        HibernateTestCustomCreate hibernateTest1 = new HibernateTestCustomCreate();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTest1);
+        HibernateTestCustomInit hibernateTest1 = new HibernateTestCustomInit();
+        Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTest1);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("org/unitils/hibernate/hibernate-sub.cfg.xml", hibernateConfiguration.getProperty("name"));
-        assertFalse(hibernateTest1.createMethod1Called);
-        assertTrue(hibernateTest1.createMethod2Called);
+        assertFalse(hibernateTest1.initMethod1Called);
+        assertTrue(hibernateTest1.initMethod2Called);
     }
 
 
@@ -70,11 +74,11 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit4 {
     @Test
     public void testGetHibernateConfiguration_overridenNoCustomCreateInSubClass() {
         HibernateTestNoCustomCreate hibernateTest2 = new HibernateTestNoCustomCreate();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTest2);
+        Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTest2);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("org/unitils/hibernate/hibernate-sub.cfg.xml", hibernateConfiguration.getProperty("name"));
-        assertTrue(hibernateTest2.createMethod1Called);
+        assertFalse(hibernateTest2.initMethod1Called);
     }
 
 
@@ -85,11 +89,11 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit4 {
     @Test
     public void testGetHibernateConfiguration_onlyInSuperClass() {
         HibernateTestNoCreation1 hibernateTestNoCreation = new HibernateTestNoCreation1();
-        Configuration hibernateConfiguration = sessionFactoryManager.getConfiguration(hibernateTestNoCreation);
+        Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTestNoCreation);
 
         assertNotNull(hibernateConfiguration);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
-        assertTrue(hibernateTestNoCreation.createMethod1Called);
+        assertTrue(hibernateTestNoCreation.initMethod1Called);
     }
 
 
@@ -98,8 +102,8 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetHibernateConfiguration_twice() {
-        Configuration hibernateConfiguration1 = sessionFactoryManager.getConfiguration(new HibernateTestNoCreation1());
-        Configuration hibernateConfiguration2 = sessionFactoryManager.getConfiguration(new HibernateTestNoCreation2());
+        Configuration hibernateConfiguration1 = hibernateModule.getConfigurationObject(new HibernateTestNoCreation1());
+        Configuration hibernateConfiguration2 = hibernateModule.getConfigurationObject(new HibernateTestNoCreation2());
 
         assertNotNull(hibernateConfiguration1);
         assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
@@ -113,16 +117,11 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit4 {
     @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
     public class HibernateTestSuper {
 
-        protected boolean createMethod1Called = false;
+        protected boolean initMethod1Called = false;
 
         @HibernateSessionFactory
-        protected Configuration createMethod1(List<String> locations) {
-            createMethod1Called = true;
-            AnnotationConfiguration config = new AnnotationConfiguration();
-            for (String location : locations) {
-                config.configure(location);
-            }
-            return config;
+        protected void initMethod1(Configuration cfg) {
+            initMethod1Called = true;
         }
     }
 
@@ -130,18 +129,13 @@ public class HibernateModuleConfigurationInheritanceTest extends UnitilsJUnit4 {
      * Test Hibernate sub-class with custom create.
      */
     @HibernateSessionFactory("org/unitils/hibernate/hibernate-sub.cfg.xml")
-    public class HibernateTestCustomCreate extends HibernateTestSuper {
+    public class HibernateTestCustomInit extends HibernateTestSuper {
 
-        protected boolean createMethod2Called = false;
+        protected boolean initMethod2Called = false;
 
         @HibernateSessionFactory
-        protected Configuration createMethod2(List<String> locations) {
-            createMethod2Called = true;
-            AnnotationConfiguration config = new AnnotationConfiguration();
-            for (String location : locations) {
-                config.configure(location);
-            }
-            return config;
+        protected void initMethod2(Configuration cfg) {
+            initMethod2Called = true;
         }
     }
 

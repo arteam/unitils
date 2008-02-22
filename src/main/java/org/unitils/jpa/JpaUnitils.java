@@ -15,9 +15,12 @@
  */
 package org.unitils.jpa;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.hibernate.HibernateModule;
+import org.unitils.jpa.annotation.JpaEntityManagerFactory;
 
 /**
  * Utility facade for handling JPA related stuff such as asserting whether the mappings correspond to the actual
@@ -31,46 +34,53 @@ public class JpaUnitils {
 	
 	/**
      * Checks if the mapping of the JPA entities with the database is still correct for the configurations
-     * that are loaded for the current test. This method assumes that the {@link JpaModule} is enabled and
-     * correctly configured.
+     * that are loaded for the current test.
      */
     public static void assertMappingWithDatabaseConsistent() {
-        Object testObject = getTestObject();
-        getJpaModule().assertMappingWithDatabaseConsistent(testObject);
+        getJpaModule().assertMappingWithDatabaseConsistent(getTestObject());
     }
 
 
-    /**
-     * Closes all open entity managers.
-     */
-    public static void closeEntityManagers() {
-    	Object testObject = getTestObject();
-		getJpaModule().closeEntityManagers(testObject);
-    }
-    
-    
     /**
      * Flushes all pending entity manager updates to the database. This method is useful when the effect
-     * of updates needs to be checked directly on the database.
+     * of updates needs to be checked directly on the database, without passing through the currently active
+     * <code>EntityManager</code>
      */
     public static void flushDatabaseUpdates() {
-    	Object testObject = getTestObject();
-    	getJpaModule().flushDatabaseUpdates(testObject);
+    	getJpaModule().flushDatabaseUpdates(getTestObject());
     }
-
-
+    
+    
     /**
-     * Forces the reloading of the EntityManagerFactory configurations the next time that it is requested. If classes are given
-     * only EntityManagerFactory configurations that are linked to those classes will be reset. If no classes are given, all cached
-     * EntityManager configurations will be reset.
-     *
-     * @param classes The classes for which to reset the configs, null for all configs
+     * For the given target object, injects the <code>EntityManagerFactory</code> configured for the current test object into
+     * fields or methods annotated with <code>javax.persistence.PersistenceUnit</code> and the active, transactional 
+     * <code>EntityManager</code> into fields or methods annotated with <code>javax.persistence.PersistenceContext</code>
+     * 
+     * @param target
      */
-    public static void invalidateEntityManagerFactoryConfiguration(Class<?>... classes) {
-        getJpaModule().invalidateConfiguration(classes);
+    public static void injectJpaResourcesInto(Object target) {
+    	getJpaModule().injectJpaResourcesInto(getTestObject(), target);
     }
     
     
+    /**
+     * @return The <code>EntityManagerFactory</code> configured for the current test object (spring or using
+     * the {@link JpaEntityManagerFactory} annotation. 
+     */
+    public static EntityManagerFactory getEntityManagerFactory() {
+    	return getJpaModule().getPersistenceUnit(getTestObject());
+    }
+    
+    
+    /**
+     * @return An <code>EntityManager</code> associated with the current transaction. This method returns the 
+     * same <code>EntityManager</code> during the course of a transaction.
+     */
+    public static EntityManager getEntityManager() {
+    	return getJpaModule().getPersistenceContext(getTestObject());
+    }
+
+
     /**
 	 * @return The current test object
 	 */

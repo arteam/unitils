@@ -371,7 +371,7 @@ public class DbUnitModule implements Module {
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
         // A db support instance is created to get the schema name in correct casing
-        TransactionalDataSource dataSource = getDatabaseModule().getDataSource();
+        DataSource dataSource = getDatabaseModule().getDataSource();
         SQLHandler sqlHandler = new SQLHandler(dataSource);
         DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
 
