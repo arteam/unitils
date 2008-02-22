@@ -15,8 +15,11 @@
  */
 package org.unitils.hibernate;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.hibernate.annotation.HibernateSessionFactory;
 
 /**
  * Utility facade for handling Hibernate related stuff such as asserting whether the mappings correspond to the actual
@@ -30,8 +33,7 @@ public class HibernateUnitils {
 
     /**
      * Checks if the mapping of the Hibernate managed objects with the database is still correct for the configurations
-     * that are loaded for the current test. This method assumes that the {@link HibernateModule} is enabled and
-     * correctly configured.
+     * that are loaded for the current test.
      */
     public static void assertMappingWithDatabaseConsistent() {
         Object testObject = getTestObject();
@@ -40,38 +42,34 @@ public class HibernateUnitils {
 
 
     /**
-     * Closes all open Hibernate session.
-     */
-    public static void closeSessions() {
-    	Object testObject = getTestObject();
-		getHibernateModule().closeSessions(testObject);
-    }
-    
-    
-    /**
      * Flushes all pending Hibernate updates to the database. This method is useful when the effect
-     * of updates needs to be checked directly on the database. For verifying updates using the
-     * Hibernate <code>Session</code> provided by the method #getCurrentSession, flushing is not
-     * needed.
+     * of updates needs to be checked directly on the database, without passing through the currently
+     * active hibernate session.
      */
     public static void flushDatabaseUpdates() {
     	Object testObject = getTestObject();
     	getHibernateModule().flushDatabaseUpdates(testObject);
     }
-
-
+    
+    
     /**
-     * Forces the reloading of the hibernate configurations the next time that it is requested. If classes are given
-     * only hibernate configurations that are linked to those classes will be reset. If no classes are given, all cached
-     * hibernate configurations will be reset.
-     *
-     * @param classes The classes for which to reset the configs, null for all configs
+     * @return The <code>SessionFactory</code> configured for the current test object (spring or using
+     * the {@link HibernateSessionFactory} annotation. 
      */
-    public static void invalidateHibernateConfiguration(Class<?>... classes) {
-        getHibernateModule().invalidateConfiguration(classes);
+    public static SessionFactory getSessionFactory() {
+    	return getHibernateModule().getPersistenceUnit(getTestObject());
     }
     
     
+    /**
+     * @return A <code>Session</code> associated with the current transaction. This method returns the 
+     * same <code>Session</code> during the course of a transaction.
+     */
+    public static Session getSession() {
+    	return getHibernateModule().getPersistenceContext(getTestObject());
+    }
+
+
     /**
 	 * @return The current test object
 	 */

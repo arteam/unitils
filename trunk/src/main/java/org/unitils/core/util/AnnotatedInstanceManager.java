@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Class for managing and creating instances of a given type. A given annotation controls how a new instance will be created.
@@ -277,7 +278,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         }
 
         // check field level annotation values
-        List<Field> fields = getFieldsAnnotatedWith(testClass, annotationClass);
+        Set<Field> fields = getFieldsAnnotatedWith(testClass, annotationClass);
         for (Field field : fields) {
             annotation = field.getAnnotation(annotationClass);
             if (annotation != null && !getAnnotationValues(annotation).isEmpty()) {
@@ -286,7 +287,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         }
 
         // check custom create methods and method level annotation values
-        List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
+        Set<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
         for (Method method : methods) {
             annotation = method.getAnnotation(annotationClass);
             if (annotation != null && !getAnnotationValues(annotation).isEmpty()) {
@@ -327,7 +328,7 @@ public abstract class AnnotatedInstanceManager<T, A extends Annotation> {
         }
 
         // get all annotated methods from the given test class, no superclasses
-        List<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
+        Set<Method> methods = getMethodsAnnotatedWith(testClass, annotationClass, false);
 
         // look for correct signature (no return value)
         List<Method> customCreateMethods = new ArrayList<Method>();

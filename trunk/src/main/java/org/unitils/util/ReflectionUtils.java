@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
@@ -141,7 +142,7 @@ public class ReflectionUtils {
      * @param setterMethods The setter methods, not null
      * @param value         The value for the given field and setters in the given object
      */
-    public static void setFieldAndSetterValue(Object object, List<Field> fields, List<Method> setterMethods, Object value) {
+    public static void setFieldAndSetterValue(Object object, Set<Field> fields, Set<Method> setterMethods, Object value) {
         for (Field field : fields) {
             try {
                 setFieldValue(object, field, value);
@@ -488,9 +489,10 @@ public class ReflectionUtils {
      * @param className The name of the class, not null
      * @return The class, not null
      */
-    public static Class<?> getClassWithName(String className) {
+    @SuppressWarnings("unchecked")
+	public static <T> Class<T> getClassWithName(String className) {
         try {
-            return Class.forName(className);
+            return (Class<T>) Class.forName(className);
 
         } catch (Throwable t) {
             throw new UnitilsException("Could not load class with name " + className, t);

@@ -16,6 +16,7 @@
 package org.unitils.util;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.jpa.annotation.JpaEntityManagerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -23,7 +24,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Utilities for retrieving and working with annotations.
@@ -41,11 +44,11 @@ public class AnnotationUtils {
      * @param annotation The annotation, not null
      * @return A List containing fields annotated with the given annotation, empty list if none found
      */
-    public static <T extends Annotation> List<Field> getFieldsAnnotatedWith(Class<? extends Object> clazz, Class<T> annotation) {
+    public static <T extends Annotation> Set<Field> getFieldsAnnotatedWith(Class<? extends Object> clazz, Class<T> annotation) {
         if (Object.class.equals(clazz)) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        List<Field> annotatedFields = new ArrayList<Field>();
+        Set<Field> annotatedFields = new HashSet<Field>();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (field.getAnnotation(annotation) != null) {
@@ -64,9 +67,29 @@ public class AnnotationUtils {
      * @param annotation The annotation, not null
      * @return A List containing methods annotated with the given annotation, empty list if none found
      */
-    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<T> annotation) {
+    public static <T extends Annotation> Set<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<T> annotation) {
         return getMethodsAnnotatedWith(clazz, annotation, true);
     }
+    
+
+    public static <T extends Annotation> Set<T> getMethodLevelAnnotations(Class<?> clazz, Class<T> annotation) {
+		Set<T> result = new HashSet<T>();
+		Set<Method> annotatedMethods = getMethodsAnnotatedWith(clazz, annotation);
+    	for (Method annotatedMethod : annotatedMethods) {
+    		result.add(annotatedMethod.getAnnotation(annotation));
+    	}
+		return result;
+	}
+	
+	
+	public static <T extends Annotation> Set<T> getFieldLevelAnnotations(Class<?> clazz, Class<T> annotation) {
+		Set<T> result = new HashSet<T>();
+		Set<Field> annotatedFields = getFieldsAnnotatedWith(clazz, annotation);
+    	for (Field annotatedField : annotatedFields) {
+    		result.add(annotatedField.getAnnotation(annotation));
+    	}
+		return result;
+	}
 
 
     /**
@@ -77,11 +100,11 @@ public class AnnotationUtils {
      * @param includeInherited True for also looking for methods in super-classes
      * @return A List containing methods annotated with the given annotation, empty list if none found
      */
-    public static <T extends Annotation> List<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<T> annotation, boolean includeInherited) {
+    public static <T extends Annotation> Set<Method> getMethodsAnnotatedWith(Class<?> clazz, Class<T> annotation, boolean includeInherited) {
         if (Object.class.equals(clazz)) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        List<Method> annotatedMethods = new ArrayList<Method>();
+        Set<Method> annotatedMethods = new HashSet<Method>();
         Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
             if (method.getAnnotation(annotation) != null) {
@@ -173,5 +196,12 @@ public class AnnotationUtils {
                 " of annotation of type " + annotation.getClass().getSimpleName(), e);
         }
     }
+
+
+	public static boolean hasClassMethodOrFieldLevelAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
+		return getClassLevelAnnotation(annotation, clazz) != null || 
+				!getFieldsAnnotatedWith(clazz, annotation).isEmpty() ||
+				!getMethodsAnnotatedWith(clazz, annotation).isEmpty();
+	}
 
 }

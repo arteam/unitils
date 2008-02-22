@@ -28,6 +28,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.jpa.annotation.JpaEntityManagerFactory;
 
@@ -60,7 +61,7 @@ public class JpaModuleInjectionTest {
     @Test
     public void testInjectHibernateSessionFactory() {
         JpaTestEntityManager jpaTestEntityManager = new JpaTestEntityManager();
-        jpaModule.injectEntityManagerFactory(jpaTestEntityManager);
+        jpaModule.injectOrmPersistenceUnitIntoTestObject(jpaTestEntityManager);
 
         assertNotNull(jpaTestEntityManager.entityManagerField);
         assertSame(jpaTestEntityManager.entityManagerField, jpaTestEntityManager.entityManagerSetter);
@@ -74,22 +75,21 @@ public class JpaModuleInjectionTest {
     @Test
     public void testInjectHibernateSessionFactory_mixingWithCustomCreateAndInitializer() {
         JpaTestEntityManagerMixing jpaTestEntityManagerMixing = new JpaTestEntityManagerMixing();
-        jpaModule.injectEntityManagerFactory(jpaTestEntityManagerMixing);
+        jpaModule.injectOrmPersistenceUnitIntoTestObject(jpaTestEntityManagerMixing);
 
         assertNotNull(jpaTestEntityManagerMixing.entityManagerField);
         assertTrue(jpaTestEntityManagerMixing.customInitializerCalled);
-        assertTrue(jpaTestEntityManagerMixing.createConfigurationCalled);
     }
 
 
     /**
      * Test hibernate test for session factory injection.
      */
-    @JpaEntityManagerFactory(persistenceUnit = "unitils", configFiles = "org/unitils/jpa/persistence-test.xml")
+    @JpaEntityManagerFactory(persistenceUnit = "unitils", configFile = "org/unitils/jpa/persistence-test.xml")
     public class JpaTestEntityManager {
 
         @JpaEntityManagerFactory
-        private EntityManagerFactory entityManagerField = null;
+        private EntityManagerFactory entityManagerField;
 
         private EntityManagerFactory entityManagerSetter;
 
@@ -104,7 +104,7 @@ public class JpaModuleInjectionTest {
      * Test hibernate test for session factory injection. It also contains a custom initializer and custom
      * create for testing the mixing of the HibernateSessionFactory annotation
      */
-    @JpaEntityManagerFactory(persistenceUnit = "unitils", configFiles = "org/unitils/jpa/persistence-test.xml")
+    @JpaEntityManagerFactory(persistenceUnit = "unitils", configFile = "org/unitils/jpa/persistence-test.xml")
     public class JpaTestEntityManagerMixing {
 
     	@JpaEntityManagerFactory
@@ -114,25 +114,16 @@ public class JpaModuleInjectionTest {
 
         private boolean customInitializerCalled = false;
 
-        private boolean createConfigurationCalled = false;
-
         @JpaEntityManagerFactory
         public void setEntityManagerSetter(EntityManagerFactory entityManagerSetter) {
             this.entityManagerSetter = entityManagerSetter;
         }
 
         @JpaEntityManagerFactory
-        public void customInitializer(Ejb3Configuration configuration) {
+        public void customInitializer(LocalContainerEntityManagerFactoryBean factoryBean) {
             customInitializerCalled = true;
         }
 
-        @JpaEntityManagerFactory
-        public Ejb3Configuration createConfiguration() {
-            createConfigurationCalled = true;
-            Ejb3Configuration ejb3Configuration = new Ejb3Configuration();
-            ejb3Configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-			return ejb3Configuration;
-        }
     }
 
 

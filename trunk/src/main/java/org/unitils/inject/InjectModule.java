@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -111,7 +112,7 @@ public class InjectModule implements Module {
      * @param testObject The test instance, not null
      */
     public void createTestedObjectsIfNull(Object testObject) {
-        List<Field> testedObjectFields = getFieldsAnnotatedWith(testObject.getClass(), TestedObject.class);
+    	Set<Field> testedObjectFields = getFieldsAnnotatedWith(testObject.getClass(), TestedObject.class);
         for (Field testedObjectField : testedObjectFields) {
             if (getFieldValue(testObject, testedObjectField) == null) {
                 createObjectForField(testObject, testedObjectField);
@@ -166,7 +167,7 @@ public class InjectModule implements Module {
      * @param test The instance to inject into, not null
      */
     public void injectAll(Object test) {
-        List<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectInto.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectInto.class);
         for (Field field : fields) {
             inject(test, field);
         }
@@ -179,7 +180,7 @@ public class InjectModule implements Module {
      * @param test The instance to inject into, not null
      */
     public void injectAllByType(Object test) {
-        List<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoByType.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoByType.class);
         for (Field field : fields) {
             injectByType(test, field);
         }
@@ -192,7 +193,7 @@ public class InjectModule implements Module {
      * @param test The instance to inject into, not null
      */
     public void injectAllStatic(Object test) {
-        List<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStatic.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStatic.class);
         for (Field field : fields) {
             injectStatic(test, field);
         }
@@ -205,7 +206,7 @@ public class InjectModule implements Module {
      * @param test The instance to inject into, not null
      */
     public void injectAllStaticByType(Object test) {
-        List<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStaticByType.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(test.getClass(), InjectIntoStaticByType.class);
         for (Field field : fields) {
             injectStaticByType(test, field);
         }
@@ -412,7 +413,7 @@ public class InjectModule implements Module {
         List<Object> targets;
         if ("".equals(targetName)) {
             // Default targetName, so it is probably not specfied. Return all objects that are annotated with the TestedObject annotation.
-            List<Field> testedObjectFields = getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
+        	Set<Field> testedObjectFields = getFieldsAnnotatedWith(test.getClass(), TestedObject.class);
             targets = new ArrayList<Object>(testedObjectFields.size());
             for (Field testedObjectField : testedObjectFields) {
                 targets.add(getFieldValue(test, testedObjectField));

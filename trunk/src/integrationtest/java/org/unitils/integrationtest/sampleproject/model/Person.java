@@ -33,6 +33,7 @@ public class Person {
 
     @Column
     private String name;
+    
 
     protected Person() {
 		super();

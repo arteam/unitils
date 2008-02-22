@@ -23,12 +23,9 @@ import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.isSetter;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -40,7 +37,6 @@ import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.transaction.impl.SpringResourceTransactionManagerTransactionalConnectionHandler;
 import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBean;
 import org.unitils.spring.annotation.SpringBeanByName;
@@ -77,8 +73,6 @@ public class SpringModule implements Module {
     /* TestContext used by the spring testcontext framework*/
     private TestContext testContext;
     
-    private Set<SpringResourceTransactionManagerTransactionalConnectionHandler> transactionalConnectionHandlers = new HashSet<SpringResourceTransactionManagerTransactionalConnectionHandler>();
-
 
     /**
      * Initializes this module using the given configuration
@@ -128,8 +122,9 @@ public class SpringModule implements Module {
      * @param type       The type, not null
      * @return The bean, not null
      */
-    public Object getSpringBeanByType(Object testObject, Class<?> type) {
-        Map<?,?> beans = getApplicationContext(testObject).getBeansOfType(type);
+    @SuppressWarnings("unchecked")
+	public <T> T getSpringBeanByType(Object testObject, Class<T> type) {
+        Map<String, T> beans = getApplicationContext(testObject).getBeansOfType(type);
         if (beans == null || beans.size() == 0) {
             throw new UnitilsException("Unable to get Spring bean by type. No Spring bean found for type " + type.getSimpleName());
         }
@@ -231,7 +226,7 @@ public class SpringModule implements Module {
      */
     public void injectApplicationContext(Object testObject) {
         // inject into fields annotated with @SpringApplicationContext
-        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringApplicationContext.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringApplicationContext.class);
         for (Field field : fields) {
             try {
                 setFieldValue(testObject, field, getApplicationContext(testObject));
@@ -242,7 +237,7 @@ public class SpringModule implements Module {
         }
 
         // inject into setter methods annotated with @SpringApplicationContext
-        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringApplicationContext.class, false);
+        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringApplicationContext.class, false);
         for (Method method : methods) {
             // ignore custom create methods
             if (method.getReturnType() != Void.TYPE) {
@@ -265,7 +260,7 @@ public class SpringModule implements Module {
      */
     public void injectSpringBeans(Object testObject) {
         // assign to fields
-        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBean.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBean.class);
         for (Field field : fields) {
             try {
                 SpringBean springBeanAnnotation = field.getAnnotation(SpringBean.class);
@@ -277,7 +272,7 @@ public class SpringModule implements Module {
         }
 
         // assign to setters
-        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBean.class);
+        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBean.class);
         for (Method method : methods) {
             try {
                 if (!isSetter(method)) {
@@ -304,7 +299,7 @@ public class SpringModule implements Module {
      */
     public void injectSpringBeansByType(Object testObject) {
         // assign to fields
-        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
         for (Field field : fields) {
             try {
                 setFieldValue(testObject, field, getSpringBeanByType(testObject, field.getType()));
@@ -315,7 +310,7 @@ public class SpringModule implements Module {
         }
 
         // assign to setters
-        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
+        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBeanByType.class);
         for (Method method : methods) {
             try {
                 if (!isSetter(method)) {
@@ -341,7 +336,7 @@ public class SpringModule implements Module {
      */
     public void injectSpringBeansByName(Object testObject) {
         // assign to fields
-        List<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
+    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
         for (Field field : fields) {
             try {
                 setFieldValue(testObject, field, getSpringBean(testObject, field.getName()));
@@ -352,7 +347,7 @@ public class SpringModule implements Module {
         }
 
         // assign to setters
-        List<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
+        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), SpringBeanByName.class);
         for (Method method : methods) {
             try {
                 if (!isSetter(method)) {
@@ -369,26 +364,6 @@ public class SpringModule implements Module {
             }
         }
     }
-    
-    
-    /**
-     * Registers a {@link SpringResourceTransactionManagerTransactionalConnectionHandler} that defines how to retrieve a
-     * <code>Connection</code>, given the fact that we use a specific resource factory type.
-     * 
-     * @param transactionalConnectionHandler
-     */
-    public void registerSpringResourceTransactionManagerTransactionalConnectionHandler(SpringResourceTransactionManagerTransactionalConnectionHandler transactionalConnectionHandler) {
-    	transactionalConnectionHandlers.add(transactionalConnectionHandler);
-    }
-
-
-    /**
-     * @return All {@link SpringResourceTransactionManagerTransactionalConnectionHandler}s that were registered using
-     * {@link #registerSpringResourceTransactionManagerTransactionalConnectionHandler}
-     */
-    public Set<SpringResourceTransactionManagerTransactionalConnectionHandler> getTransactionalConnectionHandlers() {
-		return transactionalConnectionHandlers;
-	}
     
     
     public void registerTestContext(TestContext testContext) {

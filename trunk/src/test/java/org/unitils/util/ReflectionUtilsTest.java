@@ -16,6 +16,7 @@
 package org.unitils.util;
 
 import static java.util.Arrays.asList;
+import static org.unitils.util.CollectionUtils.asSet;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.getFieldName;
 import static org.unitils.util.ReflectionUtils.getFieldValue;
@@ -26,6 +27,7 @@ import static org.unitils.util.ReflectionUtils.setFieldValue;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import junit.framework.TestCase;
 
@@ -150,7 +152,7 @@ public class ReflectionUtilsTest extends TestCase {
      * Test for setting the value of a field and setter.
      */
     public void testSetFieldAndSetterValue_field() {
-        setFieldAndSetterValue(testObject, asList(field), new ArrayList<Method>(), "newValue");
+        setFieldAndSetterValue(testObject, asSet(field), new HashSet<Method>(), "newValue");
         assertEquals("newValue", testObject.getField());
     }
 
@@ -159,7 +161,7 @@ public class ReflectionUtilsTest extends TestCase {
      * Test for setting the value of a field and setter.
      */
     public void testSetFieldAndSetterValue_setter() {
-        setFieldAndSetterValue(testObject, new ArrayList<Field>(), asList(fieldSetterMethod), "newValue");
+        setFieldAndSetterValue(testObject, new HashSet<Field>(), asSet(fieldSetterMethod), "newValue");
         assertEquals("newValue", testObject.getField());
     }
 
@@ -168,7 +170,7 @@ public class ReflectionUtilsTest extends TestCase {
      * Test for setting the value of a field and setter. Null value
      */
     public void testSetFieldAndSetterValue_null() {
-        setFieldAndSetterValue(testObject, asList(field), asList(fieldSetterMethod), null);
+        setFieldAndSetterValue(testObject, asSet(field), asSet(fieldSetterMethod), null);
         assertNull(testObject.getField());
     }
 
@@ -180,7 +182,7 @@ public class ReflectionUtilsTest extends TestCase {
         //get another field
         Field anotherField = getClass().getDeclaredField("testObject");
         try {
-            setFieldAndSetterValue(testObject, asList(anotherField), asList(fieldSetterMethod), "newValue");
+            setFieldAndSetterValue(testObject, asSet(anotherField), asSet(fieldSetterMethod), "newValue");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             //expected
@@ -195,7 +197,7 @@ public class ReflectionUtilsTest extends TestCase {
         //get another field
         Method anotherMethod = getClass().getDeclaredMethod("testInvokeMethod_unexistingMethod");
         try {
-            setFieldAndSetterValue(testObject, asList(field), asList(anotherMethod), "newValue");
+            setFieldAndSetterValue(testObject, asSet(field), asSet(anotherMethod), "newValue");
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             //expected
