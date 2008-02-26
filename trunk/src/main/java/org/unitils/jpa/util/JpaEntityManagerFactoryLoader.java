@@ -50,17 +50,22 @@ public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<E
 	}
 
 
-	@Override
-	protected AbstractEntityManagerFactoryBean createEntityManagerFactoryBean(Object testObject, JpaConfig entityManagerConfig) {
+	/**
+	 * 
+	 * @param testObject The test instance, not null
+	 * @param jpaConfig The configuration parameters for the <code>EntityManagerFactory</code>
+	 * @return A completely configured <code>AbstractEntityManagerFactoryBean</code> 
+	 */
+	protected AbstractEntityManagerFactoryBean createEntityManagerFactoryBean(Object testObject, JpaConfig jpaConfig) {
 		LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 		factoryBean.setPersistenceProvider(getJpaProviderSupport().getPersistenceProvider());
 		factoryBean.setDataSource(getDataSource());
 		factoryBean.setJpaVendorAdapter(getJpaProviderSupport().getSpringJpaVendorAdaptor());
-		factoryBean.setPersistenceXmlLocation(entityManagerConfig.getConfigFiles().iterator().next());
-		factoryBean.setPersistenceUnitName(entityManagerConfig.getPersistenceUnitName());
-		if (entityManagerConfig.getConfigMethod() != null) {
+		factoryBean.setPersistenceXmlLocation(jpaConfig.getConfigFiles().iterator().next());
+		factoryBean.setPersistenceUnitName(jpaConfig.getPersistenceUnitName());
+		if (jpaConfig.getConfigMethod() != null) {
 			try {
-				ReflectionUtils.invokeMethod(testObject, entityManagerConfig
+				ReflectionUtils.invokeMethod(testObject, jpaConfig
 						.getConfigMethod(), factoryBean);
 			} catch (InvocationTargetException e) {
 				throw new UnitilsException("Error while invoking custom config method", e.getCause());

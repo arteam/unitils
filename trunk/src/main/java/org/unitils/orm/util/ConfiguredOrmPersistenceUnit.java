@@ -49,10 +49,12 @@ public class ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ> {
 		this.ormConfigurationObject = ormConfigurationObject;
 	}
 
+	
 	public ORMPU getOrmPersistenceContext() {
 		return ormPersistenceContext;
 	}
 
+	
 	public ORMCONFOBJ getOrmConfigurationObject() {
 		return ormConfigurationObject;
 	}

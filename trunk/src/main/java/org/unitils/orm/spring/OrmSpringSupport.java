@@ -18,8 +18,8 @@ package org.unitils.orm.spring;
 import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
 
 /**
- * Defines the contract for implementations that retrieving an ORM persistence unit in that was
- * configured in a spring <code>ApplicationContext</code>
+ * Defines the contract for implementations that retrieve an ORM persistence unit from the spring 
+ * <code>ApplicationContext</code> that is configured for this class (if any)
  * 
  * @author Filip Neven
  * @author Tim Ducheyne

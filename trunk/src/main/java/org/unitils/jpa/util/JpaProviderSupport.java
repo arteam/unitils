@@ -24,7 +24,7 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.unitils.jpa.JpaModule;
 
 /**
- * Defines the contract for implementations that implement all provider specific features that unitils needs 
+ * Defines the contract for implementations that implement any provider specific operations that unitils needs 
  * to implement the {@link JpaModule}s functionality.
  * 
  * @author Filip Neven
@@ -37,39 +37,39 @@ public interface JpaProviderSupport {
 	 * Checks if the mapping of the JPA entities with the database is still correct for the given 
 	 * <code>EntityManager</code> and provider specific configuration object
 	 * 
-	 * @param entityManager Currenlty active <code>EntityManager</code>
-	 * @param configurationObject Provider specific configuration object
+	 * @param entityManager Currently active <code>EntityManager</code>, not null
+	 * @param configurationObject Provider specific configuration object, not null
 	 */
 	void assertMappingWithDatabaseConsistent(EntityManager entityManager, Object configurationObject);
 
 	
 	/**
-	 * @param entityManager
+	 * @param entityManager Currently active <code>EntityManager</code>, not null
 	 * @return The JDBC connection that is used by the currently active <code>EntityManager</code>. Actions
 	 * performed on this connection are performed in the same transaction as the one to which the given
-	 * <code>EntityManager</code> is associated
+	 * <code>EntityManager</code> is associated, not null
 	 */
 	Connection getJdbcConnection(EntityManager entityManager);
 	
 	
 	/**
-	 * @return Implementation of spring's <code>JpaVendorAdapter</code> interface for this persistence provider
+	 * @return Implementation of spring's <code>JpaVendorAdapter</code> interface for this persistence provider, not null
 	 */
 	JpaVendorAdapter getSpringJpaVendorAdaptor();
 	
 	
 	/**
-	 * @return An instance of the JPA <code>PersistenceProvider</code> for this persistence provider
+	 * @return An instance of the JPA <code>PersistenceProvider</code> for this persistence provider, not null
 	 */
 	PersistenceProvider getPersistenceProvider();
 
 	
 	/**
 	 * @param persistenceProvider The JPA <code>PersistenceProvider</code> that was used for creating the 
-	 * <code>EntityManagerFactory</code>
+	 * <code>EntityManagerFactory</code>, not null
 	 * 
 	 * @return The provider specific configuration object that was used for configuring this 
-	 * <code>EntityManagerFactory</code>
+	 * <code>EntityManagerFactory</code>, not null
 	 */
 	Object getProviderSpecificConfigurationObject(PersistenceProvider persistenceProvider);
 }

@@ -197,7 +197,18 @@ public class ReflectionUtils {
     }
     
     
-    public static <T> T invokeMethodSilent(Object target, Method method, Object... arguments) {
+    /**
+     * Invoke the given method with the given parameters on the given target object. Doesn't throw
+     * any checked exception
+     * 
+     * @param target    The object containing the method, not null
+     * @param method    The method, not null
+     * @param arguments The method arguments
+     * @return The result of the invocation, null if void
+     * @throws UnitilsException if the method could not be invoked, or the called method throwed an exception
+     */
+    @SuppressWarnings("unchecked")
+	public static <T> T invokeMethodSilent(Object target, Method method, Object... arguments) {
     	try {
 			T result = (T) invokeMethod(target, method, arguments);
 			return result;

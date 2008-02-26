@@ -26,7 +26,6 @@ import java.util.Properties;
 import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 
 /**

@@ -35,7 +35,7 @@ public class OrmConfig implements ResourceConfig {
 
 	
 	/**
-	 * Custom configuration method that performs (additional) programmatic configuration
+	 * Custom configuration method that performs additional programmatic configuration
 	 */
 	private Method configMethod;
 

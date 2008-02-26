@@ -29,7 +29,7 @@ import org.unitils.util.CollectionUtils;
 public class JpaConfig extends OrmConfig {
 
 	/**
-	 * The name of the persistence unit, defined in the persistence config file
+	 * The name of the persistence unit, as defined in the persistence config file
 	 */
 	private String persistenceUnitName;
 
@@ -37,15 +37,20 @@ public class JpaConfig extends OrmConfig {
 	/**
 	 * Creates a new instance
 	 * 
-	 * @param persistenceUnitName
-	 * @param configFile
-	 * @param configMethod
+	 * @param persistenceUnitName The name of the persistence unit, as defined in the persistence config file
+	 * @param configFile The name of the persistence.xml file. May be null: in this case, we try to find a 
+	 * persistence.xml file in the default location META-INF/persistence.xml
+	 * @param configMethod Custom configuration method, null if not available
 	 */
 	public JpaConfig(String persistenceUnitName, String configFile,	Method configMethod) {
 		super(CollectionUtils.asSet(configFile), configMethod);
 		this.persistenceUnitName = persistenceUnitName;
 	}
 
+	
+	/**
+	 * @return The name of the persistence unit, defined in the persistence config file
+	 */
 	public String getPersistenceUnitName() {
 		return persistenceUnitName;
 	}

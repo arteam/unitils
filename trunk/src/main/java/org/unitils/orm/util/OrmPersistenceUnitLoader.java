@@ -30,7 +30,7 @@ public interface OrmPersistenceUnitLoader<ORMPU, ORMCONFOBJ, ORMCFG extends OrmC
 
 	
 	/**
-	 * @param testObject The test instance, not null
+	 * @param testObject The test object, not null
 	 * @param ormConfig The persistence unit configuration, not null
 	 * @return An instance of {@link ConfiguredOrmPersistenceUnit} that wraps the persistence unit and an
 	 * implementation specific configuration object
