@@ -53,18 +53,24 @@ import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ConfigUtils;
 
 /**
- * Module providing support for unit tests for code that use JPA. It offers an easy way of loading a 
- * <code>EntityManagerFactory</code> and having it injected into the test. It also offers a test to check whether 
- * the mapping of all entities is consistent with the structure of the database. 
+ * Module providing support for unit tests for code that uses JPA. It offers an easy way of loading a 
+ * <code>EntityManagerFactory</code> and having it injected into the test. The configured 
+ * <code>EntityManagerFactory</code> will connect to the unitils configured test datasource, and
+ * join in unitils test-bound transactions.
  * <p/>
- * An <code>EntityManagerFactory</code> is created and injected into all fields or methods of the test 
+ * <code>EntityManagerFactory</code> instances are cached, to make sure that for any two tests that share the same
+ * configuration, the same instance of this object is used.
+ * <p/>
+ * An <code>EntityManagerFactory</code> is injected into all fields or methods of the test object
  * annotated with {@link JpaEntityManagerFactory} or <code>javax.persistence.PersistenceUnit</code>. An
  * <code>EntityManager</code> is injected into all fields or methods of the test annotated with 
- * <code>javax.persistence.PersistenceContext</code>
+ * <code>javax.persistence.PersistenceContext</code>. 
+ * todo injectie in andere objecten
  * <p/>
- * It is highly recommended to write a unit test that invokes {@link JpaUnitils#assertMappingWithDatabaseConsistent()},
+ * This module also offers a test to check whether the mapping of all entities is consistent with the structure of the 
+ * database. It is highly recommended to write a unit test that invokes {@link JpaUnitils#assertMappingWithDatabaseConsistent()},
  * This is a very useful test that verifies whether the mapping of all your objects entities still corresponds
- * with the actual structure of the database.
+ * with the actual structure of the database. Currently, it's only available when the persistence provider is hibernate.
  * 
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -195,12 +201,11 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     
     
     /**
-     * Injects the currently configured <code>EntityManagerFactory</code> and currently active 
-     * <code>EntityManager</code> into fields or methods of the given target object annotated 
-     * with <code>javax.persistence.PersistenceUnit</code> or 
+     * Injects the <code>EntityManagerFactory</code> and currently active <code>EntityManager</code> into fields 
+     * or methods of the given target object annotated with <code>javax.persistence.PersistenceUnit</code> or 
      * <code>javax.persistence.PersistenceContext</code>, respectively.
      * 
-     * @param testObject The test instance, not null
+     * @param testObject The test object, not null
      * @param target The target object to inject the resources into, not null
      */
     public void injectJpaResourcesInto(Object testObject, Object target) {

@@ -88,9 +88,9 @@ public class LenientOrderCollectionComparator implements Comparator {
 
 
     /**
-     * Recursively checks whether ther is a sequence so that both collections have matching elements.
-     * This will loop over the elements of the left list and then trying to find a match for these elements in the right
-     * list. If a match is found, the element is removed from the right collections and the comparison is recursively
+     * Recursively checks whether there is a sequence so that both collections have matching elements.
+     * This will loop over the elements of the left list and then try to find a match for these elements in the right
+     * list. If a match is found, the element is removed from the right collection and the comparison is recursively
      * performed again on the remaining elements.
      *
      * @param leftList             The left list, not null

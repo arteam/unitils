@@ -15,6 +15,28 @@
  */
 package org.unitils.dbunit;
 
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefault;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
+
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -24,10 +46,8 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
-import org.unitils.database.transaction.TransactionalDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
@@ -36,19 +56,6 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.*;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
-
-import javax.sql.DataSource;
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -436,7 +443,8 @@ public class DbUnitModule implements Module {
      */
     @SuppressWarnings("unchecked")
     protected DataSetFactory getDefaultDataSetFactory() {
-        return getDataSetFactory((Class<? extends DataSetFactory>) getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "factory", configuration)));
+        Class<? extends DataSetFactory> dataSetFactoryClass = getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "factory", configuration));
+		return getDataSetFactory(dataSetFactoryClass);
     }
 
 
@@ -474,7 +482,8 @@ public class DbUnitModule implements Module {
      */
     @SuppressWarnings("unchecked")
     protected DataSetLoadStrategy getDefaultDataSetLoadStrategy() {
-        return createInstanceOfType((Class<? extends DataSetLoadStrategy>) getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "loadStrategy", configuration)), false);
+        Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClassName = getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "loadStrategy", configuration));
+		return createInstanceOfType(dataSetLoadStrategyClassName, false);
     }
 
 

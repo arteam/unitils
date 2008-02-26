@@ -39,7 +39,7 @@ public class UnitilsLocalSessionFactoryBean extends LocalSessionFactoryBean {
 	}
 
 	@Override
-	protected void postProcessMappings(Configuration config) throws HibernateException {
+	protected void postProcessConfiguration(Configuration config) throws HibernateException {
 		if (customConfigMethod != null) {
 			try {
 				ReflectionUtils.invokeMethod(testObject, customConfigMethod, config);

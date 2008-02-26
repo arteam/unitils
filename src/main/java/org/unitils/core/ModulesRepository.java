@@ -119,7 +119,7 @@ public class ModulesRepository {
     public boolean isModuleEnabled(String fullyQualifiedClassName) {
         Class<? extends Module> moduleClass;
         try {
-            moduleClass = (Class<? extends Module>) getClassWithName(fullyQualifiedClassName);
+            moduleClass = getClassWithName(fullyQualifiedClassName);
 
         } catch (UnitilsException e) {
             // class could not be loaded

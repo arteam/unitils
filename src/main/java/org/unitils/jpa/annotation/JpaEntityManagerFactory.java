@@ -24,16 +24,22 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that can be used for configuring a JPA <code>EntityManagerFactory</code> on a test class. Such a 
- * <code>EntityManagerFactory</code> will connect to the unitils configured test datasource. 
- * <p/>
- * This annotation can be used at class, method or field level. If at field level, the <code>EntityManagerFactory</code>
- * associated with this test object is injected. If put on a method with a single argument of type <code>EntityManagerFactory</code>,
- * the method is invoked with the <code>EntityManagerFactory</code> as argument.
- * <p/>
- * This annotation can also be used to identify a custom configuration method. Such a method takes as single parameter a 
- * spring <code>org.springframework.orm.jpa.AbstractEntityManagerFactoryBean</code> object, on which any specified 
- * configuration file was already loaded.
+ * This annotation can be used in three different ways: 
+ * <ul><li>
+ * If the persistenceUnit and optionally the configFile attributes are specified, its goal is to specify 
+ * <code>EntityManagerFactory</code> configuration parameters. 
+ * </li><li>
+ * If these attributes are not specified and the annotation is put on a field or type <code>EntityManagerFactory</code> 
+ * or a method that takes a single parameter  of type <code>EnitityManagerFactory</code>, the <code>EntityManagerFactory</code> 
+ * for this test object is injected into this field or method. 
+ * </li><li>
+ * If put on a method that takes a single <code>org.springframework.orm.jpa.AbstractEntityManagerFactoryBean</code> 
+ * parameter, this method becomes a custom configuration method for this <code>EntityManagerFactory</code>. This method
+ * will be invoked when creating a new <code>EntityManagerFactory</code>, after having loaded all other configuration
+ * on this factory bean.
+ * </li></ul>
+ * The configured <code>EntityManagerFactory</code> will connect to the unitils configured test datasource, and
+ * will join in unitils test-bound transactions.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -43,7 +49,7 @@ import java.lang.annotation.Target;
 public @interface JpaEntityManagerFactory {
 
 	/**
-	 * The name of the persistence unit, defined in the specific persistence config file
+	 * The name of the persistence unit, as defined in the persistence config file
 	 */
 	String persistenceUnit() default "";
 	
