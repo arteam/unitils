@@ -49,7 +49,6 @@ import org.unitils.jpa.util.JpaEntityManagerFactoryLoader;
 import org.unitils.jpa.util.JpaProviderSupport;
 import org.unitils.orm.OrmModule;
 import org.unitils.orm.util.OrmPersistenceUnitLoader;
-import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ConfigUtils;
 
 /**
@@ -108,8 +107,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     	getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
     		
     		public boolean isApplicableFor(Object testObject) {
-    			// TODO Fix
-    			return AnnotationUtils.hasClassMethodOrFieldLevelAnnotation(testObject.getClass(), JpaEntityManagerFactory.class);
+    			return isPersistenceUnitConfiguredFor(testObject);
 			}
     		
 			public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
