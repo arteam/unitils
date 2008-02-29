@@ -16,7 +16,8 @@
 package org.unitils.database.util;
 
 /**
- * Enum defining whether a test must be run in a transaction and, if yes, what will be commit/rollback behavior.
+ * Defining the available transaction modes for a test. Defines whether a test must be run in a transaction and, 
+ * if yes, what is the commit/rollback behavior.
  *
  * @author Filip Neven
  * @author Tim Ducheyne

@@ -108,6 +108,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     	getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
     		
     		public boolean isApplicableFor(Object testObject) {
+    			// TODO Fix
     			return AnnotationUtils.hasClassMethodOrFieldLevelAnnotation(testObject.getClass(), JpaEntityManagerFactory.class);
 			}
     		

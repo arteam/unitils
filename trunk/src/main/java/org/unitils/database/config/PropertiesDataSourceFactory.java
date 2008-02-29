@@ -64,6 +64,7 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
      *
      * @param configuration The config, not null
      */
+    @Override
     public void init(Properties configuration) {
         driverClassName = getString(PROPKEY_DATASOURCE_DRIVERCLASSNAME, configuration);
         databaseUrl = getString(PROPKEY_DATASOURCE_URL, configuration);
@@ -72,9 +73,7 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     }
 
 
-    /**
-     * @see DataSourceFactory#createDataSource()
-     */
+    @Override
     public DataSource createDataSource() {
         logger.info("Creating data source. Driver: " + driverClassName + ", url: " + databaseUrl + ", user: " + userName + ", password: <not shown>");
         BasicDataSource dataSource = getNewDataSource();
@@ -88,8 +87,8 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
 
 
     /**
-     * Returns a concrete instance of <code>BasicDataSource</code>. This method can org overridden to return a mock
-     * instance, for testing
+     * Returns a concrete instance of <code>BasicDataSource</code>. This method may be overridden e.g. to return a mock
+     * instance for testing
      *
      * @return An instance of <code>BasicDataSource</code>
      */

@@ -21,9 +21,9 @@ import org.unitils.core.Unitils;
 import javax.sql.DataSource;
 
 /**
- * DataSource factory bean to that lets the {@link DatabaseModule} create the data source.
+ * Spring <code>FactoryBean</code> that provides access to the datasource configured in unitils.
  * <p/>
- * For example you could specify a bean definition named dataSource that connects to the test database as follows:
+ * For example, you can define a bean in spring named 'dataSource' that connects to the test database as follows:
  * <pre><code>
  *     &lt;bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean"/&gt;
  * </code></pre>
@@ -46,7 +46,7 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
 
 
     /**
-     * Gets the type of the instance, i.e. <code>DataSource</code>
+     * Gets the type of the object provided by this <code>FactoryBean</code>, i.e. <code>DataSource</code>
      *
      * @return The type, not null
      */
@@ -56,7 +56,7 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
 
 
     /**
-     * @return false, it is not a singleton
+     * @return true, this is a singleton
      */
     public boolean isSingleton() {
         return true;
