@@ -104,15 +104,10 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
 	 * @param testObject The test object, not null
 	 */
 	public void startTransaction(Object testObject) {
-		try {
-			logger.debug("Starting transaction");
-			springPlatformTransactionManager.set(getSpringPlatformTransactionManager(testObject));
-			TransactionStatus transactionStatus = springPlatformTransactionManager.get().getTransaction(createTransactionDefinition(testObject));
-			transactionStatusHolder.set(transactionStatus);
-
-		} catch (Throwable t) {
-			throw new UnitilsException("Unable to start transaction. Could not retrieve PlatformTransactionManager from the Spring application context. " + "Make sure either to configure one, or use another Unitils transaction manager. (e.g. SimpleTransactionManager, by setting the " + "property 'transactionManager.type' to 'simple')", t);
-		}
+		logger.debug("Starting transaction");
+		springPlatformTransactionManager.set(getSpringPlatformTransactionManager(testObject));
+		TransactionStatus transactionStatus = springPlatformTransactionManager.get().getTransaction(createTransactionDefinition(testObject));
+		transactionStatusHolder.set(transactionStatus);
 	}
 
 
@@ -188,11 +183,19 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
 	 * @return A suitable implementation of <code>PlatformTransactionManager</code>
 	 */
 	protected PlatformTransactionManager createPlatformTransactionManager(Object testObject) {
+		UnitilsTransactionManagementConfiguration applicableTransactionManagementConfiguration = null;
 		for (UnitilsTransactionManagementConfiguration transactionManagementConfiguration : transactionManagementConfigurations) {
-			// TODO throw exception if isApplicableFor is true for more than one configuration
 			if (transactionManagementConfiguration.isApplicableFor(testObject)) {
-				return transactionManagementConfiguration.getSpringPlatformTransactionManager(testObject);
+				if (applicableTransactionManagementConfiguration != null) {
+					throw new UnitilsException("More than one transaction management configuration is applicable for " + testObject.getClass().getSimpleName() +
+							". This means that, for example, you configured both a hibernate SessionFactory and a JPA EntityManagerFactory for this class. " +
+							"This is not supported in unitils.");
+				}
+				applicableTransactionManagementConfiguration = transactionManagementConfiguration;
 			}
+		}
+		if (applicableTransactionManagementConfiguration != null) {
+			return applicableTransactionManagementConfiguration.getSpringPlatformTransactionManager(testObject);
 		}
 		
 		return createDataSourceTransactionManager(testObject);
@@ -201,9 +204,9 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
 	
 	/**
 	 * @param testObject The test object, not null
-	 * @return An instance of <code>DataSourceTransactionManager</code>
+	 * @return An instance of <code>DataSourceTransactionManager</code> that implements transactions for the test datasource
 	 */
-	protected PlatformTransactionManager createDataSourceTransactionManager(Object testObject) {
+	protected DataSourceTransactionManager createDataSourceTransactionManager(Object testObject) {
 		DataSource dataSource = getDataSource();
 		DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
 		return dataSourceTransactionManager;
