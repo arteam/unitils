@@ -36,22 +36,10 @@ public class DatabaseUnitils {
      * @return The DataSource that connects to the test database
      */
     public static DataSource getDataSource() {
-        return getDatabaseModule().getDataSource();
+    	return getDatabaseModule().getTransactionalDataSource(getTestObject());
     }
     
     
-    /**
-     * Returns the DataSource that connects to the test database. If applicable for the
-     * type of transaction management configured for the current test object, the DataSource
-     * is wrapped in a transactional proxy.
-     *
-     * @return The DataSource that connects to the test database
-     */
-    public static DataSource getTransactionalDataSource() {
-        return getDatabaseModule().getTransactionalDataSource(getTestObject());
-    }
-
-
     /**
      * Flushes all pending updates to the database. This method is useful when the effect of updates
      * needs to be checked directly on the database.

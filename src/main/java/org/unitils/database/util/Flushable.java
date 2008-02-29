@@ -19,9 +19,8 @@ package org.unitils.database.util;
  * Marks a module as being flushable. This means that {@link #flushDatabaseUpdates(Object)} will be called on the module
  * when a flush is requested on the DatabaseModule (by calling its {@link #flushDatabaseUpdates(Object)} method).
  * <p/>
- * An example of when a module could need to be flushable is the HibernateModule. Hibernate sometimes stores
- * updates in the session (in memory) without performing them on the database. If you want to be sure that every such
- * update was performed on the database, you need to flush the hibernate session.
+ * An example a flushable module is the HibernateModule. Hibernate stores updates in the session (in memory) without performing 
+ * them on the database. If you want to be sure that these updates are executed on the database, you need to flush the hibernate session.
  *
  * @author Tim Ducheyne
  * @author Filip Neven

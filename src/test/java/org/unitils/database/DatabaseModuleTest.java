@@ -48,7 +48,7 @@ public class DatabaseModuleTest extends UnitilsJUnit4 {
 	@Before
 	public void setUp() throws Exception {
 		Properties configuration = new ConfigurationLoader().loadConfiguration();
-		configuration.setProperty(DatabaseModule.PROPKEY_UPDATEDATABASESCHEMA_ENABLED, "true");
+		configuration.setProperty(DatabaseModule.PROPERTY_UPDATEDATABASESCHEMA_ENABLED, "true");
 
 		databaseModule = new TestDatabaseModule();
 		databaseModule.init(configuration);

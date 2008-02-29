@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
- * Interface for different sorts of Factories of a TestDataSource.
+ * Defines the contract of a factory that can provide an instance of a test <code>DataSource</code>.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -27,7 +27,7 @@ import java.util.Properties;
 public interface DataSourceFactory {
 
     /**
-     * Initializes itself using the properties in the given configuration.
+     * Initializes itself using the given properties.
      *
      * @param configuration The config, not null
      */
@@ -35,9 +35,9 @@ public interface DataSourceFactory {
 
 
     /**
-     * Creates a new <code>TestDataSource</code>
+     * Creates a new <code>DataSource</code>
      *
-     * @return The TestDataSource, not null
+     * @return The DataSource, not null
      */
     public DataSource createDataSource();
 

@@ -16,10 +16,30 @@
 package org.unitils.database.util.spring;
 
 import org.springframework.transaction.PlatformTransactionManager;
+import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
 
+/**
+ * Defines the contract for implementations that retrieve an <code>PlatformTransactionManager</code> from the spring 
+ * <code>ApplicationContext</code> that is configured for this class (if any)
+ * 
+ * @author Filip Neven
+ * @author Tim Ducheyne
+ */
 public interface DatabaseSpringSupport {
 
+	
+	/**
+	 * @param testObject The test object, not null
+	 * @return True if an <code>ApplicationContext</code> is associated with the given test object, 
+	 * and if a <code>PlatformTransactionManager</code> is available
+	 */
 	boolean isTransactionManagerConfiguredInSpring(Object testObject);
 	
+	
+	/**
+	 * @param testObject The test object, not null
+	 * @return The instance of <code>PlatformTransactionManager</code> that is configured in the 
+	 * <code>ApplicationContext</code> associated with the given test object
+	 */
 	PlatformTransactionManager getPlatformTransactionManager(Object testObject);
 }

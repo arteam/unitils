@@ -24,6 +24,8 @@ import java.sql.Statement;
 
 /**
  * A collection of JDBC helper methods.  This class is thread safe.
+ * 
+ * TODO Make sure we use DataSourceUtils.getConnection and releaseConnection for getting / releasing Connections
  */
 public final class DbUtils {
 

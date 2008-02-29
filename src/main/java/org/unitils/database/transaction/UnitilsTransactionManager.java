@@ -15,7 +15,6 @@
  */
 package org.unitils.database.transaction;
 
-import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -25,7 +24,7 @@ import org.unitils.database.util.spring.DatabaseSpringSupport;
 
 
 /**
- * Defines the contract for classes that can make sure unit tests managed by unitils are executed in a transaction.
+ * Defines the contract for implementations that enable unit tests managed by unitils to be executed in a transaction.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -33,18 +32,24 @@ import org.unitils.database.util.spring.DatabaseSpringSupport;
 public interface UnitilsTransactionManager {
 
 	
-	void init(Properties configuration, Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport);
+	/**
+	 * Initialize the transaction manager
+	 * 
+	 * @param transactionManagementConfigurations Set of possible providers of a spring <code>PlatformTransactionManager</code>, not null
+	 * @param databaseSpringSupport Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
+	 * If the spring module is not enabled, this object is null
+	 */
+	void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport);
 
-    /**
-     * Makes the given data source a transactional datasource.
-     * <p/>
-     * This could for example be used to wrap the given data source for intercepting the creation of connections.
-     *
-     * @param dataSource The original data source, not null
-     * @param testObject TODO
-     * @return The transactional data source, not null
+	
+	/**
+     * The <code>DataSource</code> returned will make sure that,  for the duration of a transaction, the same <code>java.sql.Connection</code> 
+     * is returned, and that invocations on the close() method of these connections are suppressed. 
+
+	 * @param testObject The test object, not null
+     * @return A transactional data source, not null
      */
-    DataSource createTransactionalDataSource(DataSource dataSource, Object testObject);
+    DataSource getTransactionalDataSource(Object testObject);
     
 
     /**
@@ -73,10 +78,4 @@ public interface UnitilsTransactionManager {
     void rollback(Object testObject);
     
     
-    /**
-     * @param testObject The test instance, not null
-     * @return Whether or not a transaction has been started, and hasn't been committed nor rollbacked yet
-     */
-    boolean isTransactionActive(Object testObject);
-
 }

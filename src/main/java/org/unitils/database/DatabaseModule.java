@@ -65,22 +65,27 @@ import org.unitils.dbmaintainer.util.DatabaseTask;
 import org.unitils.util.PropertyUtils;
 
 /**
- * todo add javadoc explaining transaction behavior.
- * <p/>
- * Module that provides basic support for database testing such as the creation of a datasource that connectes to the
- * test database and the maintaince of the test database structure.
+ * Module that provides support for database testing: Creation of a datasource that connects to the
+ * test database, support for executing tests in a transaction and automatic maintenance of the test database.
  * <p/>
  * A datasource will be created the first time one is requested. Which type of datasource will be created depends on
- * the configured {@link DataSourceFactory}. By default this will be a pooled datasource that gets its connection-url
- * and username and password from the unitils configuration.
+ * the configured {@link DataSourceFactory}. By default this will be a pooled datasource that gets its connection-url,
+ * username and password from the unitils configuration.
  * <p/>
  * The created datasource can be injected into a field of the test by annotating the field with {@link TestDataSource}.
- * It can then be used to install it in your DAO or other class under test. See the javadoc of the annotation for more info
- * on how you can use it.
+ * It can then be used to install it in your DAO or other class under test.
  * <p/>
- * If the DbMaintainer is enabled (by setting {@link #PROPKEY_UPDATEDATABASESCHEMA_ENABLED} to true), the test database
+ * If the DBMaintainer is enabled (by setting {@link #PROPERTY_UPDATEDATABASESCHEMA_ENABLED} to true), the test database
  * schema will automatically be updated if needed. This check will be performed once during your test-suite run, namely
- * when the data source is created. See {@link DBMaintainer} javadoc for more information on how this update is performed.
+ * when the data source is created.
+ * <p/>
+ * If the test class or method is annotated with {@link Transactional} with transaction mode {@link TransactionMode#COMMIT} or
+ * {@link TransactionMode#ROLLBACK}, or if the property 'DatabaseModule.Transactional.value.default' was set to 'commit' or 
+ * 'rollback', every test is executed in a transaction. 
+ *
+ * @see TestDataSource
+ * @see DBMaintainer
+ * @see Transactional
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -88,7 +93,13 @@ import org.unitils.util.PropertyUtils;
 public class DatabaseModule implements Module {
 
     /* Property indicating if the database schema should be updated before performing the tests */
-    public static final String PROPKEY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
+    public static final String PROPERTY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
+    
+    /* 
+     * Property indicating whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using 
+     * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
+     */  
+    public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
@@ -104,32 +115,44 @@ public class DatabaseModule implements Module {
 
     /* Indicates if the DBMaintainer should be invoked to update the database */
     private boolean updateDatabaseSchemaEnabled;
+    
+    /* 
+     * Indicates whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using 
+     * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy 
+     */
+    private boolean wrapDataSourceInTransactionalProxy;
 
     /* The transaction manager */
     private UnitilsTransactionManager transactionManager;
 
+    /* Set of possible providers of a spring <code>PlatformTransactionManager</code> */
 	private Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations 
 				= new HashSet<UnitilsTransactionManagementConfiguration>();
 	
+	/* 
+	 * Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
+	 * If the spring module is not enabled, this object is null 
+	 */
 	private DatabaseSpringSupport databaseSpringSupport;
 
 
     /**
      * Initializes this module using the given <code>Configuration</code>
      *
-     * @param configuration the config, not null
+     * @param configuration The config, not null
      */
     @SuppressWarnings("unchecked")
 	public void init(Properties configuration) {
         this.configuration = configuration;
 
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
-        updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPKEY_UPDATEDATABASESCHEMA_ENABLED, configuration);
+        updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
+        wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
     }
 
 
     /**
-     * No after initialization needed for this module
+     * Initializes the spring support object
      */
     public void afterInit() {
     	initDatabaseSpringSupport();
@@ -152,26 +175,30 @@ public class DatabaseModule implements Module {
     /**
      * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
-	 * Depending on the type of transaction management that is in place (using spring or by wrapping it in a transactional
-	 * proxy), the <code>DataSource</code> is wrapped in a proxy. 
+	 * If the property {@link #PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY} has been set to true, the <code>DataSource</code> 
+	 * returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code> is returned, 
+	 * and that invocations of the close() method of these connections are suppressed.
 	 * 
      * @param testObject The test instance, not null
      * @return The <code>DataSource</code>
      */
     public DataSource getTransactionalDataSource(Object testObject) {
-    	return getTransactionManager().createTransactionalDataSource(getDataSource(), testObject);
+    	if (wrapDataSourceInTransactionalProxy) {
+    		return getTransactionManager().getTransactionalDataSource(testObject);
+    	}
+    	return getDataSource();
     }
 
 
     /**
-     * Gets the transaction manager or creates one if it does not exist yet.
+     * Returns the transaction manager or creates one if it does not exist yet.
      *
      * @return The transaction manager, not null
      */
     public UnitilsTransactionManager getTransactionManager() {
         if (transactionManager == null) {
             transactionManager = getConfiguredInstance(UnitilsTransactionManager.class, configuration);
-            transactionManager.init(configuration, transactionManagementConfigurations, databaseSpringSupport );
+            transactionManager.init(transactionManagementConfigurations, databaseSpringSupport );
         }
         return transactionManager;
     }
@@ -181,7 +208,9 @@ public class DatabaseModule implements Module {
      * Flushes all pending updates to the database. This method is useful when the effect of updates needs to
      * be checked directly on the database.
      * <p/>
-     * Will look for modules that implement {@link Flushable} and call flushDatabaseUpdates on these modules.
+     * Will look for modules that implement {@link Flushable} and call {@link Flushable#flushDatabaseUpdates(Object)} 
+     * on these modules.
+     * 
      * @param testObject The test object, not null
      */
     public void flushDatabaseUpdates(Object testObject) {
@@ -194,7 +223,7 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * Determines whether the test database is outdated and, if that is the case, updates the database with the
+     * Determines whether the test database is outdated and, if this is the case, updates the database with the
      * latest changes. See {@link DBMaintainer} for more information.
      */
     public void updateDatabase() {
@@ -203,12 +232,11 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * todo make configurable using properties
-     * <p/>
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
-     * latest changes. See {@link DBMaintainer} for more information.
+     * latest changes.
      *
      * @param sqlHandler SQLHandler that needs to be used for the database updates
+     * @see {@link DBMaintainer}
      */
     public void updateDatabase(SQLHandler sqlHandler) {
         try {
@@ -223,7 +251,7 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * Updates the database version to the current version, without issuing any other updates to the database.
+     * Updates the database version to the current version, without issuing any other update to the database.
      * This method can be used for example after you've manually brought the database to the latest version, but
      * the database version is not yet set to the current one. This method can also be useful for example for
      * reinitializing the database after having reorganized the scripts folder.
