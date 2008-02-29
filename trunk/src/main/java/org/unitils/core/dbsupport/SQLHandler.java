@@ -92,7 +92,7 @@ public class SQLHandler {
             return statement.executeUpdate(sql);
 
         } catch (Exception e) {
-            throw new UnitilsException("Error while executing statement: " + sql, e);
+            throw new UnitilsException("Error while performing database update: " + sql, e);
         } finally {
             closeQuietly(connection, statement, null);
         }
@@ -120,7 +120,7 @@ public class SQLHandler {
             return statement.executeUpdate(sql);
 
         } catch (Exception e) {
-            throw new UnitilsException("Error while executing statement: " + sql, e);
+            throw new UnitilsException("Error while performing database update: " + sql, e);
         } finally {
             closeQuietly(connection, statement, null);
         }
