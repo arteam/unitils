@@ -43,13 +43,15 @@ public interface UnitilsTransactionManager {
 
 	
 	/**
-     * The <code>DataSource</code> returned will make sure that,  for the duration of a transaction, the same <code>java.sql.Connection</code> 
+	 * Wraps the given <code>DataSource</code> in a transactional proxy.
+	 * <p/>
+     * The <code>DataSource</code> returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code> 
      * is returned, and that invocations on the close() method of these connections are suppressed. 
 
 	 * @param testObject The test object, not null
      * @return A transactional data source, not null
      */
-    DataSource getTransactionalDataSource(Object testObject);
+    DataSource getTransactionalDataSource(DataSource dataSource);
     
 
     /**

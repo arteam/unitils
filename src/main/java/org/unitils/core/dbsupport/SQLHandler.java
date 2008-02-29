@@ -43,8 +43,10 @@ public class SQLHandler {
     /* The DataSource that provides access to the database, on which all queries and updates are executed */
     private DataSource dataSource;
 
-    /* Boolean that indicates whether database updates have to executed on the database or not. Setting this value
-       to false can be useful when running in dry mode */
+    /* 
+     * Boolean that indicates whether database updates have to executed on the database or not. Setting this value
+     * to false can be useful when running in dry mode 
+     */
     private boolean doExecuteUpdates;
 
 

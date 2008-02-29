@@ -75,9 +75,9 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
 				{JUNIT3, new JUnit3TestExecutor(), UnitilsJUnit3Test_TestClass1.class},
 				{JUNIT4, new JUnit4TestExecutor(), UnitilsJUnit4Test_TestClass1.class},
 				{TESTNG, new TestNGTestExecutor(), UnitilsTestNGTest_TestClass1.class},
-				{JUNIT3, new JUnit3TestExecutor(), SpringUnitilsJUnit38Test_TestClass1.class},
-				{JUNIT4, new JUnit4TestExecutor(), SpringUnitilsJUnit4Test_TestClass1.class},
-				{TESTNG, new TestNGTestExecutor(), SpringUnitilsTestNGTest_TestClass1.class},
+				//{JUNIT3, new JUnit3TestExecutor(), SpringUnitilsJUnit38Test_TestClass1.class},
+				//{JUNIT4, new JUnit4TestExecutor(), SpringUnitilsJUnit4Test_TestClass1.class},
+				//{TESTNG, new TestNGTestExecutor(), SpringUnitilsTestNGTest_TestClass1.class},
 		});
 	}
     
