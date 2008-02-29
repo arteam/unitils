@@ -80,11 +80,11 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
 
 
 	/**
-	 * Returns the unitils datasource, wrapped in a spring <code>TransactionAwareDataSourceProxy</code>
+	 * Returns the given datasource, wrapped in a spring <code>TransactionAwareDataSourceProxy</code>
 	 */
 	@Override
-	public DataSource getTransactionalDataSource(Object testObject) {
-		return new TransactionAwareDataSourceProxy(getDataSource());
+	public DataSource getTransactionalDataSource(DataSource dataSource) {
+		return new TransactionAwareDataSourceProxy(dataSource);
 	}
 
 

@@ -184,7 +184,7 @@ public class DatabaseModule implements Module {
      */
     public DataSource getTransactionalDataSource(Object testObject) {
     	if (wrapDataSourceInTransactionalProxy) {
-    		return getTransactionManager().getTransactionalDataSource(testObject);
+    		return getTransactionManager().getTransactionalDataSource(getDataSource());
     	}
     	return getDataSource();
     }
