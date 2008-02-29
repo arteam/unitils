@@ -34,10 +34,10 @@ import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.core.Unitils;
 import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.SQLUnitils;
-import org.unitils.integrationtest.dao.hibernate.HibernateSpringTest;
-import org.unitils.integrationtest.dao.hibernate.HibernateTest;
-import org.unitils.integrationtest.dao.jpa.HibernateJpaSpringTest;
-import org.unitils.integrationtest.dao.jpa.HibernateJpaTest;
+import org.unitils.integrationtest.persistence.hibernate.HibernateSpringTest;
+import org.unitils.integrationtest.persistence.hibernate.HibernateTest;
+import org.unitils.integrationtest.persistence.jpa.HibernateJpaSpringTest;
+import org.unitils.integrationtest.persistence.jpa.HibernateJpaTest;
 import org.unitils.util.FileUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -56,7 +56,7 @@ public class UnitilsIntegrationTest {
 		// Make sure we use unitils-integrationtest.properties as configuration file
 		System.setProperty("unitils.configuration.customFileName", "org/unitils/integrationtest/unitils-integrationtest.properties");
 		// Copy the db creation scripts to the temp directory
-		FileUtils.copyClassPathResource("/org/unitils/integrationtest/dao/dbscripts/01_createPersonTable.sql", "C:/Temp/unitilsintegrationtests");
+		FileUtils.copyClassPathResource("/org/unitils/integrationtest/persistence/dbscripts/01_createPersonTable.sql", "C:/Temp/unitilsintegrationtests");
 	}
 	
 	@Before

@@ -8,7 +8,7 @@
         	<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
         </property>
         <property name="persistenceProviderClass" value="org.unitils.jpa.util.hibernate.UnitilsHibernatePersistenceProvider"/>
-        <property name="persistenceXmlLocation" value="org/unitils/integrationtest/dao/jpa/persistence-test.xml"/>
+        <property name="persistenceXmlLocation" value="org/unitils/integrationtest/persistence/jpa/persistence-test.xml"/>
     </bean>
 
 	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean"/>

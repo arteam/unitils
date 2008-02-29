@@ -13,29 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.integrationtest.dao.hibernate;
+package org.unitils.integrationtest.persistence.hibernate;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.database.annotations.Transactional;
+import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.integrationtest.sampleproject.model.Person;
 import org.unitils.reflectionassert.ReflectionAssert;
-import org.unitils.spring.annotation.SpringApplicationContext;
 
-//@Transactional(TransactionMode.ROLLBACK)
-public class HibernateSpringTest extends UnitilsJUnit4 {
+//@Transactional(TransactionMode.COMMIT)
+public class HibernateTest extends UnitilsJUnit4 {
 
-	@SpringApplicationContext({"org/unitils/integrationtest/dao/hibernate/hibernateSpringTest-spring.xml"})
-	ApplicationContext applicationContext;
-	
-	@HibernateSessionFactory
+	@HibernateSessionFactory({"org/unitils/integrationtest/persistence/hibernate/hibernate-test.cfg.xml"})
 	SessionFactory sessionFactory;
-	
+
 	Person person;
 	
     @Before
@@ -56,6 +53,5 @@ public class HibernateSpringTest extends UnitilsJUnit4 {
     public void testPersist() {
     	sessionFactory.getCurrentSession().persist(person);
     }
-
 	
 }

@@ -7,7 +7,7 @@
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="persistenceXmlLocation"
-			value="org/unitils/integrationtest/dao/jpa/persistence-test.xml" />
+			value="org/unitils/integrationtest/persistence/jpa/persistence-test.xml" />
 	</bean>
 
 	<bean id="jotm"

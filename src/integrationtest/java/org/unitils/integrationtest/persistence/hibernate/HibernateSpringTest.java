@@ -13,32 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.integrationtest.dao.jpa;
+package org.unitils.integrationtest.persistence.hibernate;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
-
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
+import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.integrationtest.sampleproject.model.Person;
-import org.unitils.jpa.JpaUnitils;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.unitils.spring.annotation.SpringApplicationContext;
 
-//@Transactional(TransactionMode.COMMIT)
-public class HibernateJpaTest extends UnitilsJUnit4 {
+//@Transactional(TransactionMode.ROLLBACK)
+public class HibernateSpringTest extends UnitilsJUnit4 {
 
-	@JpaEntityManagerFactory(persistenceUnit = "test", configFile = "org/unitils/integrationtest/dao/jpa/persistence-test.xml")
-	EntityManagerFactory entityManagerFactory;
+	@SpringApplicationContext({"org/unitils/integrationtest/persistence/hibernate/hibernateSpringTest-spring.xml"})
+	ApplicationContext applicationContext;
 	
-	@PersistenceContext
-	EntityManager entityManager;
+	@HibernateSessionFactory
+	SessionFactory sessionFactory;
 	
 	Person person;
 	
@@ -50,7 +46,7 @@ public class HibernateJpaTest extends UnitilsJUnit4 {
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Person userFromDb = entityManager.find(Person.class, 1L);
+    	Person userFromDb = (Person) sessionFactory.getCurrentSession().get(Person.class, 1L);
     	ReflectionAssert.assertLenEquals(person, userFromDb);
     }
 
@@ -58,11 +54,8 @@ public class HibernateJpaTest extends UnitilsJUnit4 {
     @DataSet("../datasets/NoPersons.xml")
     @ExpectedDataSet("../datasets/SinglePerson-result.xml")
     public void testPersist() {
-    	entityManager.persist(person);
+    	sessionFactory.getCurrentSession().persist(person);
     }
-    
-    @Test
-    public void testMapping() {
-    	JpaUnitils.assertMappingWithDatabaseConsistent();
-    }
+
+	
 }
