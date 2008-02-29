@@ -239,14 +239,9 @@ public class DatabaseModule implements Module {
      * @see {@link DBMaintainer}
      */
     public void updateDatabase(SQLHandler sqlHandler) {
-        try {
-            logger.info("Checking if database has to be updated.");
-            DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
-            dbMaintainer.updateDatabase();
-
-        } catch (UnitilsException e) {
-            throw new UnitilsException("Error while updating database", e);
-        }
+        logger.info("Checking if database has to be updated.");
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
+        dbMaintainer.updateDatabase();
     }
 
 

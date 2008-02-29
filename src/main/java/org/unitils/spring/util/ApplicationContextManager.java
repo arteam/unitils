@@ -110,16 +110,11 @@ public class ApplicationContextManager extends AnnotatedInstanceManager<Applicat
      */
     @Override
     protected ApplicationContext createInstanceForValues(Object testObject, Class<?> testClass, List<String> locations) {
-        try {
-            // create application context
-            final ConfigurableApplicationContext applicationContext = applicationContextFactory.createApplicationContext(locations);
-            // load application context
-            applicationContext.refresh();
-            return applicationContext;
-
-        } catch (Throwable t) {
-            throw new UnitilsException("Unable to create application context for locations " + locations, t);
-        }
+        // create application context
+        final ConfigurableApplicationContext applicationContext = applicationContextFactory.createApplicationContext(locations);
+        // load application context
+        applicationContext.refresh();
+        return applicationContext;
     }
    
 
