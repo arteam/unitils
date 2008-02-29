@@ -32,8 +32,8 @@ import java.util.Set;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContext;
+//import org.springframework.test.context.ContextConfiguration;
+//import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
@@ -71,7 +71,7 @@ public class SpringModule implements Module {
     private ApplicationContextManager applicationContextManager;
     
     /* TestContext used by the spring testcontext framework*/
-    private TestContext testContext;
+//    private TestContext testContext;
     
 
     /**
@@ -139,7 +139,7 @@ public class SpringModule implements Module {
      * @return Whether an ApplicationContext has been configured for the given testObject
      */
     public boolean isApplicationContextConfiguredFor(Object testObject) {
-    	checkForIncompatibleUse(testObject);
+    	//checkForIncompatibleUse(testObject);
         return applicationContextManager.hasApplicationContext(testObject);
     }
 
@@ -166,14 +166,14 @@ public class SpringModule implements Module {
     public ApplicationContext getApplicationContext(Object testObject) {
     	// Verify if the spring testcontext framework is used, and if an ApplicationContext has been configured 
     	// using @ContextConfiguration. If yes, any unitils specific configured ApplicationContext is ignored
-    	checkForIncompatibleUse(testObject);
+    	/*checkForIncompatibleUse(testObject);
     	if (isContextConfigurationAnnotationAvailable(testObject)) {
 	    	try {
 				return testContext.getApplicationContext();
 			} catch (Exception e) {
 				throw new UnitilsException(e);
 			}
-    	}
+    	}*/
     	return applicationContextManager.getApplicationContext(testObject);
     }
 
@@ -185,12 +185,12 @@ public class SpringModule implements Module {
      * 
      * @param testObject The test instance, not null
      */
-	protected void checkForIncompatibleUse(Object testObject) {
+	/*protected void checkForIncompatibleUse(Object testObject) {
 		if (isContextConfigurationAnnotationAvailable(testObject) && testContext == null) {
     		throw new UnitilsException("You've annotated your class with @" + ContextConfiguration.class.getSimpleName()
     				+ " but you're not using one of spring's base classes to execute your test");
     	}
-	}
+	}*/
 
 
 	/**
@@ -198,11 +198,11 @@ public class SpringModule implements Module {
 	 * 
 	 * @return Whether an @ContextConfiguration annotation can be found somewhere in the hierarchy
 	 */
-	protected boolean isContextConfigurationAnnotationAvailable(Object testObject) {
+	/*protected boolean isContextConfigurationAnnotationAvailable(Object testObject) {
 		ContextConfiguration contextConfigurationAnnotation = AnnotationUtils.getClassLevelAnnotation(
     			ContextConfiguration.class, testObject.getClass());
 		return contextConfigurationAnnotation != null;
-	}
+	}*/
 
 
     /**
@@ -366,9 +366,9 @@ public class SpringModule implements Module {
     }
     
     
-    public void registerTestContext(TestContext testContext) {
+    /*public void registerTestContext(TestContext testContext) {
     	this.testContext = testContext;
-	}
+	}*/
 
 
 	/**

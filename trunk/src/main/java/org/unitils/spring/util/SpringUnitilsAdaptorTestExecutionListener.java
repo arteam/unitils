@@ -35,7 +35,7 @@ public class SpringUnitilsAdaptorTestExecutionListener implements TestExecutionL
 	
 	
 	private void registerTestContext(TestContext testContext) {
-		getSpringModule().registerTestContext(testContext);
+		//getSpringModule().registerTestContext(testContext);
 	}
 
 	
