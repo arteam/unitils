@@ -48,7 +48,6 @@ import org.unitils.orm.OrmModule;
 import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.util.OrmConfig;
 import org.unitils.orm.util.OrmPersistenceUnitLoader;
-import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
 
 /**
@@ -97,7 +96,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     	getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
     		
     		public boolean isApplicableFor(Object testObject) {
-    			return AnnotationUtils.hasClassMethodOrFieldLevelAnnotation(testObject.getClass(), HibernateSessionFactory.class);
+    			return isPersistenceUnitConfiguredFor(testObject);
 			}
     		
 			public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
