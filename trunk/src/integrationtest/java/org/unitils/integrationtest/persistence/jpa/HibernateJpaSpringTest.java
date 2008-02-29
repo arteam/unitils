@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.integrationtest.dao.hibernate;
+package org.unitils.integrationtest.persistence.jpa;
 
-import org.hibernate.SessionFactory;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.integrationtest.sampleproject.model.Person;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.unitils.spring.annotation.SpringApplicationContext;
 
-//@Transactional(TransactionMode.COMMIT)
-public class HibernateTest extends UnitilsJUnit4 {
+//@Transactional(TransactionMode.ROLLBACK)
+public class HibernateJpaSpringTest extends UnitilsJUnit4 {
 
-	@HibernateSessionFactory({"org/unitils/integrationtest/dao/hibernate/hibernate-test.cfg.xml"})
-	SessionFactory sessionFactory;
-
+	@SpringApplicationContext({"org/unitils/integrationtest/persistence/jpa/hibernateJpaSpringTest-spring.xml"})
+	ApplicationContext applicationContext;
+	
+	@PersistenceContext
+	EntityManager entityManager;
+	
 	Person person;
 	
     @Before
@@ -43,7 +49,7 @@ public class HibernateTest extends UnitilsJUnit4 {
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Person userFromDb = (Person) sessionFactory.getCurrentSession().get(Person.class, 1L);
+    	Person userFromDb = (Person) entityManager.find(Person.class, 1L);
     	ReflectionAssert.assertLenEquals(person, userFromDb);
     }
 
@@ -51,7 +57,7 @@ public class HibernateTest extends UnitilsJUnit4 {
     @DataSet("../datasets/NoPersons.xml")
     @ExpectedDataSet("../datasets/SinglePerson-result.xml")
     public void testPersist() {
-    	sessionFactory.getCurrentSession().persist(person);
+    	entityManager.persist(person);
     }
 	
 }

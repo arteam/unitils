@@ -1,4 +1,4 @@
-package org.unitils.integrationtest.dao.jpa;
+package org.unitils.integrationtest.persistence.jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -20,7 +20,7 @@ import org.unitils.spring.annotation.SpringApplicationContext;
 @Transactional(TransactionMode.COMMIT)
 public class HibernateJpaJotmSpringTest extends UnitilsJUnit4 {
 
-	@SpringApplicationContext({"org/unitils/integrationtest/dao/jpa/hibernateJpaJotmSpringTest-spring.xml"})
+	@SpringApplicationContext({"org/unitils/integrationtest/persistence/jpa/hibernateJpaJotmSpringTest-spring.xml"})
 	ApplicationContext applicationContext;
 	
 	@JpaEntityManagerFactory

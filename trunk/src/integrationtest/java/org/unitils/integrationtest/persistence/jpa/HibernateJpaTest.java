@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.integrationtest.dao.jpa;
+package org.unitils.integrationtest.persistence.jpa;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.integrationtest.sampleproject.model.Person;
+import org.unitils.jpa.JpaUnitils;
+import org.unitils.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
-import org.unitils.spring.annotation.SpringApplicationContext;
 
-//@Transactional(TransactionMode.ROLLBACK)
-public class HibernateJpaSpringTest extends UnitilsJUnit4 {
+//@Transactional(TransactionMode.COMMIT)
+public class HibernateJpaTest extends UnitilsJUnit4 {
 
-	@SpringApplicationContext({"org/unitils/integrationtest/dao/jpa/hibernateJpaSpringTest-spring.xml"})
-	ApplicationContext applicationContext;
+	@JpaEntityManagerFactory(persistenceUnit = "test", configFile = "org/unitils/integrationtest/persistence/jpa/persistence-test.xml")
+	EntityManagerFactory entityManagerFactory;
 	
 	@PersistenceContext
 	EntityManager entityManager;
@@ -49,7 +50,7 @@ public class HibernateJpaSpringTest extends UnitilsJUnit4 {
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Person userFromDb = (Person) entityManager.find(Person.class, 1L);
+    	Person userFromDb = entityManager.find(Person.class, 1L);
     	ReflectionAssert.assertLenEquals(person, userFromDb);
     }
 
@@ -59,5 +60,9 @@ public class HibernateJpaSpringTest extends UnitilsJUnit4 {
     public void testPersist() {
     	entityManager.persist(person);
     }
-	
+    
+    @Test
+    public void testMapping() {
+    	JpaUnitils.assertMappingWithDatabaseConsistent();
+    }
 }
