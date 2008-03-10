@@ -15,22 +15,22 @@
  */
 package org.unitils.util;
 
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
-
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.util.Arrays.asList;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+
+import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import static java.util.Arrays.asList;
-import java.util.List;
 import java.util.Set;
+
+import junit.framework.TestCase;
 
 /**
  * Test for {@link AnnotationUtils}.
@@ -244,7 +244,6 @@ public class AnnotationUtilsTest extends TestCase {
     /**
      * Test class that extends the test super class, with class level annotation. For testing inherited annotations.
      */
-    @SuppressWarnings({"UnusedDeclaration"})
     @TestAnnotation(level="subClass")
     private static class TestAnnotatedSubClass extends TestClass {
 

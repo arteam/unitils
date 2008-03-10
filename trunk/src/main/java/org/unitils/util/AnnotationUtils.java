@@ -15,18 +15,15 @@
  */
 package org.unitils.util;
 
-import org.unitils.core.UnitilsException;
-import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+
+import org.unitils.core.UnitilsException;
 
 /**
  * Utilities for retrieving and working with annotations.

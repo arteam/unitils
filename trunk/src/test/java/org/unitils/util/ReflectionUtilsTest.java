@@ -15,7 +15,6 @@
  */
 package org.unitils.util;
 
-import static java.util.Arrays.asList;
 import static org.unitils.util.CollectionUtils.asSet;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.getFieldName;
@@ -26,7 +25,6 @@ import static org.unitils.util.ReflectionUtils.setFieldValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import junit.framework.TestCase;

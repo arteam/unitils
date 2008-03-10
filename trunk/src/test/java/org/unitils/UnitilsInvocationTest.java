@@ -41,12 +41,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.unitils.TracingTestListener.TestFramework;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.spring.SpringUnitilsJUnit38Test_TestClass1;
-import org.unitils.spring.SpringUnitilsJUnit38Test_TestClass2;
-import org.unitils.spring.SpringUnitilsJUnit4Test_TestClass1;
-import org.unitils.spring.SpringUnitilsJUnit4Test_TestClass2;
-import org.unitils.spring.SpringUnitilsTestNGTest_TestClass1;
-import org.unitils.spring.SpringUnitilsTestNGTest_TestClass2;
 
 /**
  * Test for the main flow of the unitils test listeners for JUnit3 ({@link UnitilsJUnit3}),

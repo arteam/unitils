@@ -40,9 +40,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.unitils.TracingTestListener.TestFramework;
 import org.unitils.core.TestListener;
-import org.unitils.spring.SpringUnitilsJUnit38Test_TestClass1;
-import org.unitils.spring.SpringUnitilsJUnit4Test_TestClass1;
-import org.unitils.spring.SpringUnitilsTestNGTest_TestClass1;
 
 /**
  * Test for the flows in case an exception occurs in one of the listener or test methods for JUnit3 ({@link UnitilsJUnit3}),

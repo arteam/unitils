@@ -32,8 +32,6 @@ import java.util.Set;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.test.context.TestContext;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
@@ -43,7 +41,6 @@ import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 import org.unitils.spring.util.ApplicationContextFactory;
 import org.unitils.spring.util.ApplicationContextManager;
-import org.unitils.util.AnnotationUtils;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and

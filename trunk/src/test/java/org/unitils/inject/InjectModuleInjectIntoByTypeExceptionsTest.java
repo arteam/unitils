@@ -32,7 +32,6 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@SuppressWarnings({"UnusedDeclaration"})
 public class InjectModuleInjectIntoByTypeExceptionsTest extends UnitilsJUnit4 {
 
     private static final Log logger = LogFactory.getLog(InjectModuleInjectIntoByTypeExceptionsTest.class);

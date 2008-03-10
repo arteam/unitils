@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4Test_TestClass1;
 
 public class SpringUnitilsJUnit4Test_TestClass1 extends SpringUnitilsJUnit4Test {
 

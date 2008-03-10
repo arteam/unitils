@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.hibernate;
+package org.unitils.orm.hibernate;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Properties;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.orm.hibernate.HibernateModule;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
-
-import java.util.Properties;
 
 /**
  * Test class for injection methods of the HibernateModule
@@ -106,7 +107,8 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
         @HibernateSessionFactory
         private SessionFactory sessionFactoryField = null;
 
-        private SessionFactory sessionFactorySetter;
+        @SuppressWarnings("unused")
+		private SessionFactory sessionFactorySetter;
 
         private boolean customInitializerCalled = false;
 

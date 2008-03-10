@@ -16,8 +16,7 @@
 package org.unitils.core;
 
 /**
- * todo javadoc
- * <p/>
+ * Exception type, used for all unrecoverable exceptions that occur in unitils.
  */
 public class UnitilsException extends RuntimeException {
 
