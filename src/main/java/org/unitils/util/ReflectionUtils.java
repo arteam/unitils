@@ -97,7 +97,8 @@ public class ReflectionUtils {
      * @return The value of the given field in the given object
      * @throws UnitilsException if the field could not be accessed
      */
-    public static <T> T getFieldValue(Object object, Field field) {
+    @SuppressWarnings("unchecked")
+	public static <T> T getFieldValue(Object object, Field field) {
         try {
             field.setAccessible(true);
             return (T) field.get(object);

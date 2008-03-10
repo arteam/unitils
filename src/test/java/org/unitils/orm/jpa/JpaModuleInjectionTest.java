@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa;
+package org.unitils.orm.jpa;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -23,14 +23,10 @@ import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.ejb.Ejb3Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.orm.jpa.JpaModule;
 import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 
 /**
@@ -109,11 +105,11 @@ public class JpaModuleInjectionTest {
     public class JpaTestEntityManagerMixing {
 
     	@JpaEntityManagerFactory
-        private EntityManagerFactory entityManagerField = null;
+        EntityManagerFactory entityManagerField = null;
 
-        private EntityManagerFactory entityManagerSetter;
+        EntityManagerFactory entityManagerSetter;
 
-        private boolean customInitializerCalled = false;
+        boolean customInitializerCalled = false;
 
         @JpaEntityManagerFactory
         public void setEntityManagerSetter(EntityManagerFactory entityManagerSetter) {

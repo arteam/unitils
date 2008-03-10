@@ -18,8 +18,6 @@ package org.unitils;
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
-import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
 
 class JUnit4TestExecutor implements TestExecutor {
 

@@ -31,7 +31,6 @@ import java.util.List;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@SuppressWarnings({"UnusedDeclaration"})
 public class InjectModuleCreateTestedObjectsTest extends UnitilsJUnit4 {
 
     private InjectModule injectModule = new InjectModule();

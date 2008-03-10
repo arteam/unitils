@@ -313,7 +313,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 		expectDbVersion(version0);
     	expectLastUpdateSucceeded(true);
     	expectModifiedScripts(false);
-    	expectNewScripts(Collections.EMPTY_LIST);
+    	expectNewScripts(Collections.<VersionScriptPair>emptyList());
 	}
 
 	private void expectNewScriptsAdded() {
@@ -331,7 +331,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 	}
 	
 	private void expectNoPostProcessingCodeScripts() {
-		expectPostProcessingCodeScripts(Collections.EMPTY_LIST);
+		expectPostProcessingCodeScripts(Collections.<Script>emptyList());
 	}
 
 	private void expectNoCodeScriptModifications() {

@@ -4,7 +4,6 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
-import org.unitils.spring.SpringModule;
 
 public class SpringUnitilsAdaptorTestExecutionListener implements TestExecutionListener {
 
@@ -39,11 +38,6 @@ public class SpringUnitilsAdaptorTestExecutionListener implements TestExecutionL
 	}
 
 	
-	private SpringModule getSpringModule() {
-		return getUnitils().getModulesRepository().getModuleOfType(SpringModule.class);
-	}
-
-
 	/**
 	 * @return The Unitils test listener
 	 */
