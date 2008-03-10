@@ -20,6 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
+import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.unitils.core.Unitils;
@@ -58,11 +60,14 @@ public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<E
 	 */
 	protected AbstractEntityManagerFactoryBean createEntityManagerFactoryBean(Object testObject, JpaConfig jpaConfig) {
 		LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-		factoryBean.setPersistenceProvider(getJpaProviderSupport().getPersistenceProvider());
 		factoryBean.setDataSource(getDataSource());
 		factoryBean.setJpaVendorAdapter(getJpaProviderSupport().getSpringJpaVendorAdaptor());
 		factoryBean.setPersistenceXmlLocation(jpaConfig.getConfigFiles().iterator().next());
 		factoryBean.setPersistenceUnitName(jpaConfig.getPersistenceUnitName());
+		LoadTimeWeaver loadTimeWeaver = getJpaProviderSupport().getLoadTimeWeaver();
+		if (loadTimeWeaver != null) {
+			factoryBean.setLoadTimeWeaver(loadTimeWeaver);
+		}
 		if (jpaConfig.getConfigMethod() != null) {
 			try {
 				ReflectionUtils.invokeMethod(testObject, jpaConfig
