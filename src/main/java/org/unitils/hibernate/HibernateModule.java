@@ -44,10 +44,10 @@ import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.hibernate.util.HibernateAnnotationConfigLoader;
 import org.unitils.hibernate.util.HibernateAssert;
 import org.unitils.hibernate.util.HibernateSessionFactoryLoader;
-import org.unitils.orm.OrmModule;
-import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
-import org.unitils.orm.util.OrmConfig;
-import org.unitils.orm.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.common.OrmModule;
+import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.common.util.OrmConfig;
+import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 import org.unitils.util.ReflectionUtils;
 
 /**

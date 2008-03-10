@@ -16,7 +16,7 @@
 package org.unitils.database.util.spring;
 
 import org.springframework.transaction.PlatformTransactionManager;
-import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 
 /**
  * Defines the contract for implementations that retrieve an <code>PlatformTransactionManager</code> from the spring 

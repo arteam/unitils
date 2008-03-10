@@ -17,7 +17,7 @@ package org.unitils.jpa.util;
 
 import java.lang.reflect.Method;
 
-import org.unitils.orm.util.OrmConfig;
+import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.util.CollectionUtils;
 
 /**

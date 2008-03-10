@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.orm.util;
+package org.unitils.orm.common.util;
 
 /**
  * Value object that wraps a persistence unit object and an implementation specific configuration object

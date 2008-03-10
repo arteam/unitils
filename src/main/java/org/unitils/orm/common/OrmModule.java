@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.orm;
+package org.unitils.orm.common;
 
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
@@ -35,10 +35,10 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ResourceConfigLoader;
 import org.unitils.database.util.Flushable;
-import org.unitils.orm.spring.OrmSpringSupport;
-import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
-import org.unitils.orm.util.OrmConfig;
-import org.unitils.orm.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.common.spring.OrmSpringSupport;
+import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.common.util.OrmConfig;
+import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 
 /**
  * Base module defining common behavior for a module that provides object relational mapping support for tests.
@@ -327,10 +327,10 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
     
     
     /**
-     * Creates an instance of {@link org.unitils.orm.spring.OrmSpringSupport}, that
+     * Creates an instance of {@link org.unitils.orm.common.spring.OrmSpringSupport}, that
      * implements the dependency to the {@link org.unitils.spring.SpringModule}. If the
      * {@link org.unitils.spring.SpringModule} is not active, or if a dependency of 
-     * {@link org.unitils.orm.spring.OrmSpringSupport} could not be found in the classpath, 
+     * {@link org.unitils.orm.common.spring.OrmSpringSupport} could not be found in the classpath, 
      * the instance is not loaded.
      */
     protected void initOrmSpringSupport() {

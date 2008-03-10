@@ -26,9 +26,9 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.hibernate.HibernateModule;
-import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
-import org.unitils.orm.util.OrmConfig;
-import org.unitils.orm.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.common.util.OrmConfig;
+import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 
 public class HibernateSessionFactoryLoader implements OrmPersistenceUnitLoader<SessionFactory, Configuration, OrmConfig> {
 

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.orm.spring;
+package org.unitils.orm.common.spring;
 
-import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 
 /**
  * Defines the contract for implementations that retrieve an ORM persistence unit from the spring 
