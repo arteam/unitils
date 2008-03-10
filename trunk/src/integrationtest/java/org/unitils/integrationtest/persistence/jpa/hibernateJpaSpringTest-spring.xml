@@ -5,10 +5,9 @@
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="jpaVendorAdapter">
-        	<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        	<bean class="org.unitils.jpa.util.provider.hibernate.UnitilsHibernateJpaVendorAdapter"/>
         </property>
-        <property name="persistenceProviderClass" value="org.unitils.jpa.util.hibernate.UnitilsHibernatePersistenceProvider"/>
-        <property name="persistenceXmlLocation" value="org/unitils/integrationtest/persistence/jpa/persistence-test.xml"/>
+        <property name="persistenceXmlLocation" value="org/unitils/integrationtest/persistence/jpa/hibernate-persistence-test.xml"/>
     </bean>
 
 	<bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean"/>

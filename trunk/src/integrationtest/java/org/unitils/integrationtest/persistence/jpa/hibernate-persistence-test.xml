@@ -5,7 +5,6 @@
    
    <persistence-unit name="test">
       <provider>org.hibernate.ejb.HibernatePersistence</provider>
-      <!--class>org.unitils.integrationtest.sampleproject.model.Person</class-->
       <properties>
          <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
          <property name="hibernate.show_sql" value="true"/>
