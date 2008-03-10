@@ -16,7 +16,7 @@
 package org.unitils.util;
 
 import org.unitils.core.UnitilsException;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

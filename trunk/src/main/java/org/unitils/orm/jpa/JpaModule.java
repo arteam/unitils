@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa;
+package org.unitils.orm.jpa;
 
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
@@ -42,13 +42,13 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
-import org.unitils.jpa.util.JpaAnnotationConfigLoader;
-import org.unitils.jpa.util.JpaConfig;
-import org.unitils.jpa.util.JpaEntityManagerFactoryLoader;
-import org.unitils.jpa.util.JpaProviderSupport;
 import org.unitils.orm.common.OrmModule;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.orm.jpa.util.JpaAnnotationConfigLoader;
+import org.unitils.orm.jpa.util.JpaConfig;
+import org.unitils.orm.jpa.util.JpaEntityManagerFactoryLoader;
+import org.unitils.orm.jpa.util.JpaProviderSupport;
 import org.unitils.util.ConfigUtils;
 
 /**

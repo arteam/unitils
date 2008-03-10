@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa.util.provider.hibernate;
+package org.unitils.orm.jpa.util.provider.hibernate;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -25,10 +25,9 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaVendorAdapter;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.unitils.core.UnitilsException;
 import org.unitils.hibernate.util.HibernateAssert;
-import org.unitils.jpa.util.JpaProviderSupport;
+import org.unitils.orm.jpa.util.JpaProviderSupport;
 
 /**
  * Implementation of {@link JpaProviderSupport} for hibernate JPA

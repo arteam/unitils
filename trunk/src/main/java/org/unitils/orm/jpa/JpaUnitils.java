@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa;
+package org.unitils.orm.jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 
 /**
  * Utility facade for handling JPA related stuff such as asserting whether the mappings correspond to the actual

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa.util;
+package org.unitils.orm.jpa.util;
 
 import javax.persistence.EntityManager;
 import javax.persistence.spi.PersistenceProvider;
 
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaVendorAdapter;
-import org.unitils.jpa.JpaModule;
+import org.unitils.orm.jpa.JpaModule;
 
 /**
  * Defines the contract for implementations that implement any provider specific operations that unitils needs 

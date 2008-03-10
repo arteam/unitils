@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa.util;
+package org.unitils.orm.jpa.util;
 
 import java.lang.reflect.Method;
 
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.util.AnnotationConfigLoader;
 
 

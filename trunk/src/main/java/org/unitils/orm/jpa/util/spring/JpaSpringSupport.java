@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa.util.spring;
+package org.unitils.orm.jpa.util.spring;
 
 import java.util.Collection;
 
@@ -22,9 +22,9 @@ import javax.persistence.EntityManagerFactory;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.unitils.core.Unitils;
-import org.unitils.jpa.JpaModule;
 import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.jpa.JpaModule;
 import org.unitils.spring.SpringModule;
 
 
