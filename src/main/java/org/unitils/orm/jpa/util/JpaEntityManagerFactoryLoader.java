@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa.util;
+package org.unitils.orm.jpa.util;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -26,9 +26,9 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
-import org.unitils.jpa.JpaModule;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.jpa.JpaModule;
 import org.unitils.util.ReflectionUtils;
 
 /**

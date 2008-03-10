@@ -27,7 +27,7 @@ import java.util.Set;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ResourceConfig;
 import org.unitils.core.util.ResourceConfigLoader;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 
 /**
  * Loads the configuration of a resource that is configured on a test object, by reading class, method or field

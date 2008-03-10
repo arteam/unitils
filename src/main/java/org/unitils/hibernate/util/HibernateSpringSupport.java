@@ -30,9 +30,9 @@ import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.unitils.core.Unitils;
 import org.unitils.hibernate.HibernateModule;
-import org.unitils.jpa.JpaModule;
 import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.jpa.JpaModule;
 import org.unitils.spring.SpringModule;
 
 /**

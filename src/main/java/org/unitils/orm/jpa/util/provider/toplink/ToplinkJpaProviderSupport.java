@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa.util.provider.toplink;
+package org.unitils.orm.jpa.util.provider.toplink;
 
 import javax.persistence.EntityManager;
 import javax.persistence.spi.PersistenceProvider;
@@ -22,7 +22,7 @@ import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.TopLinkJpaVendorAdapter;
-import org.unitils.jpa.util.JpaProviderSupport;
+import org.unitils.orm.jpa.util.JpaProviderSupport;
 
 /**
  * Implementation of {@link JpaProviderSupport} for Oracle Toplink JPA
