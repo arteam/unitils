@@ -47,8 +47,8 @@ import org.unitils.jpa.util.JpaAnnotationConfigLoader;
 import org.unitils.jpa.util.JpaConfig;
 import org.unitils.jpa.util.JpaEntityManagerFactoryLoader;
 import org.unitils.jpa.util.JpaProviderSupport;
-import org.unitils.orm.OrmModule;
-import org.unitils.orm.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.common.OrmModule;
+import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 import org.unitils.util.ConfigUtils;
 
 /**

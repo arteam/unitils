@@ -5,7 +5,7 @@ import java.lang.reflect.Modifier;
 
 import org.hibernate.cfg.Configuration;
 import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.orm.util.OrmConfig;
+import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.util.AnnotationConfigLoader;
 import org.unitils.util.CollectionUtils;
 

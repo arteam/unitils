@@ -27,8 +27,8 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.jpa.JpaModule;
-import org.unitils.orm.util.ConfiguredOrmPersistenceUnit;
-import org.unitils.orm.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
+import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 import org.unitils.util.ReflectionUtils;
 
 /**
