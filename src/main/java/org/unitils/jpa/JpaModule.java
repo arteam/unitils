@@ -77,7 +77,7 @@ import org.unitils.util.ConfigUtils;
 public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Object, JpaEntityManagerFactory, JpaConfig, JpaAnnotationConfigLoader> {
 
 	 /* Property key that defines the persistence provider */
-    public static final String PROPKEY_PERSISTENCE_PROVIDER = "JpaModule.persistenceProvider";
+    public static final String PROPKEY_PERSISTENCE_PROVIDER = "jpa.persistenceProvider";
     
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(JpaModule.class);

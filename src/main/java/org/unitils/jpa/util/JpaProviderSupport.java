@@ -15,11 +15,10 @@
  */
 package org.unitils.jpa.util;
 
-import java.sql.Connection;
-
 import javax.persistence.EntityManager;
 import javax.persistence.spi.PersistenceProvider;
 
+import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.unitils.jpa.JpaModule;
 
@@ -44,25 +43,10 @@ public interface JpaProviderSupport {
 
 	
 	/**
-	 * @param entityManager Currently active <code>EntityManager</code>, not null
-	 * @return The JDBC connection that is used by the currently active <code>EntityManager</code>. Actions
-	 * performed on this connection are performed in the same transaction as the one to which the given
-	 * <code>EntityManager</code> is associated, not null
-	 */
-	Connection getJdbcConnection(EntityManager entityManager);
-	
-	
-	/**
 	 * @return Implementation of spring's <code>JpaVendorAdapter</code> interface for this persistence provider, not null
 	 */
 	JpaVendorAdapter getSpringJpaVendorAdaptor();
 	
-	
-	/**
-	 * @return An instance of the JPA <code>PersistenceProvider</code> for this persistence provider, not null
-	 */
-	PersistenceProvider getPersistenceProvider();
-
 	
 	/**
 	 * @param persistenceProvider The JPA <code>PersistenceProvider</code> that was used for creating the 
@@ -72,4 +56,13 @@ public interface JpaProviderSupport {
 	 * <code>EntityManagerFactory</code>, not null
 	 */
 	Object getProviderSpecificConfigurationObject(PersistenceProvider persistenceProvider);
+
+
+	/**
+	 * If necessary for this JPA provider, return an instance of spring's <code>LoadTimeWeaver</code> interface, that
+	 * will be set on the <code>LocalContainerEntityManagerFactoryBean</code> before creating the <code>EntityManagerFactory</code> 
+	 * 
+	 * @return A <code>LoadTimeWeaver</code>, if necessary for this JPA provider, null otherwise
+	 */
+	LoadTimeWeaver getLoadTimeWeaver();
 }

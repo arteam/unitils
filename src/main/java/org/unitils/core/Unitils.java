@@ -98,7 +98,7 @@ public class Unitils {
         testContext = new TestContext();
     }
 
-
+    
 	/**
      * Initializes unitils with the configuration files.
      */
@@ -125,6 +125,7 @@ public class Unitils {
      * @param configuration The config, not null
      */
     public void init(Properties configuration) {
+    	verifyPackaging(configuration);
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
         testListener = new UnitilsTestListener();
@@ -137,6 +138,29 @@ public class Unitils {
     		module.afterInit();
     	}
     }
+    
+    
+    private void verifyPackaging(Properties configuration) {
+    	String springCoreClassName = configuration.getProperty("spring.core.someClass.name");
+    	String unitilsPackagedWithSpring = "org.unitils.includeddeps." + springCoreClassName;
+    	
+		if (isClassAvailable(springCoreClassName) && isClassAvailable(unitilsPackagedWithSpring)) {
+			throw new IllegalStateException("It appears that you're using the unitils distribution that is packaged with " +
+					"its dependency to spring, while spring is also in your classpath. This is not supported. The spring-packaged " +
+					"distribution can only be used when you're not using spring at all. Please replace unitils-spring-included-version.jar " +
+					"with unitils-version.jar");
+		}
+	}
+
+    
+	private boolean isClassAvailable(String className) {
+		try {
+			Thread.currentThread().getContextClassLoader().loadClass(className);
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+	}
 
 
     /**

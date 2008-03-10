@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.jpa.util.hibernate;
+package org.unitils.jpa.util.provider.hibernate;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-
-import java.sql.Connection;
 
 import javax.persistence.EntityManager;
 import javax.persistence.spi.PersistenceProvider;
@@ -25,6 +23,7 @@ import javax.persistence.spi.PersistenceProvider;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.ejb.Ejb3Configuration;
+import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.unitils.core.UnitilsException;
@@ -74,25 +73,11 @@ public class HibernateJpaProviderSupport implements JpaProviderSupport {
     
     
     @Override
-    @SuppressWarnings("deprecation")
-	public Connection getJdbcConnection(EntityManager entityManager) {
-		Session session = (Session) entityManager.getDelegate();
-		return session.connection();
-	}
-    
-    
-    @Override
     public JpaVendorAdapter getSpringJpaVendorAdaptor() {
-    	return new HibernateJpaVendorAdapter();
+    	return new UnitilsHibernateJpaVendorAdapter();
     }
     
     
-    @Override
-	public PersistenceProvider getPersistenceProvider() {
-		return new UnitilsHibernatePersistenceProvider();
-	}
-
-
 	@Override
 	public Object getProviderSpecificConfigurationObject(
 			PersistenceProvider persistenceProvider) {
@@ -102,6 +87,12 @@ public class HibernateJpaProviderSupport implements JpaProviderSupport {
 		UnitilsHibernatePersistenceProvider hibernatePersistenceProvider = (UnitilsHibernatePersistenceProvider) persistenceProvider;
 		Ejb3Configuration configuration = hibernatePersistenceProvider.getHibernateConfiguration();
 		return configuration;
+	}
+
+
+	@Override
+	public LoadTimeWeaver getLoadTimeWeaver() {
+		return null;
 	}
 	
 }
