@@ -27,8 +27,8 @@ import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.integrationtest.sampleproject.model.Person;
-import org.unitils.jpa.JpaUnitils;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.orm.jpa.JpaUnitils;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
 //@Transactional(TransactionMode.COMMIT)

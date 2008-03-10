@@ -26,7 +26,7 @@ import org.hibernate.ejb.Ejb3Configuration;
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.unitils.core.UnitilsException;
-import org.unitils.hibernate.util.HibernateAssert;
+import org.unitils.orm.hibernate.util.HibernateAssert;
 import org.unitils.orm.jpa.util.JpaProviderSupport;
 
 /**

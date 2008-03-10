@@ -23,8 +23,8 @@ import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.integrationtest.sampleproject.model.Person;
+import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
 //@Transactional(TransactionMode.COMMIT)

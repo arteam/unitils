@@ -22,8 +22,8 @@ import org.springframework.context.ApplicationContext;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.integrationtest.sampleproject.model.Person;
+import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.spring.annotation.SpringApplicationContext;
 

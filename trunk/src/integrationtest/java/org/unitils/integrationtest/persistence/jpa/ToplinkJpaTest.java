@@ -25,7 +25,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.integrationtest.sampleproject.model.Person;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
 
