@@ -31,7 +31,7 @@ public class MsSqlDbSupport extends DbSupport {
      * Creates a new DB support instance for MS SQL.
      */
     public MsSqlDbSupport() {
-        super("MsSql");
+        super("mssql");
     }
 
     
