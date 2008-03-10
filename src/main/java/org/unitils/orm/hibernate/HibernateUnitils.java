@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.hibernate;
+package org.unitils.orm.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
+import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 
 /**
  * Utility facade for handling Hibernate related stuff such as asserting whether the mappings correspond to the actual

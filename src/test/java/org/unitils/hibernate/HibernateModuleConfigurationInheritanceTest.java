@@ -26,7 +26,8 @@ import java.util.Properties;
 import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
+import org.unitils.orm.hibernate.HibernateModule;
+import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 
 /**
  * Test class for the loading of the configuration in a test class hierarchy for the HibernateModule

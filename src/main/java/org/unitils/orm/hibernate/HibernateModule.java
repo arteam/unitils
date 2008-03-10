@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.hibernate;
+package org.unitils.orm.hibernate;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.unitils.util.PropertyUtils.getString;
@@ -40,14 +40,14 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.hibernate.util.HibernateAnnotationConfigLoader;
-import org.unitils.hibernate.util.HibernateAssert;
-import org.unitils.hibernate.util.HibernateSessionFactoryLoader;
 import org.unitils.orm.common.OrmModule;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
+import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
+import org.unitils.orm.hibernate.util.HibernateAnnotationConfigLoader;
+import org.unitils.orm.hibernate.util.HibernateAssert;
+import org.unitils.orm.hibernate.util.HibernateSessionFactoryLoader;
 import org.unitils.util.ReflectionUtils;
 
 /**

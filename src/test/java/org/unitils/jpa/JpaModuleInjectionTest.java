@@ -30,7 +30,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.jpa.annotation.JpaEntityManagerFactory;
+import org.unitils.orm.jpa.JpaModule;
+import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 
 /**
  * Test class for the loading of the configuration in the JpaModule

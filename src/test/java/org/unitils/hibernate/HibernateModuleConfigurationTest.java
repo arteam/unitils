@@ -25,7 +25,8 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
-import org.unitils.hibernate.annotation.HibernateSessionFactory;
+import org.unitils.orm.hibernate.HibernateModule;
+import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 
 import java.util.List;
 import java.util.Properties;
