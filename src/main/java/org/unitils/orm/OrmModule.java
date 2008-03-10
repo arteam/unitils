@@ -50,37 +50,37 @@ import org.unitils.orm.util.OrmPersistenceUnitLoader;
  * @author Filip Neven
  * @author Tim Ducheyne
  *
- * @param <ORMPU> Type of the ORM persistence unit
- * @param <ORMPC> Type of the ORM persistence context
- * @param <ORMCONFOBJ> Type of the implementation specific configuration object
- * @param <ORMPUCFGANNOTATION> Type of the annotation used for configuring and injecting the persistence unit
- * @param <ORMCFG> Type of the value object extending {@link OrmConfig} that contains all unitils specific persitence unit configuration
- * @param <ORMPUCFGLOADER> Subtype of {@link OrmPersistenceUnitLoader} that loads the persistence unit based on the ORMCFG.
+ * @param <ORM_PERSISTENCE_UNIT> Type of the ORM persistence unit
+ * @param <ORM_PERSISTENCE_CONTEXT> Type of the ORM persistence context
+ * @param <PROVIDER_CONFIGURATION_OBJECT> Type of the implementation specific configuration object
+ * @param <PERSISTENCE_UNIT_CONFIG_ANNOTATION> Type of the annotation used for configuring and injecting the persistence unit
+ * @param <ORM_CONFIG> Type of the value object extending {@link OrmConfig} that contains all unitils specific persitence unit configuration
+ * @param <ORM_PERSISTENCE_UNIT_CONFIGG_LOADER> Subtype of {@link OrmPersistenceUnitLoader} that loads the persistence unit based on the ORM_CONFIG.
  */
-abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION extends Annotation, ORMCFG extends OrmConfig, ORMPUCFGLOADER extends ResourceConfigLoader<ORMCFG>> implements Module, Flushable {
+abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, PROVIDER_CONFIGURATION_OBJECT, PERSISTENCE_UNIT_CONFIG_ANNOTATION extends Annotation, ORM_CONFIG extends OrmConfig, ORM_PERSISTENCE_UNIT_CONFIGG_LOADER extends ResourceConfigLoader<ORM_CONFIG>> implements Module, Flushable {
 
 	/**
 	 * Class that loads the persistence unit configuration
 	 */
-	protected ORMPUCFGLOADER persistenceUnitConfigLoader;
+	protected ORM_PERSISTENCE_UNIT_CONFIGG_LOADER persistenceUnitConfigLoader;
 	
 	/**
 	 * Class that loads the persistence unit, given an object extending {@link OrmConfig} 
 	 */
-	protected OrmPersistenceUnitLoader<ORMPU, ORMCONFOBJ, ORMCFG> ormPersistenceUnitLoader;
+	protected OrmPersistenceUnitLoader<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT, ORM_CONFIG> ormPersistenceUnitLoader;
 	
 	/**
 	 * Cache for persistence units and its configuration. We use this to make sure that for tests that use the same 
 	 * persistence unit configuration, the same persistence unit instance is reused
 	 */
-	protected Map<ORMCFG, ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ>> configuredOrmPersistenceUnitCache 
-			= new HashMap<ORMCFG, ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ>>();
+	protected Map<ORM_CONFIG, ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT>> configuredOrmPersistenceUnitCache 
+			= new HashMap<ORM_CONFIG, ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT>>();
 	
 	/**
 	 * Support class that enables getting a configured persistence unit from a spring ApplicationContext configured in
 	 * unitils. If the spring module is not enabled, this object is null.
 	 */
-	protected OrmSpringSupport<ORMPU, ORMCONFOBJ> ormSpringSupport;
+	protected OrmSpringSupport<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> ormSpringSupport;
 	
 
 	@Override
@@ -99,27 +99,27 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
 	 * @return A new instance of the {@link ResourceConfigLoader} that scans a test object for a persistence
 	 * unit configuration, and returns a specific subtype of {@link OrmConfig} that wraps this configuration
 	 */
-	abstract protected ORMPUCFGLOADER createOrmConfigLoader();
+	abstract protected ORM_PERSISTENCE_UNIT_CONFIGG_LOADER createOrmConfigLoader();
 	
 	
 	/**
 	 * @return The class of the annotation that is used for configuring and requesting injection of the 
 	 * persistence unit
 	 */
-	abstract protected Class<ORMPUCFGANNOTATION> getPersistenceUnitConfigAnnotationClass();
+	abstract protected Class<PERSISTENCE_UNIT_CONFIG_ANNOTATION> getPersistenceUnitConfigAnnotationClass();
 	
 	
 	/**
 	 * @return The type of the persistence unit
 	 */
-	abstract protected Class<ORMPU> getPersistenceUnitClass();
+	abstract protected Class<ORM_PERSISTENCE_UNIT> getPersistenceUnitClass();
 
 	
 	/**
 	 * @return A new instance of {@link OrmPersistenceUnitLoader} that can create a new persistence unit
 	 * based on an {@link OrmConfig} object
 	 */
-	abstract protected OrmPersistenceUnitLoader<ORMPU, ORMCONFOBJ, ORMCFG> createOrmPersistenceUnitLoader();
+	abstract protected OrmPersistenceUnitLoader<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT, ORM_CONFIG> createOrmPersistenceUnitLoader();
 	
 	
 	/**
@@ -138,8 +138,8 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
      * @param testObject The test instance, not null
      * @return The ORM persistence unit, not null
      */
-    public ORMPU getPersistenceUnit(Object testObject) {
-    	ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ> configuredPersistenceUnit = getConfiguredPersistenceUnit(testObject);
+    public ORM_PERSISTENCE_UNIT getPersistenceUnit(Object testObject) {
+    	ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> configuredPersistenceUnit = getConfiguredPersistenceUnit(testObject);
     	return configuredPersistenceUnit.getOrmPersistenceContext();
     }
     
@@ -152,8 +152,8 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
      * @param testObject The test instance, not null
      * @return The ORM implementation specific configuration object
      */
-    public ORMCONFOBJ getConfigurationObject(Object testObject) {
-    	ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ> configuredPersistenceUnit = getConfiguredPersistenceUnit(testObject);
+    public PROVIDER_CONFIGURATION_OBJECT getConfigurationObject(Object testObject) {
+    	ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> configuredPersistenceUnit = getConfiguredPersistenceUnit(testObject);
     	return configuredPersistenceUnit.getOrmConfigurationObject();
     }
     
@@ -167,7 +167,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
      * @param testObject The test instance, not null
      * @return
      */
-    protected ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ> getConfiguredPersistenceUnit(Object testObject) {
+    protected ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> getConfiguredPersistenceUnit(Object testObject) {
 		// If a persistence unit was configured in the spring ApplicationContext for this test object, we return
     	// this one. Notice that in that case, no extra caching is done. This is not needed because the ApplicationContext
     	// is already cached, and the ApplicationContext makes sure that the same persitence unit instance is always
@@ -177,14 +177,14 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
 		}
 		
     	// Check if a persistence unit configuration can be found on the test class. If not, throw an exception
-		ORMCFG persistenceUnitConfig = getPersistenceUnitConfig(testObject);
+		ORM_CONFIG persistenceUnitConfig = getPersistenceUnitConfig(testObject);
 		if (persistenceUnitConfig == null) {
 			throw new UnitilsException("Could not find a configuring @" + getPersistenceUnitConfigAnnotationClass().getSimpleName() + 
 					" annotation or custom config method");
 		}
 		
 		// Look for a cached instance. If not available, a new instance is created and added to the cache
-		ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ> configuredPersistenceUnit = configuredOrmPersistenceUnitCache.get(
+		ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> configuredPersistenceUnit = configuredOrmPersistenceUnitCache.get(
 				persistenceUnitConfig);
 		if (configuredPersistenceUnit == null) {
 			configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
@@ -198,7 +198,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
      * @param testObject The test instance, not null
      * @return The persistence unit configuration for this test class. Null if no configuration is available
      */
-    protected ORMCFG getPersistenceUnitConfig(Object testObject) {
+    protected ORM_CONFIG getPersistenceUnitConfig(Object testObject) {
 		return persistenceUnitConfigLoader.loadResourceConfig(testObject);
 	}
     
@@ -223,7 +223,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
      * @param testObject The test instance, not null
      * @return A persistence context, not null
      */
-    public ORMPC getPersistenceContext(Object testObject) {
+    public ORM_PERSISTENCE_CONTEXT getPersistenceContext(Object testObject) {
     	// If no EntityManagerFactory was configured in unitils, no EntityManagers can be created
 		if (!isPersistenceUnitConfiguredFor(testObject)) {
 			throw new UnitilsException("No persistence unit has been configured for this test class. Make sure you either "
@@ -243,7 +243,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
      * @param testObject The test instance, not null
      * @return An implementation specific persistence context, not null
      */
-	abstract protected ORMPC doGetPersistenceContext(Object testObject);
+	abstract protected ORM_PERSISTENCE_CONTEXT doGetPersistenceContext(Object testObject);
 	
 	
 	/**
@@ -254,7 +254,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
 	 * @param testObject The test instance, not null
 	 * @return The currently active persistence context, if any
 	 */
-	protected ORMPC getActivePersistenceContext(Object testObject) {
+	protected ORM_PERSISTENCE_CONTEXT getActivePersistenceContext(Object testObject) {
     	// If no EntityManagerFactory was configured in unitils, there are no open EntityManagers
     	if (!isPersistenceUnitConfiguredFor(testObject)) {
     		return null;
@@ -272,7 +272,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
 	 * @param testObject
 	 * @return The currently active persistence context, if any
 	 */
-	abstract protected ORMPC doGetActivePersistenceContext(Object testObject);
+	abstract protected ORM_PERSISTENCE_CONTEXT doGetActivePersistenceContext(Object testObject);
 	
 	
 	/**
@@ -282,7 +282,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
      * @param testObject The test instance, not null
      */
     public void flushDatabaseUpdates(Object testObject) {
-    	ORMPC activePersistenceContext = getActivePersistenceContext(testObject);
+    	ORM_PERSISTENCE_CONTEXT activePersistenceContext = getActivePersistenceContext(testObject);
     	if (activePersistenceContext != null) {
     		flushOrmPersistenceContext(activePersistenceContext);
     	}
@@ -294,7 +294,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
      * 
      * @param activePersistenceContext Active persistence context, associated with the current transaction, not null
      */
-	abstract protected void flushOrmPersistenceContext(ORMPC activePersistenceContext);
+	abstract protected void flushOrmPersistenceContext(ORM_PERSISTENCE_CONTEXT activePersistenceContext);
     
 	
     /**
@@ -321,7 +321,7 @@ abstract public class OrmModule<ORMPU, ORMPC, ORMCONFOBJ, ORMPUCFGANNOTATION ext
             return;
         }
 
-        ORMPU entityManagerFactory = getPersistenceUnit(testObject);
+        ORM_PERSISTENCE_UNIT entityManagerFactory = getPersistenceUnit(testObject);
         setFieldAndSetterValue(testObject, fields, methods, entityManagerFactory);
     }
     
