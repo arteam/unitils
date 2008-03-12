@@ -40,6 +40,7 @@ import org.unitils.integrationtest.persistence.jpa.HibernateJpaSpringTest;
 import org.unitils.integrationtest.persistence.jpa.HibernateJpaTest;
 import org.unitils.integrationtest.persistence.jpa.OpenJpaTest;
 import org.unitils.integrationtest.persistence.jpa.ToplinkJpaTest;
+import org.unitils.orm.jpa.JpaUnitils;
 import org.unitils.util.FileUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -99,6 +100,7 @@ public class UnitilsIntegrationTest {
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(ToplinkJpaTest.class, "testPersist");
 		Assert.assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+		JpaUnitils.getEntityManagerFactory().close();
 	}
 	
 	@Test
@@ -110,6 +112,7 @@ public class UnitilsIntegrationTest {
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
 		runTest(ToplinkJpaTest.class, "testPersist");
 		Assert.assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+		JpaUnitils.getEntityManagerFactory().close();
 	}
 	
 	@Test
