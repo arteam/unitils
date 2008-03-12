@@ -1163,9 +1163,8 @@ alter table PRODUCT add column barCode varchar(255);
 * {Testing with JPA}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Since release 1.1, Unitils provides support for JPA. Unitils' JPA support has been built on top of spring's terrific abstraction layer on top
-	of JPA. Therefore, Unitils supports all JPA vendors that spring supports. Currently these supported vendors are hibernate, oracle toplink and
-	openjpa.
+    Since release 1.1, Unitils provides support for JPA. Unitils' JPA support has been built on top of spring's JPA abstraction layer on top. Therefore, 
+	Unitils supports all JPA vendors that spring supports. Currently the supported vendors are hibernate, oracle toplink and openjpa.
 	
 	Unitils has to know which JPA vendor you are using. Therefore, specify the property jpa.persistenceProvider in unitils.properties with one of
 	the supported values: hibernate, toplink or openjpa, e.g.
@@ -1175,7 +1174,7 @@ jpa.persistenceProvider=hibernate
 +-----+
 	
 	If your application uses spring IOC, you'll probably want to make unitils work with the <EntityManagerFactory> configured in spring. To
-	read more about this, refer to {{{#Testing with Spring} Testing with Spring}}. If you're not using spring, you can configured an <EntityManagerFactory> 
+	read more about this, refer to {{{#Testing with Spring} Testing with Spring}}. If you're not using spring, you can configure an <EntityManagerFactory> 
 	as follows:
 	
 +-----+
@@ -1186,7 +1185,8 @@ public class UserDaoTest extends UnitilsJUnit4 {
 +-----+
 
     Unitils will initialize an <EntityManagerFactory>, load the persistence unit named 'pu', and inject it into the field annotated with 
-	<@JpaEntityManagerFactory>.
+	<@JpaEntityManagerFactory>. The default config file <META-INF/persistence.xml>. The jar file or class folder that contains the file
+	<META-INF/persistence.xml> is automatically scanned for objects that are annotated as JPA entities.
 	
 	It's also possible to use a different configuration file than <META-INF/persistence.xml> for testing, using the configFile attribute, e.g.:
 	
@@ -1197,8 +1197,15 @@ public class UserDaoTest extends UnitilsJUnit4 {
     EntityManagerFactory entityManagerFactory;
 +-----+
 
-    Unitils also supports using a custom configuration method, just like when configuring a hibernate <SessionFactory>. An 
-	<org.springframework.orm.jpa.AbstractEntityManagerFactoryBean> must be taken as parameter for such a method.
+    Fields or setter methods of the test object can be annotated with <@javax.persistence.PersistenceUnit> and <@javax.persistence.PersistenceContext>.
+	Unitils will inject an <EntityManagerFactory> or <EntityManager> on these anntotated fields / setters, respectively.
+	
+	Tests that use JPA must be run in a transaction. This is done preferably by annotating the test class or test method with 
+	<@org.unitils.database.annotations.Transactional>. See read the section {{{#Transactions}Transactions}} for more information.
+
+    Unitils also supports using a custom configuration method, just like when configuring a hibernate <SessionFactory>. A 
+	<org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean> must be taken as parameter for such a method. This method will be called 
+	after loading the persistence.xml file.
 	
 	Just as when using hibernate, you can create a test that verifies the mapping of the entities with the database. An implementation looks as follows:
 	

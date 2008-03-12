@@ -64,7 +64,7 @@ import org.unitils.util.ConfigUtils;
  * annotated with {@link JpaEntityManagerFactory} or <code>javax.persistence.PersistenceUnit</code>. An
  * <code>EntityManager</code> is injected into all fields or methods of the test annotated with 
  * <code>javax.persistence.PersistenceContext</code>. 
- * todo injectie in andere objecten
+ * todo injection into other objects
  * <p/>
  * This module also offers a test to check whether the mapping of all entities is consistent with the structure of the 
  * database. It is highly recommended to write a unit test that invokes {@link JpaUnitils#assertMappingWithDatabaseConsistent()},
