@@ -20,8 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -227,10 +226,10 @@ public class ReflectionUtils {
      * @param isStatic True if static fields are to be returned, false for non-static
      * @return A list of Fields, empty list if none found
      */
-    public static List<Field> getFieldsAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
-        List<Field> fieldsOfType = new ArrayList<Field>();
-        Field[] declaredFields = clazz.getDeclaredFields();
-        for (Field field : declaredFields) {
+    public static Set<Field> getFieldsAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
+    	Set<Field> fieldsOfType = new HashSet<Field>();
+    	Set<Field> allFields = getAllFields(clazz);
+        for (Field field : allFields) {
             if (field.getType().isAssignableFrom(type) && Modifier.isStatic(field.getModifiers()) == isStatic) {
                 fieldsOfType.add(field);
             }
@@ -248,29 +247,10 @@ public class ReflectionUtils {
      * @param isStatic True if static fields are to be returned, false for non-static
      * @return The fields with the given type
      */
-    public static List<Field> getFieldsOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
-        List<Field> fields = getFieldsOfTypeIgnoreSuper(clazz, type, isStatic);
-        Class<?> superClass = clazz.getSuperclass();
-        if (!superClass.equals(Object.class)) {
-            fields.addAll(getFieldsOfType(superClass, type, isStatic));
-        }
-        return fields;
-    }
-
-
-    /**
-     * Returns the fields in the given class that have the exact given type. The class's superclasses are not
-     * investigated.
-     *
-     * @param clazz    The class to get the field from, not null
-     * @param type     The type, not null
-     * @param isStatic True if static fields are to be returned, false for non-static
-     * @return The fields with the given type
-     */
-    private static List<Field> getFieldsOfTypeIgnoreSuper(Class<?> clazz, Class<?> type, boolean isStatic) {
-        List<Field> fields = new ArrayList<Field>();
-        Field[] declaredFields = clazz.getDeclaredFields();
-        for (Field field : declaredFields) {
+    public static Set<Field> getFieldsOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
+    	Set<Field> fields = new HashSet<Field>();
+        Set<Field> allFields = getAllFields(clazz);
+        for (Field field : allFields) {
             if (field.getType().equals(type) && isStatic == Modifier.isStatic(field.getModifiers())) {
                 fields.add(field);
             }
@@ -287,15 +267,17 @@ public class ReflectionUtils {
      * @param isStatic True if static setters are to be returned, false for non-static
      * @return A list of Methods, empty list if none found
      */
-    public static List<Method> getSettersAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
-        List<Method> settersAssignableFrom = new ArrayList<Method>();
-        Method[] declaredMethods = clazz.getDeclaredMethods();
-        for (Method method : declaredMethods) {
+    public static Set<Method> getSettersAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
+        Set<Method> settersAssignableFrom = new HashSet<Method>();
+        
+        Set<Method> allMethods = getAllMethods(clazz);
+        for (Method method : allMethods) {
             if (isSetter(method) && method.getParameterTypes()[0].isAssignableFrom(type)
                     && isStatic == Modifier.isStatic(method.getModifiers())) {
                 settersAssignableFrom.add(method);
             }
         }
+        
         return settersAssignableFrom;
     }
 
@@ -309,28 +291,10 @@ public class ReflectionUtils {
      * @param isStatic True if static setters are to be returned, false for non-static
      * @return All setters for an object of the given type
      */
-    public static List<Method> getSettersOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
-        List<Method> setters = getSettersOfTypeIgnoreSuper(clazz, type, isStatic);
-        Class<?> superClass = clazz.getSuperclass();
-        if (!superClass.equals(Object.class)) {
-            setters.addAll(getSettersOfType(superClass, type, isStatic));
-        }
-        return setters;
-    }
-
-    /**
-     * Returns the setter methods in the given class that have an argument with the exact given type. The class's
-     * superclasses are not investigated.
-     *
-     * @param clazz    The class to get the setter from, not null
-     * @param type     The type, not null
-     * @param isStatic True if static setters are to be returned, false for non-static
-     * @return All setters for an object of the given type
-     */
-    private static List<Method> getSettersOfTypeIgnoreSuper(Class<?> clazz, Class<?> type, boolean isStatic) {
-        List<Method> settersOfType = new ArrayList<Method>();
-        Method[] declaredMethods = clazz.getDeclaredMethods();
-        for (Method method : declaredMethods) {
+    public static Set<Method> getSettersOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
+        Set<Method> settersOfType = new HashSet<Method>();
+        Set<Method> allMethods = getAllMethods(clazz);
+        for (Method method : allMethods) {
             if (isSetter(method) && method.getParameterTypes()[0].equals(type)
                     && isStatic == Modifier.isStatic(method.getModifiers())) {
                 settersOfType.add(method);
@@ -351,10 +315,11 @@ public class ReflectionUtils {
      */
     public static Method getSetter(Class<?> clazz, String propertyName, boolean isStatic) {
         String setterName = "set" + StringUtils.capitalize(propertyName);
-        Method[] declaredMethods = clazz.getDeclaredMethods();
-        for (Method method : declaredMethods) {
+        Set<Method> allMethods = getAllMethods(clazz);
+        for (Method method : allMethods) {
             if (isSetter(method) && setterName.equals(method.getName())
-                    && isStatic == Modifier.isStatic(method.getModifiers())) {
+                    && isStatic == Modifier.isStatic(method.getModifiers())
+                    && method.getParameterTypes().length == 1) {
                 return method;
             }
         }
@@ -373,16 +338,7 @@ public class ReflectionUtils {
      */
     public static Method getGetter(Class<?> clazz, String propertyName, boolean isStatic) {
         String getterName = "get" + StringUtils.capitalize(propertyName);
-        try {
-            Method getter = clazz.getDeclaredMethod(getterName);
-            if (isStatic == Modifier.isStatic(getter.getModifiers())) {
-                return getter;
-            } else {
-                return null;
-            }
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
+        return getMethod(clazz, getterName, isStatic);
     }
 
 
@@ -391,23 +347,15 @@ public class ReflectionUtils {
      * given class, null is returned.
      *
      * @param setter The setter method, not null
+     * @param isStatic 
      * @return The getter method that matches the given setter, or null if no such method exists
      */
-    public static Method getGetter(Method setter) {
+    public static Method getGetter(Method setter, boolean isStatic) {
         if (!isSetter(setter)) {
             return null;
         }
         String getterName = "get" + setter.getName().substring(3);
-        try {
-            Method getter = setter.getDeclaringClass().getDeclaredMethod(getterName);
-            if (Modifier.isStatic(setter.getModifiers()) == Modifier.isStatic(getter.getModifiers())) {
-                return getter;
-            } else {
-                return null;
-            }
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
+        return getMethod(setter.getDeclaringClass(), getterName, isStatic);
     }
 
 
@@ -421,16 +369,23 @@ public class ReflectionUtils {
      * @return The field that matches the given parameters, or null if no such field exists
      */
     public static Field getFieldWithName(Class<?> clazz, String fieldName, boolean isStatic) {
-        try {
-            Field field = clazz.getDeclaredField(fieldName);
-            if (Modifier.isStatic(field.getModifiers()) == isStatic) {
-                return field;
-            } else {
-                return null;
-            }
-        } catch (NoSuchFieldException e) {
-            return null;
+        
+    	if (clazz == null || clazz.equals(Object.class)) {
+    		return null;
+    	}
+    	
+    	Field field;
+    	try {
+    		field = clazz.getDeclaredField(fieldName);
+    	} catch (NoSuchFieldException e) {
+    		field = null;
         }
+    	
+        if (field != null && Modifier.isStatic(field.getModifiers()) == isStatic) {
+            return field;
+        }
+        
+        return getFieldWithName(clazz.getSuperclass(), fieldName, isStatic);
     }
 
 
@@ -468,7 +423,7 @@ public class ReflectionUtils {
      */
     public static boolean isSetter(Method method) {
         String methodName = method.getName();
-        if (methodName.length() > 3 && method.getName().startsWith("set") && method.getParameterTypes().length == 1) {
+        if (methodName.length() > 3 && methodName.startsWith("set") && method.getParameterTypes().length == 1) {
             String fourthLetter = methodName.substring(3, 4);
             if (fourthLetter.toUpperCase().equals(fourthLetter)) {
                 return true;
@@ -485,7 +440,7 @@ public class ReflectionUtils {
      * @param setterMethod The method, not null
      * @return The field name, not null
      */
-    public static String getFieldName(Method setterMethod) {
+    public static String getPropertyName(Method setterMethod) {
         String methodName = setterMethod.getName();
         if (methodName.length() < 4 || !methodName.startsWith("set")) {
             throw new UnitilsException("Unable to get field name for setter method " + setterMethod);
@@ -512,14 +467,52 @@ public class ReflectionUtils {
     }
     
     
-	public static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-		try {
-			return clazz.getDeclaredMethod(methodName, parameterTypes);
-		} catch (SecurityException e) {
-			throw new UnitilsException(e);
-		} catch (NoSuchMethodException e) {
-			throw new UnitilsException(e);
+	public static Method getMethod(Class<?> clazz, String methodName, boolean isStatic, Class<?>... parameterTypes) {
+		if (clazz == null || clazz.equals(Object.class)) {
+			return null; 
 		}
+		
+		Method result;
+		try {
+			result = clazz.getDeclaredMethod(methodName, parameterTypes);
+		} catch (NoSuchMethodException e) {
+			result = null;
+		}
+		if (result != null && Modifier.isStatic(result.getModifiers()) == isStatic) {
+			return result;
+		}
+		
+		return getMethod(clazz.getSuperclass(), methodName, isStatic, parameterTypes);
+	}
+	
+	
+	private static Set<Method> getAllMethods(Class<?> clazz) {
+		Set<Method> result = new HashSet<Method>();
+		if (clazz == null || clazz.equals(Object.class)) {
+			return result; 
+		}
+		Method[] declaredMethods = clazz.getDeclaredMethods();
+		for (Method declaredMethod : declaredMethods) {
+			result.add(declaredMethod);
+		}
+		
+		result.addAll(getAllMethods(clazz.getSuperclass()));
+		return result;
+	}
+	
+	
+	private static Set<Field> getAllFields(Class<?> clazz) {
+		Set<Field> result = new HashSet<Field>();
+		if (clazz == null || clazz.equals(Object.class)) {
+			return result; 
+		}
+		Field[] declaredFields = clazz.getDeclaredFields();
+		for (Field declaredField : declaredFields) {
+			result.add(declaredField);
+		}
+		
+		result.addAll(getAllFields(clazz.getSuperclass()));
+		return result;
 	}
 
 }
