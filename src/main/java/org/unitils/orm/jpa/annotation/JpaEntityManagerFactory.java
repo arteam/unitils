@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * If the persistenceUnit and optionally the configFile attributes are specified, its goal is to specify 
  * <code>EntityManagerFactory</code> configuration parameters. 
  * </li><li>
- * If these attributes are not specified and the annotation is put on a field or type <code>EntityManagerFactory</code> 
+ * If these attributes are not specified and the annotation is put on a field of type <code>EntityManagerFactory</code> 
  * or a method that takes a single parameter  of type <code>EnitityManagerFactory</code>, the <code>EntityManagerFactory</code> 
  * for this test object is injected into this field or method. 
  * </li><li>

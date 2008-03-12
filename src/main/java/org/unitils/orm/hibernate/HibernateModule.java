@@ -136,7 +136,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     
 	@Override
     protected String getOrmSpringSupportImplClassName() {
-		return "org.unitils.hibernate.util.HibernateSpringSupport";
+		return "org.unitils.orm.hibernate.util.HibernateSpringSupport";
 	}
 	
 	

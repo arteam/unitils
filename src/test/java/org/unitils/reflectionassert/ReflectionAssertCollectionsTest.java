@@ -15,15 +15,15 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.Assert;
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
 import java.util.Arrays;
 import java.util.List;
+
+import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
 
 import org.junit.Before;
 import org.junit.Test;

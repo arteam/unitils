@@ -82,7 +82,7 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
     /**
      * Test hibernate test for session factory injection.
      */
-    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+    @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate.cfg.xml")
     public class HibernateTestSessionFactory {
 
         @HibernateSessionFactory
@@ -101,16 +101,15 @@ public class HibernateModuleInjectionTest extends UnitilsJUnit4 {
      * Test hibernate test for session factory injection. It also contains a custom initializer and custom
      * create for testing the mixing of the HibernateSessionFactory annotation
      */
-    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+    @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate.cfg.xml")
     public class HibernateTestSessionFactoryMixing {
 
         @HibernateSessionFactory
-        private SessionFactory sessionFactoryField = null;
+        SessionFactory sessionFactoryField = null;
 
-        @SuppressWarnings("unused")
-		private SessionFactory sessionFactorySetter;
+        SessionFactory sessionFactorySetter;
 
-        private boolean customInitializerCalled = false;
+        boolean customInitializerCalled = false;
 
         @HibernateSessionFactory
         public void setSessionFactorySetter(SessionFactory sessionFactorySetter) {

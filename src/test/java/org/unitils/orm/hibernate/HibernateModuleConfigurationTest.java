@@ -66,7 +66,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
         Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTestClassLevel);
 
         assertNotNull(hibernateConfiguration);
-        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
+        assertEquals("org/unitils/orm/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
     }
 
 
@@ -94,7 +94,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
         Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTestFieldLevel);
 
         assertNotNull(hibernateConfiguration);
-        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
+        assertEquals("org/unitils/orm/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
     }
 
 
@@ -122,7 +122,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
         Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTestSetterLevel);
 
         assertNotNull(hibernateConfiguration);
-        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
+        assertEquals("org/unitils/orm/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
     }
 
 
@@ -207,7 +207,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
         Configuration hibernateConfiguration2 = hibernateModule.getConfigurationObject(new HibernateTestClassLevel());
 
         assertNotNull(hibernateConfiguration1);
-        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
+        assertEquals("org/unitils/orm/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
         assertSame(hibernateConfiguration1, hibernateConfiguration2);
     }
 
@@ -215,7 +215,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
     /**
      * Class level configuration.
      */
-    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+    @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate.cfg.xml")
     public class HibernateTestClassLevel {
     }
 
@@ -231,7 +231,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
      */
     public class HibernateTestFieldLevel {
 
-        @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+        @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate.cfg.xml")
         protected SessionFactory field;
     }
 
@@ -249,7 +249,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
      */
     public class HibernateTestSetterLevel {
 
-        @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+        @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate.cfg.xml")
         public void setField(SessionFactory sessionFactory) {
         }
     }
@@ -293,7 +293,7 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
     /**
      * Configuration with custom initialization with configuration argument.
      */
-    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+    @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate.cfg.xml")
     public class HibernateTestCustomInitialization {
 
         public boolean initCalled = false;
