@@ -15,12 +15,8 @@
  */
 package org.unitils.dbunit.util;
 
-import static java.lang.reflect.Proxy.newProxyInstance;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -46,8 +42,8 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
 
     /* Connection that is currently in use by DBUnit. Is stored to enable returning it to the connection pool after
      the DBUnit operation finished */
-    private Connection currentlyUsedConnection;
-
+    private Connection currentlyUsedConnection, currentlyUsedNativeConnection;
+    
 
     /**
      * Creates a new instance that wraps the given <code>DataSource</code>
@@ -91,67 +87,40 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     @Override
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
-            Connection connection = DataSourceUtils.getConnection(dataSource);
-			currentlyUsedConnection = connection;
+			currentlyUsedConnection = DataSourceUtils.getConnection(dataSource);
+			currentlyUsedNativeConnection = getNativeConnection(currentlyUsedConnection);
         }
-        return currentlyUsedConnection;
+        return currentlyUsedNativeConnection;
     }
-    
-    
-    // TODO move to utility class
-    
-    /**
-	 * Returns a proxy that implements the {@link CloseSuppressingConnection} interface, that delegates to an actual
-	 * {@link Connection}, suppresses the {@link Connection#close()} method and implements the
-	 * {@link CloseSuppressingConnection#doClose()} method which actually closes the target connection.
-	 * 
-	 * @param connection The wrapped connection to which is delegated
-	 * @return A close suppressing connection
-	 */
-	protected Connection getCloseSuppressingConnectionProxy(Connection connection) {
-		return (Connection) newProxyInstance(getClass().getClassLoader(), new Class[] { Connection.class }, new CloseSuppressionConnectionProxyInvocationHandler(connection));
-	}
-    
-    
-	/**
-	 * Invocation handler that can be used to implement a proxy implementing the {@link CloseSuppressingConnection}
-	 * interface. The generated proxy delegates all method calls, unless the {@link Connection#close()} method, which is
-	 * suppressed. Actually closing the underlying {@link Connection} can be done using
-	 * {@link CloseSuppressingConnection#doClose()}.
-	 */
-	protected static class CloseSuppressionConnectionProxyInvocationHandler implements InvocationHandler {
-
-		private Connection wrappedConnection;
-
-		protected CloseSuppressionConnectionProxyInvocationHandler(Connection wrappedConnection) {
-			this.wrappedConnection = wrappedConnection;
-		}
-
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			if (method.getName().equals("close")) {
-				// do nothing, connection close is suppressed
-				return null;
-			}
-			try {
-				return method.invoke(wrappedConnection, args);
-			} catch (InvocationTargetException e) {
-				throw e.getTargetException();
-			}
-		}
-
-	}
 
 
     /**
-     * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
-     *
-     * @throws SQLException When connection close fails
+     * @return The 'native' connection, which is wrapped by the given connection. Could be the supplied connection itself 
+     * @throws SQLException
      */
-    public void closeJdbcConnection() throws SQLException {
-        if (currentlyUsedConnection != null) {
-            DataSourceUtils.releaseConnection(currentlyUsedConnection, dataSource);
-            currentlyUsedConnection = null;
-        }
-    }
-
+	protected Connection getNativeConnection(Connection connection) throws SQLException {
+		DatabaseMetaData metaData = connection.getMetaData();
+		if (metaData != null) {
+			Connection targetConnection = metaData.getConnection();
+			if (targetConnection != null) {
+				return targetConnection;
+			}
+		}
+		return connection;
+	}
+    
+    
+   /**
+    * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
+    *
+    * @throws SQLException When connection close fails
+    */
+   public void closeJdbcConnection() throws SQLException {
+       if (currentlyUsedConnection != null) {
+           DataSourceUtils.releaseConnection(currentlyUsedConnection, dataSource);
+           currentlyUsedConnection = null;
+           currentlyUsedNativeConnection = null;
+       }
+   }
+   
 }
