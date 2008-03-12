@@ -17,7 +17,7 @@ package org.unitils.util;
 
 import static org.unitils.util.CollectionUtils.asSet;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getFieldName;
+import static org.unitils.util.ReflectionUtils.getPropertyName;
 import static org.unitils.util.ReflectionUtils.getFieldValue;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
@@ -268,7 +268,7 @@ public class ReflectionUtilsTest extends TestCase {
      * Test for performing a method invocation. Null value
      */
     public void testGetFieldName() throws Exception {
-        String result = getFieldName(fieldSetterMethod);
+        String result = getPropertyName(fieldSetterMethod);
         assertEquals("field", result);
     }
 
@@ -279,7 +279,7 @@ public class ReflectionUtilsTest extends TestCase {
     public void testGetFieldName_noSetter() throws Exception {
         Method anotherMethod = getClass().getDeclaredMethod("testGetFieldName_noSetter");
         try {
-            getFieldName(anotherMethod);
+            getPropertyName(anotherMethod);
             fail("UnitilsException expected");
         } catch (UnitilsException e) {
             //expected

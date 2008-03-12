@@ -148,7 +148,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
 
 	@Override
     protected String getOrmSpringSupportImplClassName() {
-		return "org.unitils.jpa.util.spring.JpaSpringSupport";
+		return "org.unitils.orm.jpa.util.spring.JpaSpringSupport";
 	}
 
 

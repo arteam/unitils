@@ -21,7 +21,20 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * This annotation can be used in three different ways: 
+ * <ul><li>
+ * If its value attribute is specified, the goal is to configure a spring <code>ApplicationContext</code> for this
+ * test object.
+ * </li><li>
+ * If this attributes is not specified and the annotation is put on a field of type <code>ApplicationContext</code> 
+ * or a method that takes a single parameter  of type <code>ApplicationContext</code>, the <code>ApplicationContext</code> 
+ * for this test object is injected into this field or method. 
+ * </li><li>
+ * If put on a method with no parameter or a single parameter of type <code>List&lt;String&gt;</code> that returns an 
+ * <code>ApplicationContext</code>, this method becomes a custom create for this test class. If it has a parameter, 
+ * this method will be invoked with the config locations as parameter. The result of this method should be an instance 
+ * of an application context for which the refresh() method was not yet invoked.
+ * </li></ul>
  *
  * @author Filip Neven
  * @author Tim Ducheyne

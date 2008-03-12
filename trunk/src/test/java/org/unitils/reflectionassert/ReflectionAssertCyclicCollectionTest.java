@@ -15,7 +15,6 @@
  */
 package org.unitils.reflectionassert;
 
-import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 

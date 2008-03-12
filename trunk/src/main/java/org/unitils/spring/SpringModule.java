@@ -18,7 +18,7 @@ package org.unitils.spring;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getInstance;
-import static org.unitils.util.ReflectionUtils.getFieldName;
+import static org.unitils.util.ReflectionUtils.getPropertyName;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
 import static org.unitils.util.ReflectionUtils.isSetter;
 import static org.unitils.util.ReflectionUtils.setFieldValue;
@@ -351,7 +351,7 @@ public class SpringModule implements Module {
                     throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBeanByName.class.getSimpleName() + ". Method " +
                             method.getName() + " is not a setter method.");
                 }
-                invokeMethod(testObject, method, getSpringBean(testObject, getFieldName(method)));
+                invokeMethod(testObject, method, getSpringBean(testObject, getPropertyName(method)));
 
             } catch (UnitilsException e) {
                 throw new UnitilsException("Unable to assign the Spring bean value to method annotated with @" + SpringBeanByName.class.getSimpleName(), e);

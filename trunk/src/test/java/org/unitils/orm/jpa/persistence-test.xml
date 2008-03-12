@@ -4,7 +4,7 @@
    version="1.0">
    <persistence-unit name="unitils">
       <properties>
-         <property name="name" value="/org/unitils/jpa/persistence-test.xml"/>
+         <property name="name" value="/org/unitils/orm/jpa/persistence-test.xml"/>
          <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
       </properties>
    </persistence-unit>

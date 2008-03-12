@@ -15,24 +15,32 @@
  */
 package org.unitils.inject.util;
 
+import static org.unitils.util.ReflectionUtils.getFieldValue;
+import static org.unitils.util.ReflectionUtils.getFieldWithName;
+import static org.unitils.util.ReflectionUtils.getFieldsAssignableFrom;
+import static org.unitils.util.ReflectionUtils.getGetter;
+import static org.unitils.util.ReflectionUtils.getSettersAssignableFrom;
+import static org.unitils.util.ReflectionUtils.getSettersOfType;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Set;
+
 import ognl.DefaultMemberAccess;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.ReflectionUtils;
-import static org.unitils.util.ReflectionUtils.*;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Class containing static methods that implement explicit injection using OGNL expressions, and auto-injection by type.
@@ -207,18 +215,18 @@ public class InjectionUtils {
     private static Object injectIntoFieldByType(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
         // Try to find a field with an exact matching type
         Field fieldToInjectTo = null;
-        List<Field> fieldsWithExactType = ReflectionUtils.getFieldsOfType(targetClass, objectToInjectType, isStatic);
+        Set<Field> fieldsWithExactType = ReflectionUtils.getFieldsOfType(targetClass, objectToInjectType, isStatic);
         if (fieldsWithExactType.size() > 1) {
             throw new UnitilsException("More than one " + (isStatic ? "static " : "") + "field with exact type " + objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
 
         } else if (fieldsWithExactType.size() == 1) {
-            fieldToInjectTo = fieldsWithExactType.get(0);
+            fieldToInjectTo = fieldsWithExactType.iterator().next();
 
         } else {
             // Try to find a supertype field:
             // If one field exist that has a type which is more specific than all other fields of the given type,
             // this one is taken. Otherwise, an exception is thrown
-            List<Field> fieldsOfType = getFieldsAssignableFrom(targetClass, objectToInjectType, isStatic);
+            Set<Field> fieldsOfType = getFieldsAssignableFrom(targetClass, objectToInjectType, isStatic);
             if (fieldsOfType.size() == 0) {
                 throw new UnitilsException("No " + (isStatic ? "static " : "") + "field with (super)type " + objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
             }
@@ -274,18 +282,18 @@ public class InjectionUtils {
     private static Object injectIntoSetterByType(Object objectToInject, Class<?> objectToInjectType, Object target, Class<?> targetClass, boolean isStatic) {
         // Try to find a method with an exact matching type
         Method setterToInjectTo = null;
-        List<Method> settersWithExactType = getSettersOfType(targetClass, objectToInjectType, isStatic);
+        Set<Method> settersWithExactType = getSettersOfType(targetClass, objectToInjectType, isStatic);
         if (settersWithExactType.size() > 1) {
             throw new UnitilsException("More than one " + (isStatic ? "static " : "") + "setter with exact type " + objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
 
         } else if (settersWithExactType.size() == 1) {
-            setterToInjectTo = settersWithExactType.get(0);
+            setterToInjectTo = settersWithExactType.iterator().next();
 
         } else {
             // Try to find a supertype setter:
             // If one setter exist that has a type which is more specific than all other setters of the given type,
             // this one is taken. Otherwise, an exception is thrown
-            List<Method> settersOfType = getSettersAssignableFrom(targetClass, objectToInjectType, isStatic);
+            Set<Method> settersOfType = getSettersAssignableFrom(targetClass, objectToInjectType, isStatic);
             if (settersOfType.size() == 0) {
                 throw new UnitilsException("No " + (isStatic ? "static " : "") + "setter with (super)type " + objectToInjectType.getSimpleName() + " found in " + targetClass.getSimpleName());
             }
@@ -313,7 +321,7 @@ public class InjectionUtils {
         // Setter to inject into found, inject the object and return old value
         Object oldValue = null;
         try {
-            Method getter = getGetter(setterToInjectTo);
+            Method getter = getGetter(setterToInjectTo, isStatic);
             if (getter == null) {
                 logger.warn("Unable to retrieve current value of field to inject into, no getter found for setter: " + setterToInjectTo + ". Will not be able to restore value after injection.");
             } else {

@@ -22,7 +22,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * This annotation can be used on fields or setter methods, in order to inject a bean
+ * from a spring <code>ApplicationContext</code>. Unitils looks for a bean assignable the annotated field 
+ * or setter method. If multiple beans are assignable, the most specific one is chosen. If none can be found that's 
+ * more specific than all others, an exception is thrown. An <code>ApplicationContext</code> has to be configured 
+ * for this test using the {@link SpringApplicationContext} annotation.
  *
  * @author Filip Neven
  * @author Tim Ducheyne

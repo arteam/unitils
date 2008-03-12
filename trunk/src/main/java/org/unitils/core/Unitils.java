@@ -19,8 +19,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
-import org.unitils.core.util.ResourceTranslatingClassLoader;
-
 /**
  * Core class of the Unitils library, and the main entry point that gives access to the {@link TestContext} and the
  * different {@link Module}s.
@@ -88,8 +86,6 @@ public class Unitils {
     /* Object keeping track of the unit test that is currently running */
     private TestContext testContext;
     
-    private ResourceTranslatingClassLoader unitilsClassLoader;
-
 
     /**
      * Creates a new instance.
@@ -203,14 +199,6 @@ public class Unitils {
     public Properties getConfiguration() {
         return configuration;
     }
-
-
-    /**
-     * @return The ClassLoader that is used to load classes in unitils
-     */
-    public ResourceTranslatingClassLoader getUnitilsClassLoader() {
-		return unitilsClassLoader;
-	}
 
 
 	/**

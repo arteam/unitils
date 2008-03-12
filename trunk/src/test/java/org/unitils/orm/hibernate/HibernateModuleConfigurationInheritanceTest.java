@@ -61,7 +61,7 @@ public class HibernateModuleConfigurationInheritanceTest {
         Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTest1);
 
         assertNotNull(hibernateConfiguration);
-        assertEquals("org/unitils/hibernate/hibernate-sub.cfg.xml", hibernateConfiguration.getProperty("name"));
+        assertEquals("org/unitils/orm/hibernate/hibernate-sub.cfg.xml", hibernateConfiguration.getProperty("name"));
         assertFalse(hibernateTest1.initMethod1Called);
         assertTrue(hibernateTest1.initMethod2Called);
     }
@@ -77,7 +77,7 @@ public class HibernateModuleConfigurationInheritanceTest {
         Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTest2);
 
         assertNotNull(hibernateConfiguration);
-        assertEquals("org/unitils/hibernate/hibernate-sub.cfg.xml", hibernateConfiguration.getProperty("name"));
+        assertEquals("org/unitils/orm/hibernate/hibernate-sub.cfg.xml", hibernateConfiguration.getProperty("name"));
         assertFalse(hibernateTest2.initMethod1Called);
     }
 
@@ -92,7 +92,7 @@ public class HibernateModuleConfigurationInheritanceTest {
         Configuration hibernateConfiguration = hibernateModule.getConfigurationObject(hibernateTestNoCreation);
 
         assertNotNull(hibernateConfiguration);
-        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
+        assertEquals("org/unitils/orm/hibernate/hibernate.cfg.xml", hibernateConfiguration.getProperty("name"));
         assertTrue(hibernateTestNoCreation.initMethod1Called);
     }
 
@@ -106,7 +106,7 @@ public class HibernateModuleConfigurationInheritanceTest {
         Configuration hibernateConfiguration2 = hibernateModule.getConfigurationObject(new HibernateTestNoCreation2());
 
         assertNotNull(hibernateConfiguration1);
-        assertEquals("org/unitils/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
+        assertEquals("org/unitils/orm/hibernate/hibernate.cfg.xml", hibernateConfiguration1.getProperty("name"));
         assertSame(hibernateConfiguration1, hibernateConfiguration2);
     }
 
@@ -114,7 +114,7 @@ public class HibernateModuleConfigurationInheritanceTest {
     /**
      * Test Hibernate super-class.
      */
-    @HibernateSessionFactory("org/unitils/hibernate/hibernate.cfg.xml")
+    @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate.cfg.xml")
     public class HibernateTestSuper {
 
         protected boolean initMethod1Called = false;
@@ -128,7 +128,7 @@ public class HibernateModuleConfigurationInheritanceTest {
     /**
      * Test Hibernate sub-class with custom create.
      */
-    @HibernateSessionFactory("org/unitils/hibernate/hibernate-sub.cfg.xml")
+    @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate-sub.cfg.xml")
     public class HibernateTestCustomInit extends HibernateTestSuper {
 
         protected boolean initMethod2Called = false;
@@ -142,7 +142,7 @@ public class HibernateModuleConfigurationInheritanceTest {
     /**
      * Test Hibernate sub-class without custom create.
      */
-    @HibernateSessionFactory("org/unitils/hibernate/hibernate-sub.cfg.xml")
+    @HibernateSessionFactory("org/unitils/orm/hibernate/hibernate-sub.cfg.xml")
     public class HibernateTestNoCustomCreate extends HibernateTestSuper {
     }
 

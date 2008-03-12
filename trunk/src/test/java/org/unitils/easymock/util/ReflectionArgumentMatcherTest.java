@@ -15,8 +15,10 @@
  */
 package org.unitils.easymock.util;
 
-import junit.framework.TestCase;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.fail;
 import static org.unitils.easymock.EasyMockUnitils.lenEq;
 import static org.unitils.easymock.EasyMockUnitils.refEq;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
@@ -27,7 +29,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Test for {@link org.unitils.easymock.util.ReflectionArgumentMatcher}.

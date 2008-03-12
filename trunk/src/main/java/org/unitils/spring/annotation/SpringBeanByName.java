@@ -22,7 +22,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * This annotation can be used on fields or setter methods, in order to inject a bean
+ * from a spring <code>ApplicationContext</code>. The id of the bean in the application context is automatically
+ * derived from the name of the field or setter method. An <code>ApplicationContext</code> has to be configured
+ * for this test using the {@link SpringApplicationContext} annotation.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
