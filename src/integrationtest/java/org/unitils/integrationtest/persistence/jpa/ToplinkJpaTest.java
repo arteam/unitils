@@ -28,7 +28,6 @@ import org.unitils.integrationtest.sampleproject.model.Person;
 import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
-
 public class ToplinkJpaTest extends UnitilsJUnit4 {
 
 	@JpaEntityManagerFactory(persistenceUnit = "test", configFile = "org/unitils/integrationtest/persistence/jpa/toplink-persistence-test.xml")

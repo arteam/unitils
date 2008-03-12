@@ -27,7 +27,7 @@ import org.unitils.integrationtest.sampleproject.model.Person;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
-@Transactional(TransactionMode.COMMIT)
+//@Transactional(TransactionMode.COMMIT)
 public class HibernateTest extends UnitilsJUnit4 {
 
 	@HibernateSessionFactory({"org/unitils/integrationtest/persistence/hibernate/hibernate-test.cfg.xml"})
