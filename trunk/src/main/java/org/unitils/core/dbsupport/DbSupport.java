@@ -15,20 +15,17 @@
  */
 package org.unitils.core.dbsupport;
 
-import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
-import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
-import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.util.StoredIdentifierCase;
+import static org.unitils.core.util.StoredIdentifierCase.*;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import org.unitils.util.PropertyUtils;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
-
-import org.unitils.core.UnitilsException;
-import org.unitils.core.util.StoredIdentifierCase;
-import org.unitils.util.PropertyUtils;
 
 /**
  * Helper class that implements a number of common operations on a database schema. Operations that can be implemented
@@ -379,6 +376,17 @@ abstract public class DbSupport {
      */
     public String getLongDataType() {
         return "BIGINT";
+    }
+
+
+    /**
+     * Gets the column type suitable to store text values.
+     *
+     * @param length The nr of characters.
+     * @return The column type, not null
+     */
+    public String getTextDataType(int length) {
+        return "VARCHAR(" + length + ")";
     }
 
 

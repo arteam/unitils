@@ -123,6 +123,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit4 {
             fail("Expected AssertionFailedError");
         } catch (AssertionFailedError e) {
             //expected
+            e.printStackTrace();
         }
     }
 

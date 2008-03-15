@@ -15,71 +15,79 @@
  */
 package org.unitils.dbmaintainer.util;
 
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DbSupportFactory;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupports;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
 
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.SQLHandler;
-
 /**
  * Base class for a database task.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 abstract public class BaseDatabaseTask implements DatabaseTask {
 
-	/** The unitils configuration */
-	protected Properties configuration;
+    /**
+     * The unitils configuration
+     */
+    protected Properties configuration;
 
-	/** Provides connections to the unit test database */
-	protected SQLHandler sqlHandler;
+    /**
+     * Provides connections to the unit test database
+     */
+    protected SQLHandler sqlHandler;
 
-	/** DbSupport for the default schema */
-	protected DbSupport defaultDbSupport;
+    /**
+     * DbSupport for the default schema
+     */
+    protected DbSupport defaultDbSupport;
 
-	/** DbSupport for all schemas */
-	protected List<DbSupport> dbSupports;
-
-
-	/**
-	 * Initializes the database operation class with the given {@link Properties}, {@link DataSource}.
-	 * 
-	 * @param configuration The configuration, not null
-	 * @param sqlHandler The sql handler, not null
-	 */
-	public void init(Properties configuration, SQLHandler sqlHandler) {
-		this.configuration = configuration;
-		this.sqlHandler = sqlHandler;
-		this.dbSupports = getDbSupports(configuration, sqlHandler);
-		this.defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
-
-		doInit(configuration);
-	}
+    /**
+     * DbSupport for all schemas
+     */
+    protected List<DbSupport> dbSupports;
 
 
-	/**
-	 * Allows subclasses to perform some extra configuration using the given configuration.
-	 * 
-	 * @param configuration The configuration, not null
-	 */
-	abstract protected void doInit(Properties configuration);
+    /**
+     * Initializes the database operation class with the given {@link Properties}, {@link DataSource}.
+     *
+     * @param configuration The configuration, not null
+     * @param sqlHandler    The sql handler, not null
+     */
+    public void init(Properties configuration, SQLHandler sqlHandler) {
+        this.configuration = configuration;
+        this.sqlHandler = sqlHandler;
+        this.dbSupports = getDbSupports(configuration, sqlHandler);
+        this.defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
+
+        doInit(configuration);
+    }
 
 
-	/**
-	 * Gets the db support for the given schema.
-	 * 
-	 * @param schemaName The schema, not null
-	 * @return The db support, not null
-	 */
-	public DbSupport getDbSupport(String schemaName) {
-		return DbSupportFactory.getDbSupport(configuration, sqlHandler, schemaName);
-	}
+    /**
+     * Allows subclasses to perform some extra configuration using the given configuration.
+     *
+     * @param configuration The configuration, not null
+     */
+    protected void doInit(Properties configuration) {
+        // do nothing
+    }
+
+
+    /**
+     * Gets the db support for the given schema.
+     *
+     * @param schemaName The schema, not null
+     * @return The db support, not null
+     */
+    public DbSupport getDbSupport(String schemaName) {
+        return DbSupportFactory.getDbSupport(configuration, sqlHandler, schemaName);
+    }
 
 }

@@ -80,7 +80,7 @@ public class SQLHandler {
      * @return The nr of updates
      */
     public int executeUpdate(String sql) {
-        logger.info(sql);
+        logger.debug(sql);
 
         if (!doExecuteUpdates) {
             // skip update
@@ -108,7 +108,7 @@ public class SQLHandler {
      * @return The nr of updates
      */
     public int executeCodeUpdate(String sql) {
-        logger.info(sql);
+        logger.debug(sql);
 
         if (!doExecuteUpdates) {
             // skip update

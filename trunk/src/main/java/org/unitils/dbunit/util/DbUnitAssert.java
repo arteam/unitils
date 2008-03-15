@@ -20,12 +20,10 @@ import org.dbunit.dataset.*;
 import org.dbunit.dataset.datatype.DataType;
 import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.unitils.core.UnitilsException;
+import org.unitils.reflectionassert.ReflectionAssert;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Assert class that offers assert methods for testing things that are specific to DbUnit.
@@ -46,13 +44,46 @@ public class DbUnitAssert {
             // get the actual data set
             IDataSet actualDataSet = dbUnitDatabaseConnection.createDataSet();
             IDataSet filteredActualDataSet = new FilteredDataSet(new IncludeTableFilter(expectedDataSet.getTableNames()), actualDataSet);
-            assertEqualsDataSet(expectedDataSet, filteredActualDataSet);
+
+            Map<String, List<Map<String, String>>> expectedDataSetContents = getDataSetContents(expectedDataSet);
+            Map<String, List<Map<String, String>>> actualDataSetContents = getDataSetContents(filteredActualDataSet);
+            ReflectionAssert.assertLenEquals(expectedDataSetContents, actualDataSetContents);
 
         } catch (SQLException e) {
             throw new UnitilsException("Unable to assert whether db content is as expected.", e);
         } catch (DataSetException e) {
             throw new UnitilsException("Unable to assert whether db content is as expected", e);
         }
+    }
+
+
+    public static Map<String, List<Map<String, String>>> getDataSetContents(IDataSet dataSet) {
+        Map<String, List<Map<String, String>>> result = new HashMap<String, List<Map<String, String>>>();
+        try {
+            ITableIterator tables = dataSet.iterator();
+            while (tables.next()) {
+                ITable table = tables.getTable();
+                String tableName = table.getTableMetaData().getTableName();
+
+                List<Map<String, String>> rows = new ArrayList<Map<String, String>>();
+                result.put(tableName, rows);
+
+                Column[] columns = table.getTableMetaData().getColumns();
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    Map<String, String> row = new HashMap<String, String>();
+                    rows.add(row);
+
+                    for (Column column : columns) {
+                        String columnName = column.getColumnName();
+                        Object value = table.getValue(i, columnName);
+                        row.put(columnName, DataType.asString(value));
+                    }
+                }
+            }
+        } catch (DataSetException e) {
+            throw new UnitilsException("Unable to assert whether data sets are equal.", e);
+        }
+        return result;
     }
 
 

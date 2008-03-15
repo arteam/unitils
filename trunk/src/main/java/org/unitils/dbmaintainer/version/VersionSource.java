@@ -58,34 +58,4 @@ public interface VersionSource extends DatabaseTask {
      */
     void setUpdateSucceeded(boolean succeeded);
 
-
-    /**
-     * Tells us whether the last database code update succeeded or not
-     *
-     * @return true if the last database code update succeeded, false otherwise
-     */
-    boolean isLastCodeUpdateSucceeded();
-
-
-    /**
-     * Notifies the VersionSource of the fact that the lastest code update has succeeded or not
-     *
-     * @param succeeded True for success
-     */
-    void setCodeUpdateSucceeded(boolean succeeded);
-
-
-    /**
-     * @return The current timestamp of the code scripts
-     */
-    long getCodeScriptsTimestamp();
-
-
-    /**
-     * Stores the timestamp of the code scripts in the VersionSource
-     *
-     * @param codeScriptsTimestamp The timestamp, not null
-     */
-    void setCodeScriptsTimestamp(long codeScriptsTimestamp);
-
 }
