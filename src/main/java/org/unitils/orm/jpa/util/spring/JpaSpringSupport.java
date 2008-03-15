@@ -15,10 +15,6 @@
  */
 package org.unitils.orm.jpa.util.spring;
 
-import java.util.Collection;
-
-import javax.persistence.EntityManagerFactory;
-
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.unitils.core.Unitils;
@@ -27,35 +23,34 @@ import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.jpa.JpaModule;
 import org.unitils.spring.SpringModule;
 
+import javax.persistence.EntityManagerFactory;
+import java.util.Collection;
+
 
 /**
  * Implementation of {@link OrmSpringSupport} for JPA. Enables retrieving a JPA <code>EntityManagerFactory</code>
- * that was configured in a spring <code>ApplicationContext</code> 
- *  
+ * that was configured in a spring <code>ApplicationContext</code>
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class JpaSpringSupport implements OrmSpringSupport<EntityManagerFactory, Object> {
 
-	
-	@Override
-	public boolean isPersistenceUnitConfiguredInSpring(Object testObject) {
-		return getEntityManagerFactoryBean(testObject) != null;
-	}
-	
-	
-	@Override
-	public ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object> getConfiguredPersistenceUnit(Object testObject) {
-		AbstractEntityManagerFactoryBean factoryBean = getEntityManagerFactoryBean(testObject);
-		
-		EntityManagerFactory entityManagerFactory = factoryBean.getObject();
-		Object providerSpecificConfigurationObject = getJpaModule().getJpaProviderSupport().getProviderSpecificConfigurationObject(
-				factoryBean.getPersistenceProvider());
-		
-		return new ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object>(entityManagerFactory, providerSpecificConfigurationObject);
-	}
 
-    
+    public boolean isPersistenceUnitConfiguredInSpring(Object testObject) {
+        return getEntityManagerFactoryBean(testObject) != null;
+    }
+
+
+    public ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object> getConfiguredPersistenceUnit(Object testObject) {
+        AbstractEntityManagerFactoryBean factoryBean = getEntityManagerFactoryBean(testObject);
+
+        EntityManagerFactory entityManagerFactory = factoryBean.getObject();
+        Object providerSpecificConfigurationObject = getJpaModule().getJpaProviderSupport().getProviderSpecificConfigurationObject(factoryBean.getPersistenceProvider());
+        return new ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object>(entityManagerFactory, providerSpecificConfigurationObject);
+    }
+
+
     /**
      * @param testObject The test instance, not null
      * @return Instance of {@link LocalSessionFactoryBean} that wraps the configuration of hibernate in spring
@@ -64,19 +59,19 @@ public class JpaSpringSupport implements OrmSpringSupport<EntityManagerFactory, 
         if (!getSpringModule().isApplicationContextConfiguredFor(testObject)) {
             return null;
         }
-        Collection<?> entityManagerFactoryBeans = getSpringModule().getApplicationContext(testObject).getBeansOfType(
-        		AbstractEntityManagerFactoryBean.class).values();
+        Collection<?> entityManagerFactoryBeans = getSpringModule().getApplicationContext(testObject).getBeansOfType(AbstractEntityManagerFactoryBean.class).values();
         if (entityManagerFactoryBeans.size() == 0) {
             return null;
         }
         return (AbstractEntityManagerFactoryBean) entityManagerFactoryBeans.iterator().next();
     }
-    
+
 
     protected SpringModule getSpringModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
     }
-    
+
+
     protected JpaModule getJpaModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(JpaModule.class);
     }

@@ -15,11 +15,6 @@
  */
 package org.unitils.orm.jpa.util;
 
-import java.lang.reflect.InvocationTargetException;
-
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -31,72 +26,71 @@ import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 import org.unitils.orm.jpa.JpaModule;
 import org.unitils.util.ReflectionUtils;
 
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Loads an <code>EntityManagerFactory</code> given a {@link JpaConfig} object
- *  
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<EntityManagerFactory, Object, JpaConfig> {
 
-	
-	@Override
-	public ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object> getConfiguredOrmPersistenceUnit(Object testObject, JpaConfig entityManagerConfig) {
-		
-		AbstractEntityManagerFactoryBean factoryBean = createEntityManagerFactoryBean(testObject, entityManagerConfig);
-		EntityManagerFactory entityManagerFactory = factoryBean.getObject();
-		Object providerSpecificConfigurationObject = getJpaProviderSupport().getProviderSpecificConfigurationObject(
-				factoryBean.getPersistenceProvider());
-		return new ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object>(entityManagerFactory, providerSpecificConfigurationObject);
-	}
+
+    public ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object> getConfiguredOrmPersistenceUnit(Object testObject, JpaConfig entityManagerConfig) {
+        AbstractEntityManagerFactoryBean factoryBean = createEntityManagerFactoryBean(testObject, entityManagerConfig);
+        EntityManagerFactory entityManagerFactory = factoryBean.getObject();
+        Object providerSpecificConfigurationObject = getJpaProviderSupport().getProviderSpecificConfigurationObject(factoryBean.getPersistenceProvider());
+        return new ConfiguredOrmPersistenceUnit<EntityManagerFactory, Object>(entityManagerFactory, providerSpecificConfigurationObject);
+    }
 
 
-	/**
-	 * 
-	 * @param testObject The test instance, not null
-	 * @param jpaConfig The configuration parameters for the <code>EntityManagerFactory</code>
-	 * @return A completely configured <code>AbstractEntityManagerFactoryBean</code> 
-	 */
-	protected AbstractEntityManagerFactoryBean createEntityManagerFactoryBean(Object testObject, JpaConfig jpaConfig) {
-		LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-		factoryBean.setDataSource(getDataSource());
-		factoryBean.setJpaVendorAdapter(getJpaProviderSupport().getSpringJpaVendorAdaptor());
-		factoryBean.setPersistenceXmlLocation(jpaConfig.getConfigFiles().iterator().next());
-		factoryBean.setPersistenceUnitName(jpaConfig.getPersistenceUnitName());
-		LoadTimeWeaver loadTimeWeaver = getJpaProviderSupport().getLoadTimeWeaver();
-		if (loadTimeWeaver != null) {
-			factoryBean.setLoadTimeWeaver(loadTimeWeaver);
-		}
-		if (jpaConfig.getConfigMethod() != null) {
-			try {
-				ReflectionUtils.invokeMethod(testObject, jpaConfig
-						.getConfigMethod(), factoryBean);
-			} catch (InvocationTargetException e) {
-				throw new UnitilsException("Error while invoking custom config method", e.getCause());
-			}
-		}
-		factoryBean.afterPropertiesSet();
-		
-		return factoryBean;
-	}
-	
-	
-	protected DataSource getDataSource() {
-		return getDatabaseModule().getDataSource();
-	}
-	
-	
-	protected JpaProviderSupport getJpaProviderSupport() {
-		return getJpaModule().getJpaProviderSupport();
-	}
+    /**
+     * @param testObject The test instance, not null
+     * @param jpaConfig  The configuration parameters for the <code>EntityManagerFactory</code>
+     * @return A completely configured <code>AbstractEntityManagerFactoryBean</code>
+     */
+    protected AbstractEntityManagerFactoryBean createEntityManagerFactoryBean(Object testObject, JpaConfig jpaConfig) {
+        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+        factoryBean.setDataSource(getDataSource());
+        factoryBean.setJpaVendorAdapter(getJpaProviderSupport().getSpringJpaVendorAdaptor());
+        factoryBean.setPersistenceXmlLocation(jpaConfig.getConfigFiles().iterator().next());
+        factoryBean.setPersistenceUnitName(jpaConfig.getPersistenceUnitName());
+        LoadTimeWeaver loadTimeWeaver = getJpaProviderSupport().getLoadTimeWeaver();
+        if (loadTimeWeaver != null) {
+            factoryBean.setLoadTimeWeaver(loadTimeWeaver);
+        }
+        if (jpaConfig.getConfigMethod() != null) {
+            try {
+                ReflectionUtils.invokeMethod(testObject, jpaConfig
+                        .getConfigMethod(), factoryBean);
+            } catch (InvocationTargetException e) {
+                throw new UnitilsException("Error while invoking custom config method", e.getCause());
+            }
+        }
+        factoryBean.afterPropertiesSet();
+        return factoryBean;
+    }
 
-	
-	protected DatabaseModule getDatabaseModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-	}
 
-	
-	protected JpaModule getJpaModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(JpaModule.class);
-	}
+    protected DataSource getDataSource() {
+        return getDatabaseModule().getDataSource();
+    }
+
+
+    protected JpaProviderSupport getJpaProviderSupport() {
+        return getJpaModule().getJpaProviderSupport();
+    }
+
+
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
+
+
+    protected JpaModule getJpaModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(JpaModule.class);
+    }
 }

@@ -15,46 +15,42 @@
  */
 package org.unitils.orm.jpa.util.provider.toplink;
 
-import javax.persistence.EntityManager;
-import javax.persistence.spi.PersistenceProvider;
-
 import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.TopLinkJpaVendorAdapter;
 import org.unitils.orm.jpa.util.JpaProviderSupport;
 
+import javax.persistence.EntityManager;
+import javax.persistence.spi.PersistenceProvider;
+
 /**
  * Implementation of {@link JpaProviderSupport} for Oracle Toplink JPA
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class ToplinkJpaProviderSupport implements JpaProviderSupport {
 
-	@Override
-	public void assertMappingWithDatabaseConsistent(
-			EntityManager entityManager, Object configurationObject) {
-		throw new UnsupportedOperationException("The method assertMappingWithDatabaseConsistent is not implemented for toplink");
-	}
+
+    public void assertMappingWithDatabaseConsistent(EntityManager entityManager, Object configurationObject) {
+        throw new UnsupportedOperationException("The method assertMappingWithDatabaseConsistent is not implemented for toplink");
+    }
 
 
-	@Override
-	public Object getProviderSpecificConfigurationObject(
-			PersistenceProvider persistenceProvider) {
-		return null;
-	}
-
-	
-	@Override
-	public JpaVendorAdapter getSpringJpaVendorAdaptor() {
-		return new TopLinkJpaVendorAdapter();
-	}
+    public Object getProviderSpecificConfigurationObject(
+            PersistenceProvider persistenceProvider) {
+        return null;
+    }
 
 
-	@Override
-	public LoadTimeWeaver getLoadTimeWeaver() {
-		return new InstrumentationLoadTimeWeaver();
-	}
+    public JpaVendorAdapter getSpringJpaVendorAdaptor() {
+        return new TopLinkJpaVendorAdapter();
+    }
+
+
+    public LoadTimeWeaver getLoadTimeWeaver() {
+        return new InstrumentationLoadTimeWeaver();
+    }
 
 }

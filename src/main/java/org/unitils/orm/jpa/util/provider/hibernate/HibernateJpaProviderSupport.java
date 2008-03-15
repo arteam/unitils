@@ -16,10 +16,6 @@
 package org.unitils.orm.jpa.util.provider.hibernate;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-
-import javax.persistence.EntityManager;
-import javax.persistence.spi.PersistenceProvider;
-
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.ejb.Ejb3Configuration;
@@ -29,30 +25,30 @@ import org.unitils.core.UnitilsException;
 import org.unitils.orm.hibernate.util.HibernateAssert;
 import org.unitils.orm.jpa.util.JpaProviderSupport;
 
+import javax.persistence.EntityManager;
+import javax.persistence.spi.PersistenceProvider;
+
 /**
  * Implementation of {@link JpaProviderSupport} for hibernate JPA
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class HibernateJpaProviderSupport implements JpaProviderSupport {
 
-	
-	/**
+
+    /**
      * Checks if the mapping of the JPA entities with the database is still correct.
-     *
-     * @param testObject The test instance, not null
      */
-	@Override
-	public void assertMappingWithDatabaseConsistent(EntityManager entityManager, Object configurationObject) {
-		Ejb3Configuration configuration = (Ejb3Configuration) configurationObject;
+    public void assertMappingWithDatabaseConsistent(EntityManager entityManager, Object configurationObject) {
+        Ejb3Configuration configuration = (Ejb3Configuration) configurationObject;
         Dialect databaseDialect = getHibernateDatabaseDialect(configuration);
 
         HibernateAssert.assertMappingWithDatabaseConsistent(configuration.getHibernateConfiguration(), (Session) entityManager.getDelegate(), databaseDialect);
-	}
-	
-	
-	/**
+    }
+
+
+    /**
      * Gets the database dialect from the Hibernate <code>Ejb3Configuration</code.
      *
      * @param configuration The hibernate config, not null
@@ -69,29 +65,25 @@ public class HibernateJpaProviderSupport implements JpaProviderSupport {
             throw new UnitilsException("Could not instantiate dialect class " + dialectClassName, e);
         }
     }
-    
-    
-    @Override
+
+
     public JpaVendorAdapter getSpringJpaVendorAdaptor() {
-    	return new UnitilsHibernateJpaVendorAdapter();
+        return new UnitilsHibernateJpaVendorAdapter();
     }
-    
-    
-	@Override
-	public Object getProviderSpecificConfigurationObject(
-			PersistenceProvider persistenceProvider) {
-		if (!(persistenceProvider instanceof UnitilsHibernatePersistenceProvider)) {
-			throw new UnitilsException("Make sure that the persistence provider that is used is an instance of " + UnitilsHibernatePersistenceProvider.class.getSimpleName());
-		}
-		UnitilsHibernatePersistenceProvider hibernatePersistenceProvider = (UnitilsHibernatePersistenceProvider) persistenceProvider;
-		Ejb3Configuration configuration = hibernatePersistenceProvider.getHibernateConfiguration();
-		return configuration;
-	}
 
 
-	@Override
-	public LoadTimeWeaver getLoadTimeWeaver() {
-		return null;
-	}
-	
+    public Object getProviderSpecificConfigurationObject(
+            PersistenceProvider persistenceProvider) {
+        if (!(persistenceProvider instanceof UnitilsHibernatePersistenceProvider)) {
+            throw new UnitilsException("Make sure that the persistence provider that is used is an instance of " + UnitilsHibernatePersistenceProvider.class.getSimpleName());
+        }
+        UnitilsHibernatePersistenceProvider hibernatePersistenceProvider = (UnitilsHibernatePersistenceProvider) persistenceProvider;
+        return hibernatePersistenceProvider.getHibernateConfiguration();
+    }
+
+
+    public LoadTimeWeaver getLoadTimeWeaver() {
+        return null;
+    }
+
 }
