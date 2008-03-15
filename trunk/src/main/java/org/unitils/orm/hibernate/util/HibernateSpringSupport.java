@@ -15,8 +15,6 @@
  */
 package org.unitils.orm.hibernate.util;
 
-import java.util.Collection;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
@@ -25,6 +23,8 @@ import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
 import org.unitils.orm.hibernate.HibernateModule;
 import org.unitils.spring.SpringModule;
+
+import java.util.Collection;
 
 /**
  * A support class containing Hibernate and {@link HibernateModule} related actions for the {@link SpringModule}.
@@ -39,37 +39,35 @@ import org.unitils.spring.SpringModule;
 public class HibernateSpringSupport implements OrmSpringSupport<SessionFactory, Configuration> {
 
 
-	public boolean isPersistenceUnitConfiguredInSpring(Object testObject) {
-		return getSessionFactoryBean(testObject) != null;
-	}
-	
-	
-	@Override
-	public ConfiguredOrmPersistenceUnit<SessionFactory, Configuration> getConfiguredPersistenceUnit(Object testObject) {
-		LocalSessionFactoryBean factoryBean = getSessionFactoryBean(testObject);
-		SessionFactory entityManagerFactory = (SessionFactory) factoryBean.getObject();
-		Configuration hibernateConfiguration = factoryBean.getConfiguration();
-		
-		return new ConfiguredOrmPersistenceUnit<SessionFactory, Configuration>(entityManagerFactory, hibernateConfiguration);
-	}
+    public boolean isPersistenceUnitConfiguredInSpring(Object testObject) {
+        return getSessionFactoryBean(testObject) != null;
+    }
 
-    
+
+    public ConfiguredOrmPersistenceUnit<SessionFactory, Configuration> getConfiguredPersistenceUnit(Object testObject) {
+        LocalSessionFactoryBean factoryBean = getSessionFactoryBean(testObject);
+        SessionFactory entityManagerFactory = (SessionFactory) factoryBean.getObject();
+        Configuration hibernateConfiguration = factoryBean.getConfiguration();
+
+        return new ConfiguredOrmPersistenceUnit<SessionFactory, Configuration>(entityManagerFactory, hibernateConfiguration);
+    }
+
+
     /**
-     * @param testObject
+     * @param testObject The test instance, not null
      * @return Instance of {@link LocalSessionFactoryBean} that wraps the configuration of hibernate in spring
      */
     protected LocalSessionFactoryBean getSessionFactoryBean(Object testObject) {
         if (!getSpringModule().isApplicationContextConfiguredFor(testObject)) {
             return null;
         }
-        Collection<?> entityManagerFactoryBeans = getSpringModule().getApplicationContext(testObject).getBeansOfType(
-        		LocalSessionFactoryBean.class).values();
+        Collection<?> entityManagerFactoryBeans = getSpringModule().getApplicationContext(testObject).getBeansOfType(LocalSessionFactoryBean.class).values();
         if (entityManagerFactoryBeans.size() == 0) {
             return null;
         }
         return (LocalSessionFactoryBean) entityManagerFactoryBeans.iterator().next();
     }
-    
+
 
     /**
      * @return The Spring module, not null
@@ -77,5 +75,5 @@ public class HibernateSpringSupport implements OrmSpringSupport<SessionFactory, 
     protected SpringModule getSpringModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
     }
-    
+
 }

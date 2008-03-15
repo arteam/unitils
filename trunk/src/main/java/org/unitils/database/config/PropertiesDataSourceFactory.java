@@ -64,7 +64,6 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
      *
      * @param configuration The config, not null
      */
-    @Override
     public void init(Properties configuration) {
         driverClassName = getString(PROPKEY_DATASOURCE_DRIVERCLASSNAME, configuration);
         databaseUrl = getString(PROPKEY_DATASOURCE_URL, configuration);
@@ -73,7 +72,6 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     }
 
 
-    @Override
     public DataSource createDataSource() {
         logger.info("Creating data source. Driver: " + driverClassName + ", url: " + databaseUrl + ", user: " + userName + ", password: <not shown>");
         BasicDataSource dataSource = getNewDataSource();

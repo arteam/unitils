@@ -15,6 +15,7 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.ParsingState;
 import org.unitils.dbmaintainer.script.ScriptParser;
@@ -173,7 +174,7 @@ public class DefaultScriptParser implements ScriptParser {
         String trimmedStatement = statement.toString().trim();
 
         // ignore empty statements
-        if (trimmedStatement.isEmpty()) {
+        if (isEmpty(trimmedStatement)) {
             return null;
         }
 

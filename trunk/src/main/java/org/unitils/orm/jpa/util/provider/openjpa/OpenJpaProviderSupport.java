@@ -15,45 +15,40 @@
  */
 package org.unitils.orm.jpa.util.provider.openjpa;
 
-import javax.persistence.EntityManager;
-import javax.persistence.spi.PersistenceProvider;
-
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter;
 import org.unitils.orm.jpa.util.JpaProviderSupport;
 
+import javax.persistence.EntityManager;
+import javax.persistence.spi.PersistenceProvider;
+
 /**
  * Implementation of {@link JpaProviderSupport} for Oracle Toplink JPA
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class OpenJpaProviderSupport implements JpaProviderSupport {
 
-	@Override
-	public void assertMappingWithDatabaseConsistent(
-			EntityManager entityManager, Object configurationObject) {
-		throw new UnsupportedOperationException("The method assertMappingWithDatabaseConsistent is not implemented for openjpa");
-	}
+
+    public void assertMappingWithDatabaseConsistent(EntityManager entityManager, Object configurationObject) {
+        throw new UnsupportedOperationException("The method assertMappingWithDatabaseConsistent is not implemented for openjpa");
+    }
 
 
-	@Override
-	public Object getProviderSpecificConfigurationObject(
-			PersistenceProvider persistenceProvider) {
-		return null;
-	}
-
-	
-	@Override
-	public JpaVendorAdapter getSpringJpaVendorAdaptor() {
-		return new OpenJpaVendorAdapter();
-	}
+    public Object getProviderSpecificConfigurationObject(PersistenceProvider persistenceProvider) {
+        return null;
+    }
 
 
-	@Override
-	public LoadTimeWeaver getLoadTimeWeaver() {
-		return null;
-	}
+    public JpaVendorAdapter getSpringJpaVendorAdaptor() {
+        return new OpenJpaVendorAdapter();
+    }
+
+
+    public LoadTimeWeaver getLoadTimeWeaver() {
+        return null;
+    }
 
 }
