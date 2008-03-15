@@ -17,16 +17,11 @@ package org.unitils.dbmaintainer.script;
 
 import org.unitils.dbmaintainer.util.DatabaseTask;
 import org.unitils.dbmaintainer.version.Version;
-import org.unitils.dbmaintainer.version.VersionScriptPair;
 
 import java.util.List;
 
 /**
- * Defines the contract for a source that provides scripts for updating the database to a given state.<br>
- * Database update scripts are provided as {@link VersionScriptPair} objects, which indicate which scripts should be
- * executed, to update the database to a given state.
- * Code scripts (stored procedures etc) are provides as {@link Script} objects. Database code scripts are regarded to
- * be repeatably executable on the database. Therefore, all code scripts are always returned as a whole.
+ * A source that provides scripts for updating the database to a given state.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -35,54 +30,54 @@ public interface ScriptSource extends DatabaseTask {
 
 
     /**
-     * Returns the current version of the scripts, i.e. the Version object as it would
+     * Returns the highest version of the scripts, i.e. the Version object as it would
      * be returned by a database that is up-to-date with the current script base.
      *
      * @return the current version of the scripts
      */
-    Version getCurrentVersion();
+    Version getHighestVersion();
+
 
     /**
-     * This methods returns true if one or more scripts that have a version index equal to or lower than
+     * Gets a list of all available update scripts. These scripts can be used to completely recreate the
+     * database from scratch, not null.
+     * <p/>
+     * The scripts are returned in the order in which they should be executed.
+     *
+     * @return all available database update scripts, not null
+     */
+    List<Script> getAllScripts();
+
+
+    /**
+     * Returns a list of scripts with a higher index or timestamp than the given version.
+     * <p/>
+     * The scripts are returned in the order in which they should be executed.
+     *
+     * @param currentVersion The start version, not null
+     * @return The scripts that have a higher index of timestamp than the start version, not null.
+     */
+    List<Script> getNewScripts(Version currentVersion);
+
+
+    /**
+     * Returns true if one or more scripts that have a version index equal to or lower than
      * the index specified by the given version object has been modified since the timestamp specfied by
      * the given version.
      *
      * @param currentVersion The current database version, not null
      * @return True if an existing script has been modified, false otherwise
      */
-    boolean isExistingScriptsModified(Version currentVersion);
+    boolean isExistingScriptModified(Version currentVersion);
 
 
     /**
-     * @param currentVersion The current database version, not null
-     * @return A List containing the scripts that need to be executed to update the database
-     *         from the given version to the latest one, not null
+     * Gets a list of all post processing scripts.
+     * <p/>
+     * The scripts are returned in the order in which they should be executed.
+     *
+     * @return All the postprocessing code scripts, not null
      */
-    List<VersionScriptPair> getNewScripts(Version currentVersion);
-
-
-    /**
-     * @return A List containing all available database update scripts. These scripts
-     *         can be used to completely recreate the database from scratch, not null
-     */
-    List<VersionScriptPair> getAllScripts();
-
-
-    /**
-     * @return The highest timestamp of all the code scripts that are currently available
-     */
-    public long getCodeScriptsTimestamp();
-
-
-    /**
-     * @return All the code scripts that are currently available, not null
-     */
-    List<Script> getAllCodeScripts();
-
-
-    /**
-     * @return All the postprocessing code scripts that are currently available, not null
-     */
-    List<Script> getAllPostProcessingCodeScripts();
+    List<Script> getPostProcessingScripts();
 
 }

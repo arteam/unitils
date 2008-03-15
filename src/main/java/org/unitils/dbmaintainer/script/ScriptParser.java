@@ -15,22 +15,32 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import java.io.Reader;
+import java.util.Properties;
 
 /**
- * todo javadoc
+ * An interface for a parser that can parse statements out of a script.
  *
- * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Filip Neven
  */
-public interface CodeScriptRunner extends DatabaseTask {
+public interface ScriptParser {
 
 
     /**
-     * Executes the given code script
+     * Initializes the parser with the given configuration settings.
      *
-     * @param script The script as a string, not null
+     * @param configuration The config, not null
+     * @param scriptReader  The script stream, not null
      */
-    void execute(String script);
+    void init(Properties configuration, Reader scriptReader);
+
+
+    /**
+     * Gets the next statement out of the given script stream.
+     *
+     * @return the statements, null if no more statements
+     */
+    String getNextStatement();
 
 }

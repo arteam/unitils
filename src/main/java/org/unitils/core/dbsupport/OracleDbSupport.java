@@ -15,16 +15,11 @@
  */
 package org.unitils.core.dbsupport;
 
+import org.unitils.core.UnitilsException;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Set;
-
-import org.unitils.core.UnitilsException;
 
 /**
  * Implementation of {@link DbSupport} for an Oracle database.
@@ -34,7 +29,7 @@ import org.unitils.core.UnitilsException;
  */
 public class OracleDbSupport extends DbSupport {
 
-	private Integer oracleMajorVersionNumber;
+    private Integer oracleMajorVersionNumber;
 
     /**
      * Creates support for Oracle databases.
@@ -278,6 +273,18 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
+     * Gets the column type suitable to store text values.
+     *
+     * @param length The nr of characters.
+     * @return The column type, not null
+     */
+    @Override
+    public String getTextDataType(int length) {
+        return "VARCHAR2(" + length + ")";
+    }
+
+
+    /**
      * Synonyms are supported
      *
      * @return True
@@ -319,31 +326,31 @@ public class OracleDbSupport extends DbSupport {
     public boolean supportsTypes() {
         return true;
     }
-    
+
     /**
      * @return Whether or not this version of the Oracle database that is used supports the purge keyword. This is,
-     * whether or not an Oracle database of version 10 or higher is used.
+     *         whether or not an Oracle database of version 10 or higher is used.
      */
     protected boolean supportsPurge() {
-    	return getOracleMajorVersionNumber() >= 10;
+        return getOracleMajorVersionNumber() >= 10;
     }
 
     /**
      * @return The major version number of the Oracle database server that is used (e.g. for Oracle version 9.2.0.1, 9 is returned
      */
     protected Integer getOracleMajorVersionNumber() {
-    	if (oracleMajorVersionNumber == null) {
-    		Connection conn = null;
-    		try {
-    			conn = getSQLHandler().getDataSource().getConnection();
-    			DatabaseMetaData metaData = conn.getMetaData();
-    			oracleMajorVersionNumber = metaData.getDatabaseMajorVersion();
-    		} catch (SQLException e) {
-    			throw new UnitilsException("Unable to determine database major version", e);
-    		} finally {
-    			closeQuietly(conn);
-    		}
-    	}
-    	return oracleMajorVersionNumber;
+        if (oracleMajorVersionNumber == null) {
+            Connection conn = null;
+            try {
+                conn = getSQLHandler().getDataSource().getConnection();
+                DatabaseMetaData metaData = conn.getMetaData();
+                oracleMajorVersionNumber = metaData.getDatabaseMajorVersion();
+            } catch (SQLException e) {
+                throw new UnitilsException("Unable to determine database major version", e);
+            } finally {
+                closeQuietly(conn);
+            }
+        }
+        return oracleMajorVersionNumber;
     }
 }

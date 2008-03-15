@@ -19,7 +19,7 @@ import org.unitils.dbmaintainer.util.DatabaseTask;
 
 
 /**
- * Defines the contract for an executer of a database update script.
+ * Runs a given database script.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -30,8 +30,8 @@ public interface ScriptRunner extends DatabaseTask {
     /**
      * Executes the given script
      *
-     * @param script The script as a string, not null
+     * @param script The script, not null
      */
-    void execute(String script);
+    void execute(Script script);
 
 }
