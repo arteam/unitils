@@ -377,7 +377,7 @@ public class DbUnitModule implements Module {
      * @return A new instance of dbUnit's <code>IDatabaseConnection</code>
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
-        // A db support instance is created to get the schema name in correct casing
+        // A DbSupport instance is fetched in order to get the schema name in correct case
         DataSource dataSource = getDatabaseModule().getDataSource();
         SQLHandler sqlHandler = new SQLHandler(dataSource);
         DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
@@ -386,11 +386,14 @@ public class DbUnitModule implements Module {
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
         DatabaseConfig config = connection.getConfig();
         
-        // Make sure that dbunit' correct IDataTypeFactory, that handles dbms specific data type issues, is used
+        // Make sure that dbunit's correct IDataTypeFactory, that handles dbms specific data type issues, is used
         IDataTypeFactory dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
         config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         // Make sure that table and column names are escaped using the dbms-specific identifier quote string
         config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
+        // Make sure that batched statements are used to insert the data into the database
+        config.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, "true");
+        
         return connection;
     }
 
