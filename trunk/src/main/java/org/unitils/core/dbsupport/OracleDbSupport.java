@@ -29,7 +29,9 @@ import java.util.Set;
  */
 public class OracleDbSupport extends DbSupport {
 
+    /* The major version number of the Oracle database */
     private Integer oracleMajorVersionNumber;
+
 
     /**
      * Creates support for Oracle databases.
@@ -59,30 +61,6 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public Set<String> getColumnNames(String tableName) {
         return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "'");
-    }
-
-
-    /**
-     * Gets the names of all primary columns of the given table.
-     *
-     * @param tableName The table, not null
-     * @return The names of the primary key columns of the table with the given name
-     */
-    @Override
-    public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select col.COLUMN_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and con.CONSTRAINT_TYPE = 'P' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME");
-    }
-
-
-    /**
-     * Returns the names of all columns that have a 'not-null' constraint on them
-     *
-     * @param tableName The table, not null
-     * @return The set of column names, not null
-     */
-    @Override
-    public Set<String> getNotNullColummnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "' and NULLABLE = 'N'");
     }
 
 
@@ -178,39 +156,17 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
-     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
+     * Removes all constraints on the specified table
      *
-     * @param tableName The table, not null
-     * @return The set of constraint names, not null
+     * @param tableName The table with the column, not null
      */
     @Override
-    public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE = 'R' and STATUS = 'ENABLED'");
-    }
-
-
-    /**
-     * Disables the constraint with the given name on table with the given name.
-     *
-     * @param tableName      The table with the constraint, not null
-     * @param constraintName The constraint, not null
-     */
-    @Override
-    public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
-    }
-
-
-    /**
-     * Removes the not-null constraint on the specified column and table
-     *
-     * @param tableName  The table with the column, not null
-     * @param columnName The column to remove constraints from, not null
-     */
-    @Override
-    public void removeNotNullConstraint(String tableName, String columnName) {
-        String constraintName = getSQLHandler().getItemAsString("select con.CONSTRAINT_NAME from USER_CONS_COLUMNS col, USER_CONSTRAINTS con where col.TABLE_NAME = '" + tableName + "' and con.TABLE_NAME = '" + tableName + "' and col.COLUMN_NAME = '" + columnName + "' and con.CONSTRAINT_TYPE = 'C' and con.CONSTRAINT_NAME = col.CONSTRAINT_NAME");
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+    public void disableConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE <> 'P' and STATUS = 'ENABLED'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+        }
     }
 
 
@@ -327,6 +283,7 @@ public class OracleDbSupport extends DbSupport {
         return true;
     }
 
+
     /**
      * @return Whether or not this version of the Oracle database that is used supports the purge keyword. This is,
      *         whether or not an Oracle database of version 10 or higher is used.
@@ -334,6 +291,7 @@ public class OracleDbSupport extends DbSupport {
     protected boolean supportsPurge() {
         return getOracleMajorVersionNumber() >= 10;
     }
+
 
     /**
      * @return The major version number of the Oracle database server that is used (e.g. for Oracle version 9.2.0.1, 9 is returned

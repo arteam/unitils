@@ -15,21 +15,22 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
+import java.util.Set;
+
 /**
- * Default implementation of {@link ConstraintsDisabler}
+ * Default implementation of {@link ConstraintsDisabler}.
+ * This will disable all foreign key, check and not-null constraints on the configured database schemas.
+ * Primary key constraints will not be disabled.
  *
+ * @author Tim Ducheyne
  * @author Filip Neven
  * @author Bart Vermeiren
- * @author Tim Ducheyne
  */
 public class DefaultConstraintsDisabler extends BaseDatabaseTask implements ConstraintsDisabler {
 
@@ -38,64 +39,17 @@ public class DefaultConstraintsDisabler extends BaseDatabaseTask implements Cons
 
 
     /**
-     * Initializes the disabler.
-     *
-     * @param configuration the config, not null
-     */
-    @Override
-    protected void doInit(Properties configuration) {
-    }
-
-
-    /**
      * Permanently disable every foreign key or not-null constraint
      */
     public void disableConstraints() {
         for (DbSupport dbSupport : dbSupports) {
             logger.info("Disabling contraints in database schema " + dbSupport.getSchemaName());
-            removeForeignKeyConstraints(dbSupport);
-            removeNotNullConstraints(dbSupport);
-        }
-    }
 
-
-    /**
-     * Disables all foreign key constraints
-     *
-     * @param dbSupport The database support, not null
-     */
-    protected void removeForeignKeyConstraints(DbSupport dbSupport) {
-        Set<String> tableNames = dbSupport.getTableNames();
-        for (String tableName : tableNames) {
-            Set<String> constraintNames = dbSupport.getForeignKeyConstraintNames(tableName);
-            for (String constraintName : constraintNames) {
-                dbSupport.removeForeignKeyConstraint(tableName, constraintName);
+            Set<String> tableNames = dbSupport.getTableNames();
+            for (String tableName : tableNames) {
+                dbSupport.disableConstraints(tableName);
             }
         }
-    }
-
-
-    /**
-     * Disables all not-null constraints that are not of primary keys.
-     *
-     * @param dbSupport The database support, not null
-     */
-    protected void removeNotNullConstraints(DbSupport dbSupport) {
-        Set<String> tableNames = dbSupport.getTableNames();
-        for (String tableName : tableNames) {
-            // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
-            Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
-
-            Set<String> notNullColumnNames = dbSupport.getNotNullColummnNames(tableName);
-            for (String notNullColumnName : notNullColumnNames) {
-                if (primaryKeyColumnNames.contains(notNullColumnName)) {
-                    // Do not remove PK constraints
-                    continue;
-                }
-                dbSupport.removeNotNullConstraint(tableName, notNullColumnName);
-            }
-        }
-    }
-
+    }    
 
 }
