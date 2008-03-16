@@ -36,7 +36,6 @@
         <url>http://unitils.svn.sourceforge.net/viewvc/unitils/</url>
     </scm>
 
-
     <!-- Build Settings -->
     <build>
         <testResources>
@@ -50,7 +49,14 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
-
+       <pluginManagement>
+          <plugins>
+             <plugin>
+                 <artifactId>maven-surefire-plugin</artifactId>
+                 <version>2.4.2-SNAPSHOT</version>
+              </plugin>
+          </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -186,7 +192,7 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-commons-annotations</artifactId>
             <version>3.3.0.ga</version>
@@ -200,17 +206,16 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>ejb</artifactId>
-			<version>3.0-public_review</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-			<version>1.0.1B</version>
-		</dependency>
-
+        <dependency>
+	 <groupId>javax.persistence</groupId>
+	 <artifactId>ejb</artifactId>
+	 <version>3.0-public_review</version>
+        </dependency>
+        <dependency>
+           <groupId>javax.transaction</groupId>
+	 <artifactId>jta</artifactId>
+	 <version>1.0.1B</version>
+        </dependency>
         <dependency>
             <groupId>hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
@@ -304,5 +309,16 @@
 
         </plugins>
     </reporting>
+
+     <!-- install plugin snapshot repository for surefire-plugin -->
+    <pluginRepositories>
+	<pluginRepository>
+		<id>apache-plugin-snapshots</id>
+		<name>Apache Maven Plugin Snapshots</name>
+		<url>http://people.apache.org/repo/m2-snapshot-repository</url>
+		<releases><enabled>false</enabled></releases>
+		<snapshots><enabled>true</enabled></snapshots>
+	</pluginRepository>
+    </pluginRepositories>
 
 </project>
