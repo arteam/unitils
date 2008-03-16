@@ -21,7 +21,6 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.clean.DBCodeClearer;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.script.ScriptSource;
@@ -126,11 +125,6 @@ public class DBMaintainer {
     protected DBClearer dbClearer;
 
     /**
-     * Clearer of all database source code (types, triggers, functions, procedures, ...)
-     */
-    protected DBCodeClearer dbCodeClearer;
-
-    /**
      * Cleaner of the database (deletes all data from all tables before updating
      */
     protected DBCleaner dbCleaner;
@@ -155,11 +149,6 @@ public class DBMaintainer {
      * cleared before updating if an already executed script is modified
      */
     protected boolean fromScratchEnabled;
-
-    /**
-     * Indicates if database code should be cleared before installing a new version of the code
-     */
-    protected boolean clearDbCodeEnabled;
 
     /**
      * Indicates if foreign key and not null constraints should removed after updating the database
@@ -205,8 +194,6 @@ public class DBMaintainer {
             if (fromScratchEnabled) {
                 dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
             }
-            clearDbCodeEnabled = PropertyUtils.getBoolean(PROPKEY_CLEAR_DB_CODE_ENABLED, configuration);
-            dbCodeClearer = getConfiguredDatabaseTaskInstance(DBCodeClearer.class, configuration, sqlHandler);
 
             disableConstraintsEnabled = PropertyUtils.getBoolean(PROPKEY_DISABLE_CONSTRAINTS_ENABLED, configuration);
             constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler);
@@ -249,7 +236,6 @@ public class DBMaintainer {
         // conflicts when dropping tables
         constraintsDisabler.disableConstraints();
         dbClearer.clearSchemas();
-        dbCodeClearer.clearSchemasCode();
         // update database with all scripts
         updateDatabase(scriptSource.getAllScripts(), currentVersion);
     }

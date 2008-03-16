@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.clean.DBCodeClearer;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.DefaultScriptRunner;
@@ -65,10 +64,6 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     @Mock
     @InjectIntoByType
     protected DBClearer mockDbClearer;
-
-    @Mock
-    @InjectIntoByType
-    protected DBCodeClearer mockDbCodeClearer;
 
     @Mock(calls = Calls.LENIENT)
     @InjectIntoByType
@@ -167,7 +162,6 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         // Record expected behavior
         mockVersionSource.setUpdateSucceeded(false);
         mockDbClearer.clearSchemas();
-        mockDbCodeClearer.clearSchemasCode();
         expectExecuteScriptsAndSetDbVersion();
         mockVersionSource.setUpdateSucceeded(true);
 
@@ -187,7 +181,6 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         // Record expected behavior
         mockVersionSource.setUpdateSucceeded(false);
         mockDbClearer.clearSchemas();
-        mockDbCodeClearer.clearSchemasCode();
         expectExecuteScriptsAndSetDbVersion();
         mockVersionSource.setUpdateSucceeded(true);
 

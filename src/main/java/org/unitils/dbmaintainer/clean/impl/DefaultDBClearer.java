@@ -63,6 +63,16 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
     public static final String PROPKEY_PRESERVE_SEQUENCES = "dbMaintainer.preserve.sequences";
 
     /**
+     * The key of the property that specifies which triggers should not be dropped
+     */
+    public static final String PROPKEY_PRESERVE_TRIGGERS = "dbMaintainer.preserve.triggers";
+
+    /**
+     * The key of the property that specifies which types should not be dropped
+     */
+    public static final String PROPKEY_PRESERVE_TYPES = "dbMaintainer.preserve.types";
+
+    /**
      * The key of the property that specifies the name of the datase table in which the
      * DB version is stored. This table should not be deleted
      */
@@ -97,6 +107,16 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      */
     protected Map<String, Set<String>> sequencesToPreserve;
 
+    /**
+     * Names of triggers that should not be dropped per schema.
+     */
+    protected Map<String, Set<String>> triggersToPreserve;
+
+    /**
+     * Names of types that should not be dropped per schema.
+     */
+    protected Map<String, Set<String>> typesToPreserve;
+
 
     /**
      * Initializes the the DBClearer. The list of database items that should be preserved is retrieved from the given
@@ -111,6 +131,8 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         viewsToPreserve = getViewsToPreserve(configuration);
         sequencesToPreserve = getSequencesToPreserve(configuration);
         synonymsToPreserve = getSynonymsToPreserve(configuration);
+        triggersToPreserve = getTriggersToPreserve(configuration);
+        typesToPreserve = getTypesToPreserve(configuration);
     }
 
 
@@ -130,6 +152,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
             dropViews(dbSupport);
             dropSequences(dbSupport);
             dropTables(dbSupport);
+
+            dropTriggers(dbSupport);
+            dropTypes(dbSupport);
+            // todo drop functions, stored procedures.
         }
     }
 
@@ -212,6 +238,50 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
             }
             logger.debug("Dropping sequence " + sequenceName + " in database schema " + dbSupport.getSchemaName());
             dbSupport.dropSequence(sequenceName);
+        }
+    }
+
+
+    /**
+     * Drops all triggers
+     *
+     * @param dbSupport The database support, not null
+     */
+    protected void dropTriggers(DbSupport dbSupport) {
+        if (!dbSupport.supportsTriggers()) {
+            return;
+        }
+        Set<String> triggerNames = dbSupport.getTriggerNames();
+        Set<String> schemaTriggersToPreserve = triggersToPreserve.get(dbSupport.getSchemaName());
+        for (String triggerName : triggerNames) {
+            // check whether trigger needs to be preserved
+            if (schemaTriggersToPreserve != null && schemaTriggersToPreserve.contains(triggerName)) {
+                continue;
+            }
+            logger.debug("Dropping trigger " + triggerName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropTrigger(triggerName);
+        }
+    }
+
+
+    /**
+     * Drops all types.
+     *
+     * @param dbSupport The database support, not null
+     */
+    protected void dropTypes(DbSupport dbSupport) {
+        if (!dbSupport.supportsTypes()) {
+            return;
+        }
+        Set<String> typeNames = dbSupport.getTypeNames();
+        Set<String> schemaTypesToPreserve = typesToPreserve.get(dbSupport.getSchemaName());
+        for (String typeName : typeNames) {
+            // check whether type needs to be preserved
+            if (schemaTypesToPreserve != null && schemaTypesToPreserve.contains(typeName)) {
+                continue;
+            }
+            logger.debug("Dropping type " + typeName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropType(typeName);
         }
     }
 
@@ -373,6 +443,68 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
             }
         }
         return synonymsToPreserve;
+    }
+
+
+    /**
+     * Gets the list of all triggers to preserve per schema. The case is corrected if necesary. Quoting a trigger name
+     * makes it case sensitive. If no schema is specified, the trigger will be added to the default schema name set.
+     * <p/>
+     * If a trigger to preserve does not exist, a UnitilsException is thrown.
+     *
+     * @param configuration The unitils configuration, not null
+     * @return The trigger to preserve per schema, not null
+     */
+    protected Map<String, Set<String>> getTriggersToPreserve(Properties configuration) {
+        Map<String, Set<String>> triggersToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TRIGGERS, configuration);
+        for (Map.Entry<String, Set<String>> entry : triggersToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+
+            DbSupport dbSupport = getDbSupport(schemaName);
+            Set<String> triggerNames;
+            if (!dbSupport.supportsTriggers()) {
+                triggerNames = new HashSet<String>();
+            } else {
+                triggerNames = dbSupport.getTriggerNames();
+            }
+            for (String triggerToPreserve : entry.getValue()) {
+                if (!triggerNames.contains(triggerToPreserve)) {
+                    throw new UnitilsException("Trigger to preserve does not exist: " + triggerToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which triggers need to be preserved. To assure nothing is dropped by mistake, no triggers will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TRIGGERS + " property.");
+                }
+            }
+        }
+        return triggersToPreserve;
+    }
+
+
+    /**
+     * Gets the list of all types to preserve per schema. The case is corrected if necesary. Quoting a type name
+     * makes it case sensitive. If no schema is specified, the type will be added to the default schema name set.
+     * <p/>
+     * If a type to preserve does not exist, a UnitilsException is thrown.
+     *
+     * @param configuration The unitils configuration, not null
+     * @return The type to preserve per schema, not null
+     */
+    protected Map<String, Set<String>> getTypesToPreserve(Properties configuration) {
+        Map<String, Set<String>> typesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TYPES, configuration);
+        for (Map.Entry<String, Set<String>> entry : typesToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+
+            DbSupport dbSupport = getDbSupport(schemaName);
+            Set<String> typeNames;
+            if (!dbSupport.supportsTypes()) {
+                typeNames = new HashSet<String>();
+            } else {
+                typeNames = dbSupport.getTypeNames();
+            }
+            for (String typeToPreserve : entry.getValue()) {
+                if (!typeNames.contains(typeToPreserve)) {
+                    throw new UnitilsException("Type to preserve does not exist: " + typeToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which types need to be preserved. To assure nothing is dropped by mistake, no types will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TYPES + " property.");
+                }
+            }
+        }
+        return typesToPreserve;
     }
 
 
