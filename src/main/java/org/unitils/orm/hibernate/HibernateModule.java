@@ -88,6 +88,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
         configurationObjectClass = ReflectionUtils.getClassWithName(configurationImplClassName);
     }
     
+    
     public void afterInit() {
     	super.afterInit();
     	
@@ -213,6 +214,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     protected DataSource getDataSource() {
     	return getDatabaseModule().getDataSource();
     }
+    
     
     /**
      * @return The TestListener associated with this module
