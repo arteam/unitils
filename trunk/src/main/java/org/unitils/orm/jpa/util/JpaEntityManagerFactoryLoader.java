@@ -15,6 +15,7 @@
  */
 package org.unitils.orm.jpa.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -56,7 +57,10 @@ public class JpaEntityManagerFactoryLoader implements OrmPersistenceUnitLoader<E
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(getDataSource());
         factoryBean.setJpaVendorAdapter(getJpaProviderSupport().getSpringJpaVendorAdaptor());
-        factoryBean.setPersistenceXmlLocation(jpaConfig.getConfigFiles().iterator().next());
+		String persistenceXmlFile = jpaConfig.getConfigFiles().iterator().next();
+		if (!StringUtils.isEmpty(persistenceXmlFile)) {
+			factoryBean.setPersistenceXmlLocation(persistenceXmlFile);
+		}
         factoryBean.setPersistenceUnitName(jpaConfig.getPersistenceUnitName());
         LoadTimeWeaver loadTimeWeaver = getJpaProviderSupport().getLoadTimeWeaver();
         if (loadTimeWeaver != null) {
