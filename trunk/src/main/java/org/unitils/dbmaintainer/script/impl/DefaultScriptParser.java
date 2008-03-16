@@ -112,15 +112,18 @@ public class DefaultScriptParser implements ScriptParser {
      * @return the statements, null if no more statements
      */
     protected String getNextStatementImpl() throws IOException {
-        StringBuilder statementStringBuilder = new StringBuilder();
-
         currentChar = scriptReader.read();
         if (currentChar == -1) {
             // nothing more to read
             return null;
         }
 
+        // set initial state
         char previousChar = 0;
+        currentParsingState = initialParsingState;
+        StringBuilder statementStringBuilder = new StringBuilder();
+
+        // parse script
         while (currentChar != -1) {
             // skip leading whitespace (NOTE String.trim uses <= ' ' for whitespace)
             if (statementStringBuilder.length() == 0 && currentChar <= ' ') {
@@ -157,8 +160,9 @@ public class DefaultScriptParser implements ScriptParser {
             }
         }
 
-        // only whitespace left in script
-        return null;
+        // check whether there was still a statement in the script
+        // or only whitespace was left
+        return createStatement(statementStringBuilder);
     }
 
 
@@ -178,6 +182,7 @@ public class DefaultScriptParser implements ScriptParser {
             return null;
         }
 
+        // remove trailing separator character (eg ;)
         int lastIndex = trimmedStatement.length() - 1;
         char lastChar = trimmedStatement.charAt(lastIndex);
         for (char trailingChar : getTrailingSeparatorCharsToRemove()) {
@@ -185,6 +190,12 @@ public class DefaultScriptParser implements ScriptParser {
                 trimmedStatement = trimmedStatement.substring(0, lastIndex);
                 break;
             }
+        }
+
+        // trim and see if anything is left after removing the trailing separator (eg ;)
+        trimmedStatement = trimmedStatement.trim();
+        if (isEmpty(trimmedStatement)) {
+            return null;
         }
         return trimmedStatement;
     }

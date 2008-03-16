@@ -39,4 +39,8 @@ comment */
 
 COMMENT ON TABLE PERSON IS 'This ; comment ; contains ; a semi-colon';
 COMMENT ON TABLE PERSON IS 'This "comment" '' contains quotes and double quotes';
-COMMENT ON TABLE PERSON IS 'This /* comment */ contains a block and -- line comment';
+
+;;;;
+
+-- last statement without ;
+COMMENT ON TABLE PERSON IS 'This /* comment */ contains a block and -- line comment'
