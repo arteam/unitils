@@ -15,12 +15,11 @@
  */
 package org.unitils.core.dbsupport;
 
+import org.unitils.core.util.StoredIdentifierCase;
 import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
 import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
 
 import java.util.Set;
-
-import org.unitils.core.util.StoredIdentifierCase;
 
 /**
  * Implementation of {@link DbSupport} for a MySql database.
@@ -71,30 +70,6 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
-     * Gets the names of all primary columns of the given table.
-     *
-     * @param tableName The table, not null
-     * @return The names of the primary key columns of the table with the given name
-     */
-    @Override
-    public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + getSchemaName() + "'");
-    }
-
-
-    /**
-     * Returns the names of all columns that have a 'not-null' constraint on them
-     *
-     * @param tableName The table, not null
-     * @return The set of column names, not null
-     */
-    @Override
-    public Set<String> getNotNullColummnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
-    }
-
-
-    /**
      * Retrieves the names of all the views in the database schema.
      *
      * @return The names of all views in the database
@@ -117,6 +92,32 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
+     * Removes all constraints on the specified table
+     *
+     * @param tableName The table with the column, not null
+     */
+    @Override
+    public void disableConstraints(String tableName) {
+        removeForeignKeyConstraints(tableName);
+        removeNotNullConstraints(tableName);
+    }
+
+
+    /**
+     * Gets the names of all identity columns of the given table.
+     * <p/>
+     * todo check, at this moment the PK columns are returned
+     *
+     * @param tableName The table, not null
+     * @return The names of the identity columns of the table with the given name
+     */
+    @Override
+    public Set<String> getIdentityColumnNames(String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + getSchemaName() + "'");
+    }
+
+
+    /**
      * Increments the identity value for the specified primary key on the specified table to the given value.
      *
      * @param tableName            The table with the identity column, not null
@@ -126,43 +127,6 @@ public class MySqlDbSupport extends DbSupport {
     @Override
     public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
         getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " AUTO_INCREMENT = " + identityValue);
-    }
-
-
-    /**
-     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
-     *
-     * @param tableName The table, not null
-     * @return The set of constraint names, not null
-     */
-    @Override
-    public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
-    }
-
-
-    /**
-     * Disables the constraint with the given name on table with the given name.
-     *
-     * @param tableName      The table with the constraint, not null
-     * @param constraintName The constraint, not null
-     */
-    @Override
-    public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + quoted(constraintName));
-    }
-
-
-    /**
-     * Removes the not-null constraint on the specified column and table
-     *
-     * @param tableName  The table with the column, not null
-     * @param columnName The column to remove constraints from, not null
-     */
-    @Override
-    public void removeNotNullConstraint(String tableName, String columnName) {
-        String columnType = getSQLHandler().getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + columnName + "'");
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " change column " + quoted(columnName) + " " + quoted(columnName) + " " + columnType + " NULL ");
     }
 
 
@@ -217,5 +181,94 @@ public class MySqlDbSupport extends DbSupport {
         return true;
     }
 
+    // todo rewrite constraint disabling
+
+    /**
+     * Disables all foreign key constraints
+     *
+     * @param tableName The table, not null
+     */
+    protected void removeForeignKeyConstraints(String tableName) {
+        Set<String> constraintNames = getForeignKeyConstraintNames(tableName);
+        for (String constraintName : constraintNames) {
+            removeForeignKeyConstraint(tableName, constraintName);
+        }
+    }
+
+
+    /**
+     * Disables all not-null constraints that are not of primary keys.
+     *
+     * @param tableName The table, not null
+     */
+    protected void removeNotNullConstraints(String tableName) {
+        // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
+        Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName);
+
+        Set<String> notNullColumnNames = getNotNullColummnNames(tableName);
+        for (String notNullColumnName : notNullColumnNames) {
+            if (primaryKeyColumnNames.contains(notNullColumnName)) {
+                // Do not remove PK constraints
+                continue;
+            }
+            removeNotNullConstraint(tableName, notNullColumnName);
+        }
+    }
+
+
+    /**
+     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
+     *
+     * @param tableName The table, not null
+     * @return The set of constraint names, not null
+     */
+    protected Set<String> getForeignKeyConstraintNames(String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Gets the names of all primary columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the primary key columns of the table with the given name
+     */
+    protected Set<String> getPrimaryKeyColumnNames(String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Returns the names of all columns that have a 'not-null' constraint on them
+     *
+     * @param tableName The table, not null
+     * @return The set of column names, not null
+     */
+    protected Set<String> getNotNullColummnNames(String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Disables the constraint with the given name on table with the given name.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
+    protected void removeForeignKeyConstraint(String tableName, String constraintName) {
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + quoted(constraintName));
+    }
+
+
+    /**
+     * Removes the not-null constraint on the specified column and table
+     *
+     * @param tableName  The table with the column, not null
+     * @param columnName The column to remove constraints from, not null
+     */
+    protected void removeNotNullConstraint(String tableName, String columnName) {
+        String columnType = getSQLHandler().getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + columnName + "'");
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " change column " + quoted(columnName) + " " + quoted(columnName) + " " + columnType + " NULL ");
+    }
 
 }

@@ -35,8 +35,8 @@ import java.util.Set;
  * todo add getIdentityColumns
  *
  * @author Filip Neven
- * @author Frederick Beernaert
  * @author Tim Ducheyne
+ * @author Frederick Beernaert
  */
 abstract public class DbSupport {
 
@@ -168,24 +168,6 @@ abstract public class DbSupport {
 
 
     /**
-     * Gets the names of all primary columns of the given table.
-     *
-     * @param tableName The table, not null
-     * @return The names of the primary key columns of the table with the given name
-     */
-    public abstract Set<String> getPrimaryKeyColumnNames(String tableName);
-
-
-    /**
-     * Returns the names of all columns that have a 'not-null' constraint on them
-     *
-     * @param tableName The table, not null
-     * @return The set of column names, not null
-     */
-    public abstract Set<String> getNotNullColummnNames(String tableName);
-
-
-    /**
      * Retrieves the names of all the views in the database schema.
      *
      * @return The names of all views in the database
@@ -300,6 +282,14 @@ abstract public class DbSupport {
 
 
     /**
+     * Disables all constraints on the specified table
+     *
+     * @param tableName The table, not null
+     */
+    public abstract void disableConstraints(String tableName);
+
+
+    /**
      * Returns the value of the sequence with the given name.
      * <p/>
      * Note: this can have the side-effect of increasing the sequence value.
@@ -324,6 +314,17 @@ abstract public class DbSupport {
 
 
     /**
+     * Gets the names of all identity columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the identity columns of the table with the given name
+     */
+    public Set<String> getIdentityColumnNames(String tableName) {
+        throw new UnsupportedOperationException("Identity columns not supported for " + getDatabaseDialect());
+    }
+
+
+    /**
      * Increments the identity value for the specified identity column on the specified table to the given value. If there
      * is no identity specified on the given primary key, the method silently finishes without effect.
      *
@@ -333,39 +334,6 @@ abstract public class DbSupport {
      */
     public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
         throw new UnsupportedOperationException("Identity columns not supported for " + getDatabaseDialect());
-    }
-
-
-    /**
-     * Removes the not-null constraint on the specified column and table
-     *
-     * @param tableName  The table with the column, not null
-     * @param columnName The column to remove constraints from, not null
-     */
-    public void removeNotNullConstraint(String tableName, String columnName) {
-        throw new UnsupportedOperationException("Remove not null constraints not supported for " + getDatabaseDialect());
-    }
-
-
-    /**
-     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
-     *
-     * @param tableName The table, not null
-     * @return The set of constraint names, not null
-     */
-    public Set<String> getForeignKeyConstraintNames(String tableName) {
-        throw new UnsupportedOperationException("Retrieval of table constraints not supported for " + getDatabaseDialect());
-    }
-
-
-    /**
-     * Disables the constraint with the given name on table with the given name.
-     *
-     * @param tableName      The table with the constraint, not null
-     * @param constraintName The constraint, not null
-     */
-    public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        throw new UnsupportedOperationException("Disabling of constraints not supported for " + getDatabaseDialect());
     }
 
 

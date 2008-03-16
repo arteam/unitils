@@ -19,21 +19,19 @@ package org.unitils.dbmaintainer.structure;
 import org.unitils.dbmaintainer.util.DatabaseTask;
 
 /**
- * Defines the contract for implementations that disable all foreign key and not-null constraints on an database.
- * The implementation guarantees that, when the method disableConstraints() is is called once after each database update.
+ * A task for disabling all foreign key, check and not-null constraints on a database schema.
+ * Primary key constraints will not be disabled.
  *
  * @author Filip Neven
- * @author Bart Vermeiren
  * @author Tim Ducheyne
+ * @author Bart Vermeiren
  */
 public interface ConstraintsDisabler extends DatabaseTask {
 
 
     /**
-     * Generates statements to disable the constraints of the associated database. This method does only guarantee that
-     * constraints are fully disabled after the method enableConstraintsOnConnection has been called on the <code>Connection</code> object that is used.
+     * Disables all constraints of the database schemas.
      */
     void disableConstraints();
-
 
 }

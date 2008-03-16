@@ -64,9 +64,9 @@ public class OracleNormalParsingState extends NormalParsingState {
                 statementBuffer.setLength(0);
                 return null;
             }
-            return this;
+        } else {
+            lineBuffer.append(currentChar);
         }
-        lineBuffer.append(currentChar);
 
         // search for the beginning of a code statement
         if (!parsingCodeBlock && statementBuffer.length() < 100) {

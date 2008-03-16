@@ -73,66 +73,6 @@ public class DerbyDbSupport extends DbSupport {
 
 
     /**
-     * Gets the names of all primary columns of the given table.
-     * <p/>
-     * This info is not available in the Derby sys tables. The database meta data is used instead to retrieve it.
-     *
-     * @param tableName The table, not null
-     * @return The names of the primary key columns of the table with the given name
-     */
-    @Override
-    public Set<String> getPrimaryKeyColumnNames(String tableName) {
-        Connection connection = null;
-        ResultSet resultSet = null;
-        try {
-            connection = getSQLHandler().getDataSource().getConnection();
-            DatabaseMetaData databaseMetaData = connection.getMetaData();
-            resultSet = databaseMetaData.getPrimaryKeys(null, getSchemaName(), tableName);
-            Set<String> result = new HashSet<String>();
-            while (resultSet.next()) {
-                result.add(resultSet.getString(4)); // COLUMN_NAME
-            }
-            return result;
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while querying for Derby primary keys for table name: " + tableName, e);
-        } finally {
-            closeQuietly(connection, null, resultSet);
-        }
-    }
-
-
-    /**
-     * Returns the names of all columns that have a 'not-null' constraint on them.
-     * <p/>
-     * This info is not available in the Derby sys tables. The database meta data is used instead to retrieve it.
-     *
-     * @param tableName The table, not null
-     * @return The set of column names, not null
-     */
-    @Override
-    public Set<String> getNotNullColummnNames(String tableName) {
-        Connection connection = null;
-        ResultSet resultSet = null;
-        try {
-            connection = getSQLHandler().getDataSource().getConnection();
-            DatabaseMetaData databaseMetaData = connection.getMetaData();
-            resultSet = databaseMetaData.getColumns(null, getSchemaName(), tableName, "%");
-            Set<String> result = new HashSet<String>();
-            while (resultSet.next()) {
-                if (resultSet.getInt(11) == DatabaseMetaData.columnNoNulls) { // NULLABLE
-                    result.add(resultSet.getString(4)); //COLUMN_NAME
-                }
-            }
-            return result;
-        } catch (SQLException e) {
-            throw new UnitilsException("Error while querying for Derby primary keys for table name: " + tableName, e);
-        } finally {
-            closeQuietly(connection, null, resultSet);
-        }
-    }
-
-
-    /**
      * Retrieves the names of all the views in the database schema.
      *
      * @return The names of all views in the database
@@ -168,6 +108,20 @@ public class DerbyDbSupport extends DbSupport {
 
 
     /**
+     * Gets the names of all identity columns of the given table.
+     * <p/>
+     * todo check, at this moment the PK columns are returned
+     *
+     * @param tableName The table, not null
+     * @return The names of the identity columns of the table with the given name
+     */
+    @Override
+    public Set<String> getIdentityColumnNames(String tableName) {
+        return getPrimaryKeyColumnNames(tableName);
+    }
+
+
+    /**
      * Increments the identity value for the specified identity column on the specified table to the given value.
      *
      * @param tableName          The table with the identity column, not null
@@ -177,44 +131,6 @@ public class DerbyDbSupport extends DbSupport {
     @Override
     public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
         getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(identityColumnName) + " RESTART WITH " + identityValue);
-    }
-
-
-    /**
-     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
-     *
-     * @param tableName The table, not null
-     * @return The set of constraint names, not null
-     */
-    @Override
-    public Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select SYS.SYSCONSTRAINTS.CONSTRAINTNAME from SYS.SYSCONSTRAINTS, SYS.SYSTABLES, SYS.SYSSCHEMAS " +
-                "where SYS.SYSCONSTRAINTS.TYPE = 'F' AND SYS.SYSCONSTRAINTS.TABLEID = SYS.SYSTABLES.TABLEID  AND SYS.SYSTABLES.TABLENAME = '" + tableName + "' AND " +
-                "SYS.SYSCONSTRAINTS.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
-    }
-
-
-    /**
-     * Disables the constraint with the given name on table with the given name.
-     *
-     * @param tableName      The table with the constraint, not null
-     * @param constraintName The constraint, not null
-     */
-    @Override
-    public void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
-    }
-
-
-    /**
-     * Removes the not-null constraint on the specified column and table
-     *
-     * @param tableName  The table with the column, not null
-     * @param columnName The column to remove constraints from, not null
-     */
-    @Override
-    public void removeNotNullConstraint(String tableName, String columnName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " NULL");
     }
 
 
@@ -240,6 +156,18 @@ public class DerbyDbSupport extends DbSupport {
      */
     public void dropView(String viewName) {
         getSQLHandler().executeUpdate("drop view " + qualified(viewName));
+    }
+
+
+    /**
+     * Removes all constraints on the specified table
+     *
+     * @param tableName The table with the column, not null
+     */
+    @Override
+    public void disableConstraints(String tableName) {
+        removeForeignKeyConstraints(tableName);
+        removeNotNullConstraints(tableName);
     }
 
 
@@ -273,6 +201,133 @@ public class DerbyDbSupport extends DbSupport {
     @Override
     public boolean supportsIdentityColumns() {
         return true;
+    }
+
+    // todo rewrite constraint disabling
+
+    /**
+     * Disables all foreign key constraints
+     *
+     * @param tableName The table, not null
+     */
+    protected void removeForeignKeyConstraints(String tableName) {
+        Set<String> constraintNames = getForeignKeyConstraintNames(tableName);
+        for (String constraintName : constraintNames) {
+            removeForeignKeyConstraint(tableName, constraintName);
+        }
+    }
+
+
+    /**
+     * Disables all not-null constraints that are not of primary keys.
+     *
+     * @param tableName The table, not null
+     */
+    protected void removeNotNullConstraints(String tableName) {
+        // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
+        Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName);
+
+        Set<String> notNullColumnNames = getNotNullColummnNames(tableName);
+        for (String notNullColumnName : notNullColumnNames) {
+            if (primaryKeyColumnNames.contains(notNullColumnName)) {
+                // Do not remove PK constraints
+                continue;
+            }
+            removeNotNullConstraint(tableName, notNullColumnName);
+        }
+    }
+
+
+    /**
+     * Gets the names of all primary columns of the given table.
+     * <p/>
+     * This info is not available in the Derby sys tables. The database meta data is used instead to retrieve it.
+     *
+     * @param tableName The table, not null
+     * @return The names of the primary key columns of the table with the given name
+     */
+    protected Set<String> getPrimaryKeyColumnNames(String tableName) {
+        Connection connection = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getSQLHandler().getDataSource().getConnection();
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+            resultSet = databaseMetaData.getPrimaryKeys(null, getSchemaName(), tableName);
+            Set<String> result = new HashSet<String>();
+            while (resultSet.next()) {
+                result.add(resultSet.getString(4)); // COLUMN_NAME
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while querying for Derby primary keys for table name: " + tableName, e);
+        } finally {
+            closeQuietly(connection, null, resultSet);
+        }
+    }
+
+
+    /**
+     * Returns the names of all columns that have a 'not-null' constraint on them.
+     * <p/>
+     * This info is not available in the Derby sys tables. The database meta data is used instead to retrieve it.
+     *
+     * @param tableName The table, not null
+     * @return The set of column names, not null
+     */
+    protected Set<String> getNotNullColummnNames(String tableName) {
+        Connection connection = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getSQLHandler().getDataSource().getConnection();
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+            resultSet = databaseMetaData.getColumns(null, getSchemaName(), tableName, "%");
+            Set<String> result = new HashSet<String>();
+            while (resultSet.next()) {
+                if (resultSet.getInt(11) == DatabaseMetaData.columnNoNulls) { // NULLABLE
+                    result.add(resultSet.getString(4)); //COLUMN_NAME
+                }
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new UnitilsException("Error while querying for Derby primary keys for table name: " + tableName, e);
+        } finally {
+            closeQuietly(connection, null, resultSet);
+        }
+    }
+
+
+    /**
+     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
+     *
+     * @param tableName The table, not null
+     * @return The set of constraint names, not null
+     */
+    protected Set<String> getForeignKeyConstraintNames(String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select SYS.SYSCONSTRAINTS.CONSTRAINTNAME from SYS.SYSCONSTRAINTS, SYS.SYSTABLES, SYS.SYSSCHEMAS " +
+                "where SYS.SYSCONSTRAINTS.TYPE = 'F' AND SYS.SYSCONSTRAINTS.TABLEID = SYS.SYSTABLES.TABLEID  AND SYS.SYSTABLES.TABLENAME = '" + tableName + "' AND " +
+                "SYS.SYSCONSTRAINTS.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Disables the constraint with the given name on table with the given name.
+     *
+     * @param tableName      The table with the constraint, not null
+     * @param constraintName The constraint, not null
+     */
+    protected void removeForeignKeyConstraint(String tableName, String constraintName) {
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+    }
+
+
+    /**
+     * Removes the not-null constraint on the specified column and table
+     *
+     * @param tableName  The table with the column, not null
+     * @param columnName The column to remove constraints from, not null
+     */
+    protected void removeNotNullConstraint(String tableName, String columnName) {
+        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " NULL");
     }
 
 

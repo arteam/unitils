@@ -15,9 +15,6 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -25,6 +22,9 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import org.unitils.util.PropertyUtils;
+
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Implementation of {@link SequenceUpdater}. All sequences and identity columns that have a value lower than the value
@@ -99,11 +99,11 @@ public class DefaultSequenceUpdater extends BaseDatabaseTask implements Sequence
         }
         Set<String> tableNames = dbSupport.getTableNames();
         for (String tableName : tableNames) {
-            Set<String> primaryKeyColumnNames = dbSupport.getPrimaryKeyColumnNames(tableName);
-            for (String primaryKeyColumnName : primaryKeyColumnNames) {
+            Set<String> identityColumnNames = dbSupport.getIdentityColumnNames(tableName);
+            for (String identityColumnName : identityColumnNames) {
                 try {
-                    dbSupport.incrementIdentityColumnToValue(tableName, primaryKeyColumnName, lowestAcceptableSequenceValue);
-                    logger.debug("Incrementing value for identity column " + primaryKeyColumnName + " in database schema " + dbSupport.getSchemaName());
+                    dbSupport.incrementIdentityColumnToValue(tableName, identityColumnName, lowestAcceptableSequenceValue);
+                    logger.debug("Incrementing value for identity column " + identityColumnName + " in database schema " + dbSupport.getSchemaName());
 
                 } catch (UnitilsException e) {
                     // primary key is not an identity column
