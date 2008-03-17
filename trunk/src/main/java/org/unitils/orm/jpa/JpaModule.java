@@ -20,19 +20,9 @@ import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -50,6 +40,17 @@ import org.unitils.orm.jpa.util.JpaConfig;
 import org.unitils.orm.jpa.util.JpaEntityManagerFactoryLoader;
 import org.unitils.orm.jpa.util.JpaProviderSupport;
 import org.unitils.util.ConfigUtils;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
+import javax.sql.DataSource;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Module providing support for unit tests for code that uses JPA. It offers an easy way of loading a 
@@ -87,8 +88,17 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
      */
     protected JpaProviderSupport jpaProviderSupport;
     
-
 	/**
+     * Constructor for JpaModule.
+     */
+    public JpaModule() {
+        super();
+        // Make sure recent version spring ORM module is in the classpath
+        AbstractEntityManagerFactoryBean.class.getName();
+    }
+
+
+    /**
      * @param configuration The Unitils configuration, not null
      */
     public void init(Properties configuration) {
