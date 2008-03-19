@@ -28,17 +28,6 @@ import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -62,6 +51,17 @@ import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.dbmaintainer.util.DatabaseTask;
 import org.unitils.util.PropertyUtils;
+
+import javax.sql.DataSource;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Module that provides support for database testing: Creation of a datasource that connects to the
@@ -213,7 +213,6 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     public void flushDatabaseUpdates(Object testObject) {
-        logger.info("Flushing database updates.");
         List<Flushable> flushables = Unitils.getInstance().getModulesRepository().getModulesOfType(Flushable.class);
         for (Flushable flushable : flushables) {
             flushable.flushDatabaseUpdates(testObject);
