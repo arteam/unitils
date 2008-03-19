@@ -17,9 +17,9 @@ package org.unitils.dbmaintainer.script;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.version.Version;
+import static org.unitils.util.FileUtils.getUrl;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -31,10 +31,10 @@ import java.net.URL;
 public class Script implements Comparable<Script> {
 
     /* The name of the script */
-    private String name;
+    protected String name;
 
-    /* The URL of the script */
-    private URL url;
+    /* The handle to the content of the script */
+    private ScriptContentHandle scriptContentHandle;
 
     /* The version of the script */
     private Version version;
@@ -48,9 +48,7 @@ public class Script implements Comparable<Script> {
      * @param version The version, not null
      */
     public Script(String name, URL url, Version version) {
-        this.name = name;
-        this.url = url;
-        this.version = version;
+        this(name, new UrlScriptContentHandle(url), version);
     }
 
 
@@ -61,13 +59,33 @@ public class Script implements Comparable<Script> {
      * @param version    The version, not null
      */
     public Script(File scriptFile, Version version) {
-        this.name = scriptFile.getName();
+        this(scriptFile.getName(), new UrlScriptContentHandle(getUrl(scriptFile)), version);
+    }
+
+
+    /**
+     * Creates a script for the given content string.
+     *
+     * @param name          The name of the script, not null
+     * @param scriptContent The content of the script, not null
+     * @param version       The version, not null
+     */
+    public Script(String name, String scriptContent, Version version) {
+        this(name, new StringScriptContentHandle(scriptContent), version);
+    }
+
+
+    /**
+     * Creates a script.
+     *
+     * @param name                The name of the script, not null
+     * @param scriptContentHandle The handle to the conent of the script, not null
+     * @param version             The version, not null
+     */
+    public Script(String name, ScriptContentHandle scriptContentHandle, Version version) {
+        this.name = name;
+        this.scriptContentHandle = scriptContentHandle;
         this.version = version;
-        try {
-            this.url = scriptFile.toURI().toURL();
-        } catch (MalformedURLException e) {
-            throw new UnitilsException("Unable to create URL for script " + name, e);
-        }
     }
 
 
@@ -88,26 +106,13 @@ public class Script implements Comparable<Script> {
 
 
     /**
-     * @return The URL of the script, not null
-     */
-    public URL getUrl() {
-        return url;
-    }
-
-
-    /**
      * Opens a stream to the content of the script.
      * NOTE: do not forget to close the stream after usage.
      *
      * @return The content stream, not null
      */
     public Reader openScriptContentReader() throws UnitilsException {
-        try {
-            InputStream scriptInputStream = url.openStream();
-            return new InputStreamReader(scriptInputStream);
-        } catch (IOException e) {
-            throw new UnitilsException("Error while trying to create reader for script " + name, e);
-        }
+        return scriptContentHandle.openScriptContentReader();
     }
 
 
@@ -130,5 +135,84 @@ public class Script implements Comparable<Script> {
     @Override
     public String toString() {
         return name + " " + version;
+    }
+
+
+    /**
+     * A handle for getting the script content as a stream.
+     */
+    public static interface ScriptContentHandle {
+
+        /**
+         * Opens a stream to the content of the script.
+         * NOTE: do not forget to close the stream after usage.
+         *
+         * @return The content stream, not null
+         */
+        Reader openScriptContentReader() throws UnitilsException;
+
+    }
+
+
+    /**
+     * A handle for getting the script content as a stream.
+     */
+    public static class UrlScriptContentHandle implements ScriptContentHandle {
+
+        /* The URL of the script */
+        private URL url;
+
+        /**
+         * Creates a content handle.
+         *
+         * @param url The url to the content, not null
+         */
+        public UrlScriptContentHandle(URL url) {
+            this.url = url;
+        }
+
+        /**
+         * Opens a stream to the content of the script.
+         * NOTE: do not forget to close the stream after usage.
+         *
+         * @return The content stream, not null
+         */
+        public Reader openScriptContentReader() throws UnitilsException {
+            try {
+                InputStream scriptInputStream = url.openStream();
+                return new InputStreamReader(scriptInputStream);
+            } catch (IOException e) {
+                throw new UnitilsException("Error while trying to create reader for url " + url, e);
+            }
+        }
+    }
+
+
+    /**
+     * A handle for getting the script content as a stream.
+     */
+    public static class StringScriptContentHandle implements ScriptContentHandle {
+
+        /* The content of the script */
+        private String scriptContent;
+
+        /**
+         * Creates a content handle.
+         *
+         * @param scriptContent The content, not null
+         */
+        public StringScriptContentHandle(String scriptContent) {
+            this.scriptContent = scriptContent;
+        }
+
+        /**
+         * Opens a stream to the content of the script.
+         * NOTE: do not forget to close the stream after usage.
+         *
+         * @return The content stream, not null
+         */
+        public Reader openScriptContentReader() throws UnitilsException {
+            return new StringReader(scriptContent);
+        }
     }
 }

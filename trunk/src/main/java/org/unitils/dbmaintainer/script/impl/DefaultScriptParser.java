@@ -25,6 +25,7 @@ import org.unitils.util.PropertyUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -162,7 +163,11 @@ public class DefaultScriptParser implements ScriptParser {
 
         // check whether there was still a statement in the script
         // or only whitespace was left
-        return createStatement(statementStringBuilder);
+        String finalStatement = createStatement(statementStringBuilder);
+        if (finalStatement != null) {
+            throw new UnitilsException("Last statement in script was not ended correctly. Each statement should end with one of " + Arrays.toString(getTrailingSeparatorCharsToRemove()));
+        }
+        return null;
     }
 
 

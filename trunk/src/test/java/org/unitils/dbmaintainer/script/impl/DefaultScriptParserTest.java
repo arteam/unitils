@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 import java.io.File;
@@ -47,6 +48,9 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
     /* Reader for the test script */
     private Reader testSQLScriptReader;
 
+    /* Reader for the test script with a missing semi colon */
+    private Reader testSQLMissingSemiColonScriptReader;
+
     /* Reader for the empty script */
     private Reader emptyScriptReader;
 
@@ -59,6 +63,7 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
         defaultScriptParser = new DefaultScriptParser();
         configuration = new ConfigurationLoader().loadConfiguration();
         testSQLScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script.sql").toURI()));
+        testSQLMissingSemiColonScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script-missing-semicolon.sql").toURI()));
         emptyScriptReader = new StringReader("");
     }
 
@@ -85,6 +90,17 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
             assertNotNull(defaultScriptParser.getNextStatement());
         }
         assertNull(defaultScriptParser.getNextStatement());
+    }
+
+
+    /**
+     * Test parsing a statements out of a script but statement does not end with a ;.
+     * This should raise an exception
+     */
+    @Test(expected = UnitilsException.class)
+    public void testParseStatements_missingEndingSemiColon() throws Exception {
+        defaultScriptParser.init(configuration, testSQLMissingSemiColonScriptReader);
+        defaultScriptParser.getNextStatement();
     }
 
 

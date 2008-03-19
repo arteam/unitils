@@ -103,12 +103,12 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         version0 = new Version("0", 0L);
         version1 = new Version("1", 1L);
         version2 = new Version("2", 2L);
-        scripts.add(new Script("script1.sql", null, version1));
-        scripts.add(new Script("script2.sql", null, version2));
+        scripts.add(new Script("script1.sql", "content", version1));
+        scripts.add(new Script("script2.sql", "content", version2));
 
         postProcessingScripts = new ArrayList<Script>();
-        postProcessingScripts.add(new Script("post-script1.sql", null, version0));
-        postProcessingScripts.add(new Script("post-script2.sql", null, version0));
+        postProcessingScripts.add(new Script("post-script1.sql", "content", version0));
+        postProcessingScripts.add(new Script("post-script2.sql", "content", version0));
     }
 
 
