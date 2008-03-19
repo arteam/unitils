@@ -43,8 +43,12 @@ end;
 -- a regular statement
 create table table1 (col1 smallint);
 
+////
 
 /* a regular statement ending with a slash */
 create
-table table1 (col1 smallint)
+table table1 (col1 smallint);
+/
+
+/
 /
