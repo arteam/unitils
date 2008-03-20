@@ -76,6 +76,17 @@ public class Script implements Comparable<Script> {
 
 
     /**
+     * Creates a script for the given content string.
+     * The script has a dummy name and version.
+     *
+     * @param scriptContent The content of the script, not null
+     */
+    public Script(String scriptContent) {
+        this("<no name>", new StringScriptContentHandle(scriptContent), new Version("", 0));
+    }
+
+
+    /**
      * Creates a script.
      *
      * @param name                The name of the script, not null
