@@ -121,7 +121,7 @@ public class Unitils {
      * @param configuration The config, not null
      */
     public void init(Properties configuration) {
-    	verifyPackaging(configuration);
+    	//verifyPackaging(configuration);
         this.configuration = configuration;
         modulesRepository = createModulesRepository(configuration);
         testListener = new UnitilsTestListener();
@@ -136,7 +136,7 @@ public class Unitils {
     }
     
     
-    private void verifyPackaging(Properties configuration) {
+    protected void verifyPackaging(Properties configuration) {
     	String springCoreClassName = configuration.getProperty("spring.core.someClass.name");
     	String unitilsPackagedWithSpring = "org.unitils.includeddeps." + springCoreClassName;
     	
