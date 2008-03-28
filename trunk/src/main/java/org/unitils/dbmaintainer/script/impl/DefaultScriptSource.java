@@ -59,7 +59,7 @@ public class DefaultScriptSource extends BaseDatabaseTask implements ScriptSourc
     /**
      * Property key for the directory in which the code script files are located
      */
-    public static final String PROPKEY_SCRIPT_POSTPROCESSINGCODESCRIPTS = "dbMaintainer.script.postProcessingScripts";
+    public static final String PROPKEY_POSTPROCESSINGSCRIPT_LOCATIONS = "dbMaintainer.postProcessingScript.locations";
 
 
     /**
@@ -170,8 +170,8 @@ public class DefaultScriptSource extends BaseDatabaseTask implements ScriptSourc
     public List<Script> getPostProcessingScripts() {
         List<Script> scripts = new ArrayList<Script>();
 
-        List<String> scriptNames = getStringList(PROPKEY_SCRIPT_POSTPROCESSINGCODESCRIPTS, configuration);
-        List<File> scriptFiles = getFiles(scriptNames, PROPKEY_SCRIPT_POSTPROCESSINGCODESCRIPTS);
+        List<String> scriptNames = getStringList(PROPKEY_POSTPROCESSINGSCRIPT_LOCATIONS, configuration);
+        List<File> scriptFiles = getFiles(scriptNames, PROPKEY_POSTPROCESSINGSCRIPT_LOCATIONS);
         for (File scriptFile : scriptFiles) {
             if (!scriptFile.isFile()) {
                 throw new UnitilsException("Post processing script is not a file. Script: " + scriptFile.getName());
