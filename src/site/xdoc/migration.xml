@@ -1,11 +1,53 @@
 <document>
   <properties>    
-    <title>Migration to RC 3</title>
+    <title>Migration path</title>
   </properties>  
-  <body>    
-    <section name="Migration to RC 4">
+  <body>
+    <section name="Migration to 1.1-rc-1">
     
-        <p>When migrating from Unitils RC 3 to RC 4, following change needs to be made:</p>
+        <p>When migrating from Unitils 1.0 to 1.1-rc-1, following changes need to be made:</p>
+        
+		<p>If you're using the DBMaintainer: In the first place, the property dbMaintainer.fileScriptSource.scripts.locations must be renamed to dbMaintainer.script.locations. 
+		We also advise you to read the section on automatic test database maintenance in the tutorial. The DBMaintainer has a lot of new features such as:
+		<ul>
+			<li>Support for organising scripts in folders that also have a version number</li>
+			<li>Support for Oracle PL/SQL, mixed with simple SQL and DDL statements</li>
+			<li>Support for version-less scripts, that are re-executed each time they are changed, without triggering a from-scratch update of the database (ideal for maintaining functions and stored procedures)</li>
+		</ul>
+		</p>
+		
+        <p>If you're using Unitils' hibernate integration:
+		<ul>
+			<li>Every test that uses hibernate, must be run in a transaction. Add @Transactional(TransactionMode.COMMIT) or @Transactional(TransactionMode.ROLLBACK) on
+			you test (super)class.</li>
+			<li>For configuring a SessionFactory, custom create methods are no longer supported. Custom configuration methods are still supported. You can easily 
+			migrate a custom create method to a custom configuration method, e.g.:</li>
+		</ul></p>
+
+		<p><pre><code>
+		@HibernateSessionFactory
+		protected Configuration createConfiguration() {
+			AnnotationConfiguration configuration = new AnnotationConfiguration();
+			configuration.loadConfig("hibernate.cfg.xml");
+			configuration.addAnnotatedClass(Person.class);
+			configuration.addAnnotatedClass(Car.class);
+		}
+		</code></pre></p>
+		Can be re-implemented as:
+		<p><pre><code>
+		@HibernateSessionFactory
+		protected void createConfiguration(AnnotationConfiguration configuration) {
+			configuration.loadConfig("hibernate.cfg.xml");
+			configuration.addAnnotatedClass(Person.class);
+			configuration.addAnnotatedClass(Car.class);
+		}
+		</code></pre></p>
+
+		<p>If you're using JPA with hibernate, toplink or openjpa as persistence provider, then try out unitils' brand new JPA support for testing your persistence layer code!</p>
+    </section>
+    <section name="Migration to 1.0-rc-4">
+    
+        <p>When migrating from Unitils 1.0-rc-3 to 1.0-rc-4, following changes need to be made:</p>
         
         <p>If no file name is specified for the @DataSet annotation, Unitils will no longer first look for a file named <i>className.methodName</i>.xml.
         It will only look for a file named <i>className</i>.xml.</p>
@@ -37,7 +79,7 @@
     </section>
     <section name="Migration to RC 3">
     
-        <p>When migrating from Unitils RC 2 to RC 3, following changes need to be made:</p>
+        <p>When migrating from Unitils 1.0-rc-2 to 1.0-rc-3, following changes need to be made:</p>
         
         <p>Rename the property <i>database.schemaName</i> to <i>database.schemaNames</i> in your configuration files. Multiple schema names may be 
         specified, seperated by commas.</p>

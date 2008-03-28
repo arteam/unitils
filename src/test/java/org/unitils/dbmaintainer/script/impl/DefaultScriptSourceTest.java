@@ -66,7 +66,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
         // Initialize FileScriptSourceObject
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS, scriptLocations);
-        configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_POSTPROCESSINGCODESCRIPTS, postProcessingScripts);
+        configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_LOCATIONS, postProcessingScripts);
         defaultScriptSource = new DefaultScriptSource();
         defaultScriptSource.init(configuration, new SQLHandler(dataSource));
     }
