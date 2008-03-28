@@ -203,7 +203,7 @@ dbMaintainer.dbVersionSource.autoCreateVersionTable=true
 
 # Comma separated list of directories and files in which the database update scripts are located. Directories in this
 # list are recursively searched for files.
-dbMaintainer.fileScriptSource.scripts.locations=<Paths to your database update script files>
+dbMaintainer.script.locations=<Paths to your database update script files>
 
 # DbUnit database XSD directory
 dataSetStructureGenerator.xsd.dirName=<Path to your database XSD directory>
@@ -259,6 +259,7 @@ HibernateModule.configuration.implClassName=org.hibernate.cfg.Configuration
 
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
+@Transactional(TransactionMode.COMMIT)
 public class UserDaoTest extends UnitilsJUnit4 {
 
     @HibernateSessionFactory
@@ -304,6 +305,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
 
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
+@Transactional(TransactionMode.COMMIT)
 public class HibernateMappingTest extends UnitilsJUnit4 {
     
     @Test
