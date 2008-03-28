@@ -327,7 +327,7 @@ public class DBMaintainer {
                     // script anyway, so that the database is rebuilt from scratch when the erroneous script is fixed.
                     increaseDbVersion(script.getVersion(), currentVersion);
                 }
-                logger.error("Current database version is " + currentVersion);
+                logger.error("Current database version is: " + currentVersion);
                 throw e;
             }
         }
@@ -348,7 +348,7 @@ public class DBMaintainer {
         }
         currentVersion.setTimeStamp(Math.max(scriptVersion.getTimeStamp(), currentVersion.getTimeStamp()));
         versionSource.setDbVersion(currentVersion);
-        logger.debug("Database version incremented to " + currentVersion);
+        logger.debug("Database version incremented to: " + currentVersion);
     }
 
 
