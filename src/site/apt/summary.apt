@@ -10,8 +10,8 @@ Summary
     with {{{http://www.junit.org}JUnit}} and {{{http://testng.org}TestNG}}.
  
     Unitils provides general asserion utilities, support for database testing, support for testing with mock objects and offers integration with 
-    {{{http://www.springframework.org}Spring}} and {{{http://www.hibernate.org}Hibernate}}. It has been designed to offer these services to unit 
-    tests in a very configurable and loosely coupled way. As a result, services can be added and extended very easily.
+    {{{http://www.springframework.org}Spring}}, {{{http://www.hibernate.org}Hibernate}} and the Java Persistence API (JPA). It has been designed to 
+	offer these services to unit tests in a very configurable and loosely coupled way. As a result, services can be added and extended very easily.
     
     Currently Unitils offers following features:
 
@@ -29,13 +29,15 @@ Summary
 
         * Simplify unit test database connection setup
 
-        * Simplify insertion of test data with DBUnit
+        * Simple insertion of test data with DBUnit
+		
+		* Run tests in a transaction
+		
+		* JPA entity manager creation and injection for hibernate, toplink and openjpa
 
-        * Simplify Hibernate session management for unit testing
+        * Hibernate SessionFactory creation and session management
 
-        * Automatically test the mapping of Hibernate mapped objects with the database
-
-        * Manage transactions during unit testing
+        * Automatically test the mapping of JPA entities / hibernate mapped objects with the database
 
     []
 
@@ -75,6 +77,15 @@ Summary
 
 * News
 ~~~~~~
+
+	<<2008-03-28 - Release of Unitils 1.1 rc 1>>
+	
+	We've been working hard to implement following features: JPA integration, support for hierarchically organized database scripts, support for Oracle PL/SQL in database scripts. Also, Unitils' transaction management and 
+	hibernate integration have been re-implemented on top of spring's abstraction layer for ORM and transactions. Unitils' JPA integration is also built on top of spring's JPA abstraction layer. Therefore, spring 
+	(2.0 or later) has become a depencency of unitils for all persistence-layer testing features. This doesn't mean your application code necessarily has to use spring: spring is used by unitils under the hoods, transparantly. 
+	
+	Unitils 1.1-rc-1 bundles all these new features. Read the {{{tutorial.html} tutorial}} for more information on Unitils' new features. Take a look at the {{{migration.html} migration page}} 
+	to see what you must do to migrate to unitils 1.1-rc-1. 
 
     <<2007-12-05 - Release of Unitils 1.0>>
 
