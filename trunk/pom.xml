@@ -30,7 +30,7 @@
         <url>http://sourceforge.net/tracker/?group_id=167201</url>
     </issueManagement>
     <scm>
-	  <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils</connection>
+        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils</connection>
         <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils</developerConnection>
         <tag>HEAD</tag>
         <url>http://unitils.svn.sourceforge.net/viewvc/unitils/</url>
@@ -38,25 +38,7 @@
 
     <!-- Build Settings -->
     <build>
-        <testResources>
-            <testResource>
-                <directory>src/test/java</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </testResource>
-	      <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-       <pluginManagement>
-          <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <version>2.4.2-SNAPSHOT</version>
-              </plugin>
-          </plugins>
-        </pluginManagement>
+        <testSourceDirectory>disabled</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -306,16 +288,5 @@
 
         </plugins>
     </reporting>
-
-     <!-- install plugin snapshot repository for surefire-plugin -->
-    <pluginRepositories>
-	<pluginRepository>
-		<id>apache-plugin-snapshots</id>
-		<name>Apache Maven Plugin Snapshots</name>
-		<url>http://people.apache.org/repo/m2-snapshot-repository</url>
-		<releases><enabled>false</enabled></releases>
-		<snapshots><enabled>true</enabled></snapshots>
-	</pluginRepository>
-    </pluginRepositories>
 
 </project>
