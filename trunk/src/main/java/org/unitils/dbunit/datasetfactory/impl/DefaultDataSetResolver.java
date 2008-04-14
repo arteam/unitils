@@ -28,20 +28,22 @@ import java.util.Properties;
 /**
  * Resolves the location for a data set with a certain name.
  * <p/>
- * If needed, the data set is prefixed with the package name (. replaced by /)
- * If a path prefix is specified it is added to the file name.
- * Package name and prefix can be specified with the {@link #PROPKEY_PREFIX_WITH_PACKAGE_NAME} and
- * {@link #PROPKEY_DATA_SET_PATH_PREFIX} properties.
+ * By default, the data set name is prefixed with the package name (. replaced by /).<br/>
+ * E.g. MyDataSet.xml becomes com/myPackage/MyDataSet.xml
  * <p/>
- * Examples:
+ * If a data set name starts with a / it will not be prefixed with the package name.<br/>
+ * E.g. /MyDataSet.xml remains /MyDataSet.xml
  * <p/>
- * prefixWithPackageName=true, pathPrefix=myPathPrefix:  myPathPrefix/org/unitils/test/myDataSet.xml
- * prefixWithPackageName=false, pathPrefix=myPathPrefix: myPathPrefix/myDataSet.xml
- * prefixWithPackageName=true, no pathPrefix:            org/unitils/test/myDataSet.xml
- * prefixWithPackageName=false, no pathPrefix:           myDataSet.xml
+ * Package name prefixing can be disabled using the {@link #PROPKEY_PREFIX_WITH_PACKAGE_NAME} property.<br/>
+ * prefixWithPackageName=false => MyDataSet.xml remains MyDataSet.xml
  * <p/>
- * If the path prefix starts with '/', the file name is treated absolute, else it will be treated relative to the
- * classpath.
+ * If a path prefix is specified using the {@link #PROPKEY_DATA_SET_PATH_PREFIX} property it is added to the file name.<br/>
+ * Examples:<br/>
+ * <p/>
+ * pathPrefix=myPathPrefix: MyDataSet.xml becomes myPathPrefix/org/unitils/test/MyDataSet.xml<br/>
+ * pathPrefix=myPathPrefix: /MyDataSet.xml becomes myPathPrefix/MyDataSet.xml<br/>
+ * <p/>
+ * If the path prefix with '/', the file name is treated absolute, else it will be treated relative to the classpath.
  * <p/>
  * Examples:
  * <p/>
@@ -104,7 +106,7 @@ public class DefaultDataSetResolver implements DataSetResolver {
         if (dataSetFileName.startsWith("/")) {
             File dataSetFile = new File(dataSetFileName);
             if (!dataSetFile.exists()) {
-                throw new UnitilsException("DataSet file with name " + dataSetName + " cannot be found");
+                throw new UnitilsException("DataSet file with name " + dataSetFileName + " cannot be found");
             }
             return dataSetFile;
         }
@@ -112,7 +114,7 @@ public class DefaultDataSetResolver implements DataSetResolver {
         // find file in classpath
         URL dataSetUrl = testClass.getResource('/' + dataSetFileName);
         if (dataSetUrl == null) {
-            throw new UnitilsException("DataSet file with name " + dataSetName + " cannot be found");
+            throw new UnitilsException("DataSet file with name " + dataSetFileName + " cannot be found");
         }
         return toFile(dataSetUrl);
     }
@@ -126,10 +128,15 @@ public class DefaultDataSetResolver implements DataSetResolver {
      * @return The file name, not null
      */
     protected String getDataSetFileName(Class<?> testClass, String dataSetName) {
-        if (prefixWithPackageName) {
+        // prefix with package name if name does not start with /
+        if (prefixWithPackageName && !dataSetName.startsWith("/")) {
             dataSetName = prefixPackageNameFilePath(testClass, dataSetName);
         }
-
+        // remove first char if it's a /
+        if (dataSetName.startsWith("/")) {
+            dataSetName = dataSetName.substring(1);
+        }
+        // add configured prefix
         if (pathPrefix != null) {
             dataSetName = pathPrefix + '/' + dataSetName;
         }
@@ -137,14 +144,21 @@ public class DefaultDataSetResolver implements DataSetResolver {
     }
 
 
+    /**
+     * Prefix the package name of the test to the name of the data set (replacing . with /).
+     *
+     * @param testClass   The test, not null
+     * @param dataSetName The data set name, not null
+     * @return The data set name with the package name prefix, not null
+     */
     protected String prefixPackageNameFilePath(Class<?> testClass, String dataSetName) {
         String className = testClass.getName();
         int indexOfLastDot = className.lastIndexOf('.');
         if (indexOfLastDot == -1) {
-        	return dataSetName;
+            return dataSetName;
         }
-    
-        String packageName = indexOfLastDot == -1 ? "" : className.substring(0, indexOfLastDot).replace('.', '/');
+
+        String packageName = className.substring(0, indexOfLastDot).replace('.', '/');
         return packageName + '/' + dataSetName;
     }
 
