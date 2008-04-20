@@ -25,6 +25,8 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
@@ -56,6 +58,8 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
     @TestDataSource
     private DataSource dataSource = null;
 
+    /* The db support instance for the default schema */
+    private DbSupport defaultDbSupport;
 
     /**
      * Initialize test fixture and creates a test version table.
@@ -64,6 +68,7 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         SQLHandler sqlHandler = new SQLHandler(dataSource);
+        defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         configuration.setProperty(PROPKEY_AUTO_CREATE_VERSION_TABLE, "false");
         dbVersionSource = new DBVersionSource();
@@ -106,6 +111,18 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void testGetDBVersion_noVersionTable() throws Exception {
         dropVersionTable();
+        dbVersionSource.getDbVersion();
+    }
+
+
+    /**
+     * Tests getting the version, but the version table is in the old pre-1.1 format.
+     * An error with an appropriate message should be raised.
+     */
+    @Test(expected = UnitilsException.class)
+    public void testGetDBVersion_oldVersionTable() throws Exception {
+        dropVersionTable();
+        createOldVersionTable();
         dbVersionSource.getDbVersion();
     }
 
@@ -164,6 +181,15 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
      */
     private void createVersionTable() throws SQLException {
         executeUpdate(dbVersionSource.getCreateVersionTableStatement(), dataSource);
+    }
+
+
+    /**
+     * Utility method to create the test version table in the pre-1.1 format that didn't support mutliple indexes.
+     */
+    private void createOldVersionTable() throws SQLException {
+        String createStatement = dbVersionSource.getCreateVersionTableStatement().replace(defaultDbSupport.qualified(dbVersionSource.versionTableName), defaultDbSupport.qualified("version_index"));
+        executeUpdate(createStatement, dataSource);
     }
 
 

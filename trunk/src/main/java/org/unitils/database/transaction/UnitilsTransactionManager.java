@@ -15,12 +15,11 @@
  */
 package org.unitils.database.transaction;
 
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.spring.DatabaseSpringSupport;
+
+import javax.sql.DataSource;
+import java.util.Set;
 
 
 /**
@@ -31,28 +30,29 @@ import org.unitils.database.util.spring.DatabaseSpringSupport;
  */
 public interface UnitilsTransactionManager {
 
-	
-	/**
-	 * Initialize the transaction manager
-	 * 
-	 * @param transactionManagementConfigurations Set of possible providers of a spring <code>PlatformTransactionManager</code>, not null
-	 * @param databaseSpringSupport Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
-	 * If the spring module is not enabled, this object is null
-	 */
-	void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport);
 
-	
-	/**
-	 * Wraps the given <code>DataSource</code> in a transactional proxy.
-	 * <p/>
-     * The <code>DataSource</code> returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code> 
-     * is returned, and that invocations on the close() method of these connections are suppressed. 
+    /**
+     * Initialize the transaction manager
+     *
+     * @param transactionManagementConfigurations
+     *                              Set of possible providers of a spring <code>PlatformTransactionManager</code>, not null
+     * @param databaseSpringSupport Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
+     *                              If the spring module is not enabled, this object is null
+     */
+    void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport);
 
-	 * @param testObject The test object, not null
+
+    /**
+     * Wraps the given <code>DataSource</code> in a transactional proxy.
+     * <p/>
+     * The <code>DataSource</code> returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code>
+     * is returned, and that invocations on the close() method of these connections are suppressed.
+     *
+     * @param dataSource The data source to wrap, not null
      * @return A transactional data source, not null
      */
     DataSource getTransactionalDataSource(DataSource dataSource);
-    
+
 
     /**
      * Starts a transaction.
@@ -78,6 +78,7 @@ public interface UnitilsTransactionManager {
      * @param testObject The test instance, not null
      */
     void rollback(Object testObject);
-    
-    
+
+
 }
+

@@ -15,14 +15,13 @@
  */
 package org.unitils;
 
-import java.lang.reflect.Method;
-
 import junit.framework.TestCase;
-
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+
+import java.lang.reflect.Method;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
@@ -35,7 +34,7 @@ import org.unitils.core.UnitilsException;
 public abstract class UnitilsJUnit3 extends TestCase {
 
 
-	/**
+    /**
      * Creates a test without a name. Be sure to call {@link TestCase#setName} afterwards.
      */
     public UnitilsJUnit3() {
@@ -54,14 +53,7 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
 
     /**
-     * Overriden JUnit3 method to be able to call {@link TestListener#beforeTestClass}, {@link TestListener#afterTestClass},
-     * {@link TestListener#beforeTestSetUp} and {@link TestListener#afterTestTearDown}.
-     * <p/>
-     * JUnit3 does not have a concept of class level hooks, such as BeforeClass and AfterClass in JUnit4. Therefore
-     * we need to simulate this behavior for unitils.
-     * When a test is about to be run that belongs to a new test class, we first call the afterTestClass of the previous class
-     * and the beforeTestClass of that new class. The last afterTestClass is called just before the afterAll,
-     * during the shutdown of the VM.
+     * Overriden JUnit3 method to be able to call {@link TestListener#beforeTestSetUp} and {@link TestListener#afterTestTearDown}.
      */
     @Override
     public void runBare() throws Throwable {
@@ -159,13 +151,13 @@ public abstract class UnitilsJUnit3 extends TestCase {
             throw new UnitilsException("Unable to find current test method. Test name: " + getName() + " , test class: " + getClass(), e);
         }
     }
-    
-    
+
+
     /**
-	 * @return The unitils test listener
-	 */
-	protected TestListener getTestListener() {
-		return getUnitils().getTestListener();
-	}
+     * @return The unitils test listener
+     */
+    protected TestListener getTestListener() {
+        return getUnitils().getTestListener();
+    }
 
 }

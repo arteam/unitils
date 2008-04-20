@@ -50,10 +50,10 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
     /* The key of the property that specifies the datase table in which the DB version is stored */
     public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
 
-    /* The key of the property that specifies the column in which the DB version index is stored */
+    /* The key of the property that specifies the column in which the version indexes are stored */
     public static final String PROPKEY_VERSION_INDEX_COLUMN_NAME = "dbMaintainer.dbVersionSource.versionIndexColumnName";
 
-    /* The key of the property that specifies the column in which the DB version index is stored */
+    /* The key of the property that specifies the column in which the last modification timestamp is stored */
     public static final String PROPKEY_VERSION_TIMESTAMP_COLUMN_NAME = "dbMaintainer.dbVersionSource.versionTimeStampColumnName";
 
     /* The key of the property that specifies the column in which is stored whether the last update succeeded. */
@@ -323,9 +323,33 @@ public class DBVersionSource extends BaseDatabaseTask implements VersionSource {
                 return true;
             }
         }
+
+        // check whether the version table is in pre-1.1 format
+        checkMigration();
         return false;
     }
 
+
+    /**
+     * Checks whether the version table is of the old (pre-1.1) format. If the table is in an old format, an exception
+     * is raised.
+     * <p/>
+     * The old table containes the version_index instead of the version_indexes column.
+     */
+    private void checkMigration() {
+        Set<String> columnNames = defaultDbSupport.getColumnNames(versionTableName);
+        if (!columnNames.contains("version_index")) {
+            return;
+        }
+
+        // throw an exception that shows how to create the version table
+        String message = "Version table " + defaultDbSupport.qualified(versionTableName) + " does not comply to the new table structure (starting from release 1.1).\n";
+        message += "Check the migration page on the unitils website (http://www.unitils.org) for more information.\n";
+        message += "Please drop and re-create the version table manually. (Note: this will re-create your unit-test database from scratch if from scratch is enabled)\n";
+        message += "The version table can be created manually by executing following statement:\n";
+        message += getCreateVersionTableStatement();
+        throw new UnitilsException(message);
+    }
 
     /**
      * Creates the version table and inserts a version record.

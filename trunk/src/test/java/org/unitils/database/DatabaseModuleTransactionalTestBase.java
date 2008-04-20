@@ -33,7 +33,7 @@ import java.util.Properties;
  * @author Flip Neven
  * @author Tim Ducheyne
  */
-abstract public class DatabaseModuleTransactionalTest extends UnitilsJUnit4 {
+abstract public class DatabaseModuleTransactionalTestBase extends UnitilsJUnit4 {
 
     /**
      * Test datasource that returns connection 1 and 2

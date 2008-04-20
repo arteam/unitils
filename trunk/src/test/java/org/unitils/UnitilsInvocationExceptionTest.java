@@ -16,30 +16,19 @@
 package org.unitils;
 
 import static junit.framework.Assert.assertEquals;
-import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_CREATE_TEST_OBJECT;
-import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_METHOD;
-import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_TEARDOWN;
-import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_BEFORE_TEST_METHOD;
-import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_BEFORE_TEST_SET_UP;
-import static org.unitils.TracingTestListener.TestFramework.JUNIT3;
-import static org.unitils.TracingTestListener.TestFramework.JUNIT4;
-import static org.unitils.TracingTestListener.TestFramework.TESTNG;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_AFTER_CLASS;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_BEFORE_CLASS;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_METHOD;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_SET_UP;
-import static org.unitils.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import static org.unitils.TracingTestListener.ListenerInvocation.*;
 import org.unitils.TracingTestListener.TestFramework;
+import static org.unitils.TracingTestListener.TestFramework.*;
+import static org.unitils.TracingTestListener.TestInvocation.*;
 import org.unitils.core.TestListener;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Test for the flows in case an exception occurs in one of the listener or test methods for JUnit3 ({@link UnitilsJUnit3}),
@@ -50,34 +39,32 @@ import org.unitils.core.TestListener;
  *
  * @author Tim Ducheyne
  * @author Filip Neven
- * 
  * @see UnitilsJUnit3Test_TestClass1
  * @see UnitilsJUnit4Test_TestClass1
  * @see UnitilsTestNGTest_TestClass1
  */
 @RunWith(Parameterized.class)
-public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
+public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
 
     Class<?> testClass;
-    
-    public UnitilsInvocationExceptionTest(TestFramework testFramework,
-			TestExecutor testExecutor, Class<?> testClass) {
-		super(testFramework, testExecutor);
-		this.testClass = testClass;
-	}
-	
-	@Parameters
-	public static Collection<Object[]> testData() {
-		return Arrays.asList(new Object[][] {
-				{JUNIT3, new JUnit3TestExecutor(), UnitilsJUnit3Test_TestClass1.class},
-				{JUNIT4, new JUnit4TestExecutor(), UnitilsJUnit4Test_TestClass1.class},
-				{TESTNG, new TestNGTestExecutor(), UnitilsTestNGTest_TestClass1.class},
-				//{JUNIT3, new JUnit3TestExecutor(), SpringUnitilsJUnit38Test_TestClass1.class},
-				//{JUNIT4, new JUnit4TestExecutor(), SpringUnitilsJUnit4Test_TestClass1.class},
-				//{TESTNG, new TestNGTestExecutor(), SpringUnitilsTestNGTest_TestClass1.class},
-		});
-	}
-    
+
+    public UnitilsInvocationExceptionTest(TestFramework testFramework, TestExecutor testExecutor, Class<?> testClass) {
+        super(testFramework, testExecutor);
+        this.testClass = testClass;
+    }
+
+    @Parameters
+    public static Collection<Object[]> testData() {
+        return Arrays.asList(new Object[][]{
+                {JUNIT3, new JUnit3TestExecutor(), UnitilsJUnit3Test_TestClass1.class},
+                {JUNIT4, new JUnit4TestExecutor(), UnitilsJUnit4Test_TestClass1.class},
+                {TESTNG, new TestNGTestExecutor(), UnitilsTestNGTest_TestClass1.class},
+                //{JUNIT3, new JUnit3TestExecutor(), SpringUnitilsJUnit38Test_TestClass1.class},
+                //{JUNIT4, new JUnit4TestExecutor(), SpringUnitilsJUnit4Test_TestClass1.class},
+                //{TESTNG, new TestNGTestExecutor(), SpringUnitilsTestNGTest_TestClass1.class},
+        });
+    }
+
     /**
      * Test the flow when a runtime exception is thrown during a {@link org.junit.BeforeClass} call of a test.
      *
@@ -85,8 +72,8 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
      */
     @Test
     public void testTestBeforeClass() throws Exception {
-    	Assume.assumeTrue(!JUNIT3.equals(testFramework));
-    	
+        Assume.assumeTrue(!JUNIT3.equals(testFramework));
+
         tracingTestListener.expectExceptionInMethod(TEST_BEFORE_CLASS, false);
         testExecutor.runTests(testClass);
 
@@ -94,12 +81,12 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
 
         if (JUNIT4.equals(testFramework)) assertEquals(1, testExecutor.getFailureCount());
         if (TESTNG.equals(testFramework)) {
-        	assertEquals(0, testExecutor.getFailureCount());
-        	assertEquals(2, testExecutor.getIgnoreCount());
+            assertEquals(0, testExecutor.getFailureCount());
+            assertEquals(2, testExecutor.getIgnoreCount());
         }
     }
 
-    
+
     /**
      * Test the flow when a runtime exception is thrown during a {@link TestListener#beforeTestSetUp} call of a module.
      *
@@ -113,9 +100,9 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         assertInvocationOrder_beforeTestSetUp();
 
         if (TESTNG.equals(testFramework)) {
-        	assertEquals(2, testExecutor.getIgnoreCount());
+            assertEquals(2, testExecutor.getIgnoreCount());
         } else {
-        	assertEquals(2, testExecutor.getFailureCount());
+            assertEquals(2, testExecutor.getFailureCount());
         }
     }
 
@@ -133,9 +120,9 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         assertInvocationOrder_beforeTestSetUp();
 
         if (TESTNG.equals(testFramework)) {
-        	assertEquals(2, testExecutor.getIgnoreCount());
+            assertEquals(2, testExecutor.getIgnoreCount());
         } else {
-        	assertEquals(2, testExecutor.getFailureCount());
+            assertEquals(2, testExecutor.getFailureCount());
         }
     }
 
@@ -151,11 +138,11 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         testExecutor.runTests(testClass);
 
         assertInvocationOrder_testSetUp();
-        
+
         if (TESTNG.equals(testFramework)) {
-        	assertEquals(2, testExecutor.getIgnoreCount());
+            assertEquals(2, testExecutor.getIgnoreCount());
         } else {
-        	assertEquals(2, testExecutor.getFailureCount());
+            assertEquals(2, testExecutor.getFailureCount());
         }
     }
 
@@ -171,11 +158,11 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         testExecutor.runTests(testClass);
 
         assertInvocationOrder_testSetUp();
-        
+
         if (TESTNG.equals(testFramework)) {
-        	assertEquals(2, testExecutor.getIgnoreCount());
+            assertEquals(2, testExecutor.getIgnoreCount());
         } else {
-        	assertEquals(2, testExecutor.getFailureCount());
+            assertEquals(2, testExecutor.getFailureCount());
         }
     }
 
@@ -190,8 +177,8 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         tracingTestListener.expectExceptionInMethod(LISTENER_BEFORE_TEST_METHOD, false);
         testExecutor.runTests(testClass);
 
-        assertInvocationOrder_beforeTestMethod(tracingTestListener);
-    	assertEquals(2, testExecutor.getFailureCount());
+        assertInvocationOrder_beforeTestMethod();
+        assertEquals(2, testExecutor.getFailureCount());
     }
 
 
@@ -205,8 +192,8 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         tracingTestListener.expectExceptionInMethod(LISTENER_BEFORE_TEST_METHOD, true);
         testExecutor.runTests(testClass);
 
-        assertInvocationOrder_beforeTestMethod(tracingTestListener);
-    	assertEquals(2, testExecutor.getFailureCount());
+        assertInvocationOrder_beforeTestMethod();
+        assertEquals(2, testExecutor.getFailureCount());
     }
 
 
@@ -220,8 +207,8 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         tracingTestListener.expectExceptionInMethod(TEST_METHOD, false);
         testExecutor.runTests(testClass);
 
-        assertInvocationOrder_testMethod(tracingTestListener);
-    	assertEquals(2, testExecutor.getFailureCount());
+        assertInvocationOrder_testMethod();
+        assertEquals(2, testExecutor.getFailureCount());
     }
 
 
@@ -235,8 +222,8 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         tracingTestListener.expectExceptionInMethod(TEST_METHOD, true);
         testExecutor.runTests(testClass);
 
-        assertInvocationOrder_testMethod(tracingTestListener);
-    	assertEquals(2, testExecutor.getFailureCount());
+        assertInvocationOrder_testMethod();
+        assertEquals(2, testExecutor.getFailureCount());
     }
 
 
@@ -282,7 +269,7 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
 
         assertInvocationOrder_testTearDown();
         if (!TESTNG.equals(testFramework)) {
-			assertEquals(2, testExecutor.getFailureCount());
+            assertEquals(2, testExecutor.getFailureCount());
         }
     }
 
@@ -299,7 +286,7 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
 
         assertInvocationOrder_testTearDown();
         if (!TESTNG.equals(testFramework)) {
-        	assertEquals(2, testExecutor.getFailureCount());
+            assertEquals(2, testExecutor.getFailureCount());
         }
     }
 
@@ -315,9 +302,9 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
         testExecutor.runTests(testClass);
 
         assertInvocationOrder_afterTestTearDown();
-    	if (!TESTNG.equals(testFramework)) {
-    		assertEquals(2, testExecutor.getFailureCount());
-    	}
+        if (!TESTNG.equals(testFramework)) {
+            assertEquals(2, testExecutor.getFailureCount());
+        }
     }
 
 
@@ -333,7 +320,7 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
 
         assertInvocationOrder_afterTestTearDown();
         if (!TESTNG.equals(testFramework)) {
-        	assertEquals(2, testExecutor.getFailureCount());
+            assertEquals(2, testExecutor.getFailureCount());
         }
     }
 
@@ -344,8 +331,8 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
      */
     @Test
     public void testTestAfterClass() throws Exception {
-    	Assume.assumeTrue(!testFramework.equals(JUNIT3));
-    	
+        Assume.assumeTrue(!testFramework.equals(JUNIT3));
+
         tracingTestListener.expectExceptionInMethod(TEST_AFTER_CLASS, false);
         testExecutor.runTests(testClass);
 
@@ -355,141 +342,132 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
 
     /**
      * Asserts the flow when an exception is thrown during a before class call of a test.
-     *
-     * @param type                JUnit3, JUnit4 or TestNG
-     * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_testBeforeClass() {
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
-    	assertInvocation(TEST_BEFORE_CLASS,                 testClass);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
+        assertInvocation(TEST_BEFORE_CLASS, testClass);
         // TestNG calls @BeforeMethod and @AfterMethod methods, even though the tests themselves are skipped
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass, TESTNG);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass, TESTNG);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass, TESTNG);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass, TESTNG);
-    	// TestNG doesn't call the @AfterClass method because there was an exception in @BeforeClass
-    	assertInvocation(TEST_AFTER_CLASS,                  testClass, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass, TESTNG);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass, TESTNG);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass, TESTNG);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass, TESTNG);
+        // TestNG doesn't call the @AfterClass method because there was an exception in @BeforeClass
+        assertInvocation(TEST_AFTER_CLASS, testClass, JUNIT4);
         assertNoMoreInvocations();
     }
 
 
     /**
      * Asserts the flow when an exception is thrown during a {@link TestListener#beforeTestSetUp} call of a module.
-     *
-     * @param type                JUnit3, JUnit4 or TestNG
-     * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_beforeTestSetUp() {
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
-        assertInvocation(TEST_BEFORE_CLASS,                 testClass, JUNIT4, TESTNG);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
+        assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-        assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-        assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass, JUNIT3, JUNIT4);
-        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass, JUNIT3, JUNIT4);
-        assertInvocation(TEST_AFTER_CLASS,                  testClass, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_AFTER_CLASS, testClass, JUNIT4);
         assertNoMoreInvocations();
     }
 
 
     /**
      * Asserts the flow when an exception is thrown during a setUp call of a test.
-     * @param tracingTestListener the recorded invocations
      */
     private void assertInvocationOrder_testSetUp() {
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
-        assertInvocation(TEST_BEFORE_CLASS,                 testClass, JUNIT4, TESTNG);
+        assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-        assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-        assertInvocation(TEST_SET_UP,                       testClass);
-        assertInvocation(TEST_TEAR_DOWN,                    testClass, JUNIT4);
-        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass, JUNIT4);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-        assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass, JUNIT3, JUNIT4);
-        assertInvocation(TEST_SET_UP,                       testClass, JUNIT3, JUNIT4);
-        assertInvocation(TEST_TEAR_DOWN,                    testClass, JUNIT4);
-        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_SET_UP, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_TEAR_DOWN, testClass, JUNIT4);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass, JUNIT3, JUNIT4);
     }
 
 
     /**
      * Asserts the flow when an exception is thrown during a {@link TestListener#beforeTestMethod} call of a module.
-     * @param tracingTestListener the recorded invocations
      */
-    private void assertInvocationOrder_beforeTestMethod(TracingTestListener tracingTestListener) {
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
-    	assertInvocation(TEST_BEFORE_CLASS,                 testClass, JUNIT4, TESTNG);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(TEST_AFTER_CLASS,                  testClass, JUNIT4, TESTNG);
-    	assertNoMoreInvocations();
+    private void assertInvocationOrder_beforeTestMethod() {
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
+        assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(TEST_AFTER_CLASS, testClass, JUNIT4, TESTNG);
+        assertNoMoreInvocations();
     }
 
 
     /**
      * Asserts the flow when an exception is thrown during the test.
-     * @param tracingTestListener the recorded invocations
      */
-    private void assertInvocationOrder_testMethod(TracingTestListener tracingTestListener) {
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
-    	assertInvocation(TEST_BEFORE_CLASS,                 testClass, JUNIT4, TESTNG);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass);
-    	assertInvocation(TEST_METHOD,                       testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass);
-    	assertInvocation(TEST_METHOD,                       testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(TEST_AFTER_CLASS,                  testClass, JUNIT4, TESTNG);
-    	assertNoMoreInvocations();
+    private void assertInvocationOrder_testMethod() {
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
+        assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass);
+        assertInvocation(TEST_METHOD, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass);
+        assertInvocation(TEST_METHOD, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(TEST_AFTER_CLASS, testClass, JUNIT4, TESTNG);
+        assertNoMoreInvocations();
     }
-    
+
     /**
      * Asserts the flow when an exception is thrown during the test.
      */
     private void assertInvocationOrder() {
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
-    	assertInvocation(TEST_BEFORE_CLASS,                 testClass, JUNIT4, TESTNG);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass);
-    	assertInvocation(TEST_METHOD,                       testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass);
-    	assertInvocation(TEST_METHOD,                       testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(TEST_AFTER_CLASS,                  testClass, JUNIT4, TESTNG);
-    	assertNoMoreInvocations();
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
+        assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass);
+        assertInvocation(TEST_METHOD, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass);
+        assertInvocation(TEST_METHOD, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(TEST_AFTER_CLASS, testClass, JUNIT4, TESTNG);
+        assertNoMoreInvocations();
     }
 
 
@@ -497,26 +475,26 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
      * Asserts the flow when an exception is thrown during a tear down call of a test.
      */
     private void assertInvocationOrder_testTearDown() {
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass,TESTNG);
-    	assertInvocation(TEST_BEFORE_CLASS,                 testClass, JUNIT4, TESTNG);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass);
-    	assertInvocation(TEST_METHOD,                       testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass, JUNIT3, JUNIT4);
-    	assertInvocation(TEST_METHOD,                       testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass, JUNIT3, JUNIT4);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(TEST_AFTER_CLASS,                  testClass, JUNIT4);
-    	assertNoMoreInvocations();
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
+        assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass);
+        assertInvocation(TEST_METHOD, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_METHOD, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_TEAR_DOWN, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(TEST_AFTER_CLASS, testClass, JUNIT4);
+        assertNoMoreInvocations();
     }
 
 
@@ -524,26 +502,26 @@ public class UnitilsInvocationExceptionTest extends BaseUnitilsInvocationTest {
      * Asserts the flow when an exception is thrown during a {@link TestListener#afterTestTearDown} call of a module.
      */
     private void assertInvocationOrder_afterTestTearDown() {
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass,TESTNG);
-    	assertInvocation(TEST_BEFORE_CLASS,                 testClass, JUNIT4, TESTNG);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass);
-    	assertInvocation(TEST_SET_UP,                       testClass);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass);
-    	assertInvocation(TEST_METHOD,                       testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass);
-    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_SET_UP,       testClass, JUNIT3, JUNIT4);
-    	assertInvocation(TEST_SET_UP,                       testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_BEFORE_TEST_METHOD,       testClass, JUNIT3, JUNIT4);
-    	assertInvocation(TEST_METHOD,                       testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_AFTER_TEST_METHOD,        testClass, JUNIT3, JUNIT4);
-    	assertInvocation(TEST_TEAR_DOWN,                    testClass, JUNIT3, JUNIT4);
-    	assertInvocation(LISTENER_AFTER_TEST_TEARDOWN,      testClass, JUNIT3, JUNIT4);
-    	assertInvocation(TEST_AFTER_CLASS,                  testClass, JUNIT4);
-    	assertNoMoreInvocations();
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
+        assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
+        assertInvocation(TEST_SET_UP, testClass);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass);
+        assertInvocation(TEST_METHOD, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass);
+        assertInvocation(TEST_TEAR_DOWN, testClass);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass);
+        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_SET_UP, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_BEFORE_TEST_METHOD, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_METHOD, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_AFTER_TEST_METHOD, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_TEAR_DOWN, testClass, JUNIT3, JUNIT4);
+        assertInvocation(LISTENER_AFTER_TEST_TEARDOWN, testClass, JUNIT3, JUNIT4);
+        assertInvocation(TEST_AFTER_CLASS, testClass, JUNIT4);
+        assertNoMoreInvocations();
     }
 
 }

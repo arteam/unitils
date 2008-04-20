@@ -23,16 +23,14 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+import static org.unitils.database.SQLUnitils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
-import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
 /**
@@ -116,15 +114,19 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit4 {
      */
     @Test
     public void testInsertTestData_differentContent() throws Exception {
+        Object testObject = new ExpectedDataSetTest();
         try {
-            Object testObject = new ExpectedDataSetTest();
             Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod4");
+            dbUnitModule.insertDataSet(testMethod, testObject);
             dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
             fail("Expected AssertionFailedError");
         } catch (AssertionFailedError e) {
             //expected
-            e.printStackTrace();
         }
+
+        // check whether the loading of the data set was not rolled back
+        Method testMethod = ExpectedDataSetTest.class.getMethod("testMethod2");
+        dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
     }
 
 
@@ -296,15 +298,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit4 {
      * Utility method to create the test table.
      */
     private void createTestTable() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            st.execute("create table test (dataset varchar(100))");
-        } finally {
-            closeQuietly(conn, st, null);
-        }
+        executeUpdate("create table test (dataset varchar(100))", dataSource);
     }
 
 
@@ -312,18 +306,10 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit4 {
      * Removes the test database table
      */
     private void dropTestTable() throws SQLException {
-        Connection conn = null;
-        Statement st = null;
         try {
-            conn = dataSource.getConnection();
-            st = conn.createStatement();
-            try {
-                st.executeUpdate("drop table test");
-            } catch (SQLException e) {
-                // Ignored
-            }
-        } finally {
-            closeQuietly(conn, st, null);
+            executeUpdate("drop table test", dataSource);
+        } catch (UnitilsException e) {
+            // Ignored
         }
     }
 

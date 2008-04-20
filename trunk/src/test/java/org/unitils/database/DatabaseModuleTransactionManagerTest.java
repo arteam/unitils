@@ -37,7 +37,7 @@ import java.sql.Connection;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransactionalTest {
+public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransactionalTestBase {
 
     private DatabaseModule databaseModule;
 
