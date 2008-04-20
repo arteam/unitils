@@ -15,19 +15,6 @@
  */
 package org.unitils.database;
 
-import static org.unitils.database.util.TransactionMode.COMMIT;
-import static org.unitils.database.util.TransactionMode.DEFAULT;
-import static org.unitils.database.util.TransactionMode.DISABLED;
-import static org.unitils.database.util.TransactionMode.ROLLBACK;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -41,6 +28,7 @@ import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
+import static org.unitils.database.util.TransactionMode.*;
 import org.unitils.database.util.spring.DatabaseSpringSupport;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.clean.DBCleaner;
@@ -50,18 +38,19 @@ import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.dbmaintainer.util.DatabaseTask;
+import static org.unitils.util.AnnotationUtils.*;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
 import javax.sql.DataSource;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Module that provides support for database testing: Creation of a datasource that connects to the
@@ -79,25 +68,24 @@ import java.util.Set;
  * when the data source is created.
  * <p/>
  * If the test class or method is annotated with {@link Transactional} with transaction mode {@link TransactionMode#COMMIT} or
- * {@link TransactionMode#ROLLBACK}, or if the property 'DatabaseModule.Transactional.value.default' was set to 'commit' or 
- * 'rollback', every test is executed in a transaction. 
- *
- * @see TestDataSource
- * @see DBMaintainer
- * @see Transactional
+ * {@link TransactionMode#ROLLBACK}, or if the property 'DatabaseModule.Transactional.value.default' was set to 'commit' or
+ * 'rollback', every test is executed in a transaction.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
+ * @see TestDataSource
+ * @see DBMaintainer
+ * @see Transactional
  */
 public class DatabaseModule implements Module {
 
     /* Property indicating if the database schema should be updated before performing the tests */
     public static final String PROPERTY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
-    
+
     /* 
-     * Property indicating whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using 
-     * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
-     */  
+    * Property indicating whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
+    * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
+    */
     public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
 
     /* The logger instance for this class */
@@ -114,25 +102,25 @@ public class DatabaseModule implements Module {
 
     /* Indicates if the DBMaintainer should be invoked to update the database */
     private boolean updateDatabaseSchemaEnabled;
-    
+
     /* 
-     * Indicates whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using 
-     * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy 
-     */
+    * Indicates whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
+    * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
+    */
     private boolean wrapDataSourceInTransactionalProxy;
 
     /* The transaction manager */
     private UnitilsTransactionManager transactionManager;
 
     /* Set of possible providers of a spring <code>PlatformTransactionManager</code> */
-	private Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations 
-				= new HashSet<UnitilsTransactionManagementConfiguration>();
-	
-	/* 
-	 * Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
-	 * If the spring module is not enabled, this object is null 
-	 */
-	private DatabaseSpringSupport databaseSpringSupport;
+    private Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations
+            = new HashSet<UnitilsTransactionManagementConfiguration>();
+
+    /*
+      * Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
+      * If the spring module is not enabled, this object is null
+      */
+    private DatabaseSpringSupport databaseSpringSupport;
 
 
     /**
@@ -141,7 +129,7 @@ public class DatabaseModule implements Module {
      * @param configuration The config, not null
      */
     @SuppressWarnings("unchecked")
-	public void init(Properties configuration) {
+    public void init(Properties configuration) {
         this.configuration = configuration;
 
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
@@ -154,14 +142,15 @@ public class DatabaseModule implements Module {
      * Initializes the spring support object
      */
     public void afterInit() {
-    	initDatabaseSpringSupport();
-	}
+        initDatabaseSpringSupport();
+    }
 
 
-	/**
+    /**
      * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
-	 * @return The <code>DataSource</code>
+     *
+     * @return The <code>DataSource</code>
      */
     public DataSource getDataSource() {
         if (dataSource == null) {
@@ -169,23 +158,23 @@ public class DatabaseModule implements Module {
         }
         return dataSource;
     }
-    
-    
+
+
     /**
      * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
-	 * If the property {@link #PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY} has been set to true, the <code>DataSource</code> 
-	 * returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code> is returned, 
-	 * and that invocations of the close() method of these connections are suppressed.
-	 * 
+     * If the property {@link #PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY} has been set to true, the <code>DataSource</code>
+     * returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code> is returned,
+     * and that invocations of the close() method of these connections are suppressed.
+     *
      * @param testObject The test instance, not null
      * @return The <code>DataSource</code>
      */
     public DataSource getTransactionalDataSource(Object testObject) {
-    	if (wrapDataSourceInTransactionalProxy) {
-    		return getTransactionManager().getTransactionalDataSource(getDataSource());
-    	}
-    	return getDataSource();
+        if (wrapDataSourceInTransactionalProxy) {
+            return getTransactionManager().getTransactionalDataSource(getDataSource());
+        }
+        return getDataSource();
     }
 
 
@@ -197,7 +186,7 @@ public class DatabaseModule implements Module {
     public UnitilsTransactionManager getTransactionManager() {
         if (transactionManager == null) {
             transactionManager = getConfiguredInstance(UnitilsTransactionManager.class, configuration);
-            transactionManager.init(transactionManagementConfigurations, databaseSpringSupport );
+            transactionManager.init(transactionManagementConfigurations, databaseSpringSupport);
         }
         return transactionManager;
     }
@@ -207,9 +196,9 @@ public class DatabaseModule implements Module {
      * Flushes all pending updates to the database. This method is useful when the effect of updates needs to
      * be checked directly on the database.
      * <p/>
-     * Will look for modules that implement {@link Flushable} and call {@link Flushable#flushDatabaseUpdates(Object)} 
+     * Will look for modules that implement {@link Flushable} and call {@link Flushable#flushDatabaseUpdates(Object)}
      * on these modules.
-     * 
+     *
      * @param testObject The test object, not null
      */
     public void flushDatabaseUpdates(Object testObject) {
@@ -259,7 +248,7 @@ public class DatabaseModule implements Module {
      * This method can be used for example after you've manually brought the database to the latest version, but
      * the database version is not yet set to the current one. This method can also be useful for example for
      * reinitializing the database after having reorganized the scripts folder.
-     * 
+     *
      * @param sqlHandler The {@link SQLHandler} to which all commands are issued
      */
     public void setDatabaseToCurrentVersion(SQLHandler sqlHandler) {
@@ -275,8 +264,8 @@ public class DatabaseModule implements Module {
      * @param testObject The test instance, not null
      */
     public void injectDataSource(Object testObject) {
-    	Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
-    	Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+        Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         if (fields.isEmpty() && methods.isEmpty()) {
             // Nothing to do. Jump out to make sure that we don't try to instantiate the DataSource
             return;
@@ -287,6 +276,7 @@ public class DatabaseModule implements Module {
 
     /**
      * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
+     *
      * @return the datasource
      */
     protected DataSource createDataSource() {
@@ -325,7 +315,7 @@ public class DatabaseModule implements Module {
      */
     protected void startTransactionForTestMethod(Object testObject, Method testMethod) {
         if (isTransactionsEnabled(testObject, testMethod)) {
-        	startTransaction(testObject);
+            startTransaction(testObject);
         }
     }
 
@@ -339,44 +329,47 @@ public class DatabaseModule implements Module {
      */
     protected void endTransactionForTestMethod(Object testObject, Method testMethod) {
         if (isTransactionsEnabled(testObject, testMethod)) {
-	        if (getTransactionMode(testObject, testMethod) == COMMIT) {
-	            commitTransaction(testObject);
-	        } else if (getTransactionMode(testObject, testMethod) == ROLLBACK) {
-	            rollbackTransaction(testObject);
-	        }
+            if (getTransactionMode(testObject, testMethod) == COMMIT) {
+                commitTransaction(testObject);
+            } else if (getTransactionMode(testObject, testMethod) == ROLLBACK) {
+                rollbackTransaction(testObject);
+            }
         }
     }
-    
-    
+
+
     /**
      * Starts a new transaction on the transaction manager configured in unitils
-     * 
+     *
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
+        logger.info("Starting transaction.");
         getTransactionManager().startTransaction(testObject);
     }
 
 
     /**
      * Commits the current transaction.
-     * 
+     *
      * @param testObject The test object, not null
      */
     public void commitTransaction(Object testObject) {
         flushDatabaseUpdates(testObject);
         getTransactionManager().commit(testObject);
+        logger.info("Committed transaction.");
     }
-    
-    
+
+
     /**
      * Performs a rollback of the current transaction
-     * 
+     *
      * @param testObject The test object, not null
      */
     public void rollbackTransaction(Object testObject) {
         flushDatabaseUpdates(testObject);
         getTransactionManager().rollback(testObject);
+        logger.info("Rolled back transaction.");
     }
 
 
@@ -385,101 +378,101 @@ public class DatabaseModule implements Module {
      * @param testMethod The test method, not null
      * @return Whether transactions are enabled for the given test method and test object
      */
-	public boolean isTransactionsEnabled(Object testObject, Method testMethod) {
-		TransactionMode transactionMode = getTransactionMode(testObject, testMethod);
+    public boolean isTransactionsEnabled(Object testObject, Method testMethod) {
+        TransactionMode transactionMode = getTransactionMode(testObject, testMethod);
         return transactionMode != DISABLED;
-	}
-    
-    
+    }
+
+
     /**
-	 * Clears all configured schema's. I.e. drops all tables, views and other database objects.
-	 */
-	public void clearSchemas() {
-		getConfiguredDatabaseTaskInstance(DBClearer.class).clearSchemas();
-	}
-	
-	
-	/**
-	 * Cleans all configured schema's. I.e. removes all data from its database tables.
-	 */
-	public void cleanSchemas() {
-		getConfiguredDatabaseTaskInstance(DBCleaner.class).cleanSchemas();
-	}
-	
-	
-	/**
-	 * Disables all foreigh key and not-null constraints on the configured schema's.
-	 */
-	public void disableConstraints() {
-		getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class).disableConstraints();
-	}
-	
-	
-	/**
-	 * Updates all sequences that have a value below a certain configurable treshold to become equal 
-	 * to this treshold
-	 */
-	public void updateSequences() {
-		getConfiguredDatabaseTaskInstance(SequenceUpdater.class).updateSequences();
-	}
-	
-	
-	/**
-	 * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
-	 * describes the structure of the database.
-	 */
-	public void generateDatasetDefinition() {
-		getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class).generateDataSetStructure();
-	}
+     * Clears all configured schema's. I.e. drops all tables, views and other database objects.
+     */
+    public void clearSchemas() {
+        getConfiguredDatabaseTaskInstance(DBClearer.class).clearSchemas();
+    }
 
 
-	/**
-	 * @return A configured instance of {@link DatabaseTask} of the given type
-	 */
-	private <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
-		return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, 
-				getDefaultSqlHandler());
-	}
-	
-	
-	/**
-	 * @return The default SQLHandler, which simply executes the sql statements on the unitils-configured
-	 * test database
-	 */
-	protected SQLHandler getDefaultSqlHandler() {
-		return new SQLHandler(getDataSource());
-	}
-	
-	
-	public void registerTransactionManagementConfiguration(UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
-		transactionManagementConfigurations.add(transactionManagementConfiguration);
-	}
-	
-	
-   /**
-    * Creates an instance of {@link org.unitils.database.util.spring.DatabaseSpringSupportImpl}, that
-    * implements the dependency to the {@link org.unitils.spring.SpringModule}. If the
-    * {@link org.unitils.spring.SpringModule} is not active, the instance is not loaded and the spring 
-    * support is not enabled
-    */
-   protected void initDatabaseSpringSupport() {
-       if (!isSpringModuleEnabled()) {
-           return;
-       }
-       databaseSpringSupport = createInstanceOfType("org.unitils.database.util.spring.DatabaseSpringSupportImpl", false);
-   }
+    /**
+     * Cleans all configured schema's. I.e. removes all data from its database tables.
+     */
+    public void cleanSchemas() {
+        getConfiguredDatabaseTaskInstance(DBCleaner.class).cleanSchemas();
+    }
 
 
-   /**
-    * Verifies whether the SpringModule is enabled. If not, this means that either the property unitils.modules doesn't
-    * include spring, or unitils.module.spring.enabled = false, or that the module could not be loaded because spring is not
-    * in the classpath.
-    *
-    * @return true if the SpringModule is enabled, false otherwise
-    */
-   protected boolean isSpringModuleEnabled() {
-       return Unitils.getInstance().getModulesRepository().isModuleEnabled("org.unitils.spring.SpringModule");
-   }
+    /**
+     * Disables all foreigh key and not-null constraints on the configured schema's.
+     */
+    public void disableConstraints() {
+        getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class).disableConstraints();
+    }
+
+
+    /**
+     * Updates all sequences that have a value below a certain configurable treshold to become equal
+     * to this treshold
+     */
+    public void updateSequences() {
+        getConfiguredDatabaseTaskInstance(SequenceUpdater.class).updateSequences();
+    }
+
+
+    /**
+     * Generates a definition file that defines the structure of dataset's, i.e. a XSD of DTD that
+     * describes the structure of the database.
+     */
+    public void generateDatasetDefinition() {
+        getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class).generateDataSetStructure();
+    }
+
+
+    /**
+     * @return A configured instance of {@link DatabaseTask} of the given type
+     */
+    private <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
+        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration,
+                getDefaultSqlHandler());
+    }
+
+
+    /**
+     * @return The default SQLHandler, which simply executes the sql statements on the unitils-configured
+     *         test database
+     */
+    protected SQLHandler getDefaultSqlHandler() {
+        return new SQLHandler(getDataSource());
+    }
+
+
+    public void registerTransactionManagementConfiguration(UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
+        transactionManagementConfigurations.add(transactionManagementConfiguration);
+    }
+
+
+    /**
+     * Creates an instance of {@link org.unitils.database.util.spring.DatabaseSpringSupportImpl}, that
+     * implements the dependency to the {@link org.unitils.spring.SpringModule}. If the
+     * {@link org.unitils.spring.SpringModule} is not active, the instance is not loaded and the spring
+     * support is not enabled
+     */
+    protected void initDatabaseSpringSupport() {
+        if (!isSpringModuleEnabled()) {
+            return;
+        }
+        databaseSpringSupport = createInstanceOfType("org.unitils.database.util.spring.DatabaseSpringSupportImpl", false);
+    }
+
+
+    /**
+     * Verifies whether the SpringModule is enabled. If not, this means that either the property unitils.modules doesn't
+     * include spring, or unitils.module.spring.enabled = false, or that the module could not be loaded because spring is not
+     * in the classpath.
+     *
+     * @return true if the SpringModule is enabled, false otherwise
+     */
+    protected boolean isSpringModuleEnabled() {
+        return Unitils.getInstance().getModulesRepository().isModuleEnabled("org.unitils.spring.SpringModule");
+    }
 
 
     /**

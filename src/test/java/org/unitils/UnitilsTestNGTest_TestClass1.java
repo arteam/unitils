@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNGTest {
+public class UnitilsTestNGTest_TestClass1 extends UnitilsTestNGTestBase {
 
 
     @Test

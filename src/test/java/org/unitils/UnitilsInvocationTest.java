@@ -64,7 +64,7 @@ import org.unitils.core.Unitils;
  * @see UnitilsTestNGTest_EmptyTestClass
  */
 @RunWith(Parameterized.class)
-public class UnitilsInvocationTest extends BaseUnitilsInvocationTest {
+public class UnitilsInvocationTest extends UnitilsInvocationTestBase {
     
     Class<?> testClass1, testClass2;
     

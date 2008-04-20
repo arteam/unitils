@@ -24,7 +24,7 @@ import static org.unitils.TracingTestListener.TestInvocation.TEST_METHOD;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class UnitilsJUnit3Test_TestClass2 extends UnitilsJUnit3Test {
+public class UnitilsJUnit3Test_TestClass2 extends UnitilsJUnit3TestBase {
 
 	public void test1() {
         registerTestInvocation(TEST_METHOD, "test1");

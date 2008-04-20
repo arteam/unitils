@@ -29,7 +29,7 @@ import static org.unitils.TracingTestListener.TestInvocation.TEST_AFTER_CLASS;
  *
  * @author Tim Ducheyne
  */
-public class UnitilsJUnit4Test_TestClass2 extends UnitilsJUnit4Test {
+public class UnitilsJUnit4Test_TestClass2 extends UnitilsJUnit4TestBase {
 
 
 	@BeforeClass
