@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils</artifactId>
-    <version>1.1-rc-1-SNAPSHOT</version>
+    <version>1.1-rc-1</version>
     <packaging>jar</packaging>
 
 
@@ -31,10 +30,10 @@
         <url>http://sourceforge.net/tracker/?group_id=167201</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</connection>
-        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</developerConnection>
+        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-1.1-rc-1</connection>
+        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-1.1-rc-1</developerConnection>
         <tag>HEAD</tag>
-        <url>http://unitils.svn.sourceforge.net/viewvc/unitils/</url>
+        <url>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-1.1-rc-1</url>
     </scm>
 
     <!-- Remote repository -->
