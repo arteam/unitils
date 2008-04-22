@@ -32,14 +32,14 @@
     </issueManagement>
     <scm>
         <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</connection>
-        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</developerConnection>        
+        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</developerConnection>
         <url>http://unitils.svn.sourceforge.net/viewvc/unitils/</url>
     </scm>
 
     <!-- Remote repository -->
     <distributionManagement>
         <repository>
-            <id>remote-repository</id>
+            <id>sourceforge-repository</id>
             <url>sftp://shell.sourceforge.net/home/groups/u/un/unitils/htdocs/m2-repo</url>
         </repository>
     </distributionManagement>
@@ -72,6 +72,46 @@
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>run-tests</id>
+                        <phase>test</phase>
+                        <configuration>
+                            <tasks unless="maven.test.skip">
+                                <mkdir dir="${project.build.directory}/test"/>
+                                <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" classpathref="maven.test.classpath"/>
+                                <junit printsummary="true" haltonfailure="false" filtertrace="false" showoutput="false" fork="true" forkmode="perBatch">
+                                    <classpath>
+                                        <path refid="maven.test.classpath"/>
+                                        <path location="${project.build.outputDirectory}"/>
+                                        <path location="${project.build.testOutputDirectory}"/>
+                                    </classpath>
+
+                                    <formatter type="plain"/>
+
+                                    <batchtest todir="${project.build.directory}/test">
+                                        <fileset dir="${project.build.testOutputDirectory}">
+                                            <include name="**/*Test.class"/>
+                                            <!-- ignore inner classes -->
+                                            <exclude name="**/*$*Test.class"/>
+                                            <!-- ignore tests in default package -->
+                                            <exclude name="*Test.class"/>
+                                            <!-- ignore TestNG tests -->
+                                            <exclude name="**/*TestNGTest*.class"/>
+                                            <exclude name="org/unitils/orm/jpa/JpaModuleInjectionTest.class"/>
+                                        </fileset>
+                                    </batchtest>
+                                </junit>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <outputDirectory>${project.build.directory}/dist</outputDirectory>
@@ -85,7 +125,7 @@
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <goals>javadoc:javadoc,assembly:assembly</goals>                    
+                    <goals>javadoc:javadoc,assembly:assembly,deploy:deploy</goals>
                     <tagBase>https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases</tagBase>
                 </configuration>
             </plugin>
@@ -294,6 +334,12 @@
         </dependency>
 
         <!-- Test dependencies -->
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant-junit</artifactId>
+            <version>1.6.5</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
