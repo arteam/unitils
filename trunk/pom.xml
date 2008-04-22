@@ -3,7 +3,7 @@
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils</artifactId>
-    <version>1.1-rc-1</version>
+    <version>1.1-rc-2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
 
@@ -30,10 +30,9 @@
         <url>http://sourceforge.net/tracker/?group_id=167201</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-1.1-rc-1</connection>
-        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-1.1-rc-1</developerConnection>
-        <tag>HEAD</tag>
-        <url>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-1.1-rc-1</url>
+        <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</connection>
+        <developerConnection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/trunk</developerConnection>
+        <url>http://unitils.svn.sourceforge.net/viewvc/unitils/</url>
     </scm>
 
     <!-- Remote repository -->
