@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:a="SCHEMA_A" xmlns:b="SCHEMA_B" xmlns:c="SCHEMA_C">
+
+    <TABLE_A COLUMN_1="1"/>
+    <b:TABLE_A COLUMN_1="2"/>
+    <TABLE_A COLUMN_1="3"/>
+    <b:TABLE_A COLUMN_1="4"/>
+    <TABLE_A COLUMN_2="5"/>
+    <c:TABLE_A COLUMN_1="6"/>
+    <c:TABLE_A COLUMN_1="7"/>
+
+</dataset>
