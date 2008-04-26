@@ -53,7 +53,7 @@
 
         <!--antcall target="create-release-properties"/-->
         <!-- first perform a dry run and check whether all unit-tests pass -->
-        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-DreleaseVersion=1.2222" arg3="-DdevVersion=2.333"/>
+        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-Dresume=false" input="2${line.separator}3${line.separator}4${line.separator}"/>
         <!--antcall target="run-tests"/-->
 
         <!-- ask confirmation -->
@@ -68,7 +68,7 @@
         <!-- everything ok, perform the release -->
         <antcall target="create-settings-file"/>
         <maven target="release:prepare"/>
-        <maven target="release:perform" args="-s${settings.file}"/>
+        <maven target="release:perform" arg1="-s${settings.file}"/>
         <!-- clean up -->
         <maven target="release:clean"/>
         <delete file="${settings.file}"/>
@@ -125,8 +125,9 @@
         <attribute name="arg1" default=""/>
         <attribute name="arg2" default=""/>
         <attribute name="arg3" default=""/>
+        <attribute name="input" default=""/>
         <sequential>
-            <exec executable="mvn.bat" searchpath="true" failonerror="true">
+            <exec executable="mvn.bat" searchpath="true" failonerror="true" inputstring="@{input}">
                 <arg value="@{target}"/>
                 <arg value="@{arg1}"/>
                 <arg value="@{arg2}"/>
