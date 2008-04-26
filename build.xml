@@ -53,8 +53,8 @@
 
         <antcall target="create-release-properties"/>
         <!-- first perform a dry run and check whether all unit-tests pass -->
-        <maven target="release:prepare" args="-DdryRun=true"/>
-        <antcall target="run-tests"/>
+        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-Dproject.dev.org.unitils\:unitils=1.1-rc-200-SNAPSHOT"/>
+        <!--antcall target="run-tests"/-->
 
         <!-- ask confirmation -->
         <input message="Are you sure you want to peform a release? (y/n)" addproperty="confirmed"/>
@@ -122,11 +122,15 @@
     <!-- Calls maven for the given target and optional arguments -->
     <macrodef name="maven">
         <attribute name="target"/>
-        <attribute name="args" default=""/>
+        <attribute name="arg1" default=""/>
+        <attribute name="arg2" default=""/>
+        <attribute name="arg3" default=""/>
         <sequential>
             <exec executable="mvn.bat" searchpath="true" failonerror="true">
                 <arg value="@{target}"/>
-                <arg value="@{args}"/>
+                <arg value="@{arg1}"/>
+                <arg value="@{arg2}"/>
+                <arg value="@{arg3}"/>
             </exec>
         </sequential>
     </macrodef>
