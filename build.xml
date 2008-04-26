@@ -50,11 +50,13 @@
     <!--   Upload unitils jar to Sourceforge repositor so that it can be uploaded to the central maven repo -->
     <!--   Generates the site -->
     <target name="release" depends="load-pom" description="Releases a new version of Unitils.">
-        <!-- first try a build and see whether all unit-tests pass -->
-        <antcall target="build"/>
-        <!-- first perform a dry run -->
-        <maven target="release:prepare" args="-DdryRun=true"/>
-        <input message="Please check the distribution and confirm the release. Continue with release? (y/n)" addproperty="confirmed"/>
+        <!-- first perform a dry run and check whether all unit-tests pass -->
+        <antcall target="create-settings-file"/>
+        <maven target="release:prepare" args="-DdryRun=true -Dresume=false"/>
+        <antcall target="run-tests"/>
+
+        <!-- ask confirmation -->
+        <input message="Are you sure you want to peform a release? (y/n)" addproperty="confirmed"/>
         <condition property="aborted">
             <not>
                 <equals arg1="y" arg2="${confirmed}"/>
@@ -62,14 +64,15 @@
         </condition>
         <fail if="aborted">Build aborted by user.</fail>
 
-        <!-- everything ok, perform the prepare phase -->
-        <antcall target="create-settings-file"/>
+        <!-- everything ok, perform the release -->
         <maven target="release:prepare"/>
         <maven target="release:perform" args="-s${settings.file}"/>
+        <!-- clean up -->
         <maven target="release:clean"/>
+        <delete file="${settings.file}"/>
+
         <!-- build the site -->
         <maven target="site"/>
-        <delete file="${settings.file}"/>
     </target>
 
 
@@ -85,6 +88,7 @@
         <mkdir dir="${pom.build.directory}"/>
         <echoxml file="${pom.build.directory}/settings.xml">
             <settings>
+                <interactiveMode>true</interactiveMode>
                 <servers>
                     <server>
                         <id>remote-repository</id>
