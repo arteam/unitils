@@ -53,7 +53,7 @@
 
         <antcall target="create-release-properties"/>
         <!-- first perform a dry run and check whether all unit-tests pass -->
-        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-Dproject.dev.org.unitils\:unitils=1.1-rc-200-SNAPSHOT"/>
+        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-DreleaseVersion=1.2222" arg3="-DdevVersion=2.333"/>
         <!--antcall target="run-tests"/-->
 
         <!-- ask confirmation -->
