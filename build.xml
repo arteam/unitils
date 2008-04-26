@@ -127,7 +127,7 @@
         <attribute name="arg3" default=""/>
         <attribute name="input" default=""/>
         <sequential>
-            <exec executable="mvn.bat" searchpath="true" failonerror="true" inputstring="2">
+            <exec executable="mvn.bat" searchpath="true" failonerror="true" inputstring="@{input}">
                 <arg value="@{target}"/>
                 <arg value="@{arg1}"/>
                 <arg value="@{arg2}"/>
