@@ -68,19 +68,12 @@
         <!-- everything ok, perform the release -->
         <maven target="release:clean"/>
         <maven target="release:prepare" arg1="-Dresume=false"/>
-        <antcall target="deploy-to-sourceforge-repository"/>
-        <maven target="release:perform" arg1="-s${settings.file}"/>
-        <maven target="release:clean"/>
-    </target>
-
-    <target name="deploy-to-sourceforge-repository" depends="load-pom">
-        <echo>${pom.build.directory}</echo>
         <property name="settings.file" value="${pom.build.directory}/settings.xml"/>
         <antcall target="create-settings-file"/>
-        <maven target="deploy" arg1="-s${settings.file}"/>
+        <maven target="release:perform" arg1="-s${settings.file}"/>
+        <maven target="release:clean"/>
         <delete file="${settings.file}"/>
     </target>
-
 
     <!-- Utility tasks -->
 
