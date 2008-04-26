@@ -50,11 +50,11 @@
     <!--   Upload unitils jar to Sourceforge repositor so that it can be uploaded to the central maven repo -->
     <!--   Generates the site -->
     <target name="release" depends="load-pom" description="Releases a new version of Unitils.">
-
-        <!--antcall target="create-release-properties"/-->
         <!-- first perform a dry run and check whether all unit-tests pass -->
         <maven target="release:prepare" arg1="-DdryRun=true" arg2="-Dresume=false"/>
         <antcall target="run-tests"/>
+        <!-- build the site -->
+        <maven target="site"/>
 
         <!-- ask confirmation -->
         <input message="Are you sure you want to peform a release? (y/n)" addproperty="confirmed"/>
@@ -66,17 +66,19 @@
         <fail if="aborted">Build aborted by user.</fail>
 
         <!-- everything ok, perform the release -->
-        <property name="settings.file" value="${pom.build.directory}/settings.xml"/>
-        <antcall target="create-settings-file"/>
         <maven target="release:clean"/>
         <maven target="release:prepare" arg1="-Dresume=false"/>
+        <antcall target="deploy-to-sourceforge-repository"/>
         <maven target="release:perform" arg1="-s${settings.file}"/>
-        <!-- clean up -->
         <maven target="release:clean"/>
-        <delete file="${settings.file}"/>
+    </target>
 
-        <!-- build the site -->
-        <maven target="site"/>
+    <target name="deploy-to-sourceforge-repository" depends="load-pom">
+        <echo>${pom.build.directory}</echo>
+        <property name="settings.file" value="${pom.build.directory}/settings.xml"/>
+        <antcall target="create-settings-file"/>
+        <maven target="deploy" arg1="-s${settings.file}"/>
+        <delete file="${settings.file}"/>
     </target>
 
 
@@ -90,10 +92,9 @@
         <mkdir dir="${pom.build.directory}"/>
         <echoxml file="${settings.file}">
             <settings>
-                <interactiveMode>true</interactiveMode>
                 <servers>
                     <server>
-                        <id>remote-repository</id>
+                        <id>sourceforge-repository</id>
                         <username>${sourceforge.username}</username>
                         <password>${sourceforge.password}</password>
                     </server>
