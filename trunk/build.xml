@@ -67,16 +67,22 @@
 
         <!-- everything ok, perform the release -->
         <maven target="release:clean"/>
-        <maven target="release:prepare" arg1="-Dresume=false"/>
-        <property name="settings.file" value="${pom.build.directory}/settings.xml"/>
-        <antcall target="create-settings-file"/>
-        <maven target="release:perform" arg1="-s${settings.file}"/>
-        <maven target="release:clean"/>
-        <delete file="${settings.file}"/>
+        <maven target="release:prepare" arg1="-Dresume=false"/>        
+        <maven target="release:perform"/>
+        <ant antfile="${pom.build.directory}/checkout/build.xml" target="deploy-to-sourceforge-m2-repo"/>
+        <maven target="release:clean"/>        
     </target>
 
     <!-- Utility tasks -->
 
+    <!-- Upload unitils jar to Sourceforge repositor so that it can be uploaded to the central maven repo -->    
+    <target name="deploy-to-sourceforge-m2-repo" depends="load-pom">       
+        <property name="settings.file" value="${pom.build.directory}/settings.xml"/>
+        <antcall target="create-settings-file"/>
+        <maven target="deploy" arg1="-s${settings.file}"/>
+        <delete file="${settings.file}"/>
+    </target>
+    
     <!-- Maven only supports configuration of username and password through settings file. -->
     <!-- This will dynamically create a settings file -->
     <target name="create-settings-file" depends="load-pom">
