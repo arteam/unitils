@@ -53,7 +53,7 @@
 
         <!--antcall target="create-release-properties"/-->
         <!-- first perform a dry run and check whether all unit-tests pass -->
-        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-Dresume=false" input="2${line.separator}3${line.separator}4${line.separator}"/>
+        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-Dresume=false" input="44${line.separator}33${line.separator}55${line.separator}"/>
         <!--antcall target="run-tests"/-->
 
         <!-- ask confirmation -->
