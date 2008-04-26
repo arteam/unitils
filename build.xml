@@ -80,14 +80,6 @@
 
     <!-- Utility tasks -->
 
-    <target name="create-release-properties" depends="load-pom">
-        <property name="release.properties.file" value="release.properties"/>
-
-        <input message="Sourceforge username" addproperty="sourceforge.username"/>
-        <input message="Sourceforge password" addproperty="sourceforge.password"/>
-        <echo file="${release.properties.file}" message="scm.tag=unitils-1.1-rc-6${line.separator}project.rel.org.unitils\:unitils=1.1-rc-6${line.separator}project.dev.org.unitils\:unitils=1.1-rc-7-SNAPSHOT"/>
-    </target>
-
     <!-- Maven only supports configuration of username and password through settings file. -->
     <!-- This will dynamically create a settings file -->
     <target name="create-settings-file" depends="load-pom">
@@ -127,7 +119,7 @@
         <attribute name="arg3" default=""/>
         <attribute name="input" default=""/>
         <sequential>
-            <exec executable="mvn.bat" searchpath="true" failonerror="true" inputstring="11\r22\r33\r">
+            <exec executable="mvn.bat" searchpath="true" failonerror="true">
                 <arg value="@{target}"/>
                 <arg value="@{arg1}"/>
                 <arg value="@{arg2}"/>
