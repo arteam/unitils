@@ -1,0 +1,396 @@
+ -----
+ Cookbook
+ -----
+ -----
+
+Cookbook
+~~~~~~~~
+    This page helps you to get started quickly with Unitils. Code and configuration are explained using a few simple examples.  
+    
+    This cookbook contains only typical configuration. More elaborate information about Unitils and its configuration can be found 
+    in the {{{documentation.html} tutorial}}. A complete documented reference of all configuration options can be found in 
+    {{{unitils-default.properties} unitils-default.properties}}. 
+   
+    The third party libraries required by Unitils can be found on the {{{dependencies.html}dependencies}} page.
+    
+    
+    
+* Reflection assert
+~~~~~~~~~~~~~~~~~~~
+    Following examples show some possible uses of the reflection assert utility. All assertions are successful:
+    
++-----+
+// Exact field-by-field comparison
+ReflectionAssert.assertRefEquals(new Person("John", "Doe", new Address("New street", 5, "Brussels")), 
+                                 new Person("John", "Doe", new Address("New street", 5, "Brussels"));
+  
+// Ignore Null / 0 values in the expected object
+ReflectionAssert.assertRefEquals(new Person("John", null, new Address("New street", 0, null)), 
+                                 new Person("John", "Doe", new Address("New street", 5, "Brussels"), 
+                                 ReflectionComparatorMode.IGNORE_DEFAULTS); 
+  
+// Ignore collection order
+ReflectionAssert.assertRefEquals(Arrays.asList(new Person("John"), new Person("Jane")), 
+                                 new Person[] {new Person("Jane"), new Person("John")}, 
+                                 ReflectionComparatorMode.LENIENT_ORDER);
+  
+// Ignore null/0 values + collection order
+ReflectionAssert.assertLenEquals(Arrays.asList(new Person("John"), null), 
+                                 new Person[] {new Person("Jane", "Doe"), new Person("John", "Doe")});
+
+// Check only the firstName property 
+ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), 
+                                         new Person[] {new Person("Jane", "Doe"), new Person("John", "Doe")});
++-----+
+
+
+
+
+* Mock creation and mock injection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+    This example demonstrates the EasyMock and Injection modules. The test must extend one of Unitils base classes: UnitilsJUnit3, UnitilsJUnit4 or UnitilsTestNG.
+    No extra configuration is needed.
+    
++-----+
+public class UserServiceTest extends UnitilsJUnit4 {
+    
+    @Mock 
+    @InjectInto(property="userDao")
+    protected UserDAO mockUserDao;
+  
+    @TestedObject
+    protected UserService userService;
+
+    @Test
+    public void testRaiseSalary() {        
+        expect(userDao.findAllUsers()).andReturn(Arrays.asList(new User()));
+        expect(userDao.updateSalary(null, 100));     
+        EasyMockUnitils.replay();
+    
+        userService.raiseSalaryOfAllUsers(100);
+    }    
+}
++-----+
+
+** Description
+~~~~~~~~~~~~~~
+
+    * a lenient EasyMock mock object of type <UserDAO> is created and assigned to the <mockUserDao> field
+    
+    * since the <userService> was not initialized in the setup, an instance of <UserService> is created using the default constructor and assigned to the field
+    
+    * the mock is injected into the <userDao> property of <userService> 
+    
+    * during the test, we first record the expected behavior. Arguments are matched using lenient reflection equals: ignoring null/0 defaults and the order of collections
+    
+    * <EasyMockUnitils.replay()> is called to call replay on all mocks that were created in the test
+    
+    * the method under test is invoked
+    
+    * when the test finishes, Unitils automatically calls <verify()> on all created mock objects
+    
+    []
+    
+    
+    
+    
+* Database testing
+~~~~~~~~~~~~~~~~~~
+    To enable database testing, you should start by setting up a unit test database for every developer in the team. In our typical 
+    configuration shown below, we assume that these separate unit test schemas were created on the same database instance.
+  
+    Start by creating a file named <unitils.properties> and make it available in your classpath. It should contain 
+    following properties:
+  
++------+
+# Name or path of the user specific properties file. This file should contain the necessary parameters to connect to the
+# developer's own unit test schema. It is recommended to override the name of this file in the project specific properties
+# file, to include the name of the project. The system will try to find this file in the classpath, the user home folder
+# (recommended) or the local filesystem.
+unitils.configuration.localFileName=unitils-<myproject>-local.properties
+
+# Properties for the PropertiesDataSourceFactory
+database.driverClassName=<my driver classname>
+database.url=<my database connection url>
+
+# This property specifies the underlying DBMS implementation. Supported values are 'oracle', 'db2', 'mysql' and 'hsqldb'.
+# The value of this property defines which vendor specific implementations of DbSupport and ConstraintsDisabler are chosen.
+database.dialect=<my database dialect>
++------+
+
+    Next, create a file <unitils-\<myproject\>-local.properties> and put this file in the local user home directory. The file 
+    should contain following properties:
+
++------+
+database.userName=<developers database login username>
+database.password=<developers database login password>
+database.schemaNames=<developers database schema name>
++------+
+
+    Following is an example of a database test:
+    
++-----+
+public class UserDaoTest extends UnitilsJUnit4 {
+    
+    @TestDataSource
+    private DataSource dataSource;
+    
+    private UserDao userDao;
+        
+    @Before
+    public void setUp() {
+        userDao = new UserDao();
+        userDao.setDataSource(dataSource);
+    }
+    
+    @DataSet
+    @Test
+    public void testFindUserByLastName() {
+        List<User> users = userDao.findByLastName("Doe");
+        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+    }
+}
++-----+
+
+    This is the test data file: <UserDaoTest.xml>
+
++-----+
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="<path to dataset.xsd file>">
+    <user firstname="John" lastname="Doe"/>
+    <user firstname="Jane" lastname="Doe"/>
+    <user firstname="Jack" lastname="Smith"/>
+</dataset>
++-----+
+
+** Description
+~~~~~~~~~~~~~~
+
+    * a <DataSource> is created that provides access to the unit test database configured in <unitils.properties> and <unitils-\<myproject\>-local.properties>
+      and is injected in the <dataSource> field      
+    
+    * in the setUp method, a new instance of <UserDao> is created and configured with the test DataSource
+    
+    * Unitils looks for a DbUnit dataset file named <UserDaoTest.xml> or <UserDaoTest.testFindUserByLastName.xml>
+    
+    * <UserDaoTest.xml> is found and loaded in the database
+    
+    * the test method is invoked
+    
+    * using <ReflectionAssert>, the first names of the users are compared with the expected names ignoring the actual order of the list
+    
+    * when the test is finished, any Hibernate sessions that are still open are automatically closed
+    
+    []
+
+
+* Automatic maintenance of unit test databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    To enable automatic maintenance of the developers' unit test databases, start with creating a database scripts folder. Add this folder 
+    to your source control system. Next, add following properties to <unitils.properties>:
+  
++------+
+# If set to true, the DBMaintainer will be used to update the unit test database schema. This is done once for each
+# test run, when creating the DataSource that provides access to the unit test database.
+updateDataBaseSchema.enabled=true
+
+# Set to true if the db version table should be created automatically if it does not exist yet.
+# If false, an exception is thrown the it does not exist yet, showing how to create the version table manually. 
+# This is set to false by default to be sure that no non-unit test schema is dropped by accident. If a 
+# version table is available, we assume it to be a unit-test schema, if not, you should manually add a version table 
+# to indicate that it is a unit-test schema.
+dbMaintainer.dbVersionSource.autoCreateVersionTable=true
+
+# Comma separated list of directories and files in which the database update scripts are located. Directories in this
+# list are recursively searched for files.
+dbMaintainer.script.locations=<Paths to your database update script files>
+
+# DbUnit database XSD directory
+dataSetStructureGenerator.xsd.dirName=<Path to your database XSD directory>
+
+# Comma separated list of database items that may not be dropped or cleared by the db maintainer when
+# updating the database from scratch (dbMaintainer.fromScratch.enabled=true).
+# Schemas can also be preserved as a whole. If identifiers are quoted (eg "" for oracle) they are considered
+# case sensitive. Items that do not have a schema prefix are considered to be in the default schema
+dbMaintainer.preserve.schemas=
+dbMaintainer.preserve.tables=
+dbMaintainer.preserve.views=
+dbMaintainer.preserve.synonyms=
+dbMaintainer.preserve.sequences=
+
+# Comma separated list of table names. The tables listed here will not be emptied when the db maintainer performs a database
+# update. This can be used for Tables that contain rather static, read only or type data. The database version table
+# is preserved automatically.
+# Tables listed here will still be dropped when the db maintainer performs a from scratch update. If this is not desirable
+# you should add the tablename to the dbMaintainer.preserve.tables property instead
+# Schemas can also be preserved as a whole. If identifiers are quoted (eg "" for oracle) they are considered 
+# case sensitive. Items that do not have a schema prefix are considered to be in the default schema
+dbMaintainer.preserveDataOnly.schemas=
+dbMaintainer.preserveDataOnly.tables=
++------+
+
+    Every time an update DDL script is created, add it to the database scripts folder. The name of this script should
+    comply with following naming convention: <\<version\>_\<some name\>.sql>. For example:
+    
++-----+
+dbscripts / 001_user_table.sql
+            002_company_table.sql
++-----+
+
+    Unitils detects that a script was added and will invoke it on the database. If one of the existing scripts is altered, the
+    database is dropped and created from scratch, re-invoking all of the scripts. When the database is updated XSD files are generated 
+    that can be used for validation and completion when writing DBUnit data sets. 
+
+
+* Enable Hibernate support
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+    To make use of Unitils' Hibernate support, first make sure the database support is configured correctly as described above and that you have hibernate
+    in your classpath. Note: if you use Spring, the Hibernate configuration can also be performed from an application context (See next section).
+    
+    Set the property <HibernateModule.configuration.implClassName> to the subclass of <org.hibernate.cfg.Configuration> that you want to use. By default
+    an instance of <org.hibernate.cfg.AnnotationConfiguration> will be created. If you don't make use of Hibernate with annotations, change the value of 
+    this property to the following:
+
++-----+
+HibernateModule.configuration.implClassName=org.hibernate.cfg.Configuration
++-----+
+
+    Following is an example of a tests with Hibernate:
+
++-----+
+@HibernateSessionFactory("hibernate.cfg.xml")
+@Transactional(TransactionMode.COMMIT)
+public class UserDaoTest extends UnitilsJUnit4 {
+
+    @HibernateSessionFactory
+    private SessionFactory sessionFactory;
+    
+    private UserDao userDao;
+    
+    @Before
+    public void setUp() {
+        userDao = new UserDao();
+        userDao.setSessionFactory(sessionFactory);
+    }
+  
+    @Test
+    public void testFindUserByLastName() {
+        List<User> users = userDao.findByLastName("Doe");
+        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+    }
+}
++-----+
+
+** Description
+~~~~~~~~~~~~~~
+
+    * a Hibernate <Configuration> or <AnnotationConfiguration> object is instantiated, and configured using the <hibernate.cfg.xml> config file 
+
+    * a <SessionFactory> is created and injected in the <sessionFactory> field
+    
+    * in thet setUp method of the test a new instance of the <UserDao> is created and configured with the session factory instance
+    
+    * the test method is invoked
+    
+    * using <ReflectionAssert> the first names of the users are compared with the expected names ignoring the actual order of the list
+    
+    []
+
+
+** Testing the mapping
+~~~~~~~~~~~~~~~~~~~~~~
+    Unitils is shipped with a ready-to-use unit test that verifies if the mapping of all your mapped classes is consistent with the database structure. This 
+    test is not automatically executed; you should write a unit test that looks like the following:
+
+
++-----+
+@HibernateSessionFactory("hibernate.cfg.xml")
+@Transactional(TransactionMode.COMMIT)
+public class HibernateMappingTest extends UnitilsJUnit4 {
+    
+    @Test
+    public void testMappingToDatabase() {        
+        HibernateUnitils.assertMappingWithDatabaseConsistent();
+    }
+}
++-----+
+  
+  
+  
+  
+* Spring integration
+~~~~~~~~~~~~~~~~~~~~
+    To make use of Unitils' Spring support, first make sure the database support is configured correctly as described above and that you have spring
+    in your classpath. 
+    
+    Following is an example of a tests with Spring:
+    
++-----+
+@SpringApplicationContext("services-config.xml")
+public class UserDaoTest extends UnitilsJUnit4 {
+    
+    @SpringBean("userDao")
+    protected UserDao userDao;
+  
+    @Test
+    public void testFindUserByLastName() {
+        List<User> users = userDao.findByLastName("Doe");
+        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+    }
+  
+    @Test
+    public void testMappingWithDatabase() {        
+        HibernateAssert.assertMappingWithDatabaseConsistent();
+    }
+}
++-----+
+
+    This is the configuration file: <services-config.xml>
+
++-----+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+
+    <bean id="userDao" class="org.unitils.cookbook.UserDao">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>org.unitils.sample.cookbook.User</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <value>
+            ...
+            </value>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
+  
+</beans>
++-----+
+
+
+** Description
+~~~~~~~~~~~~~~
+
+    * a Spring <ApplicationContext> instance is created and intialized with the <services-config.xml> file
+    
+    * the configured <UnitilsDataSource> will connect to the unit test database as configured in <unitils.properties> and <unitils-\<myproject\>-local.properties>
+    
+    * Spring wires the <userDao> Spring bean with a <SessionFactory> that uses the DataSource supplied by Unitils 
+    
+    * the Spring bean named <userDao> is retrieved from the application context and injected in the <userDao> field    
+    
+    * the first test method, <testFindUserByLastName>, is invoked
+    
+    * using <ReflectionAssert> the first names of the users are compared with the expected names ignoring the actual order of the list
+    
+    * the second test method, <testMappingToDatabase>, is invoked. This test checks whether the Hibernate mapping is consistent with the database. This test uses
+      the Hibernate configuration as defined in the application context. 
+    
+    []
