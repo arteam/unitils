@@ -68,7 +68,8 @@
         <!-- everything ok, perform the release -->
         <property name="settings.file" value="${pom.build.directory}/settings.xml"/>
         <antcall target="create-settings-file"/>
-        <maven target="release:prepare"/>
+        <maven target="release:clean"/>
+        <maven target="release:prepare" arg1="-Dresume=false"/>
         <maven target="release:perform" arg1="-s${settings.file}"/>
         <!-- clean up -->
         <maven target="release:clean"/>
