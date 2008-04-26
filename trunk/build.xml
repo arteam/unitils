@@ -53,7 +53,7 @@
 
         <!--antcall target="create-release-properties"/-->
         <!-- first perform a dry run and check whether all unit-tests pass -->
-        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-Dresume=false" input="44${line.separator}33${line.separator}55${line.separator}"/>
+        <maven target="release:prepare" arg1="-DdryRun=true" arg2="-Dresume=false"/>
         <!--antcall target="run-tests"/-->
 
         <!-- ask confirmation -->
@@ -127,7 +127,7 @@
         <attribute name="arg3" default=""/>
         <attribute name="input" default=""/>
         <sequential>
-            <exec executable="mvn.bat" searchpath="true" failonerror="true" inputstring="@{input}">
+            <exec executable="mvn.bat" searchpath="true" failonerror="true" input="../test.txt">
                 <arg value="@{target}"/>
                 <arg value="@{arg1}"/>
                 <arg value="@{arg2}"/>
