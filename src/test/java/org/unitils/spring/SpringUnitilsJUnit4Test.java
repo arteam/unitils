@@ -5,10 +5,12 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.unitils.TracingTestListener;
 import org.unitils.spring.util.SpringUnitilsAdaptorTestExecutionListener;
 
+
+// todo javadoc
 @TestExecutionListeners(value = SpringUnitilsAdaptorTestExecutionListener.class, inheritListeners = false)
 abstract public class SpringUnitilsJUnit4Test extends AbstractJUnit4SpringContextTests {
 
-	/* Test listener that will record all invocations */
+    /* Test listener that will record all invocations */
     private static TracingTestListener tracingTestListener;
 
 

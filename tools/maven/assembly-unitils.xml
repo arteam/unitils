@@ -1,5 +1,5 @@
 <assembly>
-    <id>src</id>
+    <id/>
     <formats>
         <format>zip</format>
     </formats>
@@ -13,9 +13,23 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory/>
+            <includes>
+                <include>${project.build.finalName}.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <includes>
                 <include>src/main/**</include>
                 <include>src/test/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/site/apidocs</directory>
+            <outputDirectory>docs/apidocs</outputDirectory>
+            <includes>
+                <include>**</include>
             </includes>
         </fileSet>
     </fileSets>
