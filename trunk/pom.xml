@@ -3,7 +3,7 @@
 
     <groupId>org.unitils</groupId>
     <artifactId>unitils</artifactId>
-    <version>1.1-rc-1-SNAPSHOT</version>
+    <version>1.1-rc-1</version>
     <packaging>jar</packaging>
 
 
