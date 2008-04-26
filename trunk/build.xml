@@ -50,8 +50,9 @@
     <!--   Upload unitils jar to Sourceforge repositor so that it can be uploaded to the central maven repo -->
     <!--   Generates the site -->
     <target name="release" depends="load-pom" description="Releases a new version of Unitils.">
+
+        <antcall target="create-release-properties"/>
         <!-- first perform a dry run and check whether all unit-tests pass -->
-        <antcall target="create-settings-file"/>
         <maven target="release:prepare" args="-DdryRun=true -Dresume=false"/>
         <antcall target="run-tests"/>
 
@@ -65,6 +66,7 @@
         <fail if="aborted">Build aborted by user.</fail>
 
         <!-- everything ok, perform the release -->
+        <antcall target="create-settings-file"/>
         <maven target="release:prepare"/>
         <maven target="release:perform" args="-s${settings.file}"/>
         <!-- clean up -->
@@ -78,6 +80,14 @@
 
     <!-- Utility tasks -->
 
+    <target name="create-release-properties" depends="load-pom">
+        <property name="release.properties.file" value="release.properties"/>
+
+        <input message="Sourceforge username" addproperty="sourceforge.username"/>
+        <input message="Sourceforge password" addproperty="sourceforge.password"/>
+        <echo file="${release.properties.file}" message="scm.tag=unitils-1.1-rc-6${line.separator}project.rel.org.unitils\:unitils=1.1-rc-6${line.separator}project.dev.org.unitils\:unitils=1.1-rc-7-SNAPSHOT"/>
+    </target>
+
     <!-- Maven only supports configuration of username and password through settings file. -->
     <!-- This will dynamically create a settings file -->
     <target name="create-settings-file" depends="load-pom">
@@ -86,7 +96,7 @@
         <input message="Sourceforge username" addproperty="sourceforge.username"/>
         <input message="Sourceforge password" addproperty="sourceforge.password"/>
         <mkdir dir="${pom.build.directory}"/>
-        <echoxml file="${pom.build.directory}/settings.xml">
+        <echoxml file="${settings.file}">
             <settings>
                 <interactiveMode>true</interactiveMode>
                 <servers>
