@@ -72,53 +72,12 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>run-tests</id>
-                        <phase>test</phase>
-                        <configuration>
-                            <tasks unless="maven.test.skip">
-                                <mkdir dir="${project.build.directory}/test"/>
-                                <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" classpathref="maven.test.classpath"/>
-                                <junit printsummary="true" haltonfailure="false" filtertrace="false" showoutput="false" fork="true" forkmode="perBatch">
-                                    <classpath>
-                                        <path refid="maven.test.classpath"/>
-                                        <path location="${project.build.outputDirectory}"/>
-                                        <path location="${project.build.testOutputDirectory}"/>
-                                    </classpath>
-
-                                    <formatter type="plain"/>
-
-                                    <batchtest todir="${project.build.directory}/test">
-                                        <fileset dir="${project.build.testOutputDirectory}">
-                                            <include name="**/*Test.class"/>
-                                            <!-- ignore inner classes -->
-                                            <exclude name="**/*$*Test.class"/>
-                                            <!-- ignore tests in default package -->
-                                            <exclude name="*Test.class"/>
-                                            <!-- ignore TestNG tests -->
-                                            <exclude name="**/*TestNGTest*.class"/>
-                                            <exclude name="org/unitils/orm/jpa/JpaModuleInjectionTest.class"/>
-                                        </fileset>
-                                    </batchtest>
-                                </junit>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <outputDirectory>${project.build.directory}/dist</outputDirectory>
                     <descriptors>
-                        <descriptor>assembly-unitils.xml</descriptor>
-                        <descriptor>assembly-unitils-src.xml</descriptor>
-                        <descriptor>assembly-unitils-with-dependencies.xml</descriptor>
+                        <descriptor>tools/maven/assembly-unitils.xml</descriptor>
+                        <descriptor>tools/maven/assembly-unitils-with-dependencies.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
@@ -334,12 +293,6 @@
         </dependency>
 
         <!-- Test dependencies -->
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant-junit</artifactId>
-            <version>1.6.5</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

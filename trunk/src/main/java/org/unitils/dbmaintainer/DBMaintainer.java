@@ -236,6 +236,8 @@ public class DBMaintainer {
         // conflicts when dropping tables
         constraintsDisabler.disableConstraints();
         dbClearer.clearSchemas();
+        // reset the database version
+        versionSource.setDbVersion(new Version("", 0));
         // update database with all scripts
         updateDatabase(scriptSource.getAllScripts(), currentVersion);
     }
@@ -265,7 +267,7 @@ public class DBMaintainer {
             logger.info("Database is up to date. Current database version is " + currentVersion);
             return;
         }
-        logger.info("Database update scripts have been found and will be executed on the database.");
+        logger.info("Database update scripts have been found and will be executed on the database. Current database version is " + currentVersion);
 
         // We register the update as being not successful. If anything goes wrong or if the update is
         // interrupted before being completed, this will be the final state and the DbMaintainer will
