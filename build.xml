@@ -66,6 +66,7 @@
         <fail if="aborted">Build aborted by user.</fail>
 
         <!-- everything ok, perform the release -->
+        <property name="settings.file" value="${pom.build.directory}/settings.xml"/>
         <antcall target="create-settings-file"/>
         <maven target="release:prepare"/>
         <maven target="release:perform" arg1="-s${settings.file}"/>
@@ -83,8 +84,6 @@
     <!-- Maven only supports configuration of username and password through settings file. -->
     <!-- This will dynamically create a settings file -->
     <target name="create-settings-file" depends="load-pom">
-        <property name="settings.file" value="${pom.build.directory}/settings.xml"/>
-
         <input message="Sourceforge username" addproperty="sourceforge.username"/>
         <input message="Sourceforge password" addproperty="sourceforge.password"/>
         <mkdir dir="${pom.build.directory}"/>
