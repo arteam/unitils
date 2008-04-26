@@ -51,7 +51,7 @@
     <!--   Generates the site -->
     <target name="release" depends="load-pom" description="Releases a new version of Unitils.">
 
-        <antcall target="create-release-properties"/>
+        <!--antcall target="create-release-properties"/-->
         <!-- first perform a dry run and check whether all unit-tests pass -->
         <maven target="release:prepare" arg1="-DdryRun=true" arg2="-DreleaseVersion=1.2222" arg3="-DdevVersion=2.333"/>
         <!--antcall target="run-tests"/-->
