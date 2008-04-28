@@ -32,7 +32,6 @@ import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
 import static java.util.Arrays.asList;
 import java.util.Properties;
 import java.util.Set;
@@ -215,7 +214,11 @@ public class DbSupportTest extends UnitilsJUnit4 {
         Set<String> result = dbSupport.getTriggerNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL trigger behavior: trigger names are case-sensitive
-            assertLenEquals(Arrays.asList("test_trigger", "Test_CASE_Trigger"), result);
+            assertLenEquals(asList("test_trigger", "Test_CASE_Trigger"), result);
+        } else if ("postgresql".equals(dbSupport.getDatabaseDialect())) {
+            // Postgresql trigger behavior: non-standard drop statement (see PostgreSqlDbSupport.dropTrigger for more info
+            // Triggers are returned as  'trigger-name' ON 'table name'
+            assertLenEquals(asList(dbSupport.quoted("test_trigger") + " ON " + dbSupport.qualified("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Trigger") + " ON " + dbSupport.qualified("Test_CASE_Table")), result);
         } else {
             assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_trigger"), "Test_CASE_Trigger"), result);
         }
@@ -398,7 +401,10 @@ public class DbSupportTest extends UnitilsJUnit4 {
 
         // should succeed now
         // drop triggers to avoid side-effects during insert
-        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        Set<String> triggerNames = dbSupport.getTriggerNames();
+        for (String triggerName : triggerNames) {
+            dbSupport.dropTrigger(triggerName);
+        }
         executeUpdate("insert into " + dbSupport.quoted("Test_CASE_Table") + " (col1) values (null)", dataSource);
     }
 
@@ -624,7 +630,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
         dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"");
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
-        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTriggers(dbSupport, "test_trigger ON \"Test_CASE_Sequence\"", "\"Test_CASE_Trigger\" ON \"Test_CASE_Sequence\"");
         dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
     }
 
