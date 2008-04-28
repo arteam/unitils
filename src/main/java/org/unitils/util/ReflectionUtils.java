@@ -15,16 +15,17 @@
  */
 package org.unitils.util;
 
+import static org.apache.commons.lang.StringUtils.capitalize;
+import org.unitils.core.UnitilsException;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-import org.unitils.core.UnitilsException;
 
 /**
  * Utility methods that use reflection for instance creation or class inspection.
@@ -97,7 +98,7 @@ public class ReflectionUtils {
      * @throws UnitilsException if the field could not be accessed
      */
     @SuppressWarnings("unchecked")
-	public static <T> T getFieldValue(Object object, Field field) {
+    public static <T> T getFieldValue(Object object, Field field) {
         try {
             field.setAccessible(true);
             return (T) field.get(object);
@@ -195,12 +196,12 @@ public class ReflectionUtils {
             throw new UnitilsException("Error while invoking method " + method, e);
         }
     }
-    
-    
+
+
     /**
      * Invoke the given method with the given parameters on the given target object. Doesn't throw
      * any checked exception
-     * 
+     *
      * @param target    The object containing the method, not null
      * @param method    The method, not null
      * @param arguments The method arguments
@@ -208,13 +209,12 @@ public class ReflectionUtils {
      * @throws UnitilsException if the method could not be invoked, or the called method throwed an exception
      */
     @SuppressWarnings("unchecked")
-	public static <T> T invokeMethodSilent(Object target, Method method, Object... arguments) {
-    	try {
-			T result = (T) invokeMethod(target, method, arguments);
-			return result;
-		} catch (InvocationTargetException e) {
-			throw new UnitilsException(e);
-		}
+    public static <T> T invokeMethodSilent(Object target, Method method, Object... arguments) {
+        try {
+            return (T) invokeMethod(target, method, arguments);
+        } catch (InvocationTargetException e) {
+            throw new UnitilsException(e);
+        }
     }
 
 
@@ -227,10 +227,10 @@ public class ReflectionUtils {
      * @return A list of Fields, empty list if none found
      */
     public static Set<Field> getFieldsAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
-    	Set<Field> fieldsOfType = new HashSet<Field>();
-    	Set<Field> allFields = getAllFields(clazz);
+        Set<Field> fieldsOfType = new HashSet<Field>();
+        Set<Field> allFields = getAllFields(clazz);
         for (Field field : allFields) {
-            if (field.getType().isAssignableFrom(type) && Modifier.isStatic(field.getModifiers()) == isStatic) {
+            if (field.getType().isAssignableFrom(type) && isStatic(field.getModifiers()) == isStatic) {
                 fieldsOfType.add(field);
             }
         }
@@ -248,10 +248,10 @@ public class ReflectionUtils {
      * @return The fields with the given type
      */
     public static Set<Field> getFieldsOfType(Class<?> clazz, Class<?> type, boolean isStatic) {
-    	Set<Field> fields = new HashSet<Field>();
+        Set<Field> fields = new HashSet<Field>();
         Set<Field> allFields = getAllFields(clazz);
         for (Field field : allFields) {
-            if (field.getType().equals(type) && isStatic == Modifier.isStatic(field.getModifiers())) {
+            if (field.getType().equals(type) && isStatic == isStatic(field.getModifiers())) {
                 fields.add(field);
             }
         }
@@ -269,15 +269,13 @@ public class ReflectionUtils {
      */
     public static Set<Method> getSettersAssignableFrom(Class<?> clazz, Class<?> type, boolean isStatic) {
         Set<Method> settersAssignableFrom = new HashSet<Method>();
-        
+
         Set<Method> allMethods = getAllMethods(clazz);
         for (Method method : allMethods) {
-            if (isSetter(method) && method.getParameterTypes()[0].isAssignableFrom(type)
-                    && isStatic == Modifier.isStatic(method.getModifiers())) {
+            if (isSetter(method) && method.getParameterTypes()[0].isAssignableFrom(type) && (isStatic == isStatic(method.getModifiers()))) {
                 settersAssignableFrom.add(method);
             }
         }
-        
         return settersAssignableFrom;
     }
 
@@ -296,7 +294,7 @@ public class ReflectionUtils {
         Set<Method> allMethods = getAllMethods(clazz);
         for (Method method : allMethods) {
             if (isSetter(method) && method.getParameterTypes()[0].equals(type)
-                    && isStatic == Modifier.isStatic(method.getModifiers())) {
+                    && isStatic == isStatic(method.getModifiers())) {
                 settersOfType.add(method);
             }
         }
@@ -314,11 +312,11 @@ public class ReflectionUtils {
      * @return The setter method that matches the given parameters, null if not found
      */
     public static Method getSetter(Class<?> clazz, String propertyName, boolean isStatic) {
-        String setterName = "set" + StringUtils.capitalize(propertyName);
+        String setterName = "set" + capitalize(propertyName);
         Set<Method> allMethods = getAllMethods(clazz);
         for (Method method : allMethods) {
             if (isSetter(method) && setterName.equals(method.getName())
-                    && isStatic == Modifier.isStatic(method.getModifiers())
+                    && isStatic == isStatic(method.getModifiers())
                     && method.getParameterTypes().length == 1) {
                 return method;
             }
@@ -337,7 +335,7 @@ public class ReflectionUtils {
      * @return The getter method that matches the given parameters, or null if no such method exists
      */
     public static Method getGetter(Class<?> clazz, String propertyName, boolean isStatic) {
-        String getterName = "get" + StringUtils.capitalize(propertyName);
+        String getterName = "get" + capitalize(propertyName);
         return getMethod(clazz, getterName, isStatic);
     }
 
@@ -346,8 +344,8 @@ public class ReflectionUtils {
      * From the given class, returns the getter for the given setter method. If no such getter exists in the
      * given class, null is returned.
      *
-     * @param setter The setter method, not null
-     * @param isStatic 
+     * @param setter   The setter method, not null
+     * @param isStatic True if a static getter is to be returned, false for non-static
      * @return The getter method that matches the given setter, or null if no such method exists
      */
     public static Method getGetter(Method setter, boolean isStatic) {
@@ -369,22 +367,21 @@ public class ReflectionUtils {
      * @return The field that matches the given parameters, or null if no such field exists
      */
     public static Field getFieldWithName(Class<?> clazz, String fieldName, boolean isStatic) {
-        
-    	if (clazz == null || clazz.equals(Object.class)) {
-    		return null;
-    	}
-    	
-    	Field field;
-    	try {
-    		field = clazz.getDeclaredField(fieldName);
-    	} catch (NoSuchFieldException e) {
-    		field = null;
+
+        if (clazz == null || clazz.equals(Object.class)) {
+            return null;
         }
-    	
-        if (field != null && Modifier.isStatic(field.getModifiers()) == isStatic) {
+
+        Field field;
+        try {
+            field = clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            field = null;
+        }
+
+        if (field != null && isStatic(field.getModifiers()) == isStatic) {
             return field;
         }
-        
         return getFieldWithName(clazz.getSuperclass(), fieldName, isStatic);
     }
 
@@ -457,7 +454,7 @@ public class ReflectionUtils {
      * @return The class, not null
      */
     @SuppressWarnings("unchecked")
-	public static <T> Class<T> getClassWithName(String className) {
+    public static <T> Class<T> getClassWithName(String className) {
         try {
             return (Class<T>) Class.forName(className);
 
@@ -465,54 +462,80 @@ public class ReflectionUtils {
             throw new UnitilsException("Could not load class with name " + className, t);
         }
     }
-    
-    
-	public static Method getMethod(Class<?> clazz, String methodName, boolean isStatic, Class<?>... parameterTypes) {
-		if (clazz == null || clazz.equals(Object.class)) {
-			return null; 
-		}
-		
-		Method result;
-		try {
-			result = clazz.getDeclaredMethod(methodName, parameterTypes);
-		} catch (NoSuchMethodException e) {
-			result = null;
-		}
-		if (result != null && Modifier.isStatic(result.getModifiers()) == isStatic) {
-			return result;
-		}
-		
-		return getMethod(clazz.getSuperclass(), methodName, isStatic, parameterTypes);
-	}
-	
-	
-	private static Set<Method> getAllMethods(Class<?> clazz) {
-		Set<Method> result = new HashSet<Method>();
-		if (clazz == null || clazz.equals(Object.class)) {
-			return result; 
-		}
-		Method[] declaredMethods = clazz.getDeclaredMethods();
-		for (Method declaredMethod : declaredMethods) {
-			result.add(declaredMethod);
-		}
-		
-		result.addAll(getAllMethods(clazz.getSuperclass()));
-		return result;
-	}
-	
-	
-	private static Set<Field> getAllFields(Class<?> clazz) {
-		Set<Field> result = new HashSet<Field>();
-		if (clazz == null || clazz.equals(Object.class)) {
-			return result; 
-		}
-		Field[] declaredFields = clazz.getDeclaredFields();
-		for (Field declaredField : declaredFields) {
-			result.add(declaredField);
-		}
-		
-		result.addAll(getAllFields(clazz.getSuperclass()));
-		return result;
-	}
+
+
+    /**
+     * Gets the method with the given name from the given class or one of its super-classes.
+     *
+     * @param clazz          The class containing the method
+     * @param methodName     The name of the method, not null
+     * @param isStatic       True for a static method, false for non-static
+     * @param parameterTypes The parameter types
+     * @return The method, null if no matching method was found
+     */
+    public static Method getMethod(Class<?> clazz, String methodName, boolean isStatic, Class<?>... parameterTypes) {
+        if (clazz == null || clazz.equals(Object.class)) {
+            return null;
+        }
+
+        Method result;
+        try {
+            result = clazz.getDeclaredMethod(methodName, parameterTypes);
+        } catch (NoSuchMethodException e) {
+            result = null;
+        }
+        if (result != null && isStatic(result.getModifiers()) == isStatic) {
+            return result;
+        }
+        return getMethod(clazz.getSuperclass(), methodName, isStatic, parameterTypes);
+    }
+
+
+    /**
+     * Gets all methods of the given class and all its super-classes.
+     *
+     * @param clazz The class
+     * @return The methods, not null
+     */
+    private static Set<Method> getAllMethods(Class<?> clazz) {
+        Set<Method> result = new HashSet<Method>();
+        if (clazz == null || clazz.equals(Object.class)) {
+            return result;
+        }
+
+        // add all methods of this class
+        Method[] declaredMethods = clazz.getDeclaredMethods();
+        for (Method declaredMethod : declaredMethods) {
+            if (declaredMethod.isSynthetic() || declaredMethod.isBridge()) {
+                // skip methods that were added by the compiler
+                continue;
+            }
+            result.add(declaredMethod);
+        }
+        // add all methods of the super-classes
+        result.addAll(getAllMethods(clazz.getSuperclass()));
+        return result;
+    }
+
+
+    /**
+     * Gets all fields of the given class and all its super-classes.
+     *
+     * @param clazz The class
+     * @return The fields, not null
+     */
+    private static Set<Field> getAllFields(Class<?> clazz) {
+        Set<Field> result = new HashSet<Field>();
+        if (clazz == null || clazz.equals(Object.class)) {
+            return result;
+        }
+
+        // add all fields of this class
+        Field[] declaredFields = clazz.getDeclaredFields();
+        result.addAll(asList(declaredFields));
+        // add all fields of the super-classes
+        result.addAll(getAllFields(clazz.getSuperclass()));
+        return result;
+    }
 
 }

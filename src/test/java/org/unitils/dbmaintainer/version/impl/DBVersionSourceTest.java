@@ -61,6 +61,7 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
     /* The db support instance for the default schema */
     private DbSupport defaultDbSupport;
 
+
     /**
      * Initialize test fixture and creates a test version table.
      */
@@ -188,7 +189,7 @@ public class DBVersionSourceTest extends UnitilsJUnit4 {
      * Utility method to create the test version table in the pre-1.1 format that didn't support mutliple indexes.
      */
     private void createOldVersionTable() throws SQLException {
-        String createStatement = dbVersionSource.getCreateVersionTableStatement().replace(defaultDbSupport.qualified(dbVersionSource.versionTableName), defaultDbSupport.qualified("version_index"));
+        String createStatement = dbVersionSource.getCreateVersionTableStatement().replace(defaultDbSupport.toCorrectCaseIdentifier(dbVersionSource.versionIndexColumnName), defaultDbSupport.toCorrectCaseIdentifier("version_index"));
         executeUpdate(createStatement, dataSource);
     }
 
