@@ -23,6 +23,19 @@ Step 2: Create release
 	create distribution
 	upload the unitils jar to the repository on SourceForge 
 
+
+Step 3: Open a JIRA issue
+
+	http://jira.codehaus.org/browse/MAVENUPLOAD
+	
+	Bundle URL: 	http://www.unitils.org/m2-repo/
+	Project URL: 	http://www.unitils.org
+	Contributor URL:	http://sourceforge.net/project/memberlist.php?group_id=167201 
+
+	Description:	"org.unitils","mavensync@shell.sourceforge.net:/home/groups/u/un/unitils/htdocs/m2-repo","rsync_ssh","Tim Ducheyne","tim.ducheyne@unitils.org",, 
+
+
+
 Note: to set-up the FTP connection to SourceForge, you need to add following settings.xml to <user.home>/.m2
 
 <settings>

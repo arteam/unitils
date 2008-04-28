@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class SpringUnitilsJUnit4Test_TestClass1 extends SpringUnitilsJUnit4Test {
+public class SpringUnitilsJUnit4Test_TestClass1 extends SpringUnitilsJUnit4TestBase {
 
 	@BeforeClass
     public static void beforeClass() {

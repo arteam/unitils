@@ -27,8 +27,8 @@ import org.unitils.UnitilsInvocationTest.UnitilsJUnit3Test_EmptyTestClass;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.inject.util.InjectionUtils;
-import org.unitils.spring.SpringUnitilsJUnit38Test;
-import org.unitils.spring.SpringUnitilsJUnit4Test;
+import org.unitils.spring.SpringUnitilsJUnit38TestBase;
+import org.unitils.spring.SpringUnitilsJUnit4TestBase;
 import org.unitils.spring.SpringUnitilsTestNGTest;
 
 import java.util.Iterator;
@@ -83,10 +83,10 @@ abstract public class UnitilsInvocationTestBase {
 
         UnitilsJUnit3TestBase.setTracingTestListener(tracingTestListener);
         UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(tracingTestListener);
-        SpringUnitilsJUnit38Test.setTracingTestListener(tracingTestListener);
+        SpringUnitilsJUnit38TestBase.setTracingTestListener(tracingTestListener);
 
         UnitilsJUnit4TestBase.setTracingTestListener(tracingTestListener);
-        SpringUnitilsJUnit4Test.setTracingTestListener(tracingTestListener);
+        SpringUnitilsJUnit4TestBase.setTracingTestListener(tracingTestListener);
 
         UnitilsTestNGTestBase.setTracingTestListener(tracingTestListener);
         UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(tracingTestListener);
@@ -101,10 +101,10 @@ abstract public class UnitilsInvocationTestBase {
     public void cleanUp() throws Exception {
         UnitilsJUnit3TestBase.setTracingTestListener(null);
         UnitilsJUnit3Test_EmptyTestClass.setTracingTestListener(null);
-        SpringUnitilsJUnit38Test.setTracingTestListener(null);
+        SpringUnitilsJUnit38TestBase.setTracingTestListener(null);
 
         UnitilsJUnit4TestBase.setTracingTestListener(null);
-        SpringUnitilsJUnit4Test.setTracingTestListener(null);
+        SpringUnitilsJUnit4TestBase.setTracingTestListener(null);
 
         UnitilsTestNGTestBase.setTracingTestListener(null);
         UnitilsTestNGTest_EmptyTestClass.setTracingTestListener(null);

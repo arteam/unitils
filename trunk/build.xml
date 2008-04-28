@@ -12,7 +12,7 @@
     <target name="run-tests" depends="load-pom" description="Runs all JUnit tests">
         <property name="test.outputDirectory" value="${pom.build.directory}/test-output"/>
         <mkdir dir="${test.outputDirectory}"/>
-        <junit printsummary="true" haltonfailure="true" filtertrace="false" showoutput="false" fork="true" forkmode="perBatch">
+        <junit printsummary="true" haltonfailure="true" filtertrace="false" showoutput="false" forkmode="perBatch">
             <classpath>
                 <path refid="classpath.test"/>
                 <path location="${pom.build.outputDirectory}"/>
@@ -30,11 +30,6 @@
                     <exclude name="*Test.class"/>
                     <!-- ignore TestNG tests -->
                     <exclude name="**/*TestNGTest*.class"/>
-                    <exclude name="org/unitils/spring/SpringUnitilsJUnit38Test.class"/>
-                    <exclude name="org/unitils/spring/SpringUnitilsJUnit4Test.class"/>
-                    <exclude name="org/unitils/orm/jpa/JpaModuleInjectionTest.class"/>
-
-                    <exclude name="**/DBMaintainerTest.class"/>
                 </fileset>
             </batchtest>
         </junit>

@@ -160,6 +160,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         // Record expected behavior
+        mockVersionSource.setDbVersion(new Version("", 0));
         mockVersionSource.setUpdateSucceeded(false);
         mockDbClearer.clearSchemas();
         expectExecuteScriptsAndSetDbVersion();
@@ -179,6 +180,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         // Record expected behavior
+        mockVersionSource.setDbVersion(new Version("", 0));
         mockVersionSource.setUpdateSucceeded(false);
         mockDbClearer.clearSchemas();
         expectExecuteScriptsAndSetDbVersion();

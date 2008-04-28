@@ -9,7 +9,7 @@ import org.unitils.spring.util.SpringUnitilsAdaptorTestExecutionListener;
 
 // todo javadoc
 @TestExecutionListeners(value = SpringUnitilsAdaptorTestExecutionListener.class, inheritListeners = false)
-abstract public class SpringUnitilsJUnit38Test extends AbstractJUnit38SpringContextTests {
+abstract public class SpringUnitilsJUnit38TestBase extends AbstractJUnit38SpringContextTests {
 
     /* Test listener that will record all invocations */
     private static TracingTestListener tracingTestListener;
