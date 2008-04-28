@@ -8,6 +8,7 @@
  */
 package org.unitils.core.dbsupport;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -78,12 +79,44 @@ public class PostgreSqlDbSupport extends DbSupport {
 
     /**
      * Retrieves the names of all the triggers in the database schema.
+     * <p/>
+     * The drop trigger statement is not compatible with standard SQL in Postgresql.
+     * You have to do drop trigger 'trigger-name' ON 'table name' instead of drop trigger 'trigger-name'.
+     * <p/>
+     * To circumvent this, this method will return the trigger names as follows:
+     * 'trigger-name' ON 'table name'
      *
-     * @return The names of all triggers in the database
+     * @return The names of all triggers in the database, not null
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getSQLHandler().getItemsAsStringSet("select trigger_name from information_schema.triggers where trigger_schema = '" + getSchemaName() + "'");
+        Set<String> result = new HashSet<String>();
+
+        Set<String> triggerAndTableNames = getSQLHandler().getItemsAsStringSet("select trigger_name || ',' || event_object_table from information_schema.triggers where trigger_schema = '" + getSchemaName() + "'");
+        for (String triggerAndTableName : triggerAndTableNames) {
+            String[] parts = triggerAndTableName.split(",");
+            String triggerName = quoted(parts[0]);
+            String tableName = qualified(parts[1]);
+            result.add(triggerName + " ON " + tableName);
+        }
+        return result;
+    }
+
+
+    /**
+     * Drops the trigger with the given name from the database.
+     * <p/>
+     * The drop trigger statement is not compatible with standard SQL in Postgresql.
+     * You have to do drop trigger 'trigger-name' ON 'table name' instead of drop trigger 'trigger-name'.
+     * <p/>
+     * To circumvent this, this method expects trigger names as follows:
+     * 'trigger-name' ON 'table name'
+     *
+     * @param triggerName The trigger to drop as 'trigger-name' ON 'table name', not null
+     */
+    @Override
+    public void dropTrigger(String triggerName) {
+        getSQLHandler().executeCodeUpdate("drop trigger " + triggerName + " cascade");
     }
 
 
@@ -99,8 +132,8 @@ public class PostgreSqlDbSupport extends DbSupport {
 
 
     /**
-     * Drops the type with the given name from the database Note: the type name is surrounded with
-     * quotes, making it case-sensitive.
+     * Drops the type with the given name from the database
+     * Note: the type name is surrounded with quotes, making it case-sensitive.
      *
      * @param typeName The type to drop (case-sensitive), not null
      */
@@ -118,13 +151,22 @@ public class PostgreSqlDbSupport extends DbSupport {
     @Override
     public void disableConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where table_name = '" + tableName + "' and constraint_type <> 'PRIMARY KEY' and constraint_schema = '" + getSchemaName() + "'");
+
+        // Drop foreign key constraints
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints con where con.table_name = '" + tableName + "' and constraint_type = 'FOREIGN KEY' and constraint_schema = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint \"" + constraintName + "\"");
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        }
+
+        // Drop check constraints
+        // The join wiht pg_constraints is used to filter out not null check-constraints that are implicitly created by Postgresql 
+        constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints con, pg_constraint pg_con where pg_con.conname = con.constraint_name and con.table_name = '" + tableName + "' and constraint_type <> 'PRIMARY KEY' and constraint_schema = '" + getSchemaName() + "'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
 
         Set<String> notNullColumnNames = sqlHandler.getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
-        Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select column_name from information_schema.table_constraints con, information_schema.key_column_usage key where con.table_name = '" + tableName + "' and con.table_schema = '" + getSchemaName() + "' and key.table_name = '" + tableName + "' and key.table_schema = '" + getSchemaName() + "' and con.constraint_type = 'PRIMARY KEY'");
+        Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select column_name from information_schema.table_constraints con, information_schema.key_column_usage key where con.table_name = '" + tableName + "' and con.table_schema = '" + getSchemaName() + "' and key.table_name = con.table_name and key.table_schema = con.table_schema and key.constraint_name = con.constraint_name and con.constraint_type = 'PRIMARY KEY'");
         for (String notNullColumnName : notNullColumnNames) {
             if (primaryKeyColumnNames.contains(notNullColumnName)) {
                 // Do not remove PK constraints

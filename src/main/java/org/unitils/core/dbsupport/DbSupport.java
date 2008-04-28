@@ -188,7 +188,7 @@ abstract public class DbSupport {
     /**
      * Retrieves the names of all the sequences in the database schema.
      *
-     * @return The names of all sequences in the database
+     * @return The names of all sequences in the database, not null
      */
     public Set<String> getSequenceNames() {
         throw new UnsupportedOperationException("Sequences not supported.");
@@ -198,7 +198,7 @@ abstract public class DbSupport {
     /**
      * Retrieves the names of all the triggers in the database schema.
      *
-     * @return The names of all triggers in the database
+     * @return The names of all triggers in the database, not null
      */
     public Set<String> getTriggerNames() {
         throw new UnsupportedOperationException("Triggers not supported.");
@@ -208,7 +208,7 @@ abstract public class DbSupport {
     /**
      * Retrieves the names of all the types in the database schema.
      *
-     * @return The names of all types in the database
+     * @return The names of all types in the database, not null
      */
     public Set<String> getTypeNames() {
         throw new UnsupportedOperationException("Types not supported.");

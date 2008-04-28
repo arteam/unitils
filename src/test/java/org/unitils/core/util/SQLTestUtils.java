@@ -20,7 +20,7 @@ import org.unitils.core.dbsupport.DbSupport;
 
 /**
  * Utilities for creating and dropping test tables, views....
- * 
+ *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
@@ -29,7 +29,7 @@ public class SQLTestUtils {
 
 	/**
 	 * Drops the test tables
-	 * 
+	 *
 	 * @param dbSupport The db support, not null
 	 * @param tableNames The tables to drop
 	 */
@@ -47,7 +47,7 @@ public class SQLTestUtils {
 
 	/**
 	 * Drops the test views
-	 * 
+	 *
 	 * @param dbSupport The db support, not null
 	 * @param viewNames The views to drop
 	 */
@@ -65,7 +65,7 @@ public class SQLTestUtils {
 
 	/**
 	 * Drops the test synonyms
-	 * 
+	 *
 	 * @param dbSupport The db support, not null
 	 * @param synonymNames The views to drop
 	 */
@@ -83,7 +83,7 @@ public class SQLTestUtils {
 
 	/**
 	 * Drops the test sequence
-	 * 
+	 *
 	 * @param dbSupport The db support, not null
 	 * @param sequenceNames The sequences to drop
 	 */
@@ -101,7 +101,7 @@ public class SQLTestUtils {
 
 	/**
 	 * Drops the test triggers
-	 * 
+	 *
 	 * @param dbSupport The db support, not null
 	 * @param triggerNames The triggers to drop
 	 */
@@ -119,7 +119,7 @@ public class SQLTestUtils {
 
 	/**
 	 * Drops the test types
-	 * 
+	 *
 	 * @param dbSupport The db support, not null
 	 * @param typeNames The types to drop
 	 */
