@@ -51,7 +51,7 @@ public class DefaultScenarioReport implements ScenarioReport {
 	
 	/**
 	 * Sets the {@link ScenarioView} objects that this {@link ScenarioReport} will contain.
-	 * @param scenarioViews the views of the report.
+	 * @param scenarioViews the views of the report. Not null.
 	 */
 	public void setScenarioViews(List<ScenarioView> scenarioViews) {
 		this.scenarioViews = scenarioViews;

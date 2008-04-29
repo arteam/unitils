@@ -19,9 +19,12 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.unitils.mock.core.Invocation;
+import org.unitils.mock.core.MethodUtils;
 import org.unitils.mock.core.Scenario;
 
 /**
+ * Default implementation of a {@link ScenarioView} that just displays all the executed invocations.
+ * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -39,10 +42,8 @@ public class DefaultScenarioView implements ScenarioView {
 		for(Invocation invocation : invocations) {
 			Method method = invocation.getMethod();
 			view.append("\t")			
-				.append(method.getDeclaringClass().getSimpleName())
-				.append('.')
-				.append(method.getName())
-				.append("()\n");
+				.append(MethodUtils.getCompleteRepresentation(method))
+				.append("\n");
 		}
 		return view.toString();
 	}

@@ -78,10 +78,8 @@ public class Scenario {
 		final StringBuffer message = new StringBuffer();
 		final Method method = invocationMatcher.getMethod();
 		message.append("Prohibited invocation of ")
-			.append(method.getDeclaringClass().getSimpleName())
-			.append('.')
-			.append(method.getName())
-			.append("() at ")
+			.append(MethodUtils.getCompleteRepresentation(method))
+			.append(" at ")
 			.append(invocation.getStackTrace().length > 1 ? invocation.getStackTrace()[1] : "(unknown source)");
 		return message.toString();
 	}
@@ -91,17 +89,13 @@ public class Scenario {
 		final StringBuffer message = new StringBuffer();
 		final Method method = invocationMatcher.getMethod();
 		message.append("Expected invocation of ")
-			.append(method.getDeclaringClass().getSimpleName())
-			.append('.')
-			.append(method.getName())
-			.append("(), but ");
+			.append(MethodUtils.getCompleteRepresentation(method))
+			.append(", but ");
 		final Invocation matchedInvocation = findMatchingMethodName(method);
 		if(matchedInvocation != null) {
 			Method matchedMethod = matchedInvocation.getMethod();
-			message.append(matchedMethod.getDeclaringClass().getSimpleName())
-			.append('.')
-			.append(matchedMethod.getName())
-			.append("() was called (probably with different or non-matching arguments).");
+			message.append(MethodUtils.getCompleteRepresentation(matchedMethod))
+			.append(" was called (probably with different or non-matching arguments).");
 		} else {
 			message.append("the invocation didn't occur.");
 		} 
@@ -113,10 +107,8 @@ public class Scenario {
 		final StringBuffer message = new StringBuffer();
 		final Method method = invocation.getMethod();
 		message.append("No more invocations expected, but ")
-			.append(method.getDeclaringClass().getSimpleName())
-			.append('.')
-			.append(method.getName())
-			.append("() was called from ")
+			.append(MethodUtils.getCompleteRepresentation(method))
+			.append(" was called from ")
 			.append(invocation.getStackTrace().length > 1 ? invocation.getStackTrace()[1] : "(unknown source)");
 		return message.toString();
 	}

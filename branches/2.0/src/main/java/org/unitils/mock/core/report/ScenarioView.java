@@ -28,7 +28,7 @@ public interface ScenarioView {
 
 	/**
 	 * Creates the view for the given {@link Scenario}.
-	 * @param scenario to create the view.
+	 * @param scenario to create the view. Not null.
 	 * @return the view.
 	 */
 	public String createView(Scenario scenario);

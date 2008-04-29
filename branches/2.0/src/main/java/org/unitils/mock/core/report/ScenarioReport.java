@@ -29,7 +29,7 @@ public interface ScenarioReport {
 
 	/**
 	 * Sets the {@link Scenario} for which to generate the report.
-	 * @param scenario for which to generate the report.
+	 * @param scenario for which to generate the report. Not null.
 	 */
 	public void setScenario(Scenario scenario);
 	

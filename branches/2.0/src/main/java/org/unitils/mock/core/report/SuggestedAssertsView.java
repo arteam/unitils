@@ -15,9 +15,16 @@
  */
 package org.unitils.mock.core.report;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
+import org.unitils.mock.core.Invocation;
+import org.unitils.mock.core.MethodUtils;
 import org.unitils.mock.core.Scenario;
 
 /**
+ * A {@link ScenarioView} that will present a list of suggestions based on the provided {@link Scenario}.
+ *  
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -25,9 +32,23 @@ import org.unitils.mock.core.Scenario;
  */
 public class SuggestedAssertsView implements ScenarioView {
 
+	/*
+	 * @see ScenarioView#createView(Scenario)
+	 */
 	public String createView(Scenario scenario) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		final StringBuffer view = new StringBuffer();
+		List<Invocation> invocations = scenario.getObservedInvocations();
+		view.append("Suggested assert statements:\n");
+		for(Invocation invocation : invocations) {
+			Method method = invocation.getMethod();
+			if(Void.TYPE.equals(method.getReturnType()) ) {
+				view.append("\tassertInvoked(")
+					.append(MethodUtils.getClassName(method))
+					.append(").")
+					.append(MethodUtils.getMethodNameWithParams(method))
+					.append("\n");
+			}
+		}
+		return view.toString();	}
 
 }
