@@ -26,7 +26,7 @@ import org.unitils.mock.core.ArgumentMatcher;
  *
  */
 public class EqualsArgumentMatcher {
-	private Object o;
+	private final Object o;
 	
 	/**
 	 * Constructor.
