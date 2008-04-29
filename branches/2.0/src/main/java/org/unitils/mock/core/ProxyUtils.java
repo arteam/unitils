@@ -30,15 +30,16 @@ public class ProxyUtils {
 	/**
 	 * Creates a proxy object for the given <code>Class</code>.
 	 * A <code>MethodInterceptor</code> must be passed to hook into the proxy.
+	 * @param interceptor The interceptor to hook into the proxy. Not null.
+	 * @param targetClass The class of the proxy to be created. Not null.
 	 * 
 	 * @param <T> The type you want to create a proxy for.
-	 * @param targetClass The class of the proxy to be created. Not null.
-	 * @param interceptor The interceptor to hook into the proxy. Not null.
 	 * @return the proxy object.
 	 */
-	public static <T> T createProxy(Class<T> targetClass, MethodInterceptor interceptor) {
+	public static <T> T createProxy(MethodInterceptor interceptor, Class<T> targetClass, Class<?>... interfaces) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(targetClass);
+        enhancer.setInterfaces(interfaces);
         enhancer.setCallback(interceptor);
         @SuppressWarnings("unchecked")
         T checker = (T)enhancer.create();

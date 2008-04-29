@@ -16,6 +16,7 @@
 package org.unitils.mock.core;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ import java.util.List;
 public class InvocationMatcher {
 	
 	private final Method method;
-	private final ArgumentMatcher[] argumentMatchers;
+	private final List<ArgumentMatcher> argumentMatchers;
 	
 	/**
 	 * Constructor.
@@ -37,28 +38,34 @@ public class InvocationMatcher {
 	 * @param argumentMatchers The {@link ArgumentMatcher}s that need to be used to match the {@link Invocation}s arguments. The size of the list must be equals to the number of parameters of the given <code>Method</code>.
 	 */
 	public InvocationMatcher(Method method, ArgumentMatcher... argumentMatchers) {
+		this(method, Arrays.asList(argumentMatchers));
+	}
+
+	
+	public InvocationMatcher(Method method, List<ArgumentMatcher> argumentMatchers) {
 		this.method = method;
 		this.argumentMatchers = argumentMatchers;
-		if(method.getParameterTypes().length != argumentMatchers.length) {
+		if(method.getParameterTypes().length != argumentMatchers.size()) {
 			throw new IllegalArgumentException("The number of argument matchers does not match the number of arguments of the given method.");
 		}
 	}
-	
+
+
 	/**
 	 * Returns whether or not the given {@link Invocation} matches this object's predefined <code>Method</code> and arguments.
 	 * @param invocation the {@link Invocation} to match.
 	 * @return true when given {@link Invocation} matches, false otherwise.
 	 */
 	public boolean matches(Invocation invocation) {
-		if(!this.method.equals(invocation.getMethod())) {
+		if (!this.method.equals(invocation.getMethod())) {
 			return false;
 		}
 		final List<?> arguments = invocation.getArguments();
-		if(arguments.size() != argumentMatchers.length) {
+		if(arguments.size() != argumentMatchers.size()) {
 			return false;
 		}
-		for(int i = 0; i < arguments.size(); ++i) {
-			if(!argumentMatchers[i].matches(arguments.get(i))) {
+		for (int i = 0; i < arguments.size(); ++i) {
+			if(!argumentMatchers.get(i).matches(arguments.get(i))) {
 				return false;
 			}
 		}

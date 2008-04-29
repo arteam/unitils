@@ -16,7 +16,6 @@
 package org.unitils.mock.core;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -26,22 +25,13 @@ import net.sf.cglib.proxy.MethodProxy;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockObjectProxyMethodInterceptor<T> implements MethodInterceptor {
+public class MockedMethodRegistratingMethodInterceptor<T> implements MethodInterceptor {
 
-	private MockObject<T> mockObject;
-
+	private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
 	
-	public MockObjectProxyMethodInterceptor(MockObject<T> mockObject) {
-		super();
-		this.mockObject = mockObject;
-	}
-
-
 	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-		if (method.getDeclaringClass().equals(MockObjectProxy.class)) {
-			return mockObject;
-		}
-		Invocation invocation = new Invocation(object, method, proxy, Arrays.asList(args), Thread.currentThread().getStackTrace());
-		return mockObject.handleInvocation(invocation);
+		mockBehaviorBuilder.registerInvokedMethod(method, args);
+		return null;
 	}
+
 }

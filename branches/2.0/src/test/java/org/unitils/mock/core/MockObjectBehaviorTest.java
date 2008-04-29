@@ -44,10 +44,11 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 	
 	TestInterface testInterface;
 	
-	MockObject testClassMock, testInterfaceMock;
+	MockObject<TestClass> testClassMock; 
 	
-//	@Mock(calls = Calls.LENIENT)
-	MockBehavior defaultMockBehavior;
+	MockObject<TestInterface> testInterfaceMock;
+	
+	Action defaultAction;
 	
 	@Mock
 	InvocationMatcher invocationMatcher;
@@ -56,15 +57,15 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 	@Before
 	public void setup() {
 		scenario = new Scenario();
-		defaultMockBehavior = new MockBehavior(new InvocationMatcher(null), new EmptyAction());
+		defaultAction = new EmptyAction();
 		
-		testClassMock = new MockObject(scenario, defaultMockBehavior);
-		MockObjectProxyMethodInterceptor testClassMethodInterceptor = new MockObjectProxyMethodInterceptor(testClassMock);
-		testClass = ProxyUtils.createProxy(TestClass.class, testClassMethodInterceptor);
+		testClassMock = new MockObject<TestClass>(scenario, defaultAction, TestClass.class);
+		MockObjectProxyMethodInterceptor<TestClass> testClassMethodInterceptor = new MockObjectProxyMethodInterceptor<TestClass>(testClassMock);
+		testClass = ProxyUtils.createProxy(testClassMethodInterceptor, TestClass.class);
 		
-		testInterfaceMock = new MockObject(scenario, defaultMockBehavior);
-		MockObjectProxyMethodInterceptor testInterfaceMethodInterceptor = new MockObjectProxyMethodInterceptor(testInterfaceMock);
-		testInterface = ProxyUtils.createProxy(TestInterface.class, testInterfaceMethodInterceptor);
+		testInterfaceMock = new MockObject<TestInterface>(scenario, defaultAction, TestInterface.class);
+		MockObjectProxyMethodInterceptor<TestInterface> testInterfaceMethodInterceptor = new MockObjectProxyMethodInterceptor<TestInterface>(testInterfaceMock);
+		testInterface = ProxyUtils.createProxy(testInterfaceMethodInterceptor, TestInterface.class);
 		
 		expect(invocationMatcher.matches(null)).andStubReturn(true);
 		replay();

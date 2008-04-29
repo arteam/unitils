@@ -26,21 +26,24 @@ import java.util.Map;
  * @author Kenny Claes
  *
  */
-public class MockObject {
+public class MockObject<T> {
 
 	private Scenario scenario;
 	
-	private MockBehavior defaultBehavior;
+	private Action defaultAction;
+	
+	private Class<T> mockedClass;
 	
 	private List<MockBehavior> alwaysMatchingMockBehaviors = new ArrayList<MockBehavior>();
 	
 	private Map<MockBehavior, Boolean> oneTimeMatchingMockBehaviors = new LinkedHashMap<MockBehavior, Boolean>();
 	
 
-	public MockObject(Scenario scenario, MockBehavior defaultBehavior) {
+	public MockObject(Scenario scenario, Action defaultAction, Class<T> mockedClass) {
 		super();
 		this.scenario = scenario;
-		this.defaultBehavior = defaultBehavior;
+		this.defaultAction = defaultAction;
+		this.mockedClass = mockedClass;
 	}
 
 	
@@ -66,7 +69,7 @@ public class MockObject {
 			}
 		}
 		// There's no matching behavior, simply execute the default one
-		return defaultBehavior.execute(invocation);                                       
+		return defaultAction.execute(invocation);                                       
 	}
 	
 	
@@ -77,6 +80,21 @@ public class MockObject {
 	
 	public void addOneTimeMatchingMockBehavior(MockBehavior mockBehavior) {
 		oneTimeMatchingMockBehaviors.put(mockBehavior, false);
+	}
+	
+	
+	public List<MockBehavior> getAlwaysMatchingMockBehaviors() {
+		return alwaysMatchingMockBehaviors;
+	}
+
+
+	public List<MockBehavior> getOneTimeMatchingMockBehaviors() {
+		return new ArrayList<MockBehavior>(oneTimeMatchingMockBehaviors.keySet());
+	}
+
+
+	public Class<T> getMockedClass() {
+		return mockedClass;
 	}
 
 }
