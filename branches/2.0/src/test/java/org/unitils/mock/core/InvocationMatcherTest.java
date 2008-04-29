@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Assert;
+import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +13,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
 
 public class InvocationMatcherTest extends UnitilsJUnit4 {
+	
 	Method invocationMatcherTesterMethodOnNothing;
 	Method invocationMatcherTesterMethodOnInt;
 	Method invocationMatcherTesterMethodOnObject;
@@ -31,7 +32,7 @@ public class InvocationMatcherTest extends UnitilsJUnit4 {
 	@Before
 	public void setup() {
 		final Method[] methods = InvocationMatcherTester.class.getMethods();
-		for(Method method: methods) {
+		for (Method method: methods) {
 			if("doSomethingWithNothing".equals(method.getName())) {
 				invocationMatcherTesterMethodOnNothing = method;
 			} else if ("doSomethingWithInt".equals(method.getName())){
@@ -55,21 +56,21 @@ public class InvocationMatcherTest extends UnitilsJUnit4 {
 
 	@Test
 	public void testInvocationMatcherWithDifferentMethod() {
-		Assert.assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnInt, null, noArguments, null)));
+		assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnInt, null, noArguments, null)));
 	}
 	
 	@Test
 	public void testInvocationMatcherWithDifferentNumberOfParams() {
-		Assert.assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, null, intArgument, null)));
-		Assert.assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, null, twoObjectArguments, null)));
+		assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, null, intArgument, null)));
+		assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, null, twoObjectArguments, null)));
 	}
 	
 	@Test
 	public void testInvocationMatcherWithCorrectParams() {
-		Assert.assertTrue(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, null, noArguments, null)));
-		Assert.assertTrue(invocationMatcherOnInt.matches(new Invocation(null, invocationMatcherTesterMethodOnInt, null, objectArgument, null)));
-		Assert.assertTrue(invocationMatcherOnObject.matches(new Invocation(null, invocationMatcherTesterMethodOnObject, null, objectArgument, null)));
-		Assert.assertTrue(invocationMatcherOnTwoObjects.matches(new Invocation(null, invocationMatcherTesterMethodOnTwoObjects, null, twoObjectArguments, null)));
+		assertTrue(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, null, noArguments, null)));
+		assertTrue(invocationMatcherOnInt.matches(new Invocation(null, invocationMatcherTesterMethodOnInt, null, objectArgument, null)));
+		assertTrue(invocationMatcherOnObject.matches(new Invocation(null, invocationMatcherTesterMethodOnObject, null, objectArgument, null)));
+		assertTrue(invocationMatcherOnTwoObjects.matches(new Invocation(null, invocationMatcherTesterMethodOnTwoObjects, null, twoObjectArguments, null)));
 	}
 	
 	static class InvocationMatcherTester {

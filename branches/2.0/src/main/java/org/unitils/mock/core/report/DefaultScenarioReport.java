@@ -28,6 +28,7 @@ import org.unitils.mock.core.Scenario;
  *
  */
 public class DefaultScenarioReport implements ScenarioReport {
+	
 	private Scenario scenario;
 	private List<ScenarioView> scenarioViews;
 	

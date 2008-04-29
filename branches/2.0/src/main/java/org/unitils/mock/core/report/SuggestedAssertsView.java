@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.unitils.mock.core.Invocation;
-import org.unitils.mock.core.MethodUtils;
+import org.unitils.mock.core.MethodFormatUtils;
 import org.unitils.mock.core.Scenario;
 
 /**
@@ -43,9 +43,9 @@ public class SuggestedAssertsView implements ScenarioView {
 			Method method = invocation.getMethod();
 			if(Void.TYPE.equals(method.getReturnType()) ) {
 				view.append("\tassertInvoked(")
-					.append(MethodUtils.getClassName(method))
+					.append(MethodFormatUtils.getClassName(method))
 					.append(").")
-					.append(MethodUtils.getMethodNameWithParams(method))
+					.append(MethodFormatUtils.getMethodNameWithParams(method))
 					.append("\n");
 			}
 		}

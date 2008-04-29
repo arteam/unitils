@@ -27,30 +27,34 @@ import java.util.List;
  * @author Tim Ducheyne
  *
  */
-public class MethodUtils {
+public class MethodFormatUtils {
 	
 	public static String getMethodNameWithParams(Method method, List<?> params) {
 		StringBuffer outputString = new StringBuffer();
 		outputString.append(method.getName())
-		.append("()");
+			.append("()");
 		return outputString.toString();
 	}
+	
 	
 	public static String getCompleteRepresentation(Method method, List<?> params) {
 		StringBuffer outputString = new StringBuffer();
 		outputString.append(getClassName(method))
-		.append('.')
-		.append(getMethodNameWithParams(method, params));
+			.append('.')
+			.append(getMethodNameWithParams(method, params));
 		return outputString.toString();
 	}
+	
 	
 	public static String getClassName(Method method) {
 		return method.getDeclaringClass().getSimpleName();
 	}
 
+	
 	public static String getMethodNameWithParams(Method method) {
 		return getMethodNameWithParams(method, null);
 	}
+	
 	
 	public static String getCompleteRepresentation(Method method) {
 		return getCompleteRepresentation(method, null);
