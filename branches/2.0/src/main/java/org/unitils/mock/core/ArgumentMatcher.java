@@ -16,11 +16,20 @@
 package org.unitils.mock.core;
 
 /**
+ * An interface to be used to check is a given argument matches a predefined value.
+ * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  *
  */
 public interface ArgumentMatcher {
+	
+	/**
+	 * Returns true if the given object matches this object's expected argument, false otherwise.
+	 * 
+	 * @param o the <code>Object</code> to match.
+	 * @return true when passed object matches, false otherwise.
+	 */
 	public boolean matches(Object o);
 }
