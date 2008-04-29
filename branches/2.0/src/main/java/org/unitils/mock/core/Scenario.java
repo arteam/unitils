@@ -118,13 +118,12 @@ public class Scenario {
 	}
 	
 	
-	protected String getAssertInvokedErrorMessage(Invocation key, InvocationMatcher invocationMatcher) {
+	protected String getAssertInvokedErrorMessage(Invocation matchedInvocation, InvocationMatcher invocationMatcher) {
 		final StringBuffer message = new StringBuffer();
 		final Method method = invocationMatcher.getMethod();
 		message.append("Expected invocation of ")
 			.append(MethodFormatUtils.getCompleteRepresentation(method))
 			.append(", but ");
-		final Invocation matchedInvocation = findMatchingMethodName(method);
 		if(matchedInvocation != null) {
 			Method matchedMethod = matchedInvocation.getMethod();
 			message.append(MethodFormatUtils.getCompleteRepresentation(matchedMethod))
@@ -149,7 +148,7 @@ public class Scenario {
 	
 	protected Invocation findMatchingMethodName(Method method) {
 		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
-			if(registeredInvocationEntry.getKey().getMethod().getName().equals(method.getName())) {
+			if(!registeredInvocationEntry.getValue() && registeredInvocationEntry.getKey().getMethod().getName().equals(method.getName())) {
 				return registeredInvocationEntry.getKey();
 			}
 		}
