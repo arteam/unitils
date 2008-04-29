@@ -15,8 +15,12 @@
  */
 package org.unitils.mock.core;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author Filip Neven
@@ -26,14 +30,101 @@ import java.util.List;
  */
 public class Scenario {
 	
-	private List<Invocation> observedInvocations = new ArrayList<Invocation>();
+	/**
+	 * Insertion ordered map that keeps track of the registered invocations and whether or not they have already been checked for invocation with the various assertX() methods in this class.
+	 */
+	private final Map<Invocation, Boolean> observedInvocations = new LinkedHashMap<Invocation, Boolean>();
+	
+	private boolean assertNoMoreInvocations = false;
 	
 	public void registerInvocation(Invocation invocation) {
-		observedInvocations.add(invocation);
+		if(assertNoMoreInvocations) {
+			throw new AssertionError(getNoMoreInvocationsErrorMessage(invocation));
+		}
+		observedInvocations.put(invocation, Boolean.FALSE);
 	}
 
 	public List<Invocation> getObservedInvocations() {
+		final List<Invocation> observedInvocations = new ArrayList<Invocation>();
+		for(Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
+			observedInvocations.add(registeredInvocationEntry.getKey());
+		}
 		return observedInvocations;
 	}
 	
+	public void assertInvoked(InvocationMatcher invocationMatcher) {
+		for(Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
+			if(Boolean.FALSE.equals(registeredInvocationEntry.getValue()) && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
+				registeredInvocationEntry.setValue(Boolean.TRUE);
+				return;
+			}
+		}
+		throw new AssertionError(getAssertInvokedErrorMessage(findMatchingMethodName(invocationMatcher.getMethod()), invocationMatcher));
+	}
+	
+	public void assertNotInvoked(InvocationMatcher invocationMatcher) {
+		for(Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
+			if(Boolean.FALSE.equals(registeredInvocationEntry.getValue()) && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
+				throw new AssertionError(getAssertNotInvokedErrorMessage(registeredInvocationEntry.getKey(), invocationMatcher));
+			}
+		}
+	}
+	
+	public void assertNoMoreInvocation() {
+		assertNoMoreInvocations = true;
+	}
+	
+	protected String getAssertNotInvokedErrorMessage(Invocation invocation, InvocationMatcher invocationMatcher) {
+		final StringBuffer message = new StringBuffer();
+		final Method method = invocationMatcher.getMethod();
+		message.append("Prohibited invocation of ")
+			.append(method.getDeclaringClass().getSimpleName())
+			.append('.')
+			.append(method.getName())
+			.append("() at ")
+			.append(invocation.getStackTrace().length > 1 ? invocation.getStackTrace()[1] : "(unknown source)");
+		return message.toString();
+	}
+	
+	protected String getAssertInvokedErrorMessage(Invocation key, InvocationMatcher invocationMatcher) {
+		final StringBuffer message = new StringBuffer();
+		final Method method = invocationMatcher.getMethod();
+		message.append("Expected invocation of ")
+			.append(method.getDeclaringClass().getSimpleName())
+			.append('.')
+			.append(method.getName())
+			.append("(), but ");
+		final Invocation matchedInvocation = findMatchingMethodName(method);
+		if(matchedInvocation != null) {
+			Method matchedMethod = matchedInvocation.getMethod();
+			message.append(matchedMethod.getDeclaringClass().getSimpleName())
+			.append('.')
+			.append(matchedMethod.getName())
+			.append("() was called (probably with different or non-matching arguments).");
+		} else {
+			message.append("the invocation didn't occur.");
+		} 
+		return message.toString();
+	}
+	
+	protected String getNoMoreInvocationsErrorMessage(Invocation invocation) {
+		final StringBuffer message = new StringBuffer();
+		final Method method = invocation.getMethod();
+		message.append("No more invocations expected, but ")
+			.append(method.getDeclaringClass().getSimpleName())
+			.append('.')
+			.append(method.getName())
+			.append("() was called from ")
+			.append(invocation.getStackTrace().length > 1 ? invocation.getStackTrace()[1] : "(unknown source)");
+		return message.toString();
+	}
+
+	protected Invocation findMatchingMethodName(Method method) {
+		for(Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
+			if(registeredInvocationEntry.getKey().getMethod().getName().equals(method.getName())) {
+				return registeredInvocationEntry.getKey();
+			}
+		}
+		return null;
+	}
 }

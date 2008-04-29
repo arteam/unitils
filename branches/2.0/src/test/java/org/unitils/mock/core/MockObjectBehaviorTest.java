@@ -56,7 +56,7 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 	@Before
 	public void setup() {
 		scenario = new Scenario();
-		defaultMockBehavior = new MockBehavior(new InvocationMatcher(null, null), new EmptyAction());
+		defaultMockBehavior = new MockBehavior(new InvocationMatcher(null), new EmptyAction());
 		
 		testClassMock = new MockObject(scenario, defaultMockBehavior);
 		MockObjectProxyMethodInterceptor testClassMethodInterceptor = new MockObjectProxyMethodInterceptor(testClassMock);

@@ -42,14 +42,10 @@ public class InvocationMatcherTest extends UnitilsJUnit4 {
 				invocationMatcherTesterMethodOnTwoObjects = method;
 			}
 		}
-		final List<ArgumentMatcher> emptyList = Collections.emptyList();
-		final List<ArgumentMatcher> oneArgumentMatcherList = Arrays.asList(new ArgumentMatcher[] { new NotNullArgumentMatcher() });
-		final List<ArgumentMatcher> twoArgumentMatcherList = Arrays.asList(new ArgumentMatcher[] { new NotNullArgumentMatcher(), new NotNullArgumentMatcher() });
-		
-		invocationMatcherOnNothing = new InvocationMatcher(invocationMatcherTesterMethodOnNothing, emptyList);
-		invocationMatcherOnInt = new InvocationMatcher(invocationMatcherTesterMethodOnInt, oneArgumentMatcherList);
-		invocationMatcherOnObject = new InvocationMatcher(invocationMatcherTesterMethodOnObject, oneArgumentMatcherList);
-		invocationMatcherOnTwoObjects = new InvocationMatcher(invocationMatcherTesterMethodOnTwoObjects, twoArgumentMatcherList);
+		invocationMatcherOnNothing = new InvocationMatcher(invocationMatcherTesterMethodOnNothing);
+		invocationMatcherOnInt = new InvocationMatcher(invocationMatcherTesterMethodOnInt, new NotNullArgumentMatcher());
+		invocationMatcherOnObject = new InvocationMatcher(invocationMatcherTesterMethodOnObject, new NotNullArgumentMatcher());
+		invocationMatcherOnTwoObjects = new InvocationMatcher(invocationMatcherTesterMethodOnTwoObjects, new NotNullArgumentMatcher(), new NotNullArgumentMatcher());
 		
 		noArguments = Collections.emptyList();
 		intArgument = Arrays.asList(new int[] { 0 });

@@ -28,7 +28,7 @@ import java.util.List;
 public class InvocationMatcher {
 	
 	private final Method method;
-	private final List<ArgumentMatcher> argumentMatchers;
+	private final ArgumentMatcher[] argumentMatchers;
 	
 	/**
 	 * Constructor.
@@ -36,10 +36,10 @@ public class InvocationMatcher {
 	 * @param method The <code>Method</code> which needs to be matched. Not null.
 	 * @param argumentMatchers The {@link ArgumentMatcher}s that need to be used to match the {@link Invocation}s arguments. The size of the list must be equals to the number of parameters of the given <code>Method</code>.
 	 */
-	public InvocationMatcher(Method method, List<ArgumentMatcher> argumentMatchers) {
+	public InvocationMatcher(Method method, ArgumentMatcher... argumentMatchers) {
 		this.method = method;
 		this.argumentMatchers = argumentMatchers;
-		if(method.getParameterTypes().length != argumentMatchers.size()) {
+		if(method.getParameterTypes().length != argumentMatchers.length) {
 			throw new IllegalArgumentException("The number of argument matchers does not match the number of arguments of the given method.");
 		}
 	}
@@ -54,14 +54,18 @@ public class InvocationMatcher {
 			return false;
 		}
 		final List<?> arguments = invocation.getArguments();
-		if(arguments.size() != argumentMatchers.size()) {
+		if(arguments.size() != argumentMatchers.length) {
 			return false;
 		}
 		for(int i = 0; i < arguments.size(); ++i) {
-			if(!argumentMatchers.get(i).matches(arguments.get(i))) {
+			if(!argumentMatchers[i].matches(arguments.get(i))) {
 				return false;
 			}
 		}
 		return true;
+	}
+
+	public Method getMethod() {
+		return method;
 	}
 }
