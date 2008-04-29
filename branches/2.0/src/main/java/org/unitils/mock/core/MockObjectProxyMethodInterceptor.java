@@ -38,7 +38,7 @@ public class MockObjectProxyMethodInterceptor implements MethodInterceptor {
 
 
 	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-		Invocation invocation = new Invocation(object, proxy, Arrays.asList(args), Thread.currentThread().getStackTrace());
+		Invocation invocation = new Invocation(object, method, proxy, Arrays.asList(args), Thread.currentThread().getStackTrace());
 		return mockObject.handleInvocation(invocation);
 	}
 }

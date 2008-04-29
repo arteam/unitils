@@ -31,14 +31,17 @@ public class Invocation {
 
 	private Object targetObject;
 	
-	private MethodProxy methodProxy;
+	private Method method;
 	
 	private List<?> arguments;
 	
 	private StackTraceElement[] stackTrace;
 
-	public Invocation(Object targetObject, MethodProxy methodProxy, List<?> arguments, StackTraceElement[] stackTrace) {
+	private MethodProxy methodProxy;
+
+	public Invocation(Object targetObject, Method method, MethodProxy methodProxy, List<?> arguments, StackTraceElement[] stackTrace) {
 		this.targetObject = targetObject;
+		this.method = method;
 		this.methodProxy = methodProxy;
 		this.arguments = arguments;
 		this.stackTrace = stackTrace;
@@ -52,6 +55,11 @@ public class Invocation {
 
 	public MethodProxy getMethodProxy() {
 		return methodProxy;
+	}
+
+
+	public Method getMethod() {
+		return method;
 	}
 
 

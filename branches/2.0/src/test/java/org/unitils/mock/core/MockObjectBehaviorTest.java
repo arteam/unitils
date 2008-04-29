@@ -17,19 +17,15 @@ package org.unitils.mock.core;
 
 import static junit.framework.Assert.assertEquals;
 import static org.easymock.EasyMock.expect;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.easymock.EasyMockUnitils.replay;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import static org.unitils.easymock.EasyMockUnitils.*;
-
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.easymock.util.Calls;
 import org.unitils.mock.core.action.ActualImplementationAction;
 import org.unitils.mock.core.action.EmptyAction;
 import org.unitils.mock.core.action.ExceptionThrowingAction;
@@ -60,7 +56,7 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 	@Before
 	public void setup() {
 		scenario = new Scenario();
-		defaultMockBehavior = new MockBehavior(new InvocationMatcher(), new EmptyAction());
+		defaultMockBehavior = new MockBehavior(new InvocationMatcher(null, null), new EmptyAction());
 		
 		testClassMock = new MockObject(scenario, defaultMockBehavior);
 		MockObjectProxyMethodInterceptor testClassMethodInterceptor = new MockObjectProxyMethodInterceptor(testClassMock);

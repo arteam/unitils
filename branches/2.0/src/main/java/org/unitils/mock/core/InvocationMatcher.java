@@ -33,12 +33,15 @@ public class InvocationMatcher {
 	/**
 	 * Constructor.
 	 * 
-	 * @param method The <code>Method</code> which needs to be matched.
+	 * @param method The <code>Method</code> which needs to be matched. Not null.
 	 * @param argumentMatchers The {@link ArgumentMatcher}s that need to be used to match the {@link Invocation}s arguments.
 	 */
 	public InvocationMatcher(Method method, List<ArgumentMatcher> argumentMatchers) {
 		this.method = method;
 		this.argumentMatchers = argumentMatchers;
+		if(method.getParameterTypes().length != argumentMatchers.size()) {
+			throw new IllegalArgumentException("The number of argument matchers does not match the number of arguments of the given method.");
+		}
 	}
 	
 	/**
