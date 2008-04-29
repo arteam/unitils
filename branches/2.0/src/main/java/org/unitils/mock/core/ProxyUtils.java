@@ -15,8 +15,13 @@
  */
 package org.unitils.mock.core;
 
+import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.MethodInterceptor;
+
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
 
 /**
  * Utility class to create proxy objects.
@@ -37,12 +42,21 @@ public class ProxyUtils {
 	 * @return the proxy object.
 	 */
 	public static <T> T createProxy(MethodInterceptor interceptor, Class<T> targetClass, Class<?>... interfaces) {
-        Enhancer enhancer = new Enhancer();
+        final Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(targetClass);
         enhancer.setInterfaces(interfaces);
-        enhancer.setCallback(interceptor);
+        enhancer.setCallbackType(MethodInterceptor.class);
+        enhancer.setUseFactory(true);
         @SuppressWarnings("unchecked")
-        T checker = (T)enhancer.create();
-        return checker;
+        final Class<T> enhancedTargetClass = enhancer.createClass();
+        
+        final Objenesis objenesis = new ObjenesisStd();
+        @SuppressWarnings("unchecked")
+        final Factory proxy = (Factory) objenesis.newInstance(enhancedTargetClass);
+        proxy.setCallbacks(new Callback[] { interceptor });
+        
+        @SuppressWarnings("unchecked")
+        final T t = (T) proxy;
+        return t;
 	}
 }
