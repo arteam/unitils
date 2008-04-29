@@ -22,5 +22,7 @@ package org.unitils.mock.core;
  *
  */
 public class InvocationMatcher {
-
+	public boolean matches(Invocation invocation) {
+		return true;
+	}
 }
