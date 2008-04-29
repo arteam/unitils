@@ -34,6 +34,11 @@ import org.unitils.reflectionassert.ReflectionComparatorChainFactory;
 public class LenEqArgumentMatcher implements ArgumentMatcher {
 	private final Object o;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param o the object to check for equality. Not null.
+	 */
 	public LenEqArgumentMatcher(Object o) {
 		this.o = o;
 	}
