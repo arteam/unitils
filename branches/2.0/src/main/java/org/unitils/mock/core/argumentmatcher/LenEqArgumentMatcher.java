@@ -15,20 +15,35 @@
  */
 package org.unitils.mock.core.argumentmatcher;
 
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+
 import org.unitils.mock.core.ArgumentMatcher;
+import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.ReflectionComparatorChainFactory;
 
 /**
+ * An {@link ArgumentMatcher} implementation that will match if the given argument equals the <code>Object</code> passed on construction.
+ * Reflection is used to compare all fields of these values, but order of collections is ignored and only fields that have a non default value will be compared. 
+ * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  *
  */
 public class LenEqArgumentMatcher implements ArgumentMatcher {
+	private final Object o;
+	
+	public LenEqArgumentMatcher(Object o) {
+		this.o = o;
+	}
+	
 	/*
 	 * @see ArgumentMatcher#matches(Object)
 	 */
 	public boolean matches(Object o) {
-		return false;
+        ReflectionComparator reflectionComparator = ReflectionComparatorChainFactory.getComparatorChainForModes(LENIENT_ORDER, IGNORE_DEFAULTS);
+        return reflectionComparator.getDifference(this.o, o) == null;
 	}
 
 }

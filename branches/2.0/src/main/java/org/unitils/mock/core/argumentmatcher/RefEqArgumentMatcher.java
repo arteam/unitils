@@ -16,20 +16,37 @@
 package org.unitils.mock.core.argumentmatcher;
 
 import org.unitils.mock.core.ArgumentMatcher;
+import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.ReflectionComparatorChainFactory;
 
 /**
+ * An {@link ArgumentMatcher} implementation that will match if the given argument equals the <code>Object</code> passed on construction.
+ * Reflection is used to compare all fields of these values.
+ * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  *
  */
-public class RegEqArgumentMatcher implements ArgumentMatcher {
+public class RefEqArgumentMatcher implements ArgumentMatcher {
 
+	private final Object o;
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param o the object to check for equality. Not null.
+	 */
+	public RefEqArgumentMatcher(Object o) {
+		this.o = o;
+	}
+	
 	/*
 	 * @see ArgumentMatcher#matches(Object)
 	 */
 	public boolean matches(Object o) {
-		return false;
+        ReflectionComparator reflectionComparator = ReflectionComparatorChainFactory.getComparatorChainForModes();
+        return reflectionComparator.getDifference(this.o, o) == null;
 	}
 
 }
