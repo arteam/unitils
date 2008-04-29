@@ -23,7 +23,6 @@ package org.unitils.mock.core;
 public class MockBehavior {
 
 	private InvocationMatcher invocationMatcher;
-
 	
 	private Action action;
 	

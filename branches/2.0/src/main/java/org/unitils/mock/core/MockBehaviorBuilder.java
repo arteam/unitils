@@ -16,8 +16,6 @@
 package org.unitils.mock.core;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
 
 import org.unitils.mock.core.action.ExceptionThrowingAction;
 import org.unitils.mock.core.action.ValueReturningAction;

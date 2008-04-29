@@ -38,22 +38,20 @@ public class Scenario {
 	private boolean assertNoMoreInvocations = false;
 	
 	public void registerInvocation(Invocation invocation) {
-		if(assertNoMoreInvocations) {
+		if (assertNoMoreInvocations) {
 			throw new AssertionError(getNoMoreInvocationsErrorMessage(invocation));
 		}
 		observedInvocations.put(invocation, Boolean.FALSE);
 	}
 
+	
 	public List<Invocation> getObservedInvocations() {
-		final List<Invocation> observedInvocations = new ArrayList<Invocation>();
-		for(Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
-			observedInvocations.add(registeredInvocationEntry.getKey());
-		}
-		return observedInvocations;
+		return new ArrayList<Invocation>(observedInvocations.keySet());
 	}
 	
+	
 	public void assertInvoked(InvocationMatcher invocationMatcher) {
-		for(Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
+		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
 			if(Boolean.FALSE.equals(registeredInvocationEntry.getValue()) && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
 				registeredInvocationEntry.setValue(Boolean.TRUE);
 				return;
@@ -62,8 +60,9 @@ public class Scenario {
 		throw new AssertionError(getAssertInvokedErrorMessage(findMatchingMethodName(invocationMatcher.getMethod()), invocationMatcher));
 	}
 	
+	
 	public void assertNotInvoked(InvocationMatcher invocationMatcher) {
-		for(Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
+		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
 			if(Boolean.FALSE.equals(registeredInvocationEntry.getValue()) && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
 				throw new AssertionError(getAssertNotInvokedErrorMessage(registeredInvocationEntry.getKey(), invocationMatcher));
 			}
@@ -73,6 +72,7 @@ public class Scenario {
 	public void assertNoMoreInvocation() {
 		assertNoMoreInvocations = true;
 	}
+	
 	
 	protected String getAssertNotInvokedErrorMessage(Invocation invocation, InvocationMatcher invocationMatcher) {
 		final StringBuffer message = new StringBuffer();
@@ -85,6 +85,7 @@ public class Scenario {
 			.append(invocation.getStackTrace().length > 1 ? invocation.getStackTrace()[1] : "(unknown source)");
 		return message.toString();
 	}
+	
 	
 	protected String getAssertInvokedErrorMessage(Invocation key, InvocationMatcher invocationMatcher) {
 		final StringBuffer message = new StringBuffer();
@@ -107,6 +108,7 @@ public class Scenario {
 		return message.toString();
 	}
 	
+	
 	protected String getNoMoreInvocationsErrorMessage(Invocation invocation) {
 		final StringBuffer message = new StringBuffer();
 		final Method method = invocation.getMethod();
@@ -119,8 +121,9 @@ public class Scenario {
 		return message.toString();
 	}
 
+	
 	protected Invocation findMatchingMethodName(Method method) {
-		for(Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
+		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
 			if(registeredInvocationEntry.getKey().getMethod().getName().equals(method.getName())) {
 				return registeredInvocationEntry.getKey();
 			}
