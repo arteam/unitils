@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="dataset.xsd">
-
-	<user id="1" userName="johnDoe" firstName="John" lastName="Doe" age="54"/>
-	<user id="2" userName="janeRoe" firstName="Jane" lastName="Roe"/>
-    <user id="3" userName="janeDoe" firstName="Jane" lastName="Doe"/>
-
-</dataset>
