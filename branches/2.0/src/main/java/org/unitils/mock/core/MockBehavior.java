@@ -22,12 +22,18 @@ package org.unitils.mock.core;
  */
 public class MockBehavior {
 
+	private Action action;
+	
+	private InvocationMatcher invocationMatcher;
+	
+	
 	public Object execute(Invocation invocation) {
-		return null;
+		return action.execute(invocation);
 	}
 
+	
 	public boolean matches(Invocation invocation) {
-		return false;
+		return invocationMatcher.matches(invocation);
 	}
 
 }
