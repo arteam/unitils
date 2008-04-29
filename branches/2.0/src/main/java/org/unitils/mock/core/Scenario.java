@@ -35,15 +35,21 @@ public class Scenario {
 	 */
 	private final Map<Invocation, Boolean> observedInvocations = new LinkedHashMap<Invocation, Boolean>();
 	
-	private boolean assertNoMoreInvocations = false;
+	private List<InvocationMatcher> alwaysMatchingMockBehaviorInvocationMatchers = new ArrayList<InvocationMatcher>();
+	private List<InvocationMatcher> oneTimeMatchingMockBehaviorInvocationMatchers = new ArrayList<InvocationMatcher>();
 	
 	public void registerInvocation(Invocation invocation) {
-		if (assertNoMoreInvocations) {
-			throw new AssertionError(getNoMoreInvocationsErrorMessage(invocation));
-		}
 		observedInvocations.put(invocation, Boolean.FALSE);
 	}
 
+	
+	public void registerAlwaysMatchingMockBehaviorInvocationMatcher(InvocationMatcher invocationMatcher) {
+		alwaysMatchingMockBehaviorInvocationMatchers.add(invocationMatcher);
+	}
+	
+	public void registerOneTimeMatchingMockBehaviorInvocationMatcher(InvocationMatcher invocationMatcher) {
+		oneTimeMatchingMockBehaviorInvocationMatchers.add(invocationMatcher);
+	}
 	
 	public List<Invocation> getObservedInvocations() {
 		return new ArrayList<Invocation>(observedInvocations.keySet());
@@ -69,10 +75,37 @@ public class Scenario {
 		}
 	}
 	
-	public void assertNoMoreInvocation() {
-		assertNoMoreInvocations = true;
+	public void assertNoMoreInvocations() {
+		// create a copy of the oneTimeMatchingMockBehaviorInvocationMatchers so that the method can be called repeatedly. 
+		final List<InvocationMatcher> onceMatchingInvocationMatchers = new ArrayList<InvocationMatcher>(oneTimeMatchingMockBehaviorInvocationMatchers);
+		final List<InvocationMatcher> alwaysMatchingInvocationMatchers = alwaysMatchingMockBehaviorInvocationMatchers;
+		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
+			Invocation invocation = registeredInvocationEntry.getKey();
+			if(!registeredInvocationEntry.getValue() && !isMatchForAlwaysMatchingMockBehavior(invocation, alwaysMatchingInvocationMatchers) && !isMatchForOnceMatchingMockBehavior(invocation, onceMatchingInvocationMatchers)) {
+				throw new AssertionError(getNoMoreInvocationsErrorMessage(invocation));
+			}
+		}
 	}
-	
+
+	protected boolean isMatchForOnceMatchingMockBehavior(Invocation invocation, List<InvocationMatcher> invocationMatchers) {
+		for(InvocationMatcher invocationMatcher: invocationMatchers) {
+			if(invocationMatcher.matches(invocation)) {
+				oneTimeMatchingMockBehaviorInvocationMatchers.remove(invocation);
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	protected boolean isMatchForAlwaysMatchingMockBehavior(Invocation invocation, List<InvocationMatcher> invocationMatchers) {
+		for(InvocationMatcher invocationMatcher: invocationMatchers) {
+			if(invocationMatcher.matches(invocation)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	protected String getAssertNotInvokedErrorMessage(Invocation invocation, InvocationMatcher invocationMatcher) {
 		final StringBuffer message = new StringBuffer();

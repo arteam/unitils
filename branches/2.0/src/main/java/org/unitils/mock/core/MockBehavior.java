@@ -43,4 +43,9 @@ public class MockBehavior {
 		return invocationMatcher.matches(invocation);
 	}
 
+
+	public InvocationMatcher getInvocationMatcher() {
+		return invocationMatcher;
+	}
+
 }

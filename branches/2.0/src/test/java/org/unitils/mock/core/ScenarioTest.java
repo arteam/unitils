@@ -63,13 +63,21 @@ public class ScenarioTest extends UnitilsJUnit4 {
 	public void testAssertNoMoreInvocations() {
 		scenario = new Scenario();
 		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), Thread.currentThread().getStackTrace()));
-		scenario.assertNoMoreInvocation();
+		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), Thread.currentThread().getStackTrace()));
+		scenario.assertInvoked(doSomethingInvocationMatcher);
 		try {
-			scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), Thread.currentThread().getStackTrace()));
+			scenario.assertNoMoreInvocations();
 			throw new RuntimeException();
 		} catch(AssertionError error) {
 			// expected.
 		}
+		
+		scenario.assertInvoked(doSomethingInvocationMatcher);
+		scenario.assertNoMoreInvocations();
+		
+		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), Thread.currentThread().getStackTrace()));
+		scenario.registerOneTimeMatchingMockBehaviorInvocationMatcher(doSomethingInvocationMatcher);
+		scenario.assertNoMoreInvocations();
 	}
 	
 	static class TestObject {

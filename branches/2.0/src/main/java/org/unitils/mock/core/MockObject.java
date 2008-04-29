@@ -75,11 +75,13 @@ public class MockObject<T> {
 	
 	public void registerAlwaysMatchingMockBehavior(MockBehavior mockBehavior) {
 		alwaysMatchingMockBehaviors.add(mockBehavior);
+		scenario.registerAlwaysMatchingMockBehaviorInvocationMatcher(mockBehavior.getInvocationMatcher());
 	}
 	
 	
 	public void registerOneTimeMatchingMockBehavior(MockBehavior mockBehavior) {
 		oneTimeMatchingMockBehaviors.put(mockBehavior, false);
+		scenario.registerOneTimeMatchingMockBehaviorInvocationMatcher(mockBehavior.getInvocationMatcher());
 	}
 	
 	
