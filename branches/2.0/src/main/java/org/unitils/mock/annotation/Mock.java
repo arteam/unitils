@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.annotation;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
+ *
  */
-public class MockedMethodRegistratingMethodInterceptor<T> implements MethodInterceptor {
-
-	private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
-	
-	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-		Invocation invocation = new Invocation(object, method, proxy, Arrays.asList(args), Thread.currentThread().getStackTrace());
-		mockBehaviorBuilder.registerInvokedMethod(invocation);
-		return null;
-	}
+@Target(FIELD)
+@Retention(RUNTIME)
+public @interface Mock {
 
 }

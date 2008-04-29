@@ -46,7 +46,7 @@ public class InvocationMatcher {
 		this.method = method;
 		this.argumentMatchers = argumentMatchers;
 		if(method.getParameterTypes().length != argumentMatchers.size()) {
-			throw new IllegalArgumentException("The number of argument matchers does not match the number of arguments of the given method.");
+			throw new IllegalArgumentException("The number of argument matchers does not match the number of arguments of the given method. Number of argument matchers: " + argumentMatchers.size() + ". Number of arguments " + method.getParameterTypes().length);
 		}
 	}
 

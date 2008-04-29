@@ -52,6 +52,7 @@ public class MockBehaviorBuilder {
 	
 	public <T> void registerMockObject(MockObject<T> mockObject) {
 		this.mockObject = mockObject;
+		invocationMatcherBuilder.registerMockObject(mockObject);
 	}
 	
 	
@@ -81,8 +82,8 @@ public class MockBehaviorBuilder {
 	}
 
 
-	public void registerInvokedMethod(Method method, Object[] args) {
-		invocationMatcherBuilder.registerInvokedMethod(method, args);
+	public void registerInvokedMethod(Invocation invocation) {
+		invocationMatcherBuilder.registerInvokedMethod(invocation);
 		// TODO create list of argument matchers
 		InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher();
 		MockBehavior mockBehavior = new MockBehavior(invocationMatcher, action);

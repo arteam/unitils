@@ -71,6 +71,11 @@ public class Invocation {
 	public StackTraceElement[] getStackTrace() {
 		return stackTrace;
 	}
+	
+	
+	public int getLineNumber() {
+		return stackTrace[1].getLineNumber();
+	}
 
 
 	@Override

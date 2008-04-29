@@ -17,7 +17,11 @@ package org.unitils.mock.core;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import org.unitils.mock.core.argumentmatcher.EqualsArgumentMatcher;
+import org.unitils.mock.core.argumentmatcher.LenEqArgumentMatcher;
 
 /**
  * @author Filip Neven
@@ -27,11 +31,11 @@ import java.util.List;
  */
 public class InvocationMatcherBuilder {
 
-	private Method method;
+	private MockObject<?> mockObject;
 	
-	private Object[] args;
+	private List<ArgumentMatcher> argumentMatchers, registeredArgumentMatchers;
 	
-	private List<ArgumentMatcher> argumentMatchers;
+	private Invocation invocation;
 	
 	private static InvocationMatcherBuilder instance;
 	
@@ -44,32 +48,49 @@ public class InvocationMatcherBuilder {
 	
 	
 	private InvocationMatcherBuilder() {
-		super();
 		reset();
 	}
 
+	
+	public <T> void registerMockObject(MockObject<T> mockObject) {
+		this.mockObject = mockObject;
+	}
+	
 
-
-	public void registerInvokedMethod(Method method, Object[] args) {
-		this.method = method;
-		this.args = args;
+	public void registerInvokedMethod(Invocation invocation) {
+		this.invocation = invocation;
+		
+		argumentMatchers = new ArrayList<ArgumentMatcher>();
+		List<Integer> argumentMatcherIndexes = ArgumentMatcherPositionFinder.getArgumentMatcherIndexes(invocation.getMethod(), invocation.getMethod(), invocation.getLineNumber(), 0);
+		Iterator<ArgumentMatcher> argumentMatcherIterator = registeredArgumentMatchers.iterator();
+		for (int argumentIndex = 0; argumentIndex < invocation.getArguments().size(); argumentIndex++) {
+			if (argumentMatcherIndexes != null && argumentMatcherIndexes.contains(argumentIndex)) {
+				argumentMatchers.add(argumentMatcherIterator.next());
+			} else {
+				Object argument = invocation.getArguments().get(argumentIndex);
+				if (argument instanceof Number) {
+					argumentMatchers.add(new EqualsArgumentMatcher(argument));
+				} else {
+					argumentMatchers.add(new LenEqArgumentMatcher(argument));
+				}
+			}
+		}
 	}
 	
 	
 	public void registerArgumentMatcher(ArgumentMatcher argumentMatcher) {
-		argumentMatchers.add(argumentMatcher);
+		registeredArgumentMatchers.add(argumentMatcher);
 	}
 	
 	
 	public InvocationMatcher createInvocationMatcher() {
-		return new InvocationMatcher(method, argumentMatchers);
+		return new InvocationMatcher(invocation.getMethod(), argumentMatchers);
 	}
 
 	
-	protected void reset() {
-		this.method = null;
-		this.args = null;
-		this.argumentMatchers = new ArrayList<ArgumentMatcher>();
+	public void reset() {
+		this.registeredArgumentMatchers = new ArrayList<ArgumentMatcher>();
+		this.invocation = null;
 	}
 
 }

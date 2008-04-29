@@ -15,7 +15,10 @@
  */
 package org.unitils.mock;
 
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.mock.annotation.ArgumentMatcher;
+import org.unitils.mock.core.AssertStatementCallRegistratingMethodInterceptor;
 import org.unitils.mock.core.InvocationMatcherBuilder;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.MockObjectProxy;
@@ -23,7 +26,12 @@ import org.unitils.mock.core.MockObjectProxyMethodInterceptor;
 import org.unitils.mock.core.ProxyUtils;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.action.EmptyAction;
+import org.unitils.mock.core.argumentmatcher.EqualsArgumentMatcher;
+import org.unitils.mock.core.argumentmatcher.LenEqArgumentMatcher;
 import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
+import org.unitils.mock.core.argumentmatcher.NullArgumentMatcher;
+import org.unitils.mock.core.argumentmatcher.RefEqArgumentMatcher;
+import org.unitils.mock.core.argumentmatcher.SameArgumentMatcher;
 
 /**
  * @author Filip Neven
@@ -37,13 +45,25 @@ public class MockUnitils {
 
 
 	@SuppressWarnings("unchecked")
-	public static <T> MockBehaviorDefiner<T> mock(T mockObjectProxy) {
-		if (!MockObjectProxy.class.isAssignableFrom(mockObjectProxy.getClass())) {
-			throw new UnitilsException(mockObjectProxy + " is not a mock object");
+	public static <T> MockBehaviorDefiner<T> mock(T mock) {
+		if (!MockObjectProxy.class.isAssignableFrom(mock.getClass())) {
+			throw new UnitilsException(mock + " is not a mock object");
 		}
-		MockObject<T> mockObject = ((MockObjectProxy<T>)mockObjectProxy).$_$_getMockObject();
+		MockObject<T> mockObject = ((MockObjectProxy<T>)mock).$_$_getMockObject();
 		MockBehaviorDefiner<T> mockBehaviorDefiner = new MockBehaviorDefiner<T>(mockObject);
 		return mockBehaviorDefiner;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T assertInvoked(T mock) {
+		if (!MockObjectProxy.class.isAssignableFrom(mock.getClass())) {
+			throw new UnitilsException(mock + " is not a mock object");
+		}
+		MockObject<T> mockObject = ((MockObjectProxy<T>)mock).$_$_getMockObject();
+		invocationMatcherBuilder.registerMockObject(mockObject);
+		AssertStatementCallRegistratingMethodInterceptor<T> assertStatementCallRegistratingMethodInterceptor = 
+			new AssertStatementCallRegistratingMethodInterceptor<T>(getScenario());
+		return ProxyUtils.createProxy(assertStatementCallRegistratingMethodInterceptor, mockObject.getMockedClass(), MockObjectProxy.class);
 	}
 	
 	
@@ -54,8 +74,54 @@ public class MockUnitils {
 	}
 	
 	
+	@ArgumentMatcher
 	public static <T> T notNull(Class<T> argumentClass) {
 		invocationMatcherBuilder.registerArgumentMatcher(new NotNullArgumentMatcher());
 		return null;
+	}
+	
+	
+	@ArgumentMatcher
+	public static <T> T isNull(Class<T> argumentClass) {
+		invocationMatcherBuilder.registerArgumentMatcher(new NullArgumentMatcher());
+		return null;
+	}
+	
+	
+	@ArgumentMatcher
+	public static <T> T same(T sameAs) {
+		invocationMatcherBuilder.registerArgumentMatcher(new SameArgumentMatcher(sameAs));
+		return null;
+	}
+	
+	
+	@ArgumentMatcher
+	public static <T> T eq(T equalTo) {
+		invocationMatcherBuilder.registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
+		return null;
+	}
+	
+	
+	@ArgumentMatcher
+	public static <T> T refEq(T equalTo) {
+		invocationMatcherBuilder.registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
+		return null;
+	}
+	
+	
+	@ArgumentMatcher
+	public static <T> T lenEq(T equalTo) {
+		invocationMatcherBuilder.registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
+		return null;
+	}
+	
+	
+	protected static Scenario getScenario() {
+		return getMockModule().getScenario();
+	}
+	
+	
+	private static MockModule getMockModule() {
+		return Unitils.getInstance().getModulesRepository().getModuleOfType(MockModule.class);
 	}
 }

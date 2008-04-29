@@ -26,13 +26,25 @@ import net.sf.cglib.proxy.MethodProxy;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockedMethodRegistratingMethodInterceptor<T> implements MethodInterceptor {
+public class AssertStatementCallRegistratingMethodInterceptor<T> implements MethodInterceptor {
 
-	private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
+	private Scenario scenario;
 	
+	private InvocationMatcherBuilder invocationMatcherBuilder = InvocationMatcherBuilder.getInstance();
+	
+	
+	public AssertStatementCallRegistratingMethodInterceptor(Scenario scenario) {
+		super();
+		this.scenario = scenario;
+	}
+
+
 	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		Invocation invocation = new Invocation(object, method, proxy, Arrays.asList(args), Thread.currentThread().getStackTrace());
-		mockBehaviorBuilder.registerInvokedMethod(invocation);
+		invocationMatcherBuilder.registerInvokedMethod(invocation);
+		InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher();
+		invocationMatcherBuilder.reset();
+		scenario.assertInvoked(invocationMatcher);
 		return null;
 	}
 

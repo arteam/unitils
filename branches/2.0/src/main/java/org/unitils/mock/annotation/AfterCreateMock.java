@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.annotation;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import static java.lang.annotation.ElementType.METHOD;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 
 /**
+ * Annotation that is called after a mock object has been created by the {@link org.unitils.easymock.EasyMockModule}
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockedMethodRegistratingMethodInterceptor<T> implements MethodInterceptor {
-
-	private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
-	
-	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-		Invocation invocation = new Invocation(object, method, proxy, Arrays.asList(args), Thread.currentThread().getStackTrace());
-		mockBehaviorBuilder.registerInvokedMethod(invocation);
-		return null;
-	}
-
+@Target(METHOD)
+@Retention(RUNTIME)
+public @interface AfterCreateMock {
 }
+
