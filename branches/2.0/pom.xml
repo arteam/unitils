@@ -296,6 +296,19 @@
             <version>1.3.4</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.1</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-analysis</artifactId>
+            <version>3.1</version>
+            <optional>true</optional>
+        </dependency>
+
 
         <!-- Test dependencies -->
         <dependency>

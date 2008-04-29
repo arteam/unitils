@@ -16,23 +16,9 @@
 package org.unitils.integrationtest;
 
 import static junit.framework.Assert.assertEquals;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.internal.runners.InitializationError;
 import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.Result;
@@ -52,246 +38,255 @@ import org.unitils.orm.jpa.JpaUnitils;
 import org.unitils.util.FileUtils;
 import org.unitils.util.ReflectionUtils;
 
+import java.io.*;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Integration tests that verify whether unitils behaves correctly in different test environment configurations.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class UnitilsIntegrationTest {
 
-	private static Log logger = LogFactory.getLog(UnitilsIntegrationTest.class);
-	
-	public static final String RESULT_FILENAME = "C:/Temp/springclassusagetest/testresult.txt";
-	
-	private static boolean succeeded = true;
-	
+    private static Log logger = LogFactory.getLog(UnitilsIntegrationTest.class);
+
+    public static final String RESULT_FILENAME = "C:/Temp/springclassusagetest/testresult.txt";
+
+    private static boolean succeeded = true;
+
 //	private static PrintWriter logFileWriter;
-	
-	//private static final ClassUsageLoggingClassLoader classUsageLoggingClassLoader = new ClassUsageLoggingClassLoader();
-	
-	/*static {
-		Thread.currentThread().setContextClassLoader(classUsageLoggingClassLoader);
-	}*/
-	
-	@BeforeClass
-	public static void initConfiguration() throws FileNotFoundException {
+
+    //private static final ClassUsageLoggingClassLoader classUsageLoggingClassLoader = new ClassUsageLoggingClassLoader();
+
+    /*static {
+         Thread.currentThread().setContextClassLoader(classUsageLoggingClassLoader);
+     }*/
+
+    @BeforeClass
+    public static void initConfiguration() throws FileNotFoundException {
 //		logFileWriter = new PrintWriter("C:/Temp/error.txt");
-		// Make sure we use unitils-integrationtest.properties as configuration file
-		System.setProperty("unitils.configuration.customFileName", "org/unitils/integrationtest/unitils-integrationtest.properties");
-		// Copy the db creation scripts to the temp directory
-		FileUtils.copyClassPathResource("/org/unitils/integrationtest/persistence/dbscripts/01_createPersonTable.sql", "C:/Temp/unitilsintegrationtests");
-	}
-	
-	@AfterClass
-	public static void logSuccess() throws IOException {
-		if (succeeded) registerResult(true);
+        // Make sure we use unitils-integrationtest.properties as configuration file
+        System.setProperty("unitils.configuration.customFileName", "org/unitils/integrationtest/unitils-integrationtest.properties");
+        // Copy the db creation scripts to the temp directory
+        FileUtils.copyClassPathResource("/org/unitils/integrationtest/persistence/dbscripts/01_createPersonTable.sql", "C:/Temp/unitilsintegrationtests");
+    }
+
+    @AfterClass
+    public static void logSuccess() throws IOException {
+        if (succeeded) registerResult(true);
 //		logFileWriter.close();
-	}
-	
+    }
+
 //	@AfterClass
 //	public static void logLoadedClasses() {
 //		System.out.println("-------------- Found classes -----------------");
-		
+
 //		for (String loadedClass : ClassUsageLoggingClassLoader.getFoundClasses()) {
 //			System.out.println(loadedClass);
 //		}
-		
+
 //		System.out.println("-------------- Loaded classes -----------------");
-		
+
 //		for (String loadedClass : ClassUsageLoggingClassLoader.getLoadedClasses()) {
 //			System.out.println(loadedClass);
 //		}
 //	}
-	
-	@Before
-	public void cleanDatabase() {
-//		Thread.currentThread().setContextClassLoader(classUsageLoggingClassLoader);
-		DatabaseUnitils.cleanSchemas();
-	}
-	
-	@Test
-	public void testHibernateJpa_Commit() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
-		System.setProperty("jpa.persistenceProvider", "hibernate");
-		Unitils.initSingletonInstance();
-		runTest(HibernateJpaTest.class, "testFindById");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateJpaTest.class, "testPersist");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateJpaTest.class, "testMapping");
-	}
-	
-	@Test
-	public void testHibernateJpa_Rollback() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
-		System.setProperty("jpa.persistenceProvider", "hibernate");
-		Unitils.initSingletonInstance();
-		runTest(HibernateJpaTest.class, "testFindById");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateJpaTest.class, "testPersist");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateJpaTest.class, "testMapping");
-	}
-	
-	@Test
-	public void testToplinkJpa_Commit() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
-		System.setProperty("jpa.persistenceProvider", "toplink");
-		Unitils.initSingletonInstance();
-		runTest(ToplinkJpaTest.class, "testFindById");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(ToplinkJpaTest.class, "testPersist");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		JpaUnitils.getEntityManagerFactory().close();
-	}
-	
-	@Test
-	public void testToplinkJpa_Rollback() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
-		System.setProperty("jpa.persistenceProvider", "toplink");
-		Unitils.initSingletonInstance();
-		runTest(ToplinkJpaTest.class, "testFindById");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(ToplinkJpaTest.class, "testPersist");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		JpaUnitils.getEntityManagerFactory().close();
-	}
-	
-	@Test
-	public void testOpenJpa_Commit() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
-		System.setProperty("jpa.persistenceProvider", "openjpa");
-		Unitils.initSingletonInstance();
-		runTest(OpenJpaTest.class, "testFindById");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(OpenJpaTest.class, "testPersist");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
-	
-	@Test
-	public void testOpenJpa_Rollback() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
-		System.setProperty("jpa.persistenceProvider", "openjpa");
-		Unitils.initSingletonInstance();
-		runTest(OpenJpaTest.class, "testFindById");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(OpenJpaTest.class, "testPersist");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
-	
-	@Test @Ignore
-	public void testHibernateJpaSpring_Commit() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
-		Unitils.initSingletonInstance();
-		runTest(HibernateJpaSpringTest.class, "testFindById");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateJpaSpringTest.class, "testPersist");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
-	
-	@Test @Ignore
-	public void testHibernateJpaSpring_Rollback() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
-		Unitils.initSingletonInstance();
-		runTest(HibernateJpaSpringTest.class, "testFindById");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateJpaSpringTest.class, "testPersist");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
-	
-	@Test
-	public void testHibernate_Commit() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
-		Unitils.initSingletonInstance();
-		runTest(HibernateTest.class, "testFindById");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateTest.class, "testPersist");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
-	
-	@Test
-	public void testHibernate_Rollback() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
-		Unitils.initSingletonInstance();
-		runTest(HibernateTest.class, "testFindById");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateTest.class, "testPersist");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
-	
-	@Test @Ignore
-	public void testHibernateSpring_Commit() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "commit");
-		Unitils.initSingletonInstance();
-		runTest(HibernateSpringTest.class, "testFindById");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateSpringTest.class, "testPersist");
-		assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
-	
-	@Test @Ignore
-	public void testHibernateSpring_Rollback() throws Exception {
-		System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
-		Unitils.initSingletonInstance();
-		runTest(HibernateSpringTest.class, "testFindById");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-		runTest(HibernateSpringTest.class, "testPersist");
-		assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
-	}
 
-	protected void runTest(Class<?> testClass, final String testMethodName) throws InitializationError, IOException {
-		Result result = new Result();
+    @Before
+    public void cleanDatabase() {
+//		Thread.currentThread().setContextClassLoader(classUsageLoggingClassLoader);
+        DatabaseUnitils.cleanSchemas();
+    }
+
+    @Test
+    public void testHibernateJpa_Commit() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "commit");
+        System.setProperty("jpa.persistenceProvider", "hibernate");
+        Unitils.initSingletonInstance();
+        runTest(HibernateJpaTest.class, "testFindById");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateJpaTest.class, "testPersist");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateJpaTest.class, "testMapping");
+    }
+
+    @Test
+    public void testHibernateJpa_Rollback() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
+        System.setProperty("jpa.persistenceProvider", "hibernate");
+        Unitils.initSingletonInstance();
+        runTest(HibernateJpaTest.class, "testFindById");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateJpaTest.class, "testPersist");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateJpaTest.class, "testMapping");
+    }
+
+    @Test
+    public void testToplinkJpa_Commit() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "commit");
+        System.setProperty("jpa.persistenceProvider", "toplink");
+        Unitils.initSingletonInstance();
+        runTest(ToplinkJpaTest.class, "testFindById");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(ToplinkJpaTest.class, "testPersist");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        JpaUnitils.getEntityManagerFactory().close();
+    }
+
+    @Test
+    public void testToplinkJpa_Rollback() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
+        System.setProperty("jpa.persistenceProvider", "toplink");
+        Unitils.initSingletonInstance();
+        runTest(ToplinkJpaTest.class, "testFindById");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(ToplinkJpaTest.class, "testPersist");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        JpaUnitils.getEntityManagerFactory().close();
+    }
+
+    @Test
+    public void testOpenJpa_Commit() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "commit");
+        System.setProperty("jpa.persistenceProvider", "openjpa");
+        Unitils.initSingletonInstance();
+        runTest(OpenJpaTest.class, "testFindById");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(OpenJpaTest.class, "testPersist");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+    }
+
+    @Test
+    public void testOpenJpa_Rollback() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
+        System.setProperty("jpa.persistenceProvider", "openjpa");
+        Unitils.initSingletonInstance();
+        runTest(OpenJpaTest.class, "testFindById");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(OpenJpaTest.class, "testPersist");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+    }
+
+    @Test
+    @Ignore
+    public void testHibernateJpaSpring_Commit() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "commit");
+        Unitils.initSingletonInstance();
+        runTest(HibernateJpaSpringTest.class, "testFindById");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateJpaSpringTest.class, "testPersist");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+    }
+
+    @Test
+    @Ignore
+    public void testHibernateJpaSpring_Rollback() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
+        Unitils.initSingletonInstance();
+        runTest(HibernateJpaSpringTest.class, "testFindById");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateJpaSpringTest.class, "testPersist");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+    }
+
+    @Test
+    public void testHibernate_Commit() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "commit");
+        Unitils.initSingletonInstance();
+        runTest(HibernateTest.class, "testFindById");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateTest.class, "testPersist");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+    }
+
+    @Test
+    public void testHibernate_Rollback() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
+        Unitils.initSingletonInstance();
+        runTest(HibernateTest.class, "testFindById");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateTest.class, "testPersist");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+    }
+
+    @Test
+    @Ignore
+    public void testHibernateSpring_Commit() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "commit");
+        Unitils.initSingletonInstance();
+        runTest(HibernateSpringTest.class, "testFindById");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateSpringTest.class, "testPersist");
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+    }
+
+    @Test
+    @Ignore
+    public void testHibernateSpring_Rollback() throws Exception {
+        System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
+        Unitils.initSingletonInstance();
+        runTest(HibernateSpringTest.class, "testFindById");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        runTest(HibernateSpringTest.class, "testPersist");
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+    }
+
+    protected void runTest(Class<?> testClass, final String testMethodName) throws InitializationError, IOException {
+        Result result = new Result();
         RunNotifier runNotifier = new RunNotifier();
         runNotifier.addListener(result.createListener());
-	    
+
         UnitilsJUnit4TestClassRunner testRunner = new UnitilsJUnit4TestClassRunner(testClass) {
 
-			@Override
-			protected List<Method> getTestMethods() {
-				return Arrays.asList(ReflectionUtils.getMethod(getTestClass().getJavaClass(), testMethodName, false));
-			}
-        	
+            @Override
+            protected List<Method> getTestMethods() {
+                return Arrays.asList(ReflectionUtils.getMethod(getTestClass().getJavaClass(), testMethodName, false));
+            }
+
         };
         testRunner.run(runNotifier);
-        
+
         if (result.getFailureCount() > 0) {
-        	registerFailure();
+            registerFailure();
         }
-        
+
         for (Failure failure : result.getFailures()) {
-        	logger.error("Failure exception", failure.getException());
-        	StringWriter stringWriter = new StringWriter();
-			failure.getException().printStackTrace(new PrintWriter(stringWriter));
+            logger.error("Failure exception", failure.getException());
+            StringWriter stringWriter = new StringWriter();
+            failure.getException().printStackTrace(new PrintWriter(stringWriter));
 //			logFileWriter.println(stringWriter.toString() + "\n");
         }
         assertEquals(0, result.getFailureCount());
         assertEquals(0, result.getIgnoreCount());
-	}
+    }
 
-	private static void registerFailure() throws IOException {
-		registerResult(false);
-	}
+    private static void registerFailure() throws IOException {
+        registerResult(false);
+    }
 
-	private static void registerResult(boolean result) throws IOException {
-		succeeded = result;
-		File file = new File(RESULT_FILENAME);
-		if (file.exists()) {
-			file.delete();
-		}
-		org.apache.commons.io.FileUtils.writeStringToFile(file, "" + succeeded);
-	}
-	
-	public static void main(String[] args) throws Exception {
-		Result result = new Result();
+    private static void registerResult(boolean result) throws IOException {
+        succeeded = result;
+        File file = new File(RESULT_FILENAME);
+        if (file.exists()) {
+            file.delete();
+        }
+        FileUtils.writeStringToFile(file, "" + succeeded);
+    }
+
+    public static void main(String[] args) throws Exception {
+        Result result = new Result();
         RunNotifier runNotifier = new RunNotifier();
         runNotifier.addListener(result.createListener());
-		
-		JUnit4ClassRunner classRunner = new JUnit4ClassRunner(UnitilsIntegrationTest.class);
-		classRunner.run(runNotifier);
-		if (result.getFailureCount() > 0) {
-			registerFailure();
-		}
-	}
-	
+
+        JUnit4ClassRunner classRunner = new JUnit4ClassRunner(UnitilsIntegrationTest.class);
+        classRunner.run(runNotifier);
+        if (result.getFailureCount() > 0) {
+            registerFailure();
+        }
+    }
+
 }
