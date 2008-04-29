@@ -52,7 +52,7 @@ public class Scenario {
 	
 	public void assertInvoked(InvocationMatcher invocationMatcher) {
 		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
-			if(Boolean.FALSE.equals(registeredInvocationEntry.getValue()) && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
+			if(!registeredInvocationEntry.getValue() && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
 				registeredInvocationEntry.setValue(Boolean.TRUE);
 				return;
 			}
@@ -63,7 +63,7 @@ public class Scenario {
 	
 	public void assertNotInvoked(InvocationMatcher invocationMatcher) {
 		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
-			if(Boolean.FALSE.equals(registeredInvocationEntry.getValue()) && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
+			if(!registeredInvocationEntry.getValue() && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
 				throw new AssertionError(getAssertNotInvokedErrorMessage(registeredInvocationEntry.getKey(), invocationMatcher));
 			}
 		}

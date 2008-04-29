@@ -91,7 +91,7 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 	@Test
 	public void testValueReturningAction() throws Exception {
 		MockBehavior valueReturningBehavior = new MockBehavior(invocationMatcher, new ValueReturningAction("returnedValue"));
-		testInterfaceMock.addAlwaysMatchingMockBehavior(valueReturningBehavior);
+		testInterfaceMock.registerAlwaysMatchingMockBehavior(valueReturningBehavior);
 		
 		assertEquals("returnedValue", testInterface.getSomeString());
 	}
@@ -101,7 +101,7 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 	public void testExceptionThrowingAction() throws Exception {
 		UnitilsException unitilsException = new UnitilsException("test exception");
 		MockBehavior exceptionThrowingBehavior = new MockBehavior(invocationMatcher, new ExceptionThrowingAction(unitilsException));
-		testClassMock.addAlwaysMatchingMockBehavior(exceptionThrowingBehavior);
+		testClassMock.registerAlwaysMatchingMockBehavior(exceptionThrowingBehavior);
 		
 		testClass.doSomething(null);
 	}
@@ -110,7 +110,7 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 	@Test
 	public void testActualImplementationAction() throws Exception {
 		MockBehavior actualImplementationBehavior = new MockBehavior(invocationMatcher, new ActualImplementationAction());
-		testClassMock.addAlwaysMatchingMockBehavior(actualImplementationBehavior);
+		testClassMock.registerAlwaysMatchingMockBehavior(actualImplementationBehavior);
 		
 		assertEquals(false, testClass.doSomethingHasBeenInvoked);
 		testClass.doSomething(null);

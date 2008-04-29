@@ -87,9 +87,9 @@ public class MockBehaviorBuilder {
 		InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher();
 		MockBehavior mockBehavior = new MockBehavior(invocationMatcher, action);
 		if (matchAlways) {
-			mockObject.addAlwaysMatchingMockBehavior(mockBehavior);
+			mockObject.registerAlwaysMatchingMockBehavior(mockBehavior);
 		} else {
-			mockObject.addOneTimeMatchingMockBehavior(mockBehavior);
+			mockObject.registerOneTimeMatchingMockBehavior(mockBehavior);
 		}
 		reset();
 	}

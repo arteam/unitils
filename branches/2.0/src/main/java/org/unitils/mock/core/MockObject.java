@@ -73,12 +73,12 @@ public class MockObject<T> {
 	}
 	
 	
-	public void addAlwaysMatchingMockBehavior(MockBehavior mockBehavior) {
+	public void registerAlwaysMatchingMockBehavior(MockBehavior mockBehavior) {
 		alwaysMatchingMockBehaviors.add(mockBehavior);
 	}
 	
 	
-	public void addOneTimeMatchingMockBehavior(MockBehavior mockBehavior) {
+	public void registerOneTimeMatchingMockBehavior(MockBehavior mockBehavior) {
 		oneTimeMatchingMockBehaviors.put(mockBehavior, false);
 	}
 	
