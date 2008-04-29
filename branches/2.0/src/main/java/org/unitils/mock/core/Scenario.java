@@ -32,4 +32,8 @@ public class Scenario {
 		observedInvocations.add(invocation);
 	}
 
+	public List<Invocation> getObservedInvocations() {
+		return observedInvocations;
+	}
+	
 }

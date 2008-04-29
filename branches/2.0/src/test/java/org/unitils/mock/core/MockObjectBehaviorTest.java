@@ -15,17 +15,67 @@
  */
 package org.unitils.mock.core;
 
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.easymock.EasyMockUnitils;
+import org.unitils.easymock.annotation.Mock;
+import org.unitils.easymock.util.Calls;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockObjectBehaviorTest {
+public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 
+	Scenario scenario;
+	
+	TestClass testClass;
+	
+	TestInterface testInterface;
+	
+	@Mock(calls = Calls.LENIENT)
+	MockBehavior defaultMockBehavior;
+	
+	@Before
+	public void setup() {
+		scenario = new Scenario();
+		MockObject testClassMock = new MockObject(scenario, defaultMockBehavior);
+		MockObjectProxyMethodInterceptor testClassMethodInterceptor = new MockObjectProxyMethodInterceptor(testClassMock);
+		testClass = ProxyUtils.createProxy(TestClass.class, testClassMethodInterceptor);
+		
+		MockObject testInterfaceMock = new MockObject(scenario, defaultMockBehavior);
+		MockObjectProxyMethodInterceptor testInterfaceMethodInterceptor = new MockObjectProxyMethodInterceptor(testInterfaceMock);
+		testInterface = ProxyUtils.createProxy(TestInterface.class, testInterfaceMethodInterceptor);
+		
+		EasyMockUnitils.replay();
+	}
+	
 	@Test
-	public void testMockObjectBehavior() {
-		// TODO implement
+	public void testMockObjectBehavior() throws Exception {
+		testClass.doSomething("test");
+		testInterface.getSomeString();
+		
+		List<Invocation> observedInvocations = scenario.getObservedInvocations();
+		assertLenEquals(Arrays.asList(
+				new Invocation(TestClass.class.getMethod("doSomething", String.class), Arrays.asList("test"), null),
+				new Invocation(TestInterface.class.getMethod("getSomeString"), Arrays.asList(), null)), 
+				observedInvocations);
+	}
+	
+	public static class TestClass {
+		
+		public void doSomething(String param) {}
+	}
+	
+	public static interface TestInterface {
+		
+		public String getSomeString();
 	}
 }

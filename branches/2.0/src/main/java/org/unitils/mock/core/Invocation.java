@@ -27,11 +27,11 @@ public class Invocation {
 
 	private Method method;
 	
-	private List<Object> arguments;
+	private List<?> arguments;
 	
 	private StackTraceElement[] stackTrace;
 
-	public Invocation(Method method, List<Object> arguments, StackTraceElement[] stackTrace) {
+	public Invocation(Method method, List<?> arguments, StackTraceElement[] stackTrace) {
 		this.method = method;
 		this.arguments = arguments;
 		this.stackTrace = stackTrace;
@@ -43,7 +43,7 @@ public class Invocation {
 	}
 
 
-	public List<Object> getArguments() {
+	public List<?> getArguments() {
 		return arguments;
 	}
 

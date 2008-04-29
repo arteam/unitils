@@ -29,7 +29,14 @@ import net.sf.cglib.proxy.MethodProxy;
 public class MockObjectProxyMethodInterceptor implements MethodInterceptor {
 
 	private MockObject mockObject;
+
 	
+	public MockObjectProxyMethodInterceptor(MockObject mockObject) {
+		super();
+		this.mockObject = mockObject;
+	}
+
+
 	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		Invocation invocation = new Invocation(method, Arrays.asList(args), Thread.currentThread().getStackTrace());
 		return mockObject.handleInvocation(invocation);
