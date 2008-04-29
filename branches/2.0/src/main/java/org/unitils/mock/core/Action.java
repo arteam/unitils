@@ -15,33 +15,14 @@
  */
 package org.unitils.mock.core;
 
+
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
+ *
  */
-public class MockBehavior {
+public interface Action {
 
-	private InvocationMatcher invocationMatcher;
-
-	
-	private Action action;
-	
-	
-	public MockBehavior(InvocationMatcher invocationMatcher, Action action) {
-		super();
-		this.action = action;
-		this.invocationMatcher = invocationMatcher;
-	}
-
-
-	public Object execute(Invocation invocation) throws Throwable {
-		return action.execute(invocation);
-	}
-
-	
-	public boolean matches(Invocation invocation) {
-		return invocationMatcher.matches(invocation);
-	}
-
+	public Object execute(Invocation invocation) throws Throwable;
 }

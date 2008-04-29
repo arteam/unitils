@@ -18,6 +18,10 @@ package org.unitils.mock.core;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import net.sf.cglib.proxy.MethodProxy;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -25,21 +29,29 @@ import java.util.List;
  */
 public class Invocation {
 
-	private Method method;
+	private Object targetObject;
+	
+	private MethodProxy methodProxy;
 	
 	private List<?> arguments;
 	
 	private StackTraceElement[] stackTrace;
 
-	public Invocation(Method method, List<?> arguments, StackTraceElement[] stackTrace) {
-		this.method = method;
+	public Invocation(Object targetObject, MethodProxy methodProxy, List<?> arguments, StackTraceElement[] stackTrace) {
+		this.targetObject = targetObject;
+		this.methodProxy = methodProxy;
 		this.arguments = arguments;
 		this.stackTrace = stackTrace;
 	}
 
 	
-	public Method getMethod() {
-		return method;
+	public Object getTargetObject() {
+		return targetObject;
+	}
+
+
+	public MethodProxy getMethodProxy() {
+		return methodProxy;
 	}
 
 
@@ -50,6 +62,12 @@ public class Invocation {
 	
 	public StackTraceElement[] getStackTrace() {
 		return stackTrace;
+	}
+
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 	
 }

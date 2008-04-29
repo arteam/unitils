@@ -44,13 +44,13 @@ public class MockObject {
 	}
 
 	
-	public Object handleInvocation(Invocation invocation) {
+	public Object handleInvocation(Invocation invocation) throws Throwable {
 		scenario.registerInvocation(invocation);
 		return executeBehavior(invocation);
 	}
 
 	
-	protected Object executeBehavior(Invocation invocation) {
+	protected Object executeBehavior(Invocation invocation) throws Throwable {
 		// Check if there is a one-time matching behavior that hasn't been invoked yet
 		for (MockBehavior behavior : oneTimeMatchingMockBehaviors.keySet()) {
 			if (!oneTimeMatchingMockBehaviors.get(behavior) && behavior.matches(invocation)) {
@@ -67,6 +67,16 @@ public class MockObject {
 		}
 		// There's no matching behavior, simply execute the default one
 		return defaultBehavior.execute(invocation);                                       
+	}
+	
+	
+	public void addAlwaysMatchingMockBehavior(MockBehavior mockBehavior) {
+		alwaysMatchingMockBehaviors.add(mockBehavior);
+	}
+	
+	
+	public void addOneTimeMatchingMockBehavior(MockBehavior mockBehavior) {
+		oneTimeMatchingMockBehaviors.put(mockBehavior, false);
 	}
 
 }
