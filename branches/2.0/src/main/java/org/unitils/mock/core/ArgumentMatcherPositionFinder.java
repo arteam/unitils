@@ -37,11 +37,11 @@ import java.util.List;
  */
 public class ArgumentMatcherPositionFinder {
 
+
     public static void main(String[] args) throws Exception {
         //finder.getMethod(ReflectionUtils.getMethod(TestClass.class, "someMethod", false, Integer.TYPE, Integer.TYPE, Integer.class), 46, 1);
-        //Method testMethod = ReflectionUtils.getMethod(TestClass.class, "test", false);
         Method mockMethod = ReflectionUtils.getMethod(TestClass.class, "someMethod", false, String.class, String.class, String.class);
-        List<Integer> indexes = ArgumentMatcherPositionFinder.getArgumentMatcherIndexes("test", TestClass.class, mockMethod, 54, 1);
+        List<Integer> indexes = ArgumentMatcherPositionFinder.getArgumentMatcherIndexes(TestClass.class, "test", mockMethod, 54, 1);
 
         System.out.println("" + indexes);
     }
@@ -64,16 +64,15 @@ public class ArgumentMatcherPositionFinder {
         return null;
     }
 
-
     @SuppressWarnings({"unchecked"})
-    public static List<Integer> getArgumentMatcherIndexes(String invokerMethodName, Class<?> invokerClass, Method mockMethod, int methodLineNr, int methodInvocationIndex) {
+    public static List<Integer> getArgumentMatcherIndexes(Class<?> testClass, String testMethodName, Method method, int methodLineNr, int methodInvocationIndex) {
         // get the test method info
-        String mockMethodName = mockMethod.getName();
-        String mockMethodDescriptor = getMethodDescriptor(mockMethod);
+        String methodName = method.getName();
+        String methodDescriptor = getMethodDescriptor(method);
 
         InputStream inputStream = null;
         try {
-            inputStream = invokerClass.getClassLoader().getResourceAsStream(invokerClass.getName().replace('.', '/') + ".class");
+            inputStream = testClass.getClassLoader().getResourceAsStream(testClass.getName().replace('.', '/') + ".class");
 
             ClassReader cr = new ClassReader(inputStream);
             ClassNode cn = new ClassNode();
@@ -81,17 +80,20 @@ public class ArgumentMatcherPositionFinder {
 
             List<MethodNode> methods = cn.methods;
             for (final MethodNode methodNode : methods) {
-                if (invokerMethodName.equals(methodNode.name)) {
-                    MethodInterpreter methodInterpreter = new MethodInterpreter(mockMethodName, mockMethodDescriptor, methodLineNr, methodInvocationIndex);
+                if (testMethodName.equals(methodNode.name)) {
+                    MethodInterpreter methodInterpreter = new MethodInterpreter(methodName, methodDescriptor, methodLineNr, methodInvocationIndex);
                     Analyzer analyzer = new MethodAnalyzer(methodNode, methodInterpreter);
                     analyzer.analyze(cn.name, methodNode);
-                    return methodInterpreter.getResultArgumentMatcherIndexes();
+                    List<Integer> result = methodInterpreter.getResultArgumentMatcherIndexes();
+                    if (result != null) {
+                        return result;
+                    }
                 }
             }
             return null;
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to read class file for method: " + invokerMethodName, e);
+            throw new UnitilsException("Unable to read class file for test method: " + testMethodName, e);
         } finally {
             closeQuietly(inputStream);
         }
@@ -165,44 +167,45 @@ public class ArgumentMatcherPositionFinder {
         }
 
         public Value copyOperation(AbstractInsnNode insn, Value value) throws AnalyzerException {
-            return REGULAR_VALUE;
+            return value;
         }
 
         public Value unaryOperation(AbstractInsnNode insn, Value value) throws AnalyzerException {
-            return REGULAR_VALUE;
+            return value;
         }
 
         public Value binaryOperation(AbstractInsnNode insn, Value value1, Value value2) throws AnalyzerException {
-            return REGULAR_VALUE;
+            return mergeValues(value1, value2);
         }
 
         public Value ternaryOperation(AbstractInsnNode insn, Value value1, Value value2, Value value3) throws AnalyzerException {
-            return REGULAR_VALUE;
+            return mergeValues(value1, value2, value3);
         }
 
+        @SuppressWarnings({"unchecked"})
         public Value naryOperation(AbstractInsnNode insn, List values) throws AnalyzerException {
             if (currentLineNr != methodLineNr) {
-                return REGULAR_VALUE;
+                return mergeValues(values);
             }
             if (!(insn instanceof MethodInsnNode)) {
-                return REGULAR_VALUE;
+                return mergeValues(values);
             }
 
             MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
             if (methodName.equals(methodInsnNode.name) && methodDescriptor.equals(methodInsnNode.desc)) {
                 currentInvocationIndex++;
                 if (currentInvocationIndex != methodInvocationIndex) {
-                    return REGULAR_VALUE;
+                    return mergeValues(values);
                 }
 
                 boolean isStatic = methodInsnNode.getOpcode() == INVOKESTATIC;
                 resultArgumentMatcherIndexes = new ArrayList<Integer>();
                 for (int i = 0; i < values.size(); i++) {
-                    if (values.get(i) == BasicValue.REFERENCE_VALUE) {
+                    if (values.get(i) == ARGUMENT_MATCHER) {
                         resultArgumentMatcherIndexes.add(isStatic ? i - 1 : i);
                     }
                 }
-                return REGULAR_VALUE;
+                return mergeValues(values);
             }
 
             Method matcherMethod = getMethod(methodInsnNode);
@@ -211,17 +214,32 @@ public class ArgumentMatcherPositionFinder {
                     return ARGUMENT_MATCHER;
                 }
             }
+            return mergeValues(values);
+        }
+
+
+        public Value merge(Value value1, Value value2) {
+            return mergeValues(value1, value2);
+        }
+
+
+        protected Value mergeValues(Value... values) {
+            for (Value value : values) {
+                if (value == ARGUMENT_MATCHER) {
+                    return ARGUMENT_MATCHER;
+                }
+            }
             return REGULAR_VALUE;
         }
 
-
-        public Value merge(Value v, Value w) {
-            if (!v.equals(w)) {
-                return REGULAR_VALUE;
+        protected Value mergeValues(List<Value> values) {
+            for (Value value : values) {
+                if (value == ARGUMENT_MATCHER) {
+                    return ARGUMENT_MATCHER;
+                }
             }
-            return v;
+            return REGULAR_VALUE;
         }
-
 
         protected Method getMethod(MethodInsnNode methodNode) {
             String internalClassName = methodNode.owner;

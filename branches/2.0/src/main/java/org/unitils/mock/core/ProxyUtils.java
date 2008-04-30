@@ -57,10 +57,8 @@ public class ProxyUtils {
         @SuppressWarnings("unchecked")
         final Factory proxy = (Factory) objenesis.newInstance(enhancedTargetClass);
         proxy.setCallbacks(new Callback[] { interceptor });
-        
-        @SuppressWarnings("unchecked")
-        final T t = (T) proxy;
-        return t;
+
+        return (T) proxy;
 	}
 	
 	
