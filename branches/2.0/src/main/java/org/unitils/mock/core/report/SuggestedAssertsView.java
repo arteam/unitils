@@ -40,7 +40,7 @@ public class SuggestedAssertsView implements ScenarioView {
 		List<Invocation> invocations = scenario.getObservedInvocations();
 		view.append("Suggested assert statements:\n");
 		for(Invocation invocation : invocations) {
-			Method method = invocation.getMethod();
+			Method method = invocation.getProxyMethod();
 			if(Void.TYPE.equals(method.getReturnType()) ) {
 				view.append("\tassertInvoked(")
 					.append(MethodFormatUtils.getClassName(method))

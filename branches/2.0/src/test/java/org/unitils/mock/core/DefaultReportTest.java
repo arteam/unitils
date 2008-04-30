@@ -48,10 +48,10 @@ public class DefaultReportTest extends UnitilsJUnit4 {
 	
 	@Test
 	public void testDefaultReport() {
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), Thread.currentThread().getStackTrace()));
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomethingElse, null, Collections.emptyList(), Thread.currentThread().getStackTrace()));
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomethingElse, null, Collections.emptyList(), Thread.currentThread().getStackTrace()));
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), Thread.currentThread().getStackTrace()));
+		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomethingElse, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomethingElse, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		report.createReport();
 	}
 	

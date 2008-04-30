@@ -39,9 +39,9 @@ public class ArgumentMatcherPositionFinder {
 
     public static void main(String[] args) throws Exception {
         //finder.getMethod(ReflectionUtils.getMethod(TestClass.class, "someMethod", false, Integer.TYPE, Integer.TYPE, Integer.class), 46, 1);
-        Method testMethod = ReflectionUtils.getMethod(TestClass.class, "test", false);
-        Method mockMethod = ReflectionUtils.getMethod(TestClass.class, "someMethod", false, Integer.TYPE, Integer.TYPE, Integer.TYPE);
-        List<Integer> indexes = ArgumentMatcherPositionFinder.getArgumentMatcherIndexes(testMethod, mockMethod, 53, 1);
+        //Method testMethod = ReflectionUtils.getMethod(TestClass.class, "test", false);
+        Method mockMethod = ReflectionUtils.getMethod(TestClass.class, "someMethod", false, String.class, String.class, String.class);
+        List<Integer> indexes = ArgumentMatcherPositionFinder.getArgumentMatcherIndexes("test", TestClass.class, mockMethod, 54, 1);
 
         System.out.println("" + indexes);
     }
@@ -50,33 +50,30 @@ public class ArgumentMatcherPositionFinder {
     public class TestClass {
 
         public void test() {
-            someMethod(1000, not0(0), new Integer(0));
-            someMethod(not0(0), new Integer(0), not0(0));
-            someMethod(1000, not0(not0(0)), new Integer(0));
+            someMethod("1000", not0(String.class), "");
+            someMethod(not0(String.class), "new Integer(0)", not0(String.class));
+            someMethod("1000", not0(String.class), "new Integer(0)");
         }
 
-        public void someMethod(int value1, int value2, int value3) {
+        public void someMethod(String value1, String value2, String value3) {
         }
     }
 
     @ArgumentMatcher
-    public static int not0(int test) {
-        return 1;
+    public static <T> T not0(Class<T> clazz) {
+        return null;
     }
 
 
     @SuppressWarnings({"unchecked"})
-    public static List<Integer> getArgumentMatcherIndexes(Method testMethod, Method mockMethod, int methodLineNr, int methodInvocationIndex) {
+    public static List<Integer> getArgumentMatcherIndexes(String invokerMethodName, Class<?> invokerClass, Method mockMethod, int methodLineNr, int methodInvocationIndex) {
         // get the test method info
-        String testMethodName = testMethod.getName();
-        String testMethodDescriptor = getMethodDescriptor(testMethod);
         String mockMethodName = mockMethod.getName();
         String mockMethodDescriptor = getMethodDescriptor(mockMethod);
-        Class<?> testClass = testMethod.getDeclaringClass();
 
         InputStream inputStream = null;
         try {
-            inputStream = testClass.getClassLoader().getResourceAsStream(testClass.getName().replace('.', '/') + ".class");
+            inputStream = invokerClass.getClassLoader().getResourceAsStream(invokerClass.getName().replace('.', '/') + ".class");
 
             ClassReader cr = new ClassReader(inputStream);
             ClassNode cn = new ClassNode();
@@ -84,7 +81,7 @@ public class ArgumentMatcherPositionFinder {
 
             List<MethodNode> methods = cn.methods;
             for (final MethodNode methodNode : methods) {
-                if (testMethodName.equals(methodNode.name) && testMethodDescriptor.equals(methodNode.desc)) {
+                if (invokerMethodName.equals(methodNode.name)) {
                     MethodInterpreter methodInterpreter = new MethodInterpreter(mockMethodName, mockMethodDescriptor, methodLineNr, methodInvocationIndex);
                     Analyzer analyzer = new MethodAnalyzer(methodNode, methodInterpreter);
                     analyzer.analyze(cn.name, methodNode);
@@ -94,7 +91,7 @@ public class ArgumentMatcherPositionFinder {
             return null;
 
         } catch (Exception e) {
-            throw new UnitilsException("Unable to read class file for test method: " + testMethodName, e);
+            throw new UnitilsException("Unable to read class file for method: " + invokerMethodName, e);
         } finally {
             closeQuietly(inputStream);
         }
@@ -201,7 +198,7 @@ public class ArgumentMatcherPositionFinder {
                 boolean isStatic = methodInsnNode.getOpcode() == INVOKESTATIC;
                 resultArgumentMatcherIndexes = new ArrayList<Integer>();
                 for (int i = 0; i < values.size(); i++) {
-                    if (values.get(i) == ARGUMENT_MATCHER) {
+                    if (values.get(i) == BasicValue.REFERENCE_VALUE) {
                         resultArgumentMatcherIndexes.add(isStatic ? i - 1 : i);
                     }
                 }

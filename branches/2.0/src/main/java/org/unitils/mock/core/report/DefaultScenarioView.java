@@ -40,7 +40,7 @@ public class DefaultScenarioView implements ScenarioView {
 		List<Invocation> invocations = scenario.getObservedInvocations();
 		view.append("Observed scenario:\n");
 		for(Invocation invocation : invocations) {
-			Method method = invocation.getMethod();
+			Method method = invocation.getProxyMethod();
 			view.append("\t")			
 				.append(MethodFormatUtils.getCompleteRepresentation(method))
 				.append("\n");

@@ -15,13 +15,13 @@
  */
 package org.unitils.mock.core;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.unitils.mock.core.argumentmatcher.EqualsArgumentMatcher;
 import org.unitils.mock.core.argumentmatcher.LenEqArgumentMatcher;
+import org.unitils.util.ReflectionUtils;
 
 /**
  * @author Filip Neven
@@ -61,7 +61,9 @@ public class InvocationMatcherBuilder {
 		this.invocation = invocation;
 		
 		argumentMatchers = new ArrayList<ArgumentMatcher>();
-		List<Integer> argumentMatcherIndexes = ArgumentMatcherPositionFinder.getArgumentMatcherIndexes(invocation.getMethod(), invocation.getMethod(), invocation.getLineNumber(), 0);
+		List<Integer> argumentMatcherIndexes = ArgumentMatcherPositionFinder.getArgumentMatcherIndexes(
+				invocation.getInvokedAt().getMethodName(), ReflectionUtils.getClassWithName(invocation.getInvokedAt().getClassName()), 
+				invocation.getProxyMethod(), invocation.getInvokedAt().getLineNumber(), 1);
 		Iterator<ArgumentMatcher> argumentMatcherIterator = registeredArgumentMatchers.iterator();
 		for (int argumentIndex = 0; argumentIndex < invocation.getArguments().size(); argumentIndex++) {
 			if (argumentMatcherIndexes != null && argumentMatcherIndexes.contains(argumentIndex)) {
@@ -84,7 +86,7 @@ public class InvocationMatcherBuilder {
 	
 	
 	public InvocationMatcher createInvocationMatcher() {
-		return new InvocationMatcher(invocation.getMethod(), argumentMatchers);
+		return new InvocationMatcher(invocation.getProxyMethod(), argumentMatchers);
 	}
 
 	

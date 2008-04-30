@@ -77,7 +77,7 @@ public class MockBehaviorDefiner<T> {
 
 	@SuppressWarnings("unchecked")
 	protected T getInvokedMethodRegistrator() {
-		MethodInterceptor invokedMethodRegistratingMethodInterceptor = new MockedMethodRegistratingMethodInterceptor<T>();
+		MethodInterceptor invokedMethodRegistratingMethodInterceptor = new MockedMethodRegistratingMethodInterceptor<T>((MockObject<T>)mockBehaviorBuilder.getMockObject());
 		return (T) ProxyUtils.createProxy(invokedMethodRegistratingMethodInterceptor, mockBehaviorBuilder.getMockObject().getMockedClass());
 	}
 }

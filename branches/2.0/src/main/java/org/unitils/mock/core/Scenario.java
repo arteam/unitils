@@ -113,7 +113,7 @@ public class Scenario {
 		message.append("Prohibited invocation of ")
 			.append(MethodFormatUtils.getCompleteRepresentation(method))
 			.append(" at ")
-			.append(invocation.getStackTrace().length > 1 ? invocation.getStackTrace()[1] : "(unknown source)");
+			.append(invocation.getInvokedAt());
 		return message.toString();
 	}
 	
@@ -125,7 +125,7 @@ public class Scenario {
 			.append(MethodFormatUtils.getCompleteRepresentation(method))
 			.append(", but ");
 		if(matchedInvocation != null) {
-			Method matchedMethod = matchedInvocation.getMethod();
+			Method matchedMethod = matchedInvocation.getProxyMethod();
 			message.append(MethodFormatUtils.getCompleteRepresentation(matchedMethod))
 			.append(" was called (probably with different or non-matching arguments).");
 		} else {
@@ -137,18 +137,18 @@ public class Scenario {
 	
 	protected String getNoMoreInvocationsErrorMessage(Invocation invocation) {
 		final StringBuffer message = new StringBuffer();
-		final Method method = invocation.getMethod();
+		final Method method = invocation.getProxyMethod();
 		message.append("No more invocations expected, but ")
 			.append(MethodFormatUtils.getCompleteRepresentation(method))
 			.append(" was called from ")
-			.append(invocation.getStackTrace().length > 1 ? invocation.getStackTrace()[1] : "(unknown source)");
+			.append(invocation.getInvokedAt());
 		return message.toString();
 	}
 
 	
 	protected Invocation findMatchingMethodName(Method method) {
 		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
-			if(!registeredInvocationEntry.getValue() && registeredInvocationEntry.getKey().getMethod().getName().equals(method.getName())) {
+			if(!registeredInvocationEntry.getValue() && registeredInvocationEntry.getKey().getProxyMethod().getName().equals(method.getName())) {
 				return registeredInvocationEntry.getKey();
 			}
 		}

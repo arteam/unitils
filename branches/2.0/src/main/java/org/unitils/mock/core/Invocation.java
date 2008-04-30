@@ -31,20 +31,21 @@ public class Invocation {
 
 	private Object targetObject;
 	
-	private Method method;
+	private Method proxyMethod;
+	
+	private Method originalMethod;
 	
 	private List<?> arguments;
 	
-	private StackTraceElement[] stackTrace;
+	private StackTraceElement invokedAt;
 
-	private MethodProxy methodProxy;
 
-	public Invocation(Object targetObject, Method method, MethodProxy methodProxy, List<?> arguments, StackTraceElement[] stackTrace) {
+	public Invocation(Object targetObject, Method proxyMethod, Method originalMethod, List<?> arguments, StackTraceElement invokedAt) {
 		this.targetObject = targetObject;
-		this.method = method;
-		this.methodProxy = methodProxy;
+		this.proxyMethod = proxyMethod;
+		this.originalMethod = originalMethod;
 		this.arguments = arguments;
-		this.stackTrace = stackTrace;
+		this.invokedAt = invokedAt;
 	}
 
 	
@@ -53,13 +54,13 @@ public class Invocation {
 	}
 
 
-	public MethodProxy getMethodProxy() {
-		return methodProxy;
+	public Method getProxyMethod() {
+		return proxyMethod;
 	}
 
 
-	public Method getMethod() {
-		return method;
+	public Method getOriginalMethod() {
+		return originalMethod;
 	}
 
 
@@ -68,13 +69,8 @@ public class Invocation {
 	}
 
 	
-	public StackTraceElement[] getStackTrace() {
-		return stackTrace;
-	}
-	
-	
-	public int getLineNumber() {
-		return stackTrace[1].getLineNumber();
+	public StackTraceElement getInvokedAt() {
+		return invokedAt;
 	}
 
 

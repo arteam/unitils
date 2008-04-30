@@ -15,9 +15,6 @@
  */
 package org.unitils.mock.core.action;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.Action;
 import org.unitils.mock.core.Invocation;
 
@@ -31,7 +28,7 @@ public class ActualImplementationAction implements Action {
 
 
 	public Object execute(Invocation invocation) throws Throwable {
-		return invocation.getMethodProxy().invokeSuper(invocation.getTargetObject(), invocation.getArguments().toArray());
+		return invocation.getOriginalMethod().invoke(invocation.getTargetObject(), invocation.getArguments().toArray());
 	}
 
 }

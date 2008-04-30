@@ -62,7 +62,7 @@ public class MockUnitils {
 		MockObject<T> mockObject = ((MockObjectProxy<T>)mock).$_$_getMockObject();
 		invocationMatcherBuilder.registerMockObject(mockObject);
 		AssertStatementCallRegistratingMethodInterceptor<T> assertStatementCallRegistratingMethodInterceptor = 
-			new AssertStatementCallRegistratingMethodInterceptor<T>(getScenario());
+			new AssertStatementCallRegistratingMethodInterceptor<T>(getScenario(), mockObject);
 		return ProxyUtils.createProxy(assertStatementCallRegistratingMethodInterceptor, mockObject.getMockedClass(), MockObjectProxy.class);
 	}
 	

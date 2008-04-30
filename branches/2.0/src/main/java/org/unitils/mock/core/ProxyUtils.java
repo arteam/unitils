@@ -15,6 +15,8 @@
  */
 package org.unitils.mock.core;
 
+import java.lang.reflect.Method;
+
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Factory;
@@ -22,6 +24,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
+import org.unitils.core.UnitilsException;
 
 /**
  * Utility class to create proxy objects.
@@ -58,5 +61,24 @@ public class ProxyUtils {
         @SuppressWarnings("unchecked")
         final T t = (T) proxy;
         return t;
+	}
+	
+	
+	public static Method getOriginalMethod(Method proxyMethod, Class<?> proxiedClass) {
+		try {
+			return proxiedClass.getMethod(proxyMethod.getName(), proxyMethod.getParameterTypes());
+		} catch (NoSuchMethodException e) {
+			throw new UnitilsException(e);
+		}
+	}
+	
+	
+	public static StackTraceElement getProxiedMethodInvokedAt(StackTraceElement[] invocationStackTrace) {
+		for (int stackTraceIndex = 0; stackTraceIndex < invocationStackTrace.length - 1; stackTraceIndex++) {
+			if (invocationStackTrace[stackTraceIndex].getClassName().contains("$$EnhancerByCGLIB$$")) {
+				return invocationStackTrace[stackTraceIndex + 1];
+			}
+		}
+		throw new UnitilsException("No invocation from a cglib proxy found in stacktrace");
 	}
 }

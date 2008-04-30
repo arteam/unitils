@@ -57,7 +57,7 @@ public class InvocationMatcher {
 	 * @return true when given {@link Invocation} matches, false otherwise.
 	 */
 	public boolean matches(Invocation invocation) {
-		if (!this.method.equals(invocation.getMethod())) {
+		if (!this.method.equals(invocation.getProxyMethod())) {
 			return false;
 		}
 		final List<?> arguments = invocation.getArguments();
