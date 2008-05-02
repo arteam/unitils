@@ -15,15 +15,17 @@
  */
 package org.unitils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Base test class that will Unitils-enable your test. This base class will make sure that the
@@ -40,7 +42,7 @@ public abstract class UnitilsTestNG implements IHookable {
 
 
     /**
-     * Called before a test of a test class is run. This is where {@link TestListener#beforeTestClass} is called.
+     * Called before a test of a test class is run. This is where {@link TestListener#afterCreateTestObject(Object)} is called.
      */
     @BeforeClass(alwaysRun = true)
     protected void unitilsBeforeClass() {
@@ -50,6 +52,8 @@ public abstract class UnitilsTestNG implements IHookable {
 
     /**
      * Called before all test setup. This is where {@link TestListener#beforeTestSetUp} is called.
+     *
+     * @param testMethod The test method, not null
      */
     @BeforeMethod(alwaysRun = true)
     protected void unitilsBeforeTestSetUp(Method testMethod) {
@@ -63,6 +67,8 @@ public abstract class UnitilsTestNG implements IHookable {
      * <p/>
      * NOTE: alwaysRun is enabled to be sure that this method is called even when an exception occurs during
      * {@link #unitilsBeforeTestSetUp}.
+     *
+     * @param testMethod The test method, not null
      */
     @AfterMethod(alwaysRun = true)
     protected void unitilsAfterTestTearDown(Method testMethod) {
@@ -85,26 +91,26 @@ public abstract class UnitilsTestNG implements IHookable {
         Throwable beforeTestMethodException = null;
         try {
             getTestListener().beforeTestMethod(this, testResult.getMethod().getMethod());
-        
+
         } catch (Throwable e) {
             // hold exception until later, first call afterTestMethod
             beforeTestMethodException = e;
         }
-        
+
         Throwable testMethodException = null;
         if (beforeTestMethodException == null) {
-        	callBack.runTestMethod(testResult);
-        	testMethodException = testResult.getThrowable();
-        	// Since TestNG calls the method using reflection, the exception is wrapped in an InvocationTargetException
-        	if (testMethodException != null && testMethodException instanceof InvocationTargetException) {
-        		testMethodException = ((InvocationTargetException) testMethodException).getTargetException();
-        	}
+            callBack.runTestMethod(testResult);
+
+            // Since TestNG calls the method using reflection, the exception is wrapped in an InvocationTargetException
+            testMethodException = testResult.getThrowable();
+            if (testMethodException != null && testMethodException instanceof InvocationTargetException) {
+                testMethodException = ((InvocationTargetException) testMethodException).getTargetException();
+            }
         }
 
         Throwable afterTestMethodException = null;
         try {
-            getTestListener().afterTestMethod(this, testResult.getMethod().getMethod(), 
-            		beforeTestMethodException != null ? beforeTestMethodException : testMethodException);
+            getTestListener().afterTestMethod(this, testResult.getMethod().getMethod(), beforeTestMethodException != null ? beforeTestMethodException : testMethodException);
 
         } catch (Throwable e) {
             afterTestMethodException = e;
@@ -114,35 +120,39 @@ public abstract class UnitilsTestNG implements IHookable {
         if (beforeTestMethodException != null) {
             throwException(beforeTestMethodException);
         } else {
-        	// We don't throw the testMethodException, it is already registered by TestNG and will be reported
-        	// to the user
-        	if (testMethodException == null && afterTestMethodException != null) {
-        		throwException(afterTestMethodException);
-        	}
+            // We don't throw the testMethodException, it is already registered by TestNG and will be reported to the user
+            if (testMethodException == null && afterTestMethodException != null) {
+                throwException(afterTestMethodException);
+            }
         }
     }
 
 
-	private void throwException(Throwable exception) {
-		if (exception instanceof RuntimeException) {
-			throw (RuntimeException) exception;
-		} else if (exception instanceof Error) {
-			throw (Error) exception;
-		} else {
-			throw new RuntimeException(exception);
-		}
-	}
+    /**
+     * Throws an unchecked excepton for the given throwable.
+     *
+     * @param throwable The throwable, not null
+     */
+    protected void throwException(Throwable throwable) {
+        if (throwable instanceof RuntimeException) {
+            throw (RuntimeException) throwable;
+        } else if (throwable instanceof Error) {
+            throw (Error) throwable;
+        } else {
+            throw new RuntimeException(throwable);
+        }
+    }
 
 
     /**
-	 * @return The Unitils test listener
-	 */
-	protected TestListener getTestListener() {
-		return getUnitils().getTestListener();
-	}
-	
-	
-	/**
+     * @return The Unitils test listener
+     */
+    protected TestListener getTestListener() {
+        return getUnitils().getTestListener();
+    }
+
+
+    /**
      * Returns the default singleton instance of Unitils
      *
      * @return the Unitils instance, not null
