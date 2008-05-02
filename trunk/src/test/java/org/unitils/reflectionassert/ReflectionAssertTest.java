@@ -16,13 +16,12 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.AssertionFailedError;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
+import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import static org.unitils.util.CollectionUtils.asSet;
 
 import static java.util.Arrays.asList;
 
@@ -33,92 +32,92 @@ import static java.util.Arrays.asList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertTest {
+public class ReflectionAssertTest extends TestCase {
 
     /* Test object */
-    private TestObject testObjectA;
+    private TestObjectString testObjectAString;
 
     /* Same as A but different instance */
-    private TestObject testObjectB;
+    private TestObjectString testObjectBString;
 
     /* Same as A and B but different string value for stringValue2 */
-    private TestObject testObjectDifferentValue;
+    private TestObjectString testObjectDifferentValueString;
+
+    /* Test object */
+    private TestObjectIntString testObjectAIntString;
+
+    /* Same as A but different instance */
+    private TestObjectIntString testObjectBIntString;
 
 
     /**
      * Initializes the test fixture.
      */
-    @Before
-    public void setUp() throws Exception {
-        testObjectA = new TestObject("test 1", "test 2");
-        testObjectB = new TestObject("test 1", "test 2");
-        testObjectDifferentValue = new TestObject("test 1", "XXXXXX");
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        testObjectAString = new TestObjectString("test 1", "test 2");
+        testObjectBString = new TestObjectString("test 1", "test 2");
+        testObjectDifferentValueString = new TestObjectString("test 1", "XXXXXX");
+        testObjectAIntString = new TestObjectIntString(1, "test");
+        testObjectBIntString = new TestObjectIntString(1, "test");
     }
 
 
     /**
      * Test for two equal objects.
      */
-    @Test
     public void testAssertRefEquals_equals() {
-        assertRefEquals(testObjectA, testObjectB);
+        assertRefEquals(testObjectAString, testObjectBString);
     }
 
 
     /**
      * Test for two equal objects (message version).
      */
-    @Test
     public void testAssertRefEquals_equalsMessage() {
-        assertRefEquals("a message", testObjectA, testObjectB);
+        assertRefEquals("a message", testObjectAString, testObjectBString);
     }
 
 
     /**
      * Test for two equal objects.
      */
-    @Test
     public void testAssertLenEquals_equals() {
-        assertLenEquals(testObjectA, testObjectB);
+        assertLenEquals(testObjectAString, testObjectBString);
     }
 
 
     /**
      * Test for two equal objects (message version).
      */
-    @Test
     public void testAssertLenEquals_equalsMessage() {
-        assertLenEquals("a message", testObjectA, testObjectB);
+        assertLenEquals("a message", testObjectAString, testObjectBString);
     }
 
 
     /**
      * Test for two objects that contain different values.
      */
-    @Test
     public void testAssertRefEquals_notEqualsDifferentValues() {
         String message = null;
         try {
-            assertRefEquals(testObjectA, testObjectDifferentValue);
+            assertRefEquals(testObjectAString, testObjectDifferentValueString);
 
         } catch (AssertionFailedError a) {
             message = a.getMessage();
         }
 
         assertNotNull("An assertion exception should have been thrown", message);
-        assertTrue(message.contains("string2"));
-        assertTrue(message.contains("XXXXXX"));
-        assertTrue(message.contains("test 2"));
     }
 
 
     /**
      * Test case for a null left-argument.
      */
-    @Test
     public void testAssertRefEquals_leftNull() {
         try {
-            assertRefEquals(null, testObjectA);
+            assertRefEquals(null, testObjectAString);
             fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError a) {
@@ -130,10 +129,9 @@ public class ReflectionAssertTest {
     /**
      * Test case for a null right-argument.
      */
-    @Test
     public void testAssertRefEquals_rightNull() {
         try {
-            assertRefEquals(testObjectA, null);
+            assertRefEquals(testObjectAString, null);
             fail("Expected AssertionFailedError");
 
         } catch (AssertionFailedError a) {
@@ -145,7 +143,6 @@ public class ReflectionAssertTest {
     /**
      * Test case for both null arguments.
      */
-    @Test
     public void testAssertRefEquals_null() {
         assertRefEquals(null, null);
     }
@@ -154,16 +151,22 @@ public class ReflectionAssertTest {
     /**
      * Test for two equal collections but with different order.
      */
-    @Test
     public void testAssertRefEquals_equalsLenientOrder() {
         assertRefEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"), LENIENT_ORDER);
     }
 
 
     /**
+     * Test for two equal sets but with different order.
+     */
+    public void testAssertRefEquals_equalsLenientOrderSet() {
+        assertRefEquals(asSet(testObjectAString, testObjectAIntString), asSet(testObjectBIntString, testObjectBString), LENIENT_ORDER, IGNORE_DEFAULTS);
+    }
+
+
+    /**
      * Test for two equal collections but with different order.
      */
-    @Test
     public void testAssertLenEquals_equalsLenientOrder() {
         assertLenEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"));
     }
@@ -172,31 +175,28 @@ public class ReflectionAssertTest {
     /**
      * Test for ignored default left value.
      */
-    @Test
     public void testAssertRefEquals_equalsIgnoredDefault() {
-        testObjectA.setString1(null);
-        testObjectB.setString1("xxxxxx");
+        testObjectAString.setString1(null);
+        testObjectBString.setString1("xxxxxx");
 
-        assertRefEquals(testObjectA, testObjectB, IGNORE_DEFAULTS);
+        assertRefEquals(testObjectAString, testObjectBString, IGNORE_DEFAULTS);
     }
 
 
     /**
      * Test for ignored default left value.
      */
-    @Test
     public void testAssertLenEquals_equalsIgnoredDefault() {
-        testObjectA.setString1(null);
-        testObjectB.setString1("xxxxxx");
+        testObjectAString.setString1(null);
+        testObjectBString.setString1("xxxxxx");
 
-        assertLenEquals(testObjectA, testObjectB);
+        assertLenEquals(testObjectAString, testObjectBString);
     }
 
 
     /**
      * Test for message of 2 not equal arrays. Should return return actual content instead of something like String[234
      */
-    @Test
     public void testAssertLenEquals_formatArraysMessage() {
         try {
             assertLenEquals(new String[]{"test1", "test2"}, new Integer[]{1, 2});
@@ -209,15 +209,15 @@ public class ReflectionAssertTest {
 
 
     /**
-     * Test class with failing equals.
+     * Test class with 2 string fields and a failing equals.
      */
-    private class TestObject {
+    private class TestObjectString {
 
         private String string1;
 
         private String string2;
 
-        public TestObject(String stringValue1, String stringValue2) {
+        public TestObjectString(String stringValue1, String stringValue2) {
             this.string1 = stringValue1;
             this.string2 = stringValue2;
         }
@@ -246,6 +246,23 @@ public class ReflectionAssertTest {
         @Override
         public boolean equals(Object o) {
             return false;
+        }
+    }
+
+
+    /**
+     * Test class with int and string field.
+     */
+    @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
+    private class TestObjectIntString {
+
+        private int intValue;
+
+        private String stringValue;
+
+        public TestObjectIntString(int intValue, String stringValue) {
+            this.intValue = intValue;
+            this.stringValue = stringValue;
         }
     }
 

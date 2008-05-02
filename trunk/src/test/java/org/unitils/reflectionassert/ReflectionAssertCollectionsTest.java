@@ -15,6 +15,9 @@
  */
 package org.unitils.reflectionassert;
 
+import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
@@ -22,47 +25,42 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
-import junit.framework.AssertionFailedError;
-
-import org.junit.Before;
-import org.junit.Test;
-
 /**
  * Test class for {@link ReflectionAssert} tests for with assertProperty methods with collection arguments.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertCollectionsTest {
+public class ReflectionAssertCollectionsTest extends TestCase {
 
     /* A test collection */
-    List<String> listA;
+    private List<String> listA;
 
     /* Same as listA but different instance */
-    List<String> listB;
+    private List<String> listB;
 
     /* Same as listA but with a different order */
-    List<String> listDifferentOrder;
+    private List<String> listDifferentOrder;
 
     /* A list having same size as listA but containing different values */
-    List<String> listDifferentValues;
+    private List<String> listDifferentValues;
 
     /* A list containing 1 extra element as listA, a double of another element */
-    List<String> listDuplicateElement;
+    private List<String> listDuplicateElement;
 
     /* A list with one element less than listA */
-    List<String> listOneElementLess;
+    private List<String> listOneElementLess;
 
     /* A list with one element more than listA */
-    List<String> listOneElementMore;
+    private List<String> listOneElementMore;
 
 
     /**
      * Initializes the test fixture.
      */
-    @Before
-    public void setUp() throws Exception {
+    protected void setUp() throws Exception {
+        super.setUp();
+
         listA = Arrays.asList("el1", "el2");
         listB = Arrays.asList("el1", "el2");
         listDifferentOrder = Arrays.asList("el2", "el1");
@@ -76,7 +74,6 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for two equal collections.
      */
-    @Test
     public void testAssertRefEquals() {
         assertRefEquals(listA, listB);
     }
@@ -85,7 +82,6 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for two equal collections but with different order.
      */
-    @Test
     public void testAssertRefEquals_notEqualsDifferentOrder() {
         try {
             assertRefEquals(listA, listDifferentOrder);
@@ -100,7 +96,6 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for two equal collections but with different order.
      */
-    @Test
     public void testAssertRefEquals_equalsDifferentOrder() {
         assertRefEquals(listA, listDifferentOrder, LENIENT_ORDER);
     }
@@ -109,7 +104,6 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for two equal collections but with different order.
      */
-    @Test
     public void testAssertLenEquals_equalsDifferentOrder() {
         assertLenEquals(listA, listDifferentOrder);
     }
@@ -118,7 +112,6 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for two collections with different elements.
      */
-    @Test
     public void testAssertEquals_differentListSameSize() {
         try {
             assertRefEquals(listA, listDifferentValues);
@@ -133,7 +126,6 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for a collection with a duplicate element.
      */
-    @Test
     public void testAssertEquals_duplicateElement() {
         try {
             assertRefEquals(listA, listDuplicateElement);
@@ -148,7 +140,6 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for with a collection that has one element less.
      */
-    @Test
     public void testAssertEquals_oneElementLess() {
         try {
             assertRefEquals(listA, listOneElementLess);
@@ -163,7 +154,6 @@ public class ReflectionAssertCollectionsTest {
     /**
      * Test for with a collection that has one element more.
      */
-    @Test
     public void testAssertEquals_oneElementMore() {
         try {
             assertRefEquals(listA, listOneElementMore);

@@ -26,11 +26,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.formatter.DifferenceReport;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 
@@ -63,7 +64,7 @@ public class ReflectionAssert {
      * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
      * If they are not equal an AssertionFailedError is thrown.
      * <p/>
-     * This is identical to {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} with
+     * This is identical to {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param expected the expected object
@@ -121,10 +122,10 @@ public class ReflectionAssert {
      * @throws AssertionFailedError when both objects are not equals
      */
     public static void assertRefEquals(String message, Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
-        ReflectionComparator reflectionComparator = ReflectionComparatorChainFactory.getComparatorChainForModes(modes);
-        Difference difference = reflectionComparator.getDifference(expected, actual);
+        ReflectionComparator reflectionComparator = createRefectionComparator(modes);
+        Difference difference = reflectionComparator.getAllDifferences(expected, actual);
         if (difference != null) {
-            Assert.fail(formatMessage(message, difference));
+            Assert.fail(DifferenceReport.createReport(message, difference));
         }
     }
 
@@ -133,7 +134,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * This is identical to {@link #assertPropertyRefEquals(String,Object,Object,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
@@ -191,7 +192,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -217,7 +218,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * This is identical to {@link #assertPropertyRefEquals(String,Collection,Collection,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
@@ -284,7 +285,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -306,28 +307,6 @@ public class ReflectionAssert {
      * Formats the exception message.
      *
      * @param suppliedMessage the user supplied message
-     * @param difference      the difference
-     * @return the formatted message
-     */
-    protected static String formatMessage(String suppliedMessage, Difference difference) {
-        String result = formatMessage(suppliedMessage, difference.getMessage());
-
-        String fieldString = difference.getFieldStackAsString();
-        if (StringUtils.isEmpty(fieldString)) {
-            fieldString = "<top-level>";
-        }
-
-        result += "\nField: <" + fieldString;
-        result += "> expected: <" + formatObject(difference.getLeftValue());
-        result += "> but was: <" + formatObject(difference.getRightValue()) + ">";
-        return result;
-    }
-
-
-    /**
-     * Formats the exception message.
-     *
-     * @param suppliedMessage the user supplied message
      * @param specificMessage the reason
      * @return the formatted message
      */
@@ -336,44 +315,6 @@ public class ReflectionAssert {
             return specificMessage;
         }
         return suppliedMessage + "\n" + specificMessage;
-    }
-
-
-    /**
-     * Gets the string representation of the given object. This also correctly handles array types.
-     *
-     * @param object The instance
-     * @return The string representation, not null
-     */
-    protected static String formatObject(Object object) {
-        if (object instanceof byte[]) {
-            return Arrays.toString((byte[]) object);
-
-        } else if (object instanceof short[]) {
-            return Arrays.toString((short[]) object);
-
-        } else if (object instanceof int[]) {
-            return Arrays.toString((int[]) object);
-
-        } else if (object instanceof long[]) {
-            return Arrays.toString((long[]) object);
-
-        } else if (object instanceof char[]) {
-            return Arrays.toString((char[]) object);
-
-        } else if (object instanceof float[]) {
-            return Arrays.toString((float[]) object);
-
-        } else if (object instanceof double[]) {
-            return Arrays.toString((double[]) object);
-
-        } else if (object instanceof boolean[]) {
-            return Arrays.toString((boolean[]) object);
-
-        } else if (object instanceof Object[]) {
-            return Arrays.toString((Object[]) object);
-        }
-        return String.valueOf(object);
     }
 
 
