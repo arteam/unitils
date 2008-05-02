@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="persistenceXmlLocation"
+			value="org/unitils/integrationtest/persistence/jpa/persistence-test.xml" />
+	</bean>
+
+	<bean id="jotm"
+		class="org.springframework.transaction.jta.JotmFactoryBean" />
+
+	<bean id="transactionManager"
+		class="org.springframework.transaction.jta.JtaTransactionManager">
+		<property name="userTransaction" ref="jotm" />
+	</bean>
+
+	<bean id="innerDataSource"
+		class="org.enhydra.jdbc.standard.StandardXADataSource"
+		destroy-method="shutdown">
+		<property name="transactionManager" ref="jotm" />
+		<property name="driverName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:unitils" />
+		<property name="user" value="sa" />
+		<property name="password" value="" />
+	</bean>
+
+	<bean id="dataSource"
+		class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"
+		destroy-method="shutdown">
+		<property name="dataSource" ref="innerDataSource" />
+		<property name="user" value="sa" />
+		<property name="password" value="" />
+		<property name="maxSize" value="5" />
+	</bean>
+
+</beans>
