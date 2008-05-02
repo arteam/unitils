@@ -77,9 +77,13 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(Difference difference, String fieldName) {
-        String result = formatTitle(difference.getMessage(), fieldName);
-        result += formatLine("Left : " + objectFormatter.format(difference.getLeftValue()));
-        result += formatLine("Right: " + objectFormatter.format(difference.getRightValue()) + "\n\n");
+        String result = "";
+        if (fieldName != null) {
+            result += formatLine(fieldName);
+        }
+        String prefix = (fieldName == null) ? "" : "    ";
+        result += formatLine(prefix + "  =>  " + objectFormatter.format(difference.getLeftValue()));
+        result += formatLine(prefix + "  =>  " + objectFormatter.format(difference.getRightValue()) + "\n");
         return result;
     }
 

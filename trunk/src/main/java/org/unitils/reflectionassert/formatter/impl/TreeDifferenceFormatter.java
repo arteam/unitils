@@ -15,7 +15,6 @@
  */
 package org.unitils.reflectionassert.formatter.impl;
 
-import static org.apache.commons.lang.StringUtils.repeat;
 import org.unitils.reflectionassert.difference.*;
 import org.unitils.reflectionassert.formatter.DifferenceFormatter;
 import org.unitils.reflectionassert.formatter.util.BestMatchFinder;
@@ -67,9 +66,13 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(Difference difference, String fieldName) {
-        String fieldNameString = fieldName == null ? "" : (fieldName + "   ");
-        String result = fieldNameString + "[L] " + objectFormatter.format(difference.getLeftValue()) + "\n";
-        result += repeat(" ", fieldNameString.length()) + "[R] " + objectFormatter.format(difference.getRightValue()) + "\n";
+        String prefix = "";
+        if (fieldName != null) {
+            prefix += "[" + fieldName + "]  ";
+        }
+
+        String result = prefix + objectFormatter.format(difference.getLeftValue()) + "\n";
+        result += prefix + objectFormatter.format(difference.getRightValue()) + "\n";
         return result;
     }
 

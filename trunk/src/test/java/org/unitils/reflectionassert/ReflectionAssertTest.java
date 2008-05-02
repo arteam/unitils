@@ -16,7 +16,10 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
@@ -32,7 +35,7 @@ import static java.util.Arrays.asList;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertTest extends TestCase {
+public class ReflectionAssertTest extends UnitilsJUnit4 {
 
     /* Test object */
     private TestObjectString testObjectAString;
@@ -53,9 +56,8 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Initializes the test fixture.
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         testObjectAString = new TestObjectString("test 1", "test 2");
         testObjectBString = new TestObjectString("test 1", "test 2");
         testObjectDifferentValueString = new TestObjectString("test 1", "XXXXXX");
@@ -67,6 +69,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for two equal objects.
      */
+    @Test
     public void testAssertRefEquals_equals() {
         assertRefEquals(testObjectAString, testObjectBString);
     }
@@ -75,6 +78,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for two equal objects (message version).
      */
+    @Test
     public void testAssertRefEquals_equalsMessage() {
         assertRefEquals("a message", testObjectAString, testObjectBString);
     }
@@ -83,6 +87,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for two equal objects.
      */
+    @Test
     public void testAssertLenEquals_equals() {
         assertLenEquals(testObjectAString, testObjectBString);
     }
@@ -91,6 +96,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for two equal objects (message version).
      */
+    @Test
     public void testAssertLenEquals_equalsMessage() {
         assertLenEquals("a message", testObjectAString, testObjectBString);
     }
@@ -99,50 +105,34 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for two objects that contain different values.
      */
+    @Test(expected = AssertionFailedError.class)
     public void testAssertRefEquals_notEqualsDifferentValues() {
-        String message = null;
-        try {
-            assertRefEquals(testObjectAString, testObjectDifferentValueString);
-
-        } catch (AssertionFailedError a) {
-            message = a.getMessage();
-        }
-
-        assertNotNull("An assertion exception should have been thrown", message);
+        assertRefEquals(testObjectAString, testObjectDifferentValueString);
     }
 
 
     /**
      * Test case for a null left-argument.
      */
+    @Test(expected = AssertionFailedError.class)
     public void testAssertRefEquals_leftNull() {
-        try {
-            assertRefEquals(null, testObjectAString);
-            fail("Expected AssertionFailedError");
-
-        } catch (AssertionFailedError a) {
-            // expected
-        }
+        assertRefEquals(null, testObjectAString);
     }
 
 
     /**
      * Test case for a null right-argument.
      */
+    @Test(expected = AssertionFailedError.class)
     public void testAssertRefEquals_rightNull() {
-        try {
-            assertRefEquals(testObjectAString, null);
-            fail("Expected AssertionFailedError");
-
-        } catch (AssertionFailedError a) {
-            // expected
-        }
+        assertRefEquals(testObjectAString, null);
     }
 
 
     /**
      * Test case for both null arguments.
      */
+    @Test
     public void testAssertRefEquals_null() {
         assertRefEquals(null, null);
     }
@@ -151,6 +141,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for two equal collections but with different order.
      */
+    @Test
     public void testAssertRefEquals_equalsLenientOrder() {
         assertRefEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"), LENIENT_ORDER);
     }
@@ -159,6 +150,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for two equal sets but with different order.
      */
+    @Test
     public void testAssertRefEquals_equalsLenientOrderSet() {
         assertRefEquals(asSet(testObjectAString, testObjectAIntString), asSet(testObjectBIntString, testObjectBString), LENIENT_ORDER, IGNORE_DEFAULTS);
     }
@@ -167,6 +159,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for two equal collections but with different order.
      */
+    @Test
     public void testAssertLenEquals_equalsLenientOrder() {
         assertLenEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"));
     }
@@ -175,6 +168,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for ignored default left value.
      */
+    @Test
     public void testAssertRefEquals_equalsIgnoredDefault() {
         testObjectAString.setString1(null);
         testObjectBString.setString1("xxxxxx");
@@ -186,6 +180,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for ignored default left value.
      */
+    @Test
     public void testAssertLenEquals_equalsIgnoredDefault() {
         testObjectAString.setString1(null);
         testObjectBString.setString1("xxxxxx");
@@ -197,6 +192,7 @@ public class ReflectionAssertTest extends TestCase {
     /**
      * Test for message of 2 not equal arrays. Should return return actual content instead of something like String[234
      */
+    @Test
     public void testAssertLenEquals_formatArraysMessage() {
         try {
             assertLenEquals(new String[]{"test1", "test2"}, new Integer[]{1, 2});
