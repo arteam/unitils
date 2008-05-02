@@ -14,24 +14,22 @@ Tutorial
     If you want to learn how you can setup Unitils to get started quickly, read the {{{cookbook.html}cookbook}}.
 
 
-    * {{{#Assertion utilities}Assertion utilities}}
+    * {{{#Assertion_utilities}Assertion utilities}}
     
-    * {{{#Unitils Modules}Unitils Modules}}
+    * {{{#Unitils_modules}Unitils modules}}
     
-    * {{{#Database testing}Database testing}}
+    * {{{#Database_testing}Database testing}}
     
-    * {{{#Automatic test database maintenance}Automatic test database maintenance}}
+    * {{{#Automatic_test_database_maintenance}Automatic test database maintenance}}
     
-    * {{{#Testing with Hibernate}Testing with Hibernate}}
+    * {{{#Testing_with_Hibernate}Testing with Hibernate}}
 	
-    * {{{#Testing with JPA}Testing with JPA}}
+    * {{{#Testing_with_JPA}Testing with JPA}}
     
-    * {{{#Testing with Spring}Testing with Spring}}
+    * {{{#Testing_with_Spring}Testing with Spring}}
     
-    * {{{#Testing with mock objects}Testing with mock objects}}
-    
-    * {{{#Future directions}Future directions}}
-    
+    * {{{#Testing_with_mock_objects}Testing with mock objects}}
+        
     []
 
 
@@ -243,7 +241,7 @@ assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second 
 
 
 
-* {Unitils Modules}
+* {Unitils modules}
 ~~~~~~~~~~~~~~~~~~~
     The rest of this tutorial describes Unitils' module system and the modules that are provided. We start with explaining how to setup a 
     test environment to let your tests make use of these modules. The subsequent chapters dive deeper into the functionality of each of 
@@ -796,9 +794,9 @@ dbscripts/ 001_initial.sql
 	
 +-----+
 dbscripts/ 01_production/ 001_initial.sql
-						  002_auditing_updates.sql
-		   02_latest_dev/ 001_add_user_table.sql
-						  002_rename_product_id.sql
+                          002_auditing_updates.sql
+           02_latest_dev/ 001_add_user_table.sql
+                          002_rename_product_id.sql
 +-----+
 
 	In this example, the scripts in folder 01_production are executed first, the scripts in 02_latest_dev are executed afterwards. 

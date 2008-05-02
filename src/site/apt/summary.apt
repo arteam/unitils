@@ -78,6 +78,12 @@ Summary
 * News
 ~~~~~~
 
+    <<2008-05-02 - Release of Unitils 1.1 rc 2>>
+
+    In this release, some small issues have been resolved: Postgresql support is improved, the database version is correctly updated during a from-scratch update
+    and a test is added to check whether the version table is correctly migrated. See the {{{migration.html} migration page}} for more information on the migration
+    of the version table.
+
 	<<2008-03-28 - Release of Unitils 1.1 rc 1>>
 	
 	We've been working hard to implement following features: JPA integration, support for hierarchically organized database scripts, support for Oracle PL/SQL in database scripts. Also, Unitils' transaction management and 
@@ -86,6 +92,7 @@ Summary
 	
 	Unitils 1.1-rc-1 bundles all these new features. Read the {{{tutorial.html} tutorial}} for more information on Unitils' new features. Take a look at the {{{migration.html} migration page}} 
 	to see what you must do to migrate to unitils 1.1-rc-1. 
+
 
     <<2007-12-05 - Release of Unitils 1.0>>
 
