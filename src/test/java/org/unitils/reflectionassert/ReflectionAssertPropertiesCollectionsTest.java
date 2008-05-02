@@ -15,18 +15,14 @@
  */
 package org.unitils.reflectionassert;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.fail;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyRefEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
+import static java.util.Arrays.asList;
 import java.util.List;
-
-import junit.framework.AssertionFailedError;
-
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Test class for {@link org.unitils.reflectionassert.ReflectionAssert} tests for with
@@ -35,18 +31,19 @@ import org.junit.Test;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ReflectionAssertPropertiesCollectionsTest {
+public class ReflectionAssertPropertiesCollectionsTest extends TestCase {
 
 
     /* A test collection */
-    List<TestObject> list;
+    private List<TestObject> list;
 
 
     /**
      * Initializes the test fixture.
      */
-    @Before
-    public void setUp() throws Exception {
+    protected void setUp() throws Exception {
+        super.setUp();
+
         list = asList(new TestObject(1L, "el1"), new TestObject(2L, "el2"));
     }
 
@@ -54,7 +51,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test for equal property values.
      */
-    @Test
     public void testAssertPropertyRefEquals() {
         assertPropertyRefEquals("stringProperty", asList("el1", "el2"), list);
     }
@@ -63,7 +59,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test for equal property values but of different types (int versus long).
      */
-    @Test
     public void testAssertPropertyRefEquals_differentTypes() {
         assertPropertyRefEquals("primitiveProperty", asList(1L, 2L), list);
     }
@@ -72,7 +67,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test for different property values.
      */
-    @Test
     public void testAssertPropertyRefEquals_notEqualsDifferentValues() {
         try {
             assertPropertyRefEquals("stringProperty", asList("xxxxx", "xxxxx"), list);
@@ -87,7 +81,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test for property values with different order.
      */
-    @Test
     public void testAssertPropertyRefEquals_equalsDifferentOrder() {
         assertPropertyRefEquals("stringProperty", asList("el1", "el2"), list, LENIENT_ORDER);
     }
@@ -96,7 +89,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test for property values with different order.
      */
-    @Test
     public void testAssertPropertyLenEquals_equalsDifferentOrder() {
         assertPropertyLenEquals("stringProperty", asList("el1", "el2"), list);
     }
@@ -105,7 +97,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test for property values with different order.
      */
-    @Test
     public void testAssertPropertyRefEquals_notEqualsDifferentOrder() {
         try {
             assertPropertyRefEquals("stringProperty", asList("el2", "el1"), list);
@@ -120,7 +111,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test for equal primitive property values. Using ints instead of longs.
      */
-    @Test
     public void testAssertPropertyRefEquals_equalsPrimitivesList() {
         assertPropertyLenEquals("primitiveProperty", asList(2, 1), list);
     }
@@ -129,7 +119,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test for different primitive property values. Using ints instead of longs.
      */
-    @Test
     public void testAssertPropertyRefEquals_notEqualsPrimitivesList() {
         try {
             assertPropertyLenEquals("primitiveProperty", asList(999, 1), list);
@@ -143,7 +132,6 @@ public class ReflectionAssertPropertiesCollectionsTest {
     /**
      * Test case for null as actual object argument.
      */
-    @Test
     public void testAssertPropertyRefEquals_actualObjectNull() {
         try {
             assertPropertyLenEquals("stringProperty", asList(1, 2), null);

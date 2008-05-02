@@ -16,7 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 /**
  * Test class for {@link ReflectionComparator}.
@@ -25,6 +27,7 @@ import org.unitils.reflectionassert.ReflectionComparator.Difference;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+@SuppressWarnings({"FieldCanBeLocal"})
 public class ReflectionComparatorEnumsTest extends TestCase {
 
     /* Test object */
@@ -46,7 +49,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
 
         enumsA = new Enums(Enums.TestEnum.TEST1);
         enumsB = new Enums(Enums.TestEnum.TEST1);
@@ -58,7 +61,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
      * Test for two equal enum values.
      */
     public void testGetDifference_equals() {
-        Difference result = reflectionComparator.getDifference(enumsA, enumsB);
+        Difference result = reflectionComparator.getAllDifferences(enumsA, enumsB);
         assertNull(result);
     }
 
@@ -67,12 +70,12 @@ public class ReflectionComparatorEnumsTest extends TestCase {
      * Test for two different enum values
      */
     public void testGetDifference_notEqualsDifferentValues() {
-        Difference result = reflectionComparator.getDifference(enumsA, enumsDifferentValue);
+        Difference result = reflectionComparator.getAllDifferences(enumsA, enumsDifferentValue);
 
         assertNotNull(result);
-        assertEquals("testEnumValue", result.getFieldStack().get(0));
-        assertEquals(Enums.TestEnum.TEST1, result.getLeftValue());
-        assertEquals(Enums.TestEnum.TEST2, result.getRightValue());
+        Difference difference = getInnerDifference("testEnumValue", result);
+        assertEquals(Enums.TestEnum.TEST1, difference.getLeftValue());
+        assertEquals(Enums.TestEnum.TEST2, difference.getRightValue());
     }
 
 
@@ -85,7 +88,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
             TEST1, TEST2
         }
 
-        @SuppressWarnings("unused")
+        @SuppressWarnings({"UnusedDeclaration"})
         private TestEnum testEnumValue;
 
 
@@ -100,7 +103,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
          * @param o the object to compare to
          */
         @Override
-		public boolean equals(Object o) {
+        public boolean equals(Object o) {
             return false;
         }
     }

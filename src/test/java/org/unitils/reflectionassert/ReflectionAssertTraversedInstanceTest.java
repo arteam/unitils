@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Tests for correct handling of traversed instances pairs in ReflectionAssert.
  * <p/>
- * Special thanks to Dmitry Sidorenko, who first rported this issue and also indicated how to solve it.
+ * Special thanks to Dmitry Sidorenko, who first reported this issue and also indicated how to solve it.
  *
  * @author Dmitry Sidorenko
  * @author Tim Ducheyne

@@ -16,7 +16,9 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import org.unitils.reflectionassert.ReflectionComparator.Difference;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
+import org.unitils.reflectionassert.difference.Difference;
+import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,15 +75,15 @@ public class ReflectionComparatorCollectionTest extends TestCase {
         collectionInnerB = createCollection(null, collectionB);
         collectionInnerDifferentValue = createCollection(null, collectionDifferentValue);
 
-        reflectionComparator = ReflectionComparatorChainFactory.STRICT_COMPARATOR;
+        reflectionComparator = createRefectionComparator();
     }
 
 
     /**
      * Test for two equal collections.
      */
-    public void testGetDifference_equals() {
-        Difference result = reflectionComparator.getDifference(collectionA, collectionB);
+    public void testGetAllDifferences_equals() {
+        Difference result = reflectionComparator.getAllDifferences(collectionA, collectionB);
         assertNull(result);
     }
 
@@ -89,8 +91,8 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two equal collections that are of a different type.
      */
-    public void testGetDifference_equalsDifferentType() {
-        Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentType);
+    public void testGetAllDifferences_equalsDifferentType() {
+        Difference result = reflectionComparator.getAllDifferences(collectionA, collectionDifferentType);
         assertNull(result);
     }
 
@@ -98,8 +100,8 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two equal collections as an inner field of an object.
      */
-    public void testGetDifference_equalsInner() {
-        Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerB);
+    public void testGetAllDifferences_equalsInner() {
+        Difference result = reflectionComparator.getAllDifferences(collectionInnerA, collectionInnerB);
         assertNull(result);
     }
 
@@ -107,74 +109,117 @@ public class ReflectionComparatorCollectionTest extends TestCase {
     /**
      * Test for two collections that contain different values.
      */
-    public void testGetDifference_notEqualsDifferentValues() {
-        Difference result = reflectionComparator.getDifference(collectionA, collectionDifferentValue);
+    public void testGetAllDifferences_notEqualsDifferentValues() {
+        Difference result = reflectionComparator.getAllDifferences(collectionA, collectionDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("1", result.getFieldStack().get(0));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = getInnerDifference("string", getInnerDifference("1", result));
+        assertEquals("test 2", difference.getLeftValue());
+        assertEquals("XXXXXX", difference.getRightValue());
     }
 
 
     /**
-     * Test for two collections that have a different size.
+     * Test for two collections that have a different size. The first element was removed from the right list.
      */
-    public void testGetDifference_notEqualsDifferentSize() {
+    public void testGetAllDifferences_notEqualsFirstRightElementRemoved() {
         Iterator<?> iterator = collectionB.iterator();
         iterator.next();
         iterator.remove();
 
-        Difference result = reflectionComparator.getDifference(collectionA, collectionB);
+        Difference result = reflectionComparator.getAllDifferences(collectionA, collectionB);
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().isEmpty());
-        assertSame(collectionA, result.getLeftValue());
-        assertSame(collectionB, result.getRightValue());
+        Difference difference1 = getInnerDifference("string", getInnerDifference("0", result));
+        assertEquals("test 1", difference1.getLeftValue());
+        assertEquals("test 2", difference1.getRightValue());
+
+        Difference difference2 = getInnerDifference("string", getInnerDifference("1", result));
+        assertEquals("test 2", difference2.getLeftValue());
+        assertEquals("test 3", difference2.getRightValue());
+
+        Difference difference3 = getInnerDifference("2", result);
+        assertEquals("test 3", ((Element) difference3.getLeftValue()).getString());
+        assertEquals(null, difference3.getRightValue());
+    }
+
+
+    /**
+     * Test for two collections that have a different size. The first element was removed from the left list.
+     */
+    public void testGetAllDifferences_notEqualsFirstLeftElementRemoved() {
+        Iterator<?> iterator = collectionA.iterator();
+        iterator.next();
+        iterator.remove();
+
+        Difference result = reflectionComparator.getAllDifferences(collectionA, collectionB);
+
+        Difference difference1 = getInnerDifference("string", getInnerDifference("0", result));
+        assertEquals("test 2", difference1.getLeftValue());
+        assertEquals("test 1", difference1.getRightValue());
+
+        Difference difference2 = getInnerDifference("string", getInnerDifference("1", result));
+        assertEquals("test 3", difference2.getLeftValue());
+        assertEquals("test 2", difference2.getRightValue());
+
+        Difference difference3 = getInnerDifference("2", result);
+        assertEquals(null, difference3.getLeftValue());
+        assertEquals("test 3", ((Element) difference3.getRightValue()).getString());
     }
 
 
     /**
      * Test for objects with inner collections that contain different values.
      */
-    public void testGetDifference_notEqualsInnerDifferentValues() {
-        Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerDifferentValue);
+    public void testGetAllDifferences_notEqualsInnerDifferentValues() {
+        Difference result = reflectionComparator.getAllDifferences(collectionInnerA, collectionInnerDifferentValue);
 
-        assertNotNull(result);
-        assertEquals("1", result.getFieldStack().get(0));
-        assertEquals("inner", result.getFieldStack().get(1));
-        assertEquals("test 2", result.getLeftValue());
-        assertEquals("XXXXXX", result.getRightValue());
+        Difference difference = getInnerDifference("inner", getInnerDifference("1", result));
+        Difference innerDifference = getInnerDifference("string", getInnerDifference("1", difference));
+        assertEquals("test 2", innerDifference.getLeftValue());
+        assertEquals("XXXXXX", innerDifference.getRightValue());
     }
 
 
     /**
      * Tests for objects with inner collections that have a different size.
      */
-    public void testGetDifference_notEqualsInnerDifferentSize() {
+    public void testGetAllDifferences_notEqualsInnerDifferentSize() {
         Iterator<?> iterator = collectionB.iterator();
         iterator.next();
         iterator.remove();
 
-        Difference result = reflectionComparator.getDifference(collectionInnerA, collectionInnerB);
+        Difference result = reflectionComparator.getAllDifferences(collectionInnerA, collectionInnerB);
 
-        assertNotNull(result);
-        assertEquals("1", result.getFieldStack().get(0));
-        assertSame(collectionA, result.getLeftValue());
-        assertSame(collectionB, result.getRightValue());
+        Difference difference = getInnerDifference("inner", getInnerDifference("1", result));
+        assertSame(collectionA, difference.getLeftValue());
+        assertSame(collectionB, difference.getRightValue());
     }
 
 
     /**
      * Tests for collections but right value is not a collection.
      */
-    public void testGetDifference_notEqualsRightNotCollection() {
-        Difference result = reflectionComparator.getDifference(collectionA, "Test string");
+    public void testGetAllDifferences_notEqualsRightNotCollection() {
+        Difference result = reflectionComparator.getAllDifferences(collectionA, "Test string");
 
-        assertNotNull(result);
-        assertTrue(result.getFieldStack().empty());
         assertSame(collectionA, result.getLeftValue());
         assertEquals("Test string", result.getRightValue());
+    }
+
+
+    /**
+     * Test for two collections that contain different values.
+     */
+    public void testGetAllDifferences_notEqualsMultipleDifferentValues() {
+        collectionDifferentValue.iterator().next().string = "YYYYYY";
+        Difference result = reflectionComparator.getAllDifferences(collectionA, collectionDifferentValue);
+
+        Difference difference1 = getInnerDifference("string", getInnerDifference("0", result));
+        assertEquals("test 1", difference1.getLeftValue());
+        assertEquals("YYYYYY", difference1.getRightValue());
+
+        Difference difference2 = getInnerDifference("string", getInnerDifference("1", result));
+        assertEquals("test 2", difference2.getLeftValue());
+        assertEquals("XXXXXX", difference2.getRightValue());
     }
 
 
