@@ -15,28 +15,6 @@
  */
 package org.unitils.dbunit;
 
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefault;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
-
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -46,6 +24,7 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
@@ -56,6 +35,19 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.util.ModuleUtils.*;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
+
+import javax.sql.DataSource;
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -113,10 +105,10 @@ public class DbUnitModule implements Module {
      * No after initialization needed for this module
      */
     public void afterInit() {
-	}
+    }
 
 
-	/**
+    /**
      * Gets the DbUnit connection or creates one if it does not exist yet.
      *
      * @param schemaName The schema name, not null
@@ -150,8 +142,8 @@ public class DbUnitModule implements Module {
                 return;
             }
             DataSetLoadStrategy dataSetLoadStrategy = getDataSetLoadStrategy(testMethod, testObject.getClass());
-
             insertDataSet(multiSchemaDataSet, dataSetLoadStrategy);
+
         } catch (Exception e) {
             throw new UnitilsException("Error inserting test data from DbUnit dataset for method " + testMethod, e);
         } finally {
@@ -312,7 +304,7 @@ public class DbUnitModule implements Module {
      * @return The dataset, null if there is no data set
      */
     public MultiSchemaDataSet getExpectedDataSet(Method testMethod, Object testObject) {
-        Class<? extends Object> testClass = testObject.getClass();
+        Class<?> testClass = testObject.getClass();
         ExpectedDataSet expectedDataSetAnnotation = getMethodOrClassLevelAnnotation(ExpectedDataSet.class, testMethod, testClass);
         if (expectedDataSetAnnotation == null) {
             // No @ExpectedDataSet annotation found
@@ -350,7 +342,7 @@ public class DbUnitModule implements Module {
             File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
             dataSetFiles.add(dataSetFile);
         }
-        return dataSetFactory.createDataSet(dataSetFiles.toArray(new File[0]));
+        return dataSetFactory.createDataSet(dataSetFiles.toArray(new File[dataSetFiles.size()]));
     }
 
 
@@ -385,7 +377,7 @@ public class DbUnitModule implements Module {
         // Create connection
         DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
         DatabaseConfig config = connection.getConfig();
-        
+
         // Make sure that dbunit's correct IDataTypeFactory, that handles dbms specific data type issues, is used
         IDataTypeFactory dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
         config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
@@ -393,7 +385,7 @@ public class DbUnitModule implements Module {
         config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
         // Make sure that batched statements are used to insert the data into the database
         config.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, "true");
-        
+
         return connection;
     }
 
@@ -447,7 +439,7 @@ public class DbUnitModule implements Module {
     @SuppressWarnings("unchecked")
     protected DataSetFactory getDefaultDataSetFactory() {
         Class<? extends DataSetFactory> dataSetFactoryClass = getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "factory", configuration));
-		return getDataSetFactory(dataSetFactoryClass);
+        return getDataSetFactory(dataSetFactoryClass);
     }
 
 
@@ -486,7 +478,7 @@ public class DbUnitModule implements Module {
     @SuppressWarnings("unchecked")
     protected DataSetLoadStrategy getDefaultDataSetLoadStrategy() {
         Class<? extends DataSetLoadStrategy> dataSetLoadStrategyClassName = getClassWithName(getAnnotationPropertyDefault(DbUnitModule.class, DataSet.class, "loadStrategy", configuration));
-		return createInstanceOfType(dataSetLoadStrategyClassName, false);
+        return createInstanceOfType(dataSetLoadStrategyClassName, false);
     }
 
 
