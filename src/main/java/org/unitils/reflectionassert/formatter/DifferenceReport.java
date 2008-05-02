@@ -24,7 +24,7 @@ import org.unitils.reflectionassert.formatter.impl.TreeDifferenceFormatter;
  * Creates a report of the given differences. This will first output the differences using the default difference
  * formatter. If the difference is not a simple difference, this will also output the difference tree using the
  * difference tree formatter.
- *  
+ * <p/>
  * todo create interface + property
  *
  * @author Tim Ducheyne
@@ -53,7 +53,7 @@ public class DifferenceReport {
         result += "Found following differences:\n\n";
         result += new DefaultDifferenceFormatter().format(difference);
         if (!Difference.class.equals(difference.getClass())) {
-            result += "\nDifference object tree:\n\n";
+            result += "______________________________________________\n\n";
             result += new TreeDifferenceFormatter().format(difference);
         }
         return result;
