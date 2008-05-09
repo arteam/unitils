@@ -24,16 +24,19 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
 
 public class ScenarioTest extends UnitilsJUnit4 {
-	private Scenario scenario;
-	private Method testMethodDoSomething;
-	private Method testMethodDoSomethingWithParam;
-	private Object testObject = new TestObject();
-	private InvocationMatcher doSomethingInvocationMatcher;
-	private InvocationMatcher doSomethingWithParamInvocationMatcher;
+
+	Scenario scenario;
+	Method testMethodDoSomething;
+	Method testMethodDoSomethingWithParam;
+	MockObject<Object> mockObject;
+	InvocationMatcher doSomethingInvocationMatcher;
+	InvocationMatcher doSomethingWithParamInvocationMatcher;
 	
 	
 	@Before
 	public void setup() throws Exception {
+		scenario = new Scenario();
+		mockObject = new MockObject<Object>("testMockObject", Object.class, false, scenario);
 		testMethodDoSomething = TestObject.class.getMethod("doSomething");
 		testMethodDoSomethingWithParam = TestObject.class.getMethod("doSomething", Object.class);
 		doSomethingInvocationMatcher = new InvocationMatcher(testMethodDoSomething);
@@ -42,8 +45,8 @@ public class ScenarioTest extends UnitilsJUnit4 {
 	
 	@Test
 	public void testAssertInvoked() {
-		scenario = new Scenario();
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), 
+				ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.assertInvoked(doSomethingInvocationMatcher);
 		try {
 			scenario.assertInvoked(doSomethingWithParamInvocationMatcher);
@@ -61,8 +64,7 @@ public class ScenarioTest extends UnitilsJUnit4 {
 	
 	@Test
 	public void testAssertNotInvoked() {
-		scenario = new Scenario();
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.assertNotInvoked(doSomethingWithParamInvocationMatcher);
 		try {
 			scenario.assertNotInvoked(doSomethingInvocationMatcher);
@@ -77,8 +79,8 @@ public class ScenarioTest extends UnitilsJUnit4 {
 	@Test
 	public void testAssertNoMoreInvocations() {
 		scenario = new Scenario();
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.assertInvoked(doSomethingInvocationMatcher);
 		try {
 			scenario.assertNoMoreInvocations();
@@ -90,7 +92,7 @@ public class ScenarioTest extends UnitilsJUnit4 {
 		scenario.assertInvoked(doSomethingInvocationMatcher);
 		scenario.assertNoMoreInvocations();
 		
-		scenario.registerInvocation(new Invocation(testObject, testMethodDoSomething, null, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.registerOneTimeMatchingMockBehaviorInvocationMatcher(doSomethingInvocationMatcher);
 		scenario.assertNoMoreInvocations();
 	}

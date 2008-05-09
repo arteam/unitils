@@ -18,8 +18,6 @@ package org.unitils.mock.core;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import net.sf.cglib.proxy.MethodProxy;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -29,38 +27,30 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class Invocation {
 
-	private Object targetObject;
+	private MockObject<?> mockObject;
 	
-	private Method proxyMethod;
-	
-	private Method originalMethod;
+	private Method method;
 	
 	private List<?> arguments;
 	
 	private StackTraceElement invokedAt;
 
 
-	public Invocation(Object targetObject, Method proxyMethod, Method originalMethod, List<?> arguments, StackTraceElement invokedAt) {
-		this.targetObject = targetObject;
-		this.proxyMethod = proxyMethod;
-		this.originalMethod = originalMethod;
+	public Invocation(MockObject<?> mockObject, Method method, List<?> arguments, StackTraceElement invokedAt) {
+		this.mockObject = mockObject;
+		this.method = method;
 		this.arguments = arguments;
 		this.invokedAt = invokedAt;
 	}
 
 	
-	public Object getTargetObject() {
-		return targetObject;
+	public MockObject<?> getMockObject() {
+		return mockObject;
 	}
 
 
-	public Method getProxyMethod() {
-		return proxyMethod;
-	}
-
-
-	public Method getOriginalMethod() {
-		return originalMethod;
+	public Method getMethod() {
+		return method;
 	}
 
 

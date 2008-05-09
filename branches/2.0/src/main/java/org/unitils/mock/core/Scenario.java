@@ -125,9 +125,7 @@ public class Scenario {
 			.append(MethodFormatUtils.getCompleteRepresentation(method))
 			.append(", but ");
 		if(matchedInvocation != null) {
-			Method matchedMethod = matchedInvocation.getProxyMethod();
-			message.append(MethodFormatUtils.getCompleteRepresentation(matchedMethod))
-			.append(" was called (probably with different or non-matching arguments).");
+			message.append(" it was called with different or non-matching arguments.");
 		} else {
 			message.append("the invocation didn't occur.");
 		} 
@@ -137,7 +135,7 @@ public class Scenario {
 	
 	protected String getNoMoreInvocationsErrorMessage(Invocation invocation) {
 		final StringBuffer message = new StringBuffer();
-		final Method method = invocation.getProxyMethod();
+		final Method method = invocation.getMethod();
 		message.append("No more invocations expected, but ")
 			.append(MethodFormatUtils.getCompleteRepresentation(method))
 			.append(" was called from ")
@@ -148,7 +146,7 @@ public class Scenario {
 	
 	protected Invocation findMatchingMethodName(Method method) {
 		for (Entry<Invocation, Boolean> registeredInvocationEntry: this.observedInvocations.entrySet()) {
-			if(!registeredInvocationEntry.getValue() && registeredInvocationEntry.getKey().getProxyMethod().getName().equals(method.getName())) {
+			if(!registeredInvocationEntry.getValue() && registeredInvocationEntry.getKey().getMethod().getName().equals(method.getName())) {
 				return registeredInvocationEntry.getKey();
 			}
 		}

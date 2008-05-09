@@ -27,6 +27,11 @@ public class MockBehavior {
 	private Action action;
 	
 	
+	public MockBehavior(InvocationMatcher invocationMatcher) {
+		this(invocationMatcher, null);
+	}
+
+
 	public MockBehavior(InvocationMatcher invocationMatcher, Action action) {
 		super();
 		this.action = action;

@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.action;
+package org.unitils.mock.annotation;
 
-import org.unitils.mock.core.Action;
-import org.unitils.mock.core.Invocation;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * @author Filip Neven
@@ -24,11 +27,8 @@ import org.unitils.mock.core.Invocation;
  * @author Kenny Claes
  *
  */
-public class ActualImplementationAction implements Action {
-
-
-	public Object execute(Invocation invocation) throws Throwable {
-		return invocation.getOriginalMethod().invoke(invocation.getTargetObject(), invocation.getArguments().toArray());
-	}
+@Target(FIELD)
+@Retention(RUNTIME)
+public @interface PartialMock {
 
 }

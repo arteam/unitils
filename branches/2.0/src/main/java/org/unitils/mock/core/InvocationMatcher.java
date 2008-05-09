@@ -29,6 +29,7 @@ import java.util.List;
 public class InvocationMatcher {
 	
 	private final Method method;
+	
 	private final List<ArgumentMatcher> argumentMatchers;
 	
 	/**
@@ -57,7 +58,7 @@ public class InvocationMatcher {
 	 * @return true when given {@link Invocation} matches, false otherwise.
 	 */
 	public boolean matches(Invocation invocation) {
-		if (!this.method.equals(invocation.getProxyMethod())) {
+		if (!this.method.equals(invocation.getMethod())) {
 			return false;
 		}
 		final List<?> arguments = invocation.getArguments();

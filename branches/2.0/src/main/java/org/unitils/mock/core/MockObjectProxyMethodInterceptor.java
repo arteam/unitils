@@ -41,7 +41,13 @@ public class MockObjectProxyMethodInterceptor<T> implements MethodInterceptor {
 		if (method.getDeclaringClass().equals(MockObjectProxy.class)) {
 			return mockObject;
 		}
-		Invocation invocation = new Invocation(object, method, ProxyUtils.getOriginalMethod(method, mockObject.getMockedClass()), Arrays.asList(args), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
-		return mockObject.handleInvocation(invocation);
+		Invocation invocation = new Invocation(mockObject, method, Arrays.asList(args), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
+		mockObject.registerInvocation(invocation);
+		
+		if (mockObject.isExecuteActualImplementation(invocation)) {
+			return proxy.invokeSuper(object, args);
+		} else {
+			return mockObject.executeBehavior(invocation);
+		}
 	}
 }

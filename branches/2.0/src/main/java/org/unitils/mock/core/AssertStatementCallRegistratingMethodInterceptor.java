@@ -32,23 +32,30 @@ public class AssertStatementCallRegistratingMethodInterceptor<T> implements Meth
 	
 	private MockObject<T> mockObject;
 	
+	private boolean checkIfInvoked;
+	
 	private InvocationMatcherBuilder invocationMatcherBuilder = InvocationMatcherBuilder.getInstance();
 	
 	
-	public AssertStatementCallRegistratingMethodInterceptor(Scenario scenario, MockObject<T> mockObject) {
+	public AssertStatementCallRegistratingMethodInterceptor(Scenario scenario, MockObject<T> mockObject, boolean checkIfInvoked) {
 		super();
 		this.scenario = scenario;
 		this.mockObject = mockObject;
+		this.checkIfInvoked = checkIfInvoked;
 	}
 
 
 	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-		Invocation invocation = new Invocation(object, method, ProxyUtils.getOriginalMethod(method, mockObject.getMockedClass()), 
-				Arrays.asList(args), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
+		Invocation invocation = new Invocation(mockObject, method, Arrays.asList(args), 
+				ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
 		invocationMatcherBuilder.registerInvokedMethod(invocation);
 		InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher();
 		invocationMatcherBuilder.reset();
-		scenario.assertInvoked(invocationMatcher);
+		if (checkIfInvoked) {
+			scenario.assertInvoked(invocationMatcher);
+		} else {
+			scenario.assertNotInvoked(invocationMatcher);
+		}
 		return null;
 	}
 

@@ -20,6 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.unitils.mock.core.action.EmptyAction;
+
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -28,48 +30,74 @@ import java.util.Map;
  */
 public class MockObject<T> {
 
-	private Scenario scenario;
-	
-	private Action defaultAction;
+	private String name;
 	
 	private Class<T> mockedClass;
+	
+	private Scenario scenario;
+
+	private boolean executeActualImplementationByDefault;
 	
 	private List<MockBehavior> alwaysMatchingMockBehaviors = new ArrayList<MockBehavior>();
 	
 	private Map<MockBehavior, Boolean> oneTimeMatchingMockBehaviors = new LinkedHashMap<MockBehavior, Boolean>();
 	
 
-	public MockObject(Scenario scenario, Action defaultAction, Class<T> mockedClass) {
+	public MockObject(String name, Class<T> mockedClass, boolean executeActualImplementationByDefault, Scenario scenario) {
 		super();
-		this.scenario = scenario;
-		this.defaultAction = defaultAction;
+		this.name = name;
 		this.mockedClass = mockedClass;
+		this.executeActualImplementationByDefault = executeActualImplementationByDefault;
+		this.scenario = scenario;
 	}
 
 	
-	public Object handleInvocation(Invocation invocation) throws Throwable {
+	public void registerInvocation(Invocation invocation) {
 		scenario.registerInvocation(invocation);
-		return executeBehavior(invocation);
+	}
+	
+	
+	public boolean isExecuteActualImplementation(Invocation invocation) {
+		return executeActualImplementationByDefault && getOneTimeMatchingMockBehavior(invocation) == null
+			&& getAlwaysMatchingMockBehavior(invocation) == null;
 	}
 
 	
-	protected Object executeBehavior(Invocation invocation) throws Throwable {
+	public Object executeBehavior(Invocation invocation) throws Throwable {
 		// Check if there is a one-time matching behavior that hasn't been invoked yet
-		for (MockBehavior behavior : oneTimeMatchingMockBehaviors.keySet()) {
-			if (!oneTimeMatchingMockBehaviors.get(behavior) && behavior.matches(invocation)) {
-				// Register the fact that this behavior has been matched, so that is not matched a second time anymore
-				oneTimeMatchingMockBehaviors.put(behavior, true);
-				return behavior.execute(invocation);
-			}
+		MockBehavior oneTimeMatchingBehavior = getOneTimeMatchingMockBehavior(invocation);
+		if (oneTimeMatchingBehavior != null) {
+			oneTimeMatchingMockBehaviors.put(oneTimeMatchingBehavior, true);
+			return oneTimeMatchingBehavior.execute(invocation);
 		}
+		
 		// Check if there is an always-matching behavior
-		for (MockBehavior behavior : alwaysMatchingMockBehaviors) {
-			if (behavior.matches(invocation)) {
-				return behavior.execute(invocation);
-			}
+		MockBehavior alwaysMatchingBehavior = getAlwaysMatchingMockBehavior(invocation);
+		if (alwaysMatchingBehavior != null) {
+			return alwaysMatchingBehavior.execute(invocation);
 		}
 		// There's no matching behavior, simply execute the default one
-		return defaultAction.execute(invocation);                                       
+		return EmptyAction.getInstance().execute(invocation);
+	}
+	
+	
+	protected MockBehavior getOneTimeMatchingMockBehavior(Invocation invocation) {
+		for (MockBehavior behavior : oneTimeMatchingMockBehaviors.keySet()) {
+			if (!oneTimeMatchingMockBehaviors.get(behavior) && behavior.matches(invocation)) {
+				return behavior;
+			}
+		}
+		return null;
+	}
+	
+	
+	protected MockBehavior getAlwaysMatchingMockBehavior(Invocation invocation) {
+		for (MockBehavior behavior : alwaysMatchingMockBehaviors) {
+			if (behavior.matches(invocation)) {
+				return behavior;
+			}
+		}
+		return null;
 	}
 	
 	
@@ -92,6 +120,11 @@ public class MockObject<T> {
 
 	public List<MockBehavior> getOneTimeMatchingMockBehaviors() {
 		return new ArrayList<MockBehavior>(oneTimeMatchingMockBehaviors.keySet());
+	}
+
+
+	public String getName() {
+		return name;
 	}
 
 

@@ -26,8 +26,6 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.mock.core.action.ActualImplementationAction;
-import org.unitils.mock.core.action.EmptyAction;
 import org.unitils.mock.core.action.ExceptionThrowingAction;
 import org.unitils.mock.core.action.ValueReturningAction;
 
@@ -57,13 +55,12 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 	@Before
 	public void setup() {
 		scenario = new Scenario();
-		defaultAction = new EmptyAction();
 		
-		testClassMock = new MockObject<TestClass>(scenario, defaultAction, TestClass.class);
+		testClassMock = new MockObject<TestClass>("testClassMock", TestClass.class, false, scenario);
 		MockObjectProxyMethodInterceptor<TestClass> testClassMethodInterceptor = new MockObjectProxyMethodInterceptor<TestClass>(testClassMock);
 		testClass = ProxyUtils.createProxy(testClassMethodInterceptor, TestClass.class);
 		
-		testInterfaceMock = new MockObject<TestInterface>(scenario, defaultAction, TestInterface.class);
+		testInterfaceMock = new MockObject<TestInterface>("testInterfaceMock", TestInterface.class, false, scenario);
 		MockObjectProxyMethodInterceptor<TestInterface> testInterfaceMethodInterceptor = new MockObjectProxyMethodInterceptor<TestInterface>(testInterfaceMock);
 		testInterface = ProxyUtils.createProxy(testInterfaceMethodInterceptor, TestInterface.class);
 		
@@ -104,17 +101,6 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 		testClassMock.registerAlwaysMatchingMockBehavior(exceptionThrowingBehavior);
 		
 		testClass.doSomething(null);
-	}
-	
-	
-	@Test
-	public void testActualImplementationAction() throws Exception {
-		MockBehavior actualImplementationBehavior = new MockBehavior(invocationMatcher, new ActualImplementationAction());
-		testClassMock.registerAlwaysMatchingMockBehavior(actualImplementationBehavior);
-		
-		assertEquals(false, testClass.doSomethingHasBeenInvoked);
-		testClass.doSomething(null);
-		assertEquals(true, testClass.doSomethingHasBeenInvoked);
 	}
 	
 	

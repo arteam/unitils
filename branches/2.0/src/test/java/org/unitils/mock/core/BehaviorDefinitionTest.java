@@ -15,6 +15,11 @@
  */
 package org.unitils.mock.core;
 
+import static org.unitils.mock.MockUnitils.createMock;
+import static org.unitils.mock.MockUnitils.mock;
+import static org.unitils.mock.MockUnitils.notNull;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+
 import java.util.Arrays;
 
 import junit.framework.AssertionFailedError;
@@ -25,9 +30,6 @@ import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.action.ExceptionThrowingAction;
 import org.unitils.mock.core.action.ValueReturningAction;
 import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
-
-import static org.unitils.mock.MockUnitils.*;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 /**
  * @author Filip Neven
@@ -40,11 +42,11 @@ public class BehaviorDefinitionTest {
 	
 	@Before
 	public void setup() {
-		testClassMock = createMock(TestClass.class, new Scenario());
+		testClassMock = createMock("testClassMock", TestClass.class, new Scenario());
 		MockBehaviorBuilder.getInstance().reset();
 	}
 	
-	@Test
+	@Test 
 	public void defineBehavior_returns() throws Exception {
 		mock(testClassMock).returns("test").doSomething(notNull(String.class), notNull(String.class));
 		

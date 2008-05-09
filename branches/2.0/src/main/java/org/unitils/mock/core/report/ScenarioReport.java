@@ -15,6 +15,9 @@
  */
 package org.unitils.mock.core.report;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+
 import org.unitils.mock.core.Scenario;
 
 /**
@@ -31,7 +34,10 @@ public interface ScenarioReport {
 	 * Sets the {@link Scenario} for which to generate the report.
 	 * @param scenario for which to generate the report. Not null.
 	 */
-	public void setScenario(Scenario scenario);
+	void setScenario(Scenario scenario);
+	
+	
+	void setTestObjectFieldMap(Map<Object, Field> objectFieldMap);
 	
 	/**
 	 * Creates the report.

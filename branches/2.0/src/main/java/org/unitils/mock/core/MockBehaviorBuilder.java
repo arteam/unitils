@@ -15,8 +15,6 @@
  */
 package org.unitils.mock.core;
 
-import java.lang.reflect.Method;
-
 import org.unitils.mock.core.action.ExceptionThrowingAction;
 import org.unitils.mock.core.action.ValueReturningAction;
 
@@ -52,7 +50,6 @@ public class MockBehaviorBuilder {
 	
 	public <T> void registerMockObject(MockObject<T> mockObject) {
 		this.mockObject = mockObject;
-		invocationMatcherBuilder.registerMockObject(mockObject);
 	}
 	
 	

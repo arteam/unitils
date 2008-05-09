@@ -37,7 +37,7 @@ public class MethodFormatUtils {
 	}
 	
 	
-	public static String getCompleteRepresentation(Method method, List<?> params) {
+	public static String getCompleteMethodRepresentation(Method method, List<?> params) {
 		StringBuffer outputString = new StringBuffer();
 		outputString.append(getClassName(method))
 			.append('.')
@@ -57,7 +57,16 @@ public class MethodFormatUtils {
 	
 	
 	public static String getCompleteRepresentation(Method method) {
-		return getCompleteRepresentation(method, null);
+		return getCompleteMethodRepresentation(method, null);
+	}
+
+
+	public static String getInvokerRepresentation(StackTraceElement invokedAt) {
+		StringBuffer outputString = new StringBuffer();
+		outputString.append(invokedAt.getClassName())
+			.append(".java:")
+			.append(invokedAt.getLineNumber());
+		return outputString.toString();
 	}
 	
 }

@@ -32,8 +32,6 @@ import java.util.List;
  */
 public class InvocationMatcherBuilder {
 
-    private MockObject<?> mockObject;
-
     private List<ArgumentMatcher> argumentMatchers, registeredArgumentMatchers;
 
     private Invocation invocation;
@@ -53,21 +51,16 @@ public class InvocationMatcherBuilder {
     }
 
 
-    public <T> void registerMockObject(MockObject<T> mockObject) {
-        this.mockObject = mockObject;
-    }
-
-
     public void registerInvokedMethod(Invocation invocation) {
         this.invocation = invocation;
 
         argumentMatchers = new ArrayList<ArgumentMatcher>();
         Class<?> testClass = getClassWithName(invocation.getInvokedAt().getClassName());
         String testMethodName = invocation.getInvokedAt().getMethodName();
-        Method proxyMethod = invocation.getProxyMethod();
+        Method method = invocation.getMethod();
         int lineNr = invocation.getInvokedAt().getLineNumber();
 
-        List<Integer> argumentMatcherIndexes = getArgumentMatcherIndexes(testClass, testMethodName, proxyMethod, lineNr, 1);
+        List<Integer> argumentMatcherIndexes = getArgumentMatcherIndexes(testClass, testMethodName, method, lineNr, 1);
         Iterator<ArgumentMatcher> argumentMatcherIterator = registeredArgumentMatchers.iterator();
         for (int argumentIndex = 0; argumentIndex < invocation.getArguments().size(); argumentIndex++) {
             if (argumentMatcherIndexes != null && argumentMatcherIndexes.contains(argumentIndex)) {
@@ -90,7 +83,7 @@ public class InvocationMatcherBuilder {
 
 
     public InvocationMatcher createInvocationMatcher() {
-        return new InvocationMatcher(invocation.getProxyMethod(), argumentMatchers);
+        return new InvocationMatcher(invocation.getMethod(), argumentMatchers);
     }
 
 

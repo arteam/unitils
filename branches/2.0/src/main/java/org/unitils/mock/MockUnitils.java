@@ -25,7 +25,6 @@ import org.unitils.mock.core.MockObjectProxy;
 import org.unitils.mock.core.MockObjectProxyMethodInterceptor;
 import org.unitils.mock.core.ProxyUtils;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.action.EmptyAction;
 import org.unitils.mock.core.argumentmatcher.EqualsArgumentMatcher;
 import org.unitils.mock.core.argumentmatcher.LenEqArgumentMatcher;
 import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
@@ -54,23 +53,70 @@ public class MockUnitils {
 		return mockBehaviorDefiner;
 	}
 	
-	@SuppressWarnings("unchecked")
+
 	public static <T> T assertInvoked(T mock) {
-		if (!MockObjectProxy.class.isAssignableFrom(mock.getClass())) {
-			throw new UnitilsException(mock + " is not a mock object");
-		}
-		MockObject<T> mockObject = ((MockObjectProxy<T>)mock).$_$_getMockObject();
-		invocationMatcherBuilder.registerMockObject(mockObject);
+		MockObject<T> mockObject = getMockObjectFromProxy(mock);
 		AssertStatementCallRegistratingMethodInterceptor<T> assertStatementCallRegistratingMethodInterceptor = 
-			new AssertStatementCallRegistratingMethodInterceptor<T>(getScenario(), mockObject);
+			new AssertStatementCallRegistratingMethodInterceptor<T>(getScenario(), mockObject, true);
 		return ProxyUtils.createProxy(assertStatementCallRegistratingMethodInterceptor, mockObject.getMockedClass(), MockObjectProxy.class);
 	}
 	
 	
-	public static <T> T createMock(Class<T> mockedClass, Scenario scenario) {
-		MockObject<T> mockObject = new MockObject<T>(scenario, new EmptyAction(), mockedClass);
+	public static <T> T assertNotInvoked(T mock) {
+		MockObject<T> mockObject = getMockObjectFromProxy(mock);
+		AssertStatementCallRegistratingMethodInterceptor<T> assertStatementCallRegistratingMethodInterceptor = 
+			new AssertStatementCallRegistratingMethodInterceptor<T>(getScenario(), mockObject, false);
+		return ProxyUtils.createProxy(assertStatementCallRegistratingMethodInterceptor, mockObject.getMockedClass(), MockObjectProxy.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> MockObject<T> getMockObjectFromProxy(T proxy) {
+		if (!MockObjectProxy.class.isAssignableFrom(proxy.getClass())) {
+			throw new UnitilsException(proxy + " is not a mock object");
+		}
+		MockObject<T> mockObject = ((MockObjectProxy<T>)proxy).$_$_getMockObject();
+		return mockObject;
+	}
+	
+	
+	public static void assertNoMoreInvocations() {
+		getScenario().assertNoMoreInvocations();
+	}
+	
+	
+	/**
+     * Creates a mock object of the given type, associated to the given {@link Scenario}.
+     *
+     * @param <T>             the type of the mock
+     * @param mockedClass        the class type for the mock, not null
+     * @param invocationOrder the order setting, not null
+     * @param calls           the calls setting, not null
+     * @return a mock for the given class or interface, not null
+     */
+    public static <T> T createMock(String name, Class<T> mockType, Scenario scenario) {
+    	return createMock(name, mockType, false, scenario);
+    }
+    
+    
+    /**
+     * Creates a mock object of the given type, associated to the given {@link Scenario}.
+     *
+     * @param <T>             the type of the mock
+     * @param mockType        the class type for the mock, not null
+     * @param invocationOrder the order setting, not null
+     * @param calls           the calls setting, not null
+     * @return a mock for the given class or interface, not null
+     */
+    public static <T> T createPartialMock(String name, Class<T> mockType, Scenario scenario) {
+    	return createMock(name, mockType, true, scenario);
+    }
+	
+	
+	private static <T> T createMock(String name, Class<T> mockType, boolean invokeOriginalMethodIfNoBehavior, Scenario scenario) {
+		MockObject<T> mockObject = new MockObject<T>(name, mockType, invokeOriginalMethodIfNoBehavior, scenario);
+    	
 		MockObjectProxyMethodInterceptor<T> mockObjectProxyMethodInterceptor = new MockObjectProxyMethodInterceptor<T>(mockObject);
-		return ProxyUtils.createProxy(mockObjectProxyMethodInterceptor, mockedClass, MockObjectProxy.class);
+		return ProxyUtils.createProxy(mockObjectProxyMethodInterceptor, mockType, MockObjectProxy.class);
 	}
 	
 	

@@ -25,7 +25,17 @@ import org.unitils.mock.core.Invocation;
  */
 public class EmptyAction implements Action {
 
+	private static final EmptyAction instance = new EmptyAction();
+
 	
+	public static EmptyAction getInstance() {
+		return instance;
+	}
+	
+	private EmptyAction() {
+	}
+
+
 	public Object execute(Invocation invocation) {
 		return null;
 	}

@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.annotation.Mock;
-
+import org.unitils.mock.annotation.PartialMock;
 import static org.unitils.mock.MockUnitils.*;
 
 /**
@@ -32,25 +32,30 @@ public class MockTest extends UnitilsJUnit4 {
 
 	@Mock Outputter outputter;
 	
-	@Mock MessageFactory messageFactory;
+	@PartialMock MessageFactory messageFactory;
 	
 	HelloWorld helloWorld;
 	
+	String person = "Jos";
+	
+	int number = 5;
+	
 	@AfterCreateMock
 	public void afterCreateMock(Object mock, String name, Class<?> type) {
-		System.out.println(mock + " " + name + " " + type);
+		System.out.println(name + " " + type);
 	}
 	
 	@Before
 	public void setup() {
-		helloWorld = new HelloWorld(outputter, messageFactory);
+		helloWorld = new HelloWorld(outputter);
 	}
 	
 	@Test
 	public void mockTest() {
-		mock(messageFactory).returns("hello world").getMessage(null, eq("sdfsd"));
-		helloWorld.sayHello();
-		assertInvoked(outputter).output(eq("hello world"));
+		//mock(messageFactory).returns("hello world").getMessage(null, eq("sdfsd"));
+		helloWorld.sayHello(messageFactory, person);
+		
+		assertInvoked(outputter).output(messageFactory, 4);
 //		assertInvoked(outputter).output(eq("hello world"));
 	}
 	
@@ -58,30 +63,27 @@ public class MockTest extends UnitilsJUnit4 {
 		
 		private Outputter outputter;
 		
-		private MessageFactory messageFactory;
-		
-		public HelloWorld(Outputter outputter, MessageFactory messageFactory) {
+		public HelloWorld(Outputter outputter) {
 			super();
 			this.outputter = outputter;
-			this.messageFactory = messageFactory;
 		}
 
-		public void sayHello() {
-			outputter.output(messageFactory.getMessage("ba", "boe"));
+		public void sayHello(MessageFactory messageFactory, String person) {
+			outputter.output(messageFactory, messageFactory.getMessage(person));
 		}
 	}
 	
-	static class Outputter {
+	public static class Outputter {
 		
-		public void output(String arg1) {
+		public void output(MessageFactory messageFactory, int arg1) {
 			System.out.println(arg1);
 		}
 	}
 	
-	static class MessageFactory {
+	public static class MessageFactory {
 		
-		public String getMessage(String arg1, String arg2) {
-			return "boe";
+		public int getMessage(String person) {
+			return 5;
 		}
 	}
 }

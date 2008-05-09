@@ -34,13 +34,13 @@ public class MockedMethodRegistratingMethodInterceptor<T> implements MethodInter
 	
 	
 	public MockedMethodRegistratingMethodInterceptor(MockObject<T> mockObject) {
-		super();
 		this.mockObject = mockObject;
 	}
 
 
 	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-		Invocation invocation = new Invocation(object, method, ProxyUtils.getOriginalMethod(method, mockObject.getMockedClass()), Arrays.asList(args), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
+		Invocation invocation = new Invocation(mockObject, method, Arrays.asList(args), 
+				ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
 		mockBehaviorBuilder.registerInvokedMethod(invocation);
 		return null;
 	}

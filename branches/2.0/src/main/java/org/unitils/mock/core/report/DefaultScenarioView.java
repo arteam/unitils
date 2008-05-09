@@ -15,8 +15,10 @@
  */
 package org.unitils.mock.core.report;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 
 import org.unitils.mock.core.Invocation;
 import org.unitils.mock.core.MethodFormatUtils;
@@ -35,15 +37,19 @@ public class DefaultScenarioView implements ScenarioView {
 	/*
 	 * @see ScenarioView#createView(Scenario)
 	 */
-	public String createView(Scenario scenario) {
+	public String createView(Scenario scenario, Map<Object, Field> objectFieldMap) {
 		final StringBuffer view = new StringBuffer();
 		List<Invocation> invocations = scenario.getObservedInvocations();
 		view.append("Observed scenario:\n");
-		for(Invocation invocation : invocations) {
-			Method method = invocation.getProxyMethod();
-			view.append("\t")			
-				.append(MethodFormatUtils.getCompleteRepresentation(method))
-				.append("\n");
+		for (Invocation invocation : invocations) {
+			view.append("\t")
+				.append(invocation.getMockObject().getName())
+				.append('.')
+				.append(invocation.getMethod().getName())
+				.append("()")
+				.append(" (")
+				.append(MethodFormatUtils.getInvokerRepresentation(invocation.getInvokedAt()))
+				.append(")\n");
 		}
 		return view.toString();
 	}

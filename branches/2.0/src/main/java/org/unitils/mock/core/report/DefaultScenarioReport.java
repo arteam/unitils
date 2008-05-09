@@ -15,7 +15,10 @@
  */
 package org.unitils.mock.core.report;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.unitils.mock.core.Scenario;
 
@@ -30,7 +33,10 @@ import org.unitils.mock.core.Scenario;
 public class DefaultScenarioReport implements ScenarioReport {
 	
 	private Scenario scenario;
-	private List<ScenarioView> scenarioViews;
+	
+	private Map<Object, Field> objectFieldMap;
+	
+	private List<ScenarioView> scenarioViews = Arrays.asList(new DefaultScenarioView(), new SuggestedAssertsScenarioView());
 	
 	/*
 	 * @see ScenarioReport#createReport()
@@ -38,7 +44,7 @@ public class DefaultScenarioReport implements ScenarioReport {
 	public String createReport() {
 		StringBuffer report = new StringBuffer();
 		for(ScenarioView scenarioView: scenarioViews) {
-			report.append(scenarioView.createView(scenario));
+			report.append(scenarioView.createView(scenario, objectFieldMap) + "\n");
 		}
 		return report.toString();
 	}
@@ -50,11 +56,9 @@ public class DefaultScenarioReport implements ScenarioReport {
 		this.scenario = scenario;
 	}
 	
-	/**
-	 * Sets the {@link ScenarioView} objects that this {@link ScenarioReport} will contain.
-	 * @param scenarioViews the views of the report. Not null.
-	 */
-	public void setScenarioViews(List<ScenarioView> scenarioViews) {
-		this.scenarioViews = scenarioViews;
+	
+	public void setTestObjectFieldMap(Map<Object, Field> objectFieldMap) {
+		this.objectFieldMap = objectFieldMap;
 	}
+	
 }
