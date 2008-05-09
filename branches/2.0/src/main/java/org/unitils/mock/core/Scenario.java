@@ -47,9 +47,11 @@ public class Scenario {
 		alwaysMatchingMockBehaviorInvocationMatchers.add(invocationMatcher);
 	}
 	
+	
 	public void registerOneTimeMatchingMockBehaviorInvocationMatcher(InvocationMatcher invocationMatcher) {
 		oneTimeMatchingMockBehaviorInvocationMatchers.add(invocationMatcher);
 	}
+	
 	
 	public List<Invocation> getObservedInvocations() {
 		return new ArrayList<Invocation>(observedInvocations.keySet());

@@ -15,13 +15,15 @@
  */
 package org.unitils.mock.core;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.core.report.DefaultScenarioReport;
+import org.unitils.mock.core.report.DefaultScenarioReporter;
 
 public class DefaultReportTest extends UnitilsJUnit4 {
 
@@ -29,7 +31,7 @@ public class DefaultReportTest extends UnitilsJUnit4 {
 	Method testMethodDoSomething;
 	Method testMethodDoSomethingElse;
 	MockObject<Object> mockObject = new MockObject<Object>("testMockObject", Object.class, false, scenario);
-	DefaultScenarioReport report;
+	DefaultScenarioReporter report;
 
 	
 	@Before
@@ -37,8 +39,7 @@ public class DefaultReportTest extends UnitilsJUnit4 {
 		scenario = new Scenario();
 		testMethodDoSomething = TestObject.class.getMethod("doSomething");
 		testMethodDoSomethingElse = TestObject.class.getMethod("doSomethingElse");
-		report = new DefaultScenarioReport();
-		report.setScenario(scenario);
+		report = new DefaultScenarioReporter();
 	}
 	
 	@Test
@@ -47,7 +48,7 @@ public class DefaultReportTest extends UnitilsJUnit4 {
 		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomethingElse, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomethingElse, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		report.createReport();
+		report.createReport(scenario, new HashMap<Object, Field>());
 	}
 	
 	static class TestObject {

@@ -23,42 +23,26 @@ import java.util.Map;
 import org.unitils.mock.core.Scenario;
 
 /**
- * Default implementation of a {@link ScenarioReport} where a list of {@link ScenarioView} can be inserted to compose a report of the {@link Scenario}.
+ * Default implementation of a {@link ScenarioReporter} where a list of {@link ScenarioView} can be inserted to compose a report of the {@link Scenario}.
  * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  *
  */
-public class DefaultScenarioReport implements ScenarioReport {
+public class DefaultScenarioReporter implements ScenarioReporter {
 	
-	private Scenario scenario;
-	
-	private Map<Object, Field> objectFieldMap;
-	
-	private List<ScenarioView> scenarioViews = Arrays.asList(new DefaultScenarioView(), new SuggestedAssertsScenarioView());
+	private List<ScenarioReporter> scenarioReporters = Arrays.asList(new FullOverviewScenarioReporter(), new SuggestedAssertsScenarioReporter());
 	
 	/*
 	 * @see ScenarioReport#createReport()
 	 */
-	public String createReport() {
+	public String createReport(Scenario scenario, Map<Object, Field> objectFieldMap) {
 		StringBuffer report = new StringBuffer();
-		for(ScenarioView scenarioView: scenarioViews) {
-			report.append(scenarioView.createView(scenario, objectFieldMap) + "\n");
+		for(ScenarioReporter scenarioReporter : scenarioReporters) {
+			report.append(scenarioReporter.createReport(scenario, objectFieldMap) + "\n");
 		}
 		return report.toString();
 	}
 
-	/*
-	 * @see ScenarioReport#setScenario(Scenario)
-	 */
-	public void setScenario(Scenario scenario) {
-		this.scenario = scenario;
-	}
-	
-	
-	public void setTestObjectFieldMap(Map<Object, Field> objectFieldMap) {
-		this.objectFieldMap = objectFieldMap;
-	}
-	
 }

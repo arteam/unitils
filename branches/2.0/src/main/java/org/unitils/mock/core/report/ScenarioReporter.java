@@ -21,28 +21,21 @@ import java.util.Map;
 import org.unitils.mock.core.Scenario;
 
 /**
- * A {@link ScenarioReport} can be used to give feedback about a given {@link Scenario}.
+ * A {@link ScenarioReporter} can be used to give feedback about a given {@link Scenario}.
  * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  *
  */
-public interface ScenarioReport {
+public interface ScenarioReporter {
 
-	/**
-	 * Sets the {@link Scenario} for which to generate the report.
-	 * @param scenario for which to generate the report. Not null.
-	 */
-	void setScenario(Scenario scenario);
-	
-	
-	void setTestObjectFieldMap(Map<Object, Field> objectFieldMap);
-	
+
 	/**
 	 * Creates the report.
 	 * {@link #setScenario(Scenario)} must be called before calling this method.
 	 * @return the report.
 	 */
-	public String createReport();
+	public String createReport(Scenario scenario, Map<Object, Field> objectFieldMap);
+
 }

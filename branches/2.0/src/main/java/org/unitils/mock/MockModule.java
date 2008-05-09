@@ -42,8 +42,8 @@ import org.unitils.mock.core.MockObjectProxy;
 import org.unitils.mock.core.MockObjectProxyMethodInterceptor;
 import org.unitils.mock.core.ProxyUtils;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.report.DefaultScenarioReport;
-import org.unitils.mock.core.report.ScenarioReport;
+import org.unitils.mock.core.report.DefaultScenarioReporter;
+import org.unitils.mock.core.report.ScenarioReporter;
 import org.unitils.util.ReflectionUtils;
 
 /**
@@ -104,7 +104,7 @@ public class MockModule implements Module {
 
 
 	protected <T> T createMock(String name, Class<T> mockType, boolean invokeOriginalMethodIfNoBehavior) {
-		MockObject<T> mockObject = new MockObject<T>(name, mockType, invokeOriginalMethodIfNoBehavior, scenario);
+		MockObject<T> mockObject = new MockObject<T>(name, mockType, invokeOriginalMethodIfNoBehavior, getScenario());
     	
 		MockObjectProxyMethodInterceptor<T> mockObjectProxyMethodInterceptor = new MockObjectProxyMethodInterceptor<T>(mockObject);
 		return ProxyUtils.createProxy(mockObjectProxyMethodInterceptor, mockType, MockObjectProxy.class);
@@ -174,14 +174,15 @@ public class MockModule implements Module {
     
     
     public void logExecutionScenario(Object testObject) {
-		ScenarioReport scenarioReport = new DefaultScenarioReport();
-		scenarioReport.setScenario(scenario);
-		scenarioReport.setTestObjectFieldMap(getTestObjectFieldMap(testObject));
-		logger.info("\n\n" + scenarioReport.createReport());
+		ScenarioReporter scenarioReport = new DefaultScenarioReporter();
+		logger.info("\n\n" + scenarioReport.createReport(getScenario(), getTestObjectFieldMap(testObject)));
 	}
     
     
     public Scenario getScenario() {
+    	if (scenario == null) {
+    		scenario = new Scenario();
+    	}
 		return scenario;
 	}
     
@@ -208,14 +209,14 @@ public class MockModule implements Module {
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
         	scenario = new Scenario();
-
             createAndInjectMocksIntoTest(testObject);
         }
 
 		@Override
-		public void afterTestMethod(Object testObject, Method testMethod,
-				Throwable testThrowable) {
-			logExecutionScenario(testObject);
+		public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable) {
+			if (scenario != null) {
+				logExecutionScenario(testObject);
+			}
 		}
 
     }

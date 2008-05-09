@@ -21,7 +21,7 @@ import java.util.Map;
 import org.unitils.mock.core.Scenario;
 
 /**
- * A {@link ScenarioView} can be used to generate a part of a {@link ScenarioReport}, based on a given {@link Scenario}.
+ * A {@link ScenarioView} can be used to generate a part of a {@link ScenarioReporter}, based on a given {@link Scenario}.
  * 
  * @author Kenny Claes
  * @author Filip Neven

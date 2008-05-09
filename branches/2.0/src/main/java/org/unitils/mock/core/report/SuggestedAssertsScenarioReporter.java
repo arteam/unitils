@@ -32,12 +32,12 @@ import org.unitils.mock.core.Scenario;
  * @author Tim Ducheyne
  *
  */
-public class SuggestedAssertsScenarioView implements ScenarioView {
+public class SuggestedAssertsScenarioReporter implements ScenarioReporter {
 
 	/*
 	 * @see ScenarioView#createView(Scenario)
 	 */
-	public String createView(Scenario scenario, Map<Object, Field> testObjectFieldMap) {
+	public String createReport(Scenario scenario, Map<Object, Field> testObjectFieldMap) {
 		final StringBuffer view = new StringBuffer();
 		List<Invocation> invocations = scenario.getObservedInvocations();
 		view.append("Suggested assert statements:\n");

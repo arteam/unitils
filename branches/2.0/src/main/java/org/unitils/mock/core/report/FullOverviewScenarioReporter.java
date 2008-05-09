@@ -32,12 +32,12 @@ import org.unitils.mock.core.Scenario;
  * @author Tim Ducheyne
  *
  */
-public class DefaultScenarioView implements ScenarioView {
+public class FullOverviewScenarioReporter implements ScenarioReporter {
 
 	/*
 	 * @see ScenarioView#createView(Scenario)
 	 */
-	public String createView(Scenario scenario, Map<Object, Field> objectFieldMap) {
+	public String createReport(Scenario scenario, Map<Object, Field> objectFieldMap) {
 		final StringBuffer view = new StringBuffer();
 		List<Invocation> invocations = scenario.getObservedInvocations();
 		view.append("Observed scenario:\n");
