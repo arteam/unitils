@@ -291,8 +291,6 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
-        	super.beforeTestSetUp(testObject, testMethod);
-        	
             injectJpaResourcesIntoTestObject(testObject);
         }
         

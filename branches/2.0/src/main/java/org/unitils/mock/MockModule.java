@@ -208,7 +208,6 @@ public class MockModule implements Module {
          */
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
-        	scenario = new Scenario();
             createAndInjectMocksIntoTest(testObject);
         }
 

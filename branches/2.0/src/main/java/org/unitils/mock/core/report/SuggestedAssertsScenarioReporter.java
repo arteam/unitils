@@ -16,12 +16,10 @@
 package org.unitils.mock.core.report;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 import org.unitils.mock.core.Invocation;
-import org.unitils.mock.core.MethodFormatUtils;
 import org.unitils.mock.core.Scenario;
 
 /**
@@ -49,6 +47,7 @@ public class SuggestedAssertsScenarioReporter implements ScenarioReporter {
 		return view.toString();	
 	}
 	
+	
 	private String getSuggestedAssertStatement(Invocation invocation, Map<Object, Field> testObjectFieldMap) {
 		StringBuffer suggestedAssertStatement = new StringBuffer();
 		suggestedAssertStatement.append("assertInvoked(")
@@ -75,6 +74,7 @@ public class SuggestedAssertsScenarioReporter implements ScenarioReporter {
 		return suggestedAssertStatement.toString();
 	}
 
+	
 	private String getSuggestedArgumentMatcher(Object argument) {
 		if (argument == null) {
 			return "null";
