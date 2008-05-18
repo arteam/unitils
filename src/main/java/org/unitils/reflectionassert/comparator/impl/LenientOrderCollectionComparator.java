@@ -19,10 +19,13 @@ import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.UnorderedCollectionDifference;
+import org.unitils.reflectionassert.formatter.util.MatchingScoreCalculator;
 import static org.unitils.util.CollectionUtils.convertToCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -82,7 +85,8 @@ public class LenientOrderCollectionComparator implements Comparator {
         if (onlyFirstDifference) {
             return difference;
         }
-        getAllDifferences(leftList, rightList, difference, reflectionComparator);
+        fillAllDifferences(leftList, rightList, reflectionComparator, difference);
+        fillBestMatchingIndexes(leftList, rightList, difference);
         return difference;
     }
 
@@ -92,6 +96,9 @@ public class LenientOrderCollectionComparator implements Comparator {
      * This will loop over the elements of the left list and then try to find a match for these elements in the right
      * list. If a match is found, the element is removed from the right collection and the comparison is recursively
      * performed again on the remaining elements.
+     * <p/>
+     * NOTE: because difference are cached in the reflection comparator, comparing two elements that were already
+     * compared should be very fast.
      *
      * @param leftList             The left list, not null
      * @param rightList            The right list, not null
@@ -131,18 +138,20 @@ public class LenientOrderCollectionComparator implements Comparator {
 
 
     /**
-     * Calculates the difference of all elements in the left list with all elements of the right list.
+     * Calculates the difference of all elements in the left list with all elements of the right list. The result is
+     * added to the given difference.
+     * <p/>
      * NOTE: because difference are cached in the reflection comparator, comparing two elements that were already
-     * compared in the isEqual step will not be done twice (should be very fast).
+     * compared should be very fast.
      *
      * @param leftList             The left list, not null
      * @param rightList            The right list, not null
-     * @param difference           The root difference to which all differences will be added, not null
      * @param reflectionComparator The comparator for element comparisons, not null
+     * @param difference           The root difference to which all differences will be added, not null
      */
     @SuppressWarnings({"unchecked"})
-    protected void getAllDifferences(ArrayList<Object> leftList, ArrayList<Object> rightList, UnorderedCollectionDifference difference, ReflectionComparator reflectionComparator) {
-
+    protected void fillAllDifferences(ArrayList<Object> leftList, ArrayList<Object> rightList, ReflectionComparator reflectionComparator, UnorderedCollectionDifference difference) {
+        // loops over all left and right elements to calculate the differences
         for (int leftIndex = 0; leftIndex < leftList.size(); leftIndex++) {
             Object leftValue = leftList.get(leftIndex);
             for (int rightIndex = 0; rightIndex < rightList.size(); rightIndex++) {
@@ -151,5 +160,98 @@ public class LenientOrderCollectionComparator implements Comparator {
                 difference.addElementDifference(leftIndex, rightIndex, elementDifference);
             }
         }
+    }
+
+
+    /**
+     * Calculates the indexes of the best matching differences for the given unordered collection difference.
+     * The resulting indexes are set on the given difference.
+     * <p/>
+     * Note: The unordered collection difference should contain the differences of all left-elements with
+     * all right-elements.
+     *
+     * @param leftList   The left list, not null
+     * @param rightList  The right list, not null
+     * @param difference The difference to which all indexes will be added, not null
+     */
+    protected void fillBestMatchingIndexes(ArrayList<Object> leftList, ArrayList<Object> rightList, UnorderedCollectionDifference difference) {
+        ArrayList<Integer> leftIndexes = new ArrayList<Integer>(rightList.size());
+        for (int i = 0; i < leftList.size(); i++) {
+            leftIndexes.add(i);
+        }
+        ArrayList<Integer> rightIndexes = new ArrayList<Integer>(rightList.size());
+        for (int i = 0; i < rightList.size(); i++) {
+            rightIndexes.add(i);
+        }
+
+        HashMap<Integer, Integer> currentMatchingIndexes = new HashMap<Integer, Integer>();
+        MatchingScoreCalculator matchingScoreCalculator = createMatchingScoreCalculator();
+        fillBestMatchingIndexesImpl(leftIndexes, rightIndexes, 0, currentMatchingIndexes, difference, matchingScoreCalculator);
+    }
+
+
+    /**
+     * Actual implementation of the best match finding algorithm. This will recursively loop over the different elements in the
+     * collections to find a permutation that has the lowest total matching score. These indexes are then set on the given
+     * difference. The matching scores are determined by the given matchingScoreCalculator.
+     * <p/>
+     * Note: The unordered collection difference should contain the differences of all left-elements with
+     * all right-elements.
+     *
+     * @param leftIndexes             The current remaining indexes in the left collection, not null
+     * @param rightIndexes            The current remaining indexes in the right collection, not null
+     * @param currentMatchingScore    The current matching score
+     * @param currentMatchingIndexes  The current indexes pairs, not null
+     * @param difference              The difference to which all indexes will be added, not null
+     * @param matchingScoreCalculator The calculator for determining the scores, not null
+     */
+    @SuppressWarnings({"unchecked"})
+    protected void fillBestMatchingIndexesImpl(ArrayList<Integer> leftIndexes, ArrayList<Integer> rightIndexes, int currentMatchingScore, HashMap<Integer, Integer> currentMatchingIndexes, UnorderedCollectionDifference difference, MatchingScoreCalculator matchingScoreCalculator) {
+        if (leftIndexes.isEmpty() || rightIndexes.isEmpty()) {
+            // ends the recursion
+            // check if we found a new best match
+            if (currentMatchingScore < difference.getBestMatchingScore()) {
+                difference.getBestMatchingIndexes().putAll(currentMatchingIndexes);
+
+                // all remaining elements are missing elements
+                for (Integer leftIndex : leftIndexes) {
+                    difference.setBestMatchingIndexes(leftIndex, -1);
+                }
+                for (Integer rightIndex : rightIndexes) {
+                    difference.setBestMatchingIndexes(-1, rightIndex);
+                }
+                difference.setBestMatchingScore(currentMatchingScore);
+            }
+            return;
+        }
+
+
+        Map<Integer, Map<Integer, Difference>> differences = difference.getElementDifferences();
+
+        Integer leftIndex = leftIndexes.get(0);
+        for (Integer rightIndex : rightIndexes) {
+            Difference elementDifference = differences.get(leftIndex).get(rightIndex);
+            int matchingScore = matchingScoreCalculator.calculateMatchingScore(elementDifference);
+
+            ArrayList<Integer> leftIndexesClone = (ArrayList<Integer>) leftIndexes.clone();
+            ArrayList<Integer> rightIndexesClone = (ArrayList<Integer>) rightIndexes.clone();
+            leftIndexesClone.remove(0);
+            rightIndexesClone.remove(rightIndex);
+
+            currentMatchingIndexes.put(leftIndex, rightIndex);
+            fillBestMatchingIndexesImpl(leftIndexesClone, rightIndexesClone, currentMatchingScore + matchingScore, currentMatchingIndexes, difference, matchingScoreCalculator);
+            currentMatchingIndexes.remove(leftIndex);
+        }
+    }
+
+
+    /**
+     * Creates the calculator for determining the matching scores of the differences.
+     * These scores are used to determine the best matching elements.
+     *
+     * @return The instance, not null
+     */
+    protected MatchingScoreCalculator createMatchingScoreCalculator() {
+        return new MatchingScoreCalculator();
     }
 }

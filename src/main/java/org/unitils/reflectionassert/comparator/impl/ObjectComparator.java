@@ -22,7 +22,8 @@ import org.unitils.reflectionassert.difference.ObjectDifference;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.lang.reflect.Modifier.isTransient;
 
 /**
  * Comparator for objects. This will compare all corresponding field values.
@@ -93,7 +94,7 @@ public class ObjectComparator implements Comparator {
 
         for (Field field : fields) {
             // skip transient and static fields
-            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
+            if (isTransient(field.getModifiers()) || isStatic(field.getModifiers()) || field.isSynthetic()) {
                 continue;
             }
             try {

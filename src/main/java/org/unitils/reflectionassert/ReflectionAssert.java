@@ -31,6 +31,7 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAU
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.formatter.DifferenceReport;
+import org.unitils.reflectionassert.formatter.impl.DefaultDifferenceReport;
 
 import java.util.Collection;
 
@@ -125,7 +126,8 @@ public class ReflectionAssert {
         ReflectionComparator reflectionComparator = createRefectionComparator(modes);
         Difference difference = reflectionComparator.getAllDifferences(expected, actual);
         if (difference != null) {
-            Assert.fail(DifferenceReport.createReport(message, difference));
+            DifferenceReport differenceReport = new DefaultDifferenceReport();
+            Assert.fail(differenceReport.createReport(message, difference));
         }
     }
 

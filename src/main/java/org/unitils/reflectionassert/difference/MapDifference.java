@@ -72,6 +72,7 @@ public class MapDifference extends Difference {
      * @param argument An optional argument for the visitor, null if not applicable
      * @return The result
      */
+    @Override
     public <T, A> T accept(DifferenceVisitor<T, A> visitor, A argument) {
         return visitor.visit(this, argument);
     }

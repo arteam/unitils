@@ -15,10 +15,8 @@
  */
 package org.unitils.reflectionassert.formatter.impl;
 
-import static org.apache.commons.lang.StringUtils.repeat;
 import org.unitils.reflectionassert.difference.*;
 import org.unitils.reflectionassert.formatter.DifferenceFormatter;
-import org.unitils.reflectionassert.formatter.util.BestMatchFinder;
 import org.unitils.reflectionassert.formatter.util.ObjectFormatter;
 
 import java.util.Map;
@@ -31,11 +29,6 @@ import java.util.Map;
  * @author Filip Neven
  */
 public class DefaultDifferenceFormatter implements DifferenceFormatter {
-
-    /**
-     * The current nr of tabs.
-     */
-    protected int indent = 0;
 
     /**
      * True when an unordered collection is being formatted.
@@ -51,11 +44,6 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
      * The visitor for visiting the difference tree
      */
     protected DifferenceFormatterVisitor differenceFormatterVisitor = new DifferenceFormatterVisitor();
-
-    /**
-     * A best match finder for unordered collection differences.
-     */
-    protected BestMatchFinder bestMatchFinder = new BestMatchFinder();
 
 
     /**
@@ -77,14 +65,18 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(Difference difference, String fieldName) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         if (fieldName != null) {
-            result += formatLine(fieldName);
+            result.append(fieldName);
+            result.append("\n");
         }
-        String prefix = (fieldName == null) ? "" : "    ";
-        result += formatLine(prefix + "  =>  " + objectFormatter.format(difference.getLeftValue()));
-        result += formatLine(prefix + "  =>  " + objectFormatter.format(difference.getRightValue()) + "\n");
-        return result;
+        result.append(" =>  ");
+        result.append(objectFormatter.format(difference.getLeftValue()));
+        result.append("\n");
+        result.append(" =>  ");
+        result.append(objectFormatter.format(difference.getRightValue()));
+        result.append("\n");
+        return result.toString();
     }
 
 
@@ -96,12 +88,13 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(ObjectDifference objectDifference, String fieldName) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Map.Entry<String, Difference> fieldDifference : objectDifference.getFieldDifferences().entrySet()) {
             String innerFieldName = createFieldName(fieldName, fieldDifference.getKey(), true);
-            result += fieldDifference.getValue().accept(differenceFormatterVisitor, innerFieldName);
+            result.append(fieldDifference.getValue().accept(differenceFormatterVisitor, innerFieldName));
+            result.append("\n");
         }
-        return result;
+        return result.toString();
     }
 
 
@@ -113,12 +106,13 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(CollectionDifference collectionDifference, String fieldName) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Map.Entry<Integer, Difference> elementDifferences : collectionDifference.getElementDifferences().entrySet()) {
             String innerFieldName = createFieldName(fieldName, "[" + elementDifferences.getKey() + "]", false);
-            result += elementDifferences.getValue().accept(differenceFormatterVisitor, innerFieldName);
+            result.append(elementDifferences.getValue().accept(differenceFormatterVisitor, innerFieldName));
+            result.append("\n");
         }
-        return result;
+        return result.toString();
     }
 
 
@@ -130,12 +124,13 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(MapDifference mapDifference, String fieldName) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Map.Entry<Object, Difference> valueDifference : mapDifference.getValueDifferences().entrySet()) {
             String innerFieldName = createFieldName(fieldName, objectFormatter.format(valueDifference.getKey()), true);
-            result += valueDifference.getValue().accept(differenceFormatterVisitor, innerFieldName);
+            result.append(valueDifference.getValue().accept(differenceFormatterVisitor, innerFieldName));
+            result.append("\n");
         }
-        return result;
+        return result.toString();
     }
 
 
@@ -147,74 +142,41 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(UnorderedCollectionDifference unorderedCollectionDifference, String fieldName) {
-        String result = "";
-        if (!outputtingUnorderedCollectionDifference) {
-            result = formatTitle("Different collections - Differences with best matches", fieldName);
-        }
+        StringBuilder result = new StringBuilder();
 
-        Map<Integer, Map<Integer, Difference>> bestMatchingElementDifferences = bestMatchFinder.getBestMatches(unorderedCollectionDifference);
-        for (Map.Entry<Integer, Map<Integer, Difference>> leftDifferences : bestMatchingElementDifferences.entrySet()) {
-            int leftIndex = leftDifferences.getKey();
-            for (Map.Entry<Integer, Difference> rightDifferences : leftDifferences.getValue().entrySet()) {
-                int rightIndex = rightDifferences.getKey();
+        Map<Integer, Integer> bestMatchingIndexes = unorderedCollectionDifference.getBestMatchingIndexes();
+        for (Map.Entry<Integer, Integer> bestMatchingIndex : bestMatchingIndexes.entrySet()) {
+            int leftIndex = bestMatchingIndex.getKey();
+            int rightIndex = bestMatchingIndex.getValue();
 
-                Difference difference = rightDifferences.getValue();
-                if (difference == null) {
-                    continue;
-                }
-
-                String elementName = "[" + leftIndex + "," + rightIndex + "]";
-                if (outputtingUnorderedCollectionDifference) {
-                    String innerFieldName = createFieldName(fieldName, elementName, false);
-                    result += difference.accept(differenceFormatterVisitor, innerFieldName);
-                    continue;
-                }
-
-                outputtingUnorderedCollectionDifference = true;
-                if (Difference.class.equals(difference.getClass())) {
-                    result += formatLine("* " + elementName);
-                } else {
-                    result += formatLine("* " + elementName + "   Left : " + objectFormatter.format(difference.getLeftValue()));
-                    result += formatLine(repeat(" ", elementName.length() + 2) + "   Right: " + objectFormatter.format(difference.getRightValue()));
-                }
-
-                indent++;
-                result += "\n" + difference.accept(differenceFormatterVisitor, null);
-                indent--;
-                outputtingUnorderedCollectionDifference = false;
+            if (leftIndex == -1) {
+                String innerFieldName = createFieldName(fieldName, "[x," + rightIndex + "]", false);
+                result.append(innerFieldName);
+                result.append("\n =>  \n");
+                result.append(" =>  ");
+                result.append(objectFormatter.format(unorderedCollectionDifference.getElementDifference(0, rightIndex).getRightValue()));
+                result.append("\n");
+                continue;
             }
+            if (rightIndex == -1) {
+                String innerFieldName = createFieldName(fieldName, "[" + leftIndex + ",x]", false);
+                result.append(innerFieldName);
+                result.append("\n =>  ");
+                result.append(objectFormatter.format(unorderedCollectionDifference.getElementDifference(leftIndex, 0).getLeftValue()));
+                result.append("\n =>  \n");
+                continue;
+            }
+
+            Difference difference = unorderedCollectionDifference.getElementDifference(leftIndex, rightIndex);
+            if (difference == null) {
+                continue;
+            }
+
+            String innerFieldName = createFieldName(fieldName, "[" + leftIndex + "," + rightIndex + "]", false);
+            result.append(difference.accept(differenceFormatterVisitor, innerFieldName));
+            result.append("\n");
         }
-        return result;
-    }
-
-
-    /**
-     * Formats a string by applying the correct indentation and adding a new line.
-     *
-     * @param text The text, not null
-     * @return The formatted line, not null
-     */
-    protected String formatLine(String text) {
-        return repeat("     ", indent) + text + "\n";
-    }
-
-
-    /**
-     * Appends a title to the given string and indents the line with the current indentation value.
-     * A number is prefixed when needed
-     *
-     * @param title     The title to append, not null
-     * @param fieldName The fieldName, null for no field name
-     * @return The new string, not null
-     */
-    protected String formatTitle(String title, String fieldName) {
-        String result = formatLine(title);
-        result += formatLine(repeat("-", title.length()));
-
-        if (fieldName != null) {
-            result += formatLine("Field: " + fieldName + "\n");
-        }
-        return result;
+        return result.toString();
     }
 
 
@@ -230,11 +192,14 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
         if (fieldName == null) {
             return innerFieldName;
         }
-        String result = fieldName;
+
+        StringBuilder result = new StringBuilder();
+        result.append(fieldName);
         if (includePoint) {
-            result += ".";
+            result.append(".");
         }
-        return result + innerFieldName;
+        result.append(innerFieldName);
+        return result.toString();
     }
 
 
