@@ -53,11 +53,6 @@ public class InnerDifferenceFinder {
          */
         protected ObjectFormatter objectFormatter = new ObjectFormatter();
 
-        /**
-         * A best match finder for unordered collection differences.
-         */
-        protected BestMatchFinder bestMatchFinder = new BestMatchFinder();
-
 
         /**
          * Returns null, there are no inner differences for a simple difference.
@@ -121,13 +116,9 @@ public class InnerDifferenceFinder {
          * @return The difference, null if there is no difference
          */
         public Difference visit(UnorderedCollectionDifference unorderedCollectionDifference, String indexString) {
-            Map<Integer, Map<Integer, Difference>> bestMatchingElementDifferences = bestMatchFinder.getBestMatches(unorderedCollectionDifference);
-            Map<Integer, Difference> differences = bestMatchingElementDifferences.get(new Integer(indexString));
-            if (differences == null || differences.isEmpty()) {
-                return null;
-            }
-            // there should only be 1 best matching difference
-            return differences.values().iterator().next();
+            int leftIndex = new Integer(indexString);
+            int rightIndex = unorderedCollectionDifference.getBestMatchingIndexes().get(leftIndex);
+            return unorderedCollectionDifference.getElementDifference(leftIndex, rightIndex);
         }
     }
 

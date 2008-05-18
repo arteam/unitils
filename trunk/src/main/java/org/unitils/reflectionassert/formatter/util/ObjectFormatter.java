@@ -15,10 +15,12 @@
  */
 package org.unitils.reflectionassert.formatter.util;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import static org.apache.commons.lang.ClassUtils.getShortClassName;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.lang.reflect.Modifier.isTransient;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -34,7 +36,10 @@ import java.util.Map;
  */
 public class ObjectFormatter {
 
-    private int maxDepth;
+    /**
+     * The maximum recursion depth
+     */
+    protected int maxDepth;
 
 
     /**
@@ -64,7 +69,9 @@ public class ObjectFormatter {
      * @return The string representation, not null
      */
     public String format(Object object) {
-        return formatImpl(object, 0);
+        StringBuilder result = new StringBuilder();
+        formatImpl(object, 0, result);
+        return result.toString();
     }
 
 
@@ -73,91 +80,203 @@ public class ObjectFormatter {
      *
      * @param object       The instance
      * @param currentDepth The current recursion depth
-     * @return The string representation, not null
+     * @param result       The builder to append the result to, not null
      */
-    protected String formatImpl(Object object, int currentDepth) {
+    protected void formatImpl(Object object, int currentDepth, StringBuilder result) {
         if (object == null) {
-            return String.valueOf(object);
+            result.append(String.valueOf(object));
+            return;
         }
         if (object instanceof String || object instanceof Number || object instanceof Character) {
-            return String.valueOf(object);
+            result.append(String.valueOf(object));
+            return;
         }
         Class type = object.getClass();
         if (type.isPrimitive() || type.isEnum()) {
-            return String.valueOf(object);
+            result.append(String.valueOf(object));
+            return;
         }
-        if (object instanceof byte[]) {
-            return Arrays.toString((byte[]) object);
+        if (type.getName().startsWith("java.lang")) {
+            result.append(String.valueOf(object));
+            return;
         }
-        if (object instanceof short[]) {
-            return Arrays.toString((short[]) object);
+        if (type.isArray()) {
+            formatArray(object, currentDepth, result);
+            return;
         }
-        if (object instanceof int[]) {
-            return Arrays.toString((int[]) object);
+        if (object instanceof Collection) {
+            formatCollection((Collection) object, currentDepth, result);
+            return;
         }
-        if (object instanceof long[]) {
-            return Arrays.toString((long[]) object);
-        }
-        if (object instanceof char[]) {
-            return Arrays.toString((char[]) object);
-        }
-        if (object instanceof float[]) {
-            return Arrays.toString((float[]) object);
-        }
-        if (object instanceof double[]) {
-            return Arrays.toString((double[]) object);
-        }
-        if (object instanceof boolean[]) {
-            return Arrays.toString((boolean[]) object);
-        }
-        if (object instanceof Object[]) {
-            return Arrays.toString((Object[]) object);
-        }
-        if (object instanceof Collection || object instanceof Map) {
-            return object.toString();
+        if (object instanceof Map) {
+            formatMap((Map) object, currentDepth, result);
+            return;
         }
         if (currentDepth >= maxDepth) {
-            return object.toString();
+            result.append(getShortClassName(type));
+            result.append("<...>");
+            return;
         }
-        return new RecursiveReflectionToStringBuilder(object, currentDepth + 1).toString();
+        formatObject(object, currentDepth, result);
     }
 
 
     /**
-     * A reflection to string builder that recursively handles inner objects.
+     * Formats the given array.
+     *
+     * @param array        The array, not null
+     * @param currentDepth The current recursion depth
+     * @param result       The builder to append the result to, not null
      */
-    protected class RecursiveReflectionToStringBuilder extends ReflectionToStringBuilder {
-
-        /* The current recursion depth */
-        private int currentDepth;
-
-
-        /**
-         * Creates a to string builder.
-         *
-         * @param object       The object to format
-         * @param currentDepth The current recursion depth.
-         */
-        public RecursiveReflectionToStringBuilder(Object object, int currentDepth) {
-            super(object, ToStringStyle.SHORT_PREFIX_STYLE);
-            this.currentDepth = currentDepth;
+    protected void formatArray(Object array, int currentDepth, StringBuilder result) {
+        if (array instanceof byte[]) {
+            result.append(Arrays.toString((byte[]) array));
+            return;
+        }
+        if (array instanceof short[]) {
+            result.append(Arrays.toString((short[]) array));
+            return;
+        }
+        if (array instanceof int[]) {
+            result.append(Arrays.toString((int[]) array));
+            return;
+        }
+        if (array instanceof long[]) {
+            result.append(Arrays.toString((long[]) array));
+            return;
+        }
+        if (array instanceof char[]) {
+            result.append(Arrays.toString((char[]) array));
+            return;
+        }
+        if (array instanceof float[]) {
+            result.append(Arrays.toString((float[]) array));
+            return;
+        }
+        if (array instanceof double[]) {
+            result.append(Arrays.toString((double[]) array));
+            return;
+        }
+        if (array instanceof boolean[]) {
+            result.append(Arrays.toString((boolean[]) array));
+            return;
         }
 
-
-        /**
-         * Overriden to recursively handle inner objects.
-         *
-         * @param field The field, not null
-         * @return The value for the field, a formatted string in case of an object
-         */
-        protected Object getValue(Field field) throws IllegalArgumentException, IllegalAccessException {
-            Object fieldValue = super.getValue(field);
-            if (fieldValue == null || fieldValue instanceof String) {
-                return fieldValue;
+        // format an object array
+        result.append("[");
+        boolean notFirst = false;
+        for (Object element : (Object[]) array) {
+            if (notFirst) {
+                result.append(", ");
+            } else {
+                notFirst = true;
             }
+            formatImpl(element, currentDepth + 1, result);
+        }
+        result.append("]");
+    }
 
-            // instead of the field value, this will return the formatted string of the field value
-            return formatImpl(fieldValue, currentDepth);
+
+    /**
+     * Formats the given collection.
+     *
+     * @param collection   The collection, not null
+     * @param currentDepth The current recursion depth
+     * @param result       The builder to append the result to, not null
+     */
+    protected void formatCollection(Collection<?> collection, int currentDepth, StringBuilder result) {
+        result.append("[");
+        boolean notFirst = false;
+        for (Object element : collection) {
+            if (notFirst) {
+                result.append(", ");
+            } else {
+                notFirst = true;
+            }
+            formatImpl(element, currentDepth + 1, result);
+        }
+        result.append("]");
+    }
+
+
+    /**
+     * Formats the given map.
+     *
+     * @param map          The map, not null
+     * @param currentDepth The current recursion depth
+     * @param result       The builder to append the result to, not null
+     */
+    protected void formatMap(Map<?, ?> map, int currentDepth, StringBuilder result) {
+        result.append("{");
+        boolean notFirst = false;
+        for (Map.Entry<?, ?> element : map.entrySet()) {
+            if (notFirst) {
+                result.append(", ");
+            } else {
+                notFirst = true;
+            }
+            formatImpl(element.getKey(), currentDepth, result);
+            result.append("=");
+            formatImpl(element.getValue(), currentDepth + 1, result);
+        }
+        result.append("}");
+    }
+
+
+    /**
+     * Formats the given object by formatting the inner fields.
+     *
+     * @param object       The object, not null
+     * @param currentDepth The current recursion depth
+     * @param result       The builder to append the result to, not null
+     */
+    protected void formatObject(Object object, int currentDepth, StringBuilder result) {
+        Class<?> type = object.getClass();
+        result.append(getShortClassName(type));
+        result.append("<");
+        formatFields(object, type, currentDepth, result);
+        result.append(">");
+    }
+
+
+    /**
+     * Formats the field values of the given object.
+     *
+     * @param object       The object, not null
+     * @param clazz        The class for which to format the fields, not null
+     * @param currentDepth The current recursion depth
+     * @param result       The builder to append the result to, not null
+     */
+    protected void formatFields(Object object, Class<?> clazz, int currentDepth, StringBuilder result) {
+        Field[] fields = clazz.getDeclaredFields();
+        AccessibleObject.setAccessible(fields, true);
+
+        for (int i = 0; i < fields.length; i++) {
+            // skip transient and static fields
+            Field field = fields[i];
+            if (isTransient(field.getModifiers()) || isStatic(field.getModifiers()) || field.isSynthetic()) {
+                continue;
+            }
+            try {
+                if (i > 0) {
+                    result.append(", ");
+                }
+                result.append(field.getName());
+                result.append("=");
+                formatImpl(field.get(object), currentDepth + 1, result);
+
+            } catch (IllegalAccessException e) {
+                // this can't happen. Would get a Security exception instead
+                // throw a runtime exception in case the impossible happens.
+                throw new InternalError("Unexpected IllegalAccessException");
+            }
+        }
+
+        // format fields declared in superclass
+        Class<?> superclazz = clazz.getSuperclass();
+        while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
+            formatFields(object, clazz, currentDepth, result);
+            superclazz = superclazz.getSuperclass();
         }
     }
 

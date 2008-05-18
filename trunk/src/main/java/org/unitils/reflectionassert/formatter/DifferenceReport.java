@@ -15,22 +15,15 @@
  */
 package org.unitils.reflectionassert.formatter;
 
-import org.apache.commons.lang.StringUtils;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.formatter.impl.DefaultDifferenceFormatter;
-import org.unitils.reflectionassert.formatter.impl.TreeDifferenceFormatter;
 
 /**
- * Creates a report of the given differences. This will first output the differences using the default difference
- * formatter. If the difference is not a simple difference, this will also output the difference tree using the
- * difference tree formatter.
- * <p/>
- * todo create interface + property
+ * Creates a report of the given differences.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DifferenceReport {
+public interface DifferenceReport {
 
 
     /**
@@ -40,23 +33,6 @@ public class DifferenceReport {
      * @param difference The difference to output, null for a match
      * @return The report, not null
      */
-    public static String createReport(String message, Difference difference) {
-        if (difference == null) {
-            return "Found no differences.";
-        }
-
-        String result = "";
-        if (!StringUtils.isEmpty(message)) {
-            result += message + "\n\n";
-        }
-
-        result += "Found following differences:\n\n";
-        result += new DefaultDifferenceFormatter().format(difference);
-        if (!Difference.class.equals(difference.getClass())) {
-            result += "______________________________________________\n\n";
-            result += new TreeDifferenceFormatter().format(difference);
-        }
-        return result;
-    }
+    public String createReport(String message, Difference difference);
 
 }
