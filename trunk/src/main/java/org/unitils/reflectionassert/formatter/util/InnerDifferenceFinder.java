@@ -16,6 +16,7 @@
 package org.unitils.reflectionassert.formatter.util;
 
 import org.unitils.reflectionassert.difference.*;
+import org.unitils.reflectionassert.formatter.util.ObjectFormatter;
 
 import java.util.Map;
 

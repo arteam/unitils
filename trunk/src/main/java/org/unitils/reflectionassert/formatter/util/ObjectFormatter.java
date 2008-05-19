@@ -16,6 +16,7 @@
 package org.unitils.reflectionassert.formatter.util;
 
 import static org.apache.commons.lang.ClassUtils.getShortClassName;
+import static org.unitils.reflectionassert.formatter.util.HibernateUtil.getUnproxiedValue;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -46,7 +47,7 @@ public class ObjectFormatter {
      * Creates a formatter with a maximum recursion depth of 5.
      */
     public ObjectFormatter() {
-        this(3);
+        this(5);
     }
 
 
@@ -83,6 +84,9 @@ public class ObjectFormatter {
      * @param result       The builder to append the result to, not null
      */
     protected void formatImpl(Object object, int currentDepth, StringBuilder result) {
+        // get the actual value if the value is wrapped by a Hibernate proxy
+        object = getUnproxiedValue(object);
+
         if (object == null) {
             result.append(String.valueOf(object));
             return;
@@ -275,7 +279,7 @@ public class ObjectFormatter {
         // format fields declared in superclass
         Class<?> superclazz = clazz.getSuperclass();
         while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
-            formatFields(object, clazz, currentDepth, result);
+            formatFields(object, superclazz, currentDepth, result);
             superclazz = superclazz.getSuperclass();
         }
     }

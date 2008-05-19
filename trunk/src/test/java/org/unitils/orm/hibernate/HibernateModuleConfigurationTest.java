@@ -16,23 +16,18 @@
 package org.unitils.orm.hibernate;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-import java.util.Properties;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Test class for the loading of the configuration in the HibernateModule
@@ -258,7 +253,6 @@ public class HibernateModuleConfigurationTest extends UnitilsJUnit4 {
      * Setter level configuration no location specified.
      */
     public class HibernateTestSetterLevelNoLocation {
-
 
         @HibernateSessionFactory
         public void setField(SessionFactory sessionFactory) {
