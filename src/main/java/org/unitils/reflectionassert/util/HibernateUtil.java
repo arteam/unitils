@@ -13,44 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.formatter.util;
+package org.unitils.reflectionassert.util;
 
 import org.unitils.core.UnitilsException;
 
 /**
- * todo javadoc
+ * Utility class for handling Hibernate proxies during the comparison.
+ * <p/>
+ * Every operation is performed through reflection to avoid a direct link to Hibernate. This way you do not
+ * need Hibernate in the classpath to use the reflection comparator.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class HibernateUtil {
 
-
-    private static Class<?> hibernateProxyClass;
+    /**
+     * The hibernate proxy type, null if the class is not found in the classpath
+     */
+    protected static Class<?> hibernateProxyClass;
 
     static {
         try {
             hibernateProxyClass = Class.forName("org.hibernate.proxy.HibernateProxy");
 
         } catch (ClassNotFoundException e) {
+            // hibernate not found in the classpath
             hibernateProxyClass = null;
         }
     }
 
 
     /**
-     * todo javadoc
+     * Gets (and loads) the wrapped object out of a given hibernate proxy.
+     * <p/>
+     * If the given object is not a proxy or if Hibernate is not found in the classpath, this method just returns
+     * the given object. If the given object is a proxy, the proxy is initialized (loaded) and the un-wrapped object
+     * is returned.
      *
      * @param object The object or proxy
      * @return The uproxied object or the object itself if it was no proxy
      */
     public static Object getUnproxiedValue(Object object) {
-
+        // check whether object is a proxy
         if (hibernateProxyClass == null || !hibernateProxyClass.isInstance(object)) {
             return object;
         }
-
         try {
+            // found a proxy, load and un-wrap
             Object lazyInitializer = hibernateProxyClass.getMethod("getHibernateLazyInitializer").invoke(object);
             return lazyInitializer.getClass().getMethod("getImplementation").invoke(lazyInitializer);
 

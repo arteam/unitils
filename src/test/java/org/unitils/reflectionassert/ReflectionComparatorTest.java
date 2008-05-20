@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import org.unitils.reflectionassert.difference.Difference;
-import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
+import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 import static java.lang.Boolean.FALSE;
 import java.lang.reflect.InvocationHandler;

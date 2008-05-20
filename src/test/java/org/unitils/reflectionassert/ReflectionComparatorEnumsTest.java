@@ -18,7 +18,7 @@ package org.unitils.reflectionassert;
 import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
-import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
+import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 /**
  * Test class for {@link ReflectionComparator}.

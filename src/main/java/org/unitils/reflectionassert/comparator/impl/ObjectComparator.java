@@ -19,7 +19,7 @@ import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.ObjectDifference;
-import static org.unitils.reflectionassert.formatter.util.HibernateUtil.getUnproxiedValue;
+import static org.unitils.reflectionassert.util.HibernateUtil.getUnproxiedValue;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -91,7 +91,7 @@ public class ObjectComparator implements Comparator {
      *
      * @param left                 the left object for the comparison, not null
      * @param right                the right object for the comparison, not null
-     * @param clazz                the type of both objects, not null
+     * @param clazz                the type of the left object, not null
      * @param difference           root difference, not null
      * @param onlyFirstDifference  True if only the first difference should be returned
      * @param reflectionComparator the reflection comparator, not null

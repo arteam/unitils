@@ -6,6 +6,8 @@
     <session-factory>
 
         <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">true</property>
 
         <mapping class="org.unitils.reflectionassert.hibernate.Child"/>
         <mapping class="org.unitils.reflectionassert.hibernate.Parent"/>

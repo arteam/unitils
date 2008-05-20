@@ -28,6 +28,7 @@ import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.ReflectionAssert;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.util.PropertyUtils;
@@ -99,13 +100,17 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetDifference_proxy() {
-        Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
-        Difference result = reflectionComparator.getDifference(testChild, childWithParentProxy);
-        assertNull(result);
+        //Child childWithParentProxy1 = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
+        //Child childWithParentProxy2 = (Child) sessionFactory.getCurrentSession().get(Child.class, 2L);
+        //Difference result = reflectionComparator.getDifference(childWithParentProxy1, childWithParentProxy2);
+
+        //ReflectionAssert.assertLenEquals(childWithParentProxy1, childWithParentProxy2);
+
+       // assertNull(result);
 
         //todo remove
-        // ReflectionAssert.assertLenEquals(asList(new Child(1L, new Parent(1L)), new Child(2L, new Parent(2L)), 3), asList(new Child(1L, new Parent(2L)), new Child(2L, new Parent(1L))));
-        //ReflectionAssert.assertRefEquals(asList(1, 2), asList(3, 4));
+        //ReflectionAssert.assertLenEquals(asList(new Child(1L, new Parent(1L)), new Child(2L, new Parent(2L)), 3), asList(new Child(1L, new Parent(2L)), new Child(2L, new Parent(1L))));
+        ReflectionAssert.assertLenEquals(asList(1, null), asList(3, 4));
         //ReflectionAssert.assertLenEquals(1, 2);
     }
 
@@ -118,7 +123,9 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         executeUpdate("create table CHILD (id bigint not null, parent_id bigint not null, primary key (id))", dataSource);
         executeUpdate("alter table CHILD add constraint CHILDTOPARENT foreign key (parent_id) references PARENT", dataSource);
         executeUpdate("insert into PARENT (id) values (1)", dataSource);
+        executeUpdate("insert into PARENT (id) values (2)", dataSource);
         executeUpdate("insert into CHILD (id, parent_id) values (1, 1)", dataSource);
+        executeUpdate("insert into CHILD (id, parent_id) values (2, 2)", dataSource);
     }
 
 
