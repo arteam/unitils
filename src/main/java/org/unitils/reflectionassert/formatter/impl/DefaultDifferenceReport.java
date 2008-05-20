@@ -51,7 +51,7 @@ public class DefaultDifferenceReport implements DifferenceReport {
         result.append("Found following differences:\n\n");
         result.append(new DefaultDifferenceFormatter().format(difference));
         if (!Difference.class.equals(difference.getClass())) {
-            result.append("___________________________________________________________\n\n");
+            result.append("\n\n--- Difference details ---\n\n");
             result.append(new TreeDifferenceFormatter().format(difference));
         }
         return result.toString();
