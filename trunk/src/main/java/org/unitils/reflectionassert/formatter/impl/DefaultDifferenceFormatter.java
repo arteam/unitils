@@ -65,18 +65,7 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
      * @return The string representation, not null
      */
     protected String formatDifference(Difference difference, String fieldName) {
-        StringBuilder result = new StringBuilder();
-        if (fieldName != null) {
-            result.append(fieldName);
-            result.append("\n");
-        }
-        result.append(" =>  ");
-        result.append(objectFormatter.format(difference.getLeftValue()));
-        result.append("\n");
-        result.append(" =>  ");
-        result.append(objectFormatter.format(difference.getRightValue()));
-        result.append("\n");
-        return result.toString();
+        return formatValues(fieldName, difference.getLeftValue(), difference.getRightValue());
     }
 
 
@@ -92,7 +81,6 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
         for (Map.Entry<String, Difference> fieldDifference : objectDifference.getFieldDifferences().entrySet()) {
             String innerFieldName = createFieldName(fieldName, fieldDifference.getKey(), true);
             result.append(fieldDifference.getValue().accept(differenceFormatterVisitor, innerFieldName));
-            result.append("\n");
         }
         return result.toString();
     }
@@ -110,7 +98,6 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
         for (Map.Entry<Integer, Difference> elementDifferences : collectionDifference.getElementDifferences().entrySet()) {
             String innerFieldName = createFieldName(fieldName, "[" + elementDifferences.getKey() + "]", false);
             result.append(elementDifferences.getValue().accept(differenceFormatterVisitor, innerFieldName));
-            result.append("\n");
         }
         return result.toString();
     }
@@ -128,7 +115,6 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
         for (Map.Entry<Object, Difference> valueDifference : mapDifference.getValueDifferences().entrySet()) {
             String innerFieldName = createFieldName(fieldName, objectFormatter.format(valueDifference.getKey()), true);
             result.append(valueDifference.getValue().accept(differenceFormatterVisitor, innerFieldName));
-            result.append("\n");
         }
         return result.toString();
     }
@@ -151,19 +137,12 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
 
             if (leftIndex == -1) {
                 String innerFieldName = createFieldName(fieldName, "[x," + rightIndex + "]", false);
-                result.append(innerFieldName);
-                result.append("\n =>  \n");
-                result.append(" =>  ");
-                result.append(objectFormatter.format(unorderedCollectionDifference.getElementDifference(0, rightIndex).getRightValue()));
-                result.append("\n");
+                result.append(formatValues(innerFieldName, "", unorderedCollectionDifference.getElementDifference(0, rightIndex).getRightValue()));
                 continue;
             }
             if (rightIndex == -1) {
                 String innerFieldName = createFieldName(fieldName, "[" + leftIndex + ",x]", false);
-                result.append(innerFieldName);
-                result.append("\n =>  ");
-                result.append(objectFormatter.format(unorderedCollectionDifference.getElementDifference(leftIndex, 0).getLeftValue()));
-                result.append("\n =>  \n");
+                result.append(formatValues(innerFieldName, unorderedCollectionDifference.getElementDifference(leftIndex, 0).getLeftValue(), ""));
                 continue;
             }
 
@@ -174,8 +153,32 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
 
             String innerFieldName = createFieldName(fieldName, "[" + leftIndex + "," + rightIndex + "]", false);
             result.append(difference.accept(differenceFormatterVisitor, innerFieldName));
+        }
+        return result.toString();
+    }
+
+
+    /**
+     * Formats and appends the given fieldname and object values.
+     *
+     * @param fieldName  The field name, null if there is no field name
+     * @param leftValue  The left value
+     * @param rightValue The right value
+     * @return The string representation, not null
+     */
+    protected String formatValues(String fieldName, Object leftValue, Object rightValue) {
+        StringBuilder result = new StringBuilder();
+        if (fieldName != null) {
+            result.append(" ");
+            result.append(fieldName);
             result.append("\n");
         }
+        result.append("    =>  ");
+        result.append(objectFormatter.format(leftValue));
+        result.append("\n");
+        result.append("    =>  ");
+        result.append(objectFormatter.format(rightValue));
+        result.append("\n\n");
         return result.toString();
     }
 

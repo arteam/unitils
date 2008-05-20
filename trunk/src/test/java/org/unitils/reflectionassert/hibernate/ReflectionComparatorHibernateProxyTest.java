@@ -30,7 +30,6 @@ import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.formatter.impl.DefaultDifferenceReport;
 import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
@@ -102,11 +101,12 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
     public void testGetDifference_proxy() {
         Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
         Difference result = reflectionComparator.getDifference(testChild, childWithParentProxy);
-
-
-        System.out.println(new DefaultDifferenceReport().createReport("", result));
-
         assertNull(result);
+
+        //todo remove
+        // ReflectionAssert.assertLenEquals(asList(new Child(1L, new Parent(1L)), new Child(2L, new Parent(2L)), 3), asList(new Child(1L, new Parent(2L)), new Child(2L, new Parent(1L))));
+        //ReflectionAssert.assertRefEquals(asList(1, 2), asList(3, 4));
+        //ReflectionAssert.assertLenEquals(1, 2);
     }
 
 
