@@ -20,7 +20,7 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_DATES;
 import org.unitils.reflectionassert.difference.Difference;
-import static org.unitils.reflectionassert.formatter.util.InnerDifferenceFinder.getInnerDifference;
+import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.Date;
 

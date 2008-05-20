@@ -19,7 +19,7 @@ import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.UnorderedCollectionDifference;
-import org.unitils.reflectionassert.formatter.util.MatchingScoreCalculator;
+import org.unitils.reflectionassert.util.MatchingScoreCalculator;
 import static org.unitils.util.CollectionUtils.convertToCollection;
 
 import java.util.ArrayList;

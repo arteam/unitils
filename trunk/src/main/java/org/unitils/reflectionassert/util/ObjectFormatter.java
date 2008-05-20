@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.formatter.util;
+package org.unitils.reflectionassert.util;
 
 import static org.apache.commons.lang.ClassUtils.getShortClassName;
-import static org.unitils.reflectionassert.formatter.util.HibernateUtil.getUnproxiedValue;
+import static org.unitils.reflectionassert.util.HibernateUtil.getUnproxiedValue;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
