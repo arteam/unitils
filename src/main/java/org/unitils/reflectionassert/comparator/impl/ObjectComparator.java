@@ -19,7 +19,6 @@ import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.comparator.Comparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.reflectionassert.difference.ObjectDifference;
-import static org.unitils.reflectionassert.util.HibernateUtil.getUnproxiedValue;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -28,12 +27,9 @@ import static java.lang.reflect.Modifier.isTransient;
 
 /**
  * Comparator for objects. This will compare all corresponding field values.
- * <p/>
- * Special thanks to Tim Peeters for helping us with the Hibernate proxy handling.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
- * @author Tim Peeters
  */
 public class ObjectComparator implements Comparator {
 
@@ -66,10 +62,6 @@ public class ObjectComparator implements Comparator {
      * @return A ObjectDifference or null if both maps are equal
      */
     public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
-        // get the actual value if the value is wrapped by a Hibernate proxy
-        left = getUnproxiedValue(left);
-        right = getUnproxiedValue(right);
-
         // check different class type
         Class<?> clazz = left.getClass();
         if (!clazz.isAssignableFrom(right.getClass())) {
@@ -107,14 +99,13 @@ public class ObjectComparator implements Comparator {
             }
             try {
                 // recursively check the value of the fields
-                Difference innerDifference = reflectionComparator.getAllDifferences(field.get(left), field.get(right));
+                Difference innerDifference = reflectionComparator.getDifference(field.get(left), field.get(right), onlyFirstDifference);
                 if (innerDifference != null) {
                     difference.addFieldDifference(field.getName(), innerDifference);
                     if (onlyFirstDifference) {
                         return;
                     }
                 }
-
             } catch (IllegalAccessException e) {
                 // this can't happen. Would get a Security exception instead
                 // throw a runtime exception in case the impossible happens.

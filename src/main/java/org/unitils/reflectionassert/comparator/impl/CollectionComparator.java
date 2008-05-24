@@ -75,7 +75,7 @@ public class CollectionComparator implements Comparator {
         while (leftIterator.hasNext() && rightIterator.hasNext()) {
             elementIndex++;
 
-            Difference elementDifference = reflectionComparator.getAllDifferences(leftIterator.next(), rightIterator.next());
+            Difference elementDifference = reflectionComparator.getDifference(leftIterator.next(), rightIterator.next(), onlyFirstDifference);
             if (elementDifference != null) {
                 difference.addElementDifference(elementIndex, elementDifference);
                 if (onlyFirstDifference) {

@@ -45,6 +45,59 @@ public class HibernateUtil {
 
 
     /**
+     * Checks whether the given ojbect is a HibernateProxy instance.
+     *
+     * @param object The object
+     * @return True if the object is a proxy
+     */
+    public static boolean isHibernateProxy(Object object) {
+        return hibernateProxyClass != null && hibernateProxyClass.isInstance(object);
+    }
+
+
+    /**
+     * Checks whether the given proxy object has been loaded.
+     *
+     * @param object The object or proxy
+     * @return True if the object is a proxy and has been loaded
+     */
+    public static boolean isUninitialized(Object object) {
+        if (!isHibernateProxy(object)) {
+            return false;
+        }
+        return (Boolean) invokeLazyInitializerMethod("isUninitialized", object);
+    }
+
+
+    /**
+     * Gets the class name of the proxied object
+     *
+     * @param object The object or proxy
+     * @return The class name of the object, null if the object is null
+     */
+    public static String getEntitiyName(Object object) {
+        if (!isHibernateProxy(object)) {
+            return object == null ? null : object.getClass().getName();
+        }
+        return (String) invokeLazyInitializerMethod("getEntityName", object);
+    }
+
+
+    /**
+     * Gets the unique identifier of the given proxy object.
+     *
+     * @param object The object or proxy
+     * @return The identifier or null if the object was not a proxy
+     */
+    public static Object getIdentifier(Object object) {
+        if (!isHibernateProxy(object)) {
+            return null;
+        }
+        return invokeLazyInitializerMethod("getIdentifier", object);
+    }
+
+
+    /**
      * Gets (and loads) the wrapped object out of a given hibernate proxy.
      * <p/>
      * If the given object is not a proxy or if Hibernate is not found in the classpath, this method just returns
@@ -56,16 +109,27 @@ public class HibernateUtil {
      */
     public static Object getUnproxiedValue(Object object) {
         // check whether object is a proxy
-        if (hibernateProxyClass == null || !hibernateProxyClass.isInstance(object)) {
+        if (!isHibernateProxy(object)) {
             return object;
         }
-        try {
-            // found a proxy, load and un-wrap
-            Object lazyInitializer = hibernateProxyClass.getMethod("getHibernateLazyInitializer").invoke(object);
-            return lazyInitializer.getClass().getMethod("getImplementation").invoke(lazyInitializer);
+        // found a proxy, load and un-wrap
+        return invokeLazyInitializerMethod("getImplementation", object);
+    }
 
+
+    /**
+     * Invokes the given method on the LazyInitializer that is associated with the given proxy.
+     *
+     * @param methodName The method to invoke, not null
+     * @param proxy      The hibernate proxy instance, not null
+     * @return The result value of the method call
+     */
+    protected static Object invokeLazyInitializerMethod(String methodName, Object proxy) {
+        try {
+            Object lazyInitializer = hibernateProxyClass.getMethod("getHibernateLazyInitializer").invoke(proxy);
+            return lazyInitializer.getClass().getMethod(methodName).invoke(lazyInitializer);
         } catch (Exception e) {
-            throw new UnitilsException("Unable to get unproxied value. Object: " + object, e);
+            throw new UnitilsException("Unable to invoke method on lazy initializer of Hibernate proxy. Method: " + methodName + ", proxy: " + proxy, e);
         }
     }
 

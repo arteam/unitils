@@ -65,32 +65,6 @@ public class ReflectionComparator {
 
 
     /**
-     * Checks whether there is a difference between the left and right objects. If more than one difference exist,
-     * only the first difference is returned.
-     *
-     * @param left  the left instance
-     * @param right the right instance
-     * @return the difference, null if there is no difference
-     */
-    public Difference getDifference(Object left, Object right) {
-        return getDifferenceImpl(left, right, true);
-    }
-
-
-    /**
-     * Checks whether there are differences between the left and right objects. This will return the root difference
-     * of the whole difference tree containing all the differences between the objects.
-     *
-     * @param left  the left instance
-     * @param right the right instance
-     * @return the root difference, null if there is no difference
-     */
-    public Difference getAllDifferences(Object left, Object right) {
-        return getDifferenceImpl(left, right, false);
-    }
-
-
-    /**
      * Checks whether there is no difference between the left and right objects.
      *
      * @param left  the left instance
@@ -98,20 +72,33 @@ public class ReflectionComparator {
      * @return true if there is no difference, false otherwise
      */
     public boolean isEqual(Object left, Object right) {
-        Difference difference = getDifferenceImpl(left, right, true);
+        Difference difference = getDifference(left, right, true);
         return difference == null;
     }
 
 
     /**
-     * Actual implementation of the difference checking.
+     * Checks whether there is a difference between the left and right objects.
+     *
+     * @param left  the left instance
+     * @param right the right instance
+     * @return the difference, null if there is no difference
+     */
+    public Difference getDifference(Object left, Object right) {
+        return getDifference(left, right, false);
+    }
+
+
+    /**
+     * Checks whether there are differences between the left and right objects. This will return the root difference
+     * of the whole difference tree containing all the differences between the objects.
      *
      * @param left                the left instance
      * @param right               the right instance
-     * @param onlyFirstDifference True if only the first difference should be returned
+     * @param onlyFirstDifference True if the comparison should stop at the first differnece
      * @return the root difference, null if there is no difference
      */
-    protected Difference getDifferenceImpl(Object left, Object right, boolean onlyFirstDifference) {
+    public Difference getDifference(Object left, Object right, boolean onlyFirstDifference) {
         // check whether difference is avaible in cache
         Map<Object, Difference> cachedResult = cachedResults.get(left);
         if (cachedResult != null) {

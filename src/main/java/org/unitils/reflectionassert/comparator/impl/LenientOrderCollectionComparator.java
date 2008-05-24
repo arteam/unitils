@@ -118,7 +118,7 @@ public class LenientOrderCollectionComparator implements Comparator {
         for (int rightIndex = 0; rightIndex < rightList.size(); rightIndex++) {
             Object rightValue = rightList.get(rightIndex);
 
-            Difference elementDifference = reflectionComparator.getAllDifferences(leftValue, rightValue);
+            Difference elementDifference = reflectionComparator.getDifference(leftValue, rightValue, true);
             if (elementDifference != null) {
                 // elements are not matching
                 continue;
@@ -156,7 +156,7 @@ public class LenientOrderCollectionComparator implements Comparator {
             Object leftValue = leftList.get(leftIndex);
             for (int rightIndex = 0; rightIndex < rightList.size(); rightIndex++) {
                 Object rightValue = rightList.get(rightIndex);
-                Difference elementDifference = reflectionComparator.getAllDifferences(leftValue, rightValue);
+                Difference elementDifference = reflectionComparator.getDifference(leftValue, rightValue, false);
                 difference.addElementDifference(leftIndex, rightIndex, elementDifference);
             }
         }

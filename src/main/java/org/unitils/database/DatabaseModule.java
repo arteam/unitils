@@ -295,7 +295,7 @@ public class DatabaseModule implements Module {
 
     /**
      * @param testObject The test object, not null
-     * @param testMethod TODO
+     * @param testMethod The test method, not null
      * @return The {@link TransactionMode} for the given object
      */
     protected TransactionMode getTransactionMode(Object testObject, Method testMethod) {

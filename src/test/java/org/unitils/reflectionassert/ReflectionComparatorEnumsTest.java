@@ -61,7 +61,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
      * Test for two equal enum values.
      */
     public void testGetDifference_equals() {
-        Difference result = reflectionComparator.getAllDifferences(enumsA, enumsB);
+        Difference result = reflectionComparator.getDifference(enumsA, enumsB);
         assertNull(result);
     }
 
@@ -70,7 +70,7 @@ public class ReflectionComparatorEnumsTest extends TestCase {
      * Test for two different enum values
      */
     public void testGetDifference_notEqualsDifferentValues() {
-        Difference result = reflectionComparator.getAllDifferences(enumsA, enumsDifferentValue);
+        Difference result = reflectionComparator.getDifference(enumsA, enumsDifferentValue);
 
         assertNotNull(result);
         Difference difference = getInnerDifference("testEnumValue", result);
