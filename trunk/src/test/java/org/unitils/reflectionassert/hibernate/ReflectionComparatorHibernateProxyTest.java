@@ -17,6 +17,7 @@ package org.unitils.reflectionassert.hibernate;
 
 import org.hibernate.SessionFactory;
 import org.junit.After;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,10 +26,12 @@ import org.unitils.core.ConfigurationLoader;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import org.unitils.database.annotations.TestDataSource;
+import org.unitils.database.annotations.Transactional;
+import static org.unitils.database.util.TransactionMode.COMMIT;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
-import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.ReflectionAssert;
+import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
 import org.unitils.util.PropertyUtils;
@@ -39,15 +42,17 @@ import java.util.Properties;
 
 
 /**
- * Test class for {@link org.unitils.reflectionassert.ReflectionComparator}.
+ * Test class for Hibernate proxy related tests of the {@link ReflectionComparator} .
  * <p/>
  * Currently this is only implemented for HsqlDb.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
+@Transactional(value = COMMIT)
 public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
+    /* A test hibernate entity, with a link to a lazily loaded parent class */
     private Child testChild;
 
     @TestDataSource
@@ -96,22 +101,54 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
 
 
     /**
-     * todo javadoc
+     * Test comparing 2 values with the right one containing a Hibernate proxy.
      */
     @Test
-    public void testGetDifference_proxy() {
-        //Child childWithParentProxy1 = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
-        //Child childWithParentProxy2 = (Child) sessionFactory.getCurrentSession().get(Child.class, 2L);
-        //Difference result = reflectionComparator.getDifference(childWithParentProxy1, childWithParentProxy2);
+    public void testGetDifference_rightProxy() {
+        Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
+        Difference result = reflectionComparator.getDifference(testChild, childWithParentProxy);
+        assertNull(result);
+    }
 
-        //ReflectionAssert.assertLenEquals(childWithParentProxy1, childWithParentProxy2);
 
-       // assertNull(result);
+    /**
+     * Test comparing 2 values with the left one containing a Hibernate proxy.
+     */
+    @Test
+    public void testGetDifference_leftProxy() {
+        Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
+        Difference result = reflectionComparator.getDifference(childWithParentProxy, testChild);
 
-        //todo remove
-        //ReflectionAssert.assertLenEquals(asList(new Child(1L, new Parent(1L)), new Child(2L, new Parent(2L)), 3), asList(new Child(1L, new Parent(2L)), new Child(2L, new Parent(1L))));
-        ReflectionAssert.assertLenEquals(asList(1, null), asList(3, 4));
-        //ReflectionAssert.assertLenEquals(1, 2);
+        ReflectionAssert.assertLenEquals(childWithParentProxy, testChild);
+        assertNull(result);
+    }
+
+
+    /**
+     * Test comparing 2 values with both containing a Hibernate proxy. The identifiers should have been used
+     * to compare the proxy values.
+     */
+    @Test
+    public void testGetDifference_bothProxy() {
+        // open 2 session two avoid the values being taken from the cache
+        Child childWithParentProxy1 = (Child) sessionFactory.openSession().get(Child.class, 1L);
+        Child childWithParentProxy2 = (Child) sessionFactory.openSession().get(Child.class, 1L);
+        Difference result = reflectionComparator.getDifference(childWithParentProxy1, childWithParentProxy2);
+        assertNull(result);
+    }
+
+
+    /**
+     * Test comparing 2 values with both containing a different hibnerate proxy. The identifiers should have been used
+     * to compare the proxy values.
+     */
+    @Test
+    public void testGetDifference_bothProxyDifferentValue() {
+        // open 2 session two avoid the values being taken from the cache
+        Child childWithParentProxy1 = (Child) sessionFactory.openSession().get(Child.class, 1L);
+        Child childWithParentProxy2 = (Child) sessionFactory.openSession().get(Child.class, 2L);
+        Difference result = reflectionComparator.getDifference(childWithParentProxy1, childWithParentProxy2);
+        assertNotNull(result);
     }
 
 

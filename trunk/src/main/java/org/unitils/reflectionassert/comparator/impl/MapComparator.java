@@ -90,7 +90,7 @@ public class MapComparator implements Comparator {
                     rightIterator.remove();
 
                     // compare values
-                    Difference elementDifference = reflectionComparator.getAllDifferences(leftValue, rightValue);
+                    Difference elementDifference = reflectionComparator.getDifference(leftValue, rightValue, onlyFirstDifference);
                     if (elementDifference != null) {
                         difference.addValueDifference(leftKey, elementDifference);
                         if (onlyFirstDifference) {

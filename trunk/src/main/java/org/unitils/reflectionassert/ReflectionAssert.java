@@ -124,7 +124,7 @@ public class ReflectionAssert {
      */
     public static void assertRefEquals(String message, Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
         ReflectionComparator reflectionComparator = createRefectionComparator(modes);
-        Difference difference = reflectionComparator.getAllDifferences(expected, actual);
+        Difference difference = reflectionComparator.getDifference(expected, actual);
         if (difference != null) {
             DifferenceReport differenceReport = new DefaultDifferenceReport();
             Assert.fail(differenceReport.createReport(message, difference));
