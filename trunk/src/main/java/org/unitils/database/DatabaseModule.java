@@ -404,7 +404,7 @@ public class DatabaseModule implements Module {
      * Disables all foreigh key and not-null constraints on the configured schema's.
      */
     public void disableConstraints() {
-        getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class).disableConstraints();
+        getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class).removeConstraints();
     }
 
 

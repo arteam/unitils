@@ -15,6 +15,8 @@
  */
 package org.unitils.dbunit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
@@ -67,6 +69,9 @@ import java.util.*;
  * @author Tim Ducheyne
  */
 public class DbUnitModule implements Module {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DbUnitModule.class);
 
     /**
      * Map holding the default configuration of the dbunit module annotations
@@ -342,6 +347,8 @@ public class DbUnitModule implements Module {
             File dataSetFile = dataSetResolver.resolve(testClass, dataSetFileName);
             dataSetFiles.add(dataSetFile);
         }
+
+        logger.info("Loading DbUnit data set. File names: " + dataSetFiles);
         return dataSetFactory.createDataSet(dataSetFiles.toArray(new File[dataSetFiles.size()]));
     }
 

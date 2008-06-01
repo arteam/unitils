@@ -15,8 +15,6 @@
  */
 package org.unitils.orm.hibernate.util;
 
-import javax.sql.DataSource;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -30,60 +28,63 @@ import org.unitils.orm.common.util.OrmConfig;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
 import org.unitils.orm.hibernate.HibernateModule;
 
+import javax.sql.DataSource;
+
+
+//todo javadoc
 public class HibernateSessionFactoryLoader implements OrmPersistenceUnitLoader<SessionFactory, Configuration, OrmConfig> {
 
-	public ConfiguredOrmPersistenceUnit<SessionFactory, Configuration> getConfiguredOrmPersistenceUnit(Object testObject, OrmConfig entityManagerConfig) {
-		
-		LocalSessionFactoryBean factoryBean = createSessionFactoryBean(testObject, entityManagerConfig);
-		SessionFactory entityManagerFactory = (SessionFactory) factoryBean.getObject();
-		Configuration hibernateConfiguration = factoryBean.getConfiguration();
-		return new ConfiguredOrmPersistenceUnit<SessionFactory, Configuration>(entityManagerFactory, hibernateConfiguration);
-	}
+    public ConfiguredOrmPersistenceUnit<SessionFactory, Configuration> getConfiguredOrmPersistenceUnit(Object testObject, OrmConfig entityManagerConfig) {
+        LocalSessionFactoryBean factoryBean = createSessionFactoryBean(testObject, entityManagerConfig);
+        SessionFactory entityManagerFactory = (SessionFactory) factoryBean.getObject();
+        Configuration hibernateConfiguration = factoryBean.getConfiguration();
+        return new ConfiguredOrmPersistenceUnit<SessionFactory, Configuration>(entityManagerFactory, hibernateConfiguration);
+    }
 
 
-	protected LocalSessionFactoryBean createSessionFactoryBean(Object testObject, OrmConfig entityManagerConfig) {
-		// A custom subclass of spring's LocalSessionFactoryBean is used, to enable calling a custom config method
-		UnitilsLocalSessionFactoryBean factoryBean = new UnitilsLocalSessionFactoryBean();
-		factoryBean.setDataSource(getDataSource());
-		factoryBean.setConfigurationClass(getConfigurationObjectClass());
-		Resource[] hibernateConfigFiles = new Resource[entityManagerConfig.getConfigFiles().size()];
-		int index = 0;
-		for (String configFileName : entityManagerConfig.getConfigFiles()) {
-			hibernateConfigFiles[index++] = new ClassPathResource(configFileName);
-		}
-		factoryBean.setConfigLocations(hibernateConfigFiles);
-		
-		// Enable invocation of custom config method
-		factoryBean.setTestObject(testObject);
-		factoryBean.setCustomConfigMethod(entityManagerConfig.getConfigMethod());
-		
-		// Build SessionFactory
-		try {
-			factoryBean.afterPropertiesSet();
-		} catch (Exception e) {
-			throw new UnitilsException("Error while processing " + LocalSessionFactoryBean.class.getSimpleName() + " configuration", e);
-		}
-		
-		return factoryBean;
-	}
-	
-	
-	protected Class<? extends Configuration> getConfigurationObjectClass() {
-		return getHibernateModule().getConfigurationObjectClass();
-	}
-	
-	
-	protected DataSource getDataSource() {
-		return getDatabaseModule().getDataSource();
-	}
-	
-	
-	protected DatabaseModule getDatabaseModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-	}
+    protected LocalSessionFactoryBean createSessionFactoryBean(Object testObject, OrmConfig entityManagerConfig) {
+        // A custom subclass of spring's LocalSessionFactoryBean is used, to enable calling a custom config method
+        UnitilsLocalSessionFactoryBean factoryBean = new UnitilsLocalSessionFactoryBean();
+        factoryBean.setDataSource(getDataSource());
+        factoryBean.setConfigurationClass(getConfigurationObjectClass());
+        Resource[] hibernateConfigFiles = new Resource[entityManagerConfig.getConfigFiles().size()];
+        int index = 0;
+        for (String configFileName : entityManagerConfig.getConfigFiles()) {
+            hibernateConfigFiles[index++] = new ClassPathResource(configFileName);
+        }
+        factoryBean.setConfigLocations(hibernateConfigFiles);
 
-	
-	protected HibernateModule getHibernateModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
-	}
+        // Enable invocation of custom config method
+        factoryBean.setTestObject(testObject);
+        factoryBean.setCustomConfigMethod(entityManagerConfig.getConfigMethod());
+
+        // Build SessionFactory
+        try {
+            factoryBean.afterPropertiesSet();
+        } catch (Exception e) {
+            throw new UnitilsException("Error while processing " + LocalSessionFactoryBean.class.getSimpleName() + " configuration", e);
+        }
+
+        return factoryBean;
+    }
+
+
+    protected Class<? extends Configuration> getConfigurationObjectClass() {
+        return getHibernateModule().getConfigurationObjectClass();
+    }
+
+
+    protected DataSource getDataSource() {
+        return getDatabaseModule().getDataSource();
+    }
+
+
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
+
+
+    protected HibernateModule getHibernateModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(HibernateModule.class);
+    }
 }

@@ -32,6 +32,6 @@ public interface ConstraintsDisabler extends DatabaseTask {
     /**
      * Disables all constraints of the database schemas.
      */
-    void disableConstraints();
+    void removeConstraints();
 
 }

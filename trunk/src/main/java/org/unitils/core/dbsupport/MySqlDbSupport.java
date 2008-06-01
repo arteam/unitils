@@ -92,18 +92,36 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
-     * Removes all constraints on the specified table
+     * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
-     * @param tableName The table with the column, not null
+     * @param tableName The table, not null
      */
     @Override
-    public void disableConstraints(String tableName) {
+    public void removeReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type <> 'PRIMARY KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + quoted(constraintName));
         }
+    }
 
+
+    /**
+     * Disables all value constraints (e.g. not null) on the specified table
+     *
+     * @param tableName The table, not null
+     */
+    @Override
+    public void removeValueConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+
+        // disable all unique constraints (check constraints are not implemented)
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type in ('UNIQUE') AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop key " + quoted(constraintName));
+        }
+
+        // disable all not null constraints
         Set<String> notNullColumnNames = sqlHandler.getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and column_key <> 'PRI' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
         for (String notNullColumnName : notNullColumnNames) {
             String columnType = sqlHandler.getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + notNullColumnName + "'");
@@ -114,14 +132,13 @@ public class MySqlDbSupport extends DbSupport {
 
     /**
      * Gets the names of all identity columns of the given table.
-     * <p/>
-     * todo check, at this moment the PK columns are returned
      *
      * @param tableName The table, not null
      * @return The names of the identity columns of the table with the given name
      */
     @Override
     public Set<String> getIdentityColumnNames(String tableName) {
+        //  todo check, at this moment the PK columns are returned
         return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + getSchemaName() + "'");
     }
 

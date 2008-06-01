@@ -89,9 +89,27 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected foreign key violation
         }
-        constraintsDisabler.disableConstraints();
+        constraintsDisabler.removeConstraints();
         // Should not throw exception anymore
         executeUpdate("insert into table2 (col1) values ('test')", dataSource);
+    }
+
+
+    /**
+     * Tests whether foreign key constraints are disabled before the alternate keys. Otherwise the disabling of
+     * the alternate key will result in an error (issue UNI-36).
+     */
+    @Test
+    public void testDisableConstraints_foreignKeyToAlternateKey() throws Exception {
+        try {
+            executeUpdate("insert into table3 (col1) values ('test')", dataSource);
+            fail("UnitilsException should have been thrown");
+        } catch (UnitilsException e) {
+            // Expected foreign key violation
+        }
+        constraintsDisabler.removeConstraints();
+        // Should not throw exception anymore
+        executeUpdate("insert into table3 (col1) values ('test')", dataSource);
     }
 
 
@@ -106,7 +124,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected not null violation
         }
-        constraintsDisabler.disableConstraints();
+        constraintsDisabler.removeConstraints();
         // Should not throw exception anymore
         executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);
     }
@@ -116,8 +134,9 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
      * Creates the test tables
      */
     protected void createTestTables() {
-        executeUpdate("create table table1 (col1 varchar(10) not null primary key, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table table1 (col1 varchar(10) not null primary key, col2 varchar(10) not null, unique (col2))", dataSource);
         executeUpdate("create table table2 (col1 varchar(10), foreign key (col1) references table1(col1))", dataSource);
+        executeUpdate("create table table3 (col1 varchar(10), foreign key (col1) references table1(col2))", dataSource);
     }
 
 
@@ -125,6 +144,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
      * Drops the test tables
      */
     protected void cleanupTestDatabase() {
+        executeUpdateQuietly("drop table table3", dataSource);
         executeUpdateQuietly("drop table table2", dataSource);
         executeUpdateQuietly("drop table table1", dataSource);
     }

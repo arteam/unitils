@@ -41,15 +41,49 @@ public class DefaultConstraintsDisabler extends BaseDatabaseTask implements Cons
     /**
      * Permanently disable every foreign key or not-null constraint
      */
-    public void disableConstraints() {
+    public void removeConstraints() {
         for (DbSupport dbSupport : dbSupports) {
             logger.info("Disabling contraints in database schema " + dbSupport.getSchemaName());
 
+            // first remove referential constraints to avoid conflicts
             Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {
-                dbSupport.disableConstraints(tableName);
+                removeReferentialConstraints(tableName, dbSupport);
+            }
+            // remove not-null and check constraints
+            for (String tableName : tableNames) {
+                removeValueConstraints(tableName, dbSupport);
             }
         }
-    }    
+    }
 
+
+    /**
+     * Removes all referential constraints (e.g. foreign keys) on the specified table
+     *
+     * @param tableName The table, not null
+     * @param dbSupport The dbSupport for the database, not null
+     */
+    protected void removeReferentialConstraints(String tableName, DbSupport dbSupport) {
+        try {
+            dbSupport.removeReferentialConstraints(tableName);
+        } catch (Throwable t) {
+            logger.error("Unable to remove referential constraints for table " + tableName, t);
+        }
+    }
+
+
+    /**
+     * Disables all value constraints (e.g. not null) on the specified table
+     *
+     * @param tableName The table, not null
+     * @param dbSupport The dbSupport for the database, not null
+     */
+    protected void removeValueConstraints(String tableName, DbSupport dbSupport) {
+        try {
+            dbSupport.removeValueConstraints(tableName);
+        } catch (Throwable t) {
+            logger.error("Unable to remove value constraints for table " + tableName, t);
+        }
+    }
 }

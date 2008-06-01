@@ -15,6 +15,8 @@
  */
 package org.unitils.reflectionassert.hibernate;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.junit.After;
 import static org.junit.Assert.assertNotNull;
@@ -49,8 +51,11 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-@Transactional(value = COMMIT)
+@Transactional(COMMIT)
 public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
+
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(ReflectionComparatorHibernateProxyTest.class);
 
     /* A test hibernate entity, with a link to a lazily loaded parent class */
     private Child testChild;
@@ -105,6 +110,10 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetDifference_rightProxy() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
         Difference result = reflectionComparator.getDifference(testChild, childWithParentProxy);
         assertNull(result);
@@ -116,6 +125,10 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetDifference_leftProxy() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
         Difference result = reflectionComparator.getDifference(childWithParentProxy, testChild);
 
@@ -130,6 +143,10 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetDifference_bothProxy() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         // open 2 session two avoid the values being taken from the cache
         Child childWithParentProxy1 = (Child) sessionFactory.openSession().get(Child.class, 1L);
         Child childWithParentProxy2 = (Child) sessionFactory.openSession().get(Child.class, 1L);
@@ -144,6 +161,10 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetDifference_bothProxyDifferentValue() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         // open 2 session two avoid the values being taken from the cache
         Child childWithParentProxy1 = (Child) sessionFactory.openSession().get(Child.class, 1L);
         Child childWithParentProxy2 = (Child) sessionFactory.openSession().get(Child.class, 2L);

@@ -39,11 +39,13 @@ import java.util.Collection;
 public class HibernateSpringSupport implements OrmSpringSupport<SessionFactory, Configuration> {
 
 
+    // todo javadoc
     public boolean isPersistenceUnitConfiguredInSpring(Object testObject) {
         return getSessionFactoryBean(testObject) != null;
     }
 
 
+    // todo javadoc
     public ConfiguredOrmPersistenceUnit<SessionFactory, Configuration> getConfiguredPersistenceUnit(Object testObject) {
         LocalSessionFactoryBean factoryBean = getSessionFactoryBean(testObject);
         SessionFactory entityManagerFactory = (SessionFactory) factoryBean.getObject();

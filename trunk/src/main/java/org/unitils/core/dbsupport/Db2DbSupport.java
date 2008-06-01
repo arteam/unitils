@@ -143,14 +143,48 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
-     * Removes all constraints on the specified table
+     * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
-     * @param tableName The table with the column, not null
+     * @param tableName The table, not null
      */
     @Override
-    public void disableConstraints(String tableName) {
-        removeForeignKeyConstraints(tableName);
-        removeNotNullConstraints(tableName);
+    public void removeReferentialConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TYPE = 'F' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        }
+    }
+
+
+    /**
+     * Disables all value constraints (e.g. not null) on the specified table
+     *
+     * @param tableName The table, not null
+     */
+    @Override
+    public void removeValueConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+
+        // disable all check and unique constraints
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TYPE in ('K', 'U') and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        }
+
+        // Retrieve the name of the primary key columns, since we cannot remove the not-null constraint on these columns
+        Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where KEYSEQ is not null and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
+
+        // disable all not null constraints
+        Set<String> notNullColumnNames = sqlHandler.getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where NULLS = 'N' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
+        for (String notNullColumnName : notNullColumnNames) {
+            if (primaryKeyColumnNames.contains(notNullColumnName)) {
+                // Do not remove PK constraints
+                continue;
+            }
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(notNullColumnName) + " drop not null");
+            sqlHandler.executeUpdate("call SYSPROC.ADMIN_CMD('REORG TABLE " + qualified(tableName) + "')");
+        }
     }
 
 
@@ -248,95 +282,6 @@ public class Db2DbSupport extends DbSupport {
     @Override
     public boolean supportsTypes() {
         return true;
-    }
-
-    // todo rewrite constraint disabling
-
-    /**
-     * Disables all foreign key constraints
-     *
-     * @param tableName The table, not null
-     */
-    protected void removeForeignKeyConstraints(String tableName) {
-        Set<String> constraintNames = getForeignKeyConstraintNames(tableName);
-        for (String constraintName : constraintNames) {
-            removeForeignKeyConstraint(tableName, constraintName);
-        }
-    }
-
-
-    /**
-     * Disables all not-null constraints that are not of primary keys.
-     *
-     * @param tableName The table, not null
-     */
-    protected void removeNotNullConstraints(String tableName) {
-        // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
-        Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName);
-
-        Set<String> notNullColumnNames = getNotNullColummnNames(tableName);
-        for (String notNullColumnName : notNullColumnNames) {
-            if (primaryKeyColumnNames.contains(notNullColumnName)) {
-                // Do not remove PK constraints
-                continue;
-            }
-            removeNotNullConstraint(tableName, notNullColumnName);
-        }
-    }
-
-    /**
-     * Gets the names of all primary columns of the given table.
-     *
-     * @param tableName The table, not null
-     * @return The names of the primary key columns of the table with the given name
-     */
-    protected Set<String> getPrimaryKeyColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where KEYSEQ is not null and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
-    }
-
-
-    /**
-     * Returns the names of all columns that have a 'not-null' constraint on them
-     *
-     * @param tableName The table, not null
-     * @return The set of column names, not null
-     */
-    protected Set<String> getNotNullColummnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select COLNAME from SYSCAT.COLUMNS where NULLS = 'N' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
-    }
-
-
-    /**
-     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
-     *
-     * @param tableName The table, not null
-     * @return The set of constraint names, not null
-     */
-    protected Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TYPE = 'F' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
-    }
-
-
-    /**
-     * Disables the constraint with the given name on table with the given name.
-     *
-     * @param tableName      The table with the constraint, not null
-     * @param constraintName The constraint, not null
-     */
-    protected void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
-    }
-
-
-    /**
-     * Removes the not-null constraint on the specified column and table
-     *
-     * @param tableName  The table with the column, not null
-     * @param columnName The column to remove constraints from, not null
-     */
-    protected void removeNotNullConstraint(String tableName, String columnName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " drop not null");
-        getSQLHandler().executeUpdate("call SYSPROC.ADMIN_CMD('REORG TABLE " + qualified(tableName) + "')");
     }
 
 }
