@@ -90,14 +90,29 @@ public class HsqldbDbSupport extends DbSupport {
 
 
     /**
-     * Removes all constraints on the specified table
+     * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
-     * @param tableName The table with the column, not null
+     * @param tableName The table, not null
      */
     @Override
-    public void disableConstraints(String tableName) {
+    public void removeReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = getSQLHandler().getItemsAsStringSet("select CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE <> 'PRIMARY KEY' AND TABLE_NAME = '" + tableName + "' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
+        Set<String> constraintNames = getSQLHandler().getItemsAsStringSet("select CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE = 'FOREIGN KEY' AND TABLE_NAME = '" + tableName + "' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        }
+    }
+
+
+    /**
+     * Disables all value constraints (e.g. not null) on the specified table
+     *
+     * @param tableName The table, not null
+     */
+    @Override
+    public void removeValueConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+        Set<String> constraintNames = getSQLHandler().getItemsAsStringSet("select CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE IN ('CHECK', 'UNIQUE') AND TABLE_NAME = '" + tableName + "' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }

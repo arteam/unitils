@@ -396,8 +396,8 @@ public class DbSupportTest extends UnitilsJUnit4 {
      * Tests disabling a foreign key constraint on the test table.
      */
     @Test
-    public void testDisableConstraints_foreignKey() throws Exception {
-        dbSupport.disableConstraints("Test_CASE_Table");
+    public void testRemoveReferentialConstraints() throws Exception {
+        dbSupport.removeReferentialConstraints("Test_CASE_Table");
 
         // should succeed now
         // drop triggers to avoid side-effects during insert
@@ -410,11 +410,21 @@ public class DbSupportTest extends UnitilsJUnit4 {
 
 
     /**
+     * Tests disabling foreign key constraints on the test table but with an unexisting table name.
+     * Nothing should happen
+     */
+    @Test
+    public void testRemoveReferentialConstraints_tableNotFound() throws Exception {
+        dbSupport.removeReferentialConstraints("xxxx");
+    }
+
+
+    /**
      * Tests disabling not null constraints on the test table.
      */
     @Test
-    public void testDisableConstraints_notNull() throws Exception {
-        dbSupport.disableConstraints(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"));
+    public void testRemoveValueConstraints() throws Exception {
+        dbSupport.removeValueConstraints(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"));
 
         // should succeed now
         executeUpdate("insert into test_table (col1, col2) values (1, null)", dataSource);
@@ -426,8 +436,8 @@ public class DbSupportTest extends UnitilsJUnit4 {
      * Nothing should happen
      */
     @Test
-    public void testDisableConstraints_tableNotFound() throws Exception {
-        dbSupport.disableConstraints("xxxx");
+    public void testRemoveValueConstraints_tableNotFound() throws Exception {
+        dbSupport.removeValueConstraints("xxxx");
     }
 
 

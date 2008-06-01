@@ -160,14 +160,51 @@ public class DerbyDbSupport extends DbSupport {
 
 
     /**
-     * Removes all constraints on the specified table
+     * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
-     * @param tableName The table with the column, not null
+     * @param tableName The table, not null
      */
     @Override
-    public void disableConstraints(String tableName) {
-        removeForeignKeyConstraints(tableName);
-        removeNotNullConstraints(tableName);
+    public void removeReferentialConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select SYS.SYSCONSTRAINTS.CONSTRAINTNAME from SYS.SYSCONSTRAINTS, SYS.SYSTABLES, SYS.SYSSCHEMAS " +
+                "where SYS.SYSCONSTRAINTS.TYPE = 'F' AND SYS.SYSCONSTRAINTS.TABLEID = SYS.SYSTABLES.TABLEID  AND SYS.SYSTABLES.TABLENAME = '" + tableName + "' AND " +
+                "SYS.SYSCONSTRAINTS.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        }
+    }
+
+
+    /**
+     * Disables all value constraints (e.g. not null) on the specified table
+     *
+     * @param tableName The table, not null
+     */
+    @Override
+    public void removeValueConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+
+        // disable all check and unique constraints
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select SYS.SYSCONSTRAINTS.CONSTRAINTNAME from SYS.SYSCONSTRAINTS, SYS.SYSTABLES, SYS.SYSSCHEMAS " +
+                "where SYS.SYSCONSTRAINTS.TYPE in ('U', 'C') AND SYS.SYSCONSTRAINTS.TABLEID = SYS.SYSTABLES.TABLEID  AND SYS.SYSTABLES.TABLENAME = '" + tableName + "' AND " +
+                "SYS.SYSCONSTRAINTS.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        }
+
+        // retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
+        Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName);
+
+        // disable all not null constraints
+        Set<String> notNullColumnNames = getNotNullColummnNames(tableName);
+        for (String notNullColumnName : notNullColumnNames) {
+            if (primaryKeyColumnNames.contains(notNullColumnName)) {
+                // Do not remove PK constraints
+                continue;
+            }
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(notNullColumnName) + " NULL");
+        }
     }
 
 
@@ -204,39 +241,6 @@ public class DerbyDbSupport extends DbSupport {
     }
 
     // todo rewrite constraint disabling
-
-    /**
-     * Disables all foreign key constraints
-     *
-     * @param tableName The table, not null
-     */
-    protected void removeForeignKeyConstraints(String tableName) {
-        Set<String> constraintNames = getForeignKeyConstraintNames(tableName);
-        for (String constraintName : constraintNames) {
-            removeForeignKeyConstraint(tableName, constraintName);
-        }
-    }
-
-
-    /**
-     * Disables all not-null constraints that are not of primary keys.
-     *
-     * @param tableName The table, not null
-     */
-    protected void removeNotNullConstraints(String tableName) {
-        // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
-        Set<String> primaryKeyColumnNames = getPrimaryKeyColumnNames(tableName);
-
-        Set<String> notNullColumnNames = getNotNullColummnNames(tableName);
-        for (String notNullColumnName : notNullColumnNames) {
-            if (primaryKeyColumnNames.contains(notNullColumnName)) {
-                // Do not remove PK constraints
-                continue;
-            }
-            removeNotNullConstraint(tableName, notNullColumnName);
-        }
-    }
-
 
     /**
      * Gets the names of all primary columns of the given table.
@@ -293,41 +297,6 @@ public class DerbyDbSupport extends DbSupport {
         } finally {
             closeQuietly(connection, null, resultSet);
         }
-    }
-
-
-    /**
-     * Returns the foreign key constraint names that are enabled/enforced for the table with the given name
-     *
-     * @param tableName The table, not null
-     * @return The set of constraint names, not null
-     */
-    protected Set<String> getForeignKeyConstraintNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select SYS.SYSCONSTRAINTS.CONSTRAINTNAME from SYS.SYSCONSTRAINTS, SYS.SYSTABLES, SYS.SYSSCHEMAS " +
-                "where SYS.SYSCONSTRAINTS.TYPE = 'F' AND SYS.SYSCONSTRAINTS.TABLEID = SYS.SYSTABLES.TABLEID  AND SYS.SYSTABLES.TABLENAME = '" + tableName + "' AND " +
-                "SYS.SYSCONSTRAINTS.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
-    }
-
-
-    /**
-     * Disables the constraint with the given name on table with the given name.
-     *
-     * @param tableName      The table with the constraint, not null
-     * @param constraintName The constraint, not null
-     */
-    protected void removeForeignKeyConstraint(String tableName, String constraintName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
-    }
-
-
-    /**
-     * Removes the not-null constraint on the specified column and table
-     *
-     * @param tableName  The table with the column, not null
-     * @param columnName The column to remove constraints from, not null
-     */
-    protected void removeNotNullConstraint(String tableName, String columnName) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " NULL");
     }
 
 

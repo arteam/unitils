@@ -156,16 +156,31 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
-     * Removes all constraints on the specified table
+     * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
-     * @param tableName The table with the column, not null
+     * @param tableName The table, not null
      */
     @Override
-    public void disableConstraints(String tableName) {
+    public void removeReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE <> 'P' and STATUS = 'ENABLED'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE = 'R'");
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        }
+    }
+
+
+    /**
+     * Disables all value constraints (e.g. not null) on the specified table
+     *
+     * @param tableName The table, not null
+     */
+    @Override
+    public void removeValueConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE in ('U', 'C', 'V', 'O')");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
     }
 

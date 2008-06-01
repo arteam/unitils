@@ -158,13 +158,12 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
      * If possible, a cached instance is returned that was created during a previous test.
      *
      * @param testObject The test instance, not null
-     * @return
+     * @return The persistence unit, not null
      */
     protected ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> getConfiguredPersistenceUnit(Object testObject) {
         // If a persistence unit was configured in the spring ApplicationContext for this test object, we return
         // this one. Notice that in that case, no extra caching is done. This is not needed because the ApplicationContext
-        // is already cached, and the ApplicationContext makes sure that the same persitence unit instance is always
-        // returned.
+        // is already cached, and the ApplicationContext makes sure that the same persitence unit instance is always returned.
         if (ormSpringSupport != null && ormSpringSupport.isPersistenceUnitConfiguredInSpring(testObject)) {
             return ormSpringSupport.getConfiguredPersistenceUnit(testObject);
         }
@@ -172,13 +171,11 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         // Check if a persistence unit configuration can be found on the test class. If not, throw an exception
         ORM_CONFIG persistenceUnitConfig = getPersistenceUnitConfig(testObject);
         if (persistenceUnitConfig == null) {
-            throw new UnitilsException("Could not find a configuring @" + getPersistenceUnitConfigAnnotationClass().getSimpleName() +
-                    " annotation or custom config method");
+            throw new UnitilsException("Could not find a configuring @" + getPersistenceUnitConfigAnnotationClass().getSimpleName() + " annotation or custom config method");
         }
 
         // Look for a cached instance. If not available, a new instance is created and added to the cache
-        ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> configuredPersistenceUnit = configuredOrmPersistenceUnitCache.get(
-                persistenceUnitConfig);
+        ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> configuredPersistenceUnit = configuredOrmPersistenceUnitCache.get(persistenceUnitConfig);
         if (configuredPersistenceUnit == null) {
             configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
@@ -205,8 +202,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
      * @return true if a <code>EntityManagerFactory</code> has been configured, false otherwise
      */
     public boolean isPersistenceUnitConfiguredFor(Object testObject) {
-        return (ormSpringSupport != null && ormSpringSupport.isPersistenceUnitConfiguredInSpring(testObject)
-                || getPersistenceUnitConfig(testObject) != null);
+        return (ormSpringSupport != null && ormSpringSupport.isPersistenceUnitConfiguredInSpring(testObject) || getPersistenceUnitConfig(testObject) != null);
     }
 
 
@@ -223,7 +219,6 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
                     + "configure one in the spring ApplicationContext for this class, or by using the annotation @"
                     + getPersistenceUnitConfigAnnotationClass().getSimpleName());
         }
-
         return doGetPersistenceContext(testObject);
     }
 
@@ -262,7 +257,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
      * transaction, if any. The implementation can presume that a persistence unit is available. If no persistence
      * context is currently active, null is returned.
      *
-     * @param testObject
+     * @param testObject The test instance, not null
      * @return The currently active persistence context, if any
      */
     abstract protected ORM_PERSISTENCE_CONTEXT doGetActivePersistenceContext(Object testObject);
@@ -333,6 +328,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         ormSpringSupport = createInstanceOfType(getOrmSpringSupportImplClassName(), false);
     }
 
+
     /**
      * Verifies whether the SpringModule is enabled. If not, this means that either the property unitils.modules doesn't
      * include spring, unitils.module.spring.enabled = false, or that the module could not be loaded because spring is not
@@ -345,6 +341,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         return Unitils.getInstance().getModulesRepository().isModuleEnabled("org.unitils.spring.SpringModule");
     }
 
+
     /**
      * The {@link TestListener} for this module
      */
@@ -354,7 +351,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             injectOrmPersistenceUnitIntoTestObject(testObject);
         }
-        
+
     }
 
 }

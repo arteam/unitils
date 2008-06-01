@@ -234,7 +234,7 @@ public class DBMaintainer {
         // From scratch needed, clear the database and retrieve scripts
         // constraints are removed before clearing the database, to be sure there will be no
         // conflicts when dropping tables
-        constraintsDisabler.disableConstraints();
+        constraintsDisabler.removeConstraints();
         dbClearer.clearSchemas();
         // reset the database version
         versionSource.setDbVersion(new Version("", 0));
@@ -288,7 +288,7 @@ public class DBMaintainer {
 
         // Disable FK and not null constraints, if enabled
         if (disableConstraintsEnabled) {
-            constraintsDisabler.disableConstraints();
+            constraintsDisabler.removeConstraints();
         }
         // Update sequences to a sufficiently high value, if enabled
         if (sequenceUpdater != null) {

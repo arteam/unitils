@@ -15,14 +15,13 @@
  */
 package org.unitils.dbunit.util;
 
+import org.dbunit.database.AbstractDatabaseConnection;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
-import org.dbunit.database.AbstractDatabaseConnection;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 
 /**
  * Implementation of DBUnits <code>IDatabaseConnection</code> interface. This implementation returns connections from
@@ -43,7 +42,7 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     /* Connection that is currently in use by DBUnit. Is stored to enable returning it to the connection pool after
      the DBUnit operation finished */
     private Connection currentlyUsedConnection, currentlyUsedNativeConnection;
-    
+
 
     /**
      * Creates a new instance that wraps the given <code>DataSource</code>
@@ -63,7 +62,6 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      */
     @Override
     public void close() throws SQLException {
-    	System.out.println("close");
         // Nothing to be done. Connections are closed (i.e. returned to the pool) after every dbUnit operation
     }
 
@@ -87,40 +85,40 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     @Override
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
-			currentlyUsedConnection = DataSourceUtils.getConnection(dataSource);
-			currentlyUsedNativeConnection = getNativeConnection(currentlyUsedConnection);
+            currentlyUsedConnection = DataSourceUtils.getConnection(dataSource);
+            currentlyUsedNativeConnection = getNativeConnection(currentlyUsedConnection);
         }
         return currentlyUsedNativeConnection;
     }
 
 
     /**
-     * @return The 'native' connection, which is wrapped by the given connection. Could be the supplied connection itself 
-     * @throws SQLException
+     * @param connection The wrapper connection, not null
+     * @return The 'native' connection, which is wrapped by the given connection. Could be the supplied connection itself
      */
-	protected Connection getNativeConnection(Connection connection) throws SQLException {
-		DatabaseMetaData metaData = connection.getMetaData();
-		if (metaData != null) {
-			Connection targetConnection = metaData.getConnection();
-			if (targetConnection != null) {
-				return targetConnection;
-			}
-		}
-		return connection;
-	}
-    
-    
-   /**
-    * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
-    *
-    * @throws SQLException When connection close fails
-    */
-   public void closeJdbcConnection() throws SQLException {
-       if (currentlyUsedConnection != null) {
-           DataSourceUtils.releaseConnection(currentlyUsedConnection, dataSource);
-           currentlyUsedConnection = null;
-           currentlyUsedNativeConnection = null;
-       }
-   }
-   
+    protected Connection getNativeConnection(Connection connection) throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
+        if (metaData != null) {
+            Connection targetConnection = metaData.getConnection();
+            if (targetConnection != null) {
+                return targetConnection;
+            }
+        }
+        return connection;
+    }
+
+
+    /**
+     * Closes the <code>Connection</code> that was last retrieved using the {@link #getConnection} method
+     *
+     * @throws SQLException When connection close fails
+     */
+    public void closeJdbcConnection() throws SQLException {
+        if (currentlyUsedConnection != null) {
+            DataSourceUtils.releaseConnection(currentlyUsedConnection, dataSource);
+            currentlyUsedConnection = null;
+            currentlyUsedNativeConnection = null;
+        }
+    }
+
 }

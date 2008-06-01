@@ -282,11 +282,19 @@ abstract public class DbSupport {
 
 
     /**
-     * Disables all constraints on the specified table
+     * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
      * @param tableName The table, not null
      */
-    public abstract void disableConstraints(String tableName);
+    public abstract void removeReferentialConstraints(String tableName);
+
+
+    /**
+     * Disables all value constraints (e.g. not null) on the specified table
+     *
+     * @param tableName The table, not null
+     */
+    public abstract void removeValueConstraints(String tableName);
 
 
     /**
