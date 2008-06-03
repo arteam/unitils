@@ -104,6 +104,20 @@ public class PostgreSqlDbSupport extends DbSupport {
 
 
     /**
+     * Drops the sequence with the given name from the database
+     * Note: the sequence name is surrounded with quotes, making it case-sensitive.
+     * <p/>
+     * The method is overriden to handle columns of type serial. For these columns, the sequence should be
+     * dropped using cascade. Thanks to Peter Oxenham for reporting this issue (UNI-28).
+     *
+     * @param sequenceName The sequence to drop (case-sensitive), not null
+     */
+    public void dropSequence(String sequenceName) {
+        getSQLHandler().executeUpdate("drop sequence " + qualified(sequenceName) + " cascade");
+    }
+
+
+    /**
      * Drops the trigger with the given name from the database.
      * <p/>
      * The drop trigger statement is not compatible with standard SQL in Postgresql.
