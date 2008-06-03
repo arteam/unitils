@@ -124,6 +124,21 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
 
 
     /**
+     * Checks if the materialized views are correctly dropped
+     */
+    @Test
+    public void testClearDatabase_materializedViews() throws Exception {
+        if (!dbSupport.supportsMaterializedViews()) {
+            logger.warn("Current dialect does not support materialized views. Skipping test.");
+            return;
+        }
+        assertEquals(2, dbSupport.getMaterializedViewNames().size());
+        defaultDbClearer.clearSchemas();
+        assertTrue(dbSupport.getMaterializedViewNames().isEmpty());
+    }
+
+
+    /**
      * Checks if the synonyms are correctly dropped
      */
     @Test
@@ -214,7 +229,6 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
         executeUpdate("create sequence test_sequence", dataSource);
         executeUpdate("create sequence \"Test_CASE_Sequence\"", dataSource);
         // create triggers
-        // todo move to code clearer test
         executeUpdate("create trigger test_trigger before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
         executeUpdate("create trigger \"Test_CASE_Trigger\" before insert on \"Test_CASE_Table\" call \"org.unitils.core.dbsupport.HsqldbDbSupportTest.TestTrigger\"", dataSource);
     }
@@ -287,6 +301,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
         // create views
         executeUpdate("create view test_view as select col1 from test_table", dataSource);
         executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create materialized views
+        executeUpdate("create materialized view test_mview as select col1 from test_table", dataSource);
+        executeUpdate("create materialized view \"Test_CASE_MView\" as select col1 from test_table", dataSource);
         // create synonyms
         executeUpdate("create synonym test_synonym for test_table", dataSource);
         executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
@@ -308,6 +325,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     private void cleanupTestDatabaseOracle() throws Exception {
         dropTestTables(dbSupport, "test_table", "\"Test_CASE_Table\"", versionTableName);
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestMaterializedViews(dbSupport, "test_mview", "\"Test_CASE_MView\"");
         dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
         dropTestSequences(dbSupport, "test_sequence", "\"Test_CASE_Sequence\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
