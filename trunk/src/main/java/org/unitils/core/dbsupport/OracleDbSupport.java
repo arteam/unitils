@@ -48,7 +48,8 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTableNames() {
-        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from USER_TABLES");
+        // user_tables also contains the materialized views: don't return these
+        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from USER_TABLES minus select MVIEW_NAME from USER_MVIEWS");
     }
 
 
@@ -65,7 +66,7 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
-     * Retrieves the names of all the views in the database schema.
+     * Retrieves the names of all views in the database schema.
      *
      * @return The names of all views in the database
      */
@@ -76,7 +77,18 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
-     * Retrieves the names of all the synonyms in the database schema.
+     * Retrieves the names of all materialized views in the database schema.
+     *
+     * @return The names of all materialized views in the database
+     */
+    @Override
+    public Set<String> getMaterializedViewNames() {
+        return getSQLHandler().getItemsAsStringSet("select MVIEW_NAME from USER_MVIEWS");
+    }
+
+
+    /**
+     * Retrieves the names of all synonyms in the database schema.
      *
      * @return The names of all synonyms in the database
      */
@@ -87,7 +99,7 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
-     * Retrieves the names of all the sequences in the database schema.
+     * Retrieves the names of all sequences in the database schema.
      *
      * @return The names of all sequences in the database
      */
@@ -98,7 +110,7 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
-     * Retrieves the names of all the triggers in the database schema.
+     * Retrieves the names of all triggers in the database schema.
      *
      * @return The names of all triggers in the database
      */
@@ -140,6 +152,18 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public void dropView(String viewName) {
         getSQLHandler().executeUpdate("drop view " + qualified(viewName) + " cascade constraints");
+    }
+
+
+    /**
+     * Removes the materialized view with the given name from the database
+     * Note: the view name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param materializedViewName The view to drop (case-sensitive), not null
+     */
+    @Override
+    public void dropMaterializedView(String materializedViewName) {
+        getSQLHandler().executeUpdate("drop materialized view " + qualified(materializedViewName));
     }
 
 
@@ -295,6 +319,17 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public boolean supportsTypes() {
+        return true;
+    }
+
+
+    /**
+     * Materialized views are supported
+     *
+     * @return true
+     */
+    @Override
+    public boolean supportsMaterializedViews() {
         return true;
     }
 

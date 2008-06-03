@@ -53,6 +53,11 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
     public static final String PROPKEY_PRESERVE_VIEWS = "dbMaintainer.preserve.views";
 
     /**
+     * The key of the property that specifies which materialized views should not be dropped
+     */
+    public static final String PROPKEY_PRESERVE_MATERIALIZED_VIEWS = "dbMaintainer.preserve.materializedViews";
+
+    /**
      * The key of the property that specifies which synonyms should not be dropped
      */
     public static final String PROPKEY_PRESERVE_SYNONYMS = "dbMaintainer.preserve.synonyms";
@@ -98,6 +103,11 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
     protected Map<String, Set<String>> viewsToPreserve;
 
     /**
+     * Names of materialized views that should not be dropped per schema.
+     */
+    protected Map<String, Set<String>> materializedViewsToPreserve;
+
+    /**
      * Names of synonyms that should not be dropped per schema.
      */
     protected Map<String, Set<String>> synonymsToPreserve;
@@ -129,6 +139,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         schemasToPreserve = getSchemasToPreserve(configuration);
         tablesToPreserve = getTablesToPreserve(configuration); // also adds db version table
         viewsToPreserve = getViewsToPreserve(configuration);
+        materializedViewsToPreserve = getMaterializedViewsToPreserve(configuration);
         sequencesToPreserve = getSequencesToPreserve(configuration);
         synonymsToPreserve = getSynonymsToPreserve(configuration);
         triggersToPreserve = getTriggersToPreserve(configuration);
@@ -150,6 +161,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
             logger.info("Clearing (dropping) database schema " + dbSupport.getSchemaName());
             dropSynonyms(dbSupport);
             dropViews(dbSupport);
+            dropMaterializedViews(dbSupport);
             dropSequences(dbSupport);
             dropTables(dbSupport);
 
@@ -194,6 +206,28 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
             }
             logger.debug("Dropping view " + viewName + " in database schema " + dbSupport.getSchemaName());
             dbSupport.dropView(viewName);
+        }
+    }
+
+
+    /**
+     * Drops all materialized views.
+     *
+     * @param dbSupport The database support, not null
+     */
+    protected void dropMaterializedViews(DbSupport dbSupport) {
+        if (!dbSupport.supportsMaterializedViews()) {
+            return;
+        }
+        Set<String> materializedViewNames = dbSupport.getMaterializedViewNames();
+        Set<String> schemaMaterializedViewsToPreserve = materializedViewsToPreserve.get(dbSupport.getSchemaName());
+        for (String materializedViewName : materializedViewNames) {
+            // check whether view needs to be preserved
+            if (schemaMaterializedViewsToPreserve != null && schemaMaterializedViewsToPreserve.contains(materializedViewName)) {
+                continue;
+            }
+            logger.debug("Dropping materialized view " + materializedViewName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropMaterializedView(materializedViewName);
         }
     }
 
@@ -381,6 +415,37 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
             }
         }
         return viewsToPreserve;
+    }
+
+
+    /**
+     * Gets the list of all materialized views to preserve per schema. The case is corrected if necesary. Quoting a view name makes
+     * it case sensitive. If no schema is specified, the view will be added to the default schema name set.
+     * <p/>
+     * If a view to preserve does not exist, a UnitilsException is thrown.
+     *
+     * @param configuration The unitils configuration, not null
+     * @return The materialized views to preserve per schema, not null
+     */
+    protected Map<String, Set<String>> getMaterializedViewsToPreserve(Properties configuration) {
+        Map<String, Set<String>> materializedViewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_MATERIALIZED_VIEWS, configuration);
+        for (Map.Entry<String, Set<String>> entry : materializedViewsToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+
+            DbSupport dbSupport = getDbSupport(schemaName);
+            Set<String> materializedViewNames;
+            if (!dbSupport.supportsMaterializedViews()) {
+                materializedViewNames = new HashSet<String>();
+            } else {
+                materializedViewNames = dbSupport.getMaterializedViewNames();
+            }
+            for (String materializedViewToPreserve : entry.getValue()) {
+                if (!materializedViewNames.contains(materializedViewToPreserve)) {
+                    throw new UnitilsException("Materialized view to preserve does not exist: " + materializedViewToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which materialized views need to be preserved. To assure nothing is dropped by mistake, no views will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_MATERIALIZED_VIEWS + " property.");
+                }
+            }
+        }
+        return materializedViewsToPreserve;
     }
 
 

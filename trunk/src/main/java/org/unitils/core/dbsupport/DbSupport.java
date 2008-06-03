@@ -176,42 +176,52 @@ abstract public class DbSupport {
 
 
     /**
-     * Retrieves the names of all the synonyms in the database schema.
+     * Retrieves the names of all materialized views in the database schema.
+     *
+     * @return The names of all materialized views in the database
+     */
+    public Set<String> getMaterializedViewNames() {
+        throw new UnsupportedOperationException("Materialized views not supported for " + getDatabaseDialect());
+    }
+
+
+    /**
+     * Retrieves the names of all synonyms in the database schema.
      *
      * @return The names of all synonyms in the database
      */
     public Set<String> getSynonymNames() {
-        throw new UnsupportedOperationException("Synonyms not supported.");
+        throw new UnsupportedOperationException("Synonyms not supported for " + getDatabaseDialect());
     }
 
 
     /**
-     * Retrieves the names of all the sequences in the database schema.
+     * Retrieves the names of all sequences in the database schema.
      *
      * @return The names of all sequences in the database, not null
      */
     public Set<String> getSequenceNames() {
-        throw new UnsupportedOperationException("Sequences not supported.");
+        throw new UnsupportedOperationException("Sequences not supported for " + getDatabaseDialect());
     }
 
 
     /**
-     * Retrieves the names of all the triggers in the database schema.
+     * Retrieves the names of all triggers in the database schema.
      *
      * @return The names of all triggers in the database, not null
      */
     public Set<String> getTriggerNames() {
-        throw new UnsupportedOperationException("Triggers not supported.");
+        throw new UnsupportedOperationException("Triggers not supported for " + getDatabaseDialect());
     }
 
 
     /**
-     * Retrieves the names of all the types in the database schema.
+     * Retrieves the names of all types in the database schema.
      *
      * @return The names of all types in the database, not null
      */
     public Set<String> getTypeNames() {
-        throw new UnsupportedOperationException("Types not supported.");
+        throw new UnsupportedOperationException("Types are not supported for " + getDatabaseDialect());
     }
 
 
@@ -234,6 +244,17 @@ abstract public class DbSupport {
      */
     public void dropView(String viewName) {
         getSQLHandler().executeUpdate("drop view " + qualified(viewName) + " cascade");
+    }
+
+
+    /**
+     * Removes the materialized view with the given name from the database
+     * Note: the view name is surrounded with quotes, making it case-sensitive.
+     *
+     * @param viewName The view to drop (case-sensitive), not null
+     */
+    public void dropMaterializedView(String viewName) {
+        throw new UnsupportedOperationException("Materialized views are not supported for " + getDatabaseDialect());
     }
 
 
@@ -551,6 +572,16 @@ abstract public class DbSupport {
      * @return True if identity is supported, false otherwise
      */
     public boolean supportsIdentityColumns() {
+        return false;
+    }
+
+
+    /**
+     * Indicates whether the underlying DBMS supports materialized views
+     *
+     * @return True if materialized views are supported, false otherwise
+     */
+    public boolean supportsMaterializedViews() {
         return false;
     }
 
