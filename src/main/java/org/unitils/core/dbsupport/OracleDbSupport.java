@@ -48,8 +48,8 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTableNames() {
-        // user_tables also contains the materialized views: don't return these
-        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from USER_TABLES minus select MVIEW_NAME from USER_MVIEWS");
+        // all_tables also contains the materialized views: don't return these
+        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from ALL_TABLES where OWNER = '" + getSchemaName() + "' minus select MVIEW_NAME from ALL_MVIEWS where OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -61,7 +61,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from USER_TAB_COLUMNS where TABLE_NAME = '" + tableName + "'");
+        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from ALL_TAB_COLUMNS where TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -72,7 +72,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getViewNames() {
-        return getSQLHandler().getItemsAsStringSet("select VIEW_NAME from USER_VIEWS");
+        return getSQLHandler().getItemsAsStringSet("select VIEW_NAME from ALL_VIEWS where OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -83,7 +83,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getMaterializedViewNames() {
-        return getSQLHandler().getItemsAsStringSet("select MVIEW_NAME from USER_MVIEWS");
+        return getSQLHandler().getItemsAsStringSet("select MVIEW_NAME from ALL_MVIEWS where OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -94,7 +94,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getSynonymNames() {
-        return getSQLHandler().getItemsAsStringSet("select SYNONYM_NAME from USER_SYNONYMS");
+        return getSQLHandler().getItemsAsStringSet("select SYNONYM_NAME from ALL_SYNONYMS where OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -105,7 +105,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getSequenceNames() {
-        return getSQLHandler().getItemsAsStringSet("select SEQUENCE_NAME from USER_SEQUENCES");
+        return getSQLHandler().getItemsAsStringSet("select SEQUENCE_NAME from ALL_SEQUENCES where SEQUENCE_OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -116,7 +116,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getSQLHandler().getItemsAsStringSet("select TRIGGER_NAME from USER_TRIGGERS triggers, USER_TABLES tables where tables.TABLE_NAME = triggers.TABLE_NAME");
+        return getSQLHandler().getItemsAsStringSet("select TRIGGER_NAME from ALL_TRIGGERS where OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -127,7 +127,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTypeNames() {
-        return getSQLHandler().getItemsAsStringSet("select TYPE_NAME from USER_TYPES");
+        return getSQLHandler().getItemsAsStringSet("select TYPE_NAME from ALL_TYPES where OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -187,7 +187,7 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public void removeReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE = 'R'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
@@ -202,7 +202,7 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public void removeValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from USER_CONSTRAINTS where TABLE_NAME = '" + tableName + "' and CONSTRAINT_TYPE in ('U', 'C', 'V', 'O')");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
@@ -219,7 +219,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public long getSequenceValue(String sequenceName) {
-        return getSQLHandler().getItemAsLong("select LAST_NUMBER from USER_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "'");
+        return getSQLHandler().getItemAsLong("select LAST_NUMBER from ALL_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "' and SEQUENCE_OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -237,7 +237,7 @@ public class OracleDbSupport extends DbSupport {
         try {
             conn = getSQLHandler().getDataSource().getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("select LAST_NUMBER, INCREMENT_BY from USER_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "'");
+            rs = st.executeQuery("select LAST_NUMBER, INCREMENT_BY from ALL_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "' and SEQUENCE_OWNER = '" + getSchemaName() + "'");
             while (rs.next()) {
                 long lastNumber = rs.getLong("LAST_NUMBER");
                 long incrementBy = rs.getLong("INCREMENT_BY");
