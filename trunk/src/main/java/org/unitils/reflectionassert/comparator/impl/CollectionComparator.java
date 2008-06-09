@@ -21,6 +21,7 @@ import org.unitils.reflectionassert.difference.CollectionDifference;
 import org.unitils.reflectionassert.difference.Difference;
 import static org.unitils.util.CollectionUtils.convertToCollection;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -64,14 +65,14 @@ public class CollectionComparator implements Comparator {
      */
     public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // Convert to list and compare as collection
-        Collection<?> leftCollection = convertToCollection(left);
-        Collection<?> rightCollection = convertToCollection(right);
+        ArrayList<Object> leftList = new ArrayList<Object>(convertToCollection(left));
+        ArrayList<Object> rightList = new ArrayList<Object>(convertToCollection(right));
 
         int elementIndex = -1;
-        CollectionDifference difference = new CollectionDifference("Different elements", left, right);
+        CollectionDifference difference = new CollectionDifference("Different elements", left, right, leftList, rightList);
 
-        Iterator<?> leftIterator = leftCollection.iterator();
-        Iterator<?> rightIterator = rightCollection.iterator();
+        Iterator<?> leftIterator = leftList.iterator();
+        Iterator<?> rightIterator = rightList.iterator();
         while (leftIterator.hasNext() && rightIterator.hasNext()) {
             elementIndex++;
 
@@ -84,16 +85,9 @@ public class CollectionComparator implements Comparator {
             }
         }
 
-        int leftElementIndex = elementIndex;
-        while (leftIterator.hasNext()) {
-            leftElementIndex++;
-            difference.addElementDifference(leftElementIndex, new Difference("Left element not found in right collection", leftIterator.next(), null));
-        }
-
-        int rightElementIndex = elementIndex;
-        while (rightIterator.hasNext()) {
-            rightElementIndex++;
-            difference.addElementDifference(rightElementIndex, new Difference("Right element not found in left collection", null, rightIterator.next()));
+        // check for missing elements 
+        if (leftIterator.hasNext() || rightIterator.hasNext()) {
+            return difference;
         }
 
         if (difference.getElementDifferences().isEmpty()) {
