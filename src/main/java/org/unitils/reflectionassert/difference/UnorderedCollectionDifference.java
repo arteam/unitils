@@ -17,10 +17,11 @@ package org.unitils.reflectionassert.difference;
 
 import static java.lang.Integer.MAX_VALUE;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * A class for holding the difference between all elements of two collections.
+ * A class for holding the difference between all elements of two collections or arrays.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -36,6 +37,12 @@ public class UnorderedCollectionDifference extends Difference {
     /* The matching score of the best matching indexes */
     private int bestMatchingScore = MAX_VALUE;
 
+    /* The left object as a list */
+    private List<?> leftList;
+
+    /* The right object as a list */
+    private List<?> rightList;
+
 
     /**
      * Creates a difference.
@@ -43,9 +50,13 @@ public class UnorderedCollectionDifference extends Difference {
      * @param message    a message describing the difference
      * @param leftValue  the left instance
      * @param rightValue the right instance
+     * @param leftList   The left instance as a list
+     * @param rightList  The right instance as a list
      */
-    public UnorderedCollectionDifference(String message, Object leftValue, Object rightValue) {
+    public UnorderedCollectionDifference(String message, Object leftValue, Object rightValue, List<?> leftList, List<?> rightList) {
         super(message, leftValue, rightValue);
+        this.leftList = leftList;
+        this.rightList = rightList;
     }
 
 
@@ -131,6 +142,22 @@ public class UnorderedCollectionDifference extends Difference {
      */
     public void setBestMatchingScore(int bestMatchingScore) {
         this.bestMatchingScore = bestMatchingScore;
+    }
+
+
+    /**
+     * @return The left instance as a list
+     */
+    public List<?> getLeftList() {
+        return leftList;
+    }
+
+
+    /**
+     * @return The right instance as a list
+     */
+    public List<?> getRightList() {
+        return rightList;
     }
 
 

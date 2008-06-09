@@ -81,7 +81,7 @@ public class LenientOrderCollectionComparator implements Comparator {
         }
 
         // no match found, determine all differences
-        UnorderedCollectionDifference difference = new UnorderedCollectionDifference("Collections/arrays are different", left, right);
+        UnorderedCollectionDifference difference = new UnorderedCollectionDifference("Collections/arrays are different", left, right, leftList, rightList);
         if (onlyFirstDifference) {
             return difference;
         }

@@ -16,6 +16,7 @@
 package org.unitils.reflectionassert.difference;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,16 +30,26 @@ public class CollectionDifference extends Difference {
     /* The differences per index */
     private Map<Integer, Difference> elementDifferences = new HashMap<Integer, Difference>();
 
+    /* The left object as a list */
+    private List<?> leftList;
+
+    /* The right object as a list */
+    private List<?> rightList;
+
 
     /**
      * Creates a difference.
      *
-     * @param message    a message describing the difference
-     * @param leftValue  the left instance
-     * @param rightValue the right instance
+     * @param message    A message describing the difference
+     * @param leftValue  The left instance
+     * @param rightValue The right instance
+     * @param leftList   The left instance as a list
+     * @param rightList  The right instance as a list
      */
-    public CollectionDifference(String message, Object leftValue, Object rightValue) {
+    public CollectionDifference(String message, Object leftValue, Object rightValue, List<?> leftList, List<?> rightList) {
         super(message, leftValue, rightValue);
+        this.leftList = leftList;
+        this.rightList = rightList;
     }
 
 
@@ -60,6 +71,22 @@ public class CollectionDifference extends Difference {
      */
     public Map<Integer, Difference> getElementDifferences() {
         return elementDifferences;
+    }
+
+
+    /**
+     * @return The left instance as a list
+     */
+    public List<?> getLeftList() {
+        return leftList;
+    }
+
+
+    /**
+     * @return The right instance as a list
+     */
+    public List<?> getRightList() {
+        return rightList;
     }
 
 

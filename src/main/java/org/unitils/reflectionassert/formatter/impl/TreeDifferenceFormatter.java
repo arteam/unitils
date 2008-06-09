@@ -19,6 +19,7 @@ import org.unitils.reflectionassert.difference.*;
 import org.unitils.reflectionassert.formatter.DifferenceFormatter;
 import org.unitils.reflectionassert.util.ObjectFormatter;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -98,6 +99,20 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
             String innerFieldName = createFieldName(fieldName, "[" + elementDifferences.getKey() + "]", false);
             result.append(elementDifferences.getValue().accept(treeDifferenceFormatterVisitor, innerFieldName));
         }
+
+        List<?> leftList = collectionDifference.getLeftList();
+        List<?> rightList = collectionDifference.getRightList();
+        if (leftList.size() > rightList.size()) {
+            for (int leftIndex = rightList.size(); leftIndex < leftList.size(); leftIndex++) {
+                String innerFieldName = createFieldName(fieldName, "[" + leftIndex + "]", false);
+                result.append(formatValues(innerFieldName, leftList.get(leftIndex), ""));
+            }
+        } else if (rightList.size() > leftList.size()) {
+            for (int rightIndex = leftList.size(); rightIndex < rightList.size(); rightIndex++) {
+                String innerFieldName = createFieldName(fieldName, "[" + rightIndex + "]", false);
+                result.append(formatValues(innerFieldName, "", rightList.get(rightIndex)));
+            }
+        }
         return result.toString();
     }
 
@@ -139,12 +154,12 @@ public class TreeDifferenceFormatter implements DifferenceFormatter {
 
             if (leftIndex == -1) {
                 String innerFieldName = createFieldName(fieldName, "[x," + rightIndex + "]", false);
-                result.append(formatValues(innerFieldName, "", objectFormatter.format(unorderedCollectionDifference.getElementDifference(0, rightIndex).getRightValue())));
+                result.append(formatValues(innerFieldName, "", objectFormatter.format(unorderedCollectionDifference.getRightList().get(rightIndex))));
                 continue;
             }
             if (rightIndex == -1) {
                 String innerFieldName = createFieldName(fieldName, "[" + leftIndex + ",x]", false);
-                result.append(formatValues(innerFieldName, objectFormatter.format(unorderedCollectionDifference.getElementDifference(leftIndex, 0).getLeftValue()), ""));
+                result.append(formatValues(innerFieldName, objectFormatter.format(unorderedCollectionDifference.getLeftList().get(leftIndex)), ""));
                 continue;
             }
 
