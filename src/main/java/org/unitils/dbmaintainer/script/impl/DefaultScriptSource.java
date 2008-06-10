@@ -102,11 +102,30 @@ public class DefaultScriptSource extends BaseDatabaseTask implements ScriptSourc
             getScripts(scriptLocation, new ArrayList<Long>(), scripts);
         }
         Collections.sort(scripts);
+        assertNoDuplicateVersionIndexes(scripts);
         return scripts;
     }
 
 
     /**
+     * Asserts that, in the given list of database update scripts, there are no two scripts with the same version.
+     * 
+     * @param scripts The list of scripts, must be sorted by version
+     */
+    protected void assertNoDuplicateVersionIndexes(List<Script> scripts) {
+    	for (int i = 0; i < scripts.size() - 1; i++) {
+    		Script script1 = scripts.get(i);
+			Script script2 = scripts.get(i + 1);
+			if (script1.getVersion().getIndexes().equals(script2.getVersion().getIndexes())) {
+    			throw new UnitilsException("Found 2 database scripts with the same version index: " 
+    					+ script1.getName() + " and " + script2.getName() + " both have version index " 
+    					+ script1.getVersion().getIndexesString());
+    		}
+    	}
+    }
+
+
+	/**
      * Returns a list of scripts with a higher index or timestamp than the given version.
      * <p/>
      * The scripts are returned in the order in which they should be executed.

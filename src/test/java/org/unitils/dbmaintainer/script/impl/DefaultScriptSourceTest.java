@@ -16,10 +16,13 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import static org.junit.Assert.*;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.Script;
@@ -29,6 +32,8 @@ import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDelete
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.IOException;
+
 import static java.lang.Long.MAX_VALUE;
 import java.util.List;
 import java.util.Properties;
@@ -43,11 +48,12 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 
     /* DataSource for the test database */
     @TestDataSource
-    private DataSource dataSource = null;
+    DataSource dataSource = null;
 
     /* Tested object */
-    private DefaultScriptSource defaultScriptSource;
+    DefaultScriptSource defaultScriptSource;
 
+    String scriptsDirName;
 
     /**
      * Cleans test directory and copies test files to it. Initializes test objects
@@ -55,17 +61,17 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         // Create test directories
-        String testDirName = System.getProperty("java.io.tmpdir") + "DefaultScriptSourceTest";
-        forceDeleteOnExit(new File(testDirName));
+        scriptsDirName = System.getProperty("java.io.tmpdir") + "DefaultScriptSourceTest";
+        forceDeleteOnExit(new File(scriptsDirName));
 
         // Copy test files
-        copyDirectory(new File(getClass().getResource("DefaultScriptSourceTest").toURI()), new File(testDirName));
-        String scriptLocations = testDirName + "/test_scripts";
-        String postProcessingScripts = testDirName + "/post_processing_scripts/post-scriptA.sql, " + testDirName + "/post_processing_scripts/post-scriptB.sql";
-
-        // Initialize FileScriptSourceObject
+        copyDirectory(new File(getClass().getResource("DefaultScriptSourceTest").toURI()), new File(scriptsDirName));
+        
+        // Initialize FileScriptSource object
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        String scriptLocations = scriptsDirName + "/test_scripts";
         configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS, scriptLocations);
+        String postProcessingScripts = scriptsDirName + "/post_processing_scripts/post-scriptA.sql, " + scriptsDirName + "/post_processing_scripts/post-scriptB.sql";
         configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_LOCATIONS, postProcessingScripts);
         defaultScriptSource = new DefaultScriptSource();
         defaultScriptSource.init(configuration, new SQLHandler(dataSource));
@@ -99,6 +105,26 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
         assertEquals("scriptH.sql", scripts.get(6).getName());       // x.2.x.x
         assertEquals("001_scriptI.sql", scripts.get(7).getName());   // x.x.1
         assertEquals("scriptJ.sql", scripts.get(8).getName());       // x.x.x
+    }
+    
+    @Test
+    public void testDuplicateIndex() throws Exception {
+    	File duplicateIndexScript = null;
+    	try {
+			File scriptA = new File(scriptsDirName
+					+ "/test_scripts/1_scripts/001_scriptA.sql");
+			duplicateIndexScript = new File(scriptsDirName
+					+ "/test_scripts/1_scripts/001_duplicateIndexScript.sql");
+			FileUtils.copyFile(scriptA, duplicateIndexScript);
+			try {
+				defaultScriptSource.getAllScripts();
+				fail("Expected a UnitilsException because of a duplicate script");
+			} catch (UnitilsException e) {
+				// expected
+			}
+		} finally {
+			FileUtils.deleteQuietly(duplicateIndexScript);
+		}
     }
 
 
