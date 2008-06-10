@@ -664,17 +664,8 @@ public abstract class BaseDAOTest extends UnitilsJUnit4 {
 }
 +-----+    
 
-    The above example uses annotations to get a reference to the datasource. Another way of making your code use the Unitils <DataSource> is by using 
-    an instance of <org.unitils.database.UnitilsDataSource>. This is a wrapper that delegates to the test datasource. Just create an instance
-    using the default constructor and you are able to connect to the unit test database. This can be used in e.g. a datasource XML config file
-    or programmatically as follows:
+    The above example uses annotations to get a reference to the datasource. Another way of making your code use the Unitils <DataSource> is by calling <DatabaseUnitils.getDataSource()>.
     
-+-----+
-DataSource dataSource = new UnitilsDataSource();
-Connection connection = dataSource.getConnection();    
-+-----+
-
-
 
 *** {Transactions}
 ~~~~~~~~~~~~~~~~~~
