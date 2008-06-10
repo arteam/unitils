@@ -19,6 +19,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.unitils.TracingTestListener.InvocationSource.TEST;
 import static org.unitils.TracingTestListener.InvocationSource.UNITILS;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_BEFORE_CLASS;
 import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_CREATE_TEST_OBJECT;
 import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_METHOD;
 import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_TEARDOWN;
@@ -50,6 +51,7 @@ public class TracingTestListener extends TestListener {
 	public interface Invocation {}
 
 	public static enum ListenerInvocation implements Invocation {
+		LISTENER_BEFORE_CLASS,
 		LISTENER_AFTER_CREATE_TEST_OBJECT, 
 		LISTENER_BEFORE_TEST_SET_UP, 
 		LISTENER_BEFORE_TEST_METHOD,
@@ -122,14 +124,20 @@ public class TracingTestListener extends TestListener {
     }
     
     
-    public void registerListenerInvocation(ListenerInvocation listenerInvocation, Object test, Method testMethod, Throwable throwable) {
-    	callList.add(new Call(listenerInvocation, test.getClass(), testMethod == null ? null : testMethod.getName(), throwable));
+    public void registerListenerInvocation(ListenerInvocation listenerInvocation, Class<?> testClass, Object test, Method testMethod, Throwable throwable) {
+    	callList.add(new Call(listenerInvocation, testClass, testMethod == null ? null : testMethod.getName(), throwable));
     }
-
-
+    
+    
     @Override
+	public void beforeTestClass(Class<?> testClass) {
+		registerListenerInvocation(LISTENER_BEFORE_CLASS, testClass, null, null, null);
+	}
+
+
+	@Override
     public void afterCreateTestObject(Object testObject) {
-        registerListenerInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testObject, null, null);
+        registerListenerInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testObject.getClass(), testObject, null, null);
         throwExceptionIfRequested(LISTENER_AFTER_CREATE_TEST_OBJECT);
     }
 
@@ -138,7 +146,7 @@ public class TracingTestListener extends TestListener {
     	currentTestMethod = testMethod;
     	currentThrowable = null;
     	
-        registerListenerInvocation(LISTENER_BEFORE_TEST_SET_UP, testObject, testMethod, null);
+        registerListenerInvocation(LISTENER_BEFORE_TEST_SET_UP, testObject.getClass(), testObject, testMethod, null);
         throwExceptionIfRequested(LISTENER_BEFORE_TEST_SET_UP);
     }
 
@@ -146,7 +154,7 @@ public class TracingTestListener extends TestListener {
     public void beforeTestMethod(Object testObject, Method testMethod) {
     	assertEquals(currentTestMethod, testMethod);
     	
-        registerListenerInvocation(LISTENER_BEFORE_TEST_METHOD, testObject, testMethod, null);
+        registerListenerInvocation(LISTENER_BEFORE_TEST_METHOD, testObject.getClass(), testObject, testMethod, null);
         throwExceptionIfRequested(LISTENER_BEFORE_TEST_METHOD);
     }
 
@@ -155,13 +163,13 @@ public class TracingTestListener extends TestListener {
     	assertEquals(currentTestMethod, testMethod);
     	assertTrue(throwable == null || (currentThrowable != null && currentThrowable.equals(throwable)));
     	
-    	registerListenerInvocation(LISTENER_AFTER_TEST_METHOD, testObject, testMethod, throwable);
+    	registerListenerInvocation(LISTENER_AFTER_TEST_METHOD, testObject.getClass(), testObject, testMethod, throwable);
         throwExceptionIfRequested(LISTENER_AFTER_TEST_METHOD);
     }
 
     @Override
     public void afterTestTearDown(Object testObject, Method testMethod) {
-    	registerListenerInvocation(LISTENER_AFTER_TEST_TEARDOWN, testObject, testMethod, null);
+    	registerListenerInvocation(LISTENER_AFTER_TEST_TEARDOWN, testObject.getClass(), testObject, testMethod, null);
         throwExceptionIfRequested(LISTENER_AFTER_TEST_TEARDOWN);
     }
 
@@ -267,7 +275,8 @@ public class TracingTestListener extends TestListener {
 
 		@Override
 		public String toString() {
-			return invocationSource + " " + invocation + " " + testClass.getSimpleName() + 
+			return invocationSource + " " + invocation + " " + 
+				(testClass == null ? "" : testClass.getSimpleName()) + 
 				(testMethod == null ? "" : " " + testMethod) + 
 				(throwable == null ? "" : " " + throwable);
 		}

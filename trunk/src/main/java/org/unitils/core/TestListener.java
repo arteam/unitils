@@ -43,13 +43,26 @@ import java.lang.reflect.Method;
  * </ul>
  * <p/>
  * The after methods will always when the before counterpart has run (or begun). For example if an exception occurs during
- * the beforeTestClass method, the afterTestClass will still be called.
+ * the beforeTestSetup method, the afterTestTearDown method will still be called.
+ * <p/>
+ * Is implemented as an abstract class with empty methods instead of an interface, since most implementations only need
+ * to implement a small subset of the provided callback methods.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public abstract class TestListener {
 
+	
+	/**
+	 * Invoked before the generic class setup (e.g. @BeforeClass) is performed.
+	 * 
+	 * @param testClass The class whose test methods are about to be executed, not null
+	 */
+	public void beforeTestClass(Class<?> testClass) {
+		// empty
+	}
+	
     
     /**
      * Invoked before any of the test in a test class are run.

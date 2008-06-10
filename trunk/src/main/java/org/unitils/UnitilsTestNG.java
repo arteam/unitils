@@ -46,6 +46,7 @@ public abstract class UnitilsTestNG implements IHookable {
      */
     @BeforeClass(alwaysRun = true)
     protected void unitilsBeforeClass() {
+    	getTestListener().beforeTestClass(this.getClass());
         getTestListener().afterCreateTestObject(this);
     }
 
