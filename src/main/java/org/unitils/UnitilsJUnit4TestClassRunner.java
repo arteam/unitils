@@ -60,6 +60,7 @@ public class UnitilsJUnit4TestClassRunner extends JUnit4ClassRunner {
         });
 
         try {
+        	getTestListener().beforeTestClass(getTestClass().getJavaClass());
             classRoadie.runProtected();
         } catch (Throwable t) {
             notifier.fireTestFailure(new Failure(getDescription(), t));

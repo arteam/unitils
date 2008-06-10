@@ -17,6 +17,7 @@ package org.unitils;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
+import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_BEFORE_CLASS;
 import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_CREATE_TEST_OBJECT;
 import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_METHOD;
 import static org.unitils.TracingTestListener.ListenerInvocation.LISTENER_AFTER_TEST_TEARDOWN;
@@ -34,6 +35,7 @@ import static org.unitils.TracingTestListener.TestInvocation.TEST_TEAR_DOWN;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -41,6 +43,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.unitils.TracingTestListener.TestFramework;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+import org.unitils.inject.util.InjectionUtils;
 
 /**
  * Test for the main flow of the unitils test listeners for JUnit3 ({@link UnitilsJUnit3}),
@@ -87,11 +90,17 @@ public class UnitilsInvocationTest extends UnitilsInvocationTestBase {
 	}
 	
 	
+	@Before
+    public void resetJunit3() {
+    	InjectionUtils.injectIntoStatic(null, UnitilsJUnit3.class, "currentTestClass");
+    }
     
+	
     @Test
     public void testSuccessfulRun() throws Exception {
     	testExecutor.runTests(testClass1, testClass2);
     	
+    	assertInvocation(LISTENER_BEFORE_CLASS, 			testClass1);
     	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass1, TESTNG);
     	assertInvocation(TEST_BEFORE_CLASS,        	        testClass1, JUNIT4, TESTNG);
     	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass1, JUNIT3, JUNIT4);
@@ -115,6 +124,7 @@ public class UnitilsInvocationTest extends UnitilsInvocationTestBase {
 		assertInvocation(TEST_AFTER_CLASS,         			testClass1, JUNIT4, TESTNG);
         
         // testClass 2, testMethod 1
+		assertInvocation(LISTENER_BEFORE_CLASS, 			testClass2);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass2, TESTNG);
 		assertInvocation(TEST_BEFORE_CLASS,        			testClass2, JUNIT4, TESTNG);
 		assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass2, JUNIT3, JUNIT4);
@@ -151,6 +161,7 @@ public class UnitilsInvocationTest extends UnitilsInvocationTestBase {
     	
         testExecutor.runTests("testGroup", UnitilsTestNGTest_GroupsTest.class);
 
+        assertInvocation(LISTENER_BEFORE_CLASS, UnitilsTestNGTest_GroupsTest.class);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, UnitilsTestNGTest_GroupsTest.class);
         assertInvocation(TEST_BEFORE_CLASS,        	        UnitilsTestNGTest_GroupsTest.class);
     	

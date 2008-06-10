@@ -17,6 +17,7 @@ package org.unitils;
 
 import static junit.framework.Assert.assertEquals;
 import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -26,6 +27,7 @@ import org.unitils.TracingTestListener.TestFramework;
 import static org.unitils.TracingTestListener.TestFramework.*;
 import static org.unitils.TracingTestListener.TestInvocation.*;
 import org.unitils.core.TestListener;
+import org.unitils.inject.util.InjectionUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,6 +65,11 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
                 //{JUNIT4, new JUnit4TestExecutor(), SpringUnitilsJUnit4Test_TestClass1.class},
                 //{TESTNG, new TestNGTestExecutor(), SpringUnitilsTestNGTest_TestClass1.class},
         });
+    }
+    
+    @Before
+    public void resetJunit3() {
+    	InjectionUtils.injectIntoStatic(null, UnitilsJUnit3.class, "currentTestClass");
     }
 
     /**
@@ -344,6 +351,7 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
      * Asserts the flow when an exception is thrown during a before class call of a test.
      */
     private void assertInvocationOrder_testBeforeClass() {
+    	assertInvocation(LISTENER_BEFORE_CLASS, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
         assertInvocation(TEST_BEFORE_CLASS, testClass);
         // TestNG calls @BeforeMethod and @AfterMethod methods, even though the tests themselves are skipped
@@ -361,6 +369,7 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
      * Asserts the flow when an exception is thrown during a {@link TestListener#beforeTestSetUp} call of a module.
      */
     private void assertInvocationOrder_beforeTestSetUp() {
+    	assertInvocation(LISTENER_BEFORE_CLASS, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
         assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
@@ -378,6 +387,7 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
      * Asserts the flow when an exception is thrown during a setUp call of a test.
      */
     private void assertInvocationOrder_testSetUp() {
+    	assertInvocation(LISTENER_BEFORE_CLASS, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
         assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
@@ -397,7 +407,8 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
      * Asserts the flow when an exception is thrown during a {@link TestListener#beforeTestMethod} call of a module.
      */
     private void assertInvocationOrder_beforeTestMethod() {
-        assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
+    	assertInvocation(LISTENER_BEFORE_CLASS, testClass);
+    	assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
         assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
         assertInvocation(LISTENER_BEFORE_TEST_SET_UP, testClass);
@@ -422,6 +433,7 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
      * Asserts the flow when an exception is thrown during the test.
      */
     private void assertInvocationOrder_testMethod() {
+    	assertInvocation(LISTENER_BEFORE_CLASS, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
         assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
@@ -448,6 +460,7 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
      * Asserts the flow when an exception is thrown during the test.
      */
     private void assertInvocationOrder() {
+    	assertInvocation(LISTENER_BEFORE_CLASS, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
         assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
@@ -475,6 +488,7 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
      * Asserts the flow when an exception is thrown during a tear down call of a test.
      */
     private void assertInvocationOrder_testTearDown() {
+    	assertInvocation(LISTENER_BEFORE_CLASS, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
         assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);
@@ -502,6 +516,7 @@ public class UnitilsInvocationExceptionTest extends UnitilsInvocationTestBase {
      * Asserts the flow when an exception is thrown during a {@link TestListener#afterTestTearDown} call of a module.
      */
     private void assertInvocationOrder_afterTestTearDown() {
+    	assertInvocation(LISTENER_BEFORE_CLASS, testClass);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, TESTNG);
         assertInvocation(TEST_BEFORE_CLASS, testClass, JUNIT4, TESTNG);
         assertInvocation(LISTENER_AFTER_CREATE_TEST_OBJECT, testClass, JUNIT3, JUNIT4);

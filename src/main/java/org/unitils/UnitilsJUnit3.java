@@ -33,6 +33,8 @@ import java.lang.reflect.Method;
  */
 public abstract class UnitilsJUnit3 extends TestCase {
 
+	private static Class<?> currentTestClass;
+	
 
     /**
      * Creates a test without a name. Be sure to call {@link TestCase#setName} afterwards.
@@ -57,6 +59,10 @@ public abstract class UnitilsJUnit3 extends TestCase {
      */
     @Override
     public void runBare() throws Throwable {
+    	if (!getClass().equals(currentTestClass)) {
+    		currentTestClass = getClass();
+    		getTestListener().beforeTestClass(getClass());
+    	}
         getTestListener().afterCreateTestObject(this);
 
         Throwable firstThrowable = null;
