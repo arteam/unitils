@@ -295,7 +295,7 @@ public class UnitilsIntegrationTest {
         if (file.exists()) {
             file.delete();
         }
-        FileUtils.writeStringToFile(file, "" + succeeded);
+        org.apache.commons.io.FileUtils.writeStringToFile(file, "" + succeeded);
     }
 
     public static void main(String[] args) throws Exception {
