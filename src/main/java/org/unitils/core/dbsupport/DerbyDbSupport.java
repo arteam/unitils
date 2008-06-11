@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * Implementation of {@link DbSupport} for a Derby database.
  * <p/>
- * Special thanks to Scott Prater how donated the Derby support code.
+ * Special thanks to Scott Prater who donated the initial version of the Derby support code.
  *
  * @author Scott Prater
  * @author Tim Ducheyne
@@ -53,8 +53,7 @@ public class DerbyDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTableNames() {
-        return getSQLHandler().getItemsAsStringSet("select SYS.SYSTABLES.TABLENAME from SYS.SYSTABLES, SYS.SYSSCHEMAS " +
-                "where SYS.SYSTABLES.TABLETYPE = 'T' AND SYS.SYSTABLES.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select t.TABLENAME from SYS.SYSTABLES t, SYS.SYSSCHEMAS  s where t.TABLETYPE = 'T' AND t.SCHEMAID = s.SCHEMAID AND s.SCHEMANAME = '" + getSchemaName() + "'");
     }
 
 
@@ -66,9 +65,7 @@ public class DerbyDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select SYS.SYSCOLUMNS.COLUMNNAME from SYS.SYSCOLUMNS, SYS.SYSTABLES, SYS.SYSSCHEMAS " +
-                "where SYS.SYSCOLUMNS.REFERENCEID = SYS.SYSTABLES.TABLEID AND SYS.SYSTABLES.TABLETYPE = 'T' AND SYS.SYSTABLES.TABLENAME = '" + tableName + "' AND " +
-                "SYS.SYSTABLES.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select c.COLUMNNAME from SYS.SYSCOLUMNS c, SYS.SYSTABLES t, SYS.SYSSCHEMAS s where c.REFERENCEID = t.TABLEID and t.TABLENAME = '" + tableName + "' AND t.SCHEMAID = s.SCHEMAID AND s.SCHEMANAME = '" + getSchemaName() + "'");
     }
 
 
@@ -79,8 +76,7 @@ public class DerbyDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getViewNames() {
-        return getSQLHandler().getItemsAsStringSet("select SYS.SYSTABLES.TABLENAME from SYS.SYSTABLES, SYS.SYSSCHEMAS " +
-                "where SYS.SYSTABLES.TABLETYPE = 'V' AND SYS.SYSTABLES.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select t.TABLENAME from SYS.SYSTABLES t, SYS.SYSSCHEMAS s where t.TABLETYPE = 'V' AND t.SCHEMAID = s.SCHEMAID AND s.SCHEMANAME = '" + getSchemaName() + "'");
     }
 
 
@@ -90,8 +86,7 @@ public class DerbyDbSupport extends DbSupport {
      * @return The names of all synonyms in the database
      */
     public Set<String> getSynonymNames() {
-        return getSQLHandler().getItemsAsStringSet("select SYS.SYSTABLES.TABLENAME from SYS.SYSTABLES, SYS.SYSSCHEMAS " +
-                "where SYS.SYSTABLES.TABLETYPE = 'A' AND SYS.SYSTABLES.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select t.TABLENAME from SYS.SYSTABLES t, SYS.SYSSCHEMAS s where t.TABLETYPE = 'A' AND t.SCHEMAID = s.SCHEMAID AND s.SCHEMANAME = '" + getSchemaName() + "'");
     }
 
 
@@ -102,8 +97,7 @@ public class DerbyDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getSQLHandler().getItemsAsStringSet("select SYS.SYSTRIGGERS.TRIGGERNAME from SYS.SYSTRIGGERS, SYS.SYSSCHEMAS " +
-                "where SYS.SYSTRIGGERS.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select t.TRIGGERNAME from SYS.SYSTRIGGERS t, SYS.SYSSCHEMAS s where t.SCHEMAID = s.SCHEMAID AND s.SCHEMANAME = '" + getSchemaName() + "'");
     }
 
 
@@ -135,31 +129,6 @@ public class DerbyDbSupport extends DbSupport {
 
 
     /**
-     * Removes the table with the given name from the database.
-     * Note: the table name is surrounded with quotes, making it case-sensitive.
-     * Derby (as of version 10.3.x) does not support the "cascade" syntax in drop statements
-     *
-     * @param tableName The table to drop (case-sensitive), not null
-     */
-    @Override
-    public void dropTable(String tableName) {
-        getSQLHandler().executeUpdate("drop table " + qualified(tableName));
-    }
-
-
-    /**
-     * Removes the view with the given name from the database
-     * Note: the view name is surrounded with quotes, making it case-sensitive.
-     * Derby (as of version 10.3.x) does not support the "cascade" syntax in drop statements
-     *
-     * @param viewName The view to drop (case-sensitive), not null
-     */
-    public void dropView(String viewName) {
-        getSQLHandler().executeUpdate("drop view " + qualified(viewName));
-    }
-
-
-    /**
      * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
      * @param tableName The table, not null
@@ -167,9 +136,7 @@ public class DerbyDbSupport extends DbSupport {
     @Override
     public void removeReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select SYS.SYSCONSTRAINTS.CONSTRAINTNAME from SYS.SYSCONSTRAINTS, SYS.SYSTABLES, SYS.SYSSCHEMAS " +
-                "where SYS.SYSCONSTRAINTS.TYPE = 'F' AND SYS.SYSCONSTRAINTS.TABLEID = SYS.SYSTABLES.TABLEID  AND SYS.SYSTABLES.TABLENAME = '" + tableName + "' AND " +
-                "SYS.SYSCONSTRAINTS.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select c.CONSTRAINTNAME from SYS.SYSCONSTRAINTS c, SYS.SYSTABLES t, SYS.SYSSCHEMAS s where c.TYPE = 'F' AND c.TABLEID = t.TABLEID  AND t.TABLENAME = '" + tableName + "' AND t.SCHEMAID = s.SCHEMAID AND s.SCHEMANAME = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
@@ -186,9 +153,7 @@ public class DerbyDbSupport extends DbSupport {
         SQLHandler sqlHandler = getSQLHandler();
 
         // disable all check and unique constraints
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select SYS.SYSCONSTRAINTS.CONSTRAINTNAME from SYS.SYSCONSTRAINTS, SYS.SYSTABLES, SYS.SYSSCHEMAS " +
-                "where SYS.SYSCONSTRAINTS.TYPE in ('U', 'C') AND SYS.SYSCONSTRAINTS.TABLEID = SYS.SYSTABLES.TABLEID  AND SYS.SYSTABLES.TABLENAME = '" + tableName + "' AND " +
-                "SYS.SYSCONSTRAINTS.SCHEMAID = SYS.SYSSCHEMAS.SCHEMAID AND SYS.SYSSCHEMAS.SCHEMANAME = '" + getSchemaName() + "'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select c.CONSTRAINTNAME from SYS.SYSCONSTRAINTS c, SYS.SYSTABLES t, SYS.SYSSCHEMAS s where c.TYPE in ('U', 'C') AND c.TABLEID = t.TABLEID  AND t.TABLENAME = '" + tableName + "' AND t.SCHEMAID = s.SCHEMAID AND s.SCHEMANAME = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
@@ -240,7 +205,6 @@ public class DerbyDbSupport extends DbSupport {
         return true;
     }
 
-    // todo rewrite constraint disabling
 
     /**
      * Gets the names of all primary columns of the given table.

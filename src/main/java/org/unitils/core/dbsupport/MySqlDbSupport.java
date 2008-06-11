@@ -124,6 +124,7 @@ public class MySqlDbSupport extends DbSupport {
         // disable all not null constraints
         Set<String> notNullColumnNames = sqlHandler.getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and column_key <> 'PRI' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
         for (String notNullColumnName : notNullColumnNames) {
+            // todo test length etc
             String columnType = sqlHandler.getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + notNullColumnName + "'");
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " change column " + quoted(notNullColumnName) + " " + quoted(notNullColumnName) + " " + columnType + " NULL ");
         }
@@ -204,6 +205,17 @@ public class MySqlDbSupport extends DbSupport {
      */
     @Override
     public boolean supportsIdentityColumns() {
+        return true;
+    }
+
+
+    /**
+     * Cascade are supported.
+     *
+     * @return True
+     */
+    @Override
+    public boolean supportsCascade() {
         return true;
     }
 

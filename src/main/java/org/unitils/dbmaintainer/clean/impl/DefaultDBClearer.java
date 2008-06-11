@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
@@ -137,13 +138,13 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
     @Override
     protected void doInit(Properties configuration) {
         schemasToPreserve = getSchemasToPreserve(configuration);
-        tablesToPreserve = getTablesToPreserve(configuration); // also adds db version table
-        viewsToPreserve = getViewsToPreserve(configuration);
-        materializedViewsToPreserve = getMaterializedViewsToPreserve(configuration);
-        sequencesToPreserve = getSequencesToPreserve(configuration);
-        synonymsToPreserve = getSynonymsToPreserve(configuration);
-        triggersToPreserve = getTriggersToPreserve(configuration);
-        typesToPreserve = getTypesToPreserve(configuration);
+        tablesToPreserve = getTablesToPreserve(); // also adds db version table
+        viewsToPreserve = getViewsToPreserve();
+        materializedViewsToPreserve = getMaterializedViewsToPreserve();
+        sequencesToPreserve = getSequencesToPreserve();
+        synonymsToPreserve = getSynonymsToPreserve();
+        triggersToPreserve = getTriggersToPreserve();
+        typesToPreserve = getTypesToPreserve();
     }
 
 
@@ -182,7 +183,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> schemaTablesToPreserve = tablesToPreserve.get(dbSupport.getSchemaName());
         for (String tableName : tableNames) {
             // check whether table needs to be preserved
-            if (schemaTablesToPreserve != null && schemaTablesToPreserve.contains(tableName)) {
+            if (isItemToPreserve(tableName, schemaTablesToPreserve)) {
                 continue;
             }
             logger.debug("Dropping table " + tableName + " in database schema " + dbSupport.getSchemaName());
@@ -201,7 +202,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> schemaViewsToPreserve = viewsToPreserve.get(dbSupport.getSchemaName());
         for (String viewName : viewNames) {
             // check whether view needs to be preserved
-            if (schemaViewsToPreserve != null && schemaViewsToPreserve.contains(viewName)) {
+            if (isItemToPreserve(viewName, schemaViewsToPreserve)) {
                 continue;
             }
             logger.debug("Dropping view " + viewName + " in database schema " + dbSupport.getSchemaName());
@@ -223,7 +224,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> schemaMaterializedViewsToPreserve = materializedViewsToPreserve.get(dbSupport.getSchemaName());
         for (String materializedViewName : materializedViewNames) {
             // check whether view needs to be preserved
-            if (schemaMaterializedViewsToPreserve != null && schemaMaterializedViewsToPreserve.contains(materializedViewName)) {
+            if (isItemToPreserve(materializedViewName, schemaMaterializedViewsToPreserve)) {
                 continue;
             }
             logger.debug("Dropping materialized view " + materializedViewName + " in database schema " + dbSupport.getSchemaName());
@@ -245,7 +246,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> schemaSynonymsToPreserve = synonymsToPreserve.get(dbSupport.getSchemaName());
         for (String synonymName : synonymNames) {
             // check whether table needs to be preserved
-            if (schemaSynonymsToPreserve != null && schemaSynonymsToPreserve.contains(synonymName)) {
+            if (isItemToPreserve(synonymName, schemaSynonymsToPreserve)) {
                 continue;
             }
             logger.debug("Dropping synonym " + synonymName + " in database schema " + dbSupport.getSchemaName());
@@ -267,7 +268,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> schemaSequencesToPreserve = sequencesToPreserve.get(dbSupport.getSchemaName());
         for (String sequenceName : sequenceNames) {
             // check whether sequence needs to be preserved
-            if (schemaSequencesToPreserve != null && schemaSequencesToPreserve.contains(sequenceName)) {
+            if (isItemToPreserve(sequenceName, schemaSequencesToPreserve)) {
                 continue;
             }
             logger.debug("Dropping sequence " + sequenceName + " in database schema " + dbSupport.getSchemaName());
@@ -289,7 +290,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> schemaTriggersToPreserve = triggersToPreserve.get(dbSupport.getSchemaName());
         for (String triggerName : triggerNames) {
             // check whether trigger needs to be preserved
-            if (schemaTriggersToPreserve != null && schemaTriggersToPreserve.contains(triggerName)) {
+            if (isItemToPreserve(triggerName, schemaTriggersToPreserve)) {
                 continue;
             }
             logger.debug("Dropping trigger " + triggerName + " in database schema " + dbSupport.getSchemaName());
@@ -311,7 +312,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         Set<String> schemaTypesToPreserve = typesToPreserve.get(dbSupport.getSchemaName());
         for (String typeName : typeNames) {
             // check whether type needs to be preserved
-            if (schemaTypesToPreserve != null && schemaTypesToPreserve.contains(typeName)) {
+            if (isItemToPreserve(typeName, schemaTypesToPreserve)) {
                 continue;
             }
             logger.debug("Dropping type " + typeName + " in database schema " + dbSupport.getSchemaName());
@@ -337,6 +338,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
             boolean found = false;
             for (DbSupport dbSupport : dbSupports) {
+                // ignore case when stored in mixed casing (e.g MS-Sql), otherwise we can't compare the item names
+                if (defaultDbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+                    schemaToPreserve = schemaToPreserve.toUpperCase();
+                }
                 // convert to correct case if needed
                 String correctCaseSchemaToPreserve = dbSupport.toCorrectCaseIdentifier(schemaToPreserve);
                 if (dbSupport.getSchemaName().equals(correctCaseSchemaToPreserve)) {
@@ -352,6 +357,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         return result;
     }
 
+
     /**
      * Gets the list of all tables to preserve per schema. The case is corrected if necesary. Quoting a table name makes
      * it case sensitive. If no schema is specified, the tables will be added to the default schema name set.
@@ -360,24 +366,23 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * <p/>
      * The db version table is also added as a table to preserve, but will not be checked on existence.
      *
-     * @param configuration The unitils configuration, not null
      * @return The tables to preserve per schema, not null
      */
-    protected Map<String, Set<String>> getTablesToPreserve(Properties configuration) {
-        Map<String, Set<String>> tablesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration);
+    protected Map<String, Set<String>> getTablesToPreserve() {
+        Map<String, Set<String>> tablesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TABLES);
         for (Map.Entry<String, Set<String>> entry : tablesToPreserve.entrySet()) {
             String schemaName = entry.getKey();
             Set<String> tableNames = getDbSupport(schemaName).getTableNames();
 
             for (String tableToPreserve : entry.getValue()) {
-                if (!tableNames.contains(tableToPreserve)) {
+                if (!itemToPreserveExists(tableToPreserve, tableNames)) {
                     throw new UnitilsException("Table to preserve does not exist: " + tableToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which tables need to be preserved. To assure nothing is dropped by mistake, no tables will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TABLES + " property.");
                 }
             }
         }
 
         // add version table as item to preserve
-        Map<String, Set<String>> dbVersionTablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME, configuration);
+        Map<String, Set<String>> dbVersionTablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME);
         for (Map.Entry<String, Set<String>> entry : dbVersionTablesToPreserve.entrySet()) {
             String schemaName = entry.getKey();
             Set<String> dbVersionTableNames = entry.getValue();
@@ -399,17 +404,16 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * <p/>
      * If a view to preserve does not exist, a UnitilsException is thrown.
      *
-     * @param configuration The unitils configuration, not null
      * @return The views to preserve per schema, not null
      */
-    protected Map<String, Set<String>> getViewsToPreserve(Properties configuration) {
-        Map<String, Set<String>> viewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_VIEWS, configuration);
+    protected Map<String, Set<String>> getViewsToPreserve() {
+        Map<String, Set<String>> viewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_VIEWS);
         for (Map.Entry<String, Set<String>> entry : viewsToPreserve.entrySet()) {
             String schemaName = entry.getKey();
             Set<String> viewNames = getDbSupport(schemaName).getViewNames();
 
             for (String viewToPreserve : entry.getValue()) {
-                if (!viewNames.contains(viewToPreserve)) {
+                if (!itemToPreserveExists(viewToPreserve, viewNames)) {
                     throw new UnitilsException("View to preserve does not exist: " + viewToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which views need to be preserved. To assure nothing is dropped by mistake, no views will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_VIEWS + " property.");
                 }
             }
@@ -424,11 +428,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * <p/>
      * If a view to preserve does not exist, a UnitilsException is thrown.
      *
-     * @param configuration The unitils configuration, not null
      * @return The materialized views to preserve per schema, not null
      */
-    protected Map<String, Set<String>> getMaterializedViewsToPreserve(Properties configuration) {
-        Map<String, Set<String>> materializedViewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_MATERIALIZED_VIEWS, configuration);
+    protected Map<String, Set<String>> getMaterializedViewsToPreserve() {
+        Map<String, Set<String>> materializedViewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_MATERIALIZED_VIEWS);
         for (Map.Entry<String, Set<String>> entry : materializedViewsToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
@@ -440,7 +443,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
                 materializedViewNames = dbSupport.getMaterializedViewNames();
             }
             for (String materializedViewToPreserve : entry.getValue()) {
-                if (!materializedViewNames.contains(materializedViewToPreserve)) {
+                if (!itemToPreserveExists(materializedViewToPreserve, materializedViewNames)) {
                     throw new UnitilsException("Materialized view to preserve does not exist: " + materializedViewToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which materialized views need to be preserved. To assure nothing is dropped by mistake, no views will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_MATERIALIZED_VIEWS + " property.");
                 }
             }
@@ -455,11 +458,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * <p/>
      * If a sequence to preserve does not exist, a UnitilsException is thrown.
      *
-     * @param configuration The unitils configuration, not null
      * @return The sequences to preserve per schema, not null
      */
-    protected Map<String, Set<String>> getSequencesToPreserve(Properties configuration) {
-        Map<String, Set<String>> sequencesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SEQUENCES, configuration);
+    protected Map<String, Set<String>> getSequencesToPreserve() {
+        Map<String, Set<String>> sequencesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SEQUENCES);
         for (Map.Entry<String, Set<String>> entry : sequencesToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
@@ -471,7 +473,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
                 sequenceNames = dbSupport.getSequenceNames();
             }
             for (String sequenceToPreserve : entry.getValue()) {
-                if (!sequenceNames.contains(sequenceToPreserve)) {
+                if (!itemToPreserveExists(sequenceToPreserve, sequenceNames)) {
                     throw new UnitilsException("Sequence to preserve does not exist: " + sequenceToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which sequences need to be preserved. To assure nothing is dropped by mistake, no sequences will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SEQUENCES + " property.");
                 }
             }
@@ -486,11 +488,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * <p/>
      * If a synonym to preserve does not exist, a UnitilsException is thrown.
      *
-     * @param configuration The unitils configuration, not null
      * @return The synonym to preserve per schema, not null
      */
-    protected Map<String, Set<String>> getSynonymsToPreserve(Properties configuration) {
-        Map<String, Set<String>> synonymsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SYNONYMS, configuration);
+    protected Map<String, Set<String>> getSynonymsToPreserve() {
+        Map<String, Set<String>> synonymsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SYNONYMS);
         for (Map.Entry<String, Set<String>> entry : synonymsToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
@@ -502,7 +503,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
                 synonymNames = dbSupport.getSynonymNames();
             }
             for (String synonymToPreserve : entry.getValue()) {
-                if (!synonymNames.contains(synonymToPreserve)) {
+                if (!itemToPreserveExists(synonymToPreserve, synonymNames)) {
                     throw new UnitilsException("Synonym to preserve does not exist: " + synonymToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which synonyms need to be preserved. To assure nothing is dropped by mistake, no synonyms will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SYNONYMS + " property.");
                 }
             }
@@ -517,11 +518,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * <p/>
      * If a trigger to preserve does not exist, a UnitilsException is thrown.
      *
-     * @param configuration The unitils configuration, not null
      * @return The trigger to preserve per schema, not null
      */
-    protected Map<String, Set<String>> getTriggersToPreserve(Properties configuration) {
-        Map<String, Set<String>> triggersToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TRIGGERS, configuration);
+    protected Map<String, Set<String>> getTriggersToPreserve() {
+        Map<String, Set<String>> triggersToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TRIGGERS);
         for (Map.Entry<String, Set<String>> entry : triggersToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
@@ -533,7 +533,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
                 triggerNames = dbSupport.getTriggerNames();
             }
             for (String triggerToPreserve : entry.getValue()) {
-                if (!triggerNames.contains(triggerToPreserve)) {
+                if (!itemToPreserveExists(triggerToPreserve, triggerNames)) {
                     throw new UnitilsException("Trigger to preserve does not exist: " + triggerToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which triggers need to be preserved. To assure nothing is dropped by mistake, no triggers will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TRIGGERS + " property.");
                 }
             }
@@ -548,11 +548,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * <p/>
      * If a type to preserve does not exist, a UnitilsException is thrown.
      *
-     * @param configuration The unitils configuration, not null
      * @return The type to preserve per schema, not null
      */
-    protected Map<String, Set<String>> getTypesToPreserve(Properties configuration) {
-        Map<String, Set<String>> typesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TYPES, configuration);
+    protected Map<String, Set<String>> getTypesToPreserve() {
+        Map<String, Set<String>> typesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TYPES);
         for (Map.Entry<String, Set<String>> entry : typesToPreserve.entrySet()) {
             String schemaName = entry.getKey();
 
@@ -564,7 +563,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
                 typeNames = dbSupport.getTypeNames();
             }
             for (String typeToPreserve : entry.getValue()) {
-                if (!typeNames.contains(typeToPreserve)) {
+                if (!itemToPreserveExists(typeToPreserve, typeNames)) {
                     throw new UnitilsException("Type to preserve does not exist: " + typeToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which types need to be preserved. To assure nothing is dropped by mistake, no types will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TYPES + " property.");
                 }
             }
@@ -574,14 +573,56 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
 
 
     /**
-     * Gets the list of items to preserve per schema. The case is corrected if necesary. Quoting an identifier makes it
-     * case sensitive. If no schema is specified, the identifiers will be added to the default schema name set.
+     * Checks whether the given item is one of the items to preserve.
+     * This also handles identifiers that are stored in mixed case.
      *
-     * @param propertyName  The name of the property that defines the items, not null
-     * @param configuration The config, not null
+     * @param item            The item, not null
+     * @param itemsToPreserve The items to preserve
+     * @return True if item to preserve
+     */
+    protected boolean isItemToPreserve(String item, Set<String> itemsToPreserve) {
+        if (itemsToPreserve == null) {
+            return false;
+        }
+        // ignore case when stored in mixed casing (e.g MS-Sql), otherwise we can't compare the item names
+        if (defaultDbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+            item = item.toUpperCase();
+        }
+        return itemsToPreserve.contains(item);
+    }
+
+
+    /**
+     * Checks whether the given item to preserve is one of the items.
+     * This also handles identifiers that are stored in mixed case.
+     *
+     * @param itemToPreserve The item to preserve, not null
+     * @param items          The items, not null
+     * @return True if on of the items
+     */
+    protected boolean itemToPreserveExists(String itemToPreserve, Set<String> items) {
+        // ignore case when stored in mixed casing (e.g MS-Sql), otherwise we can't compare the item names
+        if (defaultDbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+            for (String item : items) {
+                if (itemToPreserve.equalsIgnoreCase(item)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return items.contains(itemToPreserve);
+    }
+
+
+    /**
+     * Gets the list of items to preserve per schema. The case is corrected if necesary.
+     * Quoting an identifier makes it case sensitive. If no schema is specified, the identifiers will be added to the
+     * default schema name set.
+     *
+     * @param propertyName The name of the property that defines the items, not null
      * @return The set of items per schema name, not null
      */
-    protected Map<String, Set<String>> getItemsToPreserve(String propertyName, Properties configuration) {
+    protected Map<String, Set<String>> getItemsToPreserve(String propertyName) {
         Map<String, Set<String>> result = new HashMap<String, Set<String>>();
 
         List<String> itemsToPreserve = getStringList(propertyName, configuration);
@@ -598,6 +639,10 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
                 itemToPreserve = itemToPreserve.substring(index + 1);
             }
 
+            // ignore case when stored in mixed casing (e.g MS-Sql), otherwise the item names can't be compared
+            if (dbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+                itemToPreserve = itemToPreserve.toUpperCase();
+            }
             // convert to correct case if needed
             String correctCaseItemToPreserve = dbSupport.toCorrectCaseIdentifier(itemToPreserve);
 
@@ -611,4 +656,5 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
         }
         return result;
     }
+
 }

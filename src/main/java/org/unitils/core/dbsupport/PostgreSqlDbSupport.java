@@ -146,18 +146,6 @@ public class PostgreSqlDbSupport extends DbSupport {
 
 
     /**
-     * Drops the type with the given name from the database
-     * Note: the type name is surrounded with quotes, making it case-sensitive.
-     *
-     * @param typeName The type to drop (case-sensitive), not null
-     */
-    @Override
-    public void dropType(String typeName) {
-        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName) + " cascade");
-    }
-
-
-    /**
      * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
      * @param tableName The table, not null
@@ -255,6 +243,17 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public boolean supportsTypes() {
+        return true;
+    }
+
+
+    /**
+     * Cascade are supported.
+     *
+     * @return True
+     */
+    @Override
+    public boolean supportsCascade() {
         return true;
     }
 

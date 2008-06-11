@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -61,8 +62,6 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
 
     /**
      * Configures the tested object. Creates a test table, index, view and sequence
-     * <p/>
-     * todo Test_trigger_Preserve Test_CASE_Trigger_Preserve
      */
     @Before
     public void setUp() throws Exception {
@@ -75,16 +74,16 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
         createTestDatabase();
 
         // configure items to preserve
-        configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupport.quoted("Test_CASE_Table"));
-        configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "test_view, " + dbSupport.quoted("Test_CASE_View"));
+        configuration.setProperty(PROPKEY_PRESERVE_TABLES, "Test_Table, " + dbSupport.quoted("Test_CASE_Table"));
+        configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "Test_View, " + dbSupport.quoted("Test_CASE_View"));
         if (dbSupport.supportsMaterializedViews()) {
-            configuration.setProperty(PROPKEY_PRESERVE_MATERIALIZED_VIEWS, "test_mview, " + dbSupport.quoted("Test_CASE_MView"));
+            configuration.setProperty(PROPKEY_PRESERVE_MATERIALIZED_VIEWS, "Test_MView, " + dbSupport.quoted("Test_CASE_MView"));
         }
         if (dbSupport.supportsSequences()) {
-            configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupport.quoted("Test_CASE_Sequence"));
+            configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "Test_Sequence, " + dbSupport.quoted("Test_CASE_Sequence"));
         }
         if (dbSupport.supportsSynonyms()) {
-            configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "test_synonym, " + dbSupport.quoted("Test_CASE_Synonym"));
+            configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "Test_Synonym, " + dbSupport.quoted("Test_CASE_Synonym"));
         }
         // create clearer instance
         defaultDbClearer = new DefaultDBClearer();
@@ -185,8 +184,10 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
             createTestDatabaseDb2();
         } else if ("derby".equals(dialect)) {
             createTestDatabaseDerby();
+        } else if ("mssql".equals(dialect)) {
+            createTestDatabaseMsSql();
         } else {
-            assert false : "This test is not implemented for current dialect: " + dialect;
+            fail("This test is not implemented for current dialect: " + dialect);
         }
     }
 
@@ -208,6 +209,8 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
             cleanupTestDatabaseDb2();
         } else if ("derby".equals(dialect)) {
             cleanupTestDatabaseDerby();
+        } else if ("mssql".equals(dialect)) {
+            cleanupTestDatabaseMsSql();
         }
     }
 
@@ -445,5 +448,43 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
         dropTestTables(dbSupport, "\"Test_CASE_Table\"", "test_table");
+    }
+
+    //
+    // Database setup for MS-Sql
+    //
+
+    /**
+     * Creates all test database structures (view, tables...)
+     */
+    private void createTestDatabaseMsSql() throws Exception {
+        // create tables
+        executeUpdate("create table test_table (col1 int not null primary key identity, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        // create views
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create synonyms
+        executeUpdate("create synonym test_synonym for test_table", dataSource);
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        // create triggers
+        executeUpdate("create trigger test_trigger on \"Test_CASE_Table\" after insert AS select * from test_table", dataSource);
+        executeUpdate("create trigger \"Test_CASE_Trigger\" on \"Test_CASE_Table\" after insert AS select * from test_table", dataSource);
+        // create types
+        executeUpdate("create type test_type from int", dataSource);
+        executeUpdate("create type \"Test_CASE_Type\" from int", dataSource);
+    }
+
+
+    /**
+     * Drops all created test database structures (views, tables...) First drop the views, since Derby doesn't support
+     * "drop table ... cascade" (yet, as of Derby 10.3)
+     */
+    private void cleanupTestDatabaseMsSql() throws Exception {
+        dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTables(dbSupport, "\"Test_CASE_Table\"", "test_table");
+        dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
     }
 }
