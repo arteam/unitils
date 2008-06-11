@@ -185,6 +185,8 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
             createTestDatabaseDb2();
         } else if ("derby".equals(dialect)) {
             createTestDatabaseDerby();
+        } else if ("mssql".equals(dialect)) {
+            createTestDatabaseMsSql();
         } else {
             fail("This test is not implemented for current dialect: " + dialect);
         }
@@ -208,6 +210,8 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
             cleanupTestDatabaseDb2();
         } else if ("derby".equals(dialect)) {
             cleanupTestDatabaseDerby();
+        } else if ("mssql".equals(dialect)) {
+            cleanupTestDatabaseMsSql();
         }
     }
 
@@ -446,5 +450,43 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
         dropTestTables(dbSupport, "\"Test_CASE_Table\"", "TEST_TABLE", versionTableName);
+    }
+
+    //
+    // Database setup for MS-Sql
+    //
+
+    /**
+     * Creates all test database structures (view, tables...)
+     */
+    private void createTestDatabaseMsSql() throws Exception {
+        // create tables
+        executeUpdate("create table test_table (col1 int not null primary key identity, col2 varchar(12) not null)", dataSource);
+        executeUpdate("create table \"Test_CASE_Table\" (col1 int, foreign key (col1) references test_table(col1))", dataSource);
+        // create views
+        executeUpdate("create view test_view as select col1 from test_table", dataSource);
+        executeUpdate("create view \"Test_CASE_View\" as select col1 from \"Test_CASE_Table\"", dataSource);
+        // create synonyms
+        executeUpdate("create synonym test_synonym for test_table", dataSource);
+        executeUpdate("create synonym \"Test_CASE_Synonym\" for \"Test_CASE_Table\"", dataSource);
+        // create triggers
+        executeUpdate("create trigger test_trigger on \"Test_CASE_Table\" after insert AS select * from test_table", dataSource);
+        executeUpdate("create trigger \"Test_CASE_Trigger\" on \"Test_CASE_Table\" after insert AS select * from test_table", dataSource);
+        // create types
+        executeUpdate("create type test_type from int", dataSource);
+        executeUpdate("create type \"Test_CASE_Type\" from int", dataSource);
+    }
+
+
+    /**
+     * Drops all created test database structures (views, tables...) First drop the views, since Derby doesn't support
+     * "drop table ... cascade" (yet, as of Derby 10.3)
+     */
+    private void cleanupTestDatabaseMsSql() throws Exception {
+        dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
+        dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
+        dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
+        dropTestTables(dbSupport, "\"Test_CASE_Table\"", "test_table");
+        dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
     }
 }

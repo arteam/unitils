@@ -201,6 +201,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
             createTestDatabaseDb2();
         } else if ("derby".equals(dialect)) {
             createTestDatabaseDerby();
+        } else if ("mssql".equals(dialect)) {
+            createTestDatabaseMsSql();
         } else {
             fail("This test is not implemented for current dialect: " + dialect);
         }
@@ -224,6 +226,8 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
             cleanupTestDatabaseDb2();
         } else if ("derby".equals(dialect)) {
             cleanupTestDatabaseDerby();
+        } else if ("mssql".equals(dialect)) {
+            cleanupTestDatabaseMsSql();
         }
     }
 
@@ -358,6 +362,28 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
      * Drops all created test database structures
      */
     private void cleanupTestDatabaseDerby() throws Exception {
+        dropTestTables(dbSupport, "test_table1", "test_table2");
+    }
+
+    //
+    // Database setup for MS-Sql
+    //
+
+    /**
+     * Creates all test database structures
+     */
+    private void createTestDatabaseMsSql() throws Exception {
+        // create table containing identity
+        executeUpdate("create table test_table1 (col1 int not null primary key identity, col2 varchar(12) not null)", dataSource);
+        // create table without identity
+        executeUpdate("create table test_table2 (col1 int not null primary key, col2 varchar(12) not null)", dataSource);
+    }
+
+
+    /**
+     * Drops all created test database structures
+     */
+    private void cleanupTestDatabaseMsSql() throws Exception {
         dropTestTables(dbSupport, "test_table1", "test_table2");
     }
 }

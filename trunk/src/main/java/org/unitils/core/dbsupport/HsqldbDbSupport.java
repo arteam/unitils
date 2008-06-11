@@ -214,4 +214,14 @@ public class HsqldbDbSupport extends DbSupport {
         return true;
     }
 
+
+    /**
+     * Cascade are supported.
+     *
+     * @return True
+     */
+    @Override
+    public boolean supportsCascade() {
+        return true;
+    }
 }

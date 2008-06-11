@@ -19,7 +19,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.util.StoredIdentifierCase;
 import static org.unitils.core.util.StoredIdentifierCase.*;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
-import org.unitils.util.PropertyUtils;
+import static org.unitils.util.PropertyUtils.getString;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -31,8 +31,6 @@ import java.util.Set;
  * Helper class that implements a number of common operations on a database schema. Operations that can be implemented
  * using general JDBC or ANSI SQL constructs, are impelemented in this base abstract class. Operations that are DBMS
  * specific are abstract, and their implementation is left to DBMS specific subclasses.
- * <p/>
- * todo add getIdentityColumns
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -90,8 +88,8 @@ abstract public class DbSupport {
     public void init(Properties configuration, SQLHandler sqlHandler, String schemaName) {
         this.sqlHandler = sqlHandler;
 
-        String identifierQuoteStringProperty = PropertyUtils.getString(PROPKEY_IDENTIFIER_QUOTE_STRING + "." + getDatabaseDialect(), configuration);
-        String storedIdentifierCaseValue = PropertyUtils.getString(PROPKEY_STORED_IDENTIFIER_CASE + "." + getDatabaseDialect(), configuration);
+        String identifierQuoteStringProperty = getString(PROPKEY_IDENTIFIER_QUOTE_STRING + "." + getDatabaseDialect(), configuration);
+        String storedIdentifierCaseValue = getString(PROPKEY_STORED_IDENTIFIER_CASE + "." + getDatabaseDialect(), configuration);
 
         this.identifierQuoteString = determineIdentifierQuoteString(identifierQuoteStringProperty);
         this.storedIdentifierCase = determineStoredIdentifierCase(storedIdentifierCaseValue);
@@ -232,7 +230,7 @@ abstract public class DbSupport {
      * @param tableName The table to drop (case-sensitive), not null
      */
     public void dropTable(String tableName) {
-        getSQLHandler().executeUpdate("drop table " + qualified(tableName) + " cascade");
+        getSQLHandler().executeUpdate("drop table " + qualified(tableName) + (supportsCascade() ? " cascade" : ""));
     }
 
 
@@ -243,7 +241,7 @@ abstract public class DbSupport {
      * @param viewName The view to drop (case-sensitive), not null
      */
     public void dropView(String viewName) {
-        getSQLHandler().executeUpdate("drop view " + qualified(viewName) + " cascade");
+        getSQLHandler().executeUpdate("drop view " + qualified(viewName) + (supportsCascade() ? " cascade" : ""));
     }
 
 
@@ -298,7 +296,7 @@ abstract public class DbSupport {
      * @param typeName The type to drop (case-sensitive), not null
      */
     public void dropType(String typeName) {
-        throw new UnsupportedOperationException("Types are not supported for " + getDatabaseDialect());
+        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName) + (supportsCascade() ? " cascade" : ""));
     }
 
 
@@ -464,11 +462,11 @@ abstract public class DbSupport {
      */
     private StoredIdentifierCase determineStoredIdentifierCase(String storedIdentifierCase) {
         if ("lower_case".equals(storedIdentifierCase)) {
-            return StoredIdentifierCase.LOWER_CASE;
+            return LOWER_CASE;
         } else if ("upper_case".equals(storedIdentifierCase)) {
-            return StoredIdentifierCase.UPPER_CASE;
+            return UPPER_CASE;
         } else if ("mixed_case".equals(storedIdentifierCase)) {
-            return StoredIdentifierCase.MIXED_CASE;
+            return MIXED_CASE;
         } else if (!"auto".equals(storedIdentifierCase)) {
             throw new UnitilsException("Unknown value " + storedIdentifierCase + " for property " + PROPKEY_STORED_IDENTIFIER_CASE + ". It should be one of lower_case, upper_case, mixed_case or auto.");
         }
@@ -582,6 +580,16 @@ abstract public class DbSupport {
      * @return True if materialized views are supported, false otherwise
      */
     public boolean supportsMaterializedViews() {
+        return false;
+    }
+
+
+    /**
+     * Indicates whether the underlying DBMS supports the cascade option for dropping tables and views.
+     *
+     * @return True if cascade is supported, false otherwise
+     */
+    public boolean supportsCascade() {
         return false;
     }
 

@@ -107,42 +107,6 @@ public class Db2DbSupport extends DbSupport {
 
 
     /**
-     * Removes the table with the given name from the database. Note: the table name is surrounded with quotes, making
-     * it case-sensitive.
-     *
-     * @param tableName The table to drop (case-sensitive), not null
-     */
-    @Override
-    public void dropTable(String tableName) {
-        getSQLHandler().executeUpdate("drop table " + qualified(tableName));
-    }
-
-
-    /**
-     * Removes the view with the given name from the database Note: the view name is surrounded with quotes, making it
-     * case-sensitive.
-     *
-     * @param viewName The view to drop (case-sensitive), not null
-     */
-    @Override
-    public void dropView(String viewName) {
-        getSQLHandler().executeUpdate("drop view " + qualified(viewName));
-    }
-
-
-    /**
-     * Drops the type with the given name from the database Note: the type name is surrounded with quotes, making it
-     * case-sensitive.
-     *
-     * @param typeName The type to drop (case-sensitive), not null
-     */
-    @Override
-    public void dropType(String typeName) {
-        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName));
-    }
-
-
-    /**
      * Removes all referential constraints (e.g. foreign keys) on the specified table
      *
      * @param tableName The table, not null

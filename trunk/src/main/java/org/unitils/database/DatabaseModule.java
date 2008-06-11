@@ -79,48 +79,61 @@ import java.util.*;
  */
 public class DatabaseModule implements Module {
 
-    /* Property indicating if the database schema should be updated before performing the tests */
+    /**
+     * Property indicating if the database schema should be updated before performing the tests
+     */
     public static final String PROPERTY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
 
-    /* 
-    * Property indicating whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
-    * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
-    */
+    /**
+     * Property indicating whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
+     * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
+     */
     public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
-    /* Map holding the default configuration of the database module annotations */
-    private Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
+    /**
+     * Map holding the default configuration of the database module annotations
+     */
+    protected Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
-    /* The datasource instance */
-    private DataSource dataSource;
+    /**
+     * The datasources with the name as key
+     */
+    protected DataSource dataSource;
 
-    /* The configuration of Unitils */
-    private Properties configuration;
+    /**
+     * The configuration of Unitils
+     */
+    protected Properties configuration;
 
-    /* Indicates if the DBMaintainer should be invoked to update the database */
-    private boolean updateDatabaseSchemaEnabled;
+    /**
+     * Indicates if the DBMaintainer should be invoked to update the database
+     */
+    protected boolean updateDatabaseSchemaEnabled;
 
-    /* 
-    * Indicates whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
-    * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
-    */
-    private boolean wrapDataSourceInTransactionalProxy;
+    /**
+     * Indicates whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
+     * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
+     */
+    protected boolean wrapDataSourceInTransactionalProxy;
 
-    /* The transaction manager */
-    private UnitilsTransactionManager transactionManager;
+    /**
+     * The transaction manager
+     */
+    protected UnitilsTransactionManager transactionManager;
 
-    /* Set of possible providers of a spring <code>PlatformTransactionManager</code> */
-    private Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations
-            = new HashSet<UnitilsTransactionManagementConfiguration>();
+    /**
+     * Set of possible providers of a spring <code>PlatformTransactionManager</code>
+     */
+    protected Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations = new HashSet<UnitilsTransactionManagementConfiguration>();
 
-    /*
-      * Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
-      * If the spring module is not enabled, this object is null
-      */
-    private DatabaseSpringSupport databaseSpringSupport;
+    /**
+     * Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
+     * If the spring module is not enabled, this object is null
+     */
+    protected DatabaseSpringSupport databaseSpringSupport;
 
 
     /**
@@ -427,11 +440,13 @@ public class DatabaseModule implements Module {
 
 
     /**
+     * Utilitly method to get a configured instance of a given database task.
+     *
+     * @param databaseTaskType The type of database task, not null
      * @return A configured instance of {@link DatabaseTask} of the given type
      */
-    private <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
-        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration,
-                getDefaultSqlHandler());
+    protected <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
+        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler());
     }
 
 
@@ -444,6 +459,7 @@ public class DatabaseModule implements Module {
     }
 
 
+    // todo javadoc
     public void registerTransactionManagementConfiguration(UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
         transactionManagementConfigurations.add(transactionManagementConfiguration);
     }

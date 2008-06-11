@@ -15,19 +15,19 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
+import org.unitils.dbmaintainer.clean.DBCleaner;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SCHEMAS;
+import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.clean.DBCleaner;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 
 /**
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
@@ -82,11 +82,11 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      */
     @Override
     protected void doInit(Properties configuration) {
-        schemasToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SCHEMAS, configuration, false);
-        schemasToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_DATA_SCHEMAS, configuration, false));
-        tablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME, configuration, true);
-        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_TABLES, configuration, true));
-        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_DATA_TABLES, configuration, true));
+        schemasToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SCHEMAS, false);
+        schemasToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_DATA_SCHEMAS, false));
+        tablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME, true);
+        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_TABLES, true));
+        tablesToPreserve.addAll(getItemsToPreserve(PROPKEY_PRESERVE_DATA_TABLES, true));
     }
 
 
@@ -97,7 +97,7 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
     public void cleanSchemas() {
         for (DbSupport dbSupport : dbSupports) {
             // check whether schema needs to be preserved
-            if (schemasToPreserve.contains(dbSupport.getSchemaName())) {
+            if (isItemToPreserve(dbSupport.getSchemaName(), schemasToPreserve)) {
                 continue;
             }
             logger.info("Cleaning database schema " + dbSupport.getSchemaName());
@@ -105,7 +105,7 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
             Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {
                 // check whether table needs to be preserved
-                if (tablesToPreserve.contains(tableName) || tablesToPreserve.contains(dbSupport.getSchemaName() + "." + tableName)) {
+                if (isItemToPreserve(tableName, tablesToPreserve) || isItemToPreserve(dbSupport.getSchemaName() + "." + tableName, tablesToPreserve)) {
                     continue;
                 }
                 cleanTable(tableName, dbSupport);
@@ -129,19 +129,40 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
 
 
     /**
+     * Checks whether the given item is one of the items to preserve.
+     * This also handles identifiers that are stored in mixed case.
+     *
+     * @param item            The item, not null
+     * @param itemsToPreserve The items to preserve, not null
+     * @return True if item to preserve
+     */
+    protected boolean isItemToPreserve(String item, Set<String> itemsToPreserve) {
+        // ignore case when stored in mixed casing (e.g MS-Sql), otherwise we can't compare the item names
+        if (defaultDbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+            item = item.toUpperCase();
+        }
+        return itemsToPreserve.contains(item);
+    }
+
+
+    /**
      * Gets the list of items to preserve. The case is correct if necesary. Quoting an identifier
      * makes it case sensitive. If requested, the identifiers will be quailified with the default schema name if no
      * schema name is used as prefix.
      *
      * @param propertyName        The name of the property that defines the items, not null
-     * @param configuration       The config, not null
      * @param prefixDefaultSchema True to prefix item with default schema when needed
      * @return The set of items, not null
      */
-    protected Set<String> getItemsToPreserve(String propertyName, Properties configuration, boolean prefixDefaultSchema) {
+    protected Set<String> getItemsToPreserve(String propertyName, boolean prefixDefaultSchema) {
         Set<String> result = new HashSet<String>();
         List<String> itemsToPreserve = getStringList(propertyName, configuration);
         for (String itemToPreserve : itemsToPreserve) {
+            // ignore case when stored in mixed casing (e.g MS-Sql), otherwise we can't compare the item names
+            if (defaultDbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+                itemToPreserve = itemToPreserve.toUpperCase();
+            }
+
             String correctCaseitemToPreserve = defaultDbSupport.toCorrectCaseIdentifier(itemToPreserve);
             if (prefixDefaultSchema && correctCaseitemToPreserve.indexOf('.') == -1) {
                 correctCaseitemToPreserve = defaultDbSupport.getSchemaName() + "." + correctCaseitemToPreserve;

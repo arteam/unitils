@@ -15,15 +15,21 @@
  */
 package org.unitils.core.dbsupport;
 
+import org.unitils.core.UnitilsException;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Set;
 
 /**
- * todo review and test
- * <p/>
  * Implementation of {@link DbSupport} for a MsSQL database.
+ * <p/>
+ * Special thanks to Niki Driessen who donated the initial version of the Derby support code.
  *
- * @author Niki Driessen
  * @author Tim Ducheyne
+ * @author Niki Driessen
  * @author Filip Neven
  */
 public class MsSqlDbSupport extends DbSupport {
@@ -43,7 +49,7 @@ public class MsSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTableNames() {
-        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + getSchemaName() + "' and table_type = 'BASE TABLE'");
+        return getSQLHandler().getItemsAsStringSet("select t.name from sys.tables t, sys.schemas s where t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
     }
 
 
@@ -55,7 +61,7 @@ public class MsSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select c.name from sys.columns c, sys.tables t, sys.schemas s where c.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
     }
 
 
@@ -66,35 +72,52 @@ public class MsSqlDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getViewNames() {
-        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + getSchemaName() + "' and table_type = 'VIEW'");
+        return getSQLHandler().getItemsAsStringSet("select v.name from sys.views v, sys.schemas s where v.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
     }
 
 
     /**
-     * @param tableName  The table with the column, not null
-     * @param columnName The name of the column, not null
-     * @return The data type of the given column from the given table, not null
-     */
-    protected String getColumnDataType(String tableName, String columnName) {
-        // TODO provide cleaner implementation for data type handling
-        String dataType = getSQLHandler().getItemAsString("select data_type from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "' and column_name = '" + columnName + "'");
-        if (dataType.contains("char")) {
-            String length = getSQLHandler().getItemAsString("select character_maximum_length from information_schema.columns where table_name = '" + tableName + "' and column_name = '" + columnName + "'");
-            dataType = dataType + "(" + length + ")";
-        }
-        return dataType;
-    }
-
-
-    /**
-     * Removes the table with the given name from the database.
-     * Note: the table name is surrounded with quotes, making it case-sensitive.
+     * Retrieves the names of all synonyms in the database schema.
      *
-     * @param tableName The table to drop (case-sensitive), not null
+     * @return The names of all synonyms in the database
      */
     @Override
-    public void dropTable(String tableName) {
-        getSQLHandler().executeUpdate("drop table " + qualified(tableName));
+    public Set<String> getSynonymNames() {
+        return getSQLHandler().getItemsAsStringSet("select o.name from sys.synonyms o, sys.schemas s where o.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Retrieves the names of all the triggers in the database schema.
+     *
+     * @return The names of all triggers in the database
+     */
+    @Override
+    public Set<String> getTriggerNames() {
+        return getSQLHandler().getItemsAsStringSet("select t.name from sys.triggers t, sys.all_objects o, sys.schemas s where t.parent_id = o.object_id and o.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Retrieves the names of all the types in the database schema.
+     *
+     * @return The names of all types in the database
+     */
+    @Override
+    public Set<String> getTypeNames() {
+        return getSQLHandler().getItemsAsStringSet("select t.name from sys.types t, sys.schemas s where t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    }
+
+
+    /**
+     * Gets the names of all identity columns of the given table.
+     *
+     * @param tableName The table, not null
+     * @return The names of the identity columns of the table with the given name
+     */
+    @Override
+    public Set<String> getIdentityColumnNames(String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select i.name from sys.identity_columns i, sys.tables t, sys.schemas s where i.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
     }
 
 
@@ -106,7 +129,7 @@ public class MsSqlDbSupport extends DbSupport {
     @Override
     public void removeReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select f.name from sys.foreign_keys f, sys.tables t, sys.schemas s where f.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
@@ -121,26 +144,139 @@ public class MsSqlDbSupport extends DbSupport {
     @Override
     public void removeValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        // TODO Also take schema name into account
-        // todo also remove check and unique constraints
-        // Retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
-        Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select c.name from sysindexes i join sysobjects o ON i.id = o.id " +
-                "join sysobjects pk ON i.name = pk.name AND pk.parent_obj = i.id AND pk.xtype = 'PK' " +
-                "join sysindexkeys ik on i.id = ik.id and i.indid = ik.indid " +
-                "join syscolumns c ON ik.id = c.id AND ik.colid = c.colid " +
-                "where o.name = '" + tableName + "' ");
 
-        Set<String> notNullColumnNames = sqlHandler.getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
-        for (String notNullColumnName : notNullColumnNames) {
-            if (primaryKeyColumnNames.contains(notNullColumnName)) {
-                // Do not remove PK constraints
-                continue;
+        // disable all unique constraints
+        Set<String> keyConstraintNames = sqlHandler.getItemsAsStringSet("select k.name from sys.key_constraints k, sys.tables t, sys.schemas s where k.type = 'UQ' and k.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+        for (String keyConstraintName : keyConstraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(keyConstraintName));
+        }
+
+        // disable all check constraints
+        Set<String> checkConstraintNames = sqlHandler.getItemsAsStringSet("select c.name from sys.check_constraints c, sys.tables t, sys.schemas s where c.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+        for (String checkConstraintName : checkConstraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(checkConstraintName));
+        }
+
+        // disable all not null constraints
+        disableNotNullConstraints(tableName);
+    }
+
+
+    /**
+     * Increments the identity value for the specified identity column on the specified table to the given value. If
+     * there is no identity specified on the given primary key, the method silently finishes without effect.
+     *
+     * @param tableName          The table with the identity column, not null
+     * @param identityColumnName The column, not null
+     * @param identityValue      The new value
+     */
+    @Override
+    public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
+        // there can only be 1 identity column per table 
+        getSQLHandler().executeUpdate("DBCC CHECKIDENT ('" + qualified(tableName) + "', reseed, " + identityValue + ")");
+    }
+
+
+    /**
+     * Synonyms are supported.
+     *
+     * @return True
+     */
+    @Override
+    public boolean supportsSynonyms() {
+        return true;
+    }
+
+
+    /**
+     * Triggers are supported.
+     *
+     * @return True
+     */
+    @Override
+    public boolean supportsTriggers() {
+        return true;
+    }
+
+
+    /**
+     * Types are supported
+     *
+     * @return true
+     */
+    @Override
+    public boolean supportsTypes() {
+        return true;
+    }
+
+
+    /**
+     * Identity columns are supported.
+     *
+     * @return True
+     */
+    @Override
+    public boolean supportsIdentityColumns() {
+        return true;
+    }
+
+
+    /**
+     * Disables not-null constraints on the given table.
+     * <p/>
+     * For primary keys, row-guid, identity and computed columns not-null constrains cannot be disabled in MS-Sql.
+     *
+     * @param tableName The table, not null
+     */
+    protected void disableNotNullConstraints(String tableName) {
+        SQLHandler sqlHandler = getSQLHandler();
+
+        // retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
+        Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select c.name from sys.key_constraints k, sys.index_columns i, sys.columns c, sys.tables t, sys.schemas s " +
+                "where k.type = 'PK' and i.index_id = k.unique_index_id and i.column_id = c.column_id " +
+                "  and c.object_id = t.object_id and k.parent_object_id = t.object_id and i.object_id = t.object_id " +
+                "  and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = sqlHandler.getDataSource().getConnection();
+            statement = connection.createStatement();
+
+            // get all not-null columns but not row-guid, identity and computed columns (these cannot be altered in MS-Sql)
+            resultSet = statement.executeQuery("select c.name column_name, upper(y.name) data_type, c.max_length, c.precision from sys.types y, sys.columns c, sys.tables t, sys.schemas s " +
+                    "where c.is_nullable = 0 and c.is_rowguidcol = 0 and c.is_identity = 0 and c.is_computed = 0 " +
+                    "  and y.user_type_id = c.user_type_id and c.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+
+            while (resultSet.next()) {
+                String columnName = resultSet.getString("column_name");
+                if (primaryKeyColumnNames.contains(columnName)) {
+                    // skip primary key columns
+                    continue;
+                }
+
+                String dataType = resultSet.getString("data_type");
+                if ("TIMESTAMP".equals(dataType)) {
+                    // timestamp columns cannot be altered in MS-Sql
+                    continue;
+                }
+                // handle data types that require a length and precision
+                if ("NUMERIC".equals(dataType) || "DECIMAL".equals(dataType)) {
+                    String maxLength = resultSet.getString("max_length");
+                    String precision = resultSet.getString("precision");
+                    dataType += "(" + maxLength + ", " + precision + ")";
+                } else if (dataType.contains("CHAR")) {
+                    String maxLength = resultSet.getString("max_length");
+                    dataType += "(" + maxLength + ")";
+                }
+                // remove the not-null constraint
+                sqlHandler.executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " " + dataType + " null");
             }
-            String dataType = getColumnDataType(tableName, notNullColumnName);
-            //MS SQL doesn't support "altering" column of type "text"
-            if (!dataType.equalsIgnoreCase("text")) {
-                sqlHandler.executeUpdate("ALTER TABLE " + qualified(tableName) + " alter column " + quoted(notNullColumnName) + " " + dataType + " NULL");
-            }
+        } catch (Exception e) {
+            throw new UnitilsException("Error while disabling not null constraints. Table name: " + tableName, e);
+        } finally {
+            closeQuietly(connection, statement, resultSet);
         }
     }
 

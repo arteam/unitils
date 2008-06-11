@@ -170,6 +170,8 @@ public class OracleDbSupport extends DbSupport {
     /**
      * Drops the type with the given name from the database
      * Note: the type name is surrounded with quotes, making it case-sensitive.
+     * <p/>
+     * Overriden to add the force option. This will make sure that super-types can also be dropped.
      *
      * @param typeName The type to drop (case-sensitive), not null
      */
@@ -231,27 +233,27 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void incrementSequenceToValue(String sequenceName, long newSequenceValue) {
-        Connection conn = null;
-        ResultSet rs = null;
-        Statement st = null;
+        Connection connection = null;
+        ResultSet resultSet = null;
+        Statement statement = null;
         try {
-            conn = getSQLHandler().getDataSource().getConnection();
-            st = conn.createStatement();
-            rs = st.executeQuery("select LAST_NUMBER, INCREMENT_BY from ALL_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "' and SEQUENCE_OWNER = '" + getSchemaName() + "'");
-            while (rs.next()) {
-                long lastNumber = rs.getLong("LAST_NUMBER");
-                long incrementBy = rs.getLong("INCREMENT_BY");
-                String sqlChangeIncrement = "alter sequence " + qualified(sequenceName) + " increment by " + (newSequenceValue - lastNumber);
-                getSQLHandler().executeUpdate(sqlChangeIncrement);
-                String sqlNextSequenceValue = "select " + qualified(sequenceName) + ".NEXTVAL from DUAL";
-                getSQLHandler().executeUpdate(sqlNextSequenceValue);
-                String sqlResetIncrement = "alter sequence " + qualified(sequenceName) + " increment by " + incrementBy;
-                getSQLHandler().executeUpdate(sqlResetIncrement);
+            connection = getSQLHandler().getDataSource().getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("select LAST_NUMBER, INCREMENT_BY from ALL_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "' and SEQUENCE_OWNER = '" + getSchemaName() + "'");
+            while (resultSet.next()) {
+                long lastNumber = resultSet.getLong("LAST_NUMBER");
+                long incrementBy = resultSet.getLong("INCREMENT_BY");
+                // change the increment
+                getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " increment by " + (newSequenceValue - lastNumber));
+                // select the increment
+                getSQLHandler().executeUpdate("select " + qualified(sequenceName) + ".NEXTVAL from DUAL");
+                // set back old increment
+                getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " increment by " + incrementBy);
             }
         } catch (SQLException e) {
             throw new UnitilsException("Error while incrementing sequence to value", e);
         } finally {
-            closeQuietly(conn, st, rs);
+            closeQuietly(connection, statement, resultSet);
         }
     }
 
@@ -335,6 +337,17 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
+     * Cascade are supported.
+     *
+     * @return True
+     */
+    @Override
+    public boolean supportsCascade() {
+        return true;
+    }
+
+
+    /**
      * @return Whether or not this version of the Oracle database that is used supports the purge keyword. This is,
      *         whether or not an Oracle database of version 10 or higher is used.
      */
@@ -348,15 +361,15 @@ public class OracleDbSupport extends DbSupport {
      */
     protected Integer getOracleMajorVersionNumber() {
         if (oracleMajorVersionNumber == null) {
-            Connection conn = null;
+            Connection connection = null;
             try {
-                conn = getSQLHandler().getDataSource().getConnection();
-                DatabaseMetaData metaData = conn.getMetaData();
+                connection = getSQLHandler().getDataSource().getConnection();
+                DatabaseMetaData metaData = connection.getMetaData();
                 oracleMajorVersionNumber = metaData.getDatabaseMajorVersion();
             } catch (SQLException e) {
                 throw new UnitilsException("Unable to determine database major version", e);
             } finally {
-                closeQuietly(conn);
+                closeQuietly(connection);
             }
         }
         return oracleMajorVersionNumber;
