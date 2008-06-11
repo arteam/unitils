@@ -18,6 +18,7 @@ package org.unitils.reflectionassert;
 import junit.framework.TestCase;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.Difference;
+import org.unitils.reflectionassert.difference.MapDifference;
 import static org.unitils.reflectionassert.util.InnerDifferenceFinder.getInnerDifference;
 
 import java.util.HashMap;
@@ -122,16 +123,24 @@ public class ReflectionComparatorMapTest extends TestCase {
 
 
     /**
+     * Test for two maps that have a different size. The first element was removed from the left map
+     */
+    public void testGetDifference_notEqualsLeftElementRemoved() {
+        mapA.remove("key 1");
+        Difference result = reflectionComparator.getDifference(mapA, mapB);
+
+        assertEquals("key 1", ((MapDifference) result).getRightMissingKeys().get(0));
+    }
+
+
+    /**
      * Test for two maps that have a different size. The first element was removed from the right map
      */
     public void testGetDifference_notEqualsRightElementRemoved() {
         mapB.remove("key 1");
-
         Difference result = reflectionComparator.getDifference(mapA, mapB);
 
-        Difference difference = getInnerDifference("key 1", result);
-        assertEquals("test 1", ((Element) difference.getLeftValue()).getString());
-        assertEquals(null, difference.getRightValue());
+        assertEquals("key 1", ((MapDifference) result).getLeftMissingKeys().get(0));
     }
 
 
