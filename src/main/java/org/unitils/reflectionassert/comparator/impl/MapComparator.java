@@ -70,7 +70,7 @@ public class MapComparator implements Comparator {
         Map<Object, Object> rightCopy = new HashMap<Object, Object>(rightMap);
 
         ReflectionComparator keyReflectionComparator = createRefectionComparator();
-        MapDifference difference = new MapDifference("Different elements", left, right);
+        MapDifference difference = new MapDifference("Different elements", left, right, leftMap, rightMap);
 
         for (Map.Entry<?, ?> leftEntry : leftMap.entrySet()) {
             Object leftKey = leftEntry.getKey();
@@ -102,17 +102,15 @@ public class MapComparator implements Comparator {
             }
 
             if (!found) {
-                difference.addValueDifference(leftKey, new Difference("Left element not found in right map", leftValue, null));
+                difference.addLeftMissingKey(leftKey);
             }
         }
 
-        for (Map.Entry<?, ?> rightEntry : rightCopy.entrySet()) {
-            Object rightKey = rightEntry.getKey();
-            Object rightValue = rightEntry.getValue();
-            difference.addValueDifference(rightKey, new Difference("Right element not found in left map", null, rightValue));
+        for (Object rightKey : rightCopy.keySet()) {
+            difference.addRightMissingKey(rightKey);
         }
 
-        if (difference.getValueDifferences().isEmpty()) {
+        if (difference.getValueDifferences().isEmpty() && difference.getLeftMissingKeys().isEmpty() && difference.getRightMissingKeys().isEmpty()) {
             return null;
         }
         return difference;

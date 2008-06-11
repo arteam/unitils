@@ -103,16 +103,13 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
 
         List<?> leftList = collectionDifference.getLeftList();
         List<?> rightList = collectionDifference.getRightList();
-        if (leftList.size() > rightList.size()) {
-            for (int leftIndex = rightList.size(); leftIndex < leftList.size(); leftIndex++) {
-                String innerFieldName = createFieldName(fieldName, "[" + leftIndex + "]", false);
-                result.append(formatValues(innerFieldName, leftList.get(leftIndex), ""));
-            }
-        } else if (rightList.size() > leftList.size()) {
-            for (int rightIndex = leftList.size(); rightIndex < rightList.size(); rightIndex++) {
-                String innerFieldName = createFieldName(fieldName, "[" + rightIndex + "]", false);
-                result.append(formatValues(innerFieldName, "", rightList.get(rightIndex)));
-            }
+        for (Integer leftIndex : collectionDifference.getLeftMissingIndexes()) {
+            String innerFieldName = createFieldName(fieldName, "[" + leftIndex + "]", false);
+            result.append(formatValues(innerFieldName, leftList.get(leftIndex), ""));
+        }
+        for (Integer rightIndex : collectionDifference.getRightMissingIndexes()) {
+            String innerFieldName = createFieldName(fieldName, "[" + rightIndex + "]", false);
+            result.append(formatValues(innerFieldName, "", rightList.get(rightIndex)));
         }
         return result.toString();
     }
@@ -130,6 +127,17 @@ public class DefaultDifferenceFormatter implements DifferenceFormatter {
         for (Map.Entry<Object, Difference> valueDifference : mapDifference.getValueDifferences().entrySet()) {
             String innerFieldName = createFieldName(fieldName, objectFormatter.format(valueDifference.getKey()), true);
             result.append(valueDifference.getValue().accept(differenceFormatterVisitor, innerFieldName));
+        }
+
+        Map<?, ?> leftMap = mapDifference.getLeftMap();
+        Map<?, ?> rightMap = mapDifference.getRightMap();
+        for (Object leftKey : mapDifference.getLeftMissingKeys()) {
+            String innerFieldName = createFieldName(fieldName, objectFormatter.format(leftKey), true);
+            result.append(formatValues(innerFieldName, leftMap.get(leftKey), ""));
+        }
+        for (Object rightKey : mapDifference.getRightMissingKeys()) {
+            String innerFieldName = createFieldName(fieldName, objectFormatter.format(rightKey), true);
+            result.append(formatValues(innerFieldName, rightMap.get(rightKey), ""));
         }
         return result.toString();
     }

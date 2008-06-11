@@ -86,11 +86,18 @@ public class CollectionComparator implements Comparator {
         }
 
         // check for missing elements 
-        if (leftIterator.hasNext() || rightIterator.hasNext()) {
-            return difference;
+        int leftElementIndex = elementIndex;
+        while (leftIterator.hasNext()) {
+            leftIterator.next();
+            difference.addLeftMissingIndex(++leftElementIndex);
+        }
+        int rightElementIndex = elementIndex;
+        while (rightIterator.hasNext()) {
+            rightIterator.next();
+            difference.addRightMissingIndex(++rightElementIndex);
         }
 
-        if (difference.getElementDifferences().isEmpty()) {
+        if (difference.getElementDifferences().isEmpty() && difference.getLeftMissingIndexes().isEmpty() && difference.getRightMissingIndexes().isEmpty()) {
             return null;
         }
         return difference;
