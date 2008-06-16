@@ -49,7 +49,8 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public Set<String> getTableNames() {
         // all_tables also contains the materialized views: don't return these
-        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from ALL_TABLES where OWNER = '" + getSchemaName() + "' minus select MVIEW_NAME from ALL_MVIEWS where OWNER = '" + getSchemaName() + "'");
+        // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
+        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from ALL_TABLES where OWNER = '" + getSchemaName() + "' and TABLE_NAME not like 'BIN$%' minus select MVIEW_NAME from ALL_MVIEWS where OWNER = '" + getSchemaName() + "'");
     }
 
 
@@ -116,7 +117,8 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public Set<String> getTriggerNames() {
-        return getSQLHandler().getItemsAsStringSet("select TRIGGER_NAME from ALL_TRIGGERS where OWNER = '" + getSchemaName() + "'");
+        // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
+        return getSQLHandler().getItemsAsStringSet("select TRIGGER_NAME from ALL_TRIGGERS where OWNER = '" + getSchemaName() + "' and TRIGGER_NAME not like 'BIN$%'");
     }
 
 
@@ -189,7 +191,8 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public void removeReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "'");
+        // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
@@ -204,7 +207,8 @@ public class OracleDbSupport extends DbSupport {
     @Override
     public void removeValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "'");
+        // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%'");
         for (String constraintName : constraintNames) {
             sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
