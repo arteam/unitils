@@ -392,6 +392,8 @@ public class DbUnitModule implements Module {
         config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
         // Make sure that batched statements are used to insert the data into the database
         config.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, "true");
+        // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)
+        config.setProperty("http://www.dbunit.org/features/skipOracleRecycleBinTables", "true");
 
         return connection;
     }
