@@ -60,7 +60,6 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      * Method that is invoked by DBUnit when the connection is no longer needed. This method is not implemented,
      * connections are 'closed' (returned to the connection pool) after every DBUnit operation
      */
-    @Override
     public void close() throws SQLException {
         // Nothing to be done. Connections are closed (i.e. returned to the pool) after every dbUnit operation
     }
@@ -69,7 +68,6 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
     /**
      * @return The database schema name
      */
-    @Override
     public String getSchema() {
         return schemaName;
     }
@@ -82,7 +80,6 @@ public class DbUnitDatabaseConnection extends AbstractDatabaseConnection {
      *
      * @return A JDBC connection
      */
-    @Override
     public Connection getConnection() throws SQLException {
         if (currentlyUsedConnection == null) {
             currentlyUsedConnection = DataSourceUtils.getConnection(dataSource);
