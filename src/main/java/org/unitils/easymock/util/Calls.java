@@ -31,7 +31,7 @@ public enum Calls {
     DEFAULT,
 
     /**
-     * Accept unexpected method calls. Return default values (null, 0…) for unexpected non-void method calls
+     * Accept unexpected method calls. Return default values (null, 0) for unexpected non-void method calls
      */
     LENIENT,
 
