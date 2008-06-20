@@ -356,8 +356,8 @@ before each of the test methods so changing the test data will not cause problem
 tests into multiple test classes (see <a href="#a2.5">Keep your test fixture simple</a>). Because not all
 test data is used by every test, splitting up tests will also avoid creation of too much unused test data.</p>
 
-<p>Note: When using JUnit 3, do not forget to call super.setUp(), since superclasses can setting up in the
-setUp() method.</p>
+<p>Note: When using JUnit 3, do not forget to call super.setUp(), since superclasses can perform initialization in the
+setUp() method. If your forget the call to super.setUp(), this initialization will be omitted.</p>
 
 
 <h4>Examples</h4>
