@@ -17,7 +17,6 @@ package org.unitils.dbmaintainer.script.impl;
 
 import static org.junit.Assert.*;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -29,10 +28,10 @@ import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.version.Version;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDeleteOnExit;
+import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyFile;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.io.IOException;
 
 import static java.lang.Long.MAX_VALUE;
 import java.util.List;
@@ -115,16 +114,20 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
 					+ "/test_scripts/1_scripts/001_scriptA.sql");
 			duplicateIndexScript = new File(scriptsDirName
 					+ "/test_scripts/1_scripts/001_duplicateIndexScript.sql");
-			FileUtils.copyFile(scriptA, duplicateIndexScript);
+			copyFile(scriptA, duplicateIndexScript);
 			try {
 				defaultScriptSource.getAllScripts();
 				fail("Expected a UnitilsException because of a duplicate script");
 			} catch (UnitilsException e) {
 				// expected
 			}
-		} finally {
-			FileUtils.deleteQuietly(duplicateIndexScript);
-		}
+        } finally {
+            try {
+                duplicateIndexScript.delete();
+            } catch(Exception e) {
+                // Safely ignore NPE or any IOException...
+            }
+        }
     }
 
 
