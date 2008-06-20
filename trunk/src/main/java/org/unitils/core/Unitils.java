@@ -223,12 +223,41 @@ public class Unitils {
      */
     private class UnitilsTestListener extends TestListener {
 
-        @Override
+
+		@Override
+		public void beforeTestClass(Class<?> testClass) {
+			TestContext testContext = getTestContext();
+            testContext.setTestClass(testClass);
+            testContext.setTestObject(null);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).beforeTestClass(testClass);
+            }
+		}
+		
+		
+		@Override
+		public void afterCreateTestObject(Object testObject) {
+			TestContext testContext = getTestContext();
+            testContext.setTestClass(testObject.getClass());
+            testContext.setTestObject(testObject);
+            testContext.setTestMethod(null);
+
+            List<Module> modules = modulesRepository.getModules();
+            for (Module module : modules) {
+                modulesRepository.getTestListener(module).afterCreateTestObject(testObject);
+            }
+		}
+
+
+		@Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             TestContext testContext = getTestContext();
             testContext.setTestClass(testObject.getClass());
             testContext.setTestObject(testObject);
-            testContext.setTestMethod(null);
+            testContext.setTestMethod(testMethod);
 
             List<Module> modules = modulesRepository.getModules();
             for (Module module : modules) {
