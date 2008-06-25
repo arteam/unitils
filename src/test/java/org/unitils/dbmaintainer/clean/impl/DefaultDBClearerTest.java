@@ -486,7 +486,7 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
         dropTestSynonyms(dbSupport, "test_synonym", "\"Test_CASE_Synonym\"");
         dropTestViews(dbSupport, "test_view", "\"Test_CASE_View\"");
         dropTestTriggers(dbSupport, "test_trigger", "\"Test_CASE_Trigger\"");
-        dropTestTables(dbSupport, "\"Test_CASE_Table\"", "test_table");
+        dropTestTables(dbSupport, "\"Test_CASE_Table\"", "test_table", versionTableName);
         dropTestTypes(dbSupport, "test_type", "\"Test_CASE_Type\"");
     }
 }
