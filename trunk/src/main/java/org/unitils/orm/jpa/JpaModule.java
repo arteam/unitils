@@ -30,6 +30,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.orm.common.OrmModule;
@@ -39,7 +40,6 @@ import org.unitils.orm.jpa.util.JpaAnnotationConfigLoader;
 import org.unitils.orm.jpa.util.JpaConfig;
 import org.unitils.orm.jpa.util.JpaEntityManagerFactoryLoader;
 import org.unitils.orm.jpa.util.JpaProviderSupport;
-import org.unitils.util.ConfigUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -105,7 +105,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     	super.init(configuration);
     	
         String persistenceProviderImplClassName = getString(PROPKEY_PERSISTENCE_PROVIDER, configuration);
-        jpaProviderSupport = ConfigUtils.getConfiguredInstance(JpaProviderSupport.class, configuration, persistenceProviderImplClassName);
+        jpaProviderSupport = ConfigUtils.getInstanceOf(JpaProviderSupport.class, configuration, persistenceProviderImplClassName);
     }
     
 

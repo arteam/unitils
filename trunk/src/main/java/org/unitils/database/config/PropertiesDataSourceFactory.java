@@ -35,16 +35,16 @@ public class PropertiesDataSourceFactory implements DataSourceFactory {
     private static Log logger = LogFactory.getLog(PropertiesDataSourceFactory.class);
 
     /* Propery key of the database driver class name */
-    private static final String PROPKEY_DATASOURCE_DRIVERCLASSNAME = "database.driverClassName";
+    public static final String PROPKEY_DATASOURCE_DRIVERCLASSNAME = "database.driverClassName";
 
     /* Property key of the datasource url */
-    private static final String PROPKEY_DATASOURCE_URL = "database.url";
+    public static final String PROPKEY_DATASOURCE_URL = "database.url";
 
     /* Property key of the datasource connect username */
-    private static final String PROPKEY_DATASOURCE_USERNAME = "database.userName";
+    public static final String PROPKEY_DATASOURCE_USERNAME = "database.userName";
 
     /* Property key of the datasource connect password */
-    private static final String PROPKEY_DATASOURCE_PASSWORD = "database.password";
+    public static final String PROPKEY_DATASOURCE_PASSWORD = "database.password";
 
     /* The name of the <code>java.sql.Driver</code> class. */
     private String driverClassName;

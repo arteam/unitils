@@ -26,8 +26,13 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
@@ -39,7 +44,6 @@ import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import static org.unitils.util.ModuleUtils.*;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
@@ -378,7 +382,7 @@ public class DbUnitModule implements Module {
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
         // A DbSupport instance is fetched in order to get the schema name in correct case
         DataSource dataSource = getDatabaseModule().getDataSource();
-        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
 
         // Create connection
@@ -386,7 +390,7 @@ public class DbUnitModule implements Module {
         DatabaseConfig config = connection.getConfig();
 
         // Make sure that dbunit's correct IDataTypeFactory, that handles dbms specific data type issues, is used
-        IDataTypeFactory dataTypeFactory = (IDataTypeFactory) getConfiguredInstance(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
+        IDataTypeFactory dataTypeFactory = (IDataTypeFactory) getInstanceOf(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
         config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         // Make sure that table and column names are escaped using the dbms-specific identifier quote string
         config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
@@ -495,8 +499,7 @@ public class DbUnitModule implements Module {
      * @return The data set resolver, as configured in the Unitils configuration
      */
     protected DataSetResolver getDataSetResolver() {
-        DataSetResolver dataSetResolver = getConfiguredInstance(DataSetResolver.class, configuration);
-        dataSetResolver.init(configuration);
+        DataSetResolver dataSetResolver = ConfigUtils.getConfiguredInstanceOf(DataSetResolver.class, configuration);
         return dataSetResolver;
     }
 
@@ -506,7 +509,7 @@ public class DbUnitModule implements Module {
      */
     protected DbSupport getDefaultDbSupport() {
         DataSource dataSource = getDatabaseModule().getDataSource();
-        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
     }
 

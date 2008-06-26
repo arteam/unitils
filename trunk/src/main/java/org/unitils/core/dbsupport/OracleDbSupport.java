@@ -194,7 +194,7 @@ public class OracleDbSupport extends DbSupport {
         // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%'");
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
         }
     }
 
@@ -210,7 +210,7 @@ public class OracleDbSupport extends DbSupport {
         // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%'");
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
         }
     }
 

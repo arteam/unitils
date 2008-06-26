@@ -16,7 +16,7 @@
 package org.unitils.dbmaintainer.structure;
 
 
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.DatabaseAccessing;
 
 /**
  * A task for disabling all foreign key, check and not-null constraints on a database schema.
@@ -26,7 +26,7 @@ import org.unitils.dbmaintainer.util.DatabaseTask;
  * @author Tim Ducheyne
  * @author Bart Vermeiren
  */
-public interface ConstraintsDisabler extends DatabaseTask {
+public interface ConstraintsDisabler extends DatabaseAccessing {
 
 
     /**

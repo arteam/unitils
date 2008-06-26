@@ -15,10 +15,11 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.unitils.dbmaintainer.util.DatabaseTask;
-import org.unitils.dbmaintainer.version.Version;
-
 import java.util.List;
+import java.util.Set;
+
+import org.unitils.core.util.Configurable;
+import org.unitils.dbmaintainer.version.Version;
 
 /**
  * A source that provides scripts for updating the database to a given state.
@@ -26,38 +27,29 @@ import java.util.List;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface ScriptSource extends DatabaseTask {
+public interface ScriptSource extends Configurable {
 
 
     /**
-     * Returns the highest version of the scripts, i.e. the Version object as it would
-     * be returned by a database that is up-to-date with the current script base.
-     *
-     * @return the current version of the scripts
+     * @return a list of all available update scripts, in the order in which they must be executed on the database. 
+     * These scripts can be used to completely recreate the database from scratch. Not null
      */
-    Version getHighestVersion();
+    List<Script> getAllUpdateScripts();
 
 
     /**
-     * Gets a list of all available update scripts. These scripts can be used to completely recreate the
-     * database from scratch, not null.
+     * Returns a list of scripts including the ones that:
+     * <ol><li>have a higher version than the given version</li>
+     * <li>are unversioned, and they weren't yet applied on the database</li>
+     * <li>are unversioned, and their contents differ from the one currently applied to the database</li>
      * <p/>
      * The scripts are returned in the order in which they should be executed.
      *
-     * @return all available database update scripts, not null
+     * @param highestExecutedScriptVersion The highest version of the versioned scripts that were already applied to the database
+     * @param alreadyExecutedScripts The scripts which were already executed on the database
+     * @return The new scripts.
      */
-    List<Script> getAllScripts();
-
-
-    /**
-     * Returns a list of scripts with a higher index or timestamp than the given version.
-     * <p/>
-     * The scripts are returned in the order in which they should be executed.
-     *
-     * @param currentVersion The start version, not null
-     * @return The scripts that have a higher index of timestamp than the start version, not null.
-     */
-    List<Script> getNewScripts(Version currentVersion);
+    List<Script> getNewScripts(Version highestExecutedScriptVersion, Set<ExecutedScript> alreadyExecutedScripts);
 
 
     /**
@@ -66,9 +58,10 @@ public interface ScriptSource extends DatabaseTask {
      * the given version.
      *
      * @param currentVersion The current database version, not null
+     * @param alreadyExecutedScripts 
      * @return True if an existing script has been modified, false otherwise
      */
-    boolean isExistingScriptModified(Version currentVersion);
+    boolean isExistingIndexedScriptModified(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts);
 
 
     /**

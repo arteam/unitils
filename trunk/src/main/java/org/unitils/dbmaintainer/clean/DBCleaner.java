@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.DatabaseAccessing;
 
 /**
  * Defines the contract for implementations that delete data from the database, that could cause problems when performing
@@ -24,7 +24,7 @@ import org.unitils.dbmaintainer.util.DatabaseTask;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DBCleaner extends DatabaseTask {
+public interface DBCleaner extends DatabaseAccessing {
 
 
     /**

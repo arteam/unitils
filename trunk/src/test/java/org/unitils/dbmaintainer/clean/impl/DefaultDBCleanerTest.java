@@ -23,8 +23,10 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.core.util.SQLTestUtils.dropTestViews;
 import static org.unitils.database.SQLUnitils.executeUpdate;
@@ -64,7 +66,7 @@ public class DefaultDBCleanerTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         // items to preserve

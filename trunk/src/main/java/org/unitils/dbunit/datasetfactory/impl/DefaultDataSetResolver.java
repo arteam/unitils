@@ -16,6 +16,7 @@
 package org.unitils.dbunit.datasetfactory.impl;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.core.util.BaseConfigurable;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
 import static org.unitils.util.PropertyUtils.getBoolean;

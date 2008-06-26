@@ -25,8 +25,10 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.database.SQLUnitils.executeUpdate;
@@ -75,7 +77,7 @@ public class SequenceUpdaterTest extends UnitilsJUnit4 {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
 
-        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler);
         dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 

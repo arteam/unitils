@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.util.PropertyUtils;
@@ -81,7 +82,7 @@ public class DefaultDBCleanerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 
 		// configure 3 schemas
 		configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
-		SQLHandler sqlHandler = new SQLHandler(dataSource);
+		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
 		dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 		// items to preserve
 		configuration.setProperty(PROPKEY_PRESERVE_DATA_SCHEMAS, "schema_c");

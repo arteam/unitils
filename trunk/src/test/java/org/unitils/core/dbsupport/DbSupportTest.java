@@ -63,7 +63,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         cleanupTestDatabase();

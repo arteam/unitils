@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.DatabaseAccessing;
 
 
 /**
@@ -24,14 +24,14 @@ import org.unitils.dbmaintainer.util.DatabaseTask;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface ScriptRunner extends DatabaseTask {
+public interface ScriptRunner extends DatabaseAccessing {
 
 
     /**
      * Executes the given script
      *
-     * @param script The script, not null
+     * @param script A handle that provides access to the content of the script, not null
      */
-    void execute(Script script);
+    void execute(ScriptContentHandle scriptContentHandle);
 
 }

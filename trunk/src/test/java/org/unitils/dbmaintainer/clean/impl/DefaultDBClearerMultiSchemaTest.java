@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
@@ -86,7 +87,7 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 
 		// configure 3 schemas
 		configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
-		SQLHandler sqlHandler = new SQLHandler(dataSource);
+		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
 		dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC");
 		dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A");
 		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B");

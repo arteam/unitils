@@ -17,21 +17,22 @@ package org.unitils.dbmaintainer.util;
 
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
+import org.unitils.core.dbsupport.SQLHandler;
+
 import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupports;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
 
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Properties;
 
 /**
- * Base class for a database task.
+ * Base class for implementations that access the test database
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-abstract public class BaseDatabaseTask implements DatabaseTask {
+abstract public class BaseDatabaseAccessor implements DatabaseAccessing {
 
     /**
      * The unitils configuration

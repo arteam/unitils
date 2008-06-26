@@ -20,7 +20,9 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
@@ -28,6 +30,8 @@ import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
+
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import static org.unitils.database.util.TransactionMode.*;
 import org.unitils.database.util.spring.DatabaseSpringSupport;
 import org.unitils.dbmaintainer.DBMaintainer;
@@ -37,9 +41,8 @@ import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.DatabaseAccessing;
 import static org.unitils.util.AnnotationUtils.*;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
 import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
@@ -198,7 +201,7 @@ public class DatabaseModule implements Module {
      */
     public UnitilsTransactionManager getTransactionManager() {
         if (transactionManager == null) {
-            transactionManager = getConfiguredInstance(UnitilsTransactionManager.class, configuration);
+            transactionManager = getInstanceOf(UnitilsTransactionManager.class, configuration);
             transactionManager.init(transactionManagementConfigurations, databaseSpringSupport);
         }
         return transactionManager;
@@ -251,8 +254,8 @@ public class DatabaseModule implements Module {
      * the database version is not yet set to the current one. This method can also be useful for example for
      * reinitializing the database after having reorganized the scripts folder.
      */
-    public void setDatabaseToCurrentVersion() {
-        setDatabaseToCurrentVersion(getDefaultSqlHandler());
+    public void resetDatabaseState() {
+        resetDatabaseState(getDefaultSqlHandler());
     }
 
 
@@ -262,11 +265,11 @@ public class DatabaseModule implements Module {
      * the database version is not yet set to the current one. This method can also be useful for example for
      * reinitializing the database after having reorganized the scripts folder.
      *
-     * @param sqlHandler The {@link SQLHandler} to which all commands are issued
+     * @param sqlHandler The {@link DefaultSQLHandler} to which all commands are issued
      */
-    public void setDatabaseToCurrentVersion(SQLHandler sqlHandler) {
+    public void resetDatabaseState(SQLHandler sqlHandler) {
         DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
-        dbMaintainer.setDatabaseToCurrentVersion();
+        dbMaintainer.resetDatabaseState();
     }
 
 
@@ -294,13 +297,13 @@ public class DatabaseModule implements Module {
      */
     protected DataSource createDataSource() {
         // Get the factory for the data source and create it
-        DataSourceFactory dataSourceFactory = getConfiguredInstance(DataSourceFactory.class, configuration);
+        DataSourceFactory dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
         DataSource dataSource = dataSourceFactory.createDataSource();
 
         // Call the database maintainer if enabled
         if (updateDatabaseSchemaEnabled) {
-            updateDatabase(new SQLHandler(dataSource));
+            updateDatabase(new DefaultSQLHandler(dataSource));
         }
         return dataSource;
     }
@@ -440,12 +443,11 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * Utilitly method to get a configured instance of a given database task.
+     * @return A configured instance of {@link DatabaseAccessing} of the given type
      *
      * @param databaseTaskType The type of database task, not null
-     * @return A configured instance of {@link DatabaseTask} of the given type
      */
-    protected <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
+    protected <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
         return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler());
     }
 
@@ -455,7 +457,7 @@ public class DatabaseModule implements Module {
      *         test database
      */
     protected SQLHandler getDefaultSqlHandler() {
-        return new SQLHandler(getDataSource());
+        return new DefaultSQLHandler(getDataSource());
     }
 
 

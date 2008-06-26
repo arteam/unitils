@@ -44,9 +44,6 @@ public class Version implements Comparable<Version> {
     /* The version indexes, empty if not defined */
     private List<Long> indexes = new ArrayList<Long>();
 
-    /* A last modification timestamp, expressed as the number of milliseconds since January 1, 1970 */
-    private long timeStamp;
-
 
     /**
      * Creates a new version.
@@ -54,9 +51,8 @@ public class Version implements Comparable<Version> {
      * @param indexes   The script indexes, not null
      * @param timeStamp The script timestamp
      */
-    public Version(List<Long> indexes, long timeStamp) {
+    public Version(List<Long> indexes) {
         this.indexes = indexes;
-        this.timeStamp = timeStamp;
     }
 
 
@@ -64,11 +60,9 @@ public class Version implements Comparable<Version> {
      * Creates a new version.
      *
      * @param indexString The indexes as a string
-     * @param timeStamp   The script timestamp
      */
-    public Version(String indexString, long timeStamp) {
+    public Version(String indexString) {
         this.indexes = extractIndexes(indexString);
-        this.timeStamp = timeStamp;
     }
 
 
@@ -102,24 +96,6 @@ public class Version implements Comparable<Version> {
      */
     public void setIndexes(List<Long> indexes) {
         this.indexes = indexes;
-    }
-
-
-    /**
-     * @return The script timestamp
-     */
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
-
-    /**
-     * Sets the script timestamp
-     *
-     * @param timeStamp The script timestamp
-     */
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
     }
 
 
@@ -179,7 +155,7 @@ public class Version implements Comparable<Version> {
      */
     @Override
     public String toString() {
-        return "indexes: " + getIndexesString() + ", timestamp: " + timeStamp;
+        return "indexes: " + getIndexesString();
     }
 
 
@@ -222,6 +198,42 @@ public class Version implements Comparable<Version> {
                 return 1;
             }
         }
-        return 0;
+        if (!thisIterator.hasNext() && !otherIterator.hasNext()) {
+        	return 0;
+        }
+        if (thisIterator.hasNext()) {
+        	return 1;
+        } else {
+        	return -1;
+        }
     }
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((indexes == null) ? 0 : indexes.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Version other = (Version) obj;
+		if (indexes == null) {
+			if (other.indexes != null)
+				return false;
+		} else if (!indexes.equals(other.indexes))
+			return false;
+		return true;
+	}
+    
+    
 }

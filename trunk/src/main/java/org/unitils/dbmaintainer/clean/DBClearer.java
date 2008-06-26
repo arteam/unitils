@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.clean;
 
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.DatabaseAccessing;
 
 
 /**
@@ -25,7 +25,7 @@ import org.unitils.dbmaintainer.util.DatabaseTask;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DBClearer extends DatabaseTask {
+public interface DBClearer extends DatabaseAccessing {
 
 
     /**

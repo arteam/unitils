@@ -15,29 +15,35 @@
  */
 package org.unitils.dbmaintainer;
 
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.util.ConfigUtils;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
+import org.unitils.dbmaintainer.version.ExecutedScriptInfoSource;
 import org.unitils.dbmaintainer.version.Version;
-import org.unitils.dbmaintainer.version.VersionSource;
 import org.unitils.util.PropertyUtils;
-
-import java.util.List;
-import java.util.Properties;
 
 /**
  * A class for performing automatic maintenance of a database.<br>
- * This class must be configured with implementations of a {@link VersionSource},
+ * This class must be configured with implementations of a {@link ExecutedScriptInfoSource},
  * {@link ScriptSource}, a {@link ScriptRunner}, {@link DBClearer}, {@link DBCleaner},
  * {@link ConstraintsDisabler}, {@link SequenceUpdater} and a {@link DataSetStructureGenerator}
  * <p/> The {@link #updateDatabase()} method check what is the current version of the database, and
@@ -51,12 +57,12 @@ import java.util.Properties;
  * <ul>
  * <li>Foreign key and not null constraints are disabled.</li>
  * <li>Sequences and identity columns that have a value lower than a configured treshold, are
- * updated to a value equal to or largen than this treshold</li>
+ * updated to a value equal to or larger than this treshold</li>
  * <li>A DTD is generated that describes the database's table structure, to use in test data XML
  * files</li>
  * </ul>
- * <p/> To obtain a properly configured <code>DBMaintainer</code>, invoke the contructor
- * {@link #DBMaintainer(Properties,SQLHandler)} with a <code>TestDataSource</code> providing
+ * <p/> To obtain a properly configured <code>DBMaintainer</code>, invoke the constructor
+ * {@link #DBMaintainer(Properties,DefaultSQLHandler)} with a <code>TestDataSource</code> providing
  * access to the database and a <code>Configuration</code> object containing all necessary
  * properties.
  *
@@ -107,7 +113,7 @@ public class DBMaintainer {
     /**
      * Provider of the current version of the database, and means to increment it
      */
-    protected VersionSource versionSource;
+    protected ExecutedScriptInfoSource versionSource;
 
     /**
      * Provider of scripts for updating the database to a higher version
@@ -167,7 +173,7 @@ public class DBMaintainer {
     /**
      * Default constructor for testing.
      */
-    public DBMaintainer() {
+    protected DBMaintainer() {
     }
 
 
@@ -181,8 +187,8 @@ public class DBMaintainer {
     public DBMaintainer(Properties configuration, SQLHandler sqlHandler) {
         try {
             scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, sqlHandler);
-            versionSource = getConfiguredDatabaseTaskInstance(VersionSource.class, configuration, sqlHandler);
-            scriptSource = getConfiguredDatabaseTaskInstance(ScriptSource.class, configuration, sqlHandler);
+            versionSource = getConfiguredDatabaseTaskInstance(ExecutedScriptInfoSource.class, configuration, sqlHandler);
+            scriptSource = ConfigUtils.getConfiguredInstanceOf(ScriptSource.class, configuration);
 
             boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DB_CLEANER_ENABLED, configuration);
             if (cleanDbEnabled) {
@@ -221,13 +227,13 @@ public class DBMaintainer {
      * with one of the scripts, a {@link UnitilsException} is thrown.
      */
     public void updateDatabase() {
-        // Get current version
-        Version currentVersion = versionSource.getDbVersion();
+        Set<ExecutedScript> alreadyExecutedScripts = versionSource.getExecutedScripts();
+        Version highestExecutedScriptVersion = getHighestExecutedScriptVersion(alreadyExecutedScripts);
 
         // check whether an incremental update can be performed
-        if (!shouldUpdateDatabaseFromScratch(currentVersion)) {
+        if (!shouldUpdateDatabaseFromScratch(highestExecutedScriptVersion, alreadyExecutedScripts)) {
             // update database with new scripts
-            updateDatabase(scriptSource.getNewScripts(currentVersion), currentVersion);
+            updateDatabase(scriptSource.getNewScripts(highestExecutedScriptVersion, alreadyExecutedScripts));
             return;
         }
 
@@ -237,21 +243,38 @@ public class DBMaintainer {
         constraintsDisabler.removeConstraints();
         dbClearer.clearSchemas();
         // reset the database version
-        versionSource.setDbVersion(new Version("", 0));
+        versionSource.clearAllExecutedScripts();
         // update database with all scripts
-        updateDatabase(scriptSource.getAllScripts(), currentVersion);
+        updateDatabase(scriptSource.getAllUpdateScripts());
     }
 
 
-    /**
+	protected Version getHighestExecutedScriptVersion(Set<ExecutedScript> executedScripts) {
+		Version highest = new Version("0");
+		for (ExecutedScript executedScript : executedScripts) {
+			if (executedScript.getScript().isIncremental()) {
+				if (executedScript.getScript().getVersion().compareTo(highest) > 0) {
+					highest = executedScript.getScript().getVersion();
+				}
+			}
+		}
+		return highest;
+	}
+
+
+	/**
      * Updates the database version to the current version of the update scripts, without changing
      * anything else in the database. Can be used to initialize the database for future updates,
      * knowning that the current state of the database is synchronized with the current state of the
      * scripts.
      */
-    public void setDatabaseToCurrentVersion() {
-        Version currentVersion = scriptSource.getHighestVersion();
-        versionSource.setDbVersion(currentVersion);
+    public void resetDatabaseState() {
+        versionSource.clearAllExecutedScripts();
+    	
+    	List<Script> allScripts = scriptSource.getAllUpdateScripts();
+        for (Script script : allScripts) {
+        	versionSource.registerExecutedScript(new ExecutedScript(script, new Date(), true));
+        }
     }
 
 
@@ -259,20 +282,14 @@ public class DBMaintainer {
      * Updates the state of the database using the given scripts.
      *
      * @param scripts        The scripts, not null
-     * @param currentVersion The current version of the database, not null
      */
-    protected void updateDatabase(List<Script> scripts, Version currentVersion) {
+    protected void updateDatabase(List<Script> scripts) {
         if (scripts.isEmpty()) {
             // nothing to do
-            logger.info("Database is up to date. Current database version is " + currentVersion);
+            logger.info("Database is up to date");
             return;
         }
-        logger.info("Database update scripts have been found and will be executed on the database. Current database version is " + currentVersion);
-
-        // We register the update as being not successful. If anything goes wrong or if the update is
-        // interrupted before being completed, this will be the final state and the DbMaintainer will
-        // do a from-scratch update the next time
-        versionSource.setUpdateSucceeded(false);
+        logger.info("Database update scripts have been found and will be executed on the database.");
 
         // Remove data from the database, that could cause errors when executing scripts. Such
         // as for example when added a not null column.
@@ -281,7 +298,7 @@ public class DBMaintainer {
         }
 
         // Excute all of the scripts
-        executeScripts(scripts, currentVersion);
+        executeScripts(scripts);
 
         // Execute postprocessing scripts, if any
         executePostProcessingScripts(scriptSource.getPostProcessingScripts());
@@ -298,9 +315,6 @@ public class DBMaintainer {
         if (dataSetStructureGenerator != null) {
             dataSetStructureGenerator.generateDataSetStructure();
         }
-
-        // Processing has finished, we regard the db update as being successful
-        versionSource.setUpdateSucceeded(true);
     }
 
 
@@ -315,42 +329,25 @@ public class DBMaintainer {
      * @param scripts        The scripts to execute, not null
      * @param currentVersion The current version of the database, not null
      */
-    protected void executeScripts(List<Script> scripts, Version currentVersion) {
+    protected void executeScripts(List<Script> scripts) {
         for (Script script : scripts) {
             try {
-                scriptRunner.execute(script);
-                increaseDbVersion(script.getVersion(), currentVersion);
-
+            	// We register the script execution, but we indicate it to be unsuccessful. If anything goes wrong or if the update is
+                // interrupted before being completed, this will be the final state and the DbMaintainer will do a from-scratch update the next time
+            	ExecutedScript executedScript = new ExecutedScript(script, new Date(), false);
+            	versionSource.registerExecutedScript(executedScript);
+            	
+            	logger.info("Executing script " + script.getFileName());
+                scriptRunner.execute(script.getScriptContentHandle());
+                // We now register the previously registered script execution as being successful
+                executedScript.setSuccessful(true);
+                versionSource.updateExecutedScript(executedScript);
+                
             } catch (UnitilsException e) {
-                logger.error("Error while executing script " + script.getName(), e);
-                if (fromScratchEnabled) {
-                    // If rebuilding from scratch is disabled, the version is not incremented, to give the chance of fixing the erroneous script.
-                    // If rebuilding from scratch is enabled, the version is set to the version of the erroneous
-                    // script anyway, so that the database is rebuilt from scratch when the erroneous script is fixed.
-                    increaseDbVersion(script.getVersion(), currentVersion);
-                }
-                logger.error("Current database version is: " + currentVersion);
+                logger.error("Error while executing script " + script.getFileName(), e);
                 throw e;
             }
         }
-    }
-
-
-    /**
-     * Increases the database version. If the index of the script or the timestamp is higher, it will be updated.
-     *
-     * @param scriptVersion  The version of the script, not null
-     * @param currentVersion The current version of the database, not null
-     */
-    protected void increaseDbVersion(Version scriptVersion, Version currentVersion) {
-        if (scriptVersion.getScriptIndex() != null) {
-            if (currentVersion.getScriptIndex() == null || scriptVersion.compareTo(currentVersion) > 0) {
-                currentVersion.setIndexes(scriptVersion.getIndexes());
-            }
-        }
-        currentVersion.setTimeStamp(Math.max(scriptVersion.getTimeStamp(), currentVersion.getTimeStamp()));
-        versionSource.setDbVersion(currentVersion);
-        logger.debug("Database version incremented to: " + currentVersion);
     }
 
 
@@ -361,17 +358,14 @@ public class DBMaintainer {
      * @param postProcessingScripts The scripts to execute, not null
      */
     protected void executePostProcessingScripts(List<Script> postProcessingScripts) {
-        if (postProcessingScripts.isEmpty()) {
-            // nothing to do
-            return;
-        }
-
         for (Script script : postProcessingScripts) {
             try {
-                scriptRunner.execute(script);
+            	logger.info("Executing post processing script " + script.getFileName());
+            	
+                scriptRunner.execute(script.getScriptContentHandle());
 
             } catch (UnitilsException e) {
-                logger.error("Error while executing post processing script " + script.getName(), e);
+                logger.error("Error while executing post processing script " + script.getFileName(), e);
                 throw e;
             }
         }
@@ -380,7 +374,7 @@ public class DBMaintainer {
 
     /**
      * Checks whether the database should be updated from scratch or just incrementally. The
-     * database needs to be rebuild in following cases:
+     * database needs to be rebuilt in following cases:
      * <ul>
      * <li>Some existing scripts were modified.</li>
      * <li>The last update of the database was unsuccessful.</li>
@@ -393,26 +387,34 @@ public class DBMaintainer {
      * @param currentVersion The current database version, not null
      * @return True if a from scratch rebuild is needed, false otherwise
      */
-    protected boolean shouldUpdateDatabaseFromScratch(Version currentVersion) {
-        // check whether the last run was successful
-        if (!versionSource.isLastUpdateSucceeded()) {
-            if (!fromScratchEnabled) {
-                logger.warn("The previous database update failed, so it would be a good idea to rebuild the database from scratch. This is not done since updating from scratch is disabled!");
+    protected boolean shouldUpdateDatabaseFromScratch(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts) {
+    	// check whether the last run was successful
+        if (errorInIndexedScriptDuringLastUpdate(alreadyExecutedScripts)) {
+        	if (fromScratchEnabled) {
+        		if (!keepRetryingAfterError) {
+                    logger.warn("During a previous database update, the execution of an incremental script failed! Since " + 
+                		PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED + " is set to false, the database will not be rebuilt " +
+        				"from scratch, unless the failed (or another) incremental script is modified.");
+                    return false;
+                }
+        		logger.info("During a previous database update, the execution of a incremental script failed! " +
+        				"Database will be cleared and rebuilt from scratch.");
+                return true;
+        	} else {
+                logger.warn("During a previous database update, the execution of an incremental script failed! " +
+        			"Since from scratch updates are disabled, you should fix the erroneous script, solve the problem " +
+        			"manually on the database, and then reset the database state by invoking resetDatabaseState()");
                 return false;
-            }
-            if (!keepRetryingAfterError) {
-                logger.warn("The previous database update did not succeed and there were no modified script files. The updated scripts are not executed again!!");
-                return false;
-            }
-            logger.info("The previous database update did not succeed. Database will be cleared and rebuilt from scratch.");
-            return true;
+        	}
         }
 
-        // check whether there an existing script was updated
-        if (scriptSource.isExistingScriptModified(currentVersion)) {
+    	
+        // check whether an existing script was updated
+        if (scriptSource.isExistingIndexedScriptModified(currentVersion, alreadyExecutedScripts)) {
             if (!fromScratchEnabled) {
-                logger.warn("Existing database update scripts have been modified, but updating from scratch is disabled. The updated scripts are not executed again!!");
-                return false;
+                throw new UnitilsException("One or more existing incremental database update scripts have been modified, but updating from scratch is disabled. " +
+                		"You should either revert to the original version of the modified script and add an new incremental script that performs the desired " +
+                		"update, or perform the update manually on the database and then reset the database state by invoking resetDatabaseState()");
             }
             logger.info("One or more existing database update scripts have been modified. Database will be cleared and rebuilt from scratch.");
             return true;
@@ -421,4 +423,15 @@ public class DBMaintainer {
         // from scratch is not needed
         return false;
     }
+
+
+	protected boolean errorInIndexedScriptDuringLastUpdate(Set<ExecutedScript> alreadyExecutedScripts) {
+		for (ExecutedScript script : alreadyExecutedScripts) {
+			if (!script.isSucceeded() && script.getScript().isIncremental()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

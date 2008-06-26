@@ -15,31 +15,33 @@
  */
 package org.unitils.dbmaintainer;
 
-import static org.easymock.classextension.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.junit.Assert.fail;
+import static org.unitils.easymock.EasyMockUnitils.replay;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.DefaultScriptRunner;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import org.unitils.dbmaintainer.version.Version;
-import org.unitils.dbmaintainer.version.VersionSource;
-import static org.unitils.easymock.EasyMockUnitils.replay;
+import org.unitils.dbmaintainer.version.ExecutedScriptInfoSource;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.util.Calls;
 import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.TestedObject;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Tests the main algorithm of the DBMaintainer, using mocks for all implementation classes.
@@ -51,40 +53,39 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
     @Mock
     @InjectIntoByType
-    protected VersionSource mockVersionSource;
+    ExecutedScriptInfoSource mockVersionSource;
 
     @Mock
     @InjectIntoByType
-    protected ScriptSource mockScriptSource;
+    ScriptSource mockScriptSource;
 
     @Mock
     @InjectIntoByType
-    protected DefaultScriptRunner mockScriptRunner;
+    DefaultScriptRunner mockScriptRunner;
 
     @Mock
     @InjectIntoByType
-    protected DBClearer mockDbClearer;
+    DBClearer mockDbClearer;
 
     @Mock(calls = Calls.LENIENT)
     @InjectIntoByType
-    protected ConstraintsDisabler mockConstraintsDisabler;
+    ConstraintsDisabler mockConstraintsDisabler;
 
     @Mock(calls = Calls.LENIENT)
     @InjectIntoByType
-    protected SequenceUpdater mockSequenceUpdater;
+    SequenceUpdater mockSequenceUpdater;
 
     @Mock(calls = Calls.LENIENT)
     @InjectIntoByType
-    protected DataSetStructureGenerator mockDataSetStructureGenerator;
+    DataSetStructureGenerator mockDataSetStructureGenerator;
 
     @TestedObject
-    protected DBMaintainer dbMaintainer;
+    DBMaintainer dbMaintainer;
 
     /* Test database update scripts */
-    protected List<Script> scripts, postProcessingScripts;
-
-    /* Test database versions */
-    protected Version version0, version1, version2;
+    List<Script> scripts, postProcessingScripts;
+    
+    List<ExecutedScript> alreadyExecutedScripts;
 
 
     /**
@@ -100,15 +101,20 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         dbMaintainer.disableConstraintsEnabled = true;
 
         scripts = new ArrayList<Script>();
-        version0 = new Version("0", 0L);
-        version1 = new Version("1", 1L);
-        version2 = new Version("2", 2L);
-        scripts.add(new Script("script1.sql", "content", version1));
-        scripts.add(new Script("script2.sql", "content", version2));
+        Script script1 = new Script("script1.sql", 0L, "checksum1");
+		scripts.add(script1);
+        Script script2 = new Script("script2.sql", 0L, "checksum2");
+		scripts.add(script2);
 
+        alreadyExecutedScripts = new ArrayList<ExecutedScript>();
+        alreadyExecutedScripts.add(new ExecutedScript(script1, null, true));
+        alreadyExecutedScripts.add(new ExecutedScript(script2, null, true));
+        
         postProcessingScripts = new ArrayList<Script>();
-        postProcessingScripts.add(new Script("post-script1.sql", "content", version0));
-        postProcessingScripts.add(new Script("post-script2.sql", "content", version0));
+        postProcessingScripts.add(new Script("post-script1.sql", 0L, "post-checksum1"));
+        postProcessingScripts.add(new Script("post-script2.sql", 0L, "post-checksum2"));
+        
+        expect(mockVersionSource.getExecutedScripts()).andStubReturn(new HashSet<ExecutedScript>(alreadyExecutedScripts));
     }
 
 
@@ -137,9 +143,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         // Record expected behavior
-        mockVersionSource.setUpdateSucceeded(false);
         expectExecuteScriptsAndSetDbVersion();
-        mockVersionSource.setUpdateSucceeded(true);
 
         replay();
 
@@ -160,11 +164,9 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         // Record expected behavior
-        mockVersionSource.setDbVersion(new Version("", 0));
-        mockVersionSource.setUpdateSucceeded(false);
         mockDbClearer.clearSchemas();
+        mockVersionSource.clearAllExecutedScripts();
         expectExecuteScriptsAndSetDbVersion();
-        mockVersionSource.setUpdateSucceeded(true);
 
         replay();
 
@@ -180,11 +182,9 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectPostProcessingScripts(postProcessingScripts);
 
         // Record expected behavior
-        mockVersionSource.setDbVersion(new Version("", 0));
-        mockVersionSource.setUpdateSucceeded(false);
         mockDbClearer.clearSchemas();
+        mockVersionSource.clearAllExecutedScripts();
         expectExecuteScriptsAndSetDbVersion();
-        mockVersionSource.setUpdateSucceeded(true);
 
         replay();
 
@@ -204,10 +204,9 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectNoPostProcessingCodeScripts();
 
         // Record expected behavior
-        mockVersionSource.setUpdateSucceeded(false);
-        mockScriptRunner.execute(scripts.get(0));
+        mockVersionSource.registerExecutedScript(new ExecutedScript(scripts.get(0), null, false));
+        mockScriptRunner.execute(scripts.get(0).getScriptContentHandle());
         expectLastCall().andThrow(new UnitilsException("Test exception"));
-        mockVersionSource.setDbVersion(version1);
         replay();
 
         try {
@@ -219,26 +218,11 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void testUpdateDatabase_PostProcessingCodeScriptsAvailable() {
-        // Set database version and available script expectations
-        expectNewScriptsAdded();
-        expectPostProcessingScripts(postProcessingScripts);
-
-        mockVersionSource.setUpdateSucceeded(false);
-        expectExecuteScriptsAndSetDbVersion();
-        mockVersionSource.setUpdateSucceeded(true);
-        replay();
-
-        dbMaintainer.updateDatabase();
-    }
-
-    @Test
     public void testUpdateDatabase_ErrorInPostProcessingCodeScripts() {
         // Set database version and available script expectations
         expectNewScriptsAdded();
         expectPostProcessingScripts(postProcessingScripts);
 
-        mockVersionSource.setUpdateSucceeded(false);
         expectExecuteScriptsAndSetDbVersion();
         expectLastCall().andThrow(new UnitilsException("Test exception"));
         replay();
@@ -254,22 +238,17 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
     @SuppressWarnings({"unchecked"})
     private void expectNoScriptModifications() {
-        expectDbVersion(version0);
-        expectLastUpdateSucceeded(true);
         expectModifiedScripts(false);
         expectNewScripts(Collections.EMPTY_LIST);
     }
 
     private void expectNewScriptsAdded() {
-        expectDbVersion(version0);
-        expectLastUpdateSucceeded(true);
         expectModifiedScripts(false);
         expectNewScripts(scripts);
     }
 
     private void expectLastUpdateFailed() {
-        expectDbVersion(version0);
-        expectLastUpdateSucceeded(false);
+        expectErrorInExistingIndexedScript();
         expectModifiedScripts(false);
         expectAllScripts(scripts);
     }
@@ -281,39 +260,35 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void expectExistingScriptModified() {
-        expectDbVersion(version0);
-        expectLastUpdateSucceeded(true);
         expectModifiedScripts(true);
         expectAllScripts(scripts);
     }
 
 
     private void expectExecuteScriptsAndSetDbVersion() {
-        mockScriptRunner.execute(scripts.get(0));
-        mockVersionSource.setDbVersion(version1);
-        mockScriptRunner.execute(scripts.get(1));
-        mockVersionSource.setDbVersion(version2);
-        mockScriptRunner.execute(postProcessingScripts.get(0));
-        mockScriptRunner.execute(postProcessingScripts.get(1));
+    	mockVersionSource.registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
+        mockScriptRunner.execute(scripts.get(0).getScriptContentHandle());
+        mockVersionSource.updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));
+        mockVersionSource.registerExecutedScript(new ExecutedScript(scripts.get(1), null, null));
+        mockScriptRunner.execute(scripts.get(1).getScriptContentHandle());
+        mockVersionSource.updateExecutedScript(new ExecutedScript(scripts.get(1), null, null));
+        mockScriptRunner.execute(postProcessingScripts.get(0).getScriptContentHandle());
+        mockScriptRunner.execute(postProcessingScripts.get(1).getScriptContentHandle());
     }
 
 
     private void expectNewScripts(List<Script> scripts) {
-        expect(mockScriptSource.getNewScripts(null)).andStubReturn(scripts);
+        expect(mockScriptSource.getNewScripts(null, null)).andStubReturn(scripts);
     }
 
 
-    private void expectDbVersion(Version dbVersion) {
-        expect(mockVersionSource.getDbVersion()).andStubReturn(dbVersion);
-    }
-
-    private void expectLastUpdateSucceeded(boolean lastUpdateSucceeded) {
-        expect(mockVersionSource.isLastUpdateSucceeded()).andStubReturn(lastUpdateSucceeded);
+    private void expectErrorInExistingIndexedScript() {
+        alreadyExecutedScripts.get(0).setSuccessful(false);
     }
 
 
     private void expectModifiedScripts(boolean modifiedScripts) {
-        expect(mockScriptSource.isExistingScriptModified(null)).andStubReturn(modifiedScripts);
+        expect(mockScriptSource.isExistingIndexedScriptModified(null, null)).andStubReturn(modifiedScripts);
     }
 
 
@@ -323,7 +298,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void expectAllScripts(List<Script> scripts) {
-        expect(mockScriptSource.getAllScripts()).andReturn(scripts);
+        expect(mockScriptSource.getAllUpdateScripts()).andReturn(scripts);
     }
 
 }

@@ -16,7 +16,8 @@
 package org.unitils.database.config;
 
 import javax.sql.DataSource;
-import java.util.Properties;
+
+import org.unitils.core.util.Configurable;
 
 /**
  * Defines the contract of a factory that can provide an instance of a test <code>DataSource</code>.
@@ -24,21 +25,13 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface DataSourceFactory {
-
-    /**
-     * Initializes itself using the given properties.
-     *
-     * @param configuration The config, not null
-     */
-    public void init(Properties configuration);
-
+public interface DataSourceFactory extends Configurable {
 
     /**
      * Creates a new <code>DataSource</code>
      *
      * @return The DataSource, not null
      */
-    public DataSource createDataSource();
+    DataSource createDataSource();
 
 }

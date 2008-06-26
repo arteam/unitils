@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.util;
-
-import org.unitils.core.dbsupport.SQLHandler;
+package org.unitils.core.util;
 
 import java.util.Properties;
 
 /**
- * Task that can be performed on a database.
- *
+ * Base class for implementations that need access to the unitils configuration 
+ * 
  * @author Filip Neven
  * @author Tim Ducheyne
+ *
  */
-public interface DatabaseTask {
+public class BaseConfigurable implements Configurable {
 
-    /**
-     * Initializes the database operation class with the given {@link Properties}, {@link SQLHandler}.
-     *
-     * @param configuration The configuration, not null
-     * @param sqlHandler    The sql handler, not null
-     */
-    public void init(Properties configuration, SQLHandler sqlHandler);
+	protected Properties configuration;
+	
+	/* 
+	 * @see org.unitils.core.util.Configurable#init(java.util.Properties)
+	 */
+	public void init(Properties configuration) {
+		this.configuration = configuration;
+	}
 
 }

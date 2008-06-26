@@ -15,7 +15,7 @@
  */
 package org.unitils.core.dbsupport;
 
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.PropertyUtils.getStringList;
 
@@ -73,7 +73,7 @@ public class DbSupportFactory {
         }
         // create new instance
         String databaseDialect = getString(PROPKEY_DATABASE_DIALECT, configuration);
-        dbSupport = getConfiguredInstance(DbSupport.class, configuration, databaseDialect);
+        dbSupport = getInstanceOf(DbSupport.class, configuration, databaseDialect);
         dbSupport.init(configuration, sqlHandler, schemaName);
         // add to cache
         dbSupportCache.put(schemaName, dbSupport);

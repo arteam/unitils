@@ -35,10 +35,10 @@ import java.util.Set;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SQLHandler {
+public class DefaultSQLHandler implements SQLHandler {
 
     /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(SQLHandler.class);
+    private static Log logger = LogFactory.getLog(DefaultSQLHandler.class);
 
     /* The DataSource that provides access to the database, on which all queries and updates are executed */
     private DataSource dataSource;
@@ -55,7 +55,7 @@ public class SQLHandler {
      *
      * @param dataSource The data source, not null
      */
-    public SQLHandler(DataSource dataSource) {
+    public DefaultSQLHandler(DataSource dataSource) {
         this(dataSource, true);
     }
 
@@ -67,18 +67,15 @@ public class SQLHandler {
      * @param doExecuteUpdates Boolean indicating whether updates should effectively be executed on the underlying
      *                         database
      */
-    public SQLHandler(DataSource dataSource, boolean doExecuteUpdates) {
+    public DefaultSQLHandler(DataSource dataSource, boolean doExecuteUpdates) {
         this.dataSource = dataSource;
         this.doExecuteUpdates = doExecuteUpdates;
     }
 
 
-    /**
-     * Executes the given statement.
-     *
-     * @param sql The sql string for retrieving the items
-     * @return The nr of updates
-     */
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#executeUpdate(java.lang.String)
+	 */
     public int executeUpdate(String sql) {
         logger.debug(sql);
 
@@ -101,12 +98,9 @@ public class SQLHandler {
     }
 
 
-    /**
-     * Executes the given code update statement.
-     *
-     * @param sql The sql string for retrieving the items
-     * @return The nr of updates
-     */
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#executeCodeUpdate(java.lang.String)
+	 */
     public int executeCodeUpdate(String sql) {
         logger.debug(sql);
 
@@ -129,13 +123,9 @@ public class SQLHandler {
     }
 
 
-    /**
-     * Returns the long extracted from the result of the given query. If no value is found, a {@link UnitilsException}
-     * is thrown.
-     *
-     * @param sql The sql string for retrieving the items
-     * @return The long item value
-     */
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#getItemAsLong(java.lang.String)
+	 */
     public long getItemAsLong(String sql) {
         logger.debug(sql);
 
@@ -160,13 +150,9 @@ public class SQLHandler {
     }
 
 
-    /**
-     * Returns the value extracted from the result of the given query. If no value is found, a {@link UnitilsException}
-     * is thrown.
-     *
-     * @param sql The sql string for retrieving the items
-     * @return The string item value
-     */
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#getItemAsString(java.lang.String)
+	 */
     public String getItemAsString(String sql) {
         logger.debug(sql);
 
@@ -191,12 +177,9 @@ public class SQLHandler {
     }
 
 
-    /**
-     * Returns the items extracted from the result of the given query.
-     *
-     * @param sql The sql string for retrieving the items
-     * @return The items, not null
-     */
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#getItemsAsStringSet(java.lang.String)
+	 */
     public Set<String> getItemsAsStringSet(String sql) {
         logger.debug(sql);
 
@@ -221,12 +204,9 @@ public class SQLHandler {
     }
 
 
-    /**
-     * Returns true if the query returned a record.
-     *
-     * @param sql The sql string for checking the existence
-     * @return True if a record was returned
-     */
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#exists(java.lang.String)
+	 */
     public boolean exists(String sql) {
         logger.debug(sql);
 
@@ -247,17 +227,17 @@ public class SQLHandler {
     }
 
 
-    /**
-     * @return The DataSource
-     */
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#getDataSource()
+	 */
     public DataSource getDataSource() {
         return dataSource;
     }
 
 
-    /**
-     * @return Whether updates are executed on the database or not
-     */
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#isDoExecuteUpdates()
+	 */
     public boolean isDoExecuteUpdates() {
         return doExecuteUpdates;
     }

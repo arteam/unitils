@@ -24,6 +24,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
@@ -65,7 +66,7 @@ public class DefaultDBClearerPreserveDoesNotExistTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         configuration = new ConfigurationLoader().loadConfiguration();
-        sqlHandler = new SQLHandler(dataSource);
+        sqlHandler = new DefaultSQLHandler(dataSource);
         defaultDbClearer = new DefaultDBClearer();
     }
 

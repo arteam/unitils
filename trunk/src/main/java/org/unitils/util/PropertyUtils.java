@@ -177,7 +177,7 @@ public class PropertyUtils {
      * @param propertyName The name, not null
      * @param defaultValue The default value
      * @param properties   The properties, not null
-     * @return The string value, not null
+     * @return The long value, not null
      */
     public static long getLong(String propertyName, long defaultValue, Properties properties) {
         String value = getProperty(propertyName, properties);
@@ -186,6 +186,52 @@ public class PropertyUtils {
         }
         try {
             return Long.valueOf(value.trim());
+
+        } catch (NumberFormatException e) {
+            throw new UnitilsException("Value " + value + " for property " + propertyName + " is not a number.");
+        }
+    }
+    
+    
+    /**
+     * Gets the int value for the property with the given name. If no such property is found, the value is empty
+     * or cannot be converted to a long, an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param properties   The properties, not null
+     * @return The int value, not null
+     */
+    public static int getInt(String propertyName, Properties properties) {
+        String value = getProperty(propertyName, properties);
+        if (value == null || "".equals(value.trim())) {
+            throw new UnitilsException("No value found for property " + propertyName);
+        }
+        try {
+            return Integer.valueOf(value.trim());
+
+        } catch (NumberFormatException e) {
+            throw new UnitilsException("Value " + value + " for property " + propertyName + " is not a number.");
+        }
+    }
+
+
+    /**
+     * Gets the int value for the property with the given name. If no such property is found or
+     * the value is empty, the given default value is returned. If the value cannot be converted to a long,
+     * an exception will be raised.
+     *
+     * @param propertyName The name, not null
+     * @param defaultValue The default value
+     * @param properties   The properties, not null
+     * @return The int value, not null
+     */
+    public static int getInt(String propertyName, int defaultValue, Properties properties) {
+        String value = getProperty(propertyName, properties);
+        if (value == null || "".equals(value.trim())) {
+            return defaultValue;
+        }
+        try {
+            return Integer.valueOf(value.trim());
 
         } catch (NumberFormatException e) {
             throw new UnitilsException("Value " + value + " for property " + propertyName + " is not a number.");
