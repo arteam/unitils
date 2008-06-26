@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
@@ -57,7 +58,7 @@ public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
         configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", DtdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
         DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 

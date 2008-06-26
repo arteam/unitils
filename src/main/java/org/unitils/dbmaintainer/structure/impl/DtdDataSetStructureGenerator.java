@@ -27,7 +27,7 @@ import org.dbunit.dataset.filter.IncludeTableFilter;
 import org.dbunit.dataset.xml.FlatDtdWriter;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
 import org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils;
 import org.unitils.util.PropertyUtils;
 
@@ -47,7 +47,7 @@ import java.util.Set;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DtdDataSetStructureGenerator extends BaseDatabaseTask implements DataSetStructureGenerator {
+public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implements DataSetStructureGenerator {
 
     /* Property key of the filename of the generated DTD  */
     public static final String PROPKEY_DTD_FILENAME = "dtdGenerator.dtd.filename";

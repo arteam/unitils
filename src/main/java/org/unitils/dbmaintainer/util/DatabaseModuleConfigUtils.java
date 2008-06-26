@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 
 import java.util.Properties;
 
@@ -39,7 +39,7 @@ public class DatabaseModuleConfigUtils {
 
     /**
      * Retrieves the concrete instance of the class with the given type as configured by the given <code>Configuration</code>.
-     * The concrete instance must extend the class {@link DatabaseTask}.
+     * The concrete instance must extend the class {@link DatabaseAccessing}.
      * 
      * @param <T>              The type of the DatabaseTask 
      * @param databaseTaskType The type of the DatabaseTask, not null
@@ -48,9 +48,9 @@ public class DatabaseModuleConfigUtils {
      * @return The configured instance
      */
     @SuppressWarnings({"unchecked"})
-    public static <T extends DatabaseTask> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, SQLHandler sqlHandler) {
+    public static <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, SQLHandler sqlHandler) {
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-        DatabaseTask instance = getConfiguredInstance(databaseTaskType, configuration, databaseDialect);
+        DatabaseAccessing instance = getInstanceOf(databaseTaskType, configuration, databaseDialect);
         instance.init(configuration, sqlHandler);
         return (T) instance;
     }

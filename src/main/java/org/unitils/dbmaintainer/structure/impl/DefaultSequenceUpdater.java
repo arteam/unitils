@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
 import org.unitils.util.PropertyUtils;
 
 import java.util.Properties;
@@ -33,7 +33,7 @@ import java.util.Set;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultSequenceUpdater extends BaseDatabaseTask implements SequenceUpdater {
+public class DefaultSequenceUpdater extends BaseDatabaseAccessor implements SequenceUpdater {
 
     /* Property key for the lowest acceptacle sequence value */
     public static final String PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE = "sequenceUpdater.sequencevalue.lowestacceptable";

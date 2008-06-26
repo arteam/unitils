@@ -21,7 +21,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
 import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.*;
@@ -36,7 +36,7 @@ import java.util.*;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
+public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer {
 
     /**
      * The key of the property that specifies of which schemas nothing should be dropped
@@ -82,7 +82,7 @@ public class DefaultDBClearer extends BaseDatabaseTask implements DBClearer {
      * The key of the property that specifies the name of the datase table in which the
      * DB version is stored. This table should not be deleted
      */
-    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
+    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.executedScriptsTableName";
 
 
     /* The logger instance for this class */

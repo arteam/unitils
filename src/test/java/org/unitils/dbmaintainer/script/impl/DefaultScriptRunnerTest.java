@@ -21,11 +21,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.database.SQLUnitils.isEmpty;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -60,10 +61,10 @@ public class DefaultScriptRunnerTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         defaultScriptRunner = new DefaultScriptRunner();
-        defaultScriptRunner.init(configuration, new SQLHandler(dataSource));
+        defaultScriptRunner.init(configuration, new DefaultSQLHandler(dataSource));
 
-        script1 = new Script("test-script1.sql", getClass().getResource("DefaultScriptRunnerTest/test-script1.sql"), null);
-        script2 = new Script("test-script2.sql", getClass().getResource("DefaultScriptRunnerTest/test-script2.sql"), null);
+        script1 = new Script("test-script1.sql", 0L, new UrlScriptContentHandle(getClass().getResource("DefaultScriptRunnerTest/test-script1.sql")));
+        script2 = new Script("test-script2.sql", 0L, new UrlScriptContentHandle(getClass().getResource("DefaultScriptRunnerTest/test-script2.sql")));
 
         cleanupTestDatabase();
     }
@@ -83,10 +84,10 @@ public class DefaultScriptRunnerTest extends UnitilsJUnit4 {
      */
     @Test
     public void testExecute() throws Exception {
-        defaultScriptRunner.execute(script1);
-        defaultScriptRunner.execute(script2);
+        defaultScriptRunner.execute(script1.getScriptContentHandle());
+        defaultScriptRunner.execute(script2.getScriptContentHandle());
 
-        // all tables should exist (otherwhise an exception will be thrown)
+        // all tables should exist (otherwise an exception will be thrown)
         assertTrue(isEmpty("table1", dataSource));
         assertTrue(isEmpty("table2", dataSource));
         assertTrue(isEmpty("table3", dataSource));

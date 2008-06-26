@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
 
 import java.util.Set;
 
@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Filip Neven
  * @author Bart Vermeiren
  */
-public class DefaultConstraintsDisabler extends BaseDatabaseTask implements ConstraintsDisabler {
+public class DefaultConstraintsDisabler extends BaseDatabaseAccessor implements ConstraintsDisabler {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultConstraintsDisabler.class);

@@ -15,7 +15,7 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.unitils.dbmaintainer.util.DatabaseTask;
+import org.unitils.dbmaintainer.util.DatabaseAccessing;
 
 /**
  * Defines the contract for implementation classes that update all sequences and identity columns of a database to
@@ -24,7 +24,7 @@ import org.unitils.dbmaintainer.util.DatabaseTask;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public interface SequenceUpdater extends DatabaseTask {
+public interface SequenceUpdater extends DatabaseAccessing {
 
 
     /**

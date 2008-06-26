@@ -26,8 +26,10 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
@@ -66,7 +68,7 @@ public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        SQLHandler sqlHandler = new SQLHandler(dataSource);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         // first create database, otherwise items to preserve do not yet exist

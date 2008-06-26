@@ -18,7 +18,7 @@ package org.unitils.dbmaintainer.structure.impl;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
@@ -38,7 +38,7 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGenerator extends BaseDatabaseTask implements DataSetStructureGenerator {
+public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implements DataSetStructureGenerator {
 
     /* Property key for the target directory for the generated xsd files */
     public static final String PROPKEY_XSD_DIR_NAME = "dataSetStructureGenerator.xsd.dirName";

@@ -16,7 +16,8 @@
 package org.unitils.dbunit.datasetfactory;
 
 import java.io.File;
-import java.util.Properties;
+
+import org.unitils.core.util.Configurable;
 
 /**
  * Resolves the location for a data set with a certain name.
@@ -25,15 +26,7 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tuomas Jormola
  */
-public interface DataSetResolver {
-
-
-    /**
-     * Initializes the resolver with the given configuration.
-     *
-     * @param configuration The configuration, not null
-     */
-    void init(Properties configuration);
+public interface DataSetResolver extends Configurable {
 
 
     /**

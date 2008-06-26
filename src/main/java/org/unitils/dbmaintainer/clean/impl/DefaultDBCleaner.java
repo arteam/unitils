@@ -21,7 +21,6 @@ import org.unitils.core.dbsupport.DbSupport;
 import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SCHEMAS;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
 import static org.unitils.util.PropertyUtils.getStringList;
 
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
 /**
  * Implementation of {@link DBCleaner}. This implementation will delete all data from a database, except for the tables
  * that are configured as tables to preserve. This includes the tables that are listed in the property
@@ -38,7 +38,7 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
+public class DefaultDBCleaner extends BaseDatabaseAccessor implements DBCleaner {
 
     /**
      * Property key for schemas in which none of the tables should be cleaned
@@ -59,7 +59,7 @@ public class DefaultDBCleaner extends BaseDatabaseTask implements DBCleaner {
      * The key of the property that specifies the name of the datase table in which the
      * DB version is stored. This table should not be deleted
      */
-    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.dbVersionSource.tableName";
+    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.executedScriptsTableName";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBCleaner.class);

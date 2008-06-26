@@ -93,8 +93,8 @@ public class DatabaseUnitils {
      * the database version is not yet set to the current one. This method can also be useful for example for
      * reinitializing the database after having reorganized the scripts folder.
      */
-    public static void setDatabaseToCurrentVersion() {
-        getDatabaseModule().setDatabaseToCurrentVersion();
+    public static void resetDatabaseState() {
+        getDatabaseModule().resetDatabaseState();
     }
 
 

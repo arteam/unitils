@@ -18,12 +18,14 @@ package org.unitils.dbmaintainer.script.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptContentHandle;
 import org.unitils.dbmaintainer.script.ScriptParser;
 import org.unitils.dbmaintainer.script.ScriptRunner;
-import org.unitils.dbmaintainer.util.BaseDatabaseTask;
+import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
+
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.ConfigUtils.getConfiguredInstance;
 import org.unitils.util.PropertyUtils;
 
 import java.io.Reader;
@@ -34,11 +36,7 @@ import java.io.Reader;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultScriptRunner extends BaseDatabaseTask implements ScriptRunner {
-
-    /* The logger instance for this class */
-    private static Log logger = LogFactory.getLog(DefaultScriptRunner.class);
-
+public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptRunner {
 
     /**
      * Executes the given script.
@@ -46,15 +44,14 @@ public class DefaultScriptRunner extends BaseDatabaseTask implements ScriptRunne
      * All statements should be separated with a semicolon (;). The last statement will be
      * added even if it does not end with a semicolon.
      *
-     * @param script The script as a string, not null
+     * @param scriptContentHandle The script as a string, not null
      */
-    public void execute(Script script) {
-        logger.info("Executing script " + script.getName());
+    public void execute(ScriptContentHandle scriptContentHandle) {
 
         Reader scriptContentReader = null;
         try {
             // get content stream
-            scriptContentReader = script.openScriptContentReader();
+            scriptContentReader = scriptContentHandle.openScriptContentReader();
 
             // create a parser
             ScriptParser scriptParser = createScriptParser();
@@ -78,6 +75,6 @@ public class DefaultScriptRunner extends BaseDatabaseTask implements ScriptRunne
      */
     protected ScriptParser createScriptParser() {
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
-        return getConfiguredInstance(ScriptParser.class, configuration, databaseDialect);
+        return getInstanceOf(ScriptParser.class, configuration, databaseDialect);
     }
 }
