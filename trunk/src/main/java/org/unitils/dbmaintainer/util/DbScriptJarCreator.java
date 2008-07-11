@@ -8,7 +8,6 @@
 package org.unitils.dbmaintainer.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,10 +86,8 @@ public class DbScriptJarCreator {
      * @param extensions If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS
      * @param postProcessingDirNameStartsWith If not null, overrides the property DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH
      */
-	public DbScriptJarCreator(String configurationFileName, String location, String extensions, String postProcessingDirNameStartsWith) {
-		if (configurationFileName != null) {
-			loadProperties(configurationFileName);
-		}
+	public DbScriptJarCreator(String location, String extensions, String postProcessingDirNameStartsWith) {
+		loadProperties();
         this.postProcessingDirNameStartsWith = postProcessingDirNameStartsWith;
         this.location = location;
         this.extensions = extensions;
@@ -101,13 +98,8 @@ public class DbScriptJarCreator {
 	 * Loads the default configuration and the given properties file
 	 * @param sourcePropertiesFile
 	 */
-	private void loadProperties(String sourcePropertiesFile) {
+	private void loadProperties() {
 		configuration = new ConfigurationLoader().getDefaultConfiguration();
-		try {
-			configuration.load(new FileInputStream(sourcePropertiesFile));
-		} catch (IOException e) {
-			throw new UnitilsException("Error while loading properties file " + sourcePropertiesFile, e);
-		}
 	}
 
 	
@@ -139,6 +131,7 @@ public class DbScriptJarCreator {
 		}
     }
 
+    
     /**
      * Writes the entry with the given name and content to the given {@link JarOutputStream}
      * 
@@ -183,9 +176,9 @@ public class DbScriptJarCreator {
 		if (scriptExtensions != null) {
 			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, scriptExtensions);
 		}
-		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH) : null);
+		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME) : null);
 		if (postPrDirNameStartsWith != null) {
-			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH, postPrDirNameStartsWith);
+			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postPrDirNameStartsWith);
 		}
 		return conf;
 	}
@@ -204,9 +197,9 @@ public class DbScriptJarCreator {
 		if (scriptExtensions != null) {
 			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, scriptExtensions);
 		}
-		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH) : null);
+		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME) : null);
 		if (postPrDirNameStartsWith != null) {
-			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH, postPrDirNameStartsWith);
+			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postPrDirNameStartsWith);
 		}
 		return conf;
 	}

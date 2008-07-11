@@ -42,17 +42,20 @@ public class DefaultConstraintsDisabler extends BaseDatabaseAccessor implements 
      * Permanently disable every foreign key or not-null constraint
      */
     public void removeConstraints() {
-        for (DbSupport dbSupport : dbSupports) {
-            logger.info("Disabling contraints in database schema " + dbSupport.getSchemaName());
-
-            // first remove referential constraints to avoid conflicts
-            Set<String> tableNames = dbSupport.getTableNames();
-            for (String tableName : tableNames) {
-                removeReferentialConstraints(tableName, dbSupport);
-            }
-            // remove not-null and check constraints
-            for (String tableName : tableNames) {
-                removeValueConstraints(tableName, dbSupport);
+        for (DbSupport dbSupport : getDbSupports()) {
+            for (String schemaName : dbSupport.getSchemaNames()) {
+	        	logger.info("Disabling contraints in database " + (dbSupport.getDatabaseName() != null ? dbSupport.getDatabaseName() + 
+	        			", and schema " : "schema ") + schemaName);
+	
+	            // first remove referential constraints to avoid conflicts
+	            Set<String> tableNames = dbSupport.getTableNames(schemaName);
+	            for (String tableName : tableNames) {
+	                removeReferentialConstraints(dbSupport, schemaName, tableName);
+	            }
+	            // remove not-null and check constraints
+	            for (String tableName : tableNames) {
+	                removeValueConstraints(dbSupport, schemaName, tableName);
+	            }
             }
         }
     }
@@ -60,13 +63,13 @@ public class DefaultConstraintsDisabler extends BaseDatabaseAccessor implements 
 
     /**
      * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
-     * @param tableName The table, not null
      * @param dbSupport The dbSupport for the database, not null
+     * @param schemaName 
+     * @param tableName The table, not null
      */
-    protected void removeReferentialConstraints(String tableName, DbSupport dbSupport) {
+    protected void removeReferentialConstraints(DbSupport dbSupport, String schemaName, String tableName) {
         try {
-            dbSupport.removeReferentialConstraints(tableName);
+            dbSupport.removeReferentialConstraints(schemaName, tableName);
         } catch (Throwable t) {
             logger.error("Unable to remove referential constraints for table " + tableName, t);
         }
@@ -75,13 +78,13 @@ public class DefaultConstraintsDisabler extends BaseDatabaseAccessor implements 
 
     /**
      * Disables all value constraints (e.g. not null) on the specified table
-     *
-     * @param tableName The table, not null
      * @param dbSupport The dbSupport for the database, not null
+     * @param schemaName 
+     * @param tableName The table, not null
      */
-    protected void removeValueConstraints(String tableName, DbSupport dbSupport) {
+    protected void removeValueConstraints(DbSupport dbSupport, String schemaName, String tableName) {
         try {
-            dbSupport.removeValueConstraints(tableName);
+            dbSupport.removeValueConstraints(schemaName, tableName);
         } catch (Throwable t) {
             logger.error("Unable to remove value constraints for table " + tableName, t);
         }

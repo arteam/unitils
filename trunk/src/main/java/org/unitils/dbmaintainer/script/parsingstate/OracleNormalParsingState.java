@@ -58,7 +58,7 @@ public class OracleNormalParsingState extends NormalParsingState {
             String trimmedLine = lineBuffer.toString().trim();
             lineBuffer.setLength(0);
 
-            // if a line is found that only contains a slash (/) the end of a statementis reacheed
+            // if a line is found that only contains a slash (/) the end of a statement is reached
             if ("/".equals(trimmedLine)) {
                 parsingCodeBlock = false;
                 statementBuffer.setLength(0);

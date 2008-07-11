@@ -107,9 +107,9 @@ public class UnitilsIntegrationTest {
     	System.setProperty("DatabaseModule.Transactional.value.default", "commit");
         Unitils.initSingletonInstance();
         runTest(JdbcTest.class, "testFindById");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(JdbcTest.class, "testPersist");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
     
     @Test
@@ -117,9 +117,9 @@ public class UnitilsIntegrationTest {
     	System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
         Unitils.initSingletonInstance();
         runTest(JdbcTest.class, "testFindById");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(JdbcTest.class, "testPersist");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     @Test
@@ -128,9 +128,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("jpa.persistenceProvider", "hibernate");
         Unitils.initSingletonInstance();
         runTest(HibernateJpaTest.class, "testFindById");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateJpaTest.class, "testPersist");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateJpaTest.class, "testMapping");
     }
 
@@ -140,9 +140,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("jpa.persistenceProvider", "hibernate");
         Unitils.initSingletonInstance();
         runTest(HibernateJpaTest.class, "testFindById");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateJpaTest.class, "testPersist");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateJpaTest.class, "testMapping");
     }
 
@@ -152,9 +152,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("jpa.persistenceProvider", "toplink");
         Unitils.initSingletonInstance();
         runTest(ToplinkJpaTest.class, "testFindById");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(ToplinkJpaTest.class, "testPersist");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         JpaUnitils.getEntityManagerFactory().close();
     }
 
@@ -164,9 +164,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("jpa.persistenceProvider", "toplink");
         Unitils.initSingletonInstance();
         runTest(ToplinkJpaTest.class, "testFindById");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(ToplinkJpaTest.class, "testPersist");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         JpaUnitils.getEntityManagerFactory().close();
     }
 
@@ -176,9 +176,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("jpa.persistenceProvider", "openjpa");
         Unitils.initSingletonInstance();
         runTest(OpenJpaTest.class, "testFindById");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(OpenJpaTest.class, "testPersist");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     @Test
@@ -187,9 +187,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("jpa.persistenceProvider", "openjpa");
         Unitils.initSingletonInstance();
         runTest(OpenJpaTest.class, "testFindById");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(OpenJpaTest.class, "testPersist");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     @Test
@@ -198,9 +198,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("DatabaseModule.Transactional.value.default", "commit");
         Unitils.initSingletonInstance();
         runTest(HibernateJpaSpringTest.class, "testFindById");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateJpaSpringTest.class, "testPersist");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     @Test
@@ -209,9 +209,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
         Unitils.initSingletonInstance();
         runTest(HibernateJpaSpringTest.class, "testFindById");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateJpaSpringTest.class, "testPersist");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     @Test
@@ -219,9 +219,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("DatabaseModule.Transactional.value.default", "commit");
         Unitils.initSingletonInstance();
         runTest(HibernateTest.class, "testFindById");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateTest.class, "testPersist");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     @Test
@@ -229,9 +229,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
         Unitils.initSingletonInstance();
         runTest(HibernateTest.class, "testFindById");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateTest.class, "testPersist");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     @Test
@@ -240,9 +240,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("DatabaseModule.Transactional.value.default", "commit");
         Unitils.initSingletonInstance();
         runTest(HibernateSpringTest.class, "testFindById");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateSpringTest.class, "testPersist");
-        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(1, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     @Test
@@ -251,9 +251,9 @@ public class UnitilsIntegrationTest {
         System.setProperty("DatabaseModule.Transactional.value.default", "rollback");
         Unitils.initSingletonInstance();
         runTest(HibernateSpringTest.class, "testFindById");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
         runTest(HibernateSpringTest.class, "testPersist");
-        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDataSource()));
+        assertEquals(0, SQLUnitils.getItemAsLong("select count(*) from person", DatabaseUnitils.getDefaultDataSource()));
     }
 
     protected void runTest(Class<?> testClass, final String testMethodName) throws InitializationError, IOException {

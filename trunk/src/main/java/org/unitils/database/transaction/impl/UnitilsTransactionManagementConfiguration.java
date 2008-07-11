@@ -15,6 +15,8 @@
  */
 package org.unitils.database.transaction.impl;
 
+import java.util.Set;
+
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -43,6 +45,6 @@ public interface UnitilsTransactionManagementConfiguration {
 	 * @param testObject The test object, not null
 	 * @return A <code>PlatformTransactionManager</code> that can provide transactional behavior for the given test object.
 	 */
-	PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject);
+	Set<PlatformTransactionManager> getSpringPlatformTransactionManagers(Object testObject);
 
 }

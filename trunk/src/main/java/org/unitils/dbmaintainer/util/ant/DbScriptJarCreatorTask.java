@@ -24,13 +24,11 @@ import org.unitils.dbmaintainer.util.DbScriptJarCreator;
 
 /**
  * @author Alexander Snaps <alex.snaps@gmail.com>
- * @version $Revision$
+ * @author Filip Neven
  */
 public class DbScriptJarCreatorTask extends Task {
 
     private String jarFileName;
-    
-    private String sourcePropertiesFileName;
     
     private String location;
     private String extensions;
@@ -40,7 +38,7 @@ public class DbScriptJarCreatorTask extends Task {
             throws BuildException {
 
         try {
-			DbScriptJarCreator creator = new DbScriptJarCreator(sourcePropertiesFileName, location, extensions, postProcessingLocation);
+			DbScriptJarCreator creator = new DbScriptJarCreator(location, extensions, postProcessingLocation);
             creator.createJar(jarFileName);
         } catch(Exception e) {
         	e.printStackTrace();
@@ -51,10 +49,6 @@ public class DbScriptJarCreatorTask extends Task {
     public void setJarFileName(String jarFileName) {
         this.jarFileName = jarFileName;
     }
-
-    public void setSourcePropertiesFileName(String sourcePropertiesFileName) {
-		this.sourcePropertiesFileName = sourcePropertiesFileName;
-	}
 
 	public void setLocation(String location) {
         this.location = location;

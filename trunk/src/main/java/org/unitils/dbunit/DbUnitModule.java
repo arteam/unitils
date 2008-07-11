@@ -15,6 +15,25 @@
  */
 package org.unitils.dbunit;
 
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefault;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getClassValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import static org.unitils.util.ReflectionUtils.getClassWithName;
+
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbunit.database.DatabaseConfig;
@@ -25,13 +44,6 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-
-import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.util.ConfigUtils;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
@@ -42,18 +54,6 @@ import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
 import org.unitils.dbunit.util.DbUnitAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.ModuleUtils.*;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getClassWithName;
-
-import javax.sql.DataSource;
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Module that provides support for managing database test data using DBUnit.
@@ -381,12 +381,10 @@ public class DbUnitModule implements Module {
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
         // A DbSupport instance is fetched in order to get the schema name in correct case
-        DataSource dataSource = getDatabaseModule().getDataSource();
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
+        DbSupport dbSupport = getDefaultDbSupport();
 
         // Create connection
-        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dataSource, dbSupport.getSchemaName());
+        DbUnitDatabaseConnection connection = new DbUnitDatabaseConnection(dbSupport.getDataSource(), schemaName);
         DatabaseConfig config = connection.getConfig();
 
         // Make sure that dbunit's correct IDataTypeFactory, that handles dbms specific data type issues, is used
@@ -396,7 +394,7 @@ public class DbUnitModule implements Module {
         config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
         // Make sure that batched statements are used to insert the data into the database
         config.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, "true");
-        // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)
+        // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used directly to ensure dbunit-2.2 compliancy)
         config.setProperty("http://www.dbunit.org/features/skipOracleRecycleBinTables", "true");
 
         return connection;
@@ -480,7 +478,7 @@ public class DbUnitModule implements Module {
      */
     protected DataSetFactory getDataSetFactory(Class<? extends DataSetFactory> dataSetFactoryClass) {
         DataSetFactory dataSetFactory = createInstanceOfType(dataSetFactoryClass, false);
-        dataSetFactory.init(configuration, getDefaultDbSupport().getSchemaName());
+        dataSetFactory.init(configuration, getDatabaseModule().getDefaultDbSupport().getDefaultSchemaName());
         return dataSetFactory;
     }
 
@@ -502,16 +500,12 @@ public class DbUnitModule implements Module {
         DataSetResolver dataSetResolver = ConfigUtils.getConfiguredInstanceOf(DataSetResolver.class, configuration);
         return dataSetResolver;
     }
-
-
-    /**
-     * @return The default DbSupport (the one that connects to the default database schema)
-     */
+    
+    
     protected DbSupport getDefaultDbSupport() {
-        DataSource dataSource = getDatabaseModule().getDataSource();
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
-    }
+		DbSupport dbSupport = getDatabaseModule().getDefaultDbSupport();
+		return dbSupport;
+	}
 
 
     /**

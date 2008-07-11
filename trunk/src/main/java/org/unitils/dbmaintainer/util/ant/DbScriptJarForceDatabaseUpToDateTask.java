@@ -25,44 +25,51 @@ import java.util.Map;
 import org.apache.tools.ant.BuildException;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.dbmaintainer.util.DbScriptJarRunner;
+import org.unitils.dbmaintainer.util.DbScriptJarDatabaseUpToDateForcer;
 
 /**
- * @author Alexander Snaps <alex.snaps@gmail.com>
- * @version $Revision$
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-public class DbScriptJarRunnerTask extends BaseDatabaseTask {
+public class DbScriptJarForceDatabaseUpToDateTask extends BaseDatabaseTask {
 
-    private String jarFileName;
+	private String jarFileName;
     private List<DatabaseType> databases = new ArrayList<DatabaseType>();
 
     public void execute() throws BuildException {
 
     	try {
-			if (databases.size() == 0) {
-				throw new UnitilsException("No target database defined");
-			}
-			DbSupport defaultDbSupport = null;
-			Map<String, DbSupport> nameDbSupportMap = new HashMap<String, DbSupport>();
-			for (DatabaseType database : databases) {
-				DbSupport dbSupport = createDbSupport(database);
-				nameDbSupportMap.put(dbSupport.getDatabaseName(), dbSupport);
-				if (defaultDbSupport == null) {
-					defaultDbSupport = dbSupport;
-				}
-			}
-			new DbScriptJarRunner(defaultDbSupport, nameDbSupportMap).executeJar(jarFileName);
+    		if (databases.size() == 0) {
+    			throw new UnitilsException("No target database defined");
+    		}
+    		
+    		DbSupport defaultDbSupport = null;
+    		Map<String, DbSupport> nameDbSupportMap = new HashMap<String, DbSupport>();
+    		for (DatabaseType database : databases) {
+    			DbSupport dbSupport = createDbSupport(database);
+    			nameDbSupportMap.put(dbSupport.getDatabaseName(), dbSupport);
+    			if (defaultDbSupport == null) {
+    				defaultDbSupport = dbSupport;
+    			}
+    		}
+			
+			new DbScriptJarDatabaseUpToDateForcer(defaultDbSupport, nameDbSupportMap).resetDatabaseState(jarFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new BuildException(e);
 		}
     }
 
-    public void setJarFilename(String fileName) {
+
+    
+
+
+	public void setJarFilename(String fileName) {
         this.jarFileName = fileName;
     }
 
-    public void add(DatabaseType database) {
+	public void add(DatabaseType database) {
 		databases.add(database);
 	}
+	
 }

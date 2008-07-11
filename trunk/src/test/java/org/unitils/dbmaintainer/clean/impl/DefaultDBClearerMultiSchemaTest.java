@@ -17,8 +17,6 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
-import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
@@ -33,12 +31,9 @@ import org.hsqldb.Trigger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
-import org.unitils.database.annotations.TestDataSource;
+import org.unitils.core.util.TestUtils;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.util.PropertyUtils;
 
@@ -49,26 +44,19 @@ import org.unitils.util.PropertyUtils;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
+public class DefaultDBClearerMultiSchemaTest {
 
 	/* The logger instance for this class */
 	private static Log logger = LogFactory.getLog(DefaultDBClearerMultiSchemaTest.class);
 
-	/* DataSource for the test database, is injected */
-	@TestDataSource
-	private DataSource dataSource = null;
+	/* DataSource for the test database */
+	private DataSource dataSource;
 
 	/* Tested object */
 	private DefaultDBClearer defaultDbClearer;
 
-	/* The db support for the default PUBLIC schema */
-	private DbSupport dbSupportPublic;
-
-	/* The db support for the SCHEMA_A schema */
-	private DbSupport dbSupportSchemaA;
-
-	/* The db support for the SCHEMA_B schema */
-	private DbSupport dbSupportSchemaB;
+	/* The db support */
+	private DbSupport dbSupport;
 
 	/* True if current test is not for the current dialect */
 	private boolean disabled;
@@ -80,20 +68,18 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 	@Before
 	public void setUp() throws Exception {
 		Properties configuration = new ConfigurationLoader().loadConfiguration();
-		this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
+		String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
+		this.disabled = !"hsqldb".equals(databaseDialect);
 		if (disabled) {
 			return;
 		}
 
 		// configure 3 schemas
-		configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
-		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-		dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC");
-		dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A");
-		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B");
-		// create clearer instance
-		defaultDbClearer = new DefaultDBClearer();
-		defaultDbClearer.init(configuration, sqlHandler);
+		configuration.setProperty("database.schemaNames", "PUBLIC, SCHEMA_A, SCHEMA_B");
+
+		dbSupport = TestUtils.getDefaultDbSupport(configuration);
+        dataSource = dbSupport.getDataSource();
+		defaultDbClearer = TestUtils.getDefaultDBClearer(configuration, dbSupport);
 
 		dropTestDatabase();
 		createTestDatabase();
@@ -121,13 +107,13 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 			logger.warn("Test is not for current dialect. Skipping test.");
 			return;
 		}
-		assertEquals(1, dbSupportPublic.getTableNames().size());
-		assertEquals(1, dbSupportSchemaA.getTableNames().size());
-		assertEquals(1, dbSupportSchemaB.getTableNames().size());
+		assertEquals(1, dbSupport.getTableNames("PUBLIC").size());
+		assertEquals(1, dbSupport.getTableNames("SCHEMA_A").size());
+		assertEquals(1, dbSupport.getTableNames("SCHEMA_B").size());
 		defaultDbClearer.clearSchemas();
-		assertTrue(dbSupportPublic.getTableNames().isEmpty());
-		assertTrue(dbSupportSchemaA.getTableNames().isEmpty());
-		assertTrue(dbSupportSchemaB.getTableNames().isEmpty());
+		assertTrue(dbSupport.getTableNames("PUBLIC").isEmpty());
+		assertTrue(dbSupport.getTableNames("SCHEMA_A").isEmpty());
+		assertTrue(dbSupport.getTableNames("SCHEMA_B").isEmpty());
 	}
 
 
@@ -140,13 +126,13 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 			logger.warn("Test is not for current dialect. Skipping test.");
 			return;
 		}
-		assertEquals(1, dbSupportPublic.getViewNames().size());
-		assertEquals(1, dbSupportSchemaA.getViewNames().size());
-		assertEquals(1, dbSupportSchemaB.getViewNames().size());
+		assertEquals(1, dbSupport.getViewNames("PUBLIC").size());
+		assertEquals(1, dbSupport.getViewNames("SCHEMA_A").size());
+		assertEquals(1, dbSupport.getViewNames("SCHEMA_B").size());
 		defaultDbClearer.clearSchemas();
-		assertTrue(dbSupportPublic.getViewNames().isEmpty());
-		assertTrue(dbSupportSchemaA.getViewNames().isEmpty());
-		assertTrue(dbSupportSchemaB.getViewNames().isEmpty());
+		assertTrue(dbSupport.getViewNames("PUBLIC").isEmpty());
+		assertTrue(dbSupport.getViewNames("SCHEMA_A").isEmpty());
+		assertTrue(dbSupport.getViewNames("SCHEMA_B").isEmpty());
 	}
 
 
@@ -159,13 +145,13 @@ public class DefaultDBClearerMultiSchemaTest extends UnitilsJUnit4 {
 			logger.warn("Test is not for current dialect. Skipping test.");
 			return;
 		}
-		assertEquals(1, dbSupportPublic.getSequenceNames().size());
-		assertEquals(1, dbSupportSchemaA.getSequenceNames().size());
-		assertEquals(1, dbSupportSchemaB.getSequenceNames().size());
+		assertEquals(1, dbSupport.getSequenceNames("PUBLIC").size());
+		assertEquals(1, dbSupport.getSequenceNames("SCHEMA_A").size());
+		assertEquals(1, dbSupport.getSequenceNames("SCHEMA_B").size());
 		defaultDbClearer.clearSchemas();
-		assertTrue(dbSupportPublic.getSequenceNames().isEmpty());
-		assertTrue(dbSupportSchemaA.getSequenceNames().isEmpty());
-		assertTrue(dbSupportSchemaB.getSequenceNames().isEmpty());
+		assertTrue(dbSupport.getSequenceNames("PUBLIC").isEmpty());
+		assertTrue(dbSupport.getSequenceNames("SCHEMA_A").isEmpty());
+		assertTrue(dbSupport.getSequenceNames("SCHEMA_B").isEmpty());
 	}
 
 

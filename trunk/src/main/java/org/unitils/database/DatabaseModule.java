@@ -15,11 +15,39 @@
  */
 package org.unitils.database;
 
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.database.util.TransactionMode.COMMIT;
+import static org.unitils.database.util.TransactionMode.DEFAULT;
+import static org.unitils.database.util.TransactionMode.DISABLED;
+import static org.unitils.database.util.TransactionMode.ROLLBACK;
+import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
+import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
+import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
@@ -30,9 +58,6 @@ import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
-
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.database.util.TransactionMode.*;
 import org.unitils.database.util.spring.DatabaseSpringSupport;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.clean.DBCleaner;
@@ -40,20 +65,10 @@ import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.dbmaintainer.util.DatabaseAccessing;
-import static org.unitils.util.AnnotationUtils.*;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.PropertyUtils;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import javax.sql.DataSource;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.*;
+import org.unitils.util.ReflectionUtils;
 
 /**
  * Module that provides support for database testing: Creation of a datasource that connects to the
@@ -92,7 +107,11 @@ public class DatabaseModule implements Module {
      * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
      */
     public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
-
+    
+    
+    public static final String PROPERTY_DATABASE_NAMES = "database.names";
+    
+    
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
@@ -101,10 +120,17 @@ public class DatabaseModule implements Module {
      */
     protected Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
+    
     /**
      * The datasources with the name as key
      */
-    protected DataSource dataSource;
+    protected Map<String, DataSource> dataSources;
+    
+    
+    protected  Map<String, DbSupport> nameDbSupportMap;
+    
+    
+    protected DbSupport defaultDbSupport;
 
     /**
      * The configuration of Unitils
@@ -160,37 +186,93 @@ public class DatabaseModule implements Module {
     public void afterInit() {
         initDatabaseSpringSupport();
     }
-
+    
 
     /**
-     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
-     * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
+     * Returns the <code>DataSource</code> that provides connection to the test database identified by the given name. 
+     * When invoked the first time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database 
+     * updating is enabled)
      *
      * @return The <code>DataSource</code>
      */
-    public DataSource getDataSource() {
-        if (dataSource == null) {
-            dataSource = createDataSource();
-        }
-        return dataSource;
+    public DataSource getDataSource(String name) {
+    	return getDbSupport(name).getDataSource();
     }
+    
+    
+	public DbSupport getDefaultDbSupport() {
+		if (defaultDbSupport == null) {
+			initDbSupports();
+		}
+		return defaultDbSupport;
+	}
+	
+	
+	protected DbSupport getDbSupport(String name) {
+		if (defaultDbSupport == null) {
+			initDbSupports();
+		}
+		if (name == null) {
+    		return defaultDbSupport;
+    	}
+    	DbSupport dbSupport = nameDbSupportMap.get(name);
+        if (dbSupport == null) {
+            throw new UnitilsException("No test database configured with the name '" + name + "'");
+        }
+        return dbSupport;
+	}
+	
+	
+	
+	protected Map<String, DbSupport> getNameDbSupportMap() {
+		if (nameDbSupportMap == null) {
+			initDbSupports();
+		}
+		return nameDbSupportMap;
+	}
+
+
+	protected void initDbSupports() {
+		SQLHandler sqlHandler = getDefaultSqlHandler();
+		
+		nameDbSupportMap = new HashMap<String, DbSupport>();
+		DbSupportFactory dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DbSupportFactory.class, configuration);
+		List<String> databaseNames = PropertyUtils.getStringList(PROPERTY_DATABASE_NAMES, configuration);
+		if (databaseNames.isEmpty()) {
+			defaultDbSupport = dataSourceFactory.createDefaultDbSupport(sqlHandler);
+			nameDbSupportMap.put(null, defaultDbSupport);
+		} else {
+			for (String databaseName : databaseNames) {
+				DbSupport dbSupport = dataSourceFactory.createDbSupport(databaseName, sqlHandler);
+				nameDbSupportMap.put(databaseName, dbSupport);
+				if (defaultDbSupport == null) {
+					defaultDbSupport = dbSupport;
+				}
+			}
+		}
+		
+		if (updateDatabaseSchemaEnabled) {
+			updateDatabase();
+		}
+	}
 
 
     /**
-     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
+     * Returns the <code>DataSource</code> that provides connection to the test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
      * If the property {@link #PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY} has been set to true, the <code>DataSource</code>
      * returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code> is returned,
      * and that invocations of the close() method of these connections are suppressed.
-     *
+     * @param name 
      * @param testObject The test instance, not null
+     *
      * @return The <code>DataSource</code>
      */
-    public DataSource getTransactionalDataSource(Object testObject) {
+    public DataSource getTransactionalDataSource(String name, Object testObject) {
         if (wrapDataSourceInTransactionalProxy) {
-            return getTransactionManager().getTransactionalDataSource(getDataSource());
+            return getTransactionManager().getTransactionalDataSource(getDataSource(name));
         }
-        return getDataSource();
+        return getDataSource(name);
     }
 
 
@@ -202,13 +284,22 @@ public class DatabaseModule implements Module {
     public UnitilsTransactionManager getTransactionManager() {
         if (transactionManager == null) {
             transactionManager = getInstanceOf(UnitilsTransactionManager.class, configuration);
-            transactionManager.init(transactionManagementConfigurations, databaseSpringSupport);
+            transactionManager.init(transactionManagementConfigurations, databaseSpringSupport, getDataSources());
         }
         return transactionManager;
     }
 
 
-    /**
+    protected Set<DataSource> getDataSources() {
+		Set<DataSource> result = new HashSet<DataSource>();
+		for (DbSupport dbSupport : getNameDbSupportMap().values()) {
+			result.add(dbSupport.getDataSource());
+		}
+		return result;
+	}
+
+
+	/**
      * Flushes all pending updates to the database. This method is useful when the effect of updates needs to
      * be checked directly on the database.
      * <p/>
@@ -243,7 +334,7 @@ public class DatabaseModule implements Module {
      */
     public void updateDatabase(SQLHandler sqlHandler) {
         logger.info("Checking if database has to be updated.");
-        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, getDefaultDbSupport(), getNameDbSupportMap());
         dbMaintainer.updateDatabase();
     }
 
@@ -268,7 +359,7 @@ public class DatabaseModule implements Module {
      * @param sqlHandler The {@link DefaultSQLHandler} to which all commands are issued
      */
     public void resetDatabaseState(SQLHandler sqlHandler) {
-        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler, getDefaultDbSupport(), getNameDbSupportMap());
         dbMaintainer.resetDatabaseState();
     }
 
@@ -276,34 +367,39 @@ public class DatabaseModule implements Module {
     /**
      * Assigns the <code>TestDataSource</code> to every field annotated with {@link TestDataSource} and calls all methods
      * annotated with {@link TestDataSource}
-     *
+
      * @param testObject The test instance, not null
      */
-    public void injectDataSource(Object testObject) {
+    public void injectDataSources(Object testObject) {
         Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
-        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
-        if (fields.isEmpty() && methods.isEmpty()) {
-            // Nothing to do. Jump out to make sure that we don't try to instantiate the DataSource
-            return;
+        for (Field field : fields) {
+        	String name = StringUtils.trimToNull(field.getAnnotation(TestDataSource.class).value());
+        	ReflectionUtils.setFieldValue(testObject, field, getDataSource(name));
         }
-        setFieldAndSetterValue(testObject, fields, methods, getTransactionalDataSource(testObject));
+        
+        Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
+        for (Method method : methods) {
+        	String name = StringUtils.trimToNull(method.getAnnotation(TestDataSource.class).value());
+        	ReflectionUtils.invokeMethodSilent(testObject, method, getDataSource(name));
+        }
     }
 
 
     /**
      * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
-     *
+     * 
+     * @param name Optional name that identifies the datasource
      * @return the datasource
      */
-    protected DataSource createDataSource() {
+    protected DataSource createDataSource(String name) {
         // Get the factory for the data source and create it
         DataSourceFactory dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DataSourceFactory.class, configuration);
         dataSourceFactory.init(configuration);
-        DataSource dataSource = dataSourceFactory.createDataSource();
+        DataSource dataSource = dataSourceFactory.createDataSource(name);
 
         // Call the database maintainer if enabled
         if (updateDatabaseSchemaEnabled) {
-            updateDatabase(new DefaultSQLHandler(dataSource));
+            updateDatabase(new DefaultSQLHandler());
         }
         return dataSource;
     }
@@ -448,7 +544,7 @@ public class DatabaseModule implements Module {
      * @param databaseTaskType The type of database task, not null
      */
     protected <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
-        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler());
+        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler(), getDefaultDbSupport(), getNameDbSupportMap());
     }
 
 
@@ -457,7 +553,7 @@ public class DatabaseModule implements Module {
      *         test database
      */
     protected SQLHandler getDefaultSqlHandler() {
-        return new DefaultSQLHandler(getDataSource());
+        return new DefaultSQLHandler();
     }
 
 
@@ -508,7 +604,7 @@ public class DatabaseModule implements Module {
 
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
-            injectDataSource(testObject);
+            injectDataSources(testObject);
             startTransactionForTestMethod(testObject, testMethod);
         }
 

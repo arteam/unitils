@@ -18,13 +18,14 @@ package org.unitils.dbmaintainer.util;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
-
-import javax.sql.DataSource;
 
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
+import org.unitils.database.DatabaseModule;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.DefaultScriptSource;
@@ -38,19 +39,15 @@ import org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource;
  */
 public abstract class DbScriptJarHandler {
 
-	protected DataSource dataSource;
+	protected DbSupport defaultDbSupport;
 	
-	protected String databaseDialect;
+	protected Map<String, DbSupport> nameDbSupportMap;
 	
-	protected String schemaName;
-
 	
-	protected DbScriptJarHandler(DataSource dataSource, String databaseDialect,
-			String schemaName) {
+	protected DbScriptJarHandler(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap) {
 		super();
-		this.dataSource = dataSource;
-		this.databaseDialect = databaseDialect;
-		this.schemaName = schemaName;
+		this.defaultDbSupport = defaultDbSupport;
+		this.nameDbSupportMap= nameDbSupportMap;
 	}
 
 	/**
@@ -76,8 +73,8 @@ public abstract class DbScriptJarHandler {
 		configuration.put(DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, Boolean.toString(true));
 	
 		// Initialize the database dialect and schema name
-		configuration.put(DbSupportFactory.PROPKEY_DATABASE_DIALECT, databaseDialect);
-		configuration.put(DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES, schemaName);
+//		configuration.put(DatabaseModule.PROPERTY_DATABASE_DIALECT, databaseDialect);
+//		configuration.put(DatabaseModule.PROPERTY_DATABASE_SCHEMA_NAMES, schemaName);
 		
 		// Make sure the JarScriptSource is used, that reads scripts from the jar file instead of the file system
 		configuration.put(ScriptSource.class.getName() + ".implClassName", JarScriptSource.class.getName());

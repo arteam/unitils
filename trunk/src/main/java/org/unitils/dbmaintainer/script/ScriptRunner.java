@@ -32,6 +32,6 @@ public interface ScriptRunner extends DatabaseAccessing {
      *
      * @param script A handle that provides access to the content of the script, not null
      */
-    void execute(ScriptContentHandle scriptContentHandle);
+    void execute(Script script);
 
 }

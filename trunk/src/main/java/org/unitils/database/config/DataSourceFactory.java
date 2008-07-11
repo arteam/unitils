@@ -29,9 +29,13 @@ public interface DataSourceFactory extends Configurable {
 
     /**
      * Creates a new <code>DataSource</code>
+     * @param name 
      *
      * @return The DataSource, not null
      */
-    DataSource createDataSource();
+    DataSource createDataSource(String name);
+
+    
+	DataSource createDefaultDataSource();
 
 }

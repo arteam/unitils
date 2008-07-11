@@ -15,15 +15,11 @@
  */
 package org.unitils.dbmaintainer.script;
 
-import static org.unitils.util.FileUtils.getUrl;
-
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle;
 import org.unitils.dbmaintainer.version.Version;
 
 /**
@@ -39,6 +35,8 @@ public class Script implements Comparable<Script> {
     
     /* The version of the script */
     private Version version;
+    
+    private String targetDatabaseName;
 
     /* Timestamp that indicates when the file was last modified */
     private Long fileLastModifiedAt;
@@ -60,12 +58,13 @@ public class Script implements Comparable<Script> {
     public Script(String fileName, Long fileLastModifiedAt, ScriptContentHandle scriptContentHandle) {
         this.fileName = fileName;
         this.version = getVersionFromPath(fileName);
+        this.targetDatabaseName = getTargetDatabaseNameFromPath(fileName);
         this.fileLastModifiedAt = fileLastModifiedAt;
         this.scriptContentHandle = scriptContentHandle;
     }
     
     
-    /**
+	/**
      * Creates a script with the given fileName and content checksum. The contents of the scripts itself
      * are unknown, which makes a script that is created this way unsuitable for being executed. The reason
      * that we provide this constructor is to be able to store information of the script without having to
@@ -79,6 +78,7 @@ public class Script implements Comparable<Script> {
     public Script(String fileName, Long fileLastModifiedAt, String checkSum) {
     	this.fileName = fileName;
     	this.version = getVersionFromPath(fileName);
+    	this.targetDatabaseName = getTargetDatabaseNameFromPath(fileName);
     	this.fileLastModifiedAt = fileLastModifiedAt;
     	this.checkSum = checkSum;
     }
@@ -91,8 +91,25 @@ public class Script implements Comparable<Script> {
         return fileName;
     }
     
-
+    
     /**
+     * @return The version, not null
+     */
+    public Version getVersion() {
+        return version;
+    }
+    
+    
+    /**
+     * @return Logical name that indicates the target database on which this script must be executed. Can be null to
+     * indicate that it must be executed on the default target database.
+     */
+    public String getTargetDatabaseName() {
+		return targetDatabaseName;
+	}
+
+
+	/**
      * @return The timestamp at which the file in which this script is stored on the filesystem was last 
      * modified. Be careful: This can also be the timestamp on which this file was retrieved from the sourcde
      * control system. If the timestamp wasn't changed, we're almost 100% sure that this file has not been modified. If
@@ -116,14 +133,6 @@ public class Script implements Comparable<Script> {
 	}
 
 
-	/**
-     * @return The version, not null
-     */
-    public Version getVersion() {
-        return version;
-    }
-
-    
     /**
      * @return Handle that provides access to the content of the script. May be null! If so, this
      * object is not suitable for being executed. The checksum however cannot be null, so we can always
@@ -195,6 +204,7 @@ public class Script implements Comparable<Script> {
         return new Version(indexes);
     }
     
+    
     protected Version getVersionFromPath(String relativePath) {
     	String[] pathParts = StringUtils.split(relativePath, '/');
     	List<Long> versionIndexes = new ArrayList<Long>();
@@ -204,6 +214,7 @@ public class Script implements Comparable<Script> {
     	return new Version(versionIndexes);
     }
     
+    
     /**
      * Extracts the index part out of a given file name.
      *
@@ -212,14 +223,42 @@ public class Script implements Comparable<Script> {
      */
     protected Long extractIndex(String pathPart) {
         if (StringUtils.contains(pathPart, "_")) {
-            try {
-                return Long.parseLong(StringUtils.substringBefore(pathPart, "_"));
+        	String versionIndex = StringUtils.substringBefore(pathPart, "_");
+        	try {
+				return Long.parseLong(versionIndex);
             } catch (NumberFormatException e) {
                 // ignore
             }
         }
         return null;
     }
+    
+    
+    protected String getTargetDatabaseNameFromPath(String relativePath) {
+    	String[] pathParts = StringUtils.split(relativePath, '/');
+    	for (int i = pathParts.length - 1; i >= 0; i--) {
+    		String targetDatabase = extractTargetDatabase(pathParts[i]);
+    		if (targetDatabase != null) {
+    			return targetDatabase;
+    		}
+    	}
+    	return null;
+	}
+    
+    protected String extractTargetDatabase(String pathPart) {
+		Long index = extractIndex(pathPart);
+		String pathPartAfterIndex;
+		if (index == null) {
+			pathPartAfterIndex = pathPart;
+		} else {
+			pathPartAfterIndex = StringUtils.substringAfter(pathPart, "_");
+		}
+		if (pathPartAfterIndex.startsWith("@") && pathPartAfterIndex.contains("_")) {
+			String databaseName = StringUtils.substringBefore(pathPartAfterIndex, "_").substring(1);
+			return databaseName;
+		}
+		return null;
+	}
 
     
 	@Override
@@ -257,7 +296,7 @@ public class Script implements Comparable<Script> {
      */
     @Override
     public String toString() {
-        return fileName;
+        return fileName + " " + getCheckSum();
     }
 
 

@@ -63,6 +63,13 @@ public class CollectionUtils {
         result.addAll(asList(elements));
         return result;
     }
+    
+    
+    @SuppressWarnings("unchecked")
+	public static <T> Set<T> castGenericType(Set<?> set) {
+    	Set tmp = set;
+    	return (Set<T>) tmp;
+    }
 
 
     /**

@@ -15,10 +15,10 @@
  */
 package org.unitils.dbmaintainer.util;
 
+import java.util.Map;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.dbmaintainer.DBMaintainer;
 
@@ -26,16 +26,16 @@ import org.unitils.dbmaintainer.DBMaintainer;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DbScriptJarDatabaseResetter extends DbScriptJarHandler {
+public class DbScriptJarDatabaseUpToDateForcer extends DbScriptJarHandler {
 
-	public DbScriptJarDatabaseResetter(DataSource dataSource, String databaseDialect, String schemaName) {
-		super(dataSource, databaseDialect, schemaName);
+	public DbScriptJarDatabaseUpToDateForcer(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap) {
+		super(defaultDbSupport, nameDbSupportMap);
 	}
 
 	public void resetDatabaseState(String jarFileName) {
 		Properties configuration = getDbMaintainerConfiguration(jarFileName);
 		
-		DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource));
+		DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(), defaultDbSupport, nameDbSupportMap);
 		dbMaintainer.resetDatabaseState();
 	}
 }

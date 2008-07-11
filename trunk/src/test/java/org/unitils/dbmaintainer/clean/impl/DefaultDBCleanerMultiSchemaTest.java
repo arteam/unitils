@@ -15,26 +15,26 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.database.SQLUnitils.isEmpty;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.database.SQLUnitils.*;
-import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.util.TestUtils;
 import org.unitils.util.PropertyUtils;
-
-import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
  * Test class for the DBCleaner with multiple schemas.
@@ -44,14 +44,13 @@ import java.util.Properties;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
+public class DefaultDBCleanerMultiSchemaTest {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBCleanerMultiSchemaTest.class);
 
-    /* DataSource for the test database, is injected */
-    @TestDataSource
-    private DataSource dataSource = null;
+    /* DataSource for the test database */
+    private DataSource dataSource;
 
     /* Tested object */
     private DefaultDBCleaner defaultDbCleaner;
@@ -72,10 +71,10 @@ public class DefaultDBCleanerMultiSchemaTest extends UnitilsJUnit4 {
         }
 
         // configure 3 schemas
-        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, SCHEMA_B");
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        defaultDbCleaner = new DefaultDBCleaner();
-        defaultDbCleaner.init(configuration, sqlHandler);
+        configuration.setProperty("database.schemaNames", "PUBLIC, SCHEMA_A, SCHEMA_B");
+        DbSupport dbSupport = TestUtils.getDefaultDbSupport(configuration);
+        dataSource = dbSupport.getDataSource();
+        defaultDbCleaner = TestUtils.getDefaultDBCleaner(configuration, dbSupport);
 
         dropTestTables();
         createTestTables();
