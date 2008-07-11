@@ -15,17 +15,23 @@
  */
 package org.unitils.core.dbsupport;
 
-import org.unitils.core.UnitilsException;
-import org.unitils.core.util.StoredIdentifierCase;
-import static org.unitils.core.util.StoredIdentifierCase.*;
+import static org.unitils.core.util.StoredIdentifierCase.LOWER_CASE;
+import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
+import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import static org.unitils.util.PropertyUtils.getString;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+
+import javax.sql.DataSource;
+
+import org.unitils.core.UnitilsException;
+import org.unitils.core.util.StoredIdentifierCase;
 
 /**
  * Helper class that implements a number of common operations on a database schema. Operations that can be implemented
@@ -51,9 +57,14 @@ abstract public class DbSupport {
 
     /* The name of the DBMS implementation that is supported by this implementation */
     private String databaseDialect;
-
-    /* The name of the database schema */
-    private String schemaName;
+    
+    private String databaseName;
+    
+    private DataSource dataSource;
+    
+    private String defaultSchemaName;
+    
+    private Set<String> schemaNames;
 
     /* Gives access to the database */
     private SQLHandler sqlHandler;
@@ -83,18 +94,29 @@ abstract public class DbSupport {
      *
      * @param configuration The config, not null
      * @param sqlHandler    The sql handler, not null
-     * @param schemaName    The name of the database schema
+     * @param dataSource 
+     * @param databaseName 
+     * @param defaultSchemaName 
+     * @param schemaNames 
      */
-    public void init(Properties configuration, SQLHandler sqlHandler, String schemaName) {
-        this.sqlHandler = sqlHandler;
+    public void init(Properties configuration, SQLHandler sqlHandler, DataSource dataSource, String databaseName, 
+    		String defaultSchemaName, Set<String> schemaNames) {
+        
+    	this.sqlHandler = sqlHandler;
+        this.dataSource = dataSource;
+        this.databaseName = databaseName;
 
         String identifierQuoteStringProperty = getString(PROPKEY_IDENTIFIER_QUOTE_STRING + "." + getDatabaseDialect(), configuration);
         String storedIdentifierCaseValue = getString(PROPKEY_STORED_IDENTIFIER_CASE + "." + getDatabaseDialect(), configuration);
 
         this.identifierQuoteString = determineIdentifierQuoteString(identifierQuoteStringProperty);
         this.storedIdentifierCase = determineStoredIdentifierCase(storedIdentifierCaseValue);
-
-        this.schemaName = toCorrectCaseIdentifier(schemaName);
+        
+        this.defaultSchemaName = toCorrectCaseIdentifier(defaultSchemaName);
+        this.schemaNames = new HashSet<String>();
+        for (String schemaName : schemaNames) {
+        	this.schemaNames.add(toCorrectCaseIdentifier(schemaName));
+        }
     }
 
 
@@ -108,13 +130,28 @@ abstract public class DbSupport {
     }
 
 
-    /**
-     * Gets the schema name.
+    public String getDatabaseName() {
+    	return databaseName;
+    }
+
+
+	/**
+     * Gets the data source.
      *
-     * @return the schema name, not null
+     * @return the data source, not null
      */
-    public String getSchemaName() {
-        return schemaName;
+    public DataSource getDataSource() {
+		return dataSource;
+	}
+    
+    
+    public String getDefaultSchemaName() {
+    	return defaultSchemaName;
+    }
+    
+    
+    public Set<String> getSchemaNames() {
+    	return schemaNames;
     }
 
 
@@ -150,75 +187,83 @@ abstract public class DbSupport {
 
     /**
      * Returns the names of all tables in the database.
+     * @param schemaName 
      *
      * @return The names of all tables in the database
      */
-    public abstract Set<String> getTableNames();
+    public abstract Set<String> getTableNames(String schemaName);
 
 
     /**
      * Gets the names of all columns of the given table.
-     *
+     * @param schemaName 
      * @param tableName The table, not null
+     *
      * @return The names of the columns of the table with the given name
      */
-    public abstract Set<String> getColumnNames(String tableName);
+    public abstract Set<String> getColumnNames(String schemaName, String tableName);
 
 
     /**
      * Retrieves the names of all the views in the database schema.
+     * @param schemaName 
      *
      * @return The names of all views in the database
      */
-    public abstract Set<String> getViewNames();
+    public abstract Set<String> getViewNames(String schemaName);
 
 
     /**
      * Retrieves the names of all materialized views in the database schema.
+     * @param schemaName 
      *
      * @return The names of all materialized views in the database
      */
-    public Set<String> getMaterializedViewNames() {
+    public Set<String> getMaterializedViewNames(String schemaName) {
         throw new UnsupportedOperationException("Materialized views not supported for " + getDatabaseDialect());
     }
 
 
     /**
      * Retrieves the names of all synonyms in the database schema.
+     * @param schemaName 
      *
      * @return The names of all synonyms in the database
      */
-    public Set<String> getSynonymNames() {
+    public Set<String> getSynonymNames(String schemaName) {
         throw new UnsupportedOperationException("Synonyms not supported for " + getDatabaseDialect());
     }
 
 
     /**
      * Retrieves the names of all sequences in the database schema.
+     * @param schemaName 
      *
      * @return The names of all sequences in the database, not null
      */
-    public Set<String> getSequenceNames() {
+    public Set<String> getSequenceNames(String schemaName) {
         throw new UnsupportedOperationException("Sequences not supported for " + getDatabaseDialect());
     }
 
 
     /**
      * Retrieves the names of all triggers in the database schema.
+     * @param schemaName 
      *
      * @return The names of all triggers in the database, not null
      */
-    public Set<String> getTriggerNames() {
+    public Set<String> getTriggerNames(String schemaName) {
         throw new UnsupportedOperationException("Triggers not supported for " + getDatabaseDialect());
     }
 
 
     /**
      * Retrieves the names of all types in the database schema.
+     * @param schemaName 
      *
      * @return The names of all types in the database, not null
      */
-    public Set<String> getTypeNames() {
+    public Set<String> getTypeNames(String schemaName) {
         throw new UnsupportedOperationException("Types are not supported for " + getDatabaseDialect());
     }
 
@@ -226,32 +271,32 @@ abstract public class DbSupport {
     /**
      * Removes the table with the given name from the database.
      * Note: the table name is surrounded with quotes, making it case-sensitive.
-     *
+     * @param schemaName 
      * @param tableName The table to drop (case-sensitive), not null
      */
-    public void dropTable(String tableName) {
-        getSQLHandler().executeUpdate("drop table " + qualified(tableName) + (supportsCascade() ? " cascade" : ""));
+    public void dropTable(String schemaName, String tableName) {
+        getSQLHandler().executeUpdate("drop table " + qualified(schemaName, tableName) + (supportsCascade() ? " cascade" : ""), getDataSource());
     }
 
 
     /**
      * Removes the view with the given name from the database
      * Note: the view name is surrounded with quotes, making it case-sensitive.
-     *
+     * @param schemaName 
      * @param viewName The view to drop (case-sensitive), not null
      */
-    public void dropView(String viewName) {
-        getSQLHandler().executeUpdate("drop view " + qualified(viewName) + (supportsCascade() ? " cascade" : ""));
+    public void dropView(String schemaName, String viewName) {
+        getSQLHandler().executeUpdate("drop view " + qualified(schemaName, viewName) + (supportsCascade() ? " cascade" : ""), getDataSource());
     }
 
 
     /**
      * Removes the materialized view with the given name from the database
      * Note: the view name is surrounded with quotes, making it case-sensitive.
-     *
+     * @param schemaName 
      * @param viewName The view to drop (case-sensitive), not null
      */
-    public void dropMaterializedView(String viewName) {
+    public void dropMaterializedView(String schemaName, String viewName) {
         throw new UnsupportedOperationException("Materialized views are not supported for " + getDatabaseDialect());
     }
 
@@ -259,94 +304,96 @@ abstract public class DbSupport {
     /**
      * Removes the synonym with the given name from the database
      * Note: the synonym name is surrounded with quotes, making it case-sensitive.
-     *
+     * @param schemaName 
      * @param synonymName The synonym to drop (case-sensitive), not null
      */
-    public void dropSynonym(String synonymName) {
-        getSQLHandler().executeUpdate("drop synonym " + qualified(synonymName));
+    public void dropSynonym(String schemaName, String synonymName) {
+        getSQLHandler().executeUpdate("drop synonym " + qualified(schemaName, synonymName), getDataSource());
     }
 
 
     /**
      * Drops the sequence with the given name from the database
      * Note: the sequence name is surrounded with quotes, making it case-sensitive.
-     *
+     * @param schemaName 
      * @param sequenceName The sequence to drop (case-sensitive), not null
      */
-    public void dropSequence(String sequenceName) {
-        getSQLHandler().executeUpdate("drop sequence " + qualified(sequenceName));
+    public void dropSequence(String schemaName, String sequenceName) {
+        getSQLHandler().executeUpdate("drop sequence " + qualified(schemaName, sequenceName), getDataSource());
     }
 
 
     /**
      * Drops the trigger with the given name from the database
      * Note: the trigger name is surrounded with quotes, making it case-sensitive.
-     *
+     * @param schemaName 
      * @param triggerName The trigger to drop (case-sensitive), not null
      */
-    public void dropTrigger(String triggerName) {
-        getSQLHandler().executeCodeUpdate("drop trigger " + qualified(triggerName));
+    public void dropTrigger(String schemaName, String triggerName) {
+        getSQLHandler().executeCodeUpdate("drop trigger " + qualified(schemaName, triggerName), getDataSource());
     }
 
 
     /**
      * Drops the type with the given name from the database
      * Note: the type name is surrounded with quotes, making it case-sensitive.
-     *
+     * @param schemaName 
      * @param typeName The type to drop (case-sensitive), not null
      */
-    public void dropType(String typeName) {
-        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName) + (supportsCascade() ? " cascade" : ""));
+    public void dropType(String schemaName, String typeName) {
+        getSQLHandler().executeCodeUpdate("drop type " + qualified(schemaName, typeName) + (supportsCascade() ? " cascade" : ""), getDataSource());
     }
 
 
     /**
      * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
+     * @param schemaName 
      * @param tableName The table, not null
      */
-    public abstract void removeReferentialConstraints(String tableName);
+    public abstract void removeReferentialConstraints(String schemaName, String tableName);
 
 
     /**
      * Disables all value constraints (e.g. not null) on the specified table
-     *
+     * @param schemaName 
      * @param tableName The table, not null
      */
-    public abstract void removeValueConstraints(String tableName);
+    public abstract void removeValueConstraints(String schemaName, String tableName);
 
 
     /**
      * Returns the value of the sequence with the given name.
      * <p/>
      * Note: this can have the side-effect of increasing the sequence value.
-     *
+     * @param schemaName 
      * @param sequenceName The sequence, not null
+     *
      * @return The value of the sequence with the given name
      */
-    public long getSequenceValue(String sequenceName) {
+    public long getSequenceValue(String schemaName, String sequenceName) {
         throw new UnsupportedOperationException("Sequences not supported for " + getDatabaseDialect());
     }
 
 
     /**
      * Sets the next value of the sequence with the given sequence name to the given sequence value.
-     *
+     * @param schemaName 
      * @param sequenceName     The sequence, not null
      * @param newSequenceValue The value to set
      */
-    public void incrementSequenceToValue(String sequenceName, long newSequenceValue) {
+    public void incrementSequenceToValue(String schemaName, String sequenceName, long newSequenceValue) {
         throw new UnsupportedOperationException("Sequences not supported for " + getDatabaseDialect());
     }
 
 
     /**
      * Gets the names of all identity columns of the given table.
-     *
+     * @param schemaName 
      * @param tableName The table, not null
+     *
      * @return The names of the identity columns of the table with the given name
      */
-    public Set<String> getIdentityColumnNames(String tableName) {
+    public Set<String> getIdentityColumnNames(String schemaName, String tableName) {
         throw new UnsupportedOperationException("Identity columns not supported for " + getDatabaseDialect());
     }
 
@@ -354,12 +401,12 @@ abstract public class DbSupport {
     /**
      * Increments the identity value for the specified identity column on the specified table to the given value. If there
      * is no identity specified on the given primary key, the method silently finishes without effect.
-     *
+     * @param schemaName 
      * @param tableName          The table with the identity column, not null
      * @param identityColumnName The column, not null
      * @param identityValue      The new value
      */
-    public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
+    public void incrementIdentityColumnToValue(String schemaName, String tableName, String identityColumnName, long identityValue) {
         throw new UnsupportedOperationException("Identity columns not supported for " + getDatabaseDialect());
     }
 
@@ -390,11 +437,12 @@ abstract public class DbSupport {
      * schemaname and object name. If the schemaName is not supplied, the database object is returned surrounded with
      * quotes. If the DBMS doesn't support quoted database object names, no quotes are put around neither schema name
      * nor database object name.
-     *
+     * @param schemaName 
      * @param databaseObjectName The database object name to be qualified
+     *
      * @return The qualified database object name
      */
-    public String qualified(String databaseObjectName) {
+    public String qualified(String schemaName, String databaseObjectName) {
         return quoted(schemaName) + "." + quoted(databaseObjectName);
     }
 
@@ -473,7 +521,7 @@ abstract public class DbSupport {
 
         Connection connection = null;
         try {
-            connection = getSQLHandler().getDataSource().getConnection();
+            connection = getDataSource().getConnection();
 
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             if (databaseMetaData.storesUpperCaseIdentifiers()) {
@@ -507,7 +555,7 @@ abstract public class DbSupport {
 
         Connection connection = null;
         try {
-            connection = getSQLHandler().getDataSource().getConnection();
+            connection = getDataSource().getConnection();
 
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             String quoteString = databaseMetaData.getIdentifierQuoteString();

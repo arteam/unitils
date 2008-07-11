@@ -15,20 +15,26 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.*;
-import org.junit.After;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.unitils.database.util.TransactionMode.COMMIT;
+import static org.unitils.database.util.TransactionMode.DISABLED;
+import static org.unitils.database.util.TransactionMode.ROLLBACK;
+
+import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.util.Collections;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.ConnectionProxy;
-import org.unitils.core.Unitils;
 import org.unitils.database.annotations.Transactional;
-import static org.unitils.database.util.TransactionMode.*;
-
-import javax.sql.DataSource;
-import java.lang.reflect.Method;
-import java.sql.Connection;
 
 /**
  * Tests verifying whether the SimpleTransactionManager functions correctly.
@@ -52,22 +58,21 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
      */
     @Before
     public void setUp() throws Exception {
-        configuration.setProperty("unitils.module.spring.enabled", "false");
-        Unitils.getInstance().init(configuration);
-        databaseModule = getDatabaseModule();
+        databaseModule = new DatabaseModule() {
+			@Override
+			public DataSource getDataSource(String name) {
+				return mockDataSource;
+			}
+			@Override
+			protected Set<DataSource> getDataSources() {
+				return Collections.singleton(mockDataSource);
+			}
+        };
+        databaseModule.init(configuration);
 
         transactionsDisabledTest = new TransactionsDisabledTest();
         rollbackTest = new RollbackTest();
         commitTest = new CommitTest();
-    }
-
-
-    /**
-     * Cleans up test by resetting the unitils instance.
-     */
-    @After
-    public void tearDown() throws Exception {
-        Unitils.getInstance().init();
     }
 
 
@@ -82,9 +87,9 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
 
         Method testMethod = TransactionsDisabledTest.class.getMethod("test", new Class[]{});
         databaseModule.startTransactionForTestMethod(transactionsDisabledTest, testMethod);
-        Connection conn1 = databaseModule.getDataSource().getConnection();
+        Connection conn1 = databaseModule.getDataSource(null).getConnection();
         conn1.close();
-        Connection conn2 = databaseModule.getDataSource().getConnection();
+        Connection conn2 = databaseModule.getDataSource(null).getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
         databaseModule.endTransactionForTestMethod(transactionsDisabledTest, testMethod);
@@ -105,7 +110,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = RollbackTest.class.getMethod("test", new Class[]{});
-        DataSource dataSource = databaseModule.getTransactionalDataSource(rollbackTest);
+        DataSource dataSource = databaseModule.getTransactionalDataSource(null, rollbackTest);
         databaseModule.startTransactionForTestMethod(rollbackTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         Connection targetConnection1 = ((ConnectionProxy) connection1).getTargetConnection();
@@ -132,7 +137,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = CommitTest.class.getMethod("test", new Class[]{});
-        DataSource dataSource = databaseModule.getTransactionalDataSource(commitTest);
+        DataSource dataSource = databaseModule.getTransactionalDataSource(null, commitTest);
         databaseModule.startTransactionForTestMethod(commitTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         Connection targetConnection1 = ((ConnectionProxy) connection1).getTargetConnection();

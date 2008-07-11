@@ -37,33 +37,34 @@ public class PropertiesDataSourceFactoryTest extends UnitilsJUnit4 {
 	@Mock
 	private BasicDataSource mockBasicDataSource;
 
+	private Properties configuration;
+
 
 	/**
 	 * Initializes the test
 	 */
 	@Before
 	public void setUp() throws Exception {
-		Properties configuration = new Properties();
-		configuration.setProperty("database.driverClassName", "testdriver");
-		configuration.setProperty("database.url", "testurl");
-		configuration.setProperty("database.userName", "testusername");
-		configuration.setProperty("database.password", "testpassword");
-
 		propertiesFileDataSource = new PropertiesDataSourceFactory() {
 			@Override
 			protected BasicDataSource getNewDataSource() {
 				return mockBasicDataSource;
 			}
 		};
+		configuration = new Properties();
 		propertiesFileDataSource.init(configuration);
 	}
 
 
 	/**
-	 * Test creating a data source.
+	 * Test creating the default data source.
 	 */
 	@Test
-	public void testCreateDataSource() {
+	public void createDefaultDataSource() {
+		configuration.setProperty("database.driverClassName", "testdriver");
+		configuration.setProperty("database.url", "testurl");
+		configuration.setProperty("database.userName", "testusername");
+		configuration.setProperty("database.password", "testpassword");
 		// expectations
 		mockBasicDataSource.setDriverClassName("testdriver");
 		mockBasicDataSource.setUrl("testurl");
@@ -71,7 +72,27 @@ public class PropertiesDataSourceFactoryTest extends UnitilsJUnit4 {
 		mockBasicDataSource.setPassword("testpassword");
 		replay();
 
-		propertiesFileDataSource.createDataSource();
+		propertiesFileDataSource.createDefaultDataSource();
+	}
+	
+	
+	/**
+	 * Test creating named data source.
+	 */
+	@Test
+	public void createNamedDataSource() {
+		configuration.setProperty("database.xyz.driverClassName", "testdriver");
+		configuration.setProperty("database.xyz.url", "testurl");
+		configuration.setProperty("database.xyz.userName", "testusername");
+		configuration.setProperty("database.xyz.password", "testpassword");
+		// expectations
+		mockBasicDataSource.setDriverClassName("testdriver");
+		mockBasicDataSource.setUrl("testurl");
+		mockBasicDataSource.setUsername("testusername");
+		mockBasicDataSource.setPassword("testpassword");
+		replay();
+
+		propertiesFileDataSource.createDataSource("xyz");
 	}
 
 }

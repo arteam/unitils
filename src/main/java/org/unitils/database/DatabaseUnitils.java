@@ -30,13 +30,19 @@ import javax.sql.DataSource;
 public class DatabaseUnitils {
 
 
+	public static DataSource getDefaultDataSource() {
+		return getDataSource(null);
+	}
+	
+	
     /**
      * Returns the DataSource that connects to the test database
      *
+     * @param name The name that identifies the DataSource
      * @return The DataSource that connects to the test database
      */
-    public static DataSource getDataSource() {
-    	return getDatabaseModule().getTransactionalDataSource(getTestObject());
+    public static DataSource getDataSource(String name) {
+    	return getDatabaseModule().getTransactionalDataSource(name, getTestObject());
     }
     
     

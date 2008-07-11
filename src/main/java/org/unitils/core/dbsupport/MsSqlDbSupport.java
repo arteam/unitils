@@ -48,20 +48,20 @@ public class MsSqlDbSupport extends DbSupport {
      * @return The names of all tables in the database
      */
     @Override
-    public Set<String> getTableNames() {
-        return getSQLHandler().getItemsAsStringSet("select t.name from sys.tables t, sys.schemas s where t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    public Set<String> getTableNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select t.name from sys.tables t, sys.schemas s where t.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
     }
 
 
     /**
      * Gets the names of all columns of the given table.
-     *
      * @param tableName The table, not null
+     *
      * @return The names of the columns of the table with the given name
      */
     @Override
-    public Set<String> getColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select c.name from sys.columns c, sys.tables t, sys.schemas s where c.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    public Set<String> getColumnNames(String schemaName, String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select c.name from sys.columns c, sys.tables t, sys.schemas s where c.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -71,8 +71,8 @@ public class MsSqlDbSupport extends DbSupport {
      * @return The names of all views in the database
      */
     @Override
-    public Set<String> getViewNames() {
-        return getSQLHandler().getItemsAsStringSet("select v.name from sys.views v, sys.schemas s where v.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    public Set<String> getViewNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select v.name from sys.views v, sys.schemas s where v.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -82,8 +82,8 @@ public class MsSqlDbSupport extends DbSupport {
      * @return The names of all synonyms in the database
      */
     @Override
-    public Set<String> getSynonymNames() {
-        return getSQLHandler().getItemsAsStringSet("select o.name from sys.synonyms o, sys.schemas s where o.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    public Set<String> getSynonymNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select o.name from sys.synonyms o, sys.schemas s where o.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -93,8 +93,8 @@ public class MsSqlDbSupport extends DbSupport {
      * @return The names of all triggers in the database
      */
     @Override
-    public Set<String> getTriggerNames() {
-        return getSQLHandler().getItemsAsStringSet("select t.name from sys.triggers t, sys.all_objects o, sys.schemas s where t.parent_id = o.object_id and o.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    public Set<String> getTriggerNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select t.name from sys.triggers t, sys.all_objects o, sys.schemas s where t.parent_id = o.object_id and o.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -104,76 +104,73 @@ public class MsSqlDbSupport extends DbSupport {
      * @return The names of all types in the database
      */
     @Override
-    public Set<String> getTypeNames() {
-        return getSQLHandler().getItemsAsStringSet("select t.name from sys.types t, sys.schemas s where t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    public Set<String> getTypeNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select t.name from sys.types t, sys.schemas s where t.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
     }
 
 
     /**
      * Gets the names of all identity columns of the given table.
-     *
      * @param tableName The table, not null
+     *
      * @return The names of the identity columns of the table with the given name
      */
     @Override
-    public Set<String> getIdentityColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select i.name from sys.identity_columns i, sys.tables t, sys.schemas s where i.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+    public Set<String> getIdentityColumnNames(String schemaName, String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select i.name from sys.identity_columns i, sys.tables t, sys.schemas s where i.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
     }
 
 
     /**
      * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
      * @param tableName The table, not null
      */
     @Override
-    public void removeReferentialConstraints(String tableName) {
+    public void removeReferentialConstraints(String schemaName, String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select f.name from sys.foreign_keys f, sys.tables t, sys.schemas s where f.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select f.name from sys.foreign_keys f, sys.tables t, sys.schemas s where f.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " drop constraint " + quoted(constraintName), getDataSource());
         }
     }
 
 
     /**
      * Disables all value constraints (e.g. not null) on the specified table
-     *
      * @param tableName The table, not null
      */
     @Override
-    public void removeValueConstraints(String tableName) {
+    public void removeValueConstraints(String schemaName, String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
         // disable all unique constraints
-        Set<String> keyConstraintNames = sqlHandler.getItemsAsStringSet("select k.name from sys.key_constraints k, sys.tables t, sys.schemas s where k.type = 'UQ' and k.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+        Set<String> keyConstraintNames = sqlHandler.getItemsAsStringSet("select k.name from sys.key_constraints k, sys.tables t, sys.schemas s where k.type = 'UQ' and k.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
         for (String keyConstraintName : keyConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(keyConstraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " drop constraint " + quoted(keyConstraintName), getDataSource());
         }
 
         // disable all check constraints
-        Set<String> checkConstraintNames = sqlHandler.getItemsAsStringSet("select c.name from sys.check_constraints c, sys.tables t, sys.schemas s where c.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+        Set<String> checkConstraintNames = sqlHandler.getItemsAsStringSet("select c.name from sys.check_constraints c, sys.tables t, sys.schemas s where c.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
         for (String checkConstraintName : checkConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(checkConstraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " drop constraint " + quoted(checkConstraintName), getDataSource());
         }
 
         // disable all not null constraints
-        disableNotNullConstraints(tableName);
+        disableNotNullConstraints(schemaName, tableName);
     }
 
 
     /**
      * Increments the identity value for the specified identity column on the specified table to the given value. If
      * there is no identity specified on the given primary key, the method silently finishes without effect.
-     *
      * @param tableName          The table with the identity column, not null
      * @param identityColumnName The column, not null
      * @param identityValue      The new value
      */
     @Override
-    public void incrementIdentityColumnToValue(String tableName, String identityColumnName, long identityValue) {
+    public void incrementIdentityColumnToValue(String schemaName, String tableName, String identityColumnName, long identityValue) {
         // there can only be 1 identity column per table 
-        getSQLHandler().executeUpdate("DBCC CHECKIDENT ('" + qualified(tableName) + "', reseed, " + identityValue + ")");
+        getSQLHandler().executeUpdate("DBCC CHECKIDENT ('" + qualified(schemaName, tableName) + "', reseed, " + identityValue + ")", getDataSource());
     }
 
 
@@ -225,29 +222,29 @@ public class MsSqlDbSupport extends DbSupport {
      * Disables not-null constraints on the given table.
      * <p/>
      * For primary keys, row-guid, identity and computed columns not-null constrains cannot be disabled in MS-Sql.
-     *
+     * @param schemaName 
      * @param tableName The table, not null
      */
-    protected void disableNotNullConstraints(String tableName) {
+    protected void disableNotNullConstraints(String schemaName, String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
         // retrieve the name of the primary key, since we cannot remove the not-null constraint on this column
         Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select c.name from sys.key_constraints k, sys.index_columns i, sys.columns c, sys.tables t, sys.schemas s " +
                 "where k.type = 'PK' and i.index_id = k.unique_index_id and i.column_id = c.column_id " +
                 "  and c.object_id = t.object_id and k.parent_object_id = t.object_id and i.object_id = t.object_id " +
-                "  and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+                "  and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + schemaName + "'", getDataSource());
 
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-            connection = sqlHandler.getDataSource().getConnection();
+            connection = getDataSource().getConnection();
             statement = connection.createStatement();
 
             // get all not-null columns but not row-guid, identity and computed columns (these cannot be altered in MS-Sql)
             resultSet = statement.executeQuery("select c.name column_name, upper(y.name) data_type, c.max_length, c.precision from sys.types y, sys.columns c, sys.tables t, sys.schemas s " +
                     "where c.is_nullable = 0 and c.is_rowguidcol = 0 and c.is_identity = 0 and c.is_computed = 0 " +
-                    "  and y.user_type_id = c.user_type_id and c.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+                    "  and y.user_type_id = c.user_type_id and c.object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + schemaName + "'");
 
             while (resultSet.next()) {
                 String columnName = resultSet.getString("column_name");
@@ -271,7 +268,7 @@ public class MsSqlDbSupport extends DbSupport {
                     dataType += "(" + maxLength + ")";
                 }
                 // remove the not-null constraint
-                sqlHandler.executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " " + dataType + " null");
+                sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " alter column " + quoted(columnName) + " " + dataType + " null", getDataSource());
             }
         } catch (Exception e) {
             throw new UnitilsException("Error while disabling not null constraints. Table name: " + tableName, e);

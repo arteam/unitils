@@ -15,10 +15,10 @@
  */
 package org.unitils.dbmaintainer.util;
 
+import java.util.Map;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
+import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.dbmaintainer.DBMaintainer;
 
@@ -39,8 +39,8 @@ public class DbScriptJarRunner extends DbScriptJarHandler {
 	 * @param databaseDialect Indicator of the database type, that defines the SQL dialect that must be used for this database
 	 * @param schemaName Name of the database schema that is used
 	 */
-	public DbScriptJarRunner(DataSource dataSource, String databaseDialect,	String schemaName) {
-		super(dataSource, databaseDialect, schemaName);
+	public DbScriptJarRunner(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap) {
+		super(defaultDbSupport, nameDbSupportMap);
 	}
 
 	
@@ -52,7 +52,7 @@ public class DbScriptJarRunner extends DbScriptJarHandler {
 	public void executeJar(String jarFileName) {
 		Properties configuration = getDbMaintainerConfiguration(jarFileName);
 		
-		DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource));
+		DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(), defaultDbSupport, nameDbSupportMap);
 		dbMaintainer.updateDatabase();
 	}
 }

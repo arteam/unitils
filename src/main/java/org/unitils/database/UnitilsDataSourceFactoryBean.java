@@ -41,7 +41,7 @@ public class UnitilsDataSourceFactoryBean implements FactoryBean {
      */
     public Object getObject() throws Exception {
         DatabaseModule databaseModule = Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-        return databaseModule.getDataSource();
+        return databaseModule.getDataSource(null);
     }
 
 

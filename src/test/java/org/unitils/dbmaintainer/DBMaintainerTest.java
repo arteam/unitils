@@ -15,6 +15,8 @@
  */
 package org.unitils.dbmaintainer;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.junit.Assert.fail;
@@ -25,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -101,7 +104,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         dbMaintainer.disableConstraintsEnabled = true;
 
         scripts = new ArrayList<Script>();
-        Script script1 = new Script("script1.sql", 0L, "checksum1");
+        Script script1 = new Script("01_script1.sql", 0L, "checksum1");
 		scripts.add(script1);
         Script script2 = new Script("script2.sql", 0L, "checksum2");
 		scripts.add(script2);
@@ -116,7 +119,6 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         
         expect(mockVersionSource.getExecutedScripts()).andStubReturn(new HashSet<ExecutedScript>(alreadyExecutedScripts));
     }
-
 
     @Test
     public void testNoUpdateNeeded() {
@@ -205,7 +207,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
         // Record expected behavior
         mockVersionSource.registerExecutedScript(new ExecutedScript(scripts.get(0), null, false));
-        mockScriptRunner.execute(scripts.get(0).getScriptContentHandle());
+        mockScriptRunner.execute(scripts.get(0));
         expectLastCall().andThrow(new UnitilsException("Test exception"));
         replay();
 
@@ -267,13 +269,13 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
     private void expectExecuteScriptsAndSetDbVersion() {
     	mockVersionSource.registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
-        mockScriptRunner.execute(scripts.get(0).getScriptContentHandle());
+        mockScriptRunner.execute(scripts.get(0));
         mockVersionSource.updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));
         mockVersionSource.registerExecutedScript(new ExecutedScript(scripts.get(1), null, null));
-        mockScriptRunner.execute(scripts.get(1).getScriptContentHandle());
+        mockScriptRunner.execute(scripts.get(1));
         mockVersionSource.updateExecutedScript(new ExecutedScript(scripts.get(1), null, null));
-        mockScriptRunner.execute(postProcessingScripts.get(0).getScriptContentHandle());
-        mockScriptRunner.execute(postProcessingScripts.get(1).getScriptContentHandle());
+        mockScriptRunner.execute(postProcessingScripts.get(0));
+        mockScriptRunner.execute(postProcessingScripts.get(1));
     }
 
 

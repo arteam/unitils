@@ -47,22 +47,22 @@ public class OracleDbSupport extends DbSupport {
      * @return The names of all tables in the database
      */
     @Override
-    public Set<String> getTableNames() {
+    public Set<String> getTableNames(String schemaName) {
         // all_tables also contains the materialized views: don't return these
         // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from ALL_TABLES where OWNER = '" + getSchemaName() + "' and TABLE_NAME not like 'BIN$%' minus select MVIEW_NAME from ALL_MVIEWS where OWNER = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select TABLE_NAME from ALL_TABLES where OWNER = '" + schemaName + "' and TABLE_NAME not like 'BIN$%' minus select MVIEW_NAME from ALL_MVIEWS where OWNER = '" + schemaName + "'", getDataSource());
     }
 
 
     /**
      * Gets the names of all columns of the given table.
-     *
      * @param tableName The table, not null
+     *
      * @return The names of the columns of the table with the given name
      */
     @Override
-    public Set<String> getColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from ALL_TAB_COLUMNS where TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "'");
+    public Set<String> getColumnNames(String schemaName, String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select COLUMN_NAME from ALL_TAB_COLUMNS where TABLE_NAME = '" + tableName + "' and OWNER = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -72,8 +72,8 @@ public class OracleDbSupport extends DbSupport {
      * @return The names of all views in the database
      */
     @Override
-    public Set<String> getViewNames() {
-        return getSQLHandler().getItemsAsStringSet("select VIEW_NAME from ALL_VIEWS where OWNER = '" + getSchemaName() + "'");
+    public Set<String> getViewNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select VIEW_NAME from ALL_VIEWS where OWNER = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -83,8 +83,8 @@ public class OracleDbSupport extends DbSupport {
      * @return The names of all materialized views in the database
      */
     @Override
-    public Set<String> getMaterializedViewNames() {
-        return getSQLHandler().getItemsAsStringSet("select MVIEW_NAME from ALL_MVIEWS where OWNER = '" + getSchemaName() + "'");
+    public Set<String> getMaterializedViewNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select MVIEW_NAME from ALL_MVIEWS where OWNER = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -94,8 +94,8 @@ public class OracleDbSupport extends DbSupport {
      * @return The names of all synonyms in the database
      */
     @Override
-    public Set<String> getSynonymNames() {
-        return getSQLHandler().getItemsAsStringSet("select SYNONYM_NAME from ALL_SYNONYMS where OWNER = '" + getSchemaName() + "'");
+    public Set<String> getSynonymNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select SYNONYM_NAME from ALL_SYNONYMS where OWNER = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -105,8 +105,8 @@ public class OracleDbSupport extends DbSupport {
      * @return The names of all sequences in the database
      */
     @Override
-    public Set<String> getSequenceNames() {
-        return getSQLHandler().getItemsAsStringSet("select SEQUENCE_NAME from ALL_SEQUENCES where SEQUENCE_OWNER = '" + getSchemaName() + "'");
+    public Set<String> getSequenceNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select SEQUENCE_NAME from ALL_SEQUENCES where SEQUENCE_OWNER = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -116,9 +116,9 @@ public class OracleDbSupport extends DbSupport {
      * @return The names of all triggers in the database
      */
     @Override
-    public Set<String> getTriggerNames() {
+    public Set<String> getTriggerNames(String schemaName) {
         // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-        return getSQLHandler().getItemsAsStringSet("select TRIGGER_NAME from ALL_TRIGGERS where OWNER = '" + getSchemaName() + "' and TRIGGER_NAME not like 'BIN$%'");
+        return getSQLHandler().getItemsAsStringSet("select TRIGGER_NAME from ALL_TRIGGERS where OWNER = '" + schemaName + "' and TRIGGER_NAME not like 'BIN$%'", getDataSource());
     }
 
 
@@ -128,44 +128,41 @@ public class OracleDbSupport extends DbSupport {
      * @return The names of all types in the database
      */
     @Override
-    public Set<String> getTypeNames() {
-        return getSQLHandler().getItemsAsStringSet("select TYPE_NAME from ALL_TYPES where OWNER = '" + getSchemaName() + "'");
+    public Set<String> getTypeNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select TYPE_NAME from ALL_TYPES where OWNER = '" + schemaName + "'", getDataSource());
     }
 
 
     /**
      * Removes the table with the given name from the database.
      * Note: the table name is surrounded with quotes, making it case-sensitive.
-     *
      * @param tableName The table to drop (case-sensitive), not null
      */
     @Override
-    public void dropTable(String tableName) {
-        getSQLHandler().executeUpdate("drop table " + qualified(tableName) + " cascade constraints" + (supportsPurge() ? " purge" : ""));
+    public void dropTable(String schemaName, String tableName) {
+        getSQLHandler().executeUpdate("drop table " + qualified(schemaName, tableName) + " cascade constraints" + (supportsPurge() ? " purge" : ""), getDataSource());
     }
 
 
     /**
      * Removes the view with the given name from the database
      * Note: the view name is surrounded with quotes, making it case-sensitive.
-     *
      * @param viewName The view to drop (case-sensitive), not null
      */
     @Override
-    public void dropView(String viewName) {
-        getSQLHandler().executeUpdate("drop view " + qualified(viewName) + " cascade constraints");
+    public void dropView(String schemaName, String viewName) {
+        getSQLHandler().executeUpdate("drop view " + qualified(schemaName, viewName) + " cascade constraints", getDataSource());
     }
 
 
     /**
      * Removes the materialized view with the given name from the database
      * Note: the view name is surrounded with quotes, making it case-sensitive.
-     *
      * @param materializedViewName The view to drop (case-sensitive), not null
      */
     @Override
-    public void dropMaterializedView(String materializedViewName) {
-        getSQLHandler().executeUpdate("drop materialized view " + qualified(materializedViewName));
+    public void dropMaterializedView(String schemaName, String materializedViewName) {
+        getSQLHandler().executeUpdate("drop materialized view " + qualified(schemaName, materializedViewName), getDataSource());
     }
 
 
@@ -174,43 +171,40 @@ public class OracleDbSupport extends DbSupport {
      * Note: the type name is surrounded with quotes, making it case-sensitive.
      * <p/>
      * Overriden to add the force option. This will make sure that super-types can also be dropped.
-     *
      * @param typeName The type to drop (case-sensitive), not null
      */
     @Override
-    public void dropType(String typeName) {
-        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName) + " force");
+    public void dropType(String schemaName, String typeName) {
+        getSQLHandler().executeCodeUpdate("drop type " + qualified(schemaName, typeName) + " force", getDataSource());
     }
 
 
     /**
      * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
      * @param tableName The table, not null
      */
     @Override
-    public void removeReferentialConstraints(String tableName) {
+    public void removeReferentialConstraints(String schemaName, String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
         // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and TABLE_NAME = '" + tableName + "' and OWNER = '" + schemaName + "' and CONSTRAINT_NAME not like 'BIN$%'", getDataSource());
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " disable constraint " + quoted(constraintName), getDataSource());
         }
     }
 
 
     /**
      * Disables all value constraints (e.g. not null) on the specified table
-     *
      * @param tableName The table, not null
      */
     @Override
-    public void removeValueConstraints(String tableName) {
+    public void removeValueConstraints(String schemaName, String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
         // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and TABLE_NAME = '" + tableName + "' and OWNER = '" + schemaName + "' and CONSTRAINT_NAME not like 'BIN$%'", getDataSource());
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " disable constraint " + quoted(constraintName), getDataSource());
         }
     }
 
@@ -219,40 +213,39 @@ public class OracleDbSupport extends DbSupport {
      * Returns the value of the sequence with the given name.
      * <p/>
      * Note: this can have the side-effect of increasing the sequence value.
-     *
      * @param sequenceName The sequence, not null
+     *
      * @return The value of the sequence with the given name
      */
     @Override
-    public long getSequenceValue(String sequenceName) {
-        return getSQLHandler().getItemAsLong("select LAST_NUMBER from ALL_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "' and SEQUENCE_OWNER = '" + getSchemaName() + "'");
+    public long getSequenceValue(String schemaName, String sequenceName) {
+        return getSQLHandler().getItemAsLong("select LAST_NUMBER from ALL_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "' and SEQUENCE_OWNER = '" + schemaName + "'", getDataSource());
     }
 
 
     /**
      * Sets the next value of the sequence with the given sequence name to the given sequence value.
-     *
      * @param sequenceName     The sequence, not null
      * @param newSequenceValue The value to set
      */
     @Override
-    public void incrementSequenceToValue(String sequenceName, long newSequenceValue) {
+    public void incrementSequenceToValue(String schemaName, String sequenceName, long newSequenceValue) {
         Connection connection = null;
         ResultSet resultSet = null;
         Statement statement = null;
         try {
-            connection = getSQLHandler().getDataSource().getConnection();
+            connection = getDataSource().getConnection();
             statement = connection.createStatement();
-            resultSet = statement.executeQuery("select LAST_NUMBER, INCREMENT_BY from ALL_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "' and SEQUENCE_OWNER = '" + getSchemaName() + "'");
+            resultSet = statement.executeQuery("select LAST_NUMBER, INCREMENT_BY from ALL_SEQUENCES where SEQUENCE_NAME = '" + sequenceName + "' and SEQUENCE_OWNER = '" + schemaName + "'");
             while (resultSet.next()) {
                 long lastNumber = resultSet.getLong("LAST_NUMBER");
                 long incrementBy = resultSet.getLong("INCREMENT_BY");
                 // change the increment
-                getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " increment by " + (newSequenceValue - lastNumber));
+                getSQLHandler().executeUpdate("alter sequence " + qualified(schemaName, sequenceName) + " increment by " + (newSequenceValue - lastNumber), getDataSource());
                 // select the increment
-                getSQLHandler().executeUpdate("select " + qualified(sequenceName) + ".NEXTVAL from DUAL");
+                getSQLHandler().executeUpdate("select " + qualified(schemaName, sequenceName) + ".NEXTVAL from DUAL", getDataSource());
                 // set back old increment
-                getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " increment by " + incrementBy);
+                getSQLHandler().executeUpdate("alter sequence " + qualified(schemaName, sequenceName) + " increment by " + incrementBy, getDataSource());
             }
         } catch (SQLException e) {
             throw new UnitilsException("Error while incrementing sequence to value", e);
@@ -367,7 +360,7 @@ public class OracleDbSupport extends DbSupport {
         if (oracleMajorVersionNumber == null) {
             Connection connection = null;
             try {
-                connection = getSQLHandler().getDataSource().getConnection();
+                connection = getDataSource().getConnection();
                 DatabaseMetaData metaData = connection.getMetaData();
                 oracleMajorVersionNumber = metaData.getDatabaseMajorVersion();
             } catch (SQLException e) {

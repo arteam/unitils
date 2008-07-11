@@ -18,7 +18,9 @@ package org.unitils.orm.hibernate;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.unitils.util.PropertyUtils.getString;
 
+import java.util.Collections;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -100,11 +102,11 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     			return isPersistenceUnitConfiguredFor(testObject);
 			}
     		
-			public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+			public Set<PlatformTransactionManager> getSpringPlatformTransactionManagers(Object testObject) {
 				SessionFactory sessionFactory = getPersistenceUnit(testObject);
 				HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(sessionFactory);
 				hibernateTransactionManager.setDataSource(getDataSource());
-				return hibernateTransactionManager;
+				return Collections.<PlatformTransactionManager>singleton(hibernateTransactionManager);
 			}
     		
     	});
@@ -212,7 +214,7 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     
     
     protected DataSource getDataSource() {
-    	return getDatabaseModule().getDataSource();
+    	return getDatabaseModule().getDataSource(null);
     }
     
     

@@ -15,25 +15,22 @@
  */
 package org.unitils.dbmaintainer.structure;
 
-import org.junit.After;
 import static org.junit.Assert.fail;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
-
-import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
-import org.unitils.core.dbsupport.DefaultSQLHandler;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
-
-import javax.sql.DataSource;
-import java.util.Properties;
+import org.unitils.core.util.TestUtils;
 
 /**
  * Test class for the ConstraintsDisabler. This test is independent of the dbms that is used. The database dialect that
@@ -42,7 +39,7 @@ import java.util.Properties;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class ConstraintsDisablerTest extends UnitilsJUnit4 {
+public class ConstraintsDisablerTest {
 
     /* The tested object */
     private ConstraintsDisabler constraintsDisabler;
@@ -50,9 +47,8 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
     /* Database support class instance */
     protected DbSupport dbSupport;
 
-    /* DataSource for the test database, is injected */
-    @TestDataSource
-    protected DataSource dataSource = null;
+    /* DataSource for the test database */
+    protected DataSource dataSource;
 
 
     /**
@@ -62,9 +58,9 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
-        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
-        constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler);
+        dbSupport = TestUtils.getDefaultDbSupport(configuration);
+        dataSource = dbSupport.getDataSource();
+        constraintsDisabler = TestUtils.getDefaultConstraintsDisabler(configuration, dbSupport);
 
         cleanupTestDatabase();
         createTestTables();

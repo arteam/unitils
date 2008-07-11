@@ -52,20 +52,20 @@ public class MySqlDbSupport extends DbSupport {
      * @return The names of all tables in the database
      */
     @Override
-    public Set<String> getTableNames() {
-        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + getSchemaName() + "' and table_type = 'BASE TABLE'");
+    public Set<String> getTableNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + schemaName + "' and table_type = 'BASE TABLE'", getDataSource());
     }
 
 
     /**
      * Gets the names of all columns of the given table.
-     *
      * @param tableName The table, not null
+     *
      * @return The names of the columns of the table with the given name
      */
     @Override
-    public Set<String> getColumnNames(String tableName) {
-        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
+    public Set<String> getColumnNames(String schemaName, String tableName) {
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and table_schema = '" + schemaName + "'", getDataSource());
     }
 
 
@@ -75,8 +75,8 @@ public class MySqlDbSupport extends DbSupport {
      * @return The names of all views in the database
      */
     @Override
-    public Set<String> getViewNames() {
-        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + getSchemaName() + "' and table_type = 'VIEW'");
+    public Set<String> getViewNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select table_name from information_schema.tables where table_schema = '" + schemaName + "' and table_type = 'VIEW'", getDataSource());
     }
 
 
@@ -86,74 +86,71 @@ public class MySqlDbSupport extends DbSupport {
      * @return The names of all triggers in the database
      */
     @Override
-    public Set<String> getTriggerNames() {
-        return getSQLHandler().getItemsAsStringSet("select trigger_name from information_schema.triggers where trigger_schema = '" + getSchemaName() + "'");
+    public Set<String> getTriggerNames(String schemaName) {
+        return getSQLHandler().getItemsAsStringSet("select trigger_name from information_schema.triggers where trigger_schema = '" + schemaName + "'", getDataSource());
     }
 
 
     /**
      * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
      * @param tableName The table, not null
      */
     @Override
-    public void removeReferentialConstraints(String tableName) {
+    public void removeReferentialConstraints(String schemaName, String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + schemaName + "'", getDataSource());
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop foreign key " + quoted(constraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " drop foreign key " + quoted(constraintName), getDataSource());
         }
     }
 
 
     /**
      * Disables all value constraints (e.g. not null) on the specified table
-     *
      * @param tableName The table, not null
      */
     @Override
-    public void removeValueConstraints(String tableName) {
+    public void removeValueConstraints(String schemaName, String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
         // disable all unique constraints (check constraints are not implemented)
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type in ('UNIQUE') AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type in ('UNIQUE') AND table_name = '" + tableName + "' and constraint_schema = '" + schemaName + "'", getDataSource());
         for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop key " + quoted(constraintName));
+            sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " drop key " + quoted(constraintName), getDataSource());
         }
 
         // disable all not null constraints
-        Set<String> notNullColumnNames = sqlHandler.getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and column_key <> 'PRI' and table_name = '" + tableName + "' and table_schema = '" + getSchemaName() + "'");
+        Set<String> notNullColumnNames = sqlHandler.getItemsAsStringSet("select column_name from information_schema.columns where is_nullable = 'NO' and column_key <> 'PRI' and table_name = '" + tableName + "' and table_schema = '" + schemaName + "'", getDataSource());
         for (String notNullColumnName : notNullColumnNames) {
             // todo test length etc
-            String columnType = sqlHandler.getItemAsString("select column_type from information_schema.columns where table_schema = '" + getSchemaName() + "' and table_name = '" + tableName + "' and column_name = '" + notNullColumnName + "'");
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " change column " + quoted(notNullColumnName) + " " + quoted(notNullColumnName) + " " + columnType + " NULL ");
+            String columnType = sqlHandler.getItemAsString("select column_type from information_schema.columns where table_schema = '" + schemaName + "' and table_name = '" + tableName + "' and column_name = '" + notNullColumnName + "'", getDataSource());
+            sqlHandler.executeUpdate("alter table " + qualified(schemaName, tableName) + " change column " + quoted(notNullColumnName) + " " + quoted(notNullColumnName) + " " + columnType + " NULL ", getDataSource());
         }
     }
 
 
     /**
      * Gets the names of all identity columns of the given table.
-     *
      * @param tableName The table, not null
+     *
      * @return The names of the identity columns of the table with the given name
      */
     @Override
-    public Set<String> getIdentityColumnNames(String tableName) {
+    public Set<String> getIdentityColumnNames(String schemaName, String tableName) {
         //  todo check, at this moment the PK columns are returned
-        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + getSchemaName() + "'");
+        return getSQLHandler().getItemsAsStringSet("select column_name from information_schema.columns where table_name = '" + tableName + "' and column_key = 'PRI' and table_schema = '" + schemaName + "'", getDataSource());
     }
 
 
     /**
      * Increments the identity value for the specified primary key on the specified table to the given value.
-     *
      * @param tableName            The table with the identity column, not null
-     * @param primaryKeyColumnName The column, not null
      * @param identityValue        The new value
+     * @param primaryKeyColumnName The column, not null
      */
     @Override
-    public void incrementIdentityColumnToValue(String tableName, String primaryKeyColumnName, long identityValue) {
-        getSQLHandler().executeUpdate("alter table " + qualified(tableName) + " AUTO_INCREMENT = " + identityValue);
+    public void incrementIdentityColumnToValue(String schemaName, String tableName, String primaryKeyColumnName, long identityValue) {
+        getSQLHandler().executeUpdate("alter table " + qualified(schemaName, tableName) + " AUTO_INCREMENT = " + identityValue, getDataSource());
     }
 
 
