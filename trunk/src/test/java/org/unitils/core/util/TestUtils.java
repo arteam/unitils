@@ -41,9 +41,8 @@ public class TestUtils {
 
 	public static DbSupport getDefaultDbSupport(Properties configuration) {
 		SQLHandler sqlHandler = new DefaultSQLHandler();
-		DefaultDbSupportFactory defaultDbSupportFactory = new DefaultDbSupportFactory();
-		defaultDbSupportFactory.init(configuration);
-		return defaultDbSupportFactory.createDefaultDbSupport(sqlHandler);
+		DefaultDbSupportFactory defaultDbSupportFactory = new DefaultDbSupportFactory(configuration);
+		return defaultDbSupportFactory.getDefaultDbSupport(sqlHandler);
 	}
 	
 	

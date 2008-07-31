@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.core.dbsupport;
+package org.unitils.core;
 
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.Map;
-
-import org.unitils.core.util.Configurable;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * todo javadoc
+ * @author Filip Neven
+ * @author Tim Ducheyne
+ *
  */
-public interface DbSupportFactory extends Configurable {
+public class UnitilsInitializer {
 
-
-	DbSupport getDefaultDbSupport(SQLHandler sqlHandler);
-	
-	
-	Map<String, DbSupport> getNameDbSupportMap(SQLHandler sqlHandler);
-
+	public void initialize() {
+		ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {"unitils-config.xml"});
+		List<Module> modules = new ArrayList<Module>(context.getBeansOfType(Module.class).values());
+		for (Module module : modules) {
+			System.out.println(module.getClass());
+		}
+	}
 }

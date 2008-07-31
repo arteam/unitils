@@ -15,17 +15,16 @@
  */
 package org.unitils.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.util.PropertyUtils;
-
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.PropertyUtils.getString;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.util.PropertyUtils;
 
 
 /**
@@ -126,7 +125,7 @@ public class ConfigurationLoader {
         	properties.putAll(localProperties);
         }
         
-        return properties;
+        return new SystemPropertiesCheckingPropertiesDecorator(properties);
     }
 
 

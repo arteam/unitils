@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+">
+
+	
+
+	<bean id="configurationLoader" class="org.unitils.core.ConfigurationLoader"/>
+	<bean id="unitilsConfiguration" factory-bean="configurationLoader" factory-method="loadConfiguration"/>
+
+	<bean id="defaultSqlHandler" class="org.unitils.core.dbsupport.DefaultSQLHandler"/>
+
+	<bean id="dbSupportFactory" class="org.unitils.core.dbsupport.DefaultDbSupportFactory">
+		<constructor-arg ref="unitilsConfiguration"/>
+	</bean>
+	<bean id="defaultDbSupport" factory-bean="dbSupportFactory" factory-method="getDefaultDbSupport">
+		<constructor-arg ref="defaultSqlHandler"/>
+	</bean>
+	<bean id="nameDbSupportMap" factory-bean="dbSupportFactory" factory-method="getNameDbSupportMap">
+		<constructor-arg ref="defaultSqlHandler"/>
+	</bean>
+	
+	<bean id="databaseModuleAnnotationAttributeDefaults" class="org.unitils.util.ModuleUtils" factory-method="getAnnotationPropertyDefaults">
+		<constructor-arg value="org.unitils.database.DatabaseModule"/>
+		<constructor-arg ref="unitilsConfiguration"/>
+		<constructor-arg value="org.unitils.database.annotations.Transactional"/>
+	</bean>
+	
+	<bean id="databaseModule" class="org.unitils.database.DatabaseModule">
+		<constructor-arg ref="defaultDbSupport"/>
+		<constructor-arg ref="nameDbSupportMap"/>
+		<constructor-arg ref="databaseModuleAnnotationAttributeDefaults"/>
+		<constructor-arg value="${updateDataBaseSchema.enabled}"/>
+		<constructor-arg value="${dataSource.wrapInTransactionalProxy}"/>
+	</bean>
+
+</beans>

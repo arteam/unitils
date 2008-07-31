@@ -30,7 +30,6 @@ import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,6 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
@@ -109,25 +107,16 @@ public class DatabaseModule implements Module {
     public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
     
     
-    public static final String PROPERTY_DATABASE_NAMES = "database.names";
-    
-    
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
 
     /**
      * Map holding the default configuration of the database module annotations
      */
-    protected Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
+    protected Map<Class<? extends Annotation>, Map<String, String>> annotationAttributeDefaults;
 
     
-    /**
-     * The datasources with the name as key
-     */
-    protected Map<String, DataSource> dataSources;
-    
-    
-    protected  Map<String, DbSupport> nameDbSupportMap;
+    protected Map<String, DbSupport> nameDbSupportMap;
     
     
     protected DbSupport defaultDbSupport;
@@ -163,7 +152,16 @@ public class DatabaseModule implements Module {
      * If the spring module is not enabled, this object is null
      */
     protected DatabaseSpringSupport databaseSpringSupport;
+    
+    
+    private boolean databaseUpdated = false;
 
+    public DatabaseModule(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap, Map<Class<? extends Annotation>, 
+    		Map<String, String>> annotationAttributeDefaults, boolean updateDatabaseSchemaEnabled, boolean wrapDataSourceInTransactionalProxy) {
+    	this.defaultDbSupport = defaultDbSupport;
+    	this.nameDbSupportMap = nameDbSupportMap;
+    	this.annotationAttributeDefaults = annotationAttributeDefaults;
+    }
 
     /**
      * Initializes this module using the given <code>Configuration</code>
@@ -174,7 +172,6 @@ public class DatabaseModule implements Module {
     public void init(Properties configuration) {
         this.configuration = configuration;
 
-        defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
         updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
         wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
     }
@@ -201,21 +198,20 @@ public class DatabaseModule implements Module {
     
     
 	public DbSupport getDefaultDbSupport() {
-		if (defaultDbSupport == null) {
-			initDbSupports();
+		if (updateDatabaseSchemaEnabled && ! databaseUpdated) {
+			databaseUpdated = true;
+			updateDatabase();
 		}
+		
 		return defaultDbSupport;
 	}
 	
 	
 	protected DbSupport getDbSupport(String name) {
-		if (defaultDbSupport == null) {
-			initDbSupports();
-		}
 		if (name == null) {
     		return defaultDbSupport;
     	}
-    	DbSupport dbSupport = nameDbSupportMap.get(name);
+    	DbSupport dbSupport = getNameDbSupportMap().get(name);
         if (dbSupport == null) {
             throw new UnitilsException("No test database configured with the name '" + name + "'");
         }
@@ -225,21 +221,23 @@ public class DatabaseModule implements Module {
 	
 	
 	protected Map<String, DbSupport> getNameDbSupportMap() {
-		if (nameDbSupportMap == null) {
-			initDbSupports();
+		if (updateDatabaseSchemaEnabled && ! databaseUpdated) {
+			databaseUpdated = true;
+			updateDatabase();
 		}
+		
 		return nameDbSupportMap;
 	}
 
 
-	protected void initDbSupports() {
+	/*protected void initDbSupports() {
 		SQLHandler sqlHandler = getDefaultSqlHandler();
 		
 		nameDbSupportMap = new HashMap<String, DbSupport>();
 		DbSupportFactory dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DbSupportFactory.class, configuration);
 		List<String> databaseNames = PropertyUtils.getStringList(PROPERTY_DATABASE_NAMES, configuration);
 		if (databaseNames.isEmpty()) {
-			defaultDbSupport = dataSourceFactory.createDefaultDbSupport(sqlHandler);
+			defaultDbSupport = dataSourceFactory.getDefaultDbSupport(sqlHandler);
 			nameDbSupportMap.put(null, defaultDbSupport);
 		} else {
 			for (String databaseName : databaseNames) {
@@ -254,7 +252,7 @@ public class DatabaseModule implements Module {
 		if (updateDatabaseSchemaEnabled) {
 			updateDatabase();
 		}
-	}
+	}*/
 
 
     /**
@@ -412,7 +410,7 @@ public class DatabaseModule implements Module {
      */
     protected TransactionMode getTransactionMode(Object testObject, Method testMethod) {
         TransactionMode transactionMode = getMethodOrClassLevelAnnotationProperty(Transactional.class, "value", DEFAULT, testMethod, testObject.getClass());
-        transactionMode = getEnumValueReplaceDefault(Transactional.class, "value", transactionMode, defaultAnnotationPropertyValues);
+        transactionMode = getEnumValueReplaceDefault(Transactional.class, "value", transactionMode, annotationAttributeDefaults);
         return transactionMode;
     }
 

@@ -93,6 +93,16 @@ public class DatabaseModuleTest {
 
 		private boolean updateDataSchemaCalled = false;
 
+		/**
+		 * @param defaultDbSupport
+		 * @param nameDbSupportMap
+		 */
+		public TestDatabaseModule() {
+			super(null, null, null, false, false);
+		}
+
+
+
 		public void updateDatabase(SQLHandler sqlHandler) {
 			updateDataSchemaCalled = true;
 		}
