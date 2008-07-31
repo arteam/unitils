@@ -21,6 +21,7 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.reset;
 
 import java.sql.Connection;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -94,7 +95,11 @@ abstract public class DatabaseModuleTransactionalTestBase {
 			return null;
 		}
 
-		public DbSupport createDefaultDbSupport(SQLHandler sqlHandler) {
+		public DbSupport getDefaultDbSupport(SQLHandler sqlHandler) {
+			return null;
+		}
+
+		public Map<String, DbSupport> getNameDbSupportMap(SQLHandler sqlHandler) {
 			return null;
 		}
 

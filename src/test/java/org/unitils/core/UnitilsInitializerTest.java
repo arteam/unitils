@@ -13,22 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.core.dbsupport;
+package org.unitils.core;
 
 
-import java.util.Map;
-
-import org.unitils.core.util.Configurable;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * todo javadoc
+ * @author Filip Neven
+ * @author Tim Ducheyne
+ *
  */
-public interface DbSupportFactory extends Configurable {
+public class UnitilsInitializerTest {
 
-
-	DbSupport getDefaultDbSupport(SQLHandler sqlHandler);
+	UnitilsInitializer unitilsInitializer;
 	
-	
-	Map<String, DbSupport> getNameDbSupportMap(SQLHandler sqlHandler);
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+		unitilsInitializer = new UnitilsInitializer();
+	}
 
+	@Test
+	public void testInitialize() throws Exception {
+		unitilsInitializer.initialize();
+	}
 }
