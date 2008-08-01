@@ -58,7 +58,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
      */
     @Before
     public void setUp() throws Exception {
-        databaseModule = new DatabaseModule(null, null, null, false, false) {
+        databaseModule = new DatabaseModule() {
 			@Override
 			public DataSource getDataSource(String name) {
 				return mockDataSource;
