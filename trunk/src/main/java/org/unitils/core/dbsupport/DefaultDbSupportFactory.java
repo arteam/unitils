@@ -15,11 +15,8 @@
  */
 package org.unitils.core.dbsupport;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -40,8 +37,6 @@ public class DefaultDbSupportFactory extends BaseConfigurable implements DbSuppo
 	/* The logger instance for this class */
     private static Log logger = LogFactory.getLog(PropertiesDataSourceFactory.class);
 
-    public static final String PROPERTY_DATABASE_NAMES = "database.names";
-    
     public static final String PROPERTY_DATABASE_START = "database";
     
     public static final String PROPERTY_DRIVERCLASSNAME_END = "driverClassName";
@@ -58,55 +53,22 @@ public class DefaultDbSupportFactory extends BaseConfigurable implements DbSuppo
     /** Property key for the database schema names */
     public static final String PROPERTY_SCHEMA_NAMES_END = "schemaNames";
 	
-    private Properties configuration;
-    
-    private Map<String, DbSupport> nameDbSupportMap;
-    
-    private DbSupport defaultDbSupport;
-    
-	/**
-	 * @param configuration
-	 */
-	public DefaultDbSupportFactory(Properties configuration) {
-		this.configuration = configuration;
+	public DbSupport createDefaultDbSupport(SQLHandler sqlHandler) {
+		String driverClassName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_DRIVERCLASSNAME_END, configuration);
+    	String url = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_URL_END, configuration);
+    	String userName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_USERNAME_END, configuration);
+    	String password = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_PASSWORD_END, "", configuration);
+    	
+    	BasicDataSource dataSource = createDataSource(null, driverClassName, url, userName, password);
+    	
+    	String databaseDialect = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_DIALECT_END, configuration);
+    	List<String> schemaNamesList = PropertyUtils.getStringList(PROPERTY_DATABASE_START + '.' + PROPERTY_SCHEMA_NAMES_END, configuration);
+    	String defaultSchemaName = schemaNamesList.get(0);
+    	Set<String> schemaNames = new HashSet<String>(schemaNamesList);
+    	DbSupport dbSupport = ConfigUtils.getInstanceOf(DbSupport.class, configuration, databaseDialect);
+    	dbSupport.init(configuration, sqlHandler, dataSource, null, defaultSchemaName, schemaNames);
+    	return dbSupport;
 	}
-
-	
-	public DbSupport getDefaultDbSupport(SQLHandler sqlHandler) {
-		if (nameDbSupportMap == null) {
-			initDbSupports(sqlHandler);
-		}
-		
-    	return defaultDbSupport;
-	}
-	
-	
-	public Map<String, DbSupport> getNameDbSupportMap(SQLHandler sqlHandler) {
-		if (nameDbSupportMap == null) {
-			initDbSupports(sqlHandler);
-		}
-		
-    	return nameDbSupportMap;
-	}
-
-
-	public void initDbSupports(SQLHandler sqlHandler) {
-		List<String> databaseNames = PropertyUtils.getStringList(PROPERTY_DATABASE_NAMES, configuration);
-		nameDbSupportMap = new HashMap<String, DbSupport>();
-		if (databaseNames.isEmpty()) {
-			defaultDbSupport = createDefaultNamelessDbSupport(sqlHandler);
-			nameDbSupportMap.put(null, defaultDbSupport);
-		} else {
-			for (String databaseName : databaseNames) {
-				DbSupport dbSupport = createDbSupport(databaseName, sqlHandler);
-				nameDbSupportMap.put(databaseName, dbSupport);
-				if (defaultDbSupport == null) {
-					defaultDbSupport = dbSupport;
-				}
-			}
-		};
-	}
-	
 	
 	/**
      * Returns the dbms specific {@link DbSupport} as configured in the given <code>Configuration</code>.
@@ -133,25 +95,8 @@ public class DefaultDbSupportFactory extends BaseConfigurable implements DbSuppo
     	dbSupport.init(configuration, sqlHandler, dataSource, databaseName, defaultSchemaName, schemaNames);
     	return dbSupport;
     }
-	
-	
-	protected DbSupport createDefaultNamelessDbSupport(SQLHandler sqlHandler) {
-		String driverClassName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_DRIVERCLASSNAME_END, configuration);
-    	String url = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_URL_END, configuration);
-    	String userName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_USERNAME_END, configuration);
-    	String password = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_PASSWORD_END, "", configuration);
-    	
-    	BasicDataSource dataSource = createDataSource(null, driverClassName, url, userName, password);
-    	
-    	String databaseDialect = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_DIALECT_END, configuration);
-    	List<String> schemaNamesList = PropertyUtils.getStringList(PROPERTY_DATABASE_START + '.' + PROPERTY_SCHEMA_NAMES_END, configuration);
-    	String defaultSchemaName = schemaNamesList.get(0);
-    	Set<String> schemaNames = new HashSet<String>(schemaNamesList);
-    	DbSupport dbSupport = ConfigUtils.getInstanceOf(DbSupport.class, configuration, databaseDialect);
-    	dbSupport.init(configuration, sqlHandler, dataSource, null, defaultSchemaName, schemaNames);
-    	return dbSupport;
-	}
-
+    
+    
 	protected BasicDataSource createDataSource(String name,	String driverClassName, String url, String userName, String password) {
 		
 		logger.info("Creating data source" + (name != null ? " with name '" + name + "'" : "") + ". Driver: " + driverClassName + 

@@ -16,19 +16,19 @@
 package org.unitils.core.dbsupport;
 
 
-import java.util.Map;
-
 import org.unitils.core.util.Configurable;
 
 /**
  * todo javadoc
+ * <p/>
+ * todo cache instances
  */
 public interface DbSupportFactory extends Configurable {
 
 
-	DbSupport getDefaultDbSupport(SQLHandler sqlHandler);
+	DbSupport createDefaultDbSupport(SQLHandler sqlHandler);
 	
 	
-	Map<String, DbSupport> getNameDbSupportMap(SQLHandler sqlHandler);
+	DbSupport createDbSupport(String databaseName, SQLHandler sqlHandler);
 
 }
