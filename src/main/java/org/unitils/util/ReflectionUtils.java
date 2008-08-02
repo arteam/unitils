@@ -524,7 +524,7 @@ public class ReflectionUtils {
      * @param clazz The class
      * @return The fields, not null
      */
-    private static Set<Field> getAllFields(Class<?> clazz) {
+    public static Set<Field> getAllFields(Class<?> clazz) {
         Set<Field> result = new HashSet<Field>();
         if (clazz == null || clazz.equals(Object.class)) {
             return result;
