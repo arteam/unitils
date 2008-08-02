@@ -3,6 +3,8 @@ package org.unitils.util;
 import org.apache.commons.lang.StringUtils;
 import org.unitils.core.UnitilsException;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.write;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -25,8 +27,8 @@ public class FileUtils {
         } catch (IOException e) {
             throw new UnitilsException(e);
         } finally {
-            IOUtils.closeQuietly(resourceInputStream);
-            IOUtils.closeQuietly(fileOutputStream);
+            closeQuietly(resourceInputStream);
+            closeQuietly(fileOutputStream);
         }
     }
 
@@ -42,6 +44,22 @@ public class FileUtils {
             return file.toURI().toURL();
         } catch (MalformedURLException e) {
             throw new UnitilsException("Unable to create URL for file " + file.getName(), e);
+        }
+    }
+
+    /**
+     * Writes the given string to the given file
+     *
+     * @param file   the file to write, not null
+     * @param string the string, not null
+     */
+    public static void writeStringToFile(File file, String string) throws IOException {
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            write(string, out, null);
+        } finally {
+            closeQuietly(out);
         }
     }
 }
