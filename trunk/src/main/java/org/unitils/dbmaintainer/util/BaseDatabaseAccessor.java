@@ -15,15 +15,16 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.DbSupportFactory;
+import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupports;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 
 import javax.sql.DataSource;
-
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Base class for implementations that access the test database
@@ -43,7 +44,6 @@ abstract public class BaseDatabaseAccessor implements DatabaseAccessing {
      */
     protected SQLHandler sqlHandler;
 
-    
     /**
      * DbSupport for the default schema
      */
@@ -52,7 +52,7 @@ abstract public class BaseDatabaseAccessor implements DatabaseAccessing {
     /**
      * DbSupport for all schemas
      */
-    protected Map<String, DbSupport> dbNameDbSupportMap;
+    protected List<DbSupport> dbSupports;
 
 
     /**
@@ -61,11 +61,11 @@ abstract public class BaseDatabaseAccessor implements DatabaseAccessing {
      * @param configuration The configuration, not null
      * @param sqlHandler    The sql handler, not null
      */
-    public void init(Properties configuration, SQLHandler sqlHandler, DbSupport defaultDbSupport, Map<String, DbSupport> dbNameDbSupportMap) {
+    public void init(Properties configuration, SQLHandler sqlHandler) {
         this.configuration = configuration;
         this.sqlHandler = sqlHandler;
-        this.dbNameDbSupportMap = dbNameDbSupportMap;
-        this.defaultDbSupport = defaultDbSupport;
+        this.dbSupports = getDbSupports(configuration, sqlHandler);
+        this.defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         doInit(configuration);
     }
@@ -80,8 +80,15 @@ abstract public class BaseDatabaseAccessor implements DatabaseAccessing {
         // do nothing
     }
 
-    
-    public Set<DbSupport> getDbSupports() {
-    	return new HashSet<DbSupport>(dbNameDbSupportMap.values());
+
+    /**
+     * Gets the db support for the given schema.
+     *
+     * @param schemaName The schema, not null
+     * @return The db support, not null
+     */
+    public DbSupport getDbSupport(String schemaName) {
+        return DbSupportFactory.getDbSupport(configuration, sqlHandler, schemaName);
     }
+
 }

@@ -110,8 +110,8 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implement
     protected String generateDtdContent() {
         Connection conn = null;
         try {
-            conn = defaultDbSupport.getDataSource().getConnection();
-            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, defaultDbSupport.getDefaultSchemaName());
+            conn = sqlHandler.getDataSource().getConnection();
+            IDatabaseConnection dbUnitDatabaseConnection = new DatabaseConnection(conn, defaultDbSupport.getSchemaName());
 
             StringWriter stringWriter = new StringWriter();
 
@@ -120,7 +120,7 @@ public class DtdDataSetStructureGenerator extends BaseDatabaseAccessor implement
 
             // create a dataset for the database content
             // filter out all system table names
-            Set<String> tableNames = defaultDbSupport.getTableNames(defaultDbSupport.getDefaultSchemaName());
+            Set<String> tableNames = defaultDbSupport.getTableNames();
             IDataSet actualDataSet = dbUnitDatabaseConnection.createDataSet();
             IDataSet filteredActualDataSet = new FilteredDataSet(new IncludeTableFilter(tableNames.toArray(new String[0])), actualDataSet);
 

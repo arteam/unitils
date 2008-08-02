@@ -15,22 +15,21 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import static org.junit.Assert.assertTrue;
-import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
-import static org.unitils.database.SQLUnitils.isEmpty;
-
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.junit.After;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import static org.unitils.database.SQLUnitils.isEmpty;
+import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle;
+
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Test class for the DefaultScriptRunner.
@@ -38,13 +37,14 @@ import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandl
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultScriptRunnerTest {
+public class DefaultScriptRunnerTest extends UnitilsJUnit4 {
 
     /* The tested object */
     private DefaultScriptRunner defaultScriptRunner;
 
-    /* DataSource for the test database */
-    protected DataSource dataSource;
+    /* DataSource for the test database, is injected */
+    @TestDataSource
+    protected DataSource dataSource = null;
 
     /* A test script that will create 2 tables: table1, table2 */
     private Script script1;
@@ -60,10 +60,8 @@ public class DefaultScriptRunnerTest {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        
-        DbSupport dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
-        defaultScriptRunner = TestUtils.getDefaultScriptRunner(configuration, dbSupport);
+        defaultScriptRunner = new DefaultScriptRunner();
+        defaultScriptRunner.init(configuration, new DefaultSQLHandler(dataSource));
 
         script1 = new Script("test-script1.sql", 0L, new UrlScriptContentHandle(getClass().getResource("DefaultScriptRunnerTest/test-script1.sql")));
         script2 = new Script("test-script2.sql", 0L, new UrlScriptContentHandle(getClass().getResource("DefaultScriptRunnerTest/test-script2.sql")));
@@ -86,8 +84,8 @@ public class DefaultScriptRunnerTest {
      */
     @Test
     public void testExecute() throws Exception {
-        defaultScriptRunner.execute(script1);
-        defaultScriptRunner.execute(script2);
+        defaultScriptRunner.execute(script1.getScriptContentHandle());
+        defaultScriptRunner.execute(script2.getScriptContentHandle());
 
         // all tables should exist (otherwise an exception will be thrown)
         assertTrue(isEmpty("table1", dataSource));

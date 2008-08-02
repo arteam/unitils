@@ -67,7 +67,7 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     /**
      * Property key for the directory in which the code script files are located
      */
-    public static final String PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME = "dbMaintainer.postProcessingScripts.directoryName";
+    public static final String PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH = "dbMaintainer.postProcessingScripts.directoryNameStartsWith";
 
     public static final String PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES = "dbMaintainer.useScriptFileLastModificationDates.enabled";
     
@@ -275,7 +275,7 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
         if (currentLocation.isDirectory()) {
             for (File subLocation : currentLocation.listFiles()) {
                 getScriptsAt(scripts, scriptRoot, 
-                		"".equals(relativeLocation) ? subLocation.getName() : relativeLocation + '/' + subLocation.getName());
+                		"".equals(relativeLocation) ? subLocation.getName() : relativeLocation + "/" + subLocation.getName());
             }
         }
     }
@@ -286,12 +286,11 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @return True if the given script is a post processing script according to the script source configuration
      */
     protected boolean isPostProcessingScript(Script script) {
-    	String postProcessingScriptDirName = PropertyUtils.getString(PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, configuration);
-    	if (StringUtils.isEmpty(postProcessingScriptDirName)) {
+    	String postProcessingScriptDirNameStartsWith = PropertyUtils.getString(PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH, configuration);
+    	if (StringUtils.isEmpty(postProcessingScriptDirNameStartsWith)) {
     		return false;
     	}
-		return script.getFileName().startsWith(postProcessingScriptDirName + '/') ||
-		script.getFileName().startsWith(postProcessingScriptDirName + '\\');
+		return script.getFileName().startsWith(postProcessingScriptDirNameStartsWith);
 	}
 
 

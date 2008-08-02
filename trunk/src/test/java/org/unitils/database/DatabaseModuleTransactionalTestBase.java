@@ -15,31 +15,25 @@
  */
 package org.unitils.database;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.reset;
-
-import java.sql.Connection;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
+import static org.easymock.classextension.EasyMock.*;
 import org.junit.Before;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.config.DataSourceFactory;
 import org.unitils.spring.SpringModule;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.Properties;
 
 /**
  * Base class for tests that verify the transactional behavior of the database module
  *
- * @author Filip Neven
+ * @author Flip Neven
  * @author Tim Ducheyne
  */
-abstract public class DatabaseModuleTransactionalTestBase {
+abstract public class DatabaseModuleTransactionalTestBase extends UnitilsJUnit4 {
 
     /**
      * Test datasource that returns connection 1 and 2
@@ -55,11 +49,6 @@ abstract public class DatabaseModuleTransactionalTestBase {
      * Test connection 2
      */
     protected static Connection mockConnection2 = createMock(Connection.class);
-    
-    /**
-     * Mock DbSupport that returns mock datasource
-     */
-    protected static DbSupport mockDbSupport = createMock(DbSupport.class);
 
     /**
      * The unitils configuration
@@ -75,35 +64,28 @@ abstract public class DatabaseModuleTransactionalTestBase {
         reset(mockConnection1);
         reset(mockConnection2);
         reset(mockDataSource);
-        expect(mockDbSupport.getDataSource()).andStubReturn(mockDataSource);
         expect(mockDataSource.getConnection()).andReturn(mockConnection1);
         expect(mockDataSource.getConnection()).andReturn(mockConnection2);
         replay(mockDataSource);
 
         configuration = new ConfigurationLoader().loadConfiguration();
-        configuration.setProperty(DbSupportFactory.class.getName() + ".implClassName", MockDbSupportFactory.class.getName());
+        configuration.setProperty("org.unitils.database.config.DataSourceFactory.implClassName", MockDataSourceFactory.class.getName());
     }
 
 
     /**
      * Mock DataSourceFactory, that returns the static mockDataSource
      */
-    public static class MockDbSupportFactory implements DbSupportFactory {
+    public static class MockDataSourceFactory implements DataSourceFactory {
 
-		public DbSupport createDbSupport(String databaseName, SQLHandler sqlHandler) {
-			return null;
-		}
+        public void init(Properties configuration) {
+        }
 
-		public DbSupport createDefaultDbSupport(SQLHandler sqlHandler) {
-			return null;
-		}
-
-		public void init(Properties configuration) {
-		}
-
+        public DataSource createDataSource() {
+            return mockDataSource;
+        }
     }
-    
-    
+
 
     /**
      * Utility method to retrieve the database module instance.

@@ -189,11 +189,11 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 			Statement st = null;
 			ResultSet rs = null;
 			try {
-				conn = defaultDbSupport.getDataSource().getConnection();
+				conn = sqlHandler.getDataSource().getConnection();
 				st = conn.createStatement();
 				rs = st.executeQuery("select " + fileNameColumnName + ", " + versionColumnName + ", " + fileLastModifiedAtColumnName + ", " + 
 						checksumColumnName + ", " + executedAtColumnName + ", " + succeededColumnName + 
-						" from " + defaultDbSupport.qualified(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName));
+						" from " + defaultDbSupport.qualified(executedScriptsTableName));
 				executedScripts = new HashSet<ExecutedScript>();
 				while (rs.next()) {
 					String fileName = rs.getString(fileNameColumnName);
@@ -285,12 +285,12 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 		executedScripts.add(executedScript);
 		
 		String executedAt = timestampFormat.format(executedScript.getExecutedAt());
-		String insertSql = "insert into " + defaultDbSupport.qualified(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName) + 
+		String insertSql = "insert into " + defaultDbSupport.qualified(executedScriptsTableName) + 
 				" (" + fileNameColumnName + ", " + versionColumnName + ", " + fileLastModifiedAtColumnName + ", " + checksumColumnName + ", " +
 				executedAtColumnName + ", " + succeededColumnName + ") values ('" + executedScript.getScript().getFileName() +
 				"', '" + executedScript.getScript().getVersion().getIndexesString() + "', " + executedScript.getScript().getFileLastModifiedAt() + ", '" + 
 				executedScript.getScript().getCheckSum() + "', '" + executedAt + "', " + (executedScript.isSucceeded() ? "1" : "0") + ")";
-		sqlHandler.executeUpdate(insertSql, defaultDbSupport.getDataSource());
+		sqlHandler.executeUpdate(insertSql);
 	}
 	
 	
@@ -304,13 +304,13 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 		executedScripts.add(executedScript);
 		
 		String executedAt = timestampFormat.format(executedScript.getExecutedAt());
-		String updateSql = "update " + defaultDbSupport.qualified(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName) + 
+		String updateSql = "update " + defaultDbSupport.qualified(executedScriptsTableName) + 
 			" set " + checksumColumnName + " = '" + executedScript.getScript().getCheckSum() + "', " +
 			fileLastModifiedAtColumnName + " = " + executedScript.getScript().getFileLastModifiedAt() + ", " +
 			executedAtColumnName + " = '" + executedAt + "', " + 
 			succeededColumnName + " = " + (executedScript.isSucceeded() ? "1" : "0") + 
 			" where " + fileNameColumnName + " = '" + executedScript.getScript().getFileName() + "'";
-		sqlHandler.executeUpdate(updateSql, defaultDbSupport.getDataSource());
+		sqlHandler.executeUpdate(updateSql);
 	}
 
 
@@ -336,8 +336,8 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 	protected void doClearAllExecutedScripts() {
 		executedScripts = new HashSet<ExecutedScript>();
 		
-		String deleteSql = "delete from " + defaultDbSupport.qualified(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName);
-		sqlHandler.executeUpdate(deleteSql, defaultDbSupport.getDataSource());
+		String deleteSql = "delete from " + defaultDbSupport.qualified(executedScriptsTableName);
+		sqlHandler.executeUpdate(deleteSql);
 	}
 
 
@@ -355,13 +355,13 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 
         // does not exist yet, if auto-create create version table
         if (autoCreateVersionTable) {
-            logger.warn("Executed scripts table " + defaultDbSupport.qualified(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName) + " doesn't exist yet or is invalid. A new one is created automatically.");
+            logger.warn("Executed scripts table " + defaultDbSupport.qualified(executedScriptsTableName) + " doesn't exist yet or is invalid. A new one is created automatically.");
             createVersionTable();
             return false;
         }
 
         // throw an exception that shows how to create the version table
-        String message = "Executed scripts table " + defaultDbSupport.qualified(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName) + " doesn't exist yet or is invalid.\n";
+        String message = "Executed scripts table " + defaultDbSupport.qualified(executedScriptsTableName) + " doesn't exist yet or is invalid.\n";
         message += "Please create it manually or let Unitils create it automatically by setting the " + PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE + " property to true.\n";
         message += "The table can be created manually by executing following statement:\n";
         message += getCreateVersionTableStatement();
@@ -377,10 +377,10 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
      */
     protected boolean isVersionTableValid() {
         // Check existence of version table
-        Set<String> tableNames = defaultDbSupport.getTableNames(defaultDbSupport.getDefaultSchemaName());
+        Set<String> tableNames = defaultDbSupport.getTableNames();
         if (tableNames.contains(executedScriptsTableName)) {
             // Check columns of version table
-            Set<String> columnNames = defaultDbSupport.getColumnNames(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName);
+            Set<String> columnNames = defaultDbSupport.getColumnNames(executedScriptsTableName);
             if (columnNames.contains(fileNameColumnName) && columnNames.contains(versionColumnName) && 
             		columnNames.contains(fileLastModifiedAtColumnName) && columnNames.contains(checksumColumnName)
             		&& columnNames.contains(executedAtColumnName) && columnNames.contains(succeededColumnName)) {
@@ -398,13 +398,13 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
     protected void createVersionTable() {
         // If version table is invalid, drop and re-create
         try {
-            defaultDbSupport.dropTable(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName);
+            defaultDbSupport.dropTable(executedScriptsTableName);
         } catch (UnitilsException e) {
             // ignored
         }
 
         // Create db version table
-        sqlHandler.executeUpdate(getCreateVersionTableStatement(), defaultDbSupport.getDataSource());
+        sqlHandler.executeUpdate(getCreateVersionTableStatement());
     }
 
 
@@ -413,7 +413,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
      */
     protected String getCreateVersionTableStatement() {
         String longDataType = defaultDbSupport.getLongDataType();
-        return "create table " + defaultDbSupport.qualified(defaultDbSupport.getDefaultSchemaName(), executedScriptsTableName) + " ( " + 
+        return "create table " + defaultDbSupport.qualified(executedScriptsTableName) + " ( " + 
         	fileNameColumnName + " " + defaultDbSupport.getTextDataType(fileNameColumnSize) + ", " + 
         	versionColumnName + " " + defaultDbSupport.getTextDataType(versionColumnSize) + ", " +
         	fileLastModifiedAtColumnName + " " + defaultDbSupport.getLongDataType() + ", " +

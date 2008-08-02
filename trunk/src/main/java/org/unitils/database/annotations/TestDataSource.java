@@ -42,6 +42,4 @@ import java.lang.annotation.Target;
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface TestDataSource {
-	
-	String value() default "";
 }

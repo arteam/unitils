@@ -17,6 +17,7 @@ package org.unitils.dbmaintainer.version.impl;
 
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
@@ -33,10 +34,13 @@ import org.apache.commons.lang.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.util.CollectionUtils;
@@ -48,7 +52,7 @@ import org.unitils.util.CollectionUtils;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultExecutedScriptInfoSourceTest {
+public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
 
     /* The tested instance */
     DefaultExecutedScriptInfoSource dbVersionSource;
@@ -57,10 +61,11 @@ public class DefaultExecutedScriptInfoSourceTest {
     DefaultExecutedScriptInfoSource dbVersionSourceAutoCreate;
 
     /* The dataSource */
-    DataSource dataSource;
+    @TestDataSource
+    DataSource dataSource = null;
 
     /* The db support instance for the default schema */
-    DbSupport dbSupport;
+    DbSupport defaultDbSupport;
     
     ExecutedScript executedScript1, executedScript2;
     
@@ -71,14 +76,16 @@ public class DefaultExecutedScriptInfoSourceTest {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        defaultDbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         configuration.setProperty(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "false");
-        dbVersionSource = TestUtils.getDefaultExecutedScriptInfoSource(configuration, dbSupport);
+        dbVersionSource = new DefaultExecutedScriptInfoSource();
+        dbVersionSource.init(configuration, sqlHandler);
 
         configuration.setProperty(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "true");
-        dbVersionSourceAutoCreate = TestUtils.getDefaultExecutedScriptInfoSource(configuration, dbSupport);
+        dbVersionSourceAutoCreate = new DefaultExecutedScriptInfoSource();
+        dbVersionSourceAutoCreate.init(configuration, sqlHandler);
 
         dropExecutedScriptsTable();
         createExecutedScriptsTable();

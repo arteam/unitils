@@ -17,10 +17,8 @@ package org.unitils.dbmaintainer.util;
 
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 
-import java.util.Map;
 import java.util.Properties;
 
-import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.util.PropertyUtils;
 
@@ -47,15 +45,13 @@ public class DatabaseModuleConfigUtils {
      * @param databaseTaskType The type of the DatabaseTask, not null
      * @param configuration    The config, not null
      * @param sqlHandler       The sql handler, not null
-     * @param defaultDataSource 
-     * @param allDataSources 
      * @return The configured instance
      */
     @SuppressWarnings({"unchecked"})
-    public static <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, SQLHandler sqlHandler, DbSupport defaultDbSupport, Map<String, DbSupport> dbNameDbSupportMap) {
+    public static <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType, Properties configuration, SQLHandler sqlHandler) {
         String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
         DatabaseAccessing instance = getInstanceOf(databaseTaskType, configuration, databaseDialect);
-        instance.init(configuration, sqlHandler, defaultDbSupport, dbNameDbSupportMap);
+        instance.init(configuration, sqlHandler);
         return (T) instance;
     }
 

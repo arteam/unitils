@@ -15,19 +15,20 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-
-import java.io.Reader;
-
-import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptContentHandle;
 import org.unitils.dbmaintainer.script.ScriptParser;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
+
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
+
+import java.io.Reader;
 
 /**
  * Default implementation of a script runner.
@@ -45,33 +46,21 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
      *
      * @param scriptContentHandle The script as a string, not null
      */
-    public void execute(Script script) {
+    public void execute(ScriptContentHandle scriptContentHandle) {
 
         Reader scriptContentReader = null;
         try {
             // get content stream
-            scriptContentReader = script.getScriptContentHandle().openScriptContentReader();
+            scriptContentReader = scriptContentHandle.openScriptContentReader();
 
             // create a parser
             ScriptParser scriptParser = createScriptParser();
             scriptParser.init(configuration, scriptContentReader);
 
-            // Define the target database on which to execute the script
-            DbSupport targetDbSupport;
-            if (script.getTargetDatabaseName() == null) {
-            	targetDbSupport = defaultDbSupport;
-            } else {
-            	targetDbSupport = dbNameDbSupportMap.get(script.getTargetDatabaseName());
-            	if (targetDbSupport == null) {
-            		throw new UnitilsException("Error executing script " + script.getFileName() + 
-            				". No database initialized with the name " + script.getTargetDatabaseName());
-            	}
-            }
-            
             // parse and execute the statements
             String statement;
             while ((statement = scriptParser.getNextStatement()) != null) {
-                sqlHandler.executeUpdate(statement, targetDbSupport.getDataSource());
+                sqlHandler.executeUpdate(statement);
             }
         } finally {
             closeQuietly(scriptContentReader);

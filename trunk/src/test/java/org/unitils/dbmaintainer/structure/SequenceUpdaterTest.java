@@ -15,26 +15,30 @@
  */
 package org.unitils.dbmaintainer.structure;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
+import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.structure.impl.DefaultSequenceUpdater.PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE;
-
-import java.util.Properties;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
+import java.util.Properties;
 
 /**
  * Test class for the SequenceUpdater. Contains tests that can be implemented generally for all different database dialects.
@@ -48,13 +52,14 @@ import org.unitils.core.util.TestUtils;
  * @author Tim Ducheyne
  * @author Scott Prater
  */
-public class SequenceUpdaterTest {
+public class SequenceUpdaterTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(SequenceUpdaterTest.class);
 
-    /* DataSource for the test database */
-    private DataSource dataSource;
+    /* DataSource for the test database, is injected */
+    @TestDataSource
+    private DataSource dataSource = null;
 
     /* Tested object */
     private SequenceUpdater sequenceUpdater;
@@ -72,9 +77,9 @@ public class SequenceUpdaterTest {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
         configuration.setProperty(PROPKEY_LOWEST_ACCEPTABLE_SEQUENCE_VALUE, "1000");
 
-        dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
-        sequenceUpdater = TestUtils.getDefaultSequenceUpdater(configuration, dbSupport);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -162,7 +167,7 @@ public class SequenceUpdaterTest {
      */
     private void assertCurrentSequenceValueBetween(long minValue, long maxValue) {
         String correctCaseSequenceName = dbSupport.toCorrectCaseIdentifier("test_sequence");
-        long currentValue = dbSupport.getSequenceValue(dbSupport.getDefaultSchemaName(), correctCaseSequenceName);
+        long currentValue = dbSupport.getSequenceValue(correctCaseSequenceName);
         assertTrue("Current sequence value is not between " + minValue + " and " + maxValue, (currentValue >= minValue && currentValue <= maxValue));
     }
 

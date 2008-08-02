@@ -1,10 +1,24 @@
 package org.unitils.dbmaintainer.structure;
 
+import org.apache.commons.lang.StringUtils;
+import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator;
 import static org.unitils.dbmaintainer.structure.impl.DtdDataSetStructureGenerator.PROPKEY_DTD_FILENAME;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
@@ -12,25 +26,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.lang.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-
 /**
  * Test class for the FlatXmlDataSetDtdGenerator
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DtdDataSetStructureGeneratorTest {
+public class DtdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
 
     /* Tested object */
     private DataSetStructureGenerator dataSetStructureGenerator;
@@ -38,10 +40,9 @@ public class DtdDataSetStructureGeneratorTest {
     /* The file to which to write the DTD */
     private File dtdFile;
 
-    private DbSupport dbSupport;
-    
-    /* DataSource for the test database */
-    private DataSource dataSource;
+    /* DataSource for the test database. */
+    @TestDataSource
+    private DataSource dataSource = null;
 
 
     /**
@@ -54,13 +55,12 @@ public class DtdDataSetStructureGeneratorTest {
         dtdFile = File.createTempFile("testDTD", ".dtd");
 
         Properties configuration = new ConfigurationLoader().loadConfiguration();
+        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", DtdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_DTD_FILENAME, dtdFile.getPath());
 
-        dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
-        
-        dataSetStructureGenerator = TestUtils.getDtdDataSetStructureGenerator(configuration, dbSupport);
-        DBClearer dbClearer = TestUtils.getDefaultDBClearer(configuration, dbSupport);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
+        DBClearer dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 
         dbClearer.clearSchemas();
         createTestTables();
