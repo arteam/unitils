@@ -17,6 +17,8 @@ package org.unitils.dbmaintainer.clean.impl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.database.SQLUnitils.isEmpty;
@@ -33,9 +35,12 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.annotations.TestDataSource;
 import org.unitils.util.PropertyUtils;
 
 /**
@@ -45,13 +50,14 @@ import org.unitils.util.PropertyUtils;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class DefaultDBCleanerMultiSchemaPreserveTest {
+public class DefaultDBCleanerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 
 	/* The logger instance for this class */
 	private static Log logger = LogFactory.getLog(DefaultDBCleanerMultiSchemaPreserveTest.class);
 
-	/* DataSource for the test database */
-	private DataSource dataSource;
+	/* DataSource for the test database, is injected */
+	@TestDataSource
+	private DataSource dataSource = null;
 
 	/* Tested object */
 	private DefaultDBCleaner defaultDbCleaner;
@@ -75,14 +81,14 @@ public class DefaultDBCleanerMultiSchemaPreserveTest {
 		}
 
 		// configure 3 schemas
-		configuration.setProperty("database.schemaNames", "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
-		dbSupport = TestUtils.getDefaultDbSupport(configuration);
-		dataSource = dbSupport.getDataSource();
-
+		configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
+		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+		dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 		// items to preserve
 		configuration.setProperty(PROPKEY_PRESERVE_DATA_SCHEMAS, "schema_c");
 		configuration.setProperty(PROPKEY_PRESERVE_DATA_TABLES, "test, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST"));
-		defaultDbCleaner = TestUtils.getDefaultDBCleaner(configuration, dbSupport);
+		defaultDbCleaner = new DefaultDBCleaner();
+		defaultDbCleaner.init(configuration, sqlHandler);
 
 		dropTestTables();
 		createTestTables();

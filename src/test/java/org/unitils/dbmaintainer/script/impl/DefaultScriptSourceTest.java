@@ -70,14 +70,14 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void setUp() throws Exception {
     	executionDate = new Date();
 		alreadyExecutedScripts = new ArrayList<ExecutedScript>(asList(
-			new ExecutedScript(new Script("1_scripts/001_scriptA.sql", 0L, "9a6c61ba036ac10baa6d8229ddc61607"), executionDate, true),
-			new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "d28d9d6b03f7be2f6a51061360b00c9e"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/002_scriptE.sql", 0L, "2e02a907691a4f20a19ae363d5942e84"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/scriptF.sql", 0L, "77a703ac3381db7be6273a6e8899c772"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/subfolder/001_scriptG.sql", 0L, "1efbb7e68fb36681e047feb47fb57054"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "b653b6f1b6522083efe6012479898958"), executionDate, true),
-			new ExecutedScript(new Script("scripts/001_scriptI.sql", 0L, "1efbb7e68fb36681e047feb47fb57054"), executionDate, true),
-			new ExecutedScript(new Script("scripts/scriptJ.sql", 0L, "b653b6f1b6522083efe6012479898958"),  executionDate, true)
+			new ExecutedScript(new Script("1_scripts/001_scriptA.sql", 0L, "da55bb1512fad44454934a181d339918a7289394"), executionDate, true),
+			new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "a902917dbf9e35a5dda1a9bfd4a00c75fa247d8a"), executionDate, true),
+			new ExecutedScript(new Script("2_scripts/002_scriptE.sql", 0L, "5231869b0b758153646e1d4870ff7a65a3de7e2f"), executionDate, true),
+			new ExecutedScript(new Script("2_scripts/scriptF.sql", 0L, "f45dc8cf2589b8a4c4271d4e5ddc4d34ed8da67e"), executionDate, true),
+			new ExecutedScript(new Script("2_scripts/subfolder/001_scriptG.sql", 0L, "ca280bf042e7cf22685fb3001f0691d3103c15b1"), executionDate, true),
+			new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "9389cf7d1f2f6acb4d06b12c95213e50dd2ec8be"), executionDate, true),
+			new ExecutedScript(new Script("scripts/001_scriptI.sql", 0L, "ca280bf042e7cf22685fb3001f0691d3103c15b1"), executionDate, true),
+			new ExecutedScript(new Script("scripts/scriptJ.sql", 0L, "9389cf7d1f2f6acb4d06b12c95213e50dd2ec8be"),  executionDate, true)
     	));
     	
         // Create test directories
@@ -92,8 +92,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
         String scriptsLocation = scriptsDirName + "/test_scripts";
         configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION, scriptsLocation);
         configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, "sql");
-        configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, "postprocessing");
-        configuration.setProperty(DefaultScriptSource.PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES, Boolean.FALSE.toString());
+        configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH, "postprocessing");
         scriptSource = new DefaultScriptSource();
         scriptSource.init(configuration);
     }
@@ -105,7 +104,6 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     @Test
     public void testGetAllUpdateScripts() {
         List<Script> scripts = scriptSource.getAllUpdateScripts();
-        System.out.println(scripts);
 
         assertEquals("1_scripts/001_scriptA.sql", scripts.get(0).getFileName());   // x.1.1
         assertEquals("1_scripts/002_scriptB.sql", scripts.get(1).getFileName());   // x.1.2
@@ -151,11 +149,11 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testGetNewScripts() {
     	alreadyExecutedScripts.set(5, new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "xxx"), executionDate, true));
     	
-		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts));
+		List<Script> scripts = scriptSource.getNewScripts(new Version("2.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts));
 
-        assertEquals("1_scripts/scriptD.sql", scripts.get(0).getFileName());       			// 1.x 		was added
-        assertEquals("2_scripts/subfolder/scriptH.sql", scripts.get(1).getFileName());      // 2.x.x	was changed
-        assertEquals("scripts/001_scriptI.sql", scripts.get(2).getFileName());   			// x.1		higher version
+        assertEquals("1_scripts/scriptD.sql", scripts.get(0).getFileName());       			// x.1.x 		was added
+        assertEquals("2_scripts/subfolder/scriptH.sql", scripts.get(2).getFileName());      // x.2.x.x		was changed
+        assertEquals("scripts/001_scriptI.sql", scripts.get(3).getFileName());   			// x.x.1		higher version
     }
 
 

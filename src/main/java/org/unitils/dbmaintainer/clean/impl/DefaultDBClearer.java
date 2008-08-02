@@ -15,28 +15,20 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import static org.unitils.util.PropertyUtils.getStringList;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
+import static org.unitils.core.util.StoredIdentifierCase.MIXED_CASE;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
-import org.unitils.dbmaintainer.util.DbItemIdentifier;
-import org.unitils.util.PropertyUtils;
+import static org.unitils.util.PropertyUtils.getStringList;
+
+import java.util.*;
 
 /**
  * Implementation of {@link DBClearer}. This implementation individually drops every table, view, constraint, trigger
- * and sequence in the database. A list of tables, views, ... that should be preserved can be specified using the
+ * and sequence in the database. A list of tables, views, ... that should be preserverd can be specified using the
  * property {@link #PROPKEY_PRESERVE_TABLES}. <p/> NOTE: FK constraints give problems in MySQL and Derby The cascade in
  * drop table A cascade; does not work in MySQL-5.0 The DBMaintainer will first remove all constraints before calling
  * the db clearer
@@ -90,7 +82,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * The key of the property that specifies the name of the datase table in which the
      * DB version is stored. This table should not be deleted
      */
-    public static final String PROPKEY_EXECUTED_SCRIPTS_TABLE_NAME = "dbMaintainer.executedScriptsTableName";
+    public static final String PROPKEY_VERSION_TABLE_NAME = "dbMaintainer.executedScriptsTableName";
 
 
     /* The logger instance for this class */
@@ -99,42 +91,42 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
     /**
      * Names of schemas that should left untouched.
      */
-    protected Set<DbItemIdentifier> schemasToPreserve;
+    protected Set<String> schemasToPreserve;
 
     /**
      * Names of tables that should not be dropped per schema.
      */
-    protected Set<DbItemIdentifier> tablesToPreserve;
+    protected Map<String, Set<String>> tablesToPreserve;
 
     /**
      * Names of views that should not be dropped per schema.
      */
-    protected Set<DbItemIdentifier> viewsToPreserve;
+    protected Map<String, Set<String>> viewsToPreserve;
 
     /**
      * Names of materialized views that should not be dropped per schema.
      */
-    protected Set<DbItemIdentifier> materializedViewsToPreserve;
+    protected Map<String, Set<String>> materializedViewsToPreserve;
 
     /**
      * Names of synonyms that should not be dropped per schema.
      */
-    protected Set<DbItemIdentifier> synonymsToPreserve;
+    protected Map<String, Set<String>> synonymsToPreserve;
 
     /**
      * Names of sequences that should not be dropped per schema.
      */
-    protected Set<DbItemIdentifier> sequencesToPreserve;
+    protected Map<String, Set<String>> sequencesToPreserve;
 
     /**
      * Names of triggers that should not be dropped per schema.
      */
-    protected Set<DbItemIdentifier> triggersToPreserve;
+    protected Map<String, Set<String>> triggersToPreserve;
 
     /**
      * Names of types that should not be dropped per schema.
      */
-    protected Set<DbItemIdentifier> typesToPreserve;
+    protected Map<String, Set<String>> typesToPreserve;
 
 
     /**
@@ -145,7 +137,7 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      */
     @Override
     protected void doInit(Properties configuration) {
-        schemasToPreserve = getSchemasToPreserve();
+        schemasToPreserve = getSchemasToPreserve(configuration);
         tablesToPreserve = getTablesToPreserve(); // also adds db version table
         viewsToPreserve = getViewsToPreserve();
         materializedViewsToPreserve = getMaterializedViewsToPreserve();
@@ -162,24 +154,21 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * untouched.
      */
     public void clearSchemas() {
-        for (DbSupport dbSupport : getDbSupports()) {
-        	for (String schemaName : dbSupport.getSchemaNames()) {
-        	
-	            // check whether schema needs to be preserved
-	            if (schemasToPreserve.contains(DbItemIdentifier.getSchemaIdentifier(schemaName, dbSupport))) {
-	                continue;
-	            }
-	            logger.info("Clearing (dropping) database schema " + schemaName);
-	            dropSynonyms(dbSupport, schemaName);
-	            dropViews(dbSupport, schemaName);
-	            dropMaterializedViews(dbSupport, schemaName);
-	            dropSequences(dbSupport, schemaName);
-	            dropTables(dbSupport, schemaName);
-	
-	            dropTriggers(dbSupport, schemaName);
-	            dropTypes(dbSupport, schemaName);
-	            // todo drop functions, stored procedures.
-        	}
+        for (DbSupport dbSupport : dbSupports) {
+            // check whether schema needs to be preserved
+            if (schemasToPreserve.contains(dbSupport.getSchemaName())) {
+                continue;
+            }
+            logger.info("Clearing (dropping) database schema " + dbSupport.getSchemaName());
+            dropSynonyms(dbSupport);
+            dropViews(dbSupport);
+            dropMaterializedViews(dbSupport);
+            dropSequences(dbSupport);
+            dropTables(dbSupport);
+
+            dropTriggers(dbSupport);
+            dropTypes(dbSupport);
+            // todo drop functions, stored procedures.
         }
     }
 
@@ -188,17 +177,17 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * Drops all tables.
      *
      * @param dbSupport The database support, not null
-     * @param schemaName 
      */
-    protected void dropTables(DbSupport dbSupport, String schemaName) {
-        Set<String> tableNames = dbSupport.getTableNames(schemaName);
+    protected void dropTables(DbSupport dbSupport) {
+        Set<String> tableNames = dbSupport.getTableNames();
+        Set<String> schemaTablesToPreserve = tablesToPreserve.get(dbSupport.getSchemaName());
         for (String tableName : tableNames) {
             // check whether table needs to be preserved
-            if (tablesToPreserve.contains(DbItemIdentifier.getItemIdentifier(schemaName, tableName, dbSupport))) {
+            if (isItemToPreserve(tableName, schemaTablesToPreserve)) {
                 continue;
             }
-            logger.debug("Dropping table " + tableName + " in database schema " + schemaName);
-            dbSupport.dropTable(schemaName, tableName);
+            logger.debug("Dropping table " + tableName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropTable(tableName);
         }
     }
 
@@ -207,17 +196,17 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * Drops all views.
      *
      * @param dbSupport The database support, not null
-     * @param schemaName 
      */
-    protected void dropViews(DbSupport dbSupport, String schemaName) {
-        Set<String> viewNames = dbSupport.getViewNames(schemaName);
+    protected void dropViews(DbSupport dbSupport) {
+        Set<String> viewNames = dbSupport.getViewNames();
+        Set<String> schemaViewsToPreserve = viewsToPreserve.get(dbSupport.getSchemaName());
         for (String viewName : viewNames) {
             // check whether view needs to be preserved
-            if (viewsToPreserve.contains(DbItemIdentifier.getItemIdentifier(schemaName, viewName, dbSupport))) {
+            if (isItemToPreserve(viewName, schemaViewsToPreserve)) {
                 continue;
             }
-            logger.debug("Dropping view " + viewName + " in database schema " + schemaName);
-            dbSupport.dropView(schemaName, viewName);
+            logger.debug("Dropping view " + viewName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropView(viewName);
         }
     }
 
@@ -226,20 +215,20 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * Drops all materialized views.
      *
      * @param dbSupport The database support, not null
-     * @param schemaName 
      */
-    protected void dropMaterializedViews(DbSupport dbSupport, String schemaName) {
+    protected void dropMaterializedViews(DbSupport dbSupport) {
         if (!dbSupport.supportsMaterializedViews()) {
             return;
         }
-        Set<String> materializedViewNames = dbSupport.getMaterializedViewNames(schemaName);
+        Set<String> materializedViewNames = dbSupport.getMaterializedViewNames();
+        Set<String> schemaMaterializedViewsToPreserve = materializedViewsToPreserve.get(dbSupport.getSchemaName());
         for (String materializedViewName : materializedViewNames) {
             // check whether view needs to be preserved
-        	if (materializedViewsToPreserve.contains(DbItemIdentifier.getItemIdentifier(schemaName, materializedViewName, dbSupport))) {
+            if (isItemToPreserve(materializedViewName, schemaMaterializedViewsToPreserve)) {
                 continue;
             }
-            logger.debug("Dropping materialized view " + materializedViewName + " in database schema " + schemaName);
-            dbSupport.dropMaterializedView(schemaName, materializedViewName);
+            logger.debug("Dropping materialized view " + materializedViewName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropMaterializedView(materializedViewName);
         }
     }
 
@@ -248,20 +237,20 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * Drops all synonyms
      *
      * @param dbSupport The database support, not null
-     * @param schemaName 
      */
-    protected void dropSynonyms(DbSupport dbSupport, String schemaName) {
+    protected void dropSynonyms(DbSupport dbSupport) {
         if (!dbSupport.supportsSynonyms()) {
             return;
         }
-        Set<String> synonymNames = dbSupport.getSynonymNames(schemaName);
+        Set<String> synonymNames = dbSupport.getSynonymNames();
+        Set<String> schemaSynonymsToPreserve = synonymsToPreserve.get(dbSupport.getSchemaName());
         for (String synonymName : synonymNames) {
             // check whether table needs to be preserved
-            if (synonymsToPreserve.contains(DbItemIdentifier.getItemIdentifier(schemaName, synonymName, dbSupport))) {
+            if (isItemToPreserve(synonymName, schemaSynonymsToPreserve)) {
                 continue;
             }
-            logger.debug("Dropping synonym " + synonymName + " in database schema " + schemaName);
-            dbSupport.dropSynonym(schemaName, synonymName);
+            logger.debug("Dropping synonym " + synonymName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropSynonym(synonymName);
         }
     }
 
@@ -270,20 +259,20 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * Drops all sequences
      *
      * @param dbSupport The database support, not null
-     * @param schemaName 
      */
-    protected void dropSequences(DbSupport dbSupport, String schemaName) {
+    protected void dropSequences(DbSupport dbSupport) {
         if (!dbSupport.supportsSequences()) {
             return;
         }
-        Set<String> sequenceNames = dbSupport.getSequenceNames(schemaName);
+        Set<String> sequenceNames = dbSupport.getSequenceNames();
+        Set<String> schemaSequencesToPreserve = sequencesToPreserve.get(dbSupport.getSchemaName());
         for (String sequenceName : sequenceNames) {
             // check whether sequence needs to be preserved
-            if (sequencesToPreserve.contains(DbItemIdentifier.getItemIdentifier(schemaName, sequenceName, dbSupport))) {
+            if (isItemToPreserve(sequenceName, schemaSequencesToPreserve)) {
                 continue;
             }
-            logger.debug("Dropping sequence " + sequenceName + " in database schema " + schemaName);
-            dbSupport.dropSequence(schemaName, sequenceName);
+            logger.debug("Dropping sequence " + sequenceName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropSequence(sequenceName);
         }
     }
 
@@ -292,20 +281,20 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * Drops all triggers
      *
      * @param dbSupport The database support, not null
-     * @param schemaName 
      */
-    protected void dropTriggers(DbSupport dbSupport, String schemaName) {
+    protected void dropTriggers(DbSupport dbSupport) {
         if (!dbSupport.supportsTriggers()) {
             return;
         }
-        Set<String> triggerNames = dbSupport.getTriggerNames(schemaName);
+        Set<String> triggerNames = dbSupport.getTriggerNames();
+        Set<String> schemaTriggersToPreserve = triggersToPreserve.get(dbSupport.getSchemaName());
         for (String triggerName : triggerNames) {
             // check whether trigger needs to be preserved
-            if (triggersToPreserve.contains(DbItemIdentifier.getItemIdentifier(schemaName, triggerName, dbSupport))) {
+            if (isItemToPreserve(triggerName, schemaTriggersToPreserve)) {
                 continue;
             }
-            logger.debug("Dropping trigger " + triggerName + " in database schema " + schemaName);
-            dbSupport.dropTrigger(schemaName, triggerName);
+            logger.debug("Dropping trigger " + triggerName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropTrigger(triggerName);
         }
     }
 
@@ -314,20 +303,20 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * Drops all types.
      *
      * @param dbSupport The database support, not null
-     * @param schemaName 
      */
-    protected void dropTypes(DbSupport dbSupport, String schemaName) {
+    protected void dropTypes(DbSupport dbSupport) {
         if (!dbSupport.supportsTypes()) {
             return;
         }
-        Set<String> typeNames = dbSupport.getTypeNames(schemaName);
+        Set<String> typeNames = dbSupport.getTypeNames();
+        Set<String> schemaTypesToPreserve = typesToPreserve.get(dbSupport.getSchemaName());
         for (String typeName : typeNames) {
             // check whether type needs to be preserved
-            if (typesToPreserve.contains(DbItemIdentifier.getItemIdentifier(schemaName, typeName, dbSupport))) {
+            if (isItemToPreserve(typeName, schemaTypesToPreserve)) {
                 continue;
             }
-            logger.debug("Dropping type " + typeName + " in database schema " + schemaName);
-            dbSupport.dropType(schemaName, typeName);
+            logger.debug("Dropping type " + typeName + " in database schema " + dbSupport.getSchemaName());
+            dbSupport.dropType(typeName);
         }
     }
 
@@ -341,314 +330,331 @@ public class DefaultDBClearer extends BaseDatabaseAccessor implements DBClearer 
      * @param configuration The unitils configuration, not null
      * @return The schemas to preserve, not null
      */
-    protected Set<DbItemIdentifier> getSchemasToPreserve() {
-        Set<DbItemIdentifier> schemasToPreserve = getSchemasToPreserve(PROPKEY_PRESERVE_SCHEMAS); 
+    protected Set<String> getSchemasToPreserve(Properties configuration) {
+        Set<String> result = new HashSet<String>();
 
-        for (DbItemIdentifier schemaToPreserve : schemasToPreserve) {
-        	// Verify if the schema exists.
-        	DbSupport dbSupport = dbNameDbSupportMap.get(schemaToPreserve.getDatabaseName());
-			if (!dbSupport.getSchemaNames().contains(schemaToPreserve.getSchemaName())) {
-        		throw new UnitilsException("Schema to preserve does not exist: " + schemaToPreserve.getSchemaName() + 
-        				".\nUnitils cannot determine which schemas need to be preserved. To assure nothing is dropped by mistake, no schemas will be dropped.\nPlease fix the configuration of the " + 
-        				PROPKEY_PRESERVE_SCHEMAS + " property.");
-        	}
+        List<String> schemasToPreserve = getStringList(PROPKEY_PRESERVE_SCHEMAS, configuration);
+        for (String schemaToPreserve : schemasToPreserve) {
+
+            boolean found = false;
+            for (DbSupport dbSupport : dbSupports) {
+                // ignore case when stored in mixed casing (e.g MS-Sql), otherwise we can't compare the item names
+                if (defaultDbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+                    schemaToPreserve = schemaToPreserve.toUpperCase();
+                }
+                // convert to correct case if needed
+                String correctCaseSchemaToPreserve = dbSupport.toCorrectCaseIdentifier(schemaToPreserve);
+                if (dbSupport.getSchemaName().equals(correctCaseSchemaToPreserve)) {
+                    found = true;
+                    result.add(correctCaseSchemaToPreserve);
+                    break;
+                }
+            }
+            if (!found) {
+                throw new UnitilsException("Schema to preserve does not exist: " + schemaToPreserve + ".\nUnitils cannot determine which schemas need to be preserved. To assure nothing is dropped by mistake, no schemas will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SCHEMAS + " property.");
+            }
         }
-        return schemasToPreserve;
+        return result;
     }
 
 
     /**
-     * Gets the list of all tables to preserve per schema. Quoting a table name makes it case sensitive. 
-     * If no database or schema is specified, the default one is taken.
+     * Gets the list of all tables to preserve per schema. The case is corrected if necesary. Quoting a table name makes
+     * it case sensitive. If no schema is specified, the tables will be added to the default schema name set.
      * <p/>
      * If a table to preserve does not exist, a UnitilsException is thrown.
      * <p/>
-     * The executed scripts info table is also added as a table to preserve, but will not be checked on existence.
+     * The db version table is also added as a table to preserve, but will not be checked on existence.
      *
      * @return The tables to preserve per schema, not null
      */
-    protected Set<DbItemIdentifier> getTablesToPreserve() {
-        Set<DbItemIdentifier> tablesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TABLES);
-        
-        Map<DbItemIdentifier, Set<DbItemIdentifier>> schemaTableNames = new HashMap<DbItemIdentifier, Set<DbItemIdentifier>>();
-        for (DbItemIdentifier tableToPreserve : tablesToPreserve) {
-        	Set<DbItemIdentifier> tableNames = schemaTableNames.get(tableToPreserve.getSchema());
-        	if (tableNames == null) {
-        		DbSupport dbSupport = dbNameDbSupportMap.get(tableToPreserve.getDatabaseName());
-        		tableNames = toDbItemIdentifiers(dbSupport, tableToPreserve.getSchemaName(), dbSupport.getTableNames(tableToPreserve.getSchemaName()));
-        		schemaTableNames.put(tableToPreserve.getSchema(), tableNames);
-        	}
-        	
-            if (!tableNames.contains(tableToPreserve)) {
-                throw new UnitilsException("Table to preserve does not exist: " + tableToPreserve.getItemName() + " in schema: " + tableToPreserve.getSchemaName() + 
-                		".\nUnitils cannot determine which tables need to be preserved. To assure nothing is dropped by mistake, no tables will be dropped.\nPlease fix the configuration of the " + 
-                		PROPKEY_PRESERVE_TABLES + " property.");
+    protected Map<String, Set<String>> getTablesToPreserve() {
+        Map<String, Set<String>> tablesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TABLES);
+        for (Map.Entry<String, Set<String>> entry : tablesToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+            Set<String> tableNames = getDbSupport(schemaName).getTableNames();
+
+            for (String tableToPreserve : entry.getValue()) {
+                if (!itemToPreserveExists(tableToPreserve, tableNames)) {
+                    throw new UnitilsException("Table to preserve does not exist: " + tableToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which tables need to be preserved. To assure nothing is dropped by mistake, no tables will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TABLES + " property.");
+                }
             }
         }
-        
-        // add executed scripts info table as item to preserve
-        tablesToPreserve.add(DbItemIdentifier.getItemIdentifier(defaultDbSupport.getDefaultSchemaName(), 
-        		PropertyUtils.getString(PROPKEY_EXECUTED_SCRIPTS_TABLE_NAME, configuration), defaultDbSupport));
 
+        // add version table as item to preserve
+        Map<String, Set<String>> dbVersionTablesToPreserve = getItemsToPreserve(PROPKEY_VERSION_TABLE_NAME);
+        for (Map.Entry<String, Set<String>> entry : dbVersionTablesToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+            Set<String> dbVersionTableNames = entry.getValue();
+
+            Set<String> tableNames = tablesToPreserve.get(schemaName);
+            if (tableNames == null) {
+                tablesToPreserve.put(schemaName, dbVersionTableNames);
+            } else {
+                tableNames.addAll(dbVersionTableNames);
+            }
+        }
         return tablesToPreserve;
     }
 
 
     /**
-     * Gets the list of all views to preserve per schema. Quoting a view name makes it case sensitive. 
-     * If no database or schema is specified, the default one is taken.
+     * Gets the list of all views to preserve per schema. The case is corrected if necesary. Quoting a view name makes
+     * it case sensitive. If no schema is specified, the view will be added to the default schema name set.
      * <p/>
      * If a view to preserve does not exist, a UnitilsException is thrown.
-     * <p/>
-     * The executed scripts info view is also added as a view to preserve, but will not be checked on existence.
      *
      * @return The views to preserve per schema, not null
      */
-    protected Set<DbItemIdentifier> getViewsToPreserve() {
-        Set<DbItemIdentifier> viewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_VIEWS);
-        
-        Map<DbItemIdentifier, Set<DbItemIdentifier>> schemaViewNames = new HashMap<DbItemIdentifier, Set<DbItemIdentifier>>();
-        for (DbItemIdentifier viewToPreserve : viewsToPreserve) {
-        	Set<DbItemIdentifier> viewNames = schemaViewNames.get(viewToPreserve.getSchema());
-        	if (viewNames == null) {
-        		DbSupport dbSupport = dbNameDbSupportMap.get(viewToPreserve.getDatabaseName());
-        		viewNames = toDbItemIdentifiers(dbSupport, viewToPreserve.getSchemaName(), dbSupport.getViewNames(viewToPreserve.getSchemaName()));
-        	}
-        	
-            if (!viewNames.contains(viewToPreserve)) {
-                throw new UnitilsException("View to preserve does not exist: " + viewToPreserve.getItemName() + " in schema: " + viewToPreserve.getSchemaName() + 
-                		".\nUnitils cannot determine which views need to be preserved. To assure nothing is dropped by mistake, no views will be dropped.\nPlease fix the configuration of the " + 
-                		PROPKEY_PRESERVE_VIEWS + " property.");
+    protected Map<String, Set<String>> getViewsToPreserve() {
+        Map<String, Set<String>> viewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_VIEWS);
+        for (Map.Entry<String, Set<String>> entry : viewsToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+            Set<String> viewNames = getDbSupport(schemaName).getViewNames();
+
+            for (String viewToPreserve : entry.getValue()) {
+                if (!itemToPreserveExists(viewToPreserve, viewNames)) {
+                    throw new UnitilsException("View to preserve does not exist: " + viewToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which views need to be preserved. To assure nothing is dropped by mistake, no views will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_VIEWS + " property.");
+                }
             }
         }
-        
         return viewsToPreserve;
     }
 
 
     /**
-     * Gets the list of all materialized views to preserve per schema. Quoting a materialized view name makes it case sensitive. 
-     * If no database or schema is specified, the default one is taken.
+     * Gets the list of all materialized views to preserve per schema. The case is corrected if necesary. Quoting a view name makes
+     * it case sensitive. If no schema is specified, the view will be added to the default schema name set.
      * <p/>
-     * If a materialized view to preserve does not exist, a UnitilsException is thrown.
-     * <p/>
-     * The executed scripts info materialized view is also added as a materialized view to preserve, but will not be checked on existence.
+     * If a view to preserve does not exist, a UnitilsException is thrown.
      *
      * @return The materialized views to preserve per schema, not null
      */
-    protected Set<DbItemIdentifier> getMaterializedViewsToPreserve() {
-        Set<DbItemIdentifier> materializedViewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_MATERIALIZED_VIEWS);
-        
-        Map<DbItemIdentifier, Set<DbItemIdentifier>> schemaMaterializedViewNames = new HashMap<DbItemIdentifier, Set<DbItemIdentifier>>();
-        for (DbItemIdentifier materializedViewToPreserve : materializedViewsToPreserve) {
-        	Set<DbItemIdentifier> materializedViewNames = schemaMaterializedViewNames.get(materializedViewToPreserve.getSchema());
-        	if (materializedViewNames == null) {
-        		DbSupport dbSupport = dbNameDbSupportMap.get(materializedViewToPreserve.getDatabaseName());
-        		if (dbSupport.supportsMaterializedViews()) {
-        			materializedViewNames = toDbItemIdentifiers(dbSupport, materializedViewToPreserve.getSchemaName(), dbSupport.getMaterializedViewNames(materializedViewToPreserve.getSchemaName()));
-        		} else {
-        			materializedViewNames = Collections.emptySet();
-        		}
-        	}
-        	
-            if (!materializedViewNames.contains(materializedViewToPreserve)) {
-                throw new UnitilsException("Materialized view to preserve does not exist: " + materializedViewToPreserve.getItemName() + " in schema: " + materializedViewToPreserve.getSchemaName() + 
-                		".\nUnitils cannot determine which materialized views need to be preserved. To assure nothing is dropped by mistake, no materialized views will be dropped.\nPlease fix the configuration of the " + 
-                		PROPKEY_PRESERVE_MATERIALIZED_VIEWS + " property.");
+    protected Map<String, Set<String>> getMaterializedViewsToPreserve() {
+        Map<String, Set<String>> materializedViewsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_MATERIALIZED_VIEWS);
+        for (Map.Entry<String, Set<String>> entry : materializedViewsToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+
+            DbSupport dbSupport = getDbSupport(schemaName);
+            Set<String> materializedViewNames;
+            if (!dbSupport.supportsMaterializedViews()) {
+                materializedViewNames = new HashSet<String>();
+            } else {
+                materializedViewNames = dbSupport.getMaterializedViewNames();
+            }
+            for (String materializedViewToPreserve : entry.getValue()) {
+                if (!itemToPreserveExists(materializedViewToPreserve, materializedViewNames)) {
+                    throw new UnitilsException("Materialized view to preserve does not exist: " + materializedViewToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which materialized views need to be preserved. To assure nothing is dropped by mistake, no views will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_MATERIALIZED_VIEWS + " property.");
+                }
             }
         }
-        
         return materializedViewsToPreserve;
     }
 
 
     /**
-     * Gets the list of all sequences to preserve per schema. Quoting a sequence name makes it case sensitive. 
-     * If no database or schema is specified, the default one is taken.
+     * Gets the list of all sequences to preserve per schema. The case is corrected if necesary. Quoting a sequence name
+     * makes it case sensitive. If no schema is specified, the sequence will be added to the default schema name set.
      * <p/>
      * If a sequence to preserve does not exist, a UnitilsException is thrown.
-     * <p/>
-     * The executed scripts info sequence is also added as a sequence to preserve, but will not be checked on existence.
      *
      * @return The sequences to preserve per schema, not null
      */
-    protected Set<DbItemIdentifier> getSequencesToPreserve() {
-        Set<DbItemIdentifier> sequencesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SEQUENCES);
-        
-        Map<DbItemIdentifier, Set<DbItemIdentifier>> schemaSequenceNames = new HashMap<DbItemIdentifier, Set<DbItemIdentifier>>();
-        for (DbItemIdentifier sequenceToPreserve : sequencesToPreserve) {
-        	Set<DbItemIdentifier> sequenceNames = schemaSequenceNames.get(sequenceToPreserve.getSchema());
-        	if (sequenceNames == null) {
-        		DbSupport dbSupport = dbNameDbSupportMap.get(sequenceToPreserve.getDatabaseName());
-        		if (dbSupport.supportsSequences()) {
-        			sequenceNames = toDbItemIdentifiers(dbSupport, sequenceToPreserve.getSchemaName(), dbSupport.getSequenceNames(sequenceToPreserve.getSchemaName()));
-        		} else {
-        			sequenceNames = Collections.emptySet();
-        		}
-        	}
-        	
-            if (!sequenceNames.contains(sequenceToPreserve)) {
-                throw new UnitilsException("Sequence to preserve does not exist: " + sequenceToPreserve.getItemName() + " in schema: " + sequenceToPreserve.getSchemaName() + 
-                		".\nUnitils cannot determine which sequences need to be preserved. To assure nothing is dropped by mistake, no sequences will be dropped.\nPlease fix the configuration of the " + 
-                		PROPKEY_PRESERVE_SEQUENCES + " property.");
+    protected Map<String, Set<String>> getSequencesToPreserve() {
+        Map<String, Set<String>> sequencesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SEQUENCES);
+        for (Map.Entry<String, Set<String>> entry : sequencesToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+
+            DbSupport dbSupport = getDbSupport(schemaName);
+            Set<String> sequenceNames;
+            if (!dbSupport.supportsSequences()) {
+                sequenceNames = new HashSet<String>();
+            } else {
+                sequenceNames = dbSupport.getSequenceNames();
+            }
+            for (String sequenceToPreserve : entry.getValue()) {
+                if (!itemToPreserveExists(sequenceToPreserve, sequenceNames)) {
+                    throw new UnitilsException("Sequence to preserve does not exist: " + sequenceToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which sequences need to be preserved. To assure nothing is dropped by mistake, no sequences will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SEQUENCES + " property.");
+                }
             }
         }
-        
         return sequencesToPreserve;
     }
 
 
     /**
-     * Gets the list of all synonyms to preserve per schema. Quoting a synonym name makes it case sensitive. 
-     * If no database or schema is specified, the default one is taken.
+     * Gets the list of all synonym to preserve per schema. The case is corrected if necesary. Quoting a synonym name
+     * makes it case sensitive. If no schema is specified, the synonym will be added to the default schema name set.
      * <p/>
      * If a synonym to preserve does not exist, a UnitilsException is thrown.
-     * <p/>
-     * The executed scripts info synonym is also added as a synonym to preserve, but will not be checked on existence.
      *
-     * @return The synonyms to preserve per schema, not null
+     * @return The synonym to preserve per schema, not null
      */
-    protected Set<DbItemIdentifier> getSynonymsToPreserve() {
-        Set<DbItemIdentifier> synonymsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SYNONYMS);
-        
-        Map<DbItemIdentifier, Set<DbItemIdentifier>> schemaSynonymNames = new HashMap<DbItemIdentifier, Set<DbItemIdentifier>>();
-        for (DbItemIdentifier synonymToPreserve : synonymsToPreserve) {
-        	Set<DbItemIdentifier> synonymNames = schemaSynonymNames.get(synonymToPreserve.getSchema());
-        	if (synonymNames == null) {
-        		DbSupport dbSupport = dbNameDbSupportMap.get(synonymToPreserve.getDatabaseName());
-        		if (dbSupport.supportsSynonyms()) {
-        			synonymNames = toDbItemIdentifiers(dbSupport, synonymToPreserve.getSchemaName(), dbSupport.getSynonymNames(synonymToPreserve.getSchemaName()));
-        		} else {
-        			synonymNames = Collections.emptySet();
-        		}
-        	}
-        	
-            if (!synonymNames.contains(synonymToPreserve)) {
-                throw new UnitilsException("Synonym to preserve does not exist: " + synonymToPreserve.getItemName() + " in schema: " + synonymToPreserve.getSchemaName() + 
-                		".\nUnitils cannot determine which synonyms need to be preserved. To assure nothing is dropped by mistake, no synonyms will be dropped.\nPlease fix the configuration of the " + 
-                		PROPKEY_PRESERVE_SYNONYMS + " property.");
+    protected Map<String, Set<String>> getSynonymsToPreserve() {
+        Map<String, Set<String>> synonymsToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_SYNONYMS);
+        for (Map.Entry<String, Set<String>> entry : synonymsToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+
+            DbSupport dbSupport = getDbSupport(schemaName);
+            Set<String> synonymNames;
+            if (!dbSupport.supportsSynonyms()) {
+                synonymNames = new HashSet<String>();
+            } else {
+                synonymNames = dbSupport.getSynonymNames();
+            }
+            for (String synonymToPreserve : entry.getValue()) {
+                if (!itemToPreserveExists(synonymToPreserve, synonymNames)) {
+                    throw new UnitilsException("Synonym to preserve does not exist: " + synonymToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which synonyms need to be preserved. To assure nothing is dropped by mistake, no synonyms will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_SYNONYMS + " property.");
+                }
             }
         }
-        
         return synonymsToPreserve;
     }
 
 
     /**
-     * Gets the list of all triggers to preserve per schema. Quoting a trigger name makes it case sensitive. 
-     * If no database or schema is specified, the default one is taken.
+     * Gets the list of all triggers to preserve per schema. The case is corrected if necesary. Quoting a trigger name
+     * makes it case sensitive. If no schema is specified, the trigger will be added to the default schema name set.
      * <p/>
      * If a trigger to preserve does not exist, a UnitilsException is thrown.
-     * <p/>
-     * The executed scripts info trigger is also added as a trigger to preserve, but will not be checked on existence.
      *
-     * @return The triggers to preserve per schema, not null
+     * @return The trigger to preserve per schema, not null
      */
-    protected Set<DbItemIdentifier> getTriggersToPreserve() {
-        Set<DbItemIdentifier> triggersToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TRIGGERS);
-        
-        Map<DbItemIdentifier, Set<DbItemIdentifier>> schemaTriggerNames = new HashMap<DbItemIdentifier, Set<DbItemIdentifier>>();
-        for (DbItemIdentifier triggerToPreserve : triggersToPreserve) {
-        	Set<DbItemIdentifier> triggerNames = schemaTriggerNames.get(triggerToPreserve.getSchema());
-        	if (triggerNames == null) {
-        		DbSupport dbSupport = dbNameDbSupportMap.get(triggerToPreserve.getDatabaseName());
-        		if (dbSupport.supportsTriggers()) {
-        			triggerNames = toDbItemIdentifiers(dbSupport, triggerToPreserve.getSchemaName(), dbSupport.getTriggerNames(triggerToPreserve.getSchemaName()));
-        		} else {
-        			triggerNames = Collections.emptySet();
-        		}
-        	}
-        	
-            if (!triggerNames.contains(triggerToPreserve)) {
-                throw new UnitilsException("Trigger to preserve does not exist: " + triggerToPreserve.getItemName() + " in schema: " + triggerToPreserve.getSchemaName() + 
-                		".\nUnitils cannot determine which triggers need to be preserved. To assure nothing is dropped by mistake, no triggers will be dropped.\nPlease fix the configuration of the " + 
-                		PROPKEY_PRESERVE_TRIGGERS + " property.");
+    protected Map<String, Set<String>> getTriggersToPreserve() {
+        Map<String, Set<String>> triggersToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TRIGGERS);
+        for (Map.Entry<String, Set<String>> entry : triggersToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+
+            DbSupport dbSupport = getDbSupport(schemaName);
+            Set<String> triggerNames;
+            if (!dbSupport.supportsTriggers()) {
+                triggerNames = new HashSet<String>();
+            } else {
+                triggerNames = dbSupport.getTriggerNames();
+            }
+            for (String triggerToPreserve : entry.getValue()) {
+                if (!itemToPreserveExists(triggerToPreserve, triggerNames)) {
+                    throw new UnitilsException("Trigger to preserve does not exist: " + triggerToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which triggers need to be preserved. To assure nothing is dropped by mistake, no triggers will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TRIGGERS + " property.");
+                }
             }
         }
-        
         return triggersToPreserve;
     }
 
 
     /**
-     * Gets the list of all types to preserve per schema. Quoting a type name makes it case sensitive. 
-     * If no database or schema is specified, the default one is taken.
+     * Gets the list of all types to preserve per schema. The case is corrected if necesary. Quoting a type name
+     * makes it case sensitive. If no schema is specified, the type will be added to the default schema name set.
      * <p/>
      * If a type to preserve does not exist, a UnitilsException is thrown.
-     * <p/>
-     * The executed scripts info type is also added as a type to preserve, but will not be checked on existence.
      *
-     * @return The types to preserve per schema, not null
+     * @return The type to preserve per schema, not null
      */
-    protected Set<DbItemIdentifier> getTypesToPreserve() {
-        Set<DbItemIdentifier> typesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TYPES);
-        
-        Map<DbItemIdentifier, Set<DbItemIdentifier>> schemaTypeNames = new HashMap<DbItemIdentifier, Set<DbItemIdentifier>>();
-        for (DbItemIdentifier typeToPreserve : typesToPreserve) {
-        	Set<DbItemIdentifier> typeNames = schemaTypeNames.get(typeToPreserve.getSchema());
-        	if (typeNames == null) {
-        		DbSupport dbSupport = dbNameDbSupportMap.get(typeToPreserve.getDatabaseName());
-        		if (dbSupport.supportsTypes()) {
-        			typeNames = toDbItemIdentifiers(dbSupport, typeToPreserve.getSchemaName(), dbSupport.getTypeNames(typeToPreserve.getSchemaName()));
-        		} else {
-        			typeNames = Collections.emptySet();
-        		}
-        	}
-        	
-            if (!typeNames.contains(typeToPreserve)) {
-                throw new UnitilsException("Type to preserve does not exist: " + typeToPreserve.getItemName() + " in schema: " + typeToPreserve.getSchemaName() + 
-                		".\nUnitils cannot determine which types need to be preserved. To assure nothing is dropped by mistake, no types will be dropped.\nPlease fix the configuration of the " + 
-                		PROPKEY_PRESERVE_TYPES + " property.");
+    protected Map<String, Set<String>> getTypesToPreserve() {
+        Map<String, Set<String>> typesToPreserve = getItemsToPreserve(PROPKEY_PRESERVE_TYPES);
+        for (Map.Entry<String, Set<String>> entry : typesToPreserve.entrySet()) {
+            String schemaName = entry.getKey();
+
+            DbSupport dbSupport = getDbSupport(schemaName);
+            Set<String> typeNames;
+            if (!dbSupport.supportsTypes()) {
+                typeNames = new HashSet<String>();
+            } else {
+                typeNames = dbSupport.getTypeNames();
+            }
+            for (String typeToPreserve : entry.getValue()) {
+                if (!itemToPreserveExists(typeToPreserve, typeNames)) {
+                    throw new UnitilsException("Type to preserve does not exist: " + typeToPreserve + " in schema: " + schemaName + ".\nUnitils cannot determine which types need to be preserved. To assure nothing is dropped by mistake, no types will be dropped.\nPlease fix the configuration of the " + PROPKEY_PRESERVE_TYPES + " property.");
+                }
             }
         }
-        
         return typesToPreserve;
     }
 
 
     /**
-     * Gets the list of items to preserve. The case is correct if necesSary. Quoting an identifier
-     * makes it case sensitive. If requested, the identifiers will be qualified with the default schema name if no
-     * schema name is used as prefix.
+     * Checks whether the given item is one of the items to preserve.
+     * This also handles identifiers that are stored in mixed case.
      *
-     * @param propertyName        The name of the property that defines the items, not null
-     * @return The set of items, not null
+     * @param item            The item, not null
+     * @param itemsToPreserve The items to preserve
+     * @return True if item to preserve
      */
-    protected Set<DbItemIdentifier> getSchemasToPreserve(String propertyName) {
-        Set<DbItemIdentifier> result = new HashSet<DbItemIdentifier>();
-        List<String> schemasToPreserve = getStringList(propertyName, configuration);
-        for (String schemaToPreserve : schemasToPreserve) {
-        	DbItemIdentifier itemIdentifier = DbItemIdentifier.parseSchemaIdentifier(schemaToPreserve, defaultDbSupport, dbNameDbSupportMap);
-        	result.add(itemIdentifier);
+    protected boolean isItemToPreserve(String item, Set<String> itemsToPreserve) {
+        if (itemsToPreserve == null) {
+            return false;
         }
-        return result;
+        // ignore case when stored in mixed casing (e.g MS-Sql), otherwise we can't compare the item names
+        if (defaultDbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+            item = item.toUpperCase();
+        }
+        return itemsToPreserve.contains(item);
     }
 
 
     /**
-     * Gets the list of items to preserve. The case is correct if necesSary. Quoting an identifier
-     * makes it case sensitive. If requested, the identifiers will be qualified with the default schema name if no
-     * schema name is used as prefix.
+     * Checks whether the given item to preserve is one of the items.
+     * This also handles identifiers that are stored in mixed case.
      *
-     * @param propertyName        The name of the property that defines the items, not null
-     * @return The set of items, not null
+     * @param itemToPreserve The item to preserve, not null
+     * @param items          The items, not null
+     * @return True if on of the items
      */
-    protected Set<DbItemIdentifier> getItemsToPreserve(String propertyName) {
-        Set<DbItemIdentifier> result = new HashSet<DbItemIdentifier>();
+    protected boolean itemToPreserveExists(String itemToPreserve, Set<String> items) {
+        // ignore case when stored in mixed casing (e.g MS-Sql), otherwise we can't compare the item names
+        if (defaultDbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+            for (String item : items) {
+                if (itemToPreserve.equalsIgnoreCase(item)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return items.contains(itemToPreserve);
+    }
+
+
+    /**
+     * Gets the list of items to preserve per schema. The case is corrected if necesary.
+     * Quoting an identifier makes it case sensitive. If no schema is specified, the identifiers will be added to the
+     * default schema name set.
+     *
+     * @param propertyName The name of the property that defines the items, not null
+     * @return The set of items per schema name, not null
+     */
+    protected Map<String, Set<String>> getItemsToPreserve(String propertyName) {
+        Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+
         List<String> itemsToPreserve = getStringList(propertyName, configuration);
         for (String itemToPreserve : itemsToPreserve) {
-        	DbItemIdentifier itemIdentifier = DbItemIdentifier.parseItemIdentifier(itemToPreserve, defaultDbSupport, dbNameDbSupportMap);
-        	result.add(itemIdentifier);
+
+            // parse item string
+            DbSupport dbSupport;
+            int index = itemToPreserve.indexOf('.');
+            if (itemToPreserve.indexOf('.') == -1) {
+                dbSupport = defaultDbSupport;
+            } else {
+                String schemaName = itemToPreserve.substring(0, index);
+                dbSupport = getDbSupport(schemaName);
+                itemToPreserve = itemToPreserve.substring(index + 1);
+            }
+
+            // ignore case when stored in mixed casing (e.g MS-Sql), otherwise the item names can't be compared
+            if (dbSupport.getStoredIdentifierCase() == MIXED_CASE) {
+                itemToPreserve = itemToPreserve.toUpperCase();
+            }
+            // convert to correct case if needed
+            String correctCaseItemToPreserve = dbSupport.toCorrectCaseIdentifier(itemToPreserve);
+
+            // store item per schema
+            Set<String> schemaItems = result.get(dbSupport.getSchemaName());
+            if (schemaItems == null) {
+                schemaItems = new HashSet<String>();
+                result.put(dbSupport.getSchemaName(), schemaItems);
+            }
+            schemaItems.add(correctCaseItemToPreserve);
         }
         return result;
     }
-    
-    
-    protected Set<DbItemIdentifier> toDbItemIdentifiers(DbSupport dbSupport, String schemaName, Set<String> itemNames) {
-		Set<DbItemIdentifier> result = new HashSet<DbItemIdentifier>();
-		for (String itemName : itemNames) {
-			result.add(DbItemIdentifier.getItemIdentifier(schemaName, itemName, dbSupport));
-		}
-		return result;
-	}
+
 }

@@ -15,35 +15,28 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.unitils.core.util.SQLTestUtils.dropTestMaterializedViews;
-import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
-import static org.unitils.core.util.SQLTestUtils.dropTestSynonyms;
-import static org.unitils.core.util.SQLTestUtils.dropTestTables;
-import static org.unitils.core.util.SQLTestUtils.dropTestTriggers;
-import static org.unitils.core.util.SQLTestUtils.dropTestTypes;
-import static org.unitils.core.util.SQLTestUtils.dropTestViews;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_EXECUTED_SCRIPTS_TABLE_NAME;
-
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
+import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import static org.unitils.core.util.SQLTestUtils.*;
+import static org.unitils.database.SQLUnitils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_VERSION_TABLE_NAME;
+
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Test class for the {@link DBClearer}.
@@ -77,10 +70,12 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = TestUtils.getDefaultDbSupport(configuration);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
         // create clearer instance
-        defaultDbClearer = TestUtils.getDefaultDBClearer(configuration, dbSupport);
-        versionTableName = configuration.getProperty(PROPKEY_EXECUTED_SCRIPTS_TABLE_NAME);
+        defaultDbClearer = new DefaultDBClearer();
+        defaultDbClearer.init(configuration, sqlHandler);
+        versionTableName = configuration.getProperty(PROPKEY_VERSION_TABLE_NAME);
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -101,9 +96,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
      */
     @Test
     public void testClearDatabase_tables() throws Exception {
-        assertEquals(2, dbSupport.getTableNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getTableNames().size());
         defaultDbClearer.clearSchemas();
-        assertTrue(dbSupport.getTableNames(dbSupport.getDefaultSchemaName()).isEmpty());
+        assertTrue(dbSupport.getTableNames().isEmpty());
     }
 
 
@@ -113,9 +108,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
     @Test
     public void testClearDatabase_dbVersionTables() throws Exception {
         executeUpdate("create table " + versionTableName + "(testcolumn varchar(10))", dataSource);
-        assertEquals(3, dbSupport.getTableNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(3, dbSupport.getTableNames().size());
         defaultDbClearer.clearSchemas();
-        assertEquals(1, dbSupport.getTableNames(dbSupport.getDefaultSchemaName()).size()); // version table
+        assertEquals(1, dbSupport.getTableNames().size()); // version table
     }
 
 
@@ -124,9 +119,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
      */
     @Test
     public void testClearDatabase_views() throws Exception {
-        assertEquals(2, dbSupport.getViewNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getViewNames().size());
         defaultDbClearer.clearSchemas();
-        assertTrue(dbSupport.getViewNames(dbSupport.getDefaultSchemaName()).isEmpty());
+        assertTrue(dbSupport.getViewNames().isEmpty());
     }
 
 
@@ -139,9 +134,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
             logger.warn("Current dialect does not support materialized views. Skipping test.");
             return;
         }
-        assertEquals(2, dbSupport.getMaterializedViewNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getMaterializedViewNames().size());
         defaultDbClearer.clearSchemas();
-        assertTrue(dbSupport.getMaterializedViewNames(dbSupport.getDefaultSchemaName()).isEmpty());
+        assertTrue(dbSupport.getMaterializedViewNames().isEmpty());
     }
 
 
@@ -154,9 +149,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
             logger.warn("Current dialect does not support synonyms. Skipping test.");
             return;
         }
-        assertEquals(2, dbSupport.getSynonymNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getSynonymNames().size());
         defaultDbClearer.clearSchemas();
-        assertTrue(dbSupport.getSynonymNames(dbSupport.getDefaultSchemaName()).isEmpty());
+        assertTrue(dbSupport.getSynonymNames().isEmpty());
     }
 
 
@@ -169,9 +164,9 @@ public class DefaultDBClearerTest extends UnitilsJUnit4 {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
-        assertEquals(2, dbSupport.getSequenceNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getSequenceNames().size());
         defaultDbClearer.clearSchemas();
-        assertTrue(dbSupport.getSequenceNames(dbSupport.getDefaultSchemaName()).isEmpty());
+        assertTrue(dbSupport.getSequenceNames().isEmpty());
     }
 
 

@@ -91,7 +91,7 @@ public class DefaultScriptParser implements ScriptParser {
         try {
             return getNextStatementImpl();
         } catch (IOException e) {
-            throw new UnitilsException("Unable to parse next statement from script.", e);
+            throw new UnitilsException("Unable to parse next statement out of script.", e);
         }
     }
 

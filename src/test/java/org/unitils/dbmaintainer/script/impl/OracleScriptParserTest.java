@@ -25,7 +25,6 @@ import org.unitils.core.ConfigurationLoader;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -116,11 +115,5 @@ public class OracleScriptParserTest extends UnitilsJUnit4 {
     public void testParseStatements_emptyScript() throws Exception {
         oracleScriptParser.init(configuration, emptyScriptReader);
         assertNull(oracleScriptParser.getNextStatement());
-    }
-    
-    @Test public void testParseCompileScript() throws FileNotFoundException {
-    	Reader reader = new FileReader("C:/1_compile.sql");
-    	oracleScriptParser.init(configuration, reader);
-    	System.out.println(oracleScriptParser.getNextStatement());
     }
 }

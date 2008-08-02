@@ -15,11 +15,8 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
-import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.SQLHandler;
 
 /**
@@ -35,9 +32,7 @@ public interface DatabaseAccessing {
      *
      * @param configuration The configuration, not null
      * @param sqlHandler    The sql handler, not null
-     * @param defaultDbSupport
-     * @param dbNameDbSupportMap
      */
-	void init(Properties configuration, SQLHandler sqlHandler, DbSupport defaultDbSupport, Map<String, DbSupport> dbNameDbSupportMap);
+    public void init(Properties configuration, SQLHandler sqlHandler);
 
 }

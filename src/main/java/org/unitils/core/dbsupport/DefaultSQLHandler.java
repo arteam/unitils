@@ -40,6 +40,8 @@ public class DefaultSQLHandler implements SQLHandler {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultSQLHandler.class);
 
+    /* The DataSource that provides access to the database, on which all queries and updates are executed */
+    private DataSource dataSource;
 
     /* 
      * Boolean that indicates whether database updates have to executed on the database or not. Setting this value
@@ -50,18 +52,23 @@ public class DefaultSQLHandler implements SQLHandler {
 
     /**
      * Constructs a new instance that connects to the given DataSource
+     *
+     * @param dataSource The data source, not null
      */
-    public DefaultSQLHandler() {
-        this(true);
+    public DefaultSQLHandler(DataSource dataSource) {
+        this(dataSource, true);
     }
 
 
     /**
      * Constructs a new instance that connects to the given DataSource
+     *
+     * @param dataSource       The data source, not null
      * @param doExecuteUpdates Boolean indicating whether updates should effectively be executed on the underlying
      *                         database
      */
-    public DefaultSQLHandler(boolean doExecuteUpdates) {
+    public DefaultSQLHandler(DataSource dataSource, boolean doExecuteUpdates) {
+        this.dataSource = dataSource;
         this.doExecuteUpdates = doExecuteUpdates;
     }
 
@@ -69,7 +76,7 @@ public class DefaultSQLHandler implements SQLHandler {
     /* (non-Javadoc)
 	 * @see org.unitils.core.dbsupport.SQLHandler#executeUpdate(java.lang.String)
 	 */
-    public int executeUpdate(String sql, DataSource dataSource) {
+    public int executeUpdate(String sql) {
         logger.debug(sql);
 
         if (!doExecuteUpdates) {
@@ -94,7 +101,7 @@ public class DefaultSQLHandler implements SQLHandler {
     /* (non-Javadoc)
 	 * @see org.unitils.core.dbsupport.SQLHandler#executeCodeUpdate(java.lang.String)
 	 */
-    public int executeCodeUpdate(String sql, DataSource dataSource) {
+    public int executeCodeUpdate(String sql) {
         logger.debug(sql);
 
         if (!doExecuteUpdates) {
@@ -119,7 +126,7 @@ public class DefaultSQLHandler implements SQLHandler {
     /* (non-Javadoc)
 	 * @see org.unitils.core.dbsupport.SQLHandler#getItemAsLong(java.lang.String)
 	 */
-    public long getItemAsLong(String sql, DataSource dataSource) {
+    public long getItemAsLong(String sql) {
         logger.debug(sql);
 
         Connection connection = null;
@@ -146,7 +153,7 @@ public class DefaultSQLHandler implements SQLHandler {
     /* (non-Javadoc)
 	 * @see org.unitils.core.dbsupport.SQLHandler#getItemAsString(java.lang.String)
 	 */
-    public String getItemAsString(String sql, DataSource dataSource) {
+    public String getItemAsString(String sql) {
         logger.debug(sql);
 
         Connection connection = null;
@@ -173,7 +180,7 @@ public class DefaultSQLHandler implements SQLHandler {
     /* (non-Javadoc)
 	 * @see org.unitils.core.dbsupport.SQLHandler#getItemsAsStringSet(java.lang.String)
 	 */
-    public Set<String> getItemsAsStringSet(String sql, DataSource dataSource) {
+    public Set<String> getItemsAsStringSet(String sql) {
         logger.debug(sql);
 
         Connection connection = null;
@@ -200,7 +207,7 @@ public class DefaultSQLHandler implements SQLHandler {
     /* (non-Javadoc)
 	 * @see org.unitils.core.dbsupport.SQLHandler#exists(java.lang.String)
 	 */
-    public boolean exists(String sql, DataSource dataSource) {
+    public boolean exists(String sql) {
         logger.debug(sql);
 
         Connection connection = null;
@@ -217,6 +224,14 @@ public class DefaultSQLHandler implements SQLHandler {
         } finally {
             closeQuietly(connection, statement, resultSet);
         }
+    }
+
+
+    /* (non-Javadoc)
+	 * @see org.unitils.core.dbsupport.SQLHandler#getDataSource()
+	 */
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
 

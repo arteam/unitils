@@ -1,6 +1,7 @@
 package org.unitils.dbmaintainer.clean.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SCHEMAS;
@@ -17,9 +18,13 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
+import org.unitils.core.dbsupport.DbSupportFactory;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
+import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import org.unitils.util.PropertyUtils;
@@ -31,19 +36,29 @@ import org.unitils.util.PropertyUtils;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultDBClearerMultiSchemaPreserveTest {
+public class DefaultDBClearerMultiSchemaPreserveTest extends UnitilsJUnit4 {
 
 	/* The logger instance for this class */
 	private static Log logger = LogFactory.getLog(DefaultDBClearerMultiSchemaPreserveTest.class);
 
-	/* DataSource for the test database */
-	private DataSource dataSource;
+	/* DataSource for the test database, is injected */
+	@TestDataSource
+	private DataSource dataSource = null;
 
 	/* Tested object */
 	private DefaultDBClearer defaultDbClearer;
 
-	/* The db support */
-	private DbSupport dbSupport;
+	/* The db support for the default PUBLIC schema */
+	private DbSupport dbSupportPublic;
+
+	/* The db support for the SCHEMA_A schema */
+	private DbSupport dbSupportSchemaA;
+
+	/* The db support for the SCHEMA_B schema */
+	private DbSupport dbSupportSchemaB;
+
+	/* The db support for the SCHEMA_C schema */
+	private DbSupport dbSupportSchemaC;
 
 	/* True if current test is not for the current dialect */
 	private boolean disabled;
@@ -59,26 +74,26 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
 		if (disabled) {
 			return;
 		}
-		
-		// configure 3 schemas
-		configuration.setProperty("database.schemaNames", "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
 
-		dbSupport = TestUtils.getDefaultDbSupport(configuration);
-		dataSource = dbSupport.getDataSource();
-
-		// configure items to preserve
-		configuration.setProperty(PROPKEY_PRESERVE_SCHEMAS, "schema_c");
-		configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupport.quoted("SCHEMA_A") + "." + dbSupport.quoted("TEST_TABLE"));
-		configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "test_view, " + "schema_a." + dbSupport.quoted("TEST_VIEW"));
-		configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupport.quoted("SCHEMA_A") + ".test_sequence");
-		
-		
 		// first create database, otherwise items to preserve do not yet exist
 		cleanupTestDatabase();
 		createTestDatabase();
 
+		// configure 3 schemas
+		configuration.setProperty(DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A, \"SCHEMA_B\", schema_c");
+		SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+		dbSupportPublic = getDbSupport(configuration, sqlHandler, "PUBLIC");
+		dbSupportSchemaA = getDbSupport(configuration, sqlHandler, "SCHEMA_A");
+		dbSupportSchemaB = getDbSupport(configuration, sqlHandler, "SCHEMA_B");
+		dbSupportSchemaC = getDbSupport(configuration, sqlHandler, "SCHEMA_C");
+		// configure items to preserve
+		configuration.setProperty(PROPKEY_PRESERVE_SCHEMAS, "schema_c");
+		configuration.setProperty(PROPKEY_PRESERVE_TABLES, "test_table, " + dbSupportSchemaA.quoted("SCHEMA_A") + "." + dbSupportSchemaA.quoted("TEST_TABLE"));
+		configuration.setProperty(PROPKEY_PRESERVE_VIEWS, "test_view, " + "schema_a." + dbSupportSchemaA.quoted("TEST_VIEW"));
+		configuration.setProperty(PROPKEY_PRESERVE_SEQUENCES, "test_sequence, " + dbSupportSchemaA.quoted("SCHEMA_A") + ".test_sequence");
 		// create clearer instance
-		defaultDbClearer = TestUtils.getDefaultDBClearer(configuration, dbSupport);
+		defaultDbClearer = new DefaultDBClearer();
+		defaultDbClearer.init(configuration, sqlHandler);
 	}
 
 
@@ -103,14 +118,14 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
 			logger.warn("Test is not for current dialect. Skipping test.");
 			return;
 		}
-		assertEquals(1, dbSupport.getTableNames("PUBLIC").size());
-		assertEquals(1, dbSupport.getTableNames("SCHEMA_A").size());
-		assertEquals(1, dbSupport.getTableNames("SCHEMA_B").size());
+		assertEquals(1, dbSupportPublic.getTableNames().size());
+		assertEquals(1, dbSupportSchemaA.getTableNames().size());
+		assertEquals(1, dbSupportSchemaB.getTableNames().size());
 		defaultDbClearer.clearSchemas();
-		assertEquals(1, dbSupport.getTableNames("PUBLIC").size());
-		assertEquals(1, dbSupport.getTableNames("SCHEMA_A").size());
-		assertEquals(0, dbSupport.getTableNames("SCHEMA_B").size());
-		assertEquals(1, dbSupport.getTableNames("SCHEMA_C").size());
+		assertEquals(1, dbSupportPublic.getTableNames().size());
+		assertEquals(1, dbSupportSchemaA.getTableNames().size());
+		assertEquals(0, dbSupportSchemaB.getTableNames().size());
+		assertEquals(1, dbSupportSchemaC.getTableNames().size());
 	}
 
 
@@ -123,14 +138,14 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
 			logger.warn("Test is not for current dialect. Skipping test.");
 			return;
 		}
-		assertEquals(1, dbSupport.getViewNames("PUBLIC").size());
-		assertEquals(1, dbSupport.getViewNames("SCHEMA_A").size());
-		assertEquals(1, dbSupport.getViewNames("SCHEMA_B").size());
+		assertEquals(1, dbSupportPublic.getViewNames().size());
+		assertEquals(1, dbSupportSchemaA.getViewNames().size());
+		assertEquals(1, dbSupportSchemaB.getViewNames().size());
 		defaultDbClearer.clearSchemas();
-		assertEquals(1, dbSupport.getViewNames("PUBLIC").size());
-		assertEquals(1, dbSupport.getViewNames("SCHEMA_A").size());
-		assertEquals(0, dbSupport.getViewNames("SCHEMA_B").size());
-		assertEquals(1, dbSupport.getViewNames("SCHEMA_C").size());
+		assertEquals(1, dbSupportPublic.getViewNames().size());
+		assertEquals(1, dbSupportSchemaA.getViewNames().size());
+		assertEquals(0, dbSupportSchemaB.getViewNames().size());
+		assertEquals(1, dbSupportSchemaC.getViewNames().size());
 	}
 
 
@@ -143,14 +158,14 @@ public class DefaultDBClearerMultiSchemaPreserveTest {
 			logger.warn("Test is not for current dialect. Skipping test.");
 			return;
 		}
-		assertEquals(1, dbSupport.getSequenceNames("PUBLIC").size());
-		assertEquals(1, dbSupport.getSequenceNames("SCHEMA_A").size());
-		assertEquals(1, dbSupport.getSequenceNames("SCHEMA_B").size());
+		assertEquals(1, dbSupportPublic.getSequenceNames().size());
+		assertEquals(1, dbSupportSchemaA.getSequenceNames().size());
+		assertEquals(1, dbSupportSchemaB.getSequenceNames().size());
 		defaultDbClearer.clearSchemas();
-		assertEquals(1, dbSupport.getSequenceNames("PUBLIC").size());
-		assertEquals(1, dbSupport.getSequenceNames("SCHEMA_A").size());
-		assertEquals(0, dbSupport.getSequenceNames("SCHEMA_B").size());
-		assertEquals(1, dbSupport.getSequenceNames("SCHEMA_C").size());
+		assertEquals(1, dbSupportPublic.getSequenceNames().size());
+		assertEquals(1, dbSupportSchemaA.getSequenceNames().size());
+		assertEquals(0, dbSupportSchemaB.getSequenceNames().size());
+		assertEquals(1, dbSupportSchemaC.getSequenceNames().size());
 	}
 
 

@@ -15,26 +15,27 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
+import org.junit.After;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import static org.unitils.core.util.SQLTestUtils.dropTestViews;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.isEmpty;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_EXECUTED_SCRIPTS_TABLE_NAME;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_DATA_TABLES;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.PROPKEY_PRESERVE_TABLES;
-
-import java.util.Properties;
+import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBCleaner.*;
 
 import javax.sql.DataSource;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
+import java.util.Properties;
 
 /**
  * Test class for the DBCleaner.
@@ -42,10 +43,11 @@ import org.unitils.core.util.TestUtils;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DefaultDBCleanerTest {
+public class DefaultDBCleanerTest extends UnitilsJUnit4 {
 
-    /* DataSource for the test database */
-    private DataSource dataSource;
+    /* DataSource for the test database, is injected */
+    @TestDataSource
+    private DataSource dataSource = null;
 
     /* Tested object */
     private DefaultDBCleaner defaultDbCleaner;
@@ -53,7 +55,7 @@ public class DefaultDBCleanerTest {
     /* The DbSupport object */
     private DbSupport dbSupport;
 
-    /* The name of the version table */
+    /* The name of the version tabel */
     private String versionTableName;
 
 
@@ -64,15 +66,16 @@ public class DefaultDBCleanerTest {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
-        
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
+
         // items to preserve
         configuration.setProperty(PROPKEY_PRESERVE_DATA_TABLES, "Test_table_Preserve");
         configuration.setProperty(PROPKEY_PRESERVE_TABLES, dbSupport.quoted("Test_CASE_Table_Preserve"));
         // create cleaner instance
-        defaultDbCleaner = TestUtils.getDefaultDBCleaner(configuration, dbSupport);
-        versionTableName = configuration.getProperty(PROPKEY_EXECUTED_SCRIPTS_TABLE_NAME);
+        defaultDbCleaner = new DefaultDBCleaner();
+        defaultDbCleaner.init(configuration, sqlHandler);
+        versionTableName = configuration.getProperty(PROPKEY_VERSION_TABLE_NAME);
 
         cleanupTestDatabase();
         createTestDatabase();

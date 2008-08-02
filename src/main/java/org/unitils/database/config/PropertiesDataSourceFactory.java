@@ -15,12 +15,13 @@
  */
 package org.unitils.database.config;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.core.util.BaseConfigurable;
+import static org.unitils.util.PropertyUtils.getString;
+
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * A {@link DataSourceFactory} that loads the necessary information from a properties file.
@@ -28,60 +29,62 @@ import org.unitils.core.util.BaseConfigurable;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class PropertiesDataSourceFactory extends BaseConfigurable implements DataSourceFactory {
+public class PropertiesDataSourceFactory implements DataSourceFactory {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(PropertiesDataSourceFactory.class);
 
-    public static final String PROPERTY_DATABASE_START = "database";
-    
-    public static final String PROPERTY_DRIVERCLASSNAME_END = "driverClassName";
-    
-    public static final String PROPERTY_URL_END = "url";
-    
-    public static final String PROPERTY_USERNAME_END = "userName";
-    
-    public static final String PROPERTY_PASSWORD_END = "password";
-    
-    
-    public DataSource createDataSource(String name) {
-    	String driverClassName = configuration.getProperty(PROPERTY_DATABASE_START + '.' + name + '.' + PROPERTY_DRIVERCLASSNAME_END);
-    	String url = configuration.getProperty(PROPERTY_DATABASE_START + '.' + name + '.' + PROPERTY_URL_END);
-    	String userName = configuration.getProperty(PROPERTY_DATABASE_START + '.' + name + '.' + PROPERTY_USERNAME_END);
-    	String password = configuration.getProperty(PROPERTY_DATABASE_START + '.' + name + '.' + PROPERTY_PASSWORD_END);
-    	
-        BasicDataSource dataSource = createDataSource(name, driverClassName, url, userName, password);
-        return dataSource;
+    /* Propery key of the database driver class name */
+    public static final String PROPKEY_DATASOURCE_DRIVERCLASSNAME = "database.driverClassName";
+
+    /* Property key of the datasource url */
+    public static final String PROPKEY_DATASOURCE_URL = "database.url";
+
+    /* Property key of the datasource connect username */
+    public static final String PROPKEY_DATASOURCE_USERNAME = "database.userName";
+
+    /* Property key of the datasource connect password */
+    public static final String PROPKEY_DATASOURCE_PASSWORD = "database.password";
+
+    /* The name of the <code>java.sql.Driver</code> class. */
+    private String driverClassName;
+
+    /* The url of the database. */
+    private String databaseUrl;
+
+    /* The database username. */
+    private String userName;
+
+    /* The database password. */
+    private String password;
+
+
+    /**
+     * Initializes itself using the properties in the given <code>Properties</code> object.
+     *
+     * @param configuration The config, not null
+     */
+    public void init(Properties configuration) {
+        driverClassName = getString(PROPKEY_DATASOURCE_DRIVERCLASSNAME, configuration);
+        databaseUrl = getString(PROPKEY_DATASOURCE_URL, configuration);
+        userName = getString(PROPKEY_DATASOURCE_USERNAME, null, configuration);
+        password = getString(PROPKEY_DATASOURCE_PASSWORD, null, configuration);
     }
 
 
-	public DataSource createDefaultDataSource() {
-		String driverClassName = configuration.getProperty(PROPERTY_DATABASE_START + '.' + PROPERTY_DRIVERCLASSNAME_END);
-    	String url = configuration.getProperty(PROPERTY_DATABASE_START + '.' + PROPERTY_URL_END);
-    	String userName = configuration.getProperty(PROPERTY_DATABASE_START + '.' + PROPERTY_USERNAME_END);
-    	String password = configuration.getProperty(PROPERTY_DATABASE_START + '.' + PROPERTY_PASSWORD_END);
-    	
-        BasicDataSource dataSource = createDataSource(null, driverClassName, url, userName, password);
-        return dataSource;
-	}
-
-
-	protected BasicDataSource createDataSource(String name,
-			String driverClassName, String url, String userName, String password) {
-		
-		logger.info("Creating data source" + (name != null ? " with name '" + name + "'" : "") + ". Driver: " + driverClassName + 
-        		", url: " + url + ", user: " + userName + ", password: <not shown>");
-        
-		BasicDataSource dataSource = getNewDataSource();
+    public DataSource createDataSource() {
+        logger.info("Creating data source. Driver: " + driverClassName + ", url: " + databaseUrl + ", user: " + userName + ", password: <not shown>");
+        BasicDataSource dataSource = getNewDataSource();
         dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl(url);
         dataSource.setUsername(userName);
         dataSource.setPassword(password);
-		return dataSource;
-	}
+        dataSource.setUrl(databaseUrl);
+        return dataSource;
+
+    }
 
 
-	/**
+    /**
      * Returns a concrete instance of <code>BasicDataSource</code>. This method may be overridden e.g. to return a mock
      * instance for testing
      *

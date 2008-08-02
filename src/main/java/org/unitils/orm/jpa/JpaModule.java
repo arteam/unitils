@@ -49,7 +49,6 @@ import javax.sql.DataSource;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 
@@ -121,12 +120,12 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     			return isPersistenceUnitConfiguredFor(testObject);
 			}
     		
-			public Set<PlatformTransactionManager> getSpringPlatformTransactionManagers(Object testObject) {
+			public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
 				EntityManagerFactory entityManagerFactory = getPersistenceUnit(testObject);
 				JpaTransactionManager jpaTransactionManager = new JpaTransactionManager(entityManagerFactory);
 				jpaTransactionManager.setDataSource(getDataSource());
 				jpaTransactionManager.setJpaDialect(jpaProviderSupport.getSpringJpaVendorAdaptor().getJpaDialect());
-				return Collections.<PlatformTransactionManager>singleton(jpaTransactionManager);
+				return jpaTransactionManager;
 			}
     		
     	});
@@ -263,7 +262,7 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     
     
     protected DataSource getDataSource() {
-    	return getDatabaseModule().getDataSource(null);
+    	return getDatabaseModule().getDataSource();
     }
     
     

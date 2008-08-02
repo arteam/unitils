@@ -16,33 +16,34 @@
 package org.unitils.dbmaintainer.structure;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.ConfigurationLoader;
+import static org.unitils.core.dbsupport.DbSupportFactory.PROPKEY_DATABASE_SCHEMA_NAMES;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
 import static org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.unitils.util.PropertyUtils;
 
+import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
-import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-import org.unitils.util.PropertyUtils;
 
 /**
  * Test class for the {@link XsdDataSetStructureGenerator} using multiple schemas.
@@ -52,7 +53,7 @@ import org.unitils.util.PropertyUtils;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGeneratorMultiSchemaTest {
+public class XsdDataSetStructureGeneratorMultiSchemaTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorMultiSchemaTest.class);
@@ -63,10 +64,9 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest {
     /* The target directory for the test xsd files */
     private File xsdDirectory;
 
-    private DbSupport dbSupport;
-    
-    /* DataSource for the test database */
-    private DataSource dataSource;
+    /* DataSource for the test database. */
+    @TestDataSource
+    private DataSource dataSource = null;
 
     /* True if current test is not for the current dialect */
     private boolean disabled;
@@ -89,12 +89,10 @@ public class XsdDataSetStructureGeneratorMultiSchemaTest {
         }
         xsdDirectory.mkdirs();
 
-        configuration.setProperty("database.schemaNames", "PUBLIC, SCHEMA_A");
-        dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
-        
+        configuration.setProperty(PROPKEY_DATABASE_SCHEMA_NAMES, "PUBLIC, SCHEMA_A");
+        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
-        dataSetStructureGenerator = TestUtils.getXsdDataSetStructureGenerator(configuration, dbSupport);
+        dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, new DefaultSQLHandler(dataSource));
 
         dropTestTables();
         createTestTables();

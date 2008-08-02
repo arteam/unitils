@@ -15,13 +15,6 @@
  */
 package org.unitils.database.transaction.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -35,6 +28,10 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.util.spring.DatabaseSpringSupport;
+import org.unitils.spring.SpringModule;
+
+import javax.sql.DataSource;
+import java.util.Set;
 
 /**
  * Implements transactions for unit tests, by delegating to a spring <code>PlatformTransactionManager</code>.
@@ -56,9 +53,14 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
     private static Log logger = LogFactory.getLog(DefaultUnitilsTransactionManager.class);
 
     /**
+     * ThreadLocal for holding the TransactionStatus that keeps track of the current test's transaction status
+     */
+    protected ThreadLocal<TransactionStatus> transactionStatusHolder = new ThreadLocal<TransactionStatus>();
+
+    /**
      * ThreadLocal for holding the PlatformTransactionManager that is used by the current test
      */
-    protected ThreadLocal<Map<PlatformTransactionManager, TransactionStatus>> springPlatformTransactionManagers = new ThreadLocal<Map<PlatformTransactionManager, TransactionStatus>>();
+    protected ThreadLocal<PlatformTransactionManager> springPlatformTransactionManager = new ThreadLocal<PlatformTransactionManager>();
 
     /**
      * Provides access to an optionally custom <code>PlatformTransactionManager</code>, configured in a spring <code>ApplicationContext</code>.
@@ -70,15 +72,11 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      * Set of possible providers of a spring <code>PlatformTransactionManager</code>, not null
      */
     protected Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations;
-    
-    
-    protected Set<DataSource> dataSources;
 
 
-    public void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport, Set<DataSource> dataSources) {
+    public void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport) {
         this.transactionManagementConfigurations = transactionManagementConfigurations;
         this.databaseSpringSupport = databaseSpringSupport;
-        this.dataSources = dataSources;
     }
 
 
@@ -91,19 +89,25 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
 
 
     /**
+     * @param testObject The test object, not null
+     * @return True if a custom <code>PlatformTransactionManager</code> has been configured in the spring <code>ApplicationContext</code>
+     *         for this test class
+     */
+    protected boolean isCustomSpringTransactionManagerConfigured(Object testObject) {
+        return databaseSpringSupport != null && databaseSpringSupport.isTransactionManagerConfiguredInSpring(testObject);
+    }
+
+
+    /**
      * Starts the transaction. Starts a transaction on the PlatformTransactionManager that is configured for the given testObject.
      *
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
         logger.debug("Starting transaction");
-        Set<PlatformTransactionManager> transactionManagers = getSpringPlatformTransactionManagers(testObject);
-		Map<PlatformTransactionManager, TransactionStatus> tmStatusMap = new HashMap<PlatformTransactionManager, TransactionStatus>();
-		for (PlatformTransactionManager transactionManager : transactionManagers) {
-			TransactionStatus transactionStatus = transactionManager.getTransaction(createTransactionDefinition(testObject));
-			tmStatusMap.put(transactionManager, transactionStatus);
-		}
-        springPlatformTransactionManagers.set(tmStatusMap);
+        springPlatformTransactionManager.set(getSpringPlatformTransactionManager(testObject));
+        TransactionStatus transactionStatus = springPlatformTransactionManager.get().getTransaction(createTransactionDefinition(testObject));
+        transactionStatusHolder.set(transactionStatus);
     }
 
 
@@ -114,15 +118,14 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      * @param testObject The test object, not null
      */
     public void commit(Object testObject) {
-        Map<PlatformTransactionManager, TransactionStatus> tmStatusMap = springPlatformTransactionManagers.get();
-        if (tmStatusMap == null) {
+        TransactionStatus transactionStatus = transactionStatusHolder.get();
+        if (transactionStatus == null) {
             throw new UnitilsException("Trying to commit, while no transaction is currently active");
         }
         logger.debug("Commiting transaction");
-        for (PlatformTransactionManager transactionManager : tmStatusMap.keySet()) {
-        	transactionManager.commit(tmStatusMap.get(transactionManager));
-        }
-        springPlatformTransactionManagers.remove();
+        springPlatformTransactionManager.get().commit(transactionStatus);
+        transactionStatusHolder.remove();
+        springPlatformTransactionManager.remove();
     }
 
 
@@ -133,15 +136,14 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      * @param testObject The test object, not null
      */
     public void rollback(Object testObject) {
-    	Map<PlatformTransactionManager, TransactionStatus> tmStatusMap = springPlatformTransactionManagers.get();
-        if (tmStatusMap == null) {
+        TransactionStatus transactionStatus = transactionStatusHolder.get();
+        if (transactionStatus == null) {
             throw new UnitilsException("Trying to rollback, while no transaction is currently active");
         }
         logger.debug("Rolling back transaction");
-        for (PlatformTransactionManager transactionManager : tmStatusMap.keySet()) {
-        	transactionManager.rollback(tmStatusMap.get(transactionManager));
-        }
-        springPlatformTransactionManagers.remove();
+        springPlatformTransactionManager.get().rollback(transactionStatus);
+        transactionStatusHolder.remove();
+        springPlatformTransactionManager.remove();
     }
 
 
@@ -163,14 +165,11 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      *         associated with the given testObject.
      * @throws UnitilsException If no <code>PlatformTransactionManager</code> was configured for the given test object
      */
-    protected Set<PlatformTransactionManager> getSpringPlatformTransactionManagers(Object testObject) {
-        if (databaseSpringSupport != null) {
-        	Set<PlatformTransactionManager> springConfigured = databaseSpringSupport.getPlatformTransactionManagers(testObject);
-        	if (springConfigured.size() > 0) {
-        		return springConfigured;
-        	}
+    protected PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+        if (isCustomSpringTransactionManagerConfigured(testObject)) {
+            return databaseSpringSupport.getPlatformTransactionManager(testObject);
         }
-        return createPlatformTransactionManagers(testObject);
+        return createPlatformTransactionManager(testObject);
     }
 
 
@@ -183,7 +182,7 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      * @param testObject The test object, not null
      * @return A suitable implementation of <code>PlatformTransactionManager</code>
      */
-    protected Set<PlatformTransactionManager> createPlatformTransactionManagers(Object testObject) {
+    protected PlatformTransactionManager createPlatformTransactionManager(Object testObject) {
         UnitilsTransactionManagementConfiguration applicableTransactionManagementConfiguration = null;
         for (UnitilsTransactionManagementConfiguration transactionManagementConfiguration : transactionManagementConfigurations) {
             if (transactionManagementConfiguration.isApplicableFor(testObject)) {
@@ -196,10 +195,10 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
             }
         }
         if (applicableTransactionManagementConfiguration != null) {
-            return applicableTransactionManagementConfiguration.getSpringPlatformTransactionManagers(testObject);
+            return applicableTransactionManagementConfiguration.getSpringPlatformTransactionManager(testObject);
         }
 
-        return createDataSourceTransactionManagers(testObject);
+        return createDataSourceTransactionManager(testObject);
     }
 
 
@@ -207,12 +206,9 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      * @param testObject The test object, not null
      * @return An instance of <code>DataSourceTransactionManager</code> that implements transactions for the test datasource
      */
-    protected Set<PlatformTransactionManager> createDataSourceTransactionManagers(Object testObject) {
-    	Set<PlatformTransactionManager> dataSourceTransactionManagers = new HashSet<PlatformTransactionManager>();
-    	for (DataSource dataSource : dataSources) {
-        	dataSourceTransactionManagers.add(new DataSourceTransactionManager(dataSource));
-        }
-    	return dataSourceTransactionManagers;
+    protected DataSourceTransactionManager createDataSourceTransactionManager(Object testObject) {
+        DataSource dataSource = getDataSource();
+        return new DataSourceTransactionManager(dataSource);
     }
 
 
@@ -220,7 +216,7 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      * @return The test datasource
      */
     protected DataSource getDataSource() {
-        return getDatabaseModule().getDataSource(null);
+        return getDatabaseModule().getDataSource();
     }
 
 
@@ -231,4 +227,12 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
         return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
+
+    /**
+     * @return The Spring module
+     */
+    protected SpringModule getSpringModule() {
+		return Unitils.getInstance().getModulesRepository().getModuleOfType(SpringModule.class);
+	}
+	
 }

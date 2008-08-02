@@ -15,53 +15,45 @@
  */
 package org.unitils.dbmaintainer.clean.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.unitils.core.util.SQLTestUtils.dropTestMaterializedViews;
-import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
-import static org.unitils.core.util.SQLTestUtils.dropTestSynonyms;
-import static org.unitils.core.util.SQLTestUtils.dropTestTables;
-import static org.unitils.core.util.SQLTestUtils.dropTestTriggers;
-import static org.unitils.core.util.SQLTestUtils.dropTestTypes;
-import static org.unitils.core.util.SQLTestUtils.dropTestViews;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_MATERIALIZED_VIEWS;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SEQUENCES;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_SYNONYMS;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_TABLES;
-import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.PROPKEY_PRESERVE_VIEWS;
-
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
+import org.unitils.core.dbsupport.SQLHandler;
+
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import static org.unitils.core.util.SQLTestUtils.*;
+import static org.unitils.database.SQLUnitils.executeUpdate;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.clean.DBClearer;
+import static org.unitils.dbmaintainer.clean.impl.DefaultDBClearer.*;
+
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
- * Test class for the {@link DBClearer} with configuration to preserve all items.
+ * Test class for the {@link DBClearer} with configuratin to preserve all items.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  * @author Scott Prater
  */
-public class DefaultDBClearerPreserveTest {
+public class DefaultDBClearerPreserveTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DefaultDBClearerPreserveTest.class);
 
-    /* DataSource for the test database */
-    private DataSource dataSource;
+    /* DataSource for the test database, is injected */
+    @TestDataSource
+    private DataSource dataSource = null;
 
     /* Tested object */
     private DefaultDBClearer defaultDbClearer;
@@ -76,8 +68,8 @@ public class DefaultDBClearerPreserveTest {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         // first create database, otherwise items to preserve do not yet exist
         cleanupTestDatabase();
@@ -96,7 +88,8 @@ public class DefaultDBClearerPreserveTest {
             configuration.setProperty(PROPKEY_PRESERVE_SYNONYMS, "Test_Synonym, " + dbSupport.quoted("Test_CASE_Synonym"));
         }
         // create clearer instance
-        defaultDbClearer = TestUtils.getDefaultDBClearer(configuration, dbSupport);
+        defaultDbClearer = new DefaultDBClearer();
+        defaultDbClearer.init(configuration, sqlHandler);
     }
 
 
@@ -114,9 +107,9 @@ public class DefaultDBClearerPreserveTest {
      */
     @Test
     public void testClearDatabase_tables() throws Exception {
-        assertEquals(2, dbSupport.getTableNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getTableNames().size());
         defaultDbClearer.clearSchemas();
-        assertEquals(2, dbSupport.getTableNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getTableNames().size());
     }
 
 
@@ -125,9 +118,9 @@ public class DefaultDBClearerPreserveTest {
      */
     @Test
     public void testClearDatabase_views() throws Exception {
-        assertEquals(2, dbSupport.getViewNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getViewNames().size());
         defaultDbClearer.clearSchemas();
-        assertEquals(2, dbSupport.getViewNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getViewNames().size());
     }
 
 
@@ -140,9 +133,9 @@ public class DefaultDBClearerPreserveTest {
             logger.warn("Current dialect does not support materialized views. Skipping test.");
             return;
         }
-        assertEquals(2, dbSupport.getMaterializedViewNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getMaterializedViewNames().size());
         defaultDbClearer.clearSchemas();
-        assertEquals(2, dbSupport.getMaterializedViewNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getMaterializedViewNames().size());
     }
 
 
@@ -155,9 +148,9 @@ public class DefaultDBClearerPreserveTest {
             logger.warn("Current dialect does not support synonyms. Skipping test.");
             return;
         }
-        assertEquals(2, dbSupport.getSynonymNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getSynonymNames().size());
         defaultDbClearer.clearSchemas();
-        assertEquals(2, dbSupport.getSynonymNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getSynonymNames().size());
     }
 
 
@@ -170,9 +163,9 @@ public class DefaultDBClearerPreserveTest {
             logger.warn("Current dialect does not support sequences. Skipping test.");
             return;
         }
-        assertEquals(2, dbSupport.getSequenceNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getSequenceNames().size());
         defaultDbClearer.clearSchemas();
-        assertEquals(2, dbSupport.getSequenceNames(dbSupport.getDefaultSchemaName()).size());
+        assertEquals(2, dbSupport.getSequenceNames().size());
     }
 
 

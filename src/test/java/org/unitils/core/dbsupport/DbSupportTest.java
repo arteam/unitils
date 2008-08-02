@@ -15,33 +15,26 @@
  */
 package org.unitils.core.dbsupport;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.unitils.core.util.SQLTestUtils.dropTestSequences;
-import static org.unitils.core.util.SQLTestUtils.dropTestSynonyms;
-import static org.unitils.core.util.SQLTestUtils.dropTestTables;
-import static org.unitils.core.util.SQLTestUtils.dropTestTriggers;
-import static org.unitils.core.util.SQLTestUtils.dropTestTypes;
-import static org.unitils.core.util.SQLTestUtils.dropTestViews;
-import static org.unitils.database.SQLUnitils.executeUpdate;
-import static org.unitils.database.SQLUnitils.getItemAsLong;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
-
-import java.util.Properties;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hsqldb.Trigger;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.util.TestUtils;
+import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
+import static org.unitils.core.util.SQLTestUtils.*;
+import static org.unitils.database.SQLUnitils.executeUpdate;
+import static org.unitils.database.SQLUnitils.getItemAsLong;
+import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+
+import javax.sql.DataSource;
+import static java.util.Arrays.asList;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Tests for the db support class. Each type of database has to provide a subclass in which it sets-up the database
@@ -51,13 +44,14 @@ import org.unitils.core.util.TestUtils;
  * @author Filip Neven
  * @author Scott Prater
  */
-public class DbSupportTest {
+public class DbSupportTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DbSupportTest.class);
 
-    /* DataSource for the test database */
-    protected DataSource dataSource;
+    /* DataSource for the test database, is injected */
+    @TestDataSource
+    protected DataSource dataSource = null;
 
     /* Instance under test */
     protected DbSupport dbSupport;
@@ -69,8 +63,8 @@ public class DbSupportTest {
     @Before
     public void setUp() throws Exception {
         Properties configuration = new ConfigurationLoader().loadConfiguration();
-        dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        dbSupport = getDefaultDbSupport(configuration, sqlHandler);
 
         cleanupTestDatabase();
         createTestDatabase();
@@ -91,7 +85,7 @@ public class DbSupportTest {
      */
     @Test
     public void testGetTableNames() throws Exception {
-        Set<String> result = dbSupport.getTableNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTableNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL quoting behavior: quoted identifiers are not treated as case sensitive.
             assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_table"), dbSupport.toCorrectCaseIdentifier("Test_CASE_Table")), result);
@@ -106,7 +100,7 @@ public class DbSupportTest {
      */
     @Test
     public void testGetColumnNames() throws Exception {
-        Set<String> result = dbSupport.getColumnNames(dbSupport.getDefaultSchemaName(), dbSupport.toCorrectCaseIdentifier("test_table"));
+        Set<String> result = dbSupport.getColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
         assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1"), dbSupport.toCorrectCaseIdentifier("col2")), result);
     }
 
@@ -118,7 +112,7 @@ public class DbSupportTest {
     public void testGetTableNames_noFound() throws Exception {
         cleanupTestDatabase();
 
-        Set<String> result = dbSupport.getTableNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTableNames();
         assertTrue(result.isEmpty());
     }
 
@@ -128,7 +122,7 @@ public class DbSupportTest {
      */
     @Test
     public void testGetViewNames() throws Exception {
-        Set<String> result = dbSupport.getViewNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getViewNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL quoting behavior: quoted identifiers are not treated as case sensitive.
             assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_view"), dbSupport.toCorrectCaseIdentifier("Test_CASE_View")), result);
@@ -144,7 +138,7 @@ public class DbSupportTest {
     @Test
     public void testGetViewNames_noFound() throws Exception {
         cleanupTestDatabase();
-        Set<String> result = dbSupport.getViewNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getViewNames();
         assertTrue(result.isEmpty());
     }
 
@@ -158,7 +152,7 @@ public class DbSupportTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        Set<String> result = dbSupport.getSynonymNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getSynonymNames();
         assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_synonym"), "Test_CASE_Synonym"), result);
     }
 
@@ -173,7 +167,7 @@ public class DbSupportTest {
             return;
         }
         cleanupTestDatabase();
-        Set<String> result = dbSupport.getSynonymNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getSynonymNames();
         assertTrue(result.isEmpty());
     }
 
@@ -187,7 +181,7 @@ public class DbSupportTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        Set<String> result = dbSupport.getSequenceNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getSequenceNames();
         assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), "Test_CASE_Sequence"), result);
     }
 
@@ -202,7 +196,7 @@ public class DbSupportTest {
             return;
         }
         cleanupTestDatabase();
-        Set<String> result = dbSupport.getSequenceNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getSequenceNames();
         assertTrue(result.isEmpty());
     }
 
@@ -216,14 +210,14 @@ public class DbSupportTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        Set<String> result = dbSupport.getTriggerNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTriggerNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL trigger behavior: trigger names are case-sensitive
             assertLenEquals(asList("test_trigger", "Test_CASE_Trigger"), result);
         } else if ("postgresql".equals(dbSupport.getDatabaseDialect())) {
             // Postgresql trigger behavior: non-standard drop statement (see PostgreSqlDbSupport.dropTrigger for more info
             // Triggers are returned as  'trigger-name' ON 'table name'
-            assertLenEquals(asList(dbSupport.quoted("test_trigger") + " ON " + dbSupport.qualified(dbSupport.getDefaultSchemaName(), "Test_CASE_Table"), dbSupport.quoted("Test_CASE_Trigger") + " ON " + dbSupport.qualified(dbSupport.getDefaultSchemaName(), "Test_CASE_Table")), result);
+            assertLenEquals(asList(dbSupport.quoted("test_trigger") + " ON " + dbSupport.qualified("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Trigger") + " ON " + dbSupport.qualified("Test_CASE_Table")), result);
         } else {
             assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_trigger"), "Test_CASE_Trigger"), result);
         }
@@ -240,7 +234,7 @@ public class DbSupportTest {
             return;
         }
         cleanupTestDatabase();
-        Set<String> result = dbSupport.getTriggerNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTriggerNames();
         assertTrue(result.isEmpty());
     }
 
@@ -254,7 +248,7 @@ public class DbSupportTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        Set<String> result = dbSupport.getTypeNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTypeNames();
         assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_type"), "Test_CASE_Type"), result);
     }
 
@@ -269,7 +263,7 @@ public class DbSupportTest {
             return;
         }
         cleanupTestDatabase();
-        Set<String> result = dbSupport.getTypeNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTypeNames();
         assertTrue(result.isEmpty());
     }
 
@@ -283,7 +277,7 @@ public class DbSupportTest {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
-        Set<String> result = dbSupport.getIdentityColumnNames(dbSupport.getDefaultSchemaName(), dbSupport.toCorrectCaseIdentifier("test_table"));
+        Set<String> result = dbSupport.getIdentityColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
         assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1")), result);
     }
 
@@ -298,7 +292,7 @@ public class DbSupportTest {
             return;
         }
 
-        dbSupport.incrementIdentityColumnToValue(dbSupport.getDefaultSchemaName(), dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "COL1", 30);
+        dbSupport.incrementIdentityColumnToValue(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"), "COL1", 30);
         executeUpdate("insert into test_table (col2) values ('xxxx')", dataSource);
 
         long result = getItemAsLong("select col1 from test_table", dataSource);
@@ -314,17 +308,17 @@ public class DbSupportTest {
         // Drop cascade does not work in MySQL and Derby. Therefore we first need to
         // drop the views, next 'Test_CASE_Table' and then test_table.
         if ("mysql".equals(dbSupport.getDatabaseDialect()) || "derby".equals(dbSupport.getDatabaseDialect())) {
-            dbSupport.dropView(dbSupport.getDefaultSchemaName(), "Test_CASE_View");
-            dbSupport.dropView(dbSupport.getDefaultSchemaName(), dbSupport.toCorrectCaseIdentifier("test_view"));
-            dbSupport.dropTable(dbSupport.getDefaultSchemaName(), "Test_CASE_Table");
-            dbSupport.dropTable(dbSupport.getDefaultSchemaName(), dbSupport.toCorrectCaseIdentifier("test_table"));
+            dbSupport.dropView("Test_CASE_View");
+            dbSupport.dropView(dbSupport.toCorrectCaseIdentifier("test_view"));
+            dbSupport.dropTable("Test_CASE_Table");
+            dbSupport.dropTable(dbSupport.toCorrectCaseIdentifier("test_table"));
         } else {
-            Set<String> tableNames = dbSupport.getTableNames(dbSupport.getDefaultSchemaName());
+            Set<String> tableNames = dbSupport.getTableNames();
             for (String tableName : tableNames) {
-                dbSupport.dropTable(dbSupport.getDefaultSchemaName(), tableName);
+                dbSupport.dropTable(tableName);
             }
         }
-        Set<String> result = dbSupport.getTableNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTableNames();
         assertTrue(result.isEmpty());
     }
 
@@ -334,11 +328,11 @@ public class DbSupportTest {
      */
     @Test
     public void testDropView() throws Exception {
-        Set<String> viewNames = dbSupport.getViewNames(dbSupport.getDefaultSchemaName());
+        Set<String> viewNames = dbSupport.getViewNames();
         for (String viewName : viewNames) {
-            dbSupport.dropView(dbSupport.getDefaultSchemaName(), viewName);
+            dbSupport.dropView(viewName);
         }
-        Set<String> result = dbSupport.getViewNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getViewNames();
         assertTrue(result.isEmpty());
     }
 
@@ -353,11 +347,11 @@ public class DbSupportTest {
             return;
         }
 
-        Set<String> triggerNames = dbSupport.getTriggerNames(dbSupport.getDefaultSchemaName());
+        Set<String> triggerNames = dbSupport.getTriggerNames();
         for (String triggerName : triggerNames) {
-            dbSupport.dropTrigger(dbSupport.getDefaultSchemaName(), triggerName);
+            dbSupport.dropTrigger(triggerName);
         }
-        Set<String> result = dbSupport.getTriggerNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTriggerNames();
         assertTrue(result.isEmpty());
     }
 
@@ -372,11 +366,11 @@ public class DbSupportTest {
             return;
         }
 
-        Set<String> typeNames = dbSupport.getTypeNames(dbSupport.getDefaultSchemaName());
+        Set<String> typeNames = dbSupport.getTypeNames();
         for (String typeName : typeNames) {
-            dbSupport.dropType(dbSupport.getDefaultSchemaName(), typeName);
+            dbSupport.dropType(typeName);
         }
-        Set<String> result = dbSupport.getTypeNames(dbSupport.getDefaultSchemaName());
+        Set<String> result = dbSupport.getTypeNames();
         assertTrue(result.isEmpty());
     }
 
@@ -391,8 +385,8 @@ public class DbSupportTest {
             return;
         }
 
-        dbSupport.incrementSequenceToValue(dbSupport.getDefaultSchemaName(), dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), 30);
-        long result = dbSupport.getSequenceValue(dbSupport.getDefaultSchemaName(), dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"));
+        dbSupport.incrementSequenceToValue(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), 30);
+        long result = dbSupport.getSequenceValue(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"));
         assertEquals(30, result);
     }
 
@@ -402,13 +396,13 @@ public class DbSupportTest {
      */
     @Test
     public void testRemoveReferentialConstraints() throws Exception {
-        dbSupport.removeReferentialConstraints(dbSupport.getDefaultSchemaName(), "Test_CASE_Table");
+        dbSupport.removeReferentialConstraints("Test_CASE_Table");
 
         // should succeed now
         // drop triggers to avoid side-effects during insert
-        Set<String> triggerNames = dbSupport.getTriggerNames(dbSupport.getDefaultSchemaName());
+        Set<String> triggerNames = dbSupport.getTriggerNames();
         for (String triggerName : triggerNames) {
-            dbSupport.dropTrigger(dbSupport.getDefaultSchemaName(), triggerName);
+            dbSupport.dropTrigger(triggerName);
         }
         executeUpdate("insert into " + dbSupport.quoted("Test_CASE_Table") + " (col1) values (null)", dataSource);
     }
@@ -420,7 +414,7 @@ public class DbSupportTest {
      */
     @Test
     public void testRemoveReferentialConstraints_tableNotFound() throws Exception {
-        dbSupport.removeReferentialConstraints(dbSupport.getDefaultSchemaName(), "xxxx");
+        dbSupport.removeReferentialConstraints("xxxx");
     }
 
 
@@ -429,7 +423,7 @@ public class DbSupportTest {
      */
     @Test
     public void testRemoveValueConstraints() throws Exception {
-        dbSupport.removeValueConstraints(dbSupport.getDefaultSchemaName(), dbSupport.toCorrectCaseIdentifier("TEST_TABLE"));
+        dbSupport.removeValueConstraints(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"));
 
         // should succeed now
         if ("mssql".equals(dbSupport.getDatabaseDialect())) {
@@ -447,7 +441,7 @@ public class DbSupportTest {
      */
     @Test
     public void testRemoveValueConstraints_tableNotFound() throws Exception {
-        dbSupport.removeValueConstraints(dbSupport.getDefaultSchemaName(), "xxxx");
+        dbSupport.removeValueConstraints("xxxx");
     }
 
 

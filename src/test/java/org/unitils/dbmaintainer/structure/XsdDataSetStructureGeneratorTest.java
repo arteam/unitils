@@ -16,33 +16,35 @@
 package org.unitils.dbmaintainer.structure;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
+
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.clean.DBClearer;
+import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
+import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.deleteDirectory;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+import org.unitils.util.PropertyUtils;
 
+import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.util.TestUtils;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.structure.impl.XsdDataSetStructureGenerator;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-import org.unitils.util.PropertyUtils;
 
 /**
  * Test class for the {@link XsdDataSetStructureGenerator} for a single schema.
@@ -52,7 +54,7 @@ import org.unitils.util.PropertyUtils;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGeneratorTest {
+public class XsdDataSetStructureGeneratorTest extends UnitilsJUnit4 {
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(XsdDataSetStructureGeneratorTest.class);
@@ -63,8 +65,9 @@ public class XsdDataSetStructureGeneratorTest {
     /* The target directory for the test xsd files */
     private File xsdDirectory;
 
-    /* DataSource for the test database */
-    private DataSource dataSource;
+    /* DataSource for the test database. */
+    @TestDataSource
+    private DataSource dataSource = null;
 
     /* True if current test is not for the current dialect */
     private boolean disabled;
@@ -89,13 +92,12 @@ public class XsdDataSetStructureGeneratorTest {
         }
         xsdDirectory.mkdirs();
 
+        configuration.setProperty(DataSetStructureGenerator.class.getName() + ".implClassName", XsdDataSetStructureGenerator.class.getName());
         configuration.setProperty(XsdDataSetStructureGenerator.PROPKEY_XSD_DIR_NAME, xsdDirectory.getPath());
 
-        DbSupport dbSupport = TestUtils.getDefaultDbSupport(configuration);
-        dataSource = dbSupport.getDataSource();
-        
-        dataSetStructureGenerator = TestUtils.getXsdDataSetStructureGenerator(configuration, dbSupport);
-        DBClearer dbClearer = TestUtils.getDefaultDBClearer(configuration, dbSupport);
+        SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
+        dataSetStructureGenerator = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
+        DBClearer dbClearer = DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
 
         dbClearer.clearSchemas();
         createTestTables();

@@ -38,9 +38,8 @@ public interface UnitilsTransactionManager {
      *                              Set of possible providers of a spring <code>PlatformTransactionManager</code>, not null
      * @param databaseSpringSupport Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
      *                              If the spring module is not enabled, this object is null
-     * @param dataSources 
      */
-    void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport, Set<DataSource> dataSources);
+    void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport);
 
 
     /**

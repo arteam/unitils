@@ -19,17 +19,15 @@ package org.unitils.dbmaintainer.util.ant;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
-import org.unitils.dbmaintainer.util.DbScriptJarRunner;
+import org.unitils.dbmaintainer.util.DbScriptJarDatabaseResetter;
 
 /**
- * @author Alexander Snaps <alex.snaps@gmail.com>
- * @version $Revision$
+ * @author Filip Neven
+ * @author Tim Ducheyne
  */
-public class DbScriptJarRunnerTask
-        extends Task {
+public class DbScriptJarDatabaseResetterTask {
 
-    private String jarFileName;
+	private String jarFileName;
     private String databaseDialect;
     private String driverClassName;
     private String url;
@@ -39,13 +37,19 @@ public class DbScriptJarRunnerTask
 
     public void execute() throws BuildException {
 
-    	BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl(url);
-    	dataSource.setUsername(userName);
-        dataSource.setPassword(password);
-        
-    	new DbScriptJarRunner(dataSource, databaseDialect, schemaName != null ? schemaName : userName).executeJar(jarFileName);
+    	try {
+			BasicDataSource dataSource = new BasicDataSource();
+			dataSource.setDriverClassName(driverClassName);
+			dataSource.setUrl(url);
+			dataSource.setUsername(userName);
+			dataSource.setPassword(password);
+			new DbScriptJarDatabaseResetter(dataSource, databaseDialect,
+					schemaName != null ? schemaName : userName)
+					.resetDatabaseState(jarFileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new BuildException(e);
+		}
     }
 
 
@@ -76,5 +80,4 @@ public class DbScriptJarRunnerTask
 	public void setPassword(String password) {
         this.password = password;
     }
-
 }

@@ -19,16 +19,12 @@ import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfigu
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
@@ -66,7 +62,7 @@ import org.unitils.util.PropertyUtils;
  * files</li>
  * </ul>
  * <p/> To obtain a properly configured <code>DBMaintainer</code>, invoke the constructor
- * {@link #DBMaintainer(Properties,DefaultSQLHandler, DataSource, Set)} with a <code>TestDataSource</code> providing
+ * {@link #DBMaintainer(Properties,DefaultSQLHandler)} with a <code>TestDataSource</code> providing
  * access to the database and a <code>Configuration</code> object containing all necessary
  * properties.
  *
@@ -187,37 +183,35 @@ public class DBMaintainer {
      *
      * @param configuration the configuration, not null
      * @param sqlHandler    the data source, not null
-     * @param defaultDataSource 
-     * @param dataSources 
      */
-    public DBMaintainer(Properties configuration, SQLHandler sqlHandler, DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap) {
+    public DBMaintainer(Properties configuration, SQLHandler sqlHandler) {
         try {
-            scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, sqlHandler, defaultDbSupport, nameDbSupportMap);
-            versionSource = getConfiguredDatabaseTaskInstance(ExecutedScriptInfoSource.class, configuration, sqlHandler, defaultDbSupport, nameDbSupportMap);
+            scriptRunner = getConfiguredDatabaseTaskInstance(ScriptRunner.class, configuration, sqlHandler);
+            versionSource = getConfiguredDatabaseTaskInstance(ExecutedScriptInfoSource.class, configuration, sqlHandler);
             scriptSource = ConfigUtils.getConfiguredInstanceOf(ScriptSource.class, configuration);
 
             boolean cleanDbEnabled = PropertyUtils.getBoolean(PROPKEY_DB_CLEANER_ENABLED, configuration);
             if (cleanDbEnabled) {
-                dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler, defaultDbSupport, nameDbSupportMap);
+                dbCleaner = getConfiguredDatabaseTaskInstance(DBCleaner.class, configuration, sqlHandler);
             }
 
             fromScratchEnabled = PropertyUtils.getBoolean(PROPKEY_FROM_SCRATCH_ENABLED, configuration);
             keepRetryingAfterError = PropertyUtils.getBoolean(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, configuration);
             if (fromScratchEnabled) {
-                dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler, defaultDbSupport, nameDbSupportMap);
+                dbClearer = getConfiguredDatabaseTaskInstance(DBClearer.class, configuration, sqlHandler);
             }
 
             disableConstraintsEnabled = PropertyUtils.getBoolean(PROPKEY_DISABLE_CONSTRAINTS_ENABLED, configuration);
-            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler, defaultDbSupport, nameDbSupportMap);
+            constraintsDisabler = getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class, configuration, sqlHandler);
 
             boolean updateSequences = PropertyUtils.getBoolean(PROPKEY_UPDATE_SEQUENCES_ENABLED, configuration);
             if (updateSequences) {
-                sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler, defaultDbSupport, nameDbSupportMap);
+                sequenceUpdater = getConfiguredDatabaseTaskInstance(SequenceUpdater.class, configuration, sqlHandler);
             }
 
             boolean generateDtd = PropertyUtils.getBoolean(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, configuration);
             if (generateDtd) {
-                dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, defaultDbSupport, nameDbSupportMap);
+                dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler);
             }
         } catch (UnitilsException e) {
             logger.error("Error while initializing DbMaintainer", e);
@@ -344,7 +338,7 @@ public class DBMaintainer {
             	versionSource.registerExecutedScript(executedScript);
             	
             	logger.info("Executing script " + script.getFileName());
-                scriptRunner.execute(script);
+                scriptRunner.execute(script.getScriptContentHandle());
                 // We now register the previously registered script execution as being successful
                 executedScript.setSuccessful(true);
                 versionSource.updateExecutedScript(executedScript);
@@ -368,7 +362,7 @@ public class DBMaintainer {
             try {
             	logger.info("Executing post processing script " + script.getFileName());
             	
-                scriptRunner.execute(script);
+                scriptRunner.execute(script.getScriptContentHandle());
 
             } catch (UnitilsException e) {
                 logger.error("Error while executing post processing script " + script.getFileName(), e);
