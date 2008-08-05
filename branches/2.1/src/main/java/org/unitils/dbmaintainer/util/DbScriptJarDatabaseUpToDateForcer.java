@@ -28,8 +28,8 @@ import org.unitils.dbmaintainer.DBMaintainer;
  */
 public class DbScriptJarDatabaseUpToDateForcer extends DbScriptJarHandler {
 
-	public DbScriptJarDatabaseUpToDateForcer(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap) {
-		super(defaultDbSupport, nameDbSupportMap);
+	public DbScriptJarDatabaseUpToDateForcer(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap, String extensions) {
+		super(defaultDbSupport, nameDbSupportMap, extensions);
 	}
 
 	public void resetDatabaseState(String jarFileName) {

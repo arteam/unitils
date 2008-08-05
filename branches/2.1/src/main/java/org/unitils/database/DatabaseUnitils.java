@@ -88,7 +88,7 @@ public class DatabaseUnitils {
      * Determines whether the test database is outdated and, if that is the case, updates the database with the
      * latest changes. See {@link DBMaintainer} for more information.
      */
-    public static void updateDatabase() {
+    public static void bringDatabaseUpToDate() {
         getDatabaseModule().updateDatabase();
     }
 
@@ -99,7 +99,7 @@ public class DatabaseUnitils {
      * the database version is not yet set to the current one. This method can also be useful for example for
      * reinitializing the database after having reorganized the scripts folder.
      */
-    public static void resetDatabaseState() {
+    public static void markDatabaseAsUpToDate() {
         getDatabaseModule().resetDatabaseState();
     }
 

@@ -17,6 +17,7 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,22 +46,14 @@ public class JarScriptSource extends DefaultScriptSource implements ScriptSource
         	List<Script> allScripts = new ArrayList<Script>();
             DbScriptJarReader jarReader = new DbScriptJarReader(sourceJar);
             for (Script script : jarReader) {
-            	allScripts.add(script);
+            	if (isScriptFile(new File(script.getFileName()))) {
+            	    allScripts.add(script);
+            	}
             }
             return allScripts;
         } catch(IOException e) {
             throw new UnitilsException("Error parsing JAR file " + sourceJar + " for scripts", e);
         }
 	}
-    
-    @Test
-    public void testJarScriptSource() {
-    	JarScriptSource jarScriptSource = new JarScriptSource();
-    	Properties conf = new ConfigurationLoader().getDefaultConfiguration();
-    	conf.setProperty(DB_MAINTAINER_SCRIPT_JAR, "C:/scriptrunner.jar");
-    	jarScriptSource.init(conf);
-    	List<Script> scripts = jarScriptSource.getAllUpdateScripts();
-    	System.out.println(scripts);
-    }
 
 }

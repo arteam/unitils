@@ -16,10 +16,7 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-
-import java.io.Reader;
 
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
@@ -27,7 +24,8 @@ import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptParser;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
-import org.unitils.util.PropertyUtils;
+
+import java.io.Reader;
 
 /**
  * Default implementation of a script runner.
@@ -43,7 +41,7 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
      * All statements should be separated with a semicolon (;). The last statement will be
      * added even if it does not end with a semicolon.
      *
-     * @param scriptContentHandle The script as a string, not null
+     * @param script The script, not null
      */
     public void execute(Script script) {
 
@@ -51,10 +49,6 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
         try {
             // get content stream
             scriptContentReader = script.getScriptContentHandle().openScriptContentReader();
-
-            // create a parser
-            ScriptParser scriptParser = createScriptParser();
-            scriptParser.init(configuration, scriptContentReader);
 
             // Define the target database on which to execute the script
             DbSupport targetDbSupport;
@@ -68,6 +62,10 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
             	}
             }
             
+            // create a script parser for the target database in question 
+            ScriptParser scriptParser = createScriptParser(targetDbSupport.getDatabaseDialect());
+            scriptParser.init(configuration, scriptContentReader);
+            
             // parse and execute the statements
             String statement;
             while ((statement = scriptParser.getNextStatement()) != null) {
@@ -80,12 +78,13 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
 
 
     /**
-     * Creates a script parser.
+     * Creates a script parser for the given database dialect
+     * 
+     * @param databaseDialect 
      *
      * @return The parser, not null
      */
-    protected ScriptParser createScriptParser() {
-        String databaseDialect = PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration);
+    protected ScriptParser createScriptParser(String databaseDialect) {
         return getInstanceOf(ScriptParser.class, configuration, databaseDialect);
     }
 }

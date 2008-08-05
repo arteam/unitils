@@ -7,6 +7,14 @@
  */
 package org.unitils.dbmaintainer.util;
 
+import org.unitils.core.ConfigurationLoader;
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.impl.DefaultScriptSource;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
+import org.unitils.util.ReaderInputStream;
+import org.unitils.util.WriterOutputStream;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,14 +28,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
-
-import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.script.Script;
-import org.unitils.dbmaintainer.script.impl.DefaultScriptSource;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-import org.unitils.util.ReaderInputStream;
-import org.unitils.util.WriterOutputStream;
 
 /**
  * Enables creating a jar file that packages all database update scripts. This jar can be used by the
@@ -43,7 +43,7 @@ import org.unitils.util.WriterOutputStream;
  * that are retrieved from this file are the scripts location (property {@link DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION}, 
  * overridable using the location constructor param), the script file extensions (property {@link DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS}, 
  * overridable using the extensions constructor param) and the start of the name of directories that contain post 
- * processing scripts (property {@link DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH}, overridable 
+ * processing scripts (property {@link DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME}, overridable 
  * using the postProcessingDirNameStartsWith constructor param).  
  * 
  * @author Alexander Snaps <alex.snaps@gmail.com>
@@ -58,14 +58,9 @@ public class DbScriptJarCreator {
     public static final String DBSCRIPT_JAR_PROPERTIES_FILENAME = "META-INF/dbscriptjar.properties";
 	
     /*
-     * Config file from which properties concerning script file organization are retrieved, if any
+     * If not null, overrides the property DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME 
      */
-    private Properties configuration;
-    
-    /*
-     * If not null, overrides the property DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH 
-     */
-    private String postProcessingDirNameStartsWith;
+    private String postProcessingDirName;
     
     /*
      * If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION
@@ -84,24 +79,14 @@ public class DbScriptJarCreator {
      * @param configurationFileName Config file from which properties concerning script file organization are retrieved, if any
      * @param location If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION
      * @param extensions If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS
-     * @param postProcessingDirNameStartsWith If not null, overrides the property DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH
+     * @param postProcessingDirName If not null, overrides the property DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME
      */
-	public DbScriptJarCreator(String location, String extensions, String postProcessingDirNameStartsWith) {
-		loadProperties();
-        this.postProcessingDirNameStartsWith = postProcessingDirNameStartsWith;
+	public DbScriptJarCreator(String location, String extensions, String postProcessingDirName) {
+        this.postProcessingDirName = postProcessingDirName;
         this.location = location;
         this.extensions = extensions;
     }
 	
-	
-	/**
-	 * Loads the default configuration and the given properties file
-	 * @param sourcePropertiesFile
-	 */
-	private void loadProperties() {
-		configuration = new ConfigurationLoader().getDefaultConfiguration();
-	}
-
 	
 	/**
 	 * Creates the jar containing the scripts and stores it in the file with the given file name
@@ -172,13 +157,11 @@ public class DbScriptJarCreator {
      */
     private Properties getConfigurationToIncludeInJar() {
     	Properties conf = new Properties();
-    	String scriptExtensions = extensions != null ? extensions : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS) : null);
-		if (scriptExtensions != null) {
-			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, scriptExtensions);
+		if (extensions != null) {
+			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, extensions);
 		}
-		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME) : null);
-		if (postPrDirNameStartsWith != null) {
-			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postPrDirNameStartsWith);
+		if (postProcessingDirName != null) {
+			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postProcessingDirName);
 		}
 		return conf;
 	}
@@ -189,17 +172,19 @@ public class DbScriptJarCreator {
      */
     private Properties getScriptSourceConfiguration() {
 		Properties conf = new Properties();
-		String scriptsLocation = location != null ? location : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION) : null);
-		if (scriptsLocation != null) {
-			conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION, scriptsLocation);
+		Properties defaultConfiguration = new ConfigurationLoader().getDefaultConfiguration();
+		conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION, location);
+		if (extensions != null) {
+			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, extensions);
+		} else {
+		    conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, 
+		            defaultConfiguration.getProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS));
 		}
-		String scriptExtensions = extensions != null ? extensions : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS) : null);
-		if (scriptExtensions != null) {
-			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, scriptExtensions);
-		}
-		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME) : null);
-		if (postPrDirNameStartsWith != null) {
-			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postPrDirNameStartsWith);
+		if (postProcessingDirName != null) {
+			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postProcessingDirName);
+		} else {
+		    conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, 
+                    defaultConfiguration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME));
 		}
 		return conf;
 	}

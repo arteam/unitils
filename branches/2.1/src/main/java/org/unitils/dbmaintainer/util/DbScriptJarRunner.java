@@ -15,12 +15,12 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import java.util.Map;
-import java.util.Properties;
-
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.dbmaintainer.DBMaintainer;
+
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Enables applying a jar file that contains database update scripts to a database. Only the scripts that
@@ -33,14 +33,12 @@ import org.unitils.dbmaintainer.DBMaintainer;
 public class DbScriptJarRunner extends DbScriptJarHandler {
 	
 	/**
-	 * Creates an instance of this class.
-	 * 
-	 * @param dataSource The database to which the updates are applied 
-	 * @param databaseDialect Indicator of the database type, that defines the SQL dialect that must be used for this database
-	 * @param schemaName Name of the database schema that is used
+	 * @param defaultDbSupport 
+	 * @param nameDbSupportMap 
+	 * @param extensions 
 	 */
-	public DbScriptJarRunner(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap) {
-		super(defaultDbSupport, nameDbSupportMap);
+	public DbScriptJarRunner(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap, String extensions) {
+		super(defaultDbSupport, nameDbSupportMap, extensions);
 	}
 
 	

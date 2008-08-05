@@ -15,22 +15,20 @@
  */
 package org.unitils.dbmaintainer.util;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
-import java.util.Properties;
-
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.database.DatabaseModule;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.DefaultScriptSource;
 import org.unitils.dbmaintainer.script.impl.JarScriptSource;
 import org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Filip Neven
@@ -40,14 +38,15 @@ import org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource;
 public abstract class DbScriptJarHandler {
 
 	protected DbSupport defaultDbSupport;
-	
 	protected Map<String, DbSupport> nameDbSupportMap;
+	protected String extensions;
 	
 	
-	protected DbScriptJarHandler(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap) {
+	protected DbScriptJarHandler(DbSupport defaultDbSupport, Map<String, DbSupport> nameDbSupportMap, String extensions) {
 		super();
 		this.defaultDbSupport = defaultDbSupport;
 		this.nameDbSupportMap= nameDbSupportMap;
+		this.extensions = extensions;
 	}
 
 	/**
@@ -61,7 +60,13 @@ public abstract class DbScriptJarHandler {
 	protected Properties getDbMaintainerConfiguration(String jarFileName) {
 		Properties configuration = new ConfigurationLoader().getDefaultConfiguration();
 		
-		// Make sure that from-scratch updates are disabled, and that no post-processing is performed on the
+		// Initialize the script organization properties, which are read from the properties file that is packaged
+        // with the jar
+        configuration.putAll(getDbScriptConfig(jarFileName));
+        if (extensions != null) {
+            configuration.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, extensions);
+        }
+        // Make sure that from-scratch updates are disabled, and that no post-processing is performed on the
 		// target database
 		configuration.put(DBMaintainer.PROPKEY_DISABLE_CONSTRAINTS_ENABLED, Boolean.toString(false));
 		configuration.put(DBMaintainer.PROPKEY_DB_CLEANER_ENABLED, Boolean.toString(false));
@@ -80,9 +85,6 @@ public abstract class DbScriptJarHandler {
 		configuration.put(ScriptSource.class.getName() + ".implClassName", JarScriptSource.class.getName());
 		configuration.put(JarScriptSource.DB_MAINTAINER_SCRIPT_JAR, jarFileName);
 		
-		// Initialize the script organization properties, which are read from the properties file that is packaged
-		// with the jar
-		configuration.putAll(getDbScriptConfig(jarFileName));
 		return configuration;
 	}
 
