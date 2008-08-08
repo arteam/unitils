@@ -77,10 +77,6 @@ public abstract class DbScriptJarHandler {
 		configuration.put(DefaultScriptSource.PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES, Boolean.toString(false));
 		configuration.put(DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, Boolean.toString(true));
 	
-		// Initialize the database dialect and schema name
-//		configuration.put(DatabaseModule.PROPERTY_DATABASE_DIALECT, databaseDialect);
-//		configuration.put(DatabaseModule.PROPERTY_DATABASE_SCHEMA_NAMES, schemaName);
-		
 		// Make sure the JarScriptSource is used, that reads scripts from the jar file instead of the file system
 		configuration.put(ScriptSource.class.getName() + ".implClassName", JarScriptSource.class.getName());
 		configuration.put(JarScriptSource.DB_MAINTAINER_SCRIPT_JAR, jarFileName);

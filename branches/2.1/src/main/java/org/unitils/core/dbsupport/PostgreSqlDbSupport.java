@@ -128,7 +128,7 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public void dropTrigger(String schemaName, String triggerName) {
-        getSQLHandler().executeCodeUpdate("drop trigger " + triggerName + " cascade", getDataSource());
+        getSQLHandler().executeUpdate("drop trigger " + triggerName + " cascade", getDataSource());
     }
 
 

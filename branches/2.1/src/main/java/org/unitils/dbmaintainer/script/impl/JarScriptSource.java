@@ -17,19 +17,16 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import org.junit.Test;
-import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptSource;
 import org.unitils.dbmaintainer.script.impl.jar.DbScriptJarReader;
 import org.unitils.util.PropertyUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Alexander Snaps <alex.snaps@gmail.com>
@@ -42,9 +39,10 @@ public class JarScriptSource extends DefaultScriptSource implements ScriptSource
     @Override
 	protected List<Script> loadAllScripts() {
     	String sourceJar = PropertyUtils.getString(DB_MAINTAINER_SCRIPT_JAR, configuration);
+    	String encoding = PropertyUtils.getString(PROPKEY_SCRIPTS_ENCODING, configuration);
     	try {
         	List<Script> allScripts = new ArrayList<Script>();
-            DbScriptJarReader jarReader = new DbScriptJarReader(sourceJar);
+            DbScriptJarReader jarReader = new DbScriptJarReader(sourceJar, encoding);
             for (Script script : jarReader) {
             	if (isScriptFile(new File(script.getFileName()))) {
             	    allScripts.add(script);

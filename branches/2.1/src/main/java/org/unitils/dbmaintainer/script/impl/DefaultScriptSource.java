@@ -71,6 +71,8 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
 
     public static final String PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES = "dbMaintainer.useScriptFileLastModificationDates.enabled";
     
+    public static final String PROPKEY_SCRIPTS_ENCODING = "dbMaintainer.scripts.encoding";
+    
     protected List<Script> allUpdateScripts, allPostProcessingScripts;
 
 
@@ -319,7 +321,9 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @return The script, not null
      */
     protected Script createScript(File scriptFile, String relativePath) {
-        return new Script(relativePath, scriptFile.lastModified(), new ScriptContentHandle.UrlScriptContentHandle(FileUtils.getUrl(scriptFile)));
+        return new Script(relativePath, scriptFile.lastModified(), 
+                new ScriptContentHandle.UrlScriptContentHandle(FileUtils.getUrl(scriptFile), 
+                PropertyUtils.getString(PROPKEY_SCRIPTS_ENCODING, configuration)));
     }
 
 

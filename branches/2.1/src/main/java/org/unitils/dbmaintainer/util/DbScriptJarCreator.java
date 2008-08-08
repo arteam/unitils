@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.jar.JarEntry;
@@ -71,20 +72,26 @@ public class DbScriptJarCreator {
      * If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS
      */
     private String extensions;
+    
+    private String encoding;
+    
+    private Properties defaultConfiguration = new ConfigurationLoader().getDefaultConfiguration();
 
     
     /**
      * Creates an instance
      * 
      * @param configurationFileName Config file from which properties concerning script file organization are retrieved, if any
-     * @param location If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION
+     * @param location Must not be null
      * @param extensions If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS
      * @param postProcessingDirName If not null, overrides the property DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME
+     * @param encoding If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS
      */
-	public DbScriptJarCreator(String location, String extensions, String postProcessingDirName) {
+	public DbScriptJarCreator(String location, String extensions, String postProcessingDirName, String encoding) {
         this.postProcessingDirName = postProcessingDirName;
         this.location = location;
         this.extensions = extensions;
+        this.encoding = encoding;
     }
 	
 	
@@ -130,7 +137,8 @@ public class DbScriptJarCreator {
 		JarEntry jarEntry = new JarEntry(entryName);
 		jarOutputStream.putNextEntry(jarEntry);
 
-		InputStream scriptInputStream = new ReaderInputStream(entryContentReader);
+		InputStream scriptInputStream = new ReaderInputStream(entryContentReader, encoding != null ?
+		        encoding : defaultConfiguration.getProperty(DefaultScriptSource.PROPKEY_SCRIPTS_ENCODING));
 		byte[] buffer = new byte[1024];
 		int len;
 		while((len = scriptInputStream.read(buffer, 0, buffer.length)) > -1) {
@@ -145,9 +153,14 @@ public class DbScriptJarCreator {
 	 * @return All database update scripts, in the sequence in which they must be executed
 	 */
     private List<Script> getScripts() {
+        List<Script> allScripts = new ArrayList<Script>();
+        
         DefaultScriptSource source = new DefaultScriptSource();
         source.init(getScriptSourceConfiguration());
-        return source.getAllUpdateScripts();
+        allScripts.addAll(source.getAllUpdateScripts());
+        allScripts.addAll(source.getPostProcessingScripts());
+        
+        return allScripts;
     }
 
     
@@ -163,6 +176,12 @@ public class DbScriptJarCreator {
 		if (postProcessingDirName != null) {
 			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postProcessingDirName);
 		}
+		if (postProcessingDirName != null) {
+            conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postProcessingDirName);
+        }
+		if (encoding != null) {
+		    conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_ENCODING, encoding);
+		}
 		return conf;
 	}
     
@@ -172,7 +191,6 @@ public class DbScriptJarCreator {
      */
     private Properties getScriptSourceConfiguration() {
 		Properties conf = new Properties();
-		Properties defaultConfiguration = new ConfigurationLoader().getDefaultConfiguration();
 		conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION, location);
 		if (extensions != null) {
 			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, extensions);
@@ -185,6 +203,12 @@ public class DbScriptJarCreator {
 		} else {
 		    conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, 
                     defaultConfiguration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME));
+		}
+		if (encoding != null) {
+		    conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_ENCODING, encoding);
+		} else {
+		    conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_ENCODING, 
+                    defaultConfiguration.getProperty(DefaultScriptSource.PROPKEY_SCRIPTS_ENCODING));
 		}
 		return conf;
 	}

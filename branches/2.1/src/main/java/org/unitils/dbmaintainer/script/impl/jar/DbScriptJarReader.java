@@ -17,6 +17,11 @@
  */
 package org.unitils.dbmaintainer.script.impl.jar;
 
+import org.unitils.core.UnitilsException;
+import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle;
+import org.unitils.dbmaintainer.util.DbScriptJarCreator;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,11 +31,6 @@ import java.util.Iterator;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
-import org.unitils.core.UnitilsException;
-import org.unitils.dbmaintainer.script.Script;
-import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle;
-import org.unitils.dbmaintainer.util.DbScriptJarCreator;
-
 /**
  * @author Alexander Snaps <alex.snaps@gmail.com>
  * @author Filip Neven
@@ -39,10 +39,12 @@ public class DbScriptJarReader implements Iterable<Script> {
 
     private JarInputStream inputStream;
     private String jarFileName;
+    private String encoding;
 
-    public DbScriptJarReader(String jarFileName) throws IOException {
+    public DbScriptJarReader(String jarFileName, String encoding) throws IOException {
         this.jarFileName = jarFileName;
         this.inputStream = new JarInputStream(new FileInputStream(new File(jarFileName)));
+        this.encoding = encoding;
     }
     
     public void close() throws IOException {
@@ -70,7 +72,7 @@ public class DbScriptJarReader implements Iterable<Script> {
 
         public Script next() {
             String fileName = currentEntry.getName();
-            return new Script(fileName, currentEntry.getTime(), new UrlScriptContentHandle(getJarURL(fileName)));
+            return new Script(fileName, currentEntry.getTime(), new UrlScriptContentHandle(getJarURL(fileName), encoding));
         }
 
         public void remove() {

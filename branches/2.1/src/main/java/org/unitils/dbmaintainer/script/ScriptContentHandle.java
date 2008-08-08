@@ -15,20 +15,21 @@
  */
 package org.unitils.dbmaintainer.script;
 
+import org.unitils.core.UnitilsException;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
+import org.unitils.thirdparty.org.apache.commons.io.NullWriter;
+import org.unitils.util.ReaderInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.hibernate.lob.ReaderInputStream;
-import org.unitils.core.UnitilsException;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-import org.unitils.thirdparty.org.apache.commons.io.NullWriter;
 
 /**
  * A handle for getting the script content as a stream.
@@ -42,6 +43,8 @@ public abstract class ScriptContentHandle {
 	
 	private Reader scriptReader;
 	
+	protected String encoding;
+	
     /**
      * Opens a stream to the content of the script.
      * 
@@ -51,7 +54,11 @@ public abstract class ScriptContentHandle {
      */
     public Reader openScriptContentReader() {
         scriptDigest = getScriptDigest();
-        scriptReader = new InputStreamReader(new DigestInputStream(getScriptInputStream(), scriptDigest));
+        try {
+            scriptReader = new InputStreamReader(new DigestInputStream(getScriptInputStream(), scriptDigest), encoding);
+        } catch (UnsupportedEncodingException e) {
+            throw new UnitilsException("Unsupported encoding " + encoding, e);
+        }
 		return scriptReader;
     }
 
@@ -78,9 +85,9 @@ public abstract class ScriptContentHandle {
 	
 	
 	protected void readScript() throws IOException {
-		Reader scriptReader = openScriptContentReader();
-		IOUtils.copy(scriptReader, new NullWriter());
-		scriptReader.close();
+		Reader scriptContentReader = openScriptContentReader();
+		IOUtils.copy(scriptContentReader, new NullWriter());
+		scriptContentReader.close();
 	}
 
 	
@@ -108,9 +115,11 @@ public abstract class ScriptContentHandle {
          * Creates a content handle.
          *
          * @param url The url to the content, not null
+         * @param encoding 
          */
-        public UrlScriptContentHandle(URL url) {
+        public UrlScriptContentHandle(URL url, String encoding) {
             this.url = url;
+            this.encoding = encoding;
         }
 
 
@@ -142,9 +151,11 @@ public abstract class ScriptContentHandle {
          * Creates a content handle.
          *
          * @param scriptContent The content, not null
+         * @param encoding 
          */
-        public StringScriptContentHandle(String scriptContent) {
+        public StringScriptContentHandle(String scriptContent, String encoding) {
             this.scriptContent = scriptContent;
+            this.encoding = encoding;
         }
 
 
@@ -155,7 +166,7 @@ public abstract class ScriptContentHandle {
          */
 		@Override
 		protected InputStream getScriptInputStream() {
-			return new ReaderInputStream(new StringReader(scriptContent));
+			return new ReaderInputStream(new StringReader(scriptContent), encoding);
 		}
         
         

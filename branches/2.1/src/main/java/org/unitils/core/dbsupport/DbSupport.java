@@ -21,17 +21,17 @@ import static org.unitils.core.util.StoredIdentifierCase.UPPER_CASE;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 import static org.unitils.util.PropertyUtils.getString;
 
+import org.unitils.core.UnitilsException;
+import org.unitils.core.util.StoredIdentifierCase;
+
+import javax.sql.DataSource;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.sql.DataSource;
-
-import org.unitils.core.UnitilsException;
-import org.unitils.core.util.StoredIdentifierCase;
 
 /**
  * Helper class that implements a number of common operations on a database schema. Operations that can be implemented
@@ -330,7 +330,7 @@ abstract public class DbSupport {
      * @param triggerName The trigger to drop (case-sensitive), not null
      */
     public void dropTrigger(String schemaName, String triggerName) {
-        getSQLHandler().executeCodeUpdate("drop trigger " + qualified(schemaName, triggerName), getDataSource());
+        getSQLHandler().executeUpdate("drop trigger " + qualified(schemaName, triggerName), getDataSource());
     }
 
 
@@ -341,7 +341,7 @@ abstract public class DbSupport {
      * @param typeName The type to drop (case-sensitive), not null
      */
     public void dropType(String schemaName, String typeName) {
-        getSQLHandler().executeCodeUpdate("drop type " + qualified(schemaName, typeName) + (supportsCascade() ? " cascade" : ""), getDataSource());
+        getSQLHandler().executeUpdate("drop type " + qualified(schemaName, typeName) + (supportsCascade() ? " cascade" : ""), getDataSource());
     }
 
 

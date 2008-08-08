@@ -33,12 +33,13 @@ public class CreateDatabaseScriptJarTask extends Task {
     private String location;
     private String extensions;
     private String postProcessingDirName;
+    private String encoding;
 
     public void execute()
             throws BuildException {
 
         try {
-			DbScriptJarCreator creator = new DbScriptJarCreator(location, extensions, postProcessingDirName);
+			DbScriptJarCreator creator = new DbScriptJarCreator(location, extensions, postProcessingDirName, encoding);
             creator.createJar(jarFileName);
         } catch(Exception e) {
         	e.printStackTrace();
@@ -58,7 +59,11 @@ public class CreateDatabaseScriptJarTask extends Task {
         this.extensions = extensions;
     }
 
-    public void setostProcessingDirName(String postProcessingDirName) {
+    public void setPostProcessingDirName(String postProcessingDirName) {
         this.postProcessingDirName = postProcessingDirName;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 }

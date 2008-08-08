@@ -15,10 +15,15 @@
  */
 package org.unitils.core.dbsupport;
 
-import org.unitils.core.UnitilsException;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
-import java.sql.*;
+import org.unitils.core.UnitilsException;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Set;
 
 /**
@@ -175,7 +180,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void dropType(String schemaName, String typeName) {
-        getSQLHandler().executeCodeUpdate("drop type " + qualified(schemaName, typeName) + " force", getDataSource());
+        getSQLHandler().executeUpdate("drop type " + qualified(schemaName, typeName) + " force", getDataSource());
     }
 
 
