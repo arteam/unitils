@@ -20,7 +20,7 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
 
 import org.unitils.mock.core.ArgumentMatcher;
 import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.ReflectionComparatorChainFactory;
+import org.unitils.reflectionassert.ReflectionComparatorFactory;
 
 /**
  * An {@link ArgumentMatcher} implementation that will match if the given argument equals the <code>Object</code> passed on construction.
@@ -47,7 +47,7 @@ public class LenEqArgumentMatcher implements ArgumentMatcher {
 	 * @see ArgumentMatcher#matches(Object)
 	 */
 	public boolean matches(Object o) {
-        ReflectionComparator reflectionComparator = ReflectionComparatorChainFactory.getComparatorChainForModes(LENIENT_ORDER, IGNORE_DEFAULTS);
+        ReflectionComparator reflectionComparator = ReflectionComparatorFactory.createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
         return reflectionComparator.getDifference(this.o, o) == null;
 	}
 
