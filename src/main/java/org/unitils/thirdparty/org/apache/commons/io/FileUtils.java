@@ -15,8 +15,6 @@
  */
 package org.unitils.thirdparty.org.apache.commons.io;
 
-import org.junit.Ignore;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
