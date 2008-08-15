@@ -25,7 +25,7 @@ import static junit.framework.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
 
 public class InvocationMatcherTest extends UnitilsJUnit4 {
 	

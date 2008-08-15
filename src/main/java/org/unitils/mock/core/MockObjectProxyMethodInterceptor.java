@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.unitils.mock.util.ProxyUtil;
 
 /**
  * @author Filip Neven
@@ -41,7 +42,7 @@ public class MockObjectProxyMethodInterceptor<T> implements MethodInterceptor {
 		if (method.getDeclaringClass().equals(MockObjectProxy.class)) {
 			return mockObject;
 		}
-		Invocation invocation = new Invocation(mockObject, method, Arrays.asList(args), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
+		Invocation invocation = new Invocation(mockObject, method, Arrays.asList(args), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
 		mockObject.registerInvocation(invocation);
 		
 		if (mockObject.isExecuteActualImplementation(invocation)) {

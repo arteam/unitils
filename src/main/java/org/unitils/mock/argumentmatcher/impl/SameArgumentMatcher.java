@@ -13,28 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.report;
+package org.unitils.mock.argumentmatcher.impl;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-
-import org.unitils.mock.core.Scenario;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 /**
- * A {@link ScenarioView} can be used to generate a part of a {@link ScenarioReporter}, based on a given {@link Scenario}.
+ * An {@link ArgumentMatcher} implementation that will match if the given argument is (object) identical to the <code>Object</code> passed on construction.
  * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
+ *
  */
-public interface ScenarioView {
+public class SameArgumentMatcher implements ArgumentMatcher {
+
+	private final Object o;
 
 	/**
-	 * Creates the view for the given {@link Scenario}.
-	 * @param scenario to create the view. Not null.
-	 * @param objectFieldMap 
-	 * @return the view.
+	 * Constructor.
+	 * 
+	 * @param o the object to check for object identity. Not null.
 	 */
-	public String createView(Scenario scenario, Map<Object, Field> objectFieldMap);
+	public SameArgumentMatcher(Object o) {
+		this.o = o;
+	}
+	
+	/*
+	 * @see ArgumentMatcher#matches(Object)
+	 */
+	public boolean matches(Object o) {
+		return this.o == o;
+	}
 
 }

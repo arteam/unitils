@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.argumentmatcher.impl;
+
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 /**
- * An interface to be used to check is a given argument matches a predefined value.
+ * An {@link org.unitils.mock.argumentmatcher.ArgumentMatcher} implementation that will match if the given argument is null.
  * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
- *
  */
-public interface ArgumentMatcher {
-	
-	/**
-	 * Returns true if the given object matches this object's expected argument, false otherwise.
-	 * 
-	 * @param o the <code>Object</code> to match.
-	 * @return true when passed object matches, false otherwise.
+public class NullArgumentMatcher implements ArgumentMatcher {
+
+	/*
+	 * @see ArgumentMatcher#matches(Object)
 	 */
-	public boolean matches(Object o);
+	public boolean matches(Object o) {
+		return o == null;
+	}
 }

@@ -17,6 +17,7 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.core.action.ExceptionThrowingAction;
 import org.unitils.mock.core.action.ValueReturningAction;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 /**
  * @author Filip Neven

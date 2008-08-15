@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.unitils.mock.util.ProxyUtil;
 
 /**
  * @author Filip Neven
@@ -47,7 +48,7 @@ public class AssertStatementCallRegistratingMethodInterceptor<T> implements Meth
 
 	public Object intercept(Object object, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		Invocation invocation = new Invocation(mockObject, method, Arrays.asList(args), 
-				ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
+				ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace()));
 		invocationMatcherBuilder.registerInvokedMethod(invocation);
 		InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher();
 		invocationMatcherBuilder.reset();

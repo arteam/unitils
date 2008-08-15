@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.argumentmatcher;
+package org.unitils.mock.report;
 
-import org.unitils.mock.core.ArgumentMatcher;
+import org.unitils.mock.core.Scenario;
 
 /**
- * An {@link ArgumentMatcher} implementation that will match if the given argument is not null.
- * 
+ * An interface for classes that can create a string representation of a {@link Scenario}.
+ *
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class NotNullArgumentMatcher implements ArgumentMatcher {
+public interface ScenarioView {
 
-	/*
-	 * @see ArgumentMatcher#matches(Object)
-	 */
-	public boolean matches(Object o) {
-		return o != null;
-	}
+    /**
+     * Creates a string representation of the given scenario.
+     *
+     * @param testObject The test instance, null if there is no test object
+     * @param scenario   The sceneario, not null
+     * @return The string representation, not null
+     */
+    String createView(Object testObject, Scenario scenario);
 
 }

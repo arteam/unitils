@@ -16,8 +16,9 @@
 package org.unitils.mock.core;
 
 import static org.unitils.mock.core.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
-import org.unitils.mock.core.argumentmatcher.EqualsArgumentMatcher;
-import org.unitils.mock.core.argumentmatcher.LenEqArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.EqualsArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import java.lang.reflect.Method;

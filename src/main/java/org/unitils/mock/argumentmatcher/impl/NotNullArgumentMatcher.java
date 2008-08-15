@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.argumentmatcher;
+package org.unitils.mock.argumentmatcher.impl;
 
-import org.unitils.mock.core.ArgumentMatcher;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 /**
- * An {@link ArgumentMatcher} implementation that will match if the given argument is null.
+ * An {@link org.unitils.mock.argumentmatcher.ArgumentMatcher} implementation that will match if the given argument is not null.
  * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class NullArgumentMatcher implements ArgumentMatcher {
+public class NotNullArgumentMatcher implements ArgumentMatcher {
 
 	/*
 	 * @see ArgumentMatcher#matches(Object)
 	 */
 	public boolean matches(Object o) {
-		return o == null;
+		return o != null;
 	}
+
 }

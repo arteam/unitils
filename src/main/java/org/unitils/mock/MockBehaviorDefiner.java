@@ -21,7 +21,7 @@ import org.unitils.mock.core.Action;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.MockedMethodRegistratingMethodInterceptor;
 import org.unitils.mock.core.MockBehaviorBuilder;
-import org.unitils.mock.core.ProxyUtils;
+import org.unitils.mock.util.ProxyUtil;
 
 /**
  * @author Filip Neven
@@ -78,6 +78,6 @@ public class MockBehaviorDefiner<T> {
 	@SuppressWarnings("unchecked")
 	protected T getInvokedMethodRegistrator() {
 		MethodInterceptor invokedMethodRegistratingMethodInterceptor = new MockedMethodRegistratingMethodInterceptor<T>((MockObject<T>)mockBehaviorBuilder.getMockObject());
-		return (T) ProxyUtils.createProxy(invokedMethodRegistratingMethodInterceptor, mockBehaviorBuilder.getMockObject().getMockedClass());
+		return (T) ProxyUtil.createProxy(invokedMethodRegistratingMethodInterceptor, mockBehaviorBuilder.getMockObject().getMockedClass());
 	}
 }

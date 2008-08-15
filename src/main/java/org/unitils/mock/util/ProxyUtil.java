@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.util;
 
 import java.lang.reflect.Method;
 
@@ -33,7 +33,7 @@ import org.unitils.core.UnitilsException;
  * @author Filip Neven
  * @author Tim Ducheyne 
  */
-public class ProxyUtils {
+public class ProxyUtil {
 
 	/**
 	 * Creates a proxy object for the given <code>Class</code>.

@@ -21,7 +21,8 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
+import org.unitils.mock.util.ProxyUtil;
 
 public class ScenarioTest extends UnitilsJUnit4 {
 
@@ -46,7 +47,7 @@ public class ScenarioTest extends UnitilsJUnit4 {
 	@Test
 	public void testAssertInvoked() {
 		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), 
-				ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+				ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.assertInvoked(doSomethingInvocationMatcher);
 		try {
 			scenario.assertInvoked(doSomethingWithParamInvocationMatcher);
@@ -64,7 +65,7 @@ public class ScenarioTest extends UnitilsJUnit4 {
 	
 	@Test
 	public void testAssertNotInvoked() {
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.assertNotInvoked(doSomethingWithParamInvocationMatcher);
 		try {
 			scenario.assertNotInvoked(doSomethingInvocationMatcher);
@@ -79,8 +80,8 @@ public class ScenarioTest extends UnitilsJUnit4 {
 	@Test
 	public void testAssertNoMoreInvocations() {
 		scenario = new Scenario();
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.assertInvoked(doSomethingInvocationMatcher);
 		try {
 			scenario.assertNoMoreInvocations();
@@ -92,7 +93,7 @@ public class ScenarioTest extends UnitilsJUnit4 {
 		scenario.assertInvoked(doSomethingInvocationMatcher);
 		scenario.assertNoMoreInvocations();
 		
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
 		scenario.registerOneTimeMatchingMockBehaviorInvocationMatcher(doSomethingInvocationMatcher);
 		scenario.assertNoMoreInvocations();
 	}

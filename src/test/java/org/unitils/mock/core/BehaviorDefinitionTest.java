@@ -29,7 +29,8 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.action.ExceptionThrowingAction;
 import org.unitils.mock.core.action.ValueReturningAction;
-import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 /**
  * @author Filip Neven
@@ -116,7 +117,7 @@ public class BehaviorDefinitionTest {
 		}
 		MockBehavior expectedMockBehavior = new MockBehavior(
 				new InvocationMatcher(TestClass.class.getMethod("doSomething", String.class, String.class), 
-						Arrays.<ArgumentMatcher>asList(new NotNullArgumentMatcher(), new NotNullArgumentMatcher())), 
+						Arrays.<ArgumentMatcher>asList(new NotNullArgumentMatcher(), new NotNullArgumentMatcher())),
 				action);
 		assertLenEquals(expectedMockBehavior, mockBehavior);
 	}

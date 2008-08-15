@@ -23,12 +23,11 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.core.argumentmatcher.EqualsArgumentMatcher;
-import org.unitils.mock.core.argumentmatcher.LenEqArgumentMatcher;
-import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
-import org.unitils.mock.core.argumentmatcher.NullArgumentMatcher;
-import org.unitils.mock.core.argumentmatcher.RefEqArgumentMatcher;
-import org.unitils.mock.core.argumentmatcher.SameArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.RefEqArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.SameArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.EqualsArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.*;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 public class ArgumentMatcherTest extends UnitilsJUnit4 {
 	ArgumentMatcher notNullArgumentMatcher;
