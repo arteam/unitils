@@ -15,47 +15,46 @@
  */
 package org.unitils.mock.core;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.mock.core.report.DefaultScenarioReporter;
+import org.unitils.mock.report.impl.DefaultScenarioReport;
+import org.unitils.mock.util.ProxyUtil;
+
+import java.lang.reflect.Method;
+import java.util.Collections;
 
 public class DefaultReportTest extends UnitilsJUnit4 {
 
-	Scenario scenario;
-	Method testMethodDoSomething;
-	Method testMethodDoSomethingElse;
-	MockObject<Object> mockObject = new MockObject<Object>("testMockObject", Object.class, false, scenario);
-	DefaultScenarioReporter report;
+    protected Scenario scenario;
+    protected Method testMethodDoSomething;
+    protected Method testMethodDoSomethingElse;
+    protected MockObject<Object> mockObject = new MockObject<Object>("testMockObject", Object.class, false, scenario);
+    protected DefaultScenarioReport report;
 
-	
-	@Before
-	public void setup() throws Exception {
-		scenario = new Scenario();
-		testMethodDoSomething = TestObject.class.getMethod("doSomething");
-		testMethodDoSomethingElse = TestObject.class.getMethod("doSomethingElse");
-		report = new DefaultScenarioReporter();
-	}
-	
-	@Test
-	public void testDefaultReport() {
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomethingElse, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomethingElse, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtils.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		report.createReport(scenario, new HashMap<Object, Field>());
-	}
-	
-	static class TestObject {
-		public void doSomething() {
-		}
-		
-		public void doSomethingElse() {
-		}
-	}	
+
+    @Before
+    public void setup() throws Exception {
+        scenario = new Scenario();
+        testMethodDoSomething = TestObject.class.getMethod("doSomething");
+        testMethodDoSomethingElse = TestObject.class.getMethod("doSomethingElse");
+        report = new DefaultScenarioReport();
+    }
+
+    @Test
+    public void testDefaultReport() {
+        scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+        scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomethingElse, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+        scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomethingElse, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+        scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
+        report.createReport("", null, scenario);
+    }
+
+    protected static class TestObject {
+        public void doSomething() {
+        }
+
+        public void doSomethingElse() {
+        }
+    }
 }

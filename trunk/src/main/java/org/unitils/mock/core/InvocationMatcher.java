@@ -15,6 +15,8 @@
  */
 package org.unitils.mock.core;
 
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +38,7 @@ public class InvocationMatcher {
 	 * Constructor.
 	 * 
 	 * @param method The <code>Method</code> which needs to be matched. Not null.
-	 * @param argumentMatchers The {@link ArgumentMatcher}s that need to be used to match the {@link Invocation}s arguments. The size of the list must be equals to the number of parameters of the given <code>Method</code>.
+	 * @param argumentMatchers The {@link org.unitils.mock.argumentmatcher.ArgumentMatcher}s that need to be used to match the {@link Invocation}s arguments. The size of the list must be equals to the number of parameters of the given <code>Method</code>.
 	 */
 	public InvocationMatcher(Method method, ArgumentMatcher... argumentMatchers) {
 		this(method, Arrays.asList(argumentMatchers));

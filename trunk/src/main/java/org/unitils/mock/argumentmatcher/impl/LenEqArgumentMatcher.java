@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.argumentmatcher;
+package org.unitils.mock.argumentmatcher.impl;
 
-import org.unitils.mock.core.ArgumentMatcher;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
+import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
+
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.reflectionassert.ReflectionComparator;
 import org.unitils.reflectionassert.ReflectionComparatorFactory;
 
 /**
  * An {@link ArgumentMatcher} implementation that will match if the given argument equals the <code>Object</code> passed on construction.
- * Reflection is used to compare all fields of these values.
+ * Reflection is used to compare all fields of these values, but order of collections is ignored and only fields that have a non default value will be compared. 
  * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  *
  */
-public class RefEqArgumentMatcher implements ArgumentMatcher {
-
+public class LenEqArgumentMatcher implements ArgumentMatcher {
 	private final Object o;
 	
 	/**
@@ -37,7 +39,7 @@ public class RefEqArgumentMatcher implements ArgumentMatcher {
 	 * 
 	 * @param o the object to check for equality. Not null.
 	 */
-	public RefEqArgumentMatcher(Object o) {
+	public LenEqArgumentMatcher(Object o) {
 		this.o = o;
 	}
 	
@@ -45,7 +47,7 @@ public class RefEqArgumentMatcher implements ArgumentMatcher {
 	 * @see ArgumentMatcher#matches(Object)
 	 */
 	public boolean matches(Object o) {
-        ReflectionComparator reflectionComparator = ReflectionComparatorFactory.createRefectionComparator();
+        ReflectionComparator reflectionComparator = ReflectionComparatorFactory.createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
         return reflectionComparator.getDifference(this.o, o) == null;
 	}
 

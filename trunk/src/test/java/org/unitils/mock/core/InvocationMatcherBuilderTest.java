@@ -18,7 +18,7 @@ package org.unitils.mock.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.MockUnitils;
-import org.unitils.mock.core.argumentmatcher.NotNullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
 
 /**
  * @author Filip Neven

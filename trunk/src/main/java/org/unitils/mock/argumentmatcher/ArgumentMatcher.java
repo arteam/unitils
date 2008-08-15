@@ -13,34 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.argumentmatcher;
-
-import org.unitils.mock.core.ArgumentMatcher;
+package org.unitils.mock.argumentmatcher;
 
 /**
- * An {@link ArgumentMatcher} implementation that will match if the given argument equals the <code>Object</code> passed on construction.
- *  
+ * An interface to be used to check is a given argument matches a predefined value.
+ * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  *
  */
-public class EqualsArgumentMatcher implements ArgumentMatcher {
-	private final Object o;
+public interface ArgumentMatcher {
 	
 	/**
-	 * Constructor.
+	 * Returns true if the given object matches this object's expected argument, false otherwise.
 	 * 
-	 * @param o the object to check for equality. Not null.
+	 * @param o the <code>Object</code> to match.
+	 * @return true when passed object matches, false otherwise.
 	 */
-	public EqualsArgumentMatcher(Object o) {
-		this.o = o;
-	}
-	
-	/*
-	 * @see ArgumentMatcher#matches(Object)
-	 */
-	public boolean matches(Object o) {
-		return this.o.equals(o);
-	}
+	public boolean matches(Object o);
 }

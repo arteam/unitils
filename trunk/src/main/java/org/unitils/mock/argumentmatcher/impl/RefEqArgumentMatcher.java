@@ -13,28 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core.argumentmatcher;
+package org.unitils.mock.argumentmatcher.impl;
 
-import org.unitils.mock.core.ArgumentMatcher;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.ReflectionComparatorFactory;
 
 /**
- * An {@link ArgumentMatcher} implementation that will match if the given argument is (object) identical to the <code>Object</code> passed on construction.
+ * An {@link ArgumentMatcher} implementation that will match if the given argument equals the <code>Object</code> passed on construction.
+ * Reflection is used to compare all fields of these values.
  * 
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  *
  */
-public class SameArgumentMatcher implements ArgumentMatcher{
+public class RefEqArgumentMatcher implements ArgumentMatcher {
 
 	private final Object o;
-
+	
 	/**
 	 * Constructor.
 	 * 
-	 * @param o the object to check for object identity. Not null.
+	 * @param o the object to check for equality. Not null.
 	 */
-	public SameArgumentMatcher(Object o) {
+	public RefEqArgumentMatcher(Object o) {
 		this.o = o;
 	}
 	
@@ -42,7 +45,8 @@ public class SameArgumentMatcher implements ArgumentMatcher{
 	 * @see ArgumentMatcher#matches(Object)
 	 */
 	public boolean matches(Object o) {
-		return this.o == o;
+        ReflectionComparator reflectionComparator = ReflectionComparatorFactory.createRefectionComparator();
+        return reflectionComparator.getDifference(this.o, o) == null;
 	}
 
 }

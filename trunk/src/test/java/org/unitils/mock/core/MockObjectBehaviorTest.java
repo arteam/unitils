@@ -28,6 +28,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.easymock.annotation.Mock;
 import org.unitils.mock.core.action.ExceptionThrowingAction;
 import org.unitils.mock.core.action.ValueReturningAction;
+import org.unitils.mock.util.ProxyUtil;
 
 /**
  * @author Filip Neven
@@ -58,11 +59,11 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 		
 		testClassMock = new MockObject<TestClass>("testClassMock", TestClass.class, false, scenario);
 		MockObjectProxyMethodInterceptor<TestClass> testClassMethodInterceptor = new MockObjectProxyMethodInterceptor<TestClass>(testClassMock);
-		testClass = ProxyUtils.createProxy(testClassMethodInterceptor, TestClass.class);
+		testClass = ProxyUtil.createProxy(testClassMethodInterceptor, TestClass.class);
 		
 		testInterfaceMock = new MockObject<TestInterface>("testInterfaceMock", TestInterface.class, false, scenario);
 		MockObjectProxyMethodInterceptor<TestInterface> testInterfaceMethodInterceptor = new MockObjectProxyMethodInterceptor<TestInterface>(testInterfaceMock);
-		testInterface = ProxyUtils.createProxy(testInterfaceMethodInterceptor, TestInterface.class);
+		testInterface = ProxyUtil.createProxy(testInterfaceMethodInterceptor, TestInterface.class);
 		
 		expect(invocationMatcher.matches(null)).andStubReturn(true);
 		replay();
