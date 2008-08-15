@@ -30,8 +30,8 @@ import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRef
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import org.unitils.reflectionassert.difference.Difference;
-import org.unitils.reflectionassert.formatter.DifferenceReport;
-import org.unitils.reflectionassert.formatter.impl.DefaultDifferenceReport;
+import org.unitils.reflectionassert.report.DifferenceReport;
+import org.unitils.reflectionassert.report.impl.DefaultDifferenceReport;
 
 import java.util.Collection;
 
