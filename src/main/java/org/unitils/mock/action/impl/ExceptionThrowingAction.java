@@ -13,16 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.action.impl;
 
+import org.unitils.mock.action.Action;
+import org.unitils.mock.core.Invocation;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
- *
  */
-public interface Action {
+public class ExceptionThrowingAction implements Action {
 
-	public Object execute(Invocation invocation) throws Throwable;
+    private Throwable exceptionToThrow;
+
+
+    public ExceptionThrowingAction(Throwable exceptionToThrow) {
+        this.exceptionToThrow = exceptionToThrow;
+    }
+
+
+    public Object execute(Invocation invocation) throws Throwable {
+        throw exceptionToThrow;
+    }
+
 }

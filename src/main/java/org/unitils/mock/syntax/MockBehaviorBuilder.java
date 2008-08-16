@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.syntax;
 
-import org.unitils.mock.core.action.ExceptionThrowingAction;
-import org.unitils.mock.core.action.ValueReturningAction;
+import org.unitils.mock.action.impl.ExceptionThrowingAction;
+import org.unitils.mock.action.impl.ValueReturningAction;
+import org.unitils.mock.action.Action;
+import org.unitils.mock.core.*;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 /**

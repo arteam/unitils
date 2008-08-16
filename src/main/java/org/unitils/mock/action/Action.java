@@ -13,36 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.action;
 
-import org.unitils.mock.action.Action;
+import org.unitils.mock.core.Invocation;
+
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockBehavior {
+public interface Action {
 
-    private InvocationMatcher invocationMatcher;
-
-    private Action action;
-
-
-    public MockBehavior(InvocationMatcher invocationMatcher, Action action) {
-        this.action = action;
-        this.invocationMatcher = invocationMatcher;
-    }
-
-
-    public Object execute(Invocation invocation) throws Throwable {
-        return action.execute(invocation);
-    }
-
-
-    public boolean matches(Invocation invocation) {
-        return invocationMatcher.matches(invocation);
-    }
-
-
+    Object execute(Invocation invocation) throws Throwable;
 }

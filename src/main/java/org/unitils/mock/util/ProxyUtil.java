@@ -15,68 +15,87 @@
  */
 package org.unitils.mock.util;
 
-import java.lang.reflect.Method;
-
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.MethodInterceptor;
-
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
 /**
- * Utility class to create proxy objects.
- * 
+ * Utility class to create and work with proxy objects.
+ *
  * @author Kenny Claes
  * @author Filip Neven
- * @author Tim Ducheyne 
+ * @author Tim Ducheyne
  */
 public class ProxyUtil {
 
-	/**
-	 * Creates a proxy object for the given <code>Class</code>.
-	 * A <code>MethodInterceptor</code> must be passed to hook into the proxy.
-	 * @param interceptor The interceptor to hook into the proxy. Not null.
-	 * @param targetClass The class of the proxy to be created. Not null.
-	 * 
-	 * @param <T> The type you want to create a proxy for.
-	 * @return the proxy object.
-	 */
-	public static <T> T createProxy(MethodInterceptor interceptor, Class<T> targetClass, Class<?>... interfaces) {
-        final Enhancer enhancer = new Enhancer();
+
+    /**
+     * Creates a proxy object for the given <code>Class</code>.
+     * A <code>MethodInterceptor</code> must be passed to hook into the proxy.
+     *
+     * @param interceptor     The interceptor to hook into the proxy, not null.
+     * @param targetClass     The class of the proxy to be created, not null.
+     * @param extraInterfaces The extra interfaces that the proxy should implement.
+     * @return The proxy object, not null
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T createProxy(MethodInterceptor interceptor, Class<T> targetClass, Class<?>... extraInterfaces) {
+        Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(targetClass);
-        enhancer.setInterfaces(interfaces);
+        enhancer.setInterfaces(extraInterfaces);
         enhancer.setCallbackType(MethodInterceptor.class);
         enhancer.setUseFactory(true);
-        @SuppressWarnings("unchecked")
-        final Class<T> enhancedTargetClass = enhancer.createClass();
-        
-        final Objenesis objenesis = new ObjenesisStd();
-        @SuppressWarnings("unchecked")
-        final Factory proxy = (Factory) objenesis.newInstance(enhancedTargetClass);
-        proxy.setCallbacks(new Callback[] { interceptor });
+        Class<T> enhancedTargetClass = enhancer.createClass();
 
+        Objenesis objenesis = new ObjenesisStd();
+        Factory proxy = (Factory) objenesis.newInstance(enhancedTargetClass);
+        proxy.setCallbacks(new Callback[]{interceptor});
         return (T) proxy;
-	}
-	
-	
-	public static Method getOriginalMethod(Method proxyMethod, Class<?> proxiedClass) {
-		try {
-			return proxiedClass.getMethod(proxyMethod.getName(), proxyMethod.getParameterTypes());
-		} catch (NoSuchMethodException e) {
-			throw new UnitilsException(e);
-		}
-	}
-	
-	
-	public static StackTraceElement getProxiedMethodInvokedAt(StackTraceElement[] invocationStackTrace) {
-		for (int stackTraceIndex = 0; stackTraceIndex < invocationStackTrace.length - 1; stackTraceIndex++) {
-			if (invocationStackTrace[stackTraceIndex].getClassName().contains("$$EnhancerByCGLIB$$")) {
-				return invocationStackTrace[stackTraceIndex + 1];
-			}
-		}
-		throw new UnitilsException("No invocation from a cglib proxy found in stacktrace");
-	}
+    }
+
+
+    /**
+     * Gets the method of the proxied class that was replaced by the given proxy method.
+     * An exception is thrown when the method is not found.
+     *
+     * @param proxyMethod  The proxy method for which to find the actual method, not null
+     * @param proxiedClass The class that was proxied, not null
+     * @return The method of the proxied class, not null
+     */
+    public static Method getOriginalMethod(Method proxyMethod, Class<?> proxiedClass) {
+        try {
+            return proxiedClass.getMethod(proxyMethod.getName(), proxyMethod.getParameterTypes());
+        } catch (NoSuchMethodException e) {
+            throw new UnitilsException("Unable to find the original method in class " + proxiedClass + " for following proxy method: " + proxyMethod, e);
+        }
+    }
+
+
+    /**
+     * First finds a trace element in which a cglib proxy method was invoked. Then it returns the following stack trace
+     * element. This element is the method call that was proxied by the proxy method.
+     *
+     * @param stackTraceElements The stack trace, not null
+     * @return The proxied method trace element, not null
+     */
+    public static StackTraceElement getProxiedMethodStackTraceElement(StackTraceElement[] stackTraceElements) {
+        boolean foundProxyMethod = false;
+        for (StackTraceElement stackTraceElement : stackTraceElements) {
+            if (foundProxyMethod) {
+                // found the proxy method element, the next element is the proxied method element
+                return stackTraceElement;
+            }
+            if (stackTraceElement.getClassName().contains("$$EnhancerByCGLIB$$")) {
+                foundProxyMethod = true;
+            }
+        }
+        throw new UnitilsException("No invocation of a cglib proxy method found in stacktrace: " + Arrays.toString(stackTraceElements));
+    }
 }

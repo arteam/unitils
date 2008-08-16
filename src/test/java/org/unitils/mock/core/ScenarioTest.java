@@ -15,94 +15,96 @@
  */
 package org.unitils.mock.core;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
-import org.unitils.mock.util.ProxyUtil;
+import static org.unitils.mock.util.ProxyUtil.getProxiedMethodStackTraceElement;
+
+import java.lang.reflect.Method;
+import static java.util.Collections.emptyList;
 
 public class ScenarioTest extends UnitilsJUnit4 {
 
-	Scenario scenario;
-	Method testMethodDoSomething;
-	Method testMethodDoSomethingWithParam;
-	MockObject<Object> mockObject;
-	InvocationMatcher doSomethingInvocationMatcher;
-	InvocationMatcher doSomethingWithParamInvocationMatcher;
-	
-	
-	@Before
-	public void setup() throws Exception {
-		scenario = new Scenario();
-		mockObject = new MockObject<Object>("testMockObject", Object.class, false, scenario);
-		testMethodDoSomething = TestObject.class.getMethod("doSomething");
-		testMethodDoSomethingWithParam = TestObject.class.getMethod("doSomething", Object.class);
-		doSomethingInvocationMatcher = new InvocationMatcher(testMethodDoSomething);
-		doSomethingWithParamInvocationMatcher = new InvocationMatcher(testMethodDoSomethingWithParam, new NotNullArgumentMatcher());
-	}
-	
-	@Test
-	public void testAssertInvoked() {
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), 
-				ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.assertInvoked(doSomethingInvocationMatcher);
-		try {
-			scenario.assertInvoked(doSomethingWithParamInvocationMatcher);
-			throw new RuntimeException();
-		} catch(AssertionError error) {
-			// expected.
-		}
-		try {
-			scenario.assertInvoked(doSomethingInvocationMatcher);
-			throw new RuntimeException();
-		} catch(AssertionError error) {
-			// expected.
-		}		
-	}
-	
-	@Test
-	public void testAssertNotInvoked() {
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.assertNotInvoked(doSomethingWithParamInvocationMatcher);
-		try {
-			scenario.assertNotInvoked(doSomethingInvocationMatcher);
-			throw new RuntimeException();
-		} catch(AssertionError error) {
-			// expected.
-		}
-		scenario.assertInvoked(doSomethingInvocationMatcher);
-		scenario.assertNotInvoked(doSomethingInvocationMatcher);
-	}
-	
-	@Test
-	public void testAssertNoMoreInvocations() {
-		scenario = new Scenario();
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.assertInvoked(doSomethingInvocationMatcher);
-		try {
-			scenario.assertNoMoreInvocations();
-			throw new RuntimeException();
-		} catch(AssertionError error) {
-			// expected.
-		}
-		
-		scenario.assertInvoked(doSomethingInvocationMatcher);
-		scenario.assertNoMoreInvocations();
-		
-		scenario.registerInvocation(new Invocation(mockObject, testMethodDoSomething, Collections.emptyList(), ProxyUtil.getProxiedMethodInvokedAt(Thread.currentThread().getStackTrace())));
-		scenario.registerOneTimeMatchingMockBehaviorInvocationMatcher(doSomethingInvocationMatcher);
-		scenario.assertNoMoreInvocations();
-	}
-	
-	static class TestObject {
-		public void doSomething() {
-		}
-		
-		public void doSomething(Object o) {
-		}
-	}
+    Scenario scenario;
+    Method testMethodDoSomething;
+    Method testMethodDoSomethingWithParam;
+    MockObject<Object> mockObject;
+    InvocationMatcher doSomethingInvocationMatcher;
+    InvocationMatcher doSomethingWithParamInvocationMatcher;
+
+
+    @Before
+    public void setup() throws Exception {
+        scenario = new Scenario();
+        mockObject = new MockObject<Object>("testMockObject", Object.class, false);
+        testMethodDoSomething = TestObject.class.getMethod("doSomething");
+        testMethodDoSomethingWithParam = TestObject.class.getMethod("doSomething", Object.class);
+        doSomethingInvocationMatcher = new InvocationMatcher(testMethodDoSomething);
+        doSomethingWithParamInvocationMatcher = new InvocationMatcher(testMethodDoSomethingWithParam, new NotNullArgumentMatcher());
+    }
+
+    @Test
+    public void testAssertInvoked() {
+        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.assertInvoked(doSomethingInvocationMatcher);
+        try {
+            scenario.assertInvoked(doSomethingWithParamInvocationMatcher);
+            throw new RuntimeException();
+        } catch (AssertionError error) {
+            // expected.
+        }
+        try {
+            scenario.assertInvoked(doSomethingInvocationMatcher);
+            throw new RuntimeException();
+        } catch (AssertionError error) {
+            // expected.
+        }
+    }
+
+    @Test
+    public void testAssertNotInvoked() {
+        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.assertNotInvoked(doSomethingWithParamInvocationMatcher);
+        try {
+            scenario.assertNotInvoked(doSomethingInvocationMatcher);
+            throw new RuntimeException();
+        } catch (AssertionError error) {
+            // expected.
+        }
+        scenario.assertInvoked(doSomethingInvocationMatcher);
+        scenario.assertNotInvoked(doSomethingInvocationMatcher);
+    }
+
+    @Test
+    public void testAssertNoMoreInvocations() {
+        scenario = new Scenario();
+        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.assertInvoked(doSomethingInvocationMatcher);
+        try {
+            scenario.assertNoMoreInvocations();
+            throw new RuntimeException();
+        } catch (AssertionError error) {
+            // expected.
+        }
+
+        scenario.assertInvoked(doSomethingInvocationMatcher);
+        scenario.assertNoMoreInvocations();
+
+        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.assertInvoked(doSomethingInvocationMatcher);
+        scenario.assertNoMoreInvocations();
+    }
+
+
+    public static class TestObject {
+
+        public void doSomething() {
+        }
+
+        @SuppressWarnings({"UnusedDeclaration"})
+        public void doSomething(Object o) {
+        }
+    }
 }

@@ -15,34 +15,24 @@
  */
 package org.unitils.mock.core;
 
-import org.unitils.mock.action.Action;
-
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockBehavior {
-
-    private InvocationMatcher invocationMatcher;
-
-    private Action action;
+public class MockObjectMethodInterceptor<T> extends BaseMethodInterceptor<T> {
 
 
-    public MockBehavior(InvocationMatcher invocationMatcher, Action action) {
-        this.action = action;
-        this.invocationMatcher = invocationMatcher;
+    public MockObjectMethodInterceptor(MockObject<T> mockObject, Scenario scenario) {
+        super(mockObject, scenario);
     }
 
 
-    public Object execute(Invocation invocation) throws Throwable {
-        return action.execute(invocation);
+    public Object handleInvocation(Invocation invocation) throws Throwable {
+        getScenario().addObservedInvocation(invocation);
+
+        MockObject<T> mockObject = getMockObject();
+
+        return mockObject.executeMatchingBehavior(invocation);
     }
-
-
-    public boolean matches(Invocation invocation) {
-        return invocationMatcher.matches(invocation);
-    }
-
-
 }

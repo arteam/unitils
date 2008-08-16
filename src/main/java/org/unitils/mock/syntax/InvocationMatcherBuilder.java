@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.syntax;
 
-import static org.unitils.mock.core.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import org.unitils.mock.core.Invocation;
+import org.unitils.mock.core.InvocationMatcher;
 import org.unitils.mock.argumentmatcher.impl.EqualsArgumentMatcher;
 import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;

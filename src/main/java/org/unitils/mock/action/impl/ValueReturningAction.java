@@ -13,8 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.action.impl;
 
-public class AssertStatementBuilder {
+import org.unitils.mock.action.Action;
+import org.unitils.mock.core.Invocation;
+
+/**
+ * @author Filip Neven
+ * @author Tim Ducheyne
+ * @author Kenny Claes
+ *
+ */
+public class ValueReturningAction implements Action {
+
+	private Object valueToReturn;
+	
+	
+	public ValueReturningAction(Object valueToReturn) {
+		super();
+		this.valueToReturn = valueToReturn;
+	}
+
+
+	public Object execute(Invocation invocation) {
+		return valueToReturn;
+	}
 
 }
