@@ -19,10 +19,8 @@ import org.unitils.mock.util.MethodFormatUtil;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author Filip Neven
@@ -34,35 +32,31 @@ public class Scenario {
     /**
      * Insertion ordered map that keeps track of the registered invocations and whether or not they have already been checked for invocation with the various assertX() methods in this class.
      */
-    private final Map<Invocation, Boolean> observedInvocations = new LinkedHashMap<Invocation, Boolean>();
+    protected List<Invocation> observedInvocations = new ArrayList<Invocation>();
+    protected List<Invocation> unverifiedInvocations = new ArrayList<Invocation>();
 
-    private List<InvocationMatcher> alwaysMatchingMockBehaviorInvocationMatchers = new ArrayList<InvocationMatcher>();
-    private List<InvocationMatcher> oneTimeMatchingMockBehaviorInvocationMatchers = new ArrayList<InvocationMatcher>();
 
-    public void registerInvocation(Invocation invocation) {
-        observedInvocations.put(invocation, Boolean.FALSE);
+    public void addObservedInvocation(Invocation invocation) {
+        observedInvocations.add(invocation);
+        unverifiedInvocations.add(invocation);
     }
-
-
-    public void registerAlwaysMatchingMockBehaviorInvocationMatcher(InvocationMatcher invocationMatcher) {
-        alwaysMatchingMockBehaviorInvocationMatchers.add(invocationMatcher);
-    }
-
-
-    public void registerOneTimeMatchingMockBehaviorInvocationMatcher(InvocationMatcher invocationMatcher) {
-        oneTimeMatchingMockBehaviorInvocationMatchers.add(invocationMatcher);
-    }
-
 
     public List<Invocation> getObservedInvocations() {
-        return new ArrayList<Invocation>(observedInvocations.keySet());
+        return observedInvocations;
+    }
+
+
+    public List<Invocation> getUnverifiedInvocations() {
+        return unverifiedInvocations;
     }
 
 
     public void assertInvoked(InvocationMatcher invocationMatcher) {
-        for (Entry<Invocation, Boolean> registeredInvocationEntry : this.observedInvocations.entrySet()) {
-            if (!registeredInvocationEntry.getValue() && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
-                registeredInvocationEntry.setValue(Boolean.TRUE);
+        Iterator<Invocation> iterator = unverifiedInvocations.iterator();
+        while (iterator.hasNext()) {
+            Invocation invocation = iterator.next();
+            if (invocationMatcher.matches(invocation)) {
+                iterator.remove();
                 return;
             }
         }
@@ -71,44 +65,20 @@ public class Scenario {
 
 
     public void assertNotInvoked(InvocationMatcher invocationMatcher) {
-        for (Entry<Invocation, Boolean> registeredInvocationEntry : this.observedInvocations.entrySet()) {
-            if (!registeredInvocationEntry.getValue() && invocationMatcher.matches(registeredInvocationEntry.getKey())) {
-                throw new AssertionError(getAssertNotInvokedErrorMessage(registeredInvocationEntry.getKey(), invocationMatcher));
+        for (Invocation invocation : unverifiedInvocations) {
+            if (invocationMatcher.matches(invocation)) {
+                throw new AssertionError(getAssertNotInvokedErrorMessage(invocation, invocationMatcher));
             }
         }
     }
 
     public void assertNoMoreInvocations() {
-        // create a copy of the oneTimeMatchingMockBehaviorInvocationMatchers so that the method can be called repeatedly.
-        List<InvocationMatcher> onceMatchingInvocationMatchers = new ArrayList<InvocationMatcher>(oneTimeMatchingMockBehaviorInvocationMatchers);
-        List<InvocationMatcher> alwaysMatchingInvocationMatchers = alwaysMatchingMockBehaviorInvocationMatchers;
-        for (Entry<Invocation, Boolean> registeredInvocationEntry : this.observedInvocations.entrySet()) {
-            Invocation invocation = registeredInvocationEntry.getKey();
-            if (!registeredInvocationEntry.getValue() && !isMatchForAlwaysMatchingMockBehavior(invocation, alwaysMatchingInvocationMatchers) && !isMatchForOnceMatchingMockBehavior(invocation, onceMatchingInvocationMatchers)) {
-                throw new AssertionError(getNoMoreInvocationsErrorMessage(invocation));
-            }
+        if (!unverifiedInvocations.isEmpty()) {
+            Invocation invocation = unverifiedInvocations.get(0);
+            throw new AssertionError(getNoMoreInvocationsErrorMessage(invocation));
         }
     }
 
-    protected boolean isMatchForOnceMatchingMockBehavior(Invocation invocation, List<InvocationMatcher> invocationMatchers) {
-        for (InvocationMatcher invocationMatcher : invocationMatchers) {
-            if (invocationMatcher.matches(invocation)) {
-                oneTimeMatchingMockBehaviorInvocationMatchers.remove(invocation);
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    protected boolean isMatchForAlwaysMatchingMockBehavior(Invocation invocation, List<InvocationMatcher> invocationMatchers) {
-        for (InvocationMatcher invocationMatcher : invocationMatchers) {
-            if (invocationMatcher.matches(invocation)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     protected String getAssertNotInvokedErrorMessage(Invocation invocation, InvocationMatcher invocationMatcher) {
         StringBuilder message = new StringBuilder();
@@ -148,9 +118,9 @@ public class Scenario {
 
 
     protected Invocation findMatchingMethodName(Method method) {
-        for (Entry<Invocation, Boolean> registeredInvocationEntry : this.observedInvocations.entrySet()) {
-            if (!registeredInvocationEntry.getValue() && registeredInvocationEntry.getKey().getMethod().getName().equals(method.getName())) {
-                return registeredInvocationEntry.getKey();
+        for (Invocation invocation : unverifiedInvocations) {
+            if (invocation.getMethod().getName().equals(method.getName())) {
+                return invocation;
             }
         }
         return null;

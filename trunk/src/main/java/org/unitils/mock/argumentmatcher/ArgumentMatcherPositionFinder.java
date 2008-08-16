@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.argumentmatcher;
 
 import org.objectweb.asm.ClassReader;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;

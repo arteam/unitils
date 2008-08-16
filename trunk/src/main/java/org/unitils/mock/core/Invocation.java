@@ -15,10 +15,10 @@
  */
 package org.unitils.mock.core;
 
+import net.sf.cglib.proxy.MethodProxy;
+
 import java.lang.reflect.Method;
 import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * @author Filip Neven
@@ -27,46 +27,51 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class Invocation {
 
-	private MockObject<?> mockObject;
-	
-	private Method method;
-	
-	private List<?> arguments;
-	
-	private StackTraceElement invokedAt;
+    private MockObject<?> mockObject;
+
+    private Object object;
+
+    private Method method;
+
+    private List<?> arguments;
+
+    private StackTraceElement invokedAt;
+
+    private MethodProxy methodProxy;
 
 
-	public Invocation(MockObject<?> mockObject, Method method, List<?> arguments, StackTraceElement invokedAt) {
-		this.mockObject = mockObject;
-		this.method = method;
-		this.arguments = arguments;
-		this.invokedAt = invokedAt;
-	}
-
-	
-	public MockObject<?> getMockObject() {
-		return mockObject;
-	}
+    public Invocation(MockObject<?> mockObject, Object object, Method method, List<?> arguments, StackTraceElement invokedAt, MethodProxy methodProxy) {
+        this.mockObject = mockObject;
+        this.object = object;
+        this.method = method;
+        this.arguments = arguments;
+        this.invokedAt = invokedAt;
+        this.methodProxy = methodProxy;
+    }
 
 
-	public Method getMethod() {
-		return method;
-	}
+    public Object invokeOriginalBehavior() throws Throwable {
+        return methodProxy.invokeSuper(object, arguments.toArray());
+    }
 
 
-	public List<?> getArguments() {
-		return arguments;
-	}
-
-	
-	public StackTraceElement getInvokedAt() {
-		return invokedAt;
-	}
+    public MockObject<?> getMockObject() {
+        return mockObject;
+    }
 
 
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
-	}
-	
+    public Method getMethod() {
+        return method;
+    }
+
+
+    public List<?> getArguments() {
+        return arguments;
+    }
+
+
+    public StackTraceElement getInvokedAt() {
+        return invokedAt;
+    }
+
 }

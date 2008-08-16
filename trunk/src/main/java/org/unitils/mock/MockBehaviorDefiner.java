@@ -16,68 +16,68 @@
 package org.unitils.mock;
 
 import net.sf.cglib.proxy.MethodInterceptor;
-
-import org.unitils.mock.core.Action;
-import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.MockedMethodRegistratingMethodInterceptor;
-import org.unitils.mock.core.MockBehaviorBuilder;
+import org.unitils.mock.core.*;
 import org.unitils.mock.util.ProxyUtil;
+import org.unitils.mock.syntax.MockBehaviorBuilder;
+import org.unitils.mock.action.Action;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
- *
  */
 public class MockBehaviorDefiner<T> {
 
-	private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
-	
-	public MockBehaviorDefiner(MockObject<T> mockObject) {
-		super();
-		mockBehaviorBuilder.registerMockObject(mockObject);
-	}
-	
-	
-	public T returns(Object returnValue) {
-		mockBehaviorBuilder.registerReturnValue(returnValue, false);
-		return getInvokedMethodRegistrator();
-	}
-	
-	
-	public T raises(Throwable exception) {
-		mockBehaviorBuilder.registerThrownException(exception, false);
-		return getInvokedMethodRegistrator();
-	}
-	
-	
-	public T performs(Action action) {
-		mockBehaviorBuilder.registerPerformedAction(action, false);
-		return getInvokedMethodRegistrator();
-	}
-	
-	
-	public T alwaysReturns(Object returnValue) {
-		mockBehaviorBuilder.registerReturnValue(returnValue, true);
-		return getInvokedMethodRegistrator();
-	}
-	
-	
-	public T alwaysRaises(Throwable exception) {
-		mockBehaviorBuilder.registerThrownException(exception, true);
-		return getInvokedMethodRegistrator();
-	}
-	
-	
-	public T alwaysPerforms(Action action) {
-		mockBehaviorBuilder.registerPerformedAction(action, true);
-		return getInvokedMethodRegistrator();
-	}
+    private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
+
+    private Scenario scenario;
 
 
-	@SuppressWarnings("unchecked")
-	protected T getInvokedMethodRegistrator() {
-		MethodInterceptor invokedMethodRegistratingMethodInterceptor = new MockedMethodRegistratingMethodInterceptor<T>((MockObject<T>)mockBehaviorBuilder.getMockObject());
-		return (T) ProxyUtil.createProxy(invokedMethodRegistratingMethodInterceptor, mockBehaviorBuilder.getMockObject().getMockedClass());
-	}
+    public MockBehaviorDefiner(MockObject<T> mockObject, Scenario scenario) {
+        this.scenario = scenario;
+        mockBehaviorBuilder.registerMockObject(mockObject);
+    }
+
+
+    public T returns(Object returnValue) {
+        mockBehaviorBuilder.registerReturnValue(returnValue, false);
+        return getInvokedMethodRegistrator();
+    }
+
+
+    public T raises(Throwable exception) {
+        mockBehaviorBuilder.registerThrownException(exception, false);
+        return getInvokedMethodRegistrator();
+    }
+
+
+    public T performs(Action action) {
+        mockBehaviorBuilder.registerPerformedAction(action, false);
+        return getInvokedMethodRegistrator();
+    }
+
+
+    public T alwaysReturns(Object returnValue) {
+        mockBehaviorBuilder.registerReturnValue(returnValue, true);
+        return getInvokedMethodRegistrator();
+    }
+
+
+    public T alwaysRaises(Throwable exception) {
+        mockBehaviorBuilder.registerThrownException(exception, true);
+        return getInvokedMethodRegistrator();
+    }
+
+
+    public T alwaysPerforms(Action action) {
+        mockBehaviorBuilder.registerPerformedAction(action, true);
+        return getInvokedMethodRegistrator();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    protected T getInvokedMethodRegistrator() {
+        MethodInterceptor invokedMethodRegistratingMethodInterceptor = new MockBehaviorMethodInterceptor<T>((MockObject<T>) mockBehaviorBuilder.getMockObject(), scenario);
+        return (T) ProxyUtil.createProxy(invokedMethodRegistratingMethodInterceptor, mockBehaviorBuilder.getMockObject().getMockedClass());
+    }
 }

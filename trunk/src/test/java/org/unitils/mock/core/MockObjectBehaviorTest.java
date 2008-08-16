@@ -17,18 +17,18 @@ package org.unitils.mock.core;
 
 import static junit.framework.Assert.assertEquals;
 import static org.easymock.EasyMock.expect;
-import static org.unitils.easymock.EasyMockUnitils.replay;
-
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
+import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.mock.core.action.ExceptionThrowingAction;
-import org.unitils.mock.core.action.ValueReturningAction;
+import org.unitils.mock.action.impl.ExceptionThrowingAction;
+import org.unitils.mock.action.impl.ValueReturningAction;
+import org.unitils.mock.action.Action;
 import org.unitils.mock.util.ProxyUtil;
+
+import java.util.List;
 
 /**
  * @author Filip Neven
@@ -37,87 +37,88 @@ import org.unitils.mock.util.ProxyUtil;
  */
 public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 
-	Scenario scenario;
-	
-	TestClass testClass;
-	
-	TestInterface testInterface;
-	
-	MockObject<TestClass> testClassMock; 
-	
-	MockObject<TestInterface> testInterfaceMock;
-	
-	Action defaultAction;
-	
-	@Mock
-	InvocationMatcher invocationMatcher;
+    Scenario scenario;
 
-	
-	@Before
-	public void setup() {
-		scenario = new Scenario();
-		
-		testClassMock = new MockObject<TestClass>("testClassMock", TestClass.class, false, scenario);
-		MockObjectProxyMethodInterceptor<TestClass> testClassMethodInterceptor = new MockObjectProxyMethodInterceptor<TestClass>(testClassMock);
-		testClass = ProxyUtil.createProxy(testClassMethodInterceptor, TestClass.class);
-		
-		testInterfaceMock = new MockObject<TestInterface>("testInterfaceMock", TestInterface.class, false, scenario);
-		MockObjectProxyMethodInterceptor<TestInterface> testInterfaceMethodInterceptor = new MockObjectProxyMethodInterceptor<TestInterface>(testInterfaceMock);
-		testInterface = ProxyUtil.createProxy(testInterfaceMethodInterceptor, TestInterface.class);
-		
-		expect(invocationMatcher.matches(null)).andStubReturn(true);
-		replay();
-	}
-	
-	
-	@Test
-	public void testScenarioRecording() throws Exception {
-		testClass.doSomething("test");
-		testInterface.getSomeString();
-		
-		List<Invocation> observedInvocations = scenario.getObservedInvocations();
-		assertEquals(2, observedInvocations.size());
-		
-		// todo fix and uncomment
+    TestClass testClass;
+
+    TestInterface testInterface;
+
+    MockObject<TestClass> testClassMock;
+
+    MockObject<TestInterface> testInterfaceMock;
+
+    Action defaultAction;
+
+    @Mock
+    InvocationMatcher invocationMatcher;
+
+
+    @Before
+    public void setup() {
+        scenario = new Scenario();
+
+        testClassMock = new MockObject<TestClass>("testClassMock", TestClass.class, false);
+        MockObjectMethodInterceptor<TestClass> testClassMethodInterceptor = new MockObjectMethodInterceptor<TestClass>(testClassMock, scenario);
+        testClass = ProxyUtil.createProxy(testClassMethodInterceptor, TestClass.class);
+
+        testInterfaceMock = new MockObject<TestInterface>("testInterfaceMock", TestInterface.class, false);
+        MockObjectMethodInterceptor<TestInterface> testInterfaceMethodInterceptor = new MockObjectMethodInterceptor<TestInterface>(testInterfaceMock, scenario);
+        testInterface = ProxyUtil.createProxy(testInterfaceMethodInterceptor, TestInterface.class);
+
+        expect(invocationMatcher.matches(null)).andStubReturn(true);
+        replay();
+    }
+
+
+    @Test
+    public void testScenarioRecording() throws Exception {
+        testClass.doSomething("test");
+        testInterface.getSomeString();
+
+        List<Invocation> observedInvocations = scenario.getObservedInvocations();
+        assertEquals(2, observedInvocations.size());
+
+        // todo fix and uncomment
 //		assertLenEquals(Arrays.asList(
 //				new Invocation(null, TestClass.class.getMethod("doSomething", String.class), Arrays.asList("test"), null),
 //				new Invocation(null, TestInterface.class.getMethod("getSomeString"), Arrays.asList(), null)), 
 //				observedInvocations);
-	}
-	
-	
-	@Test
-	public void testValueReturningAction() throws Exception {
-		MockBehavior valueReturningBehavior = new MockBehavior(invocationMatcher, new ValueReturningAction("returnedValue"));
-		testInterfaceMock.registerAlwaysMatchingMockBehavior(valueReturningBehavior);
-		
-		assertEquals("returnedValue", testInterface.getSomeString());
-	}
-	
-	
-	@Test(expected = UnitilsException.class)
-	public void testExceptionThrowingAction() throws Exception {
-		UnitilsException unitilsException = new UnitilsException("test exception");
-		MockBehavior exceptionThrowingBehavior = new MockBehavior(invocationMatcher, new ExceptionThrowingAction(unitilsException));
-		testClassMock.registerAlwaysMatchingMockBehavior(exceptionThrowingBehavior);
-		
-		testClass.doSomething(null);
-	}
-	
-	
-	public static class TestClass {
-		
-		boolean doSomethingHasBeenInvoked = false;
-		
-		public void doSomething(String param) {
-			doSomethingHasBeenInvoked = true;
-		}
-		
-	}
-	
-	
-	public static interface TestInterface {
-		
-		public String getSomeString();
-	}
+    }
+
+
+    @Test
+    public void testValueReturningAction() throws Exception {
+        MockBehavior valueReturningBehavior = new MockBehavior(invocationMatcher, new ValueReturningAction("returnedValue"));
+        testInterfaceMock.registerAlwaysMatchingMockBehavior(valueReturningBehavior);
+
+        assertEquals("returnedValue", testInterface.getSomeString());
+    }
+
+
+    @Test(expected = UnitilsException.class)
+    public void testExceptionThrowingAction() throws Exception {
+        UnitilsException unitilsException = new UnitilsException("test exception");
+        MockBehavior exceptionThrowingBehavior = new MockBehavior(invocationMatcher, new ExceptionThrowingAction(unitilsException));
+        testClassMock.registerAlwaysMatchingMockBehavior(exceptionThrowingBehavior);
+
+        testClass.doSomething(null);
+    }
+
+
+    public static class TestClass {
+
+        boolean doSomethingHasBeenInvoked = false;
+
+        @SuppressWarnings({"UnusedDeclaration"})
+        public void doSomething(String param) {
+            doSomethingHasBeenInvoked = true;
+        }
+
+    }
+
+
+    public static interface TestInterface {
+
+        public String getSomeString();
+    }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.argumentmatcher;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import static org.unitils.mock.MockUnitils.notNull;
 import static org.unitils.mock.MockUnitils.refEq;
-import static org.unitils.mock.core.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.util.ReflectionUtils.getMethod;
 
