@@ -27,6 +27,8 @@ import org.unitils.mock.action.Action;
 import org.unitils.mock.action.impl.ExceptionThrowingAction;
 import org.unitils.mock.action.impl.ValueReturningAction;
 import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
+import org.unitils.mock.invocationhandler.InvocationHandler;
+import org.unitils.mock.invocationhandler.impl.MockObjectInvocationHandler;
 
 import java.util.List;
 

@@ -16,10 +16,10 @@
 package org.unitils.mock;
 
 import org.unitils.mock.action.Action;
-import org.unitils.mock.core.AlwaysMatchingMockBehaviorInvocationHandler;
-import org.unitils.mock.core.InvocationHandler;
+import org.unitils.mock.invocationhandler.impl.AlwaysMatchingMockBehaviorInvocationHandler;
+import org.unitils.mock.invocationhandler.InvocationHandler;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.OneTimeMatchingMockBehaviorInvocationHandler;
+import org.unitils.mock.invocationhandler.impl.OneTimeMatchingMockBehaviorInvocationHandler;
 import org.unitils.mock.syntax.MockBehaviorBuilder;
 import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
 

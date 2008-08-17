@@ -20,7 +20,6 @@ import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.core.Invocation;
-import org.unitils.mock.core.InvocationHandler;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.MockObjectProxy;
 
@@ -48,7 +47,7 @@ public class ProxyUtil {
      * @return The proxy object, not null
      */
     @SuppressWarnings("unchecked")
-    public static <T> T createMockObjectProxy(MockObject<T> mockObject, InvocationHandler invocationHandler) {
+    public static <T> T createMockObjectProxy(MockObject<T> mockObject, org.unitils.mock.invocationhandler.InvocationHandler invocationHandler) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(mockObject.getMockedClass());
         enhancer.setInterfaces(new Class<?>[]{MockObjectProxy.class});
@@ -106,10 +105,10 @@ public class ProxyUtil {
 
         private MockObject<T> mockObject;
 
-        private InvocationHandler invocationHandler;
+        private org.unitils.mock.invocationhandler.InvocationHandler invocationHandler;
 
 
-        public ProxyMethodInterceptor(MockObject<T> mockObject, InvocationHandler invocationHandler) {
+        public ProxyMethodInterceptor(MockObject<T> mockObject, org.unitils.mock.invocationhandler.InvocationHandler invocationHandler) {
             this.mockObject = mockObject;
             this.invocationHandler = invocationHandler;
         }
