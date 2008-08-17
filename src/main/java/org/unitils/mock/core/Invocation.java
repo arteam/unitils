@@ -29,29 +29,24 @@ public class Invocation {
 
     private MockObject<?> mockObject;
 
-    private Object object;
-
     private Method method;
 
     private List<?> arguments;
 
     private StackTraceElement invokedAt;
 
-    private MethodProxy methodProxy;
 
 
-    public Invocation(MockObject<?> mockObject, Object object, Method method, List<?> arguments, StackTraceElement invokedAt, MethodProxy methodProxy) {
+    public Invocation(MockObject<?> mockObject, Method method, List<?> arguments, StackTraceElement invokedAt) {
         this.mockObject = mockObject;
-        this.object = object;
         this.method = method;
         this.arguments = arguments;
         this.invokedAt = invokedAt;
-        this.methodProxy = methodProxy;
     }
 
 
     public Object invokeOriginalBehavior() throws Throwable {
-        return methodProxy.invokeSuper(object, arguments.toArray());
+        return null;
     }
 
 

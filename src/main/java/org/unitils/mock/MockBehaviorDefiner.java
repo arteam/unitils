@@ -15,11 +15,13 @@
  */
 package org.unitils.mock;
 
-import net.sf.cglib.proxy.MethodInterceptor;
-import org.unitils.mock.core.*;
-import org.unitils.mock.util.ProxyUtil;
-import org.unitils.mock.syntax.MockBehaviorBuilder;
 import org.unitils.mock.action.Action;
+import org.unitils.mock.core.AlwaysMatchingMockBehaviorInvocationHandler;
+import org.unitils.mock.core.InvocationHandler;
+import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.OneTimeMatchingMockBehaviorInvocationHandler;
+import org.unitils.mock.syntax.MockBehaviorBuilder;
+import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
 
 /**
  * @author Filip Neven
@@ -30,54 +32,58 @@ public class MockBehaviorDefiner<T> {
 
     private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
 
-    private Scenario scenario;
+    private MockObject<T> mockObject;
 
 
-    public MockBehaviorDefiner(MockObject<T> mockObject, Scenario scenario) {
-        this.scenario = scenario;
-        mockBehaviorBuilder.registerMockObject(mockObject);
+    public MockBehaviorDefiner(MockObject<T> mockObject) {
+        this.mockObject = mockObject;
     }
 
 
     public T returns(Object returnValue) {
-        mockBehaviorBuilder.registerReturnValue(returnValue, false);
-        return getInvokedMethodRegistrator();
+        mockBehaviorBuilder.registerReturnValue(returnValue);
+        return createOneTimeMatchingMockBehaviorProxy();
     }
 
 
     public T raises(Throwable exception) {
-        mockBehaviorBuilder.registerThrownException(exception, false);
-        return getInvokedMethodRegistrator();
+        mockBehaviorBuilder.registerThrownException(exception);
+        return createOneTimeMatchingMockBehaviorProxy();
     }
 
 
     public T performs(Action action) {
-        mockBehaviorBuilder.registerPerformedAction(action, false);
-        return getInvokedMethodRegistrator();
+        mockBehaviorBuilder.registerPerformedAction(action);
+        return createOneTimeMatchingMockBehaviorProxy();
     }
 
 
     public T alwaysReturns(Object returnValue) {
-        mockBehaviorBuilder.registerReturnValue(returnValue, true);
-        return getInvokedMethodRegistrator();
+        mockBehaviorBuilder.registerReturnValue(returnValue);
+        return createAlwaysMatchingMockBehaviorProxy();
     }
 
 
     public T alwaysRaises(Throwable exception) {
-        mockBehaviorBuilder.registerThrownException(exception, true);
-        return getInvokedMethodRegistrator();
+        mockBehaviorBuilder.registerThrownException(exception);
+        return createAlwaysMatchingMockBehaviorProxy();
     }
 
 
     public T alwaysPerforms(Action action) {
-        mockBehaviorBuilder.registerPerformedAction(action, true);
-        return getInvokedMethodRegistrator();
+        mockBehaviorBuilder.registerPerformedAction(action);
+        return createAlwaysMatchingMockBehaviorProxy();
     }
 
 
-    @SuppressWarnings("unchecked")
-    protected T getInvokedMethodRegistrator() {
-        MethodInterceptor invokedMethodRegistratingMethodInterceptor = new MockBehaviorMethodInterceptor<T>((MockObject<T>) mockBehaviorBuilder.getMockObject(), scenario);
-        return (T) ProxyUtil.createProxy(invokedMethodRegistratingMethodInterceptor, mockBehaviorBuilder.getMockObject().getMockedClass());
+    protected T createOneTimeMatchingMockBehaviorProxy() {
+        InvocationHandler invocationHandler = new OneTimeMatchingMockBehaviorInvocationHandler<T>(mockObject);
+        return createMockObjectProxy(mockObject, invocationHandler);
+    }
+
+
+    protected T createAlwaysMatchingMockBehaviorProxy() {
+        InvocationHandler invocationHandler = new AlwaysMatchingMockBehaviorInvocationHandler<T>(mockObject);
+        return createMockObjectProxy(mockObject, invocationHandler);
     }
 }

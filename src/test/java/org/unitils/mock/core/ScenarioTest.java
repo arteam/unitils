@@ -46,7 +46,7 @@ public class ScenarioTest extends UnitilsJUnit4 {
 
     @Test
     public void testAssertInvoked() {
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
         scenario.assertInvoked(doSomethingInvocationMatcher);
         try {
             scenario.assertInvoked(doSomethingWithParamInvocationMatcher);
@@ -64,7 +64,7 @@ public class ScenarioTest extends UnitilsJUnit4 {
 
     @Test
     public void testAssertNotInvoked() {
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
         scenario.assertNotInvoked(doSomethingWithParamInvocationMatcher);
         try {
             scenario.assertNotInvoked(doSomethingInvocationMatcher);
@@ -79,8 +79,8 @@ public class ScenarioTest extends UnitilsJUnit4 {
     @Test
     public void testAssertNoMoreInvocations() {
         scenario = new Scenario();
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
         scenario.assertInvoked(doSomethingInvocationMatcher);
         try {
             scenario.assertNoMoreInvocations();
@@ -92,7 +92,7 @@ public class ScenarioTest extends UnitilsJUnit4 {
         scenario.assertInvoked(doSomethingInvocationMatcher);
         scenario.assertNoMoreInvocations();
 
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
         scenario.assertInvoked(doSomethingInvocationMatcher);
         scenario.assertNoMoreInvocations();
     }

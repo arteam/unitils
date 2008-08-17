@@ -18,11 +18,11 @@ package org.unitils.mock.report;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.mock.core.Invocation;
+import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
 import static org.unitils.mock.util.ProxyUtil.getProxiedMethodStackTraceElement;
-import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Invocation;
 
 import java.lang.reflect.Method;
 import static java.util.Collections.emptyList;
@@ -46,10 +46,10 @@ public class DefaultReportTest extends UnitilsJUnit4 {
 
     @Test
     public void testDefaultReport() {
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomethingElse, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomethingElse, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
-        scenario.addObservedInvocation(new Invocation(mockObject, null, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace()), null));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomethingElse, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomethingElse, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
+        scenario.addObservedInvocation(new Invocation(mockObject, testMethodDoSomething, emptyList(), getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace())));
         report.createReport("", null, scenario);
     }
 

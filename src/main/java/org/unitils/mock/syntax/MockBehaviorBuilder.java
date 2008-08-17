@@ -15,93 +15,65 @@
  */
 package org.unitils.mock.syntax;
 
+import org.unitils.mock.action.Action;
 import org.unitils.mock.action.impl.ExceptionThrowingAction;
 import org.unitils.mock.action.impl.ValueReturningAction;
-import org.unitils.mock.action.Action;
-import org.unitils.mock.core.*;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.Invocation;
+import org.unitils.mock.core.InvocationMatcher;
+import org.unitils.mock.core.MockBehavior;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
- *
  */
 public class MockBehaviorBuilder {
 
-	private MockObject<?> mockObject;
-	
-	private Action action;
-	
-	private Boolean matchAlways;
-	
-	private InvocationMatcherBuilder invocationMatcherBuilder = InvocationMatcherBuilder.getInstance();
-	
-	private static MockBehaviorBuilder instance;
-	
-	public static MockBehaviorBuilder getInstance() {
-		if (instance == null) {
-			instance = new MockBehaviorBuilder();
-		}
-		return instance;
-	}
-	
-	
-	private MockBehaviorBuilder() {
-	}
-	
-	
-	public <T> void registerMockObject(MockObject<T> mockObject) {
-		this.mockObject = mockObject;
-	}
-	
-	
-	public MockObject<?> getMockObject() {
-		return mockObject;
-	}
-	
+    private Action action;
 
-	public void registerReturnValue(Object returnValue, Boolean matchAlways) {
-		registerPerformedAction(new ValueReturningAction(returnValue), matchAlways);
-	}
-	
-	
-	public void registerThrownException(Throwable exception, boolean matchAlways) {
-		registerPerformedAction(new ExceptionThrowingAction(exception), matchAlways);
-	}
-	
-	
-	public void registerPerformedAction(Action action, boolean matchAlways) {
-		this.action = action;
-		this.matchAlways = matchAlways;
-	}
-	
-	
-	public void registerArgumentMatcher(ArgumentMatcher argumentMatcher) {
-		invocationMatcherBuilder.registerArgumentMatcher(argumentMatcher);
-	}
+    private InvocationMatcherBuilder invocationMatcherBuilder = InvocationMatcherBuilder.getInstance();
+
+    private static MockBehaviorBuilder instance;
+
+    public static MockBehaviorBuilder getInstance() {
+        if (instance == null) {
+            instance = new MockBehaviorBuilder();
+        }
+        return instance;
+    }
 
 
-	public void registerInvokedMethod(Invocation invocation) {
-		invocationMatcherBuilder.registerInvokedMethod(invocation);
-		// TODO create list of argument matchers
-		InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher();
-		MockBehavior mockBehavior = new MockBehavior(invocationMatcher, action);
-		if (matchAlways) {
-			mockObject.registerAlwaysMatchingMockBehavior(mockBehavior);
-		} else {
-			mockObject.registerOneTimeMatchingMockBehavior(mockBehavior);
-		}
-		reset();
-	}
+    private MockBehaviorBuilder() {
+    }
 
 
-	protected void reset() {
-		mockObject = null;
-		action = null;
-		matchAlways = null;
-		invocationMatcherBuilder.reset();
-	}
+    public void registerReturnValue(Object returnValue) {
+        registerPerformedAction(new ValueReturningAction(returnValue));
+    }
+
+
+    public void registerThrownException(Throwable exception) {
+        registerPerformedAction(new ExceptionThrowingAction(exception));
+    }
+
+
+    public void registerPerformedAction(Action action) {
+        this.action = action;
+    }
+
+
+    public void registerArgumentMatcher(ArgumentMatcher argumentMatcher) {
+        invocationMatcherBuilder.registerArgumentMatcher(argumentMatcher);
+    }
+
+
+    public MockBehavior createMockBehavior(Invocation invocation) {
+        InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher(invocation);
+        MockBehavior mockBehavior = new MockBehavior(invocationMatcher, action);
+        action = null;
+        return mockBehavior;
+    }
 
 
 }

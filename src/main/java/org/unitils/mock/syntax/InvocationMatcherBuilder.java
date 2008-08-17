@@ -15,12 +15,12 @@
  */
 package org.unitils.mock.syntax;
 
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
-import org.unitils.mock.core.Invocation;
-import org.unitils.mock.core.InvocationMatcher;
 import org.unitils.mock.argumentmatcher.impl.EqualsArgumentMatcher;
 import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.core.Invocation;
+import org.unitils.mock.core.InvocationMatcher;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
 
 import java.lang.reflect.Method;
@@ -35,9 +35,8 @@ import java.util.List;
  */
 public class InvocationMatcherBuilder {
 
-    private List<ArgumentMatcher> argumentMatchers, registeredArgumentMatchers;
+    private List<ArgumentMatcher> registeredArgumentMatchers = new ArrayList<ArgumentMatcher>();
 
-    private Invocation invocation;
 
     private static InvocationMatcherBuilder instance;
 
@@ -49,15 +48,21 @@ public class InvocationMatcherBuilder {
     }
 
 
-    private InvocationMatcherBuilder() {
-        reset();
+    public void registerArgumentMatcher(ArgumentMatcher argumentMatcher) {
+        registeredArgumentMatchers.add(argumentMatcher);
     }
 
 
-    public void registerInvokedMethod(Invocation invocation) {
-        this.invocation = invocation;
+    public InvocationMatcher createInvocationMatcher(Invocation invocation) {
+        List<ArgumentMatcher> argumentMatchers = createArgumentMatchers(invocation);
+        InvocationMatcher invocationMatcher = new InvocationMatcher(invocation.getMethod(), argumentMatchers);
+        registeredArgumentMatchers = new ArrayList<ArgumentMatcher>();
+        return invocationMatcher;
+    }
 
-        argumentMatchers = new ArrayList<ArgumentMatcher>();
+
+    protected List<ArgumentMatcher> createArgumentMatchers(Invocation invocation) {
+        List<ArgumentMatcher> argumentMatchers = new ArrayList<ArgumentMatcher>();
         Class<?> testClass = getClassWithName(invocation.getInvokedAt().getClassName());
         String testMethodName = invocation.getInvokedAt().getMethodName();
         Method method = invocation.getMethod();
@@ -71,28 +76,15 @@ public class InvocationMatcherBuilder {
             } else {
                 Object argument = invocation.getArguments().get(argumentIndex);
                 if (argument instanceof Number) {
+                    // todo why not lenEq??
                     argumentMatchers.add(new EqualsArgumentMatcher(argument));
                 } else {
                     argumentMatchers.add(new LenEqArgumentMatcher(argument));
                 }
             }
         }
+        return argumentMatchers;
     }
 
-
-    public void registerArgumentMatcher(ArgumentMatcher argumentMatcher) {
-        registeredArgumentMatchers.add(argumentMatcher);
-    }
-
-
-    public InvocationMatcher createInvocationMatcher() {
-        return new InvocationMatcher(invocation.getMethod(), argumentMatchers);
-    }
-
-
-    public void reset() {
-        this.registeredArgumentMatchers = new ArrayList<ArgumentMatcher>();
-        this.invocation = null;
-    }
 
 }
