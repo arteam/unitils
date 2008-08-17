@@ -21,8 +21,11 @@ import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.impl.*;
 import org.unitils.mock.core.*;
 import org.unitils.mock.syntax.InvocationMatcherBuilder;
-import org.unitils.mock.util.ProxyUtil;
 import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
+import org.unitils.mock.invocationhandler.InvocationHandler;
+import org.unitils.mock.invocationhandler.impl.AssertInvokedInvocationHandler;
+import org.unitils.mock.invocationhandler.impl.AssertNotInvokedInvocationHandler;
+import org.unitils.mock.invocationhandler.impl.MockObjectInvocationHandler;
 
 /**
  * @author Filip Neven

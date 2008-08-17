@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.invocationhandler.impl;
 
-import org.unitils.mock.syntax.InvocationMatcherBuilder;
+import org.unitils.mock.syntax.MockBehaviorBuilder;
+import org.unitils.mock.invocationhandler.InvocationHandler;
+import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.Invocation;
+import org.unitils.mock.core.MockBehavior;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class AssertInvokedInvocationHandler implements InvocationHandler {
+public class OneTimeMatchingMockBehaviorInvocationHandler<T> implements InvocationHandler {
 
-    private Scenario scenario;
+    private MockObject<T> mockObject;
 
 
-    public AssertInvokedInvocationHandler(Scenario scenario) {
-        this.scenario = scenario;
+    public OneTimeMatchingMockBehaviorInvocationHandler(MockObject<T> mockObject) {
+        this.mockObject = mockObject;
     }
 
 
     public Object handleInvocation(Invocation invocation) throws Throwable {
-        InvocationMatcher invocationMatcher = InvocationMatcherBuilder.getInstance().createInvocationMatcher(invocation);
-        scenario.assertInvoked(invocationMatcher);
+        MockBehavior mockBehavior = MockBehaviorBuilder.getInstance().createMockBehavior(invocation);
+        mockObject.registerOneTimeMatchingMockBehavior(mockBehavior);
         return null;
     }
 
