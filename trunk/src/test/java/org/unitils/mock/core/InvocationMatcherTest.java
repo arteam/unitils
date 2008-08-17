@@ -71,21 +71,21 @@ public class InvocationMatcherTest extends UnitilsJUnit4 {
 
     @Test
     public void testInvocationMatcherWithDifferentMethod() {
-        assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, null, invocationMatcherTesterMethodOnInt, noArguments, null, null)));
+        assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnInt, noArguments, null)));
     }
 
     @Test
     public void testInvocationMatcherWithDifferentNumberOfParams() {
-        assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, null, invocationMatcherTesterMethodOnNothing, intArgument, null, null)));
-        assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, null, invocationMatcherTesterMethodOnNothing, twoObjectArguments, null, null)));
+        assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, intArgument, null)));
+        assertFalse(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, twoObjectArguments, null)));
     }
 
     @Test
     public void testInvocationMatcherWithCorrectParams() {
-        assertTrue(invocationMatcherOnNothing.matches(new Invocation(null, null, invocationMatcherTesterMethodOnNothing, noArguments, null, null)));
-        assertTrue(invocationMatcherOnInt.matches(new Invocation(null, null, invocationMatcherTesterMethodOnInt, objectArgument, null, null)));
-        assertTrue(invocationMatcherOnObject.matches(new Invocation(null, null, invocationMatcherTesterMethodOnObject, objectArgument, null, null)));
-        assertTrue(invocationMatcherOnTwoObjects.matches(new Invocation(null, null, invocationMatcherTesterMethodOnTwoObjects, twoObjectArguments, null, null)));
+        assertTrue(invocationMatcherOnNothing.matches(new Invocation(null, invocationMatcherTesterMethodOnNothing, noArguments, null)));
+        assertTrue(invocationMatcherOnInt.matches(new Invocation(null, invocationMatcherTesterMethodOnInt, objectArgument, null)));
+        assertTrue(invocationMatcherOnObject.matches(new Invocation(null, invocationMatcherTesterMethodOnObject, objectArgument, null)));
+        assertTrue(invocationMatcherOnTwoObjects.matches(new Invocation(null, invocationMatcherTesterMethodOnTwoObjects, twoObjectArguments, null)));
     }
 
     @SuppressWarnings({"UnusedDeclaration"})

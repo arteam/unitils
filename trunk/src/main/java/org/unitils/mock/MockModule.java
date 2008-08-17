@@ -24,13 +24,14 @@ import org.unitils.easymock.EasyMockModule;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.annotation.Mock;
 import org.unitils.mock.annotation.PartialMock;
+import org.unitils.mock.core.InvocationHandler;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.MockObjectProxy;
-import org.unitils.mock.core.MockObjectMethodInterceptor;
+import org.unitils.mock.core.MockObjectInvocationHandler;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
 import org.unitils.mock.util.ProxyUtil;
+import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
@@ -118,8 +119,8 @@ public class MockModule implements Module {
     protected <T> T createMock(String name, Class<T> mockType, boolean invokeOriginalMethodIfNoBehavior) {
         MockObject<T> mockObject = new MockObject<T>(name, mockType, invokeOriginalMethodIfNoBehavior);
 
-        MockObjectMethodInterceptor<T> mockObjectProxyMethodInterceptor = new MockObjectMethodInterceptor<T>(mockObject, getScenario());
-        return ProxyUtil.createProxy(mockObjectProxyMethodInterceptor, mockType, MockObjectProxy.class);
+        InvocationHandler invocationHandler = new MockObjectInvocationHandler<T>(mockObject, getScenario());
+        return createMockObjectProxy(mockObject, invocationHandler);
     }
 
 

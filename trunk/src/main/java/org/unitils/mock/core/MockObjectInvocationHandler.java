@@ -15,26 +15,26 @@
  */
 package org.unitils.mock.core;
 
-import org.unitils.mock.syntax.MockBehaviorBuilder;
-
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockBehaviorMethodInterceptor<T> extends BaseMethodInterceptor<T> {
+public class MockObjectInvocationHandler<T> implements InvocationHandler {
 
-    private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
+    private MockObject<T> mockObject;
+
+    private Scenario scenario;
 
 
-    public MockBehaviorMethodInterceptor(MockObject<T> mockObject, Scenario scenario) {
-        super(mockObject, scenario);
+    public MockObjectInvocationHandler(MockObject<T> mockObject, Scenario scenario) {
+        this.mockObject = mockObject;
+        this.scenario = scenario;
     }
 
 
     public Object handleInvocation(Invocation invocation) throws Throwable {
-        mockBehaviorBuilder.registerInvokedMethod(invocation);
-        return null;
+        scenario.addObservedInvocation(invocation);
+        return mockObject.executeMatchingBehavior(invocation);
     }
-
 }

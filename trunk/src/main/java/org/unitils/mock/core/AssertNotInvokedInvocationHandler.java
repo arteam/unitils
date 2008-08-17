@@ -22,30 +22,19 @@ import org.unitils.mock.syntax.InvocationMatcherBuilder;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class AssertInvokedMethodInterceptor<T> extends BaseMethodInterceptor<T> {
+public class AssertNotInvokedInvocationHandler implements InvocationHandler {
 
-    private InvocationMatcherBuilder invocationMatcherBuilder = InvocationMatcherBuilder.getInstance();
-
-    private boolean checkIfInvoked;
+    private Scenario scenario;
 
 
-    public AssertInvokedMethodInterceptor(Scenario scenario, MockObject<T> mockObject, boolean checkIfInvoked) {
-        super(mockObject, scenario);
-        this.checkIfInvoked = checkIfInvoked;
+    public AssertNotInvokedInvocationHandler(Scenario scenario) {
+        this.scenario = scenario;
     }
 
 
     public Object handleInvocation(Invocation invocation) throws Throwable {
-        invocationMatcherBuilder.registerInvokedMethod(invocation);
-        InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher();
-        invocationMatcherBuilder.reset();
-
-        Scenario scenario = getScenario();
-        if (checkIfInvoked) {
-            scenario.assertInvoked(invocationMatcher);
-        } else {
-            scenario.assertNotInvoked(invocationMatcher);
-        }
+        InvocationMatcher invocationMatcher = InvocationMatcherBuilder.getInstance().createInvocationMatcher(invocation);
+        scenario.assertNotInvoked(invocationMatcher);
         return null;
     }
 

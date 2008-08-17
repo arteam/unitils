@@ -42,7 +42,6 @@ public class BehaviorDefinitionTest {
     @Before
     public void setup() {
         testClassMock = createMock("testClassMock", TestClass.class, new Scenario());
-        MockBehaviorBuilder.getInstance().reset();
     }
 
     @Test
