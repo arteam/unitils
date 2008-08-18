@@ -19,11 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.MockBehaviorDefiner;
-import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.impl.*;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
-import org.unitils.mock.core.InvocationMatcherBuilder;
 import org.unitils.mock.util.MethodFormatUtil;
 import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
 
@@ -112,7 +110,6 @@ public class MockDirector {
     }
 
 
-    @ArgumentMatcher
     @SuppressWarnings({"UnusedDeclaration"})
     public <T> T notNull(Class<T> argumentClass) {
         invocationMatcherBuilder.registerArgumentMatcher(new NotNullArgumentMatcher());
@@ -120,7 +117,6 @@ public class MockDirector {
     }
 
 
-    @ArgumentMatcher
     @SuppressWarnings({"UnusedDeclaration"})
     public <T> T isNull(Class<T> argumentClass) {
         invocationMatcherBuilder.registerArgumentMatcher(new NullArgumentMatcher());
@@ -128,28 +124,24 @@ public class MockDirector {
     }
 
 
-    @ArgumentMatcher
     public <T> T same(T sameAs) {
         invocationMatcherBuilder.registerArgumentMatcher(new SameArgumentMatcher(sameAs));
         return null;
     }
 
 
-    @ArgumentMatcher
     public <T> T eq(T equalTo) {
         invocationMatcherBuilder.registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
         return null;
     }
 
 
-    @ArgumentMatcher
     public <T> T refEq(T equalTo) {
         invocationMatcherBuilder.registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
         return null;
     }
 
 
-    @ArgumentMatcher
     public <T> T lenEq(T equalTo) {
         invocationMatcherBuilder.registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
         return null;
