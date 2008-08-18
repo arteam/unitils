@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.action.impl;
+package org.unitils.mock.mockbehavior.impl;
 
-import org.unitils.mock.action.Action;
+import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.core.Invocation;
 
 /**
@@ -24,12 +24,12 @@ import org.unitils.mock.core.Invocation;
  * @author Kenny Claes
  *
  */
-public class ValueReturningAction implements Action {
+public class ValueReturningMockBehavior implements MockBehavior {
 
 	private Object valueToReturn;
 	
 	
-	public ValueReturningAction(Object valueToReturn) {
+	public ValueReturningMockBehavior(Object valueToReturn) {
 		super();
 		this.valueToReturn = valueToReturn;
 	}

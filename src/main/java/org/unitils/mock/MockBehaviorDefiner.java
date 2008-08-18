@@ -15,12 +15,14 @@
  */
 package org.unitils.mock;
 
-import org.unitils.mock.action.Action;
-import org.unitils.mock.invocationhandler.impl.AlwaysMatchingMockBehaviorInvocationHandler;
-import org.unitils.mock.invocationhandler.InvocationHandler;
+import org.unitils.mock.core.Invocation;
+import org.unitils.mock.core.InvocationMatcher;
 import org.unitils.mock.core.MockObject;
-import org.unitils.mock.invocationhandler.impl.OneTimeMatchingMockBehaviorInvocationHandler;
-import org.unitils.mock.syntax.MockBehaviorBuilder;
+import org.unitils.mock.core.InvocationHandler;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
+import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
+import org.unitils.mock.syntax.InvocationMatcherBuilder;
 import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
 
 /**
@@ -30,60 +32,85 @@ import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
  */
 public class MockBehaviorDefiner<T> {
 
-    private MockBehaviorBuilder mockBehaviorBuilder = MockBehaviorBuilder.getInstance();
 
     private MockObject<T> mockObject;
 
+    private InvocationMatcherBuilder invocationMatcherBuilder;
 
-    public MockBehaviorDefiner(MockObject<T> mockObject) {
+
+    public MockBehaviorDefiner(MockObject<T> mockObject, InvocationMatcherBuilder invocationMatcherBuilder) {
         this.mockObject = mockObject;
+        this.invocationMatcherBuilder = invocationMatcherBuilder;
     }
 
 
     public T returns(Object returnValue) {
-        mockBehaviorBuilder.registerReturnValue(returnValue);
-        return createOneTimeMatchingMockBehaviorProxy();
+        MockBehavior mockBehavior = new ValueReturningMockBehavior(returnValue);
+        return createOneTimeMatchingMockBehaviorProxy(mockBehavior);
     }
 
 
     public T raises(Throwable exception) {
-        mockBehaviorBuilder.registerThrownException(exception);
-        return createOneTimeMatchingMockBehaviorProxy();
+        MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
+        return createOneTimeMatchingMockBehaviorProxy(mockBehavior);
     }
 
 
-    public T performs(Action action) {
-        mockBehaviorBuilder.registerPerformedAction(action);
-        return createOneTimeMatchingMockBehaviorProxy();
+    public T performs(MockBehavior mockBehavior) {
+        return createOneTimeMatchingMockBehaviorProxy(mockBehavior);
     }
 
 
     public T alwaysReturns(Object returnValue) {
-        mockBehaviorBuilder.registerReturnValue(returnValue);
-        return createAlwaysMatchingMockBehaviorProxy();
+        MockBehavior mockBehavior = new ValueReturningMockBehavior(returnValue);
+        return createAlwaysMatchingMockBehaviorProxy(mockBehavior);
     }
 
 
     public T alwaysRaises(Throwable exception) {
-        mockBehaviorBuilder.registerThrownException(exception);
-        return createAlwaysMatchingMockBehaviorProxy();
+        MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
+        return createAlwaysMatchingMockBehaviorProxy(mockBehavior);
     }
 
 
-    public T alwaysPerforms(Action action) {
-        mockBehaviorBuilder.registerPerformedAction(action);
-        return createAlwaysMatchingMockBehaviorProxy();
+    public T alwaysPerforms(MockBehavior mockBehavior) {
+        return createAlwaysMatchingMockBehaviorProxy(mockBehavior);
     }
 
 
-    protected T createOneTimeMatchingMockBehaviorProxy() {
-        InvocationHandler invocationHandler = new OneTimeMatchingMockBehaviorInvocationHandler<T>(mockObject);
-        return createMockObjectProxy(mockObject, invocationHandler);
+    protected T createOneTimeMatchingMockBehaviorProxy(MockBehavior mockBehavior) {
+        return createMockObjectProxy(mockObject, new MockBehaviorInvocationHandler(mockBehavior, false));
     }
 
 
-    protected T createAlwaysMatchingMockBehaviorProxy() {
-        InvocationHandler invocationHandler = new AlwaysMatchingMockBehaviorInvocationHandler<T>(mockObject);
-        return createMockObjectProxy(mockObject, invocationHandler);
+    protected T createAlwaysMatchingMockBehaviorProxy(MockBehavior mockBehavior) {
+        return createMockObjectProxy(mockObject, new MockBehaviorInvocationHandler(mockBehavior, true));
     }
+
+
+    protected class MockBehaviorInvocationHandler implements InvocationHandler {
+
+        private MockBehavior mockBehavior;
+
+        private boolean alwaysMatching;
+
+
+        public MockBehaviorInvocationHandler(MockBehavior mockBehavior, boolean alwaysMatching) {
+            this.mockBehavior = mockBehavior;
+            this.alwaysMatching = alwaysMatching;
+        }
+
+        public Object handleInvocation(Invocation invocation) throws Throwable {
+            InvocationMatcher invocationMatcher = invocationMatcherBuilder.createInvocationMatcher(invocation);
+
+            if (alwaysMatching) {
+                mockObject.registerAlwaysMatchingMockBehavior(invocationMatcher, mockBehavior);
+            } else {
+                mockObject.registerOneTimeMatchingMockBehavior(invocationMatcher, mockBehavior);
+            }
+            return null;
+        }
+    }
+
+
 }
