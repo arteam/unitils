@@ -24,7 +24,7 @@ import org.unitils.mock.annotation.Mock;
 import org.unitils.mock.annotation.PartialMock;
 import org.unitils.mock.core.MockDirector;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.syntax.InvocationMatcherBuilder;
+import org.unitils.mock.core.InvocationMatcherBuilder;
 import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.invokeMethod;
