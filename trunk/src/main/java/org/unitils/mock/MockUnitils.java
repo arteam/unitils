@@ -16,16 +16,9 @@
 package org.unitils.mock;
 
 import org.unitils.core.Unitils;
-import org.unitils.core.UnitilsException;
 import org.unitils.mock.annotation.ArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.*;
-import org.unitils.mock.core.*;
-import org.unitils.mock.syntax.InvocationMatcherBuilder;
-import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
-import org.unitils.mock.invocationhandler.InvocationHandler;
-import org.unitils.mock.invocationhandler.impl.AssertInvokedInvocationHandler;
-import org.unitils.mock.invocationhandler.impl.AssertNotInvokedInvocationHandler;
-import org.unitils.mock.invocationhandler.impl.MockObjectInvocationHandler;
+import org.unitils.mock.core.MockDirector;
+import org.unitils.mock.core.Scenario;
 
 /**
  * @author Filip Neven
@@ -34,43 +27,24 @@ import org.unitils.mock.invocationhandler.impl.MockObjectInvocationHandler;
  */
 public class MockUnitils {
 
-    private static InvocationMatcherBuilder invocationMatcherBuilder = InvocationMatcherBuilder.getInstance();
 
-
-    @SuppressWarnings("unchecked")
     public static <T> MockBehaviorDefiner<T> mock(T mock) {
-        if (!MockObjectProxy.class.isAssignableFrom(mock.getClass())) {
-            throw new UnitilsException(mock + " is not a mock object");
-        }
-        MockObject<T> mockObject = ((MockObjectProxy<T>) mock).$_$_getMockObject();
-        return new MockBehaviorDefiner<T>(mockObject);
+        return getMockDirector().mock(mock);
     }
 
 
     public static <T> T assertInvoked(T mock) {
-        MockObject<T> mockObject = getMockObjectFromProxy(mock);
-        InvocationHandler invocationHandler = new AssertInvokedInvocationHandler(getScenario());
-        return createMockObjectProxy(mockObject, invocationHandler);
+        return getMockDirector().assertInvoked(mock);
     }
 
 
     public static <T> T assertNotInvoked(T mock) {
-        MockObject<T> mockObject = getMockObjectFromProxy(mock);
-        InvocationHandler invocationHandler = new AssertNotInvokedInvocationHandler(getScenario());
-        return createMockObjectProxy(mockObject, invocationHandler);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> MockObject<T> getMockObjectFromProxy(T proxy) {
-        if (!MockObjectProxy.class.isAssignableFrom(proxy.getClass())) {
-            throw new UnitilsException(proxy + " is not a mock object");
-        }
-        return ((MockObjectProxy<T>) proxy).$_$_getMockObject();
+        return getMockDirector().assertNotInvoked(mock);
     }
 
 
     public static void assertNoMoreInvocations() {
-        getScenario().assertNoMoreInvocations();
+        getMockDirector().assertNoMoreInvocations();
     }
 
 
@@ -79,11 +53,10 @@ public class MockUnitils {
      *
      * @param name     A name for the mock, not null
      * @param mockType The type of the mock, not null
-     * @param scenario The scenario to associate the mock to, not null
      * @return A mock for the given class or interface, not null
      */
-    public static <T> T createMock(String name, Class<T> mockType, Scenario scenario) {
-        return createMock(name, mockType, false, scenario);
+    public static <T> T createMock(String name, Class<T> mockType) {
+        return getMockDirector().createMock(name, mockType);
     }
 
 
@@ -92,72 +65,55 @@ public class MockUnitils {
      *
      * @param name     A name for the mock, not null
      * @param mockType The type of the mock, not null
-     * @param scenario The scenario to associate the mock to, not null
      * @return A mock for the given class or interface, not null
      */
-    public static <T> T createPartialMock(String name, Class<T> mockType, Scenario scenario) {
-        return createMock(name, mockType, true, scenario);
-    }
-
-
-    private static <T> T createMock(String name, Class<T> mockType, boolean invokeOriginalMethodIfNoBehavior, Scenario scenario) {
-        MockObject<T> mockObject = new MockObject<T>(name, mockType, invokeOriginalMethodIfNoBehavior);
-
-        InvocationHandler invocationHandler = new MockObjectInvocationHandler<T>(mockObject, scenario);
-        return createMockObjectProxy(mockObject, invocationHandler);
+    public static <T> T createPartialMock(String name, Class<T> mockType) {
+        return getMockDirector().createPartialMock(name, mockType);
     }
 
 
     @ArgumentMatcher
-    @SuppressWarnings({"UnusedDeclaration"})
     public static <T> T notNull(Class<T> argumentClass) {
-        invocationMatcherBuilder.registerArgumentMatcher(new NotNullArgumentMatcher());
-        return null;
+        return getMockDirector().notNull(argumentClass);
     }
 
 
     @ArgumentMatcher
-    @SuppressWarnings({"UnusedDeclaration"})
     public static <T> T isNull(Class<T> argumentClass) {
-        invocationMatcherBuilder.registerArgumentMatcher(new NullArgumentMatcher());
-        return null;
+        return getMockDirector().isNull(argumentClass);
     }
 
 
     @ArgumentMatcher
     public static <T> T same(T sameAs) {
-        invocationMatcherBuilder.registerArgumentMatcher(new SameArgumentMatcher(sameAs));
-        return null;
+        return getMockDirector().same(sameAs);
     }
 
 
     @ArgumentMatcher
     public static <T> T eq(T equalTo) {
-        invocationMatcherBuilder.registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
-        return null;
+        return getMockDirector().eq(equalTo);
     }
 
 
     @ArgumentMatcher
     public static <T> T refEq(T equalTo) {
-        invocationMatcherBuilder.registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
-        return null;
+        return getMockDirector().refEq(equalTo);
     }
 
 
     @ArgumentMatcher
     public static <T> T lenEq(T equalTo) {
-        invocationMatcherBuilder.registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
-        return null;
+        return getMockDirector().lenEq(equalTo);
     }
 
 
-    protected static Scenario getScenario() {
-        return getMockModule().getScenario();
+    protected static MockDirector getMockDirector() {
+        return getMockModule().getMockDirector();
     }
 
 
-    private static MockModule getMockModule() {
+    protected static MockModule getMockModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(MockModule.class);
     }
 }

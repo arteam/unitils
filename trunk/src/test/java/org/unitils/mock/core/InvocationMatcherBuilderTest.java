@@ -18,8 +18,8 @@ package org.unitils.mock.core;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.MockUnitils;
-import org.unitils.mock.syntax.InvocationMatcherBuilder;
 import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
+import org.unitils.mock.syntax.InvocationMatcherBuilder;
 
 /**
  * @author Filip Neven
@@ -28,28 +28,28 @@ import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
  */
 public class InvocationMatcherBuilderTest {
 
-	InvocationMatcherBuilder invocationMatcherBuilder = InvocationMatcherBuilder.getInstance();
-	
-	TestClass testClass = new TestClass();
-	
-	@Before
-	public void setup() {
-	}
-	
-	@Test
-	public void testArgumentMatchers() {
-		invocationMatcherBuilder.registerArgumentMatcher(new NotNullArgumentMatcher());
-		//Invocation invocation = new Invocation(testClass, )
-	}
-	
-	static class TestClass {
-	
-		public void testMethod() {
-			doSomething(null, MockUnitils.notNull(String.class));
-		}
-		
-		public void doSomething(String arg1, String arg2) {
-			
-		}
-	}
+    InvocationMatcherBuilder invocationMatcherBuilder = new InvocationMatcherBuilder();
+
+    TestClass testClass = new TestClass();
+
+    @Before
+    public void setup() {
+    }
+
+    @Test
+    public void testArgumentMatchers() {
+        invocationMatcherBuilder.registerArgumentMatcher(new NotNullArgumentMatcher());
+        //Invocation invocation = new Invocation(testClass, )
+    }
+
+    static class TestClass {
+
+        public void testMethod() {
+            doSomething(null, MockUnitils.notNull(String.class));
+        }
+
+        public void doSomething(String arg1, String arg2) {
+
+        }
+    }
 }

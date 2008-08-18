@@ -38,16 +38,6 @@ public class InvocationMatcherBuilder {
     private List<ArgumentMatcher> registeredArgumentMatchers = new ArrayList<ArgumentMatcher>();
 
 
-    private static InvocationMatcherBuilder instance;
-
-    public static InvocationMatcherBuilder getInstance() {
-        if (instance == null) {
-            instance = new InvocationMatcherBuilder();
-        }
-        return instance;
-    }
-
-
     public void registerArgumentMatcher(ArgumentMatcher argumentMatcher) {
         registeredArgumentMatchers.add(argumentMatcher);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2006-2007,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.action;
+package org.unitils.mock.core;
 
 import org.unitils.mock.core.Invocation;
 
-
 /**
- * @author Filip Neven
- * @author Tim Ducheyne
- * @author Kenny Claes
  */
-public interface Action {
+public interface InvocationHandler {
 
-    Object execute(Invocation invocation) throws Throwable;
+    Object handleInvocation(Invocation invocation) throws Throwable;
 }

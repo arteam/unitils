@@ -15,8 +15,6 @@
  */
 package org.unitils.mock.core;
 
-import net.sf.cglib.proxy.MethodProxy;
-
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -36,7 +34,6 @@ public class Invocation {
     private StackTraceElement invokedAt;
 
 
-
     public Invocation(MockObject<?> mockObject, Method method, List<?> arguments, StackTraceElement invokedAt) {
         this.mockObject = mockObject;
         this.method = method;
@@ -46,6 +43,7 @@ public class Invocation {
 
 
     public Object invokeOriginalBehavior() throws Throwable {
+        // todo make abstract or throw exception
         return null;
     }
 

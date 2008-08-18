@@ -15,9 +15,6 @@
  */
 package org.unitils.mock.core;
 
-import org.unitils.mock.util.MethodFormatUtil;
-
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +30,7 @@ public class Scenario {
      * Insertion ordered map that keeps track of the registered invocations and whether or not they have already been checked for invocation with the various assertX() methods in this class.
      */
     protected List<Invocation> observedInvocations = new ArrayList<Invocation>();
+
     protected List<Invocation> unverifiedInvocations = new ArrayList<Invocation>();
 
 
@@ -51,78 +49,16 @@ public class Scenario {
     }
 
 
-    public void assertInvoked(InvocationMatcher invocationMatcher) {
+    public Invocation verifyMatchingInvocation(InvocationMatcher invocationMatcher) {
         Iterator<Invocation> iterator = unverifiedInvocations.iterator();
         while (iterator.hasNext()) {
             Invocation invocation = iterator.next();
             if (invocationMatcher.matches(invocation)) {
                 iterator.remove();
-                return;
-            }
-        }
-        throw new AssertionError(getAssertInvokedErrorMessage(findMatchingMethodName(invocationMatcher.getMethod()), invocationMatcher));
-    }
-
-
-    public void assertNotInvoked(InvocationMatcher invocationMatcher) {
-        for (Invocation invocation : unverifiedInvocations) {
-            if (invocationMatcher.matches(invocation)) {
-                throw new AssertionError(getAssertNotInvokedErrorMessage(invocation, invocationMatcher));
-            }
-        }
-    }
-
-    public void assertNoMoreInvocations() {
-        if (!unverifiedInvocations.isEmpty()) {
-            Invocation invocation = unverifiedInvocations.get(0);
-            throw new AssertionError(getNoMoreInvocationsErrorMessage(invocation));
-        }
-    }
-
-
-    protected String getAssertNotInvokedErrorMessage(Invocation invocation, InvocationMatcher invocationMatcher) {
-        StringBuilder message = new StringBuilder();
-        Method method = invocationMatcher.getMethod();
-        message.append("Prohibited invocation of ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(method));
-        message.append(" at ");
-        message.append(invocation.getInvokedAt());
-        return message.toString();
-    }
-
-
-    protected String getAssertInvokedErrorMessage(Invocation matchedInvocation, InvocationMatcher invocationMatcher) {
-        StringBuilder message = new StringBuilder();
-        Method method = invocationMatcher.getMethod();
-        message.append("Expected invocation of ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(method));
-        message.append(", but ");
-        if (matchedInvocation != null) {
-            message.append("it was called with different or non-matching arguments.");
-        } else {
-            message.append("the invocation didn't occur.");
-        }
-        return message.toString();
-    }
-
-
-    protected String getNoMoreInvocationsErrorMessage(Invocation invocation) {
-        StringBuilder message = new StringBuilder();
-        Method method = invocation.getMethod();
-        message.append("No more invocations expected, but ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(method));
-        message.append(" was called from ");
-        message.append(invocation.getInvokedAt());
-        return message.toString();
-    }
-
-
-    protected Invocation findMatchingMethodName(Method method) {
-        for (Invocation invocation : unverifiedInvocations) {
-            if (invocation.getMethod().getName().equals(method.getName())) {
                 return invocation;
             }
         }
         return null;
     }
+
 }

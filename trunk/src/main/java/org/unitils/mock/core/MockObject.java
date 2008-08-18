@@ -15,9 +15,11 @@
  */
 package org.unitils.mock.core;
 
-import java.util.ArrayList;
+import org.unitils.mock.mockbehavior.MockBehavior;
+
+import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Class for handling the behavior of a mock object. This will register the required behavior of the mock during the
@@ -47,10 +49,10 @@ public class MockObject<T> {
     private boolean partialMock;
 
     /* Mock behaviors that are removed once they have been matched */
-    private List<MockBehavior> oneTimeMatchingMockBehaviors = new ArrayList<MockBehavior>();
+    private Map<InvocationMatcher, MockBehavior> oneTimeMatchingMockBehaviors = new IdentityHashMap<InvocationMatcher, MockBehavior>();
 
     /* Mock behaviors that can be matched and re-used for several invocation */
-    private List<MockBehavior> alwaysMatchingMockBehaviors = new ArrayList<MockBehavior>();
+    private Map<InvocationMatcher, MockBehavior> alwaysMatchingMockBehaviors = new IdentityHashMap<InvocationMatcher, MockBehavior>();
 
 
     /**
@@ -70,20 +72,22 @@ public class MockObject<T> {
     /**
      * Registers the given mock behavior. This mock behavior can be matched only once.
      *
-     * @param mockBehavior The mock behavior, not null
+     * @param invocationMatcher The matcher, not null
+     * @param mockBehavior      The mock behavior, not null
      */
-    public void registerOneTimeMatchingMockBehavior(MockBehavior mockBehavior) {
-        oneTimeMatchingMockBehaviors.add(mockBehavior);
+    public void registerOneTimeMatchingMockBehavior(InvocationMatcher invocationMatcher, MockBehavior mockBehavior) {
+        oneTimeMatchingMockBehaviors.put(invocationMatcher, mockBehavior);
     }
 
 
     /**
      * Registers the given mock behavior. This mock behavior can be matched multiple times.
      *
-     * @param mockBehavior The mock behavior, not null
+     * @param invocationMatcher The matcher, not null
+     * @param mockBehavior      The mock behavior, not null
      */
-    public void registerAlwaysMatchingMockBehavior(MockBehavior mockBehavior) {
-        alwaysMatchingMockBehaviors.add(mockBehavior);
+    public void registerAlwaysMatchingMockBehavior(InvocationMatcher invocationMatcher, MockBehavior mockBehavior) {
+        alwaysMatchingMockBehaviors.put(invocationMatcher, mockBehavior);
     }
 
 
@@ -137,12 +141,13 @@ public class MockObject<T> {
      * @return The matching mock behavior, null if none found
      */
     protected MockBehavior getOneTimeMatchingMockBehavior(Invocation invocation) {
-        Iterator<MockBehavior> iterator = oneTimeMatchingMockBehaviors.iterator();
+        Iterator<Map.Entry<InvocationMatcher, MockBehavior>> iterator = oneTimeMatchingMockBehaviors.entrySet().iterator();
         while (iterator.hasNext()) {
-            MockBehavior mockBehavior = iterator.next();
-            if (mockBehavior.matches(invocation)) {
+            Map.Entry<InvocationMatcher, MockBehavior> mockBehavior = iterator.next();
+            if (mockBehavior.getKey().matches(invocation)) {
+                MockBehavior result = mockBehavior.getValue();
                 iterator.remove();
-                return mockBehavior;
+                return result;
             }
         }
         return null;
@@ -156,23 +161,12 @@ public class MockObject<T> {
      * @return The matching mock behavior, null if none found
      */
     protected MockBehavior getAlwaysMatchingMockBehavior(Invocation invocation) {
-        for (MockBehavior mockBehavior : alwaysMatchingMockBehaviors) {
-            if (mockBehavior.matches(invocation)) {
-                return mockBehavior;
+        for (Map.Entry<InvocationMatcher, MockBehavior> mockBehavior : alwaysMatchingMockBehaviors.entrySet()) {
+            if (mockBehavior.getKey().matches(invocation)) {
+                return mockBehavior.getValue();
             }
         }
         return null;
-    }
-
-
-    // todo remove
-    public List<MockBehavior> getAlwaysMatchingMockBehaviors() {
-        return alwaysMatchingMockBehaviors;
-    }
-
-    // todo remove
-    public List<MockBehavior> getOneTimeMatchingMockBehaviors() {
-        return oneTimeMatchingMockBehaviors;
     }
 
 

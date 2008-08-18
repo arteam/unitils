@@ -23,12 +23,11 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 import org.unitils.easymock.annotation.Mock;
-import org.unitils.mock.action.Action;
-import org.unitils.mock.action.impl.ExceptionThrowingAction;
-import org.unitils.mock.action.impl.ValueReturningAction;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
+import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
+import org.unitils.mock.core.InvocationHandler;
 import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
-import org.unitils.mock.invocationhandler.InvocationHandler;
-import org.unitils.mock.invocationhandler.impl.MockObjectInvocationHandler;
 
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 
     MockObject<TestInterface> testInterfaceMock;
 
-    Action defaultAction;
+    MockBehavior defaultAction;
 
     @Mock
     InvocationMatcher invocationMatcher;
@@ -60,11 +59,11 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
         scenario = new Scenario();
 
         testClassMock = new MockObject<TestClass>("testClassMock", TestClass.class, false);
-        InvocationHandler testClassInvocationHandler = new MockObjectInvocationHandler<TestClass>(testClassMock, scenario);
+        InvocationHandler testClassInvocationHandler = null;//new MockObjectInvocationHandler<TestClass>(testClassMock, scenario);
         testClass = createMockObjectProxy(testClassMock, testClassInvocationHandler);
 
         testInterfaceMock = new MockObject<TestInterface>("testInterfaceMock", TestInterface.class, false);
-        InvocationHandler testInterfaceInvocationHandler = new MockObjectInvocationHandler<TestInterface>(testInterfaceMock, scenario);
+        InvocationHandler testInterfaceInvocationHandler = null; //new MockObjectInvocationHandler<TestInterface>(testInterfaceMock, scenario);
         testInterface = createMockObjectProxy(testInterfaceMock, testInterfaceInvocationHandler);
 
         expect(invocationMatcher.matches(null)).andStubReturn(true);
@@ -90,8 +89,8 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
 
     @Test
     public void testValueReturningAction() throws Exception {
-        MockBehavior valueReturningBehavior = new MockBehavior(invocationMatcher, new ValueReturningAction("returnedValue"));
-        testInterfaceMock.registerAlwaysMatchingMockBehavior(valueReturningBehavior);
+        MockBehavior valueReturningBehavior = new ValueReturningMockBehavior("returnedValue");
+        testInterfaceMock.registerAlwaysMatchingMockBehavior(invocationMatcher, valueReturningBehavior);
 
         assertEquals("returnedValue", testInterface.getSomeString());
     }
@@ -100,8 +99,8 @@ public class MockObjectBehaviorTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void testExceptionThrowingAction() throws Exception {
         UnitilsException unitilsException = new UnitilsException("test exception");
-        MockBehavior exceptionThrowingBehavior = new MockBehavior(invocationMatcher, new ExceptionThrowingAction(unitilsException));
-        testClassMock.registerAlwaysMatchingMockBehavior(exceptionThrowingBehavior);
+        MockBehavior exceptionThrowingBehavior = new ExceptionThrowingMockBehavior(unitilsException);
+        testClassMock.registerAlwaysMatchingMockBehavior(invocationMatcher, exceptionThrowingBehavior);
 
         testClass.doSomething(null);
     }
