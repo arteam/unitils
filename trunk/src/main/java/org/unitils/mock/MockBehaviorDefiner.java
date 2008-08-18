@@ -15,14 +15,11 @@
  */
 package org.unitils.mock;
 
-import org.unitils.mock.core.Invocation;
-import org.unitils.mock.core.InvocationMatcher;
-import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.InvocationHandler;
+import org.unitils.mock.core.*;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
-import org.unitils.mock.syntax.InvocationMatcherBuilder;
+import org.unitils.mock.core.InvocationMatcherBuilder;
 import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
 
 /**

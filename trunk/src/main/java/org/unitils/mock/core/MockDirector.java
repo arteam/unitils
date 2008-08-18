@@ -23,7 +23,7 @@ import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.impl.*;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
-import org.unitils.mock.syntax.InvocationMatcherBuilder;
+import org.unitils.mock.core.InvocationMatcherBuilder;
 import org.unitils.mock.util.MethodFormatUtil;
 import static org.unitils.mock.util.ProxyUtil.createMockObjectProxy;
 
