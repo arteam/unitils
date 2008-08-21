@@ -351,9 +351,9 @@
                     </reportSet>
                 </reportSets>
             </plugin>
-	  <plugin>
-	     <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-checkstyle-plugin</artifactId>
+	        <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
 				<configuration>
 		            <configLocation>checkstyle.xml</configLocation>
 		        </configuration>
@@ -364,7 +364,7 @@
 				<configuration>
 		            <targetJdk>1.5</targetJdk>
 		        </configuration>
-	  </plugin>
+			</plugin>
 			
 			<plugin>
 		      <groupId>org.codehaus.mojo</groupId>
@@ -376,7 +376,12 @@
 		        <effort>Max</effort>
 		        <findbugsXmlOutput>true</findbugsXmlOutput>
 		      </configuration>
-    </plugin>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jdepend-maven-plugin</artifactId>
+			</plugin>
 			
         </plugins>
     </reporting>
