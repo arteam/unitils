@@ -15,15 +15,15 @@
  */
 package org.unitils.dbmaintainer.util;
 
+import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.core.dbsupport.SQLHandler;
+
+import javax.sql.DataSource;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.sql.DataSource;
-
-import org.unitils.core.dbsupport.DbSupport;
-import org.unitils.core.dbsupport.SQLHandler;
 
 /**
  * Base class for implementations that access the test database
@@ -82,6 +82,12 @@ abstract public class BaseDatabaseAccessor implements DatabaseAccessing {
 
     
     public Set<DbSupport> getDbSupports() {
-    	return new HashSet<DbSupport>(dbNameDbSupportMap.values());
+        Set<DbSupport> dbSupports = new HashSet<DbSupport>();
+        for (DbSupport dbSupport : dbNameDbSupportMap.values()) {
+            if (dbSupport != null) {
+                dbSupports.add(dbSupport);
+            }
+        }
+    	return dbSupports;
     }
 }

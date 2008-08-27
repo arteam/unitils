@@ -47,6 +47,8 @@ public class DefaultDbSupportFactory extends BaseConfigurable implements DbSuppo
     
     public static final String PROPERTY_PASSWORD_END = "password";
     
+    public static final String PROPERTY_ENABLED_END = "enabled";
+    
     /** Property key of the SQL dialect of the underlying DBMS implementation */
     public static final String PROPERTY_DIALECT_END = "dialect";
 
@@ -54,6 +56,10 @@ public class DefaultDbSupportFactory extends BaseConfigurable implements DbSuppo
     public static final String PROPERTY_SCHEMA_NAMES_END = "schemaNames";
 	
 	public DbSupport createDefaultDbSupport(SQLHandler sqlHandler) {
+	    boolean enabled = PropertyUtils.getBoolean(PROPERTY_DATABASE_START + '.' + PROPERTY_ENABLED_END, true, configuration);
+	    if (!enabled) {
+	        return null;
+	    }
 		String driverClassName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_DRIVERCLASSNAME_END, configuration);
     	String url = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_URL_END, configuration);
     	String userName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + PROPERTY_USERNAME_END, configuration);
@@ -80,7 +86,12 @@ public class DefaultDbSupportFactory extends BaseConfigurable implements DbSuppo
      * @return The dbms specific instance of {@link DbSupport}, not null
      */
     public DbSupport createDbSupport(String databaseName, SQLHandler sqlHandler) {
-    	String driverClassName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + databaseName + '.' + PROPERTY_DRIVERCLASSNAME_END, configuration);
+        boolean enabled = PropertyUtils.getBoolean(PROPERTY_DATABASE_START + '.' + databaseName + '.' + PROPERTY_ENABLED_END, true, configuration);
+        if (!enabled) {
+            return null;
+        }
+        
+        String driverClassName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + databaseName + '.' + PROPERTY_DRIVERCLASSNAME_END, configuration);
     	String url = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + databaseName + '.' + PROPERTY_URL_END, configuration);
     	String userName = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + databaseName + '.' + PROPERTY_USERNAME_END, configuration);
     	String password = PropertyUtils.getString(PROPERTY_DATABASE_START + '.' + databaseName + '.' + PROPERTY_PASSWORD_END, configuration);

@@ -18,8 +18,12 @@ package org.unitils.dbmaintainer.script.impl;
 import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptParser;
 import org.unitils.dbmaintainer.script.ScriptRunner;
@@ -35,6 +39,9 @@ import java.io.Reader;
  */
 public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptRunner {
 
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DefaultScriptRunner.class);
+    
     /**
      * Executes the given script.
      * <p/>
@@ -56,9 +63,15 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
             	targetDbSupport = defaultDbSupport;
             } else {
             	targetDbSupport = dbNameDbSupportMap.get(script.getTargetDatabaseName());
-            	if (targetDbSupport == null) {
+            	if (!dbNameDbSupportMap.containsKey(script.getTargetDatabaseName())) {
             		throw new UnitilsException("Error executing script " + script.getFileName() + 
             				". No database initialized with the name " + script.getTargetDatabaseName());
+            	}
+            	targetDbSupport = dbNameDbSupportMap.get(script.getTargetDatabaseName());
+            	if (targetDbSupport == null) {
+            	    logger.info("Script " + script.getFileName() + " has target database " + script.getTargetDatabaseName() +
+            	            ". This database is disabled, so the script is not executed.");
+            	    return;
             	}
             }
             

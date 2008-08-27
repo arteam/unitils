@@ -109,7 +109,7 @@ public class DatabaseModule implements Module {
     public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
     
     
-    public static final String PROPERTY_DATABASE_NAMES = "database.names";
+    public static final String PROPERTY_DATABASE_NAMES = "databases.names";
     
     
     /* The logger instance for this class */
@@ -224,7 +224,7 @@ public class DatabaseModule implements Module {
 	
 	
 	
-	protected Map<String, DbSupport> getNameDbSupportMap() {
+	public Map<String, DbSupport> getNameDbSupportMap() {
 		if (nameDbSupportMap == null) {
 			initDbSupports();
 		}
@@ -263,12 +263,12 @@ public class DatabaseModule implements Module {
      * If the property {@link #PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY} has been set to true, the <code>DataSource</code>
      * returned will make sure that, for the duration of a transaction, the same <code>java.sql.Connection</code> is returned,
      * and that invocations of the close() method of these connections are suppressed.
+
      * @param name 
-     * @param testObject The test instance, not null
      *
      * @return The <code>DataSource</code>
      */
-    public DataSource getTransactionalDataSource(String name, Object testObject) {
+    public DataSource getTransactionalDataSource(String name) {
         if (wrapDataSourceInTransactionalProxy) {
             return getTransactionManager().getTransactionalDataSource(getDataSource(name));
         }
@@ -293,7 +293,9 @@ public class DatabaseModule implements Module {
     protected Set<DataSource> getDataSources() {
 		Set<DataSource> result = new HashSet<DataSource>();
 		for (DbSupport dbSupport : getNameDbSupportMap().values()) {
-			result.add(dbSupport.getDataSource());
+		    if (dbSupport != null) {
+		        result.add(dbSupport.getDataSource());
+		    }
 		}
 		return result;
 	}
@@ -374,13 +376,13 @@ public class DatabaseModule implements Module {
         Set<Field> fields = getFieldsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         for (Field field : fields) {
         	String name = StringUtils.trimToNull(field.getAnnotation(TestDataSource.class).value());
-        	ReflectionUtils.setFieldValue(testObject, field, getDataSource(name));
+        	ReflectionUtils.setFieldValue(testObject, field, getTransactionalDataSource(name));
         }
         
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), TestDataSource.class);
         for (Method method : methods) {
         	String name = StringUtils.trimToNull(method.getAnnotation(TestDataSource.class).value());
-        	ReflectionUtils.invokeMethodSilent(testObject, method, getDataSource(name));
+        	ReflectionUtils.invokeMethodSilent(testObject, method, getTransactionalDataSource(name));
         }
     }
 

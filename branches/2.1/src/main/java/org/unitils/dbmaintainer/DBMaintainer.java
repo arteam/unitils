@@ -18,6 +18,7 @@ package org.unitils.dbmaintainer;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -114,6 +115,7 @@ public class DBMaintainer {
      */
     public static final String PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED = "dbMaintainer.generateDataSetStructure.enabled";
 
+    
     /**
      * Provider of the current version of the database, and means to increment it
      */
@@ -173,7 +175,7 @@ public class DBMaintainer {
      */
     protected boolean keepRetryingAfterError;
 
-
+    
     /**
      * Default constructor for testing.
      */
@@ -219,6 +221,7 @@ public class DBMaintainer {
             if (generateDtd) {
                 dataSetStructureGenerator = getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class, configuration, sqlHandler, defaultDbSupport, nameDbSupportMap);
             }
+            
         } catch (UnitilsException e) {
             logger.error("Error while initializing DbMaintainer", e);
             throw e;
@@ -325,34 +328,45 @@ public class DBMaintainer {
 
 
     /**
-     * Executes the given scripts and updates the database version and state appropriatly. After
-     * each successful script execution, the new version is stored in the database and marked as
-     * succesful. If a script execution fails and fromScratch is enabled, that script version is
-     * stored in the database and marked as unsuccesful. If fromScratch is not enabled, the last
-     * succesful version is stored in the database that way, the next time an update is tried, the
-     * execution restarts from the last unsuccessful script.
+     * Executes the given scripts and updates the database execution registry appropriately. After
+     * each successful script execution, the script execution is registered in the database and marked 
+     * as successful. If a script execution fails, the script execution is registered in the database 
+     * and marked as unsuccessful.
      *
-     * @param scripts        The scripts to execute, not null
-     * @param currentVersion The current version of the database, not null
+     * @param scripts The scripts to execute, not null
      */
     protected void executeScripts(List<Script> scripts) {
         for (Script script : scripts) {
-            try {
-            	// We register the script execution, but we indicate it to be unsuccessful. If anything goes wrong or if the update is
-                // interrupted before being completed, this will be the final state and the DbMaintainer will do a from-scratch update the next time
-            	ExecutedScript executedScript = new ExecutedScript(script, new Date(), false);
-            	versionSource.registerExecutedScript(executedScript);
-            	
-            	logger.info("Executing script " + script.getFileName());
-                scriptRunner.execute(script);
-                // We now register the previously registered script execution as being successful
-                executedScript.setSuccessful(true);
-                versionSource.updateExecutedScript(executedScript);
-                
-            } catch (UnitilsException e) {
-                logger.error("Error while executing script " + script.getFileName(), e);
-                throw e;
-            }
+            logger.info("Executing script " + script.getFileName());
+            
+            executeScript(script);
+        }
+    }
+
+
+    /**
+     * Executes the given script and updates the database execution registry appropriately. If
+     * successfully, the script execution is registered in the database and marked as successful. 
+     * If an error occurred executing the script, the script execution is registered in the database 
+     * and marked as unsuccessful.
+     *
+     * @param script The script to execute, not null
+     */
+    protected void executeScript(Script script) {
+        try {
+        	// We register the script execution, but we indicate it to be unsuccessful. If anything goes wrong or if the update is
+            // interrupted before being completed, this will be the final state and the DbMaintainer will do a from-scratch update the next time
+        	ExecutedScript executedScript = new ExecutedScript(script, new Date(), false);
+        	versionSource.registerExecutedScript(executedScript);
+        	
+        	scriptRunner.execute(script);
+            // We now register the previously registered script execution as being successful
+            executedScript.setSuccessful(true);
+            versionSource.updateExecutedScript(executedScript);
+            
+        } catch (UnitilsException e) {
+            logger.error("Error while executing script " + script.getFileName(), e);
+            throw e;
         }
     }
 
@@ -364,14 +378,14 @@ public class DBMaintainer {
      * @param postProcessingScripts The scripts to execute, not null
      */
     protected void executePostProcessingScripts(List<Script> postProcessingScripts) {
-        for (Script script : postProcessingScripts) {
+        for (Script postProcessingScript : postProcessingScripts) {
             try {
-            	logger.info("Executing post processing script " + script.getFileName());
+            	logger.info("Executing post processing script " + postProcessingScript.getFileName());
             	
-                scriptRunner.execute(script);
+                scriptRunner.execute(postProcessingScript);
 
             } catch (UnitilsException e) {
-                logger.error("Error while executing post processing script " + script.getFileName(), e);
+                logger.error("Error while executing post processing script " + postProcessingScript.getFileName(), e);
                 throw e;
             }
         }
