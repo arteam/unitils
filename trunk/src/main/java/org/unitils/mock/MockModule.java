@@ -15,24 +15,19 @@
  */
 package org.unitils.mock;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.EasyMockModule;
 import org.unitils.mock.annotation.AfterCreateMock;
-import org.unitils.mock.annotation.Mock;
-import org.unitils.mock.annotation.PartialMock;
-import org.unitils.mock.core.MockDirector;
+import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.core.InvocationMatcherBuilder;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
+import static org.unitils.util.ReflectionUtils.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.Properties;
 import java.util.Set;
 
@@ -45,13 +40,18 @@ import java.util.Set;
  */
 public class MockModule implements Module {
 
-    private MockDirector mockDirector;
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(MockModule.class);
+
+
+    private Scenario scenario;
 
 
     /**
      * No initialization needed for this module
      */
     public void init(Properties configuration) {
+        scenario = createScenario();
     }
 
 
@@ -62,44 +62,58 @@ public class MockModule implements Module {
     }
 
 
-    public MockDirector getMockDirector() {
-        if (mockDirector == null) {
-            mockDirector = createMockDirector();
-        }
-        return mockDirector;
+    public Scenario getScenario() {
+        return scenario;
     }
 
 
-    protected MockDirector createMockDirector() {
-        Scenario scenario = new Scenario();
-        InvocationMatcherBuilder invocationMatcherBuilder = new InvocationMatcherBuilder();
-        return new MockDirector(scenario, invocationMatcherBuilder);
+    public void assertNoMoreInvocations() {
+        scenario.assertNoMoreInvocations();
     }
 
 
-    // todo move to director
-    public void logExecutionScenario(Object testObject) {
-        if (mockDirector != null) {
-            mockDirector.logExecutionScenario(testObject);
+    public void logExecutionScenario() {
+        String report = scenario.createReport(null);
+        logger.info(report);
+    }
+
+
+    protected Scenario createScenario() {
+        return new Scenario();
+    }
+
+
+    @SuppressWarnings({"unchecked"})
+    protected Mock<?> createMock(Field field, boolean partial) {
+        return new MockObject(field.getName(), getMockedClass(field), partial, getScenario());
+    }
+
+
+    protected Class<?> getMockedClass(Field field) {
+        Type type = field.getGenericType();
+        if (type instanceof ParameterizedType) {
+            Type[] argumentTypes = ((ParameterizedType) type).getActualTypeArguments();
+            if (argumentTypes.length == 1 && argumentTypes[0] instanceof Class<?>) {
+                return (Class<?>) argumentTypes[0];
+            }
         }
+        throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> and PartialMock<YourTypeToMock> types. Used type; " + type);
     }
 
 
     protected void createAndInjectMocksIntoTest(Object testObject) {
-        Set<Field> mockFields = getFieldsAnnotatedWith(testObject.getClass(), Mock.class);
-        for (Field mockField : mockFields) {
-            Object mockObject = getMockDirector().createMock(mockField.getName(), mockField.getType());
-            setFieldValue(testObject, mockField, mockObject);
-
-            callAfterCreateMockMethods(testObject, mockObject, mockField.getName(), mockField.getType());
+        Set<Field> mockFields = getFieldsOfType(testObject.getClass(), Mock.class, false);
+        for (Field field : mockFields) {
+            Mock<?> mock = createMock(field, false);
+            setFieldValue(testObject, field, mock);
+            callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
         }
 
-        Set<Field> partialMockFields = getFieldsAnnotatedWith(testObject.getClass(), PartialMock.class);
-        for (Field mockField : partialMockFields) {
-            Object mockObject = getMockDirector().createPartialMock(mockField.getName(), mockField.getType());
-            setFieldValue(testObject, mockField, mockObject);
-
-            callAfterCreateMockMethods(testObject, mockObject, mockField.getName(), mockField.getType());
+        Set<Field> partialMockFields = getFieldsOfType(testObject.getClass(), PartialMock.class, false);
+        for (Field field : partialMockFields) {
+            Mock<?> mock = createMock(field, true);
+            setFieldValue(testObject, field, mock);
+            callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
         }
     }
 
@@ -114,6 +128,7 @@ public class MockModule implements Module {
      * @param name       the field(=mock) name, not null
      * @param type       the field(=mock) type
      */
+    // todo should we inject the mock or the proxy??
     protected void callAfterCreateMockMethods(Object testObject, Object mockObject, String name, Class<?> type) {
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
@@ -150,12 +165,8 @@ public class MockModule implements Module {
          */
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
+            scenario.reset();
             createAndInjectMocksIntoTest(testObject);
-        }
-
-        @Override
-        public void afterTestMethod(Object testObject, Method testMethod, Throwable testThrowable) {
-            logExecutionScenario(testObject);
         }
 
     }

@@ -16,9 +16,6 @@
 package org.unitils.mock;
 
 import org.unitils.core.Unitils;
-import org.unitils.mock.annotation.ArgumentMatcher;
-import org.unitils.mock.core.MockDirector;
-import org.unitils.mock.core.Scenario;
 
 /**
  * @author Filip Neven
@@ -28,88 +25,12 @@ import org.unitils.mock.core.Scenario;
 public class MockUnitils {
 
 
-    public static <T> MockBehaviorDefiner<T> mock(T mock) {
-        return getMockDirector().mock(mock);
-    }
-
-
-    public static <T> T assertInvoked(T mock) {
-        return getMockDirector().assertInvoked(mock);
-    }
-
-
-    public static <T> T assertNotInvoked(T mock) {
-        return getMockDirector().assertNotInvoked(mock);
-    }
-
-
     public static void assertNoMoreInvocations() {
-        getMockDirector().assertNoMoreInvocations();
+        getMockModule().assertNoMoreInvocations();
     }
 
-
-    /**
-     * Creates a mock object of the given type, associated to the given {@link Scenario}.
-     *
-     * @param name     A name for the mock, not null
-     * @param mockType The type of the mock, not null
-     * @return A mock for the given class or interface, not null
-     */
-    public static <T> T createMock(String name, Class<T> mockType) {
-        return getMockDirector().createMock(name, mockType);
-    }
-
-
-    /**
-     * Creates a mock object of the given type, associated to the given {@link Scenario}.
-     *
-     * @param name     A name for the mock, not null
-     * @param mockType The type of the mock, not null
-     * @return A mock for the given class or interface, not null
-     */
-    public static <T> T createPartialMock(String name, Class<T> mockType) {
-        return getMockDirector().createPartialMock(name, mockType);
-    }
-
-
-    @ArgumentMatcher
-    public static <T> T notNull(Class<T> argumentClass) {
-        return getMockDirector().notNull(argumentClass);
-    }
-
-
-    @ArgumentMatcher
-    public static <T> T isNull(Class<T> argumentClass) {
-        return getMockDirector().isNull(argumentClass);
-    }
-
-
-    @ArgumentMatcher
-    public static <T> T same(T sameAs) {
-        return getMockDirector().same(sameAs);
-    }
-
-
-    @ArgumentMatcher
-    public static <T> T eq(T equalTo) {
-        return getMockDirector().eq(equalTo);
-    }
-
-
-    @ArgumentMatcher
-    public static <T> T refEq(T equalTo) {
-        return getMockDirector().refEq(equalTo);
-    }
-
-
-    @ArgumentMatcher
-    public static <T> T lenEq(T equalTo) {
-        return getMockDirector().lenEq(equalTo);
-    }
-
-
-    protected static MockDirector getMockDirector() {
-        return getMockModule().getMockDirector();
+    public static void logExecutionScenario() {
+        getMockModule().logExecutionScenario();
     }
 
 

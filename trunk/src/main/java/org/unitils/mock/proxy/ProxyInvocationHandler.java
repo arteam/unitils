@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2006-2007,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.mockbehavior.impl;
-
-import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
+package org.unitils.mock.proxy;
 
 /**
- * @author Filip Neven
- * @author Tim Ducheyne
- * @author Kenny Claes
  */
-public class ValueReturningMockBehavior implements MockBehavior {
+public interface ProxyInvocationHandler {
 
-    private Object valueToReturn;
-
-
-    public ValueReturningMockBehavior(Object valueToReturn) {
-        this.valueToReturn = valueToReturn;
-    }
-
-
-    public Object execute(ProxyInvocation proxyInvocation) {
-        return valueToReturn;
-    }
-
+    Object handleInvocation(ProxyInvocation invocation) throws Throwable;
 }

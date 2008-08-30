@@ -17,9 +17,9 @@ package org.unitils.mock.core;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.mock.MockUnitils;
+import static org.unitils.mock.ArgumentMatchers.notNull;
 import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
-import org.unitils.mock.core.InvocationMatcherBuilder;
+import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 
 /**
  * @author Filip Neven
@@ -28,7 +28,7 @@ import org.unitils.mock.core.InvocationMatcherBuilder;
  */
 public class InvocationMatcherBuilderTest {
 
-    InvocationMatcherBuilder invocationMatcherBuilder = new InvocationMatcherBuilder();
+    ArgumentMatcherRepository invocationMatcherBuilder = new ArgumentMatcherRepository();
 
     TestClass testClass = new TestClass();
 
@@ -38,14 +38,14 @@ public class InvocationMatcherBuilderTest {
 
     @Test
     public void testArgumentMatchers() {
-        invocationMatcherBuilder.registerArgumentMatcher(new NotNullArgumentMatcher());
+        ArgumentMatcherRepository.registerArgumentMatcher(new NotNullArgumentMatcher());
         //Invocation invocation = new Invocation(testClass, )
     }
 
     static class TestClass {
 
         public void testMethod() {
-            doSomething(null, MockUnitils.notNull(String.class));
+            doSomething(null, notNull(String.class));
         }
 
         public void doSomething(String arg1, String arg2) {

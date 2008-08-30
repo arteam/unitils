@@ -15,8 +15,9 @@
  */
 package org.unitils.mock.report.impl;
 
-import org.unitils.mock.core.Invocation;
 import org.unitils.mock.core.Scenario;
+import org.unitils.mock.invocation.ObservedInvocation;
+import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioView;
 import static org.unitils.util.ReflectionUtils.getAllFields;
 import static org.unitils.util.ReflectionUtils.getFieldValue;
@@ -44,10 +45,10 @@ public class SuggestedAssertsScenarioView implements ScenarioView {
     public String createView(Object testObject, Scenario scenario) {
         StringBuilder result = new StringBuilder();
 
-        for (Invocation invocation : scenario.getObservedInvocations()) {
+        for (ObservedInvocation mockInvocation : scenario.getObservedInvocations()) {
             // do not output mocked methods (methods that return values)
-            if (Void.TYPE.equals(invocation.getMethod().getReturnType())) {
-                result.append(getSuggestedAssertStatement(testObject, invocation));
+            if (Void.TYPE.equals(mockInvocation.getProxyInvocation().getMethod().getReturnType())) {
+                result.append(getSuggestedAssertStatement(testObject, mockInvocation));
                 result.append("\n");
             }
         }
@@ -58,19 +59,22 @@ public class SuggestedAssertsScenarioView implements ScenarioView {
     /**
      * Creates an assert statement for the given method invocation and arguments.
      *
-     * @param testObject The test instance, null if there is no test object
-     * @param invocation The invocation, not null
+     * @param testObject     The test instance, null if there is no test object
+     * @param mockInvocation The invocation, not null
      * @return The string representation of the assert statement, not null
      */
-    protected String getSuggestedAssertStatement(Object testObject, Invocation invocation) {
+    protected String getSuggestedAssertStatement(Object testObject, ObservedInvocation mockInvocation) {
         StringBuilder result = new StringBuilder();
+
+        ProxyInvocation proxyInvocation = mockInvocation.getProxyInvocation();
+
         result.append("assertInvoked(");
-        result.append(invocation.getMockObject().getName());
+        result.append(mockInvocation.getMockName());
         result.append(").");
-        result.append(invocation.getMethod().getName());
+        result.append(proxyInvocation.getMethod().getName());
         result.append("(");
         boolean firstArgument = true;
-        for (Object argument : invocation.getArguments()) {
+        for (Object argument : proxyInvocation.getArguments()) {
             String testObjectFieldName = getFieldName(testObject, argument);
             if (!firstArgument) {
                 result.append(", ");

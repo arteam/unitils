@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
-
-import org.unitils.mock.core.Invocation;
+package org.unitils.mock;
 
 /**
+ * todo javadoc
  */
-public interface InvocationHandler {
+public interface PartialMock<T> extends Mock<T> {
 
-    Object handleInvocation(Invocation invocation) throws Throwable;
 }

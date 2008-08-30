@@ -16,7 +16,6 @@
 package org.unitils.mock.syntax;
 
 import org.junit.Before;
-import static org.unitils.mock.MockUnitils.createMock;
 
 /**
  * @author Filip Neven
@@ -29,7 +28,7 @@ public class BehaviorDefinitionTest {
 
     @Before
     public void setup() {
-        testClassMock = createMock("testClassMock", TestClass.class);
+        // testClassMock = createMock("testClassMock", TestClass.class);
     }
 
     public static class TestClass {

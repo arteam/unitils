@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.annotation;
+package org.unitils.mock.mockbehavior.impl;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
- *
  */
-@Target(FIELD)
-@Retention(RUNTIME)
-public @interface Mock {
+public class DefaultValueReturningMockBehavior implements MockBehavior {
+
+
+    public Object execute(ProxyInvocation invocation) {
+        return null;
+    }
 
 }

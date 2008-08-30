@@ -15,7 +15,7 @@
  */
 package org.unitils.mock.mockbehavior;
 
-import org.unitils.mock.core.Invocation;
+import org.unitils.mock.proxy.ProxyInvocation;
 
 
 /**
@@ -25,5 +25,5 @@ import org.unitils.mock.core.Invocation;
  */
 public interface MockBehavior {
 
-    Object execute(Invocation invocation) throws Throwable;
+    Object execute(ProxyInvocation proxyInvocation) throws Throwable;
 }

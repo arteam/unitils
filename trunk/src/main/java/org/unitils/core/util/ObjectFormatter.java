@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.reflectionassert.util;
+package org.unitils.core.util;
 
 import static org.apache.commons.lang.ClassUtils.getShortClassName;
 import static org.unitils.reflectionassert.util.HibernateUtil.getUnproxiedValue;
@@ -91,7 +91,13 @@ public class ObjectFormatter {
             result.append(String.valueOf(object));
             return;
         }
-        if (object instanceof String || object instanceof Number || object instanceof Character) {
+        if (object instanceof String) {
+            result.append('"');
+            result.append(object);
+            result.append('"');
+            return;
+        }
+        if (object instanceof Number || object instanceof Character) {
             result.append(String.valueOf(object));
             return;
         }

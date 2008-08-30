@@ -1,5 +1,5 @@
 /*
- * Copyright 2008,  Unitils.org
+ * Copyright 2006-2007,  Unitils.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock;
 
-public interface MockObjectProxy<T> {
+import org.unitils.mock.mockbehavior.MockBehavior;
 
-	MockObject<T> $_$_getMockObject();
+/**
+ * todo javadoc
+ */
+public interface Mock<T> {
+
+    T getInstance();
+
+    T returns(Object returnValue);
+
+    T raises(Throwable exception);
+
+    T performs(MockBehavior mockBehavior);
+
+    T onceReturns(Object returnValue);
+
+    T onceRaises(Throwable exception);
+
+    T oncePerforms(MockBehavior mockBehavior);
+
+    T assertInvoked();
+
+    T assertNotInvoked();
 }
