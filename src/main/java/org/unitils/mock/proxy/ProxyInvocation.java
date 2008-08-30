@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.proxy;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -23,9 +23,8 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class Invocation {
+public abstract class ProxyInvocation {
 
-    private MockObject<?> mockObject;
 
     private Method method;
 
@@ -34,23 +33,14 @@ public class Invocation {
     private StackTraceElement invokedAt;
 
 
-    public Invocation(MockObject<?> mockObject, Method method, List<?> arguments, StackTraceElement invokedAt) {
-        this.mockObject = mockObject;
+    public ProxyInvocation(Method method, List<?> arguments, StackTraceElement invokedAt) {
         this.method = method;
         this.arguments = arguments;
         this.invokedAt = invokedAt;
     }
 
 
-    public Object invokeOriginalBehavior() throws Throwable {
-        // todo make abstract or throw exception
-        return null;
-    }
-
-
-    public MockObject<?> getMockObject() {
-        return mockObject;
-    }
+    public abstract Object invokeOriginalBehavior() throws Throwable;
 
 
     public Method getMethod() {

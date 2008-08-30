@@ -20,8 +20,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import static org.unitils.mock.MockUnitils.notNull;
-import static org.unitils.mock.MockUnitils.refEq;
+import static org.unitils.mock.ArgumentMatchers.notNull;
+import static org.unitils.mock.ArgumentMatchers.refEq;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 import static org.unitils.util.ReflectionUtils.getMethod;
@@ -154,7 +154,8 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
             // invocation without argument matchers
             testProxy.someMethod("aValue", "aValue", "aValue");
             // 2 invocations on same line  DO NOT FORMAT
-            testProxy.someMethod(notNull(String.class), "aValue", "aValue"); testProxy.someMethod("aValue", "aValue", notNull(String.class));
+            testProxy.someMethod(notNull(String.class), "aValue", "aValue");
+            testProxy.someMethod("aValue", "aValue", notNull(String.class));
             // static invocation
             TestProxy.someStaticMethod(refEq(1), 33);
             // no arguments invocation

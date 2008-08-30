@@ -13,22 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.annotation;
+package org.unitils.mock.argumentmatcher;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
- *
  */
-@Target(FIELD)
-@Retention(RUNTIME)
-public @interface PartialMock {
+public class ArgumentMatcherRepository {
+
+    private static List<ArgumentMatcher> argumentMatchers = new ArrayList<ArgumentMatcher>();
+
+
+    public static void registerArgumentMatcher(ArgumentMatcher argumentMatcher) {
+        argumentMatchers.add(argumentMatcher);
+    }
+
+
+    public static List<ArgumentMatcher> getArgumentMatchers() {
+        return argumentMatchers;
+    }
+
+
+    public static void resetArgumentMatchers() {
+        argumentMatchers.clear();
+    }
 
 }

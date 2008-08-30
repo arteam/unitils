@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.util;
+package org.unitils.mock.proxy;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 /**
+ * todo move
+ * <p/>
  * Helper class to format the methods and their corresponding params in the output.
  * This probably needs to be (re)moved; it was just made as a single point of reference for all method-related output.
  *

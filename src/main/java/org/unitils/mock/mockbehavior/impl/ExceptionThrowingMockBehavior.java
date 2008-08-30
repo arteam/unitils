@@ -16,7 +16,7 @@
 package org.unitils.mock.mockbehavior.impl;
 
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.core.Invocation;
+import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
  * @author Filip Neven
@@ -33,7 +33,7 @@ public class ExceptionThrowingMockBehavior implements MockBehavior {
     }
 
 
-    public Object execute(Invocation invocation) throws Throwable {
+    public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
         throw exceptionToThrow;
     }
 

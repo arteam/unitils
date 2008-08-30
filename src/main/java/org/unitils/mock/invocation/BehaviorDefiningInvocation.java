@@ -13,58 +13,73 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.core;
+package org.unitils.mock.invocation;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
-import static java.util.Arrays.asList;
 import java.util.List;
 
 /**
- * A method invocation matcher that uses a given <code>Method</code> and a list of {@link ArgumentMatcher}s to match an executed <code>Method</code> and its parameters.
- *
- * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
+ * @author Kenny Claes
  */
-public class InvocationMatcher {
+public class BehaviorDefiningInvocation {
 
-    private Method method;
+    private String mockName;
+
+    private ProxyInvocation proxyInvocation;
 
     private List<ArgumentMatcher> argumentMatchers;
 
-    /**
-     * Constructor.
-     *
-     * @param method           The <code>Method</code> which needs to be matched. Not null.
-     * @param argumentMatchers The {@link org.unitils.mock.argumentmatcher.ArgumentMatcher}s that need to be used to match the {@link Invocation}s arguments. The size of the list must be equals to the number of parameters of the given <code>Method</code>.
-     */
-    public InvocationMatcher(Method method, ArgumentMatcher... argumentMatchers) {
-        this(method, asList(argumentMatchers));
-    }
+    private MockBehavior mockBehavior;
 
 
-    public InvocationMatcher(Method method, List<ArgumentMatcher> argumentMatchers) {
-        this.method = method;
+    public BehaviorDefiningInvocation(String mockName, ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers, MockBehavior mockBehavior) {
+        this.mockName = mockName;
+        this.proxyInvocation = proxyInvocation;
         this.argumentMatchers = argumentMatchers;
+        this.mockBehavior = mockBehavior;
+
+        Method method = proxyInvocation.getMethod();
         if (method.getParameterTypes().length != argumentMatchers.size()) {
             throw new IllegalArgumentException("The number of argument matchers does not match the number of arguments of the given method. Number of argument matchers: " + argumentMatchers.size() + ". Number of arguments " + method.getParameterTypes().length);
         }
     }
 
+    public String getMockName() {
+        return mockName;
+    }
+
+
+    public ProxyInvocation getProxyInvocation() {
+        return proxyInvocation;
+    }
+
+
+    public List<ArgumentMatcher> getArgumentMatchers() {
+        return argumentMatchers;
+    }
+
+
+    public MockBehavior getMockBehavior() {
+        return mockBehavior;
+    }
 
     /**
-     * Returns whether or not the given {@link Invocation} matches this object's predefined <code>Method</code> and arguments.
+     * Returns whether or not the given {@link ProxyInvocation} matches this object's predefined <code>Method</code> and arguments.
      *
-     * @param invocation the {@link Invocation} to match.
-     * @return true when given {@link Invocation} matches, false otherwise.
+     * @param proxyInvocation the {@link ProxyInvocation} to match.
+     * @return true when given {@link org.unitils.mock.proxy.ProxyInvocation} matches, false otherwise.
      */
-    public boolean matches(Invocation invocation) {
-        if (!method.equals(invocation.getMethod())) {
+    public boolean matches(ProxyInvocation proxyInvocation) {
+        if (!this.proxyInvocation.getMethod().equals(proxyInvocation.getMethod())) {
             return false;
         }
-        List<?> arguments = invocation.getArguments();
+        List<?> arguments = proxyInvocation.getArguments();
         if (arguments.size() != argumentMatchers.size()) {
             return false;
         }
@@ -76,7 +91,5 @@ public class InvocationMatcher {
         return true;
     }
 
-    public Method getMethod() {
-        return method;
-    }
+
 }

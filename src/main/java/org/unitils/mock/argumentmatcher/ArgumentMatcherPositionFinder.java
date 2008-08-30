@@ -23,6 +23,7 @@ import org.objectweb.asm.tree.*;
 import org.objectweb.asm.tree.analysis.*;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.annotation.ArgumentMatcher;
+import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import static org.unitils.util.ReflectionUtils.getClassWithName;
 
@@ -42,14 +43,31 @@ public class ArgumentMatcherPositionFinder {
 
 
     /**
+     * Locates the argument matchers for the given proxy method invocation.
+     *
+     * @param proxyInvocation The method invocation, not null
+     * @return The argument indexes, empty if there are no matchers
+     */
+    public static List<Integer> getArgumentMatcherIndexes(ProxyInvocation proxyInvocation) {
+        Class<?> testClass = getClassWithName(proxyInvocation.getInvokedAt().getClassName());
+        String testMethodName = proxyInvocation.getInvokedAt().getMethodName();
+        Method method = proxyInvocation.getMethod();
+        int lineNr = proxyInvocation.getInvokedAt().getLineNumber();
+
+        return getArgumentMatcherIndexes(testClass, testMethodName, method, lineNr, 1);
+    }
+
+
+    /**
      * Locates the argument matchers for the method invocation on the given line.
+     * An exception is raised when the given method cannot be found.
      *
      * @param clazz           The class containing the method invocation, not null
      * @param methodName      The method containing the method invocation, not null
      * @param invokedMethod   The invocation to look for, not null
      * @param lineNr          The line nr of the invocation
      * @param invocationIndex The index, in case there is more than one invocation on the same line
-     * @return The argument indexes, null if method was not found, empty if method found but there are no matchers
+     * @return The argument indexes, empty if there are no matchers
      */
     @SuppressWarnings({"unchecked"})
     public static List<Integer> getArgumentMatcherIndexes(Class<?> clazz, String methodName, Method invokedMethod, int lineNr, int invocationIndex) {
@@ -69,7 +87,7 @@ public class ArgumentMatcherPositionFinder {
                 }
             }
         }
-        return null;
+        throw new UnitilsException("Unable to find indexes of argument matcher. Method not found: " + methodName);
     }
 
 

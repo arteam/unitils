@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.util;
+package org.unitils.mock.proxy;
 
 import net.sf.cglib.proxy.*;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.core.*;
-import org.unitils.mock.core.InvocationHandler;
+import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.proxy.ProxyInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -41,22 +41,21 @@ public class ProxyUtil {
      * Creates a proxy object for the given mock object.
      * A invocation handler must be passed to hook into the proxy.
      *
-     * @param mockObject        The mock object, not null
+     * @param mockedClass       The type to proxy, not null
      * @param invocationHandler The handler that will handle the method invocations of the proxy, not null.
      * @return The proxy object, not null
      */
     @SuppressWarnings("unchecked")
-    public static <T> T createMockObjectProxy(MockObject<T> mockObject, org.unitils.mock.core.InvocationHandler invocationHandler) {
+    public static <T> T createProxy(Class<T> mockedClass, ProxyInvocationHandler invocationHandler) {
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(mockObject.getMockedClass());
-        enhancer.setInterfaces(new Class<?>[]{MockObjectProxy.class});
+        enhancer.setSuperclass(mockedClass);
         enhancer.setCallbackType(MethodInterceptor.class);
         enhancer.setUseFactory(true);
         Class<T> enhancedTargetClass = enhancer.createClass();
 
         Objenesis objenesis = new ObjenesisStd();
         Factory proxy = (Factory) objenesis.newInstance(enhancedTargetClass);
-        proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(mockObject, invocationHandler)});
+        proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(invocationHandler)});
         return (T) proxy;
     }
 
@@ -100,41 +99,33 @@ public class ProxyUtil {
     }
 
 
-    public static class ProxyMethodInterceptor<T> implements MethodInterceptor {
+    public static class ProxyMethodInterceptor implements MethodInterceptor {
 
-        private MockObject<T> mockObject;
-
-        private InvocationHandler invocationHandler;
+        private ProxyInvocationHandler invocationHandler;
 
 
-        public ProxyMethodInterceptor(MockObject<T> mockObject, InvocationHandler invocationHandler) {
-            this.mockObject = mockObject;
+        public ProxyMethodInterceptor(ProxyInvocationHandler invocationHandler) {
             this.invocationHandler = invocationHandler;
         }
 
 
-        public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-            if (method.getDeclaringClass().equals(MockObjectProxy.class)) {
-                // handle the single $_$_getMockObject method of the MockObjectProxy interface
-                return mockObject;
-            }
-
+        public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
             StackTraceElement invokedAt = getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace());
-            Invocation invocation = new ProxyMethodInvocation(mockObject, method, asList(args), invokedAt, proxy, methodProxy);
+            ProxyInvocation invocation = new ProxyMethodInvocation(method, asList(arguments), invokedAt, proxy, methodProxy);
             return invocationHandler.handleInvocation(invocation);
         }
     }
 
 
-    public static class ProxyMethodInvocation extends Invocation {
+    public static class ProxyMethodInvocation extends ProxyInvocation {
 
         private Object proxy;
 
         private MethodProxy methodProxy;
 
 
-        public ProxyMethodInvocation(MockObject<?> mockObject, Method method, List<?> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
-            super(mockObject, method, arguments, invokedAt);
+        public ProxyMethodInvocation(Method method, List<?> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
+            super(method, arguments, invokedAt);
             this.proxy = proxy;
             this.methodProxy = methodProxy;
         }

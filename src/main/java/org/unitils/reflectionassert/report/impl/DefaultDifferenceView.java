@@ -17,7 +17,7 @@ package org.unitils.reflectionassert.report.impl;
 
 import org.unitils.reflectionassert.difference.*;
 import org.unitils.reflectionassert.report.DifferenceView;
-import org.unitils.reflectionassert.util.ObjectFormatter;
+import org.unitils.core.util.ObjectFormatter;
 
 import java.util.List;
 import java.util.Map;

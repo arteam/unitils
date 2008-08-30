@@ -15,8 +15,15 @@
  */
 package org.unitils.mock.core;
 
+import org.unitils.mock.invocation.BehaviorDefiningInvocation;
+import org.unitils.mock.invocation.ObservedInvocation;
+import org.unitils.mock.proxy.MethodFormatUtil;
+import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.report.ScenarioReport;
+import org.unitils.mock.report.impl.DefaultScenarioReport;
+
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,36 +36,105 @@ public class Scenario {
     /**
      * Insertion ordered map that keeps track of the registered invocations and whether or not they have already been checked for invocation with the various assertX() methods in this class.
      */
-    protected List<Invocation> observedInvocations = new ArrayList<Invocation>();
+    protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
 
-    protected List<Invocation> unverifiedInvocations = new ArrayList<Invocation>();
+    protected List<ObservedInvocation> unverifiedInvocations = new ArrayList<ObservedInvocation>();
 
 
-    public void addObservedInvocation(Invocation invocation) {
-        observedInvocations.add(invocation);
-        unverifiedInvocations.add(invocation);
+    public void reset() {
+        observedInvocations.clear();
+        unverifiedInvocations.clear();
     }
 
-    public List<Invocation> getObservedInvocations() {
+    public void addObservedMockInvocation(ObservedInvocation mockInvocation) {
+        observedInvocations.add(mockInvocation);
+        unverifiedInvocations.add(mockInvocation);
+    }
+
+    public List<ObservedInvocation> getObservedInvocations() {
         return observedInvocations;
     }
 
 
-    public List<Invocation> getUnverifiedInvocations() {
-        return unverifiedInvocations;
+    public void assertNoMoreInvocations() {
+        if (!unverifiedInvocations.isEmpty()) {
+            ObservedInvocation observedInvocation = unverifiedInvocations.get(0);
+            throw new AssertionError(getNoMoreInvocationsErrorMessage(observedInvocation.getProxyInvocation()));
+        }
     }
 
 
-    public Invocation verifyMatchingInvocation(InvocationMatcher invocationMatcher) {
-        Iterator<Invocation> iterator = unverifiedInvocations.iterator();
-        while (iterator.hasNext()) {
-            Invocation invocation = iterator.next();
-            if (invocationMatcher.matches(invocation)) {
-                iterator.remove();
-                return invocation;
+    public void assertInvoked(BehaviorDefiningInvocation behaviorDefiningInvocation) {
+        ObservedInvocation unverifiedInvocation = getMatchingUnverifiedInvocation(behaviorDefiningInvocation);
+        if (unverifiedInvocation == null) {
+            throw new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation.getProxyInvocation()));
+        }
+        unverifiedInvocations.remove(unverifiedInvocation);
+    }
+
+
+    public void assertNotInvoked(BehaviorDefiningInvocation behaviorDefiningInvocation) {
+        ObservedInvocation unverifiedInvocation = getMatchingUnverifiedInvocation(behaviorDefiningInvocation);
+        if (unverifiedInvocation != null) {
+            unverifiedInvocations.remove(unverifiedInvocation);
+            throw new AssertionError(getAssertNotInvokedErrorMessage(behaviorDefiningInvocation.getProxyInvocation()));
+        }
+    }
+
+
+    public String createReport(Object testObject) {
+        ScenarioReport scenarioReport = new DefaultScenarioReport();
+        return scenarioReport.createReport("Mock report:", testObject, this);
+    }
+
+
+    protected ObservedInvocation getMatchingUnverifiedInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation) {
+        for (ObservedInvocation observedInvocation : unverifiedInvocations) {
+            if (behaviorDefiningInvocation.matches(observedInvocation.getProxyInvocation())) {
+                return observedInvocation;
             }
         }
         return null;
     }
+
+
+    protected String getAssertNotInvokedErrorMessage(ProxyInvocation proxyInvocation) {
+        StringBuilder message = new StringBuilder();
+        Method method = proxyInvocation.getMethod();
+        message.append("Prohibited invocation of ");
+        message.append(MethodFormatUtil.getCompleteRepresentation(method));
+        message.append(" at ");
+        message.append(proxyInvocation.getInvokedAt());
+        message.append("\n");
+        message.append(createReport(null));
+        return message.toString();
+    }
+
+
+    // todo check message
+    protected String getAssertInvokedErrorMessage(ProxyInvocation proxyInvocation) {
+        StringBuilder message = new StringBuilder();
+        Method method = proxyInvocation.getMethod();
+        message.append("Expected invocation of ");
+        message.append(MethodFormatUtil.getCompleteRepresentation(method));
+        message.append(", but the invocation didn't occur.");
+        message.append("\n");
+        message.append(createReport(null));
+        return message.toString();
+    }
+
+
+    protected String getNoMoreInvocationsErrorMessage(ProxyInvocation invocation) {
+        StringBuilder message = new StringBuilder();
+        Method method = invocation.getMethod();
+        message.append("No more invocations expected, but ");
+        message.append(MethodFormatUtil.getCompleteRepresentation(method));
+        message.append(" was called from ");
+        message.append(invocation.getInvokedAt());
+        message.append("\n");
+        message.append(createReport(null));
+        return message.toString();
+    }
+
 
 }

@@ -367,7 +367,6 @@ public class ReflectionUtils {
      * @return The field that matches the given parameters, or null if no such field exists
      */
     public static Field getFieldWithName(Class<?> clazz, String fieldName, boolean isStatic) {
-
         if (clazz == null || clazz.equals(Object.class)) {
             return null;
         }
@@ -537,5 +536,6 @@ public class ReflectionUtils {
         result.addAll(getAllFields(clazz.getSuperclass()));
         return result;
     }
+
 
 }
