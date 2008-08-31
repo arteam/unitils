@@ -19,6 +19,15 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
+ * Mock behavior that returns a default value.
+ * <p/>
+ * Following defaults are used:<ul>
+ * <li>Primitive values: 0</li>
+ * <li>Object values: null</li>
+ * <li>Collectionn, arrays etc: empty values</li></ul>
+ * <p/>
+ * todo implment default values
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
@@ -26,7 +35,13 @@ import org.unitils.mock.proxy.ProxyInvocation;
 public class DefaultValueReturningMockBehavior implements MockBehavior {
 
 
-    public Object execute(ProxyInvocation invocation) {
+    /**
+     * Executes the mock behavior.
+     *
+     * @param proxyInvocation The proxy method invocation, not null
+     * @return The default value
+     */
+    public Object execute(ProxyInvocation proxyInvocation) {
         return null;
     }
 

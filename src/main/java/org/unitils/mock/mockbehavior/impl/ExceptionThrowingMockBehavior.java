@@ -19,20 +19,34 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
+ * Mock behavior that throws a given exception.
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
 public class ExceptionThrowingMockBehavior implements MockBehavior {
 
+    /* The exception to throw */
     private Throwable exceptionToThrow;
 
 
+    /**
+     * Creates the throwing behavior for the given exception.
+     *
+     * @param exceptionToThrow The exception, not null
+     */
     public ExceptionThrowingMockBehavior(Throwable exceptionToThrow) {
         this.exceptionToThrow = exceptionToThrow;
     }
 
 
+    /**
+     * Executes the mock behavior.
+     *
+     * @param proxyInvocation The proxy method invocation, not null
+     * @return Nothing
+     */
     public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
         throw exceptionToThrow;
     }

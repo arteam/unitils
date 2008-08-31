@@ -104,16 +104,20 @@ public class MockModule implements Module {
     protected void createAndInjectMocksIntoTest(Object testObject) {
         Set<Field> mockFields = getFieldsOfType(testObject.getClass(), Mock.class, false);
         for (Field field : mockFields) {
-            Mock<?> mock = createMock(field, false);
-            setFieldValue(testObject, field, mock);
-            callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
+            if (getFieldValue(testObject, field) == null) {
+                Mock<?> mock = createMock(field, false);
+                setFieldValue(testObject, field, mock);
+                callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
+            }
         }
 
         Set<Field> partialMockFields = getFieldsOfType(testObject.getClass(), PartialMock.class, false);
         for (Field field : partialMockFields) {
-            Mock<?> mock = createMock(field, true);
-            setFieldValue(testObject, field, mock);
-            callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
+            if (getFieldValue(testObject, field) == null) {
+                Mock<?> mock = createMock(field, true);
+                setFieldValue(testObject, field, mock);
+                callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
+            }
         }
     }
 

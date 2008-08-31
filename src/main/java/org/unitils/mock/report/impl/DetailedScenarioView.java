@@ -16,8 +16,8 @@
 package org.unitils.mock.report.impl;
 
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.invocation.BehaviorDefiningInvocation;
-import org.unitils.mock.invocation.ObservedInvocation;
+import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;

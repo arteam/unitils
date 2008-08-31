@@ -15,8 +15,8 @@
  */
 package org.unitils.mock.core;
 
-import org.unitils.mock.invocation.BehaviorDefiningInvocation;
-import org.unitils.mock.invocation.ObservedInvocation;
+import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.proxy.MethodFormatUtil;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioReport;
@@ -124,13 +124,13 @@ public class Scenario {
     }
 
 
-    protected String getNoMoreInvocationsErrorMessage(ProxyInvocation invocation) {
+    protected String getNoMoreInvocationsErrorMessage(ProxyInvocation proxyInvocation) {
         StringBuilder message = new StringBuilder();
-        Method method = invocation.getMethod();
+        Method method = proxyInvocation.getMethod();
         message.append("No more invocations expected, but ");
         message.append(MethodFormatUtil.getCompleteRepresentation(method));
         message.append(" was called from ");
-        message.append(invocation.getInvokedAt());
+        message.append(proxyInvocation.getInvokedAt());
         message.append("\n");
         message.append(createReport(null));
         return message.toString();
