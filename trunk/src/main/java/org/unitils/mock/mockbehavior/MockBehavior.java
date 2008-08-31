@@ -19,11 +19,22 @@ import org.unitils.mock.proxy.ProxyInvocation;
 
 
 /**
+ * Behavior for a mock instance. Mock behavior is defined before the test is performed and then executed during
+ * the test when needed. If a certain proxy method invocation requires the mock behavior, the {@link #execute} method
+ * is called with the invocation as argument. The result value will then be used as return value of the proxy method.
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
 public interface MockBehavior {
 
+
+    /**
+     * Executes the mock behavior.
+     *
+     * @param proxyInvocation The proxy method invocation, not null
+     * @return The result value
+     */
     Object execute(ProxyInvocation proxyInvocation) throws Throwable;
 }

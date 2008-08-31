@@ -16,7 +16,7 @@
 package org.unitils.mock.report.impl;
 
 import org.unitils.mock.core.Scenario;
-import org.unitils.mock.invocation.ObservedInvocation;
+import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioView;
 import static org.unitils.util.ReflectionUtils.getAllFields;

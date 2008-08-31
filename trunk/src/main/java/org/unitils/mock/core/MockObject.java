@@ -15,14 +15,16 @@
  */
 package org.unitils.mock.core;
 
+import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
-import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.*;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.getArgumentMatchers;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.resetArgumentMatchers;
 import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
-import org.unitils.mock.invocation.BehaviorDefiningInvocation;
-import org.unitils.mock.invocation.ObservedInvocation;
+import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
@@ -31,13 +33,14 @@ import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
 import static org.unitils.mock.proxy.ProxyUtil.createProxy;
-import org.unitils.core.util.ObjectFormatter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Implementation of a Mock and PartialMock.
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
@@ -46,26 +49,35 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
 
 
     /* The name of the mock (e.g. the name of the field) */
-    private String name;
+    protected String name;
 
     /* The class type that is mocked */
-    private Class<T> mockedClass;
+    protected Class<T> mockedClass;
 
     /* True if the actual method behavior should be invoked if no mock behavior is defined for the method */
-    private boolean partialMock;
+    protected boolean partialMock;
 
     /* Mock behaviors that are removed once they have been matched */
-    private List<BehaviorDefiningInvocation> oneTimeMatchingMockBehaviors = new ArrayList<BehaviorDefiningInvocation>();
+    protected List<BehaviorDefiningInvocation> oneTimeMatchingMockBehaviors = new ArrayList<BehaviorDefiningInvocation>();
 
     /* Mock behaviors that can be matched and re-used for several invocation */
-    private List<BehaviorDefiningInvocation> alwaysMatchingMockBehaviors = new ArrayList<BehaviorDefiningInvocation>();
+    protected List<BehaviorDefiningInvocation> alwaysMatchingMockBehaviors = new ArrayList<BehaviorDefiningInvocation>();
+
+    /* The scenario that will record all observed invocations */
+    protected Scenario scenario;
+
+    /* The mock proxy instance */
+    protected T instance;
 
 
-    private Scenario scenario;
-
-    private T instance;
-
-
+    /**
+     * Creates a mock of the given type for the given scenario.
+     *
+     * @param name        The name of the mock, e.g. the field-name, not null
+     * @param mockedClass The mock type that will be proxied, not null
+     * @param partialMock True for creating a partial mock
+     * @param scenario    The scenario, not null
+     */
     public MockObject(String name, Class<T> mockedClass, boolean partialMock, Scenario scenario) {
         this.name = name;
         this.mockedClass = mockedClass;
@@ -74,24 +86,76 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
         this.instance = createInstance();
     }
 
+    //
+    // Implementation of the Mock and PartialMock interfaces
+    //
 
+    /**
+     * Gets the mock proxy instance. This is the instance that can be used to perform the test.
+     * You could for example inject it in the tested object. It will then perform the defined behavior and record
+     * all observed method invocations so that assertions can be performed afterwards.
+     *
+     * @return The proxy instance, not null
+     */
     public T getInstance() {
         return instance;
     }
 
 
+    /**
+     * Defines behavior for this mock so that it will return the given value when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.returns("aValue").method1();
+     * <p/>
+     * will return "aValue" when method1 is called.
+     * <p/>
+     * Note that this behavior is executed each time a match is found. So "aValue" will be returned
+     * each time method1() is called. If you only want to return the value once, use the {@link #onceReturns} method.
+     *
+     * @param returnValue The value to return
+     * @return The proxy instance that will record the method call, not null
+     */
     public T returns(Object returnValue) {
         MockBehavior mockBehavior = new ValueReturningMockBehavior(returnValue);
         return createMockObjectProxy(new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior));
     }
 
 
+    /**
+     * Defines behavior for this mock so that it raises the given exception when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.raises(new MyException()).method1();
+     * <p/>
+     * will throw the given exception when method1 is called.
+     * <p/>
+     * Note that this behavior is executed each time a match is found. So the exception will be raised
+     * each time method1() is called. If you only want to raise the exception once, use the {@link #onceRaises} method.
+     *
+     * @param exception The exception to raise, not null
+     * @return The proxy instance that will record the method call, not null
+     */
     public T raises(Throwable exception) {
         MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
         return createMockObjectProxy(new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior));
     }
 
 
+    /**
+     * Defines behavior for this mock so that will be performed when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.performs(new MyMockBehavior()).method1();
+     * <p/>
+     * will execute the given mock behavior when method1 is called.
+     * <p/>
+     * Note that this behavior is executed each time a match is found. So the behavior will be executed
+     * each time method1() is called. If you only want to execute the behavior once, use the {@link #oncePerforms} method.
+     *
+     * @param mockBehavior The behavior to perform, not null
+     * @return The proxy instance that will record the method call, not null
+     */
     public T performs(MockBehavior mockBehavior) {
         return createMockObjectProxy(new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior));
     }
@@ -123,6 +187,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
         return createMockObjectProxy(new AssertNotInvokedInvocationHandler());
     }
 
+    //
+    // Core implementation
+    //
 
     protected Object handleMockObjectInvocation(ProxyInvocation proxyInvocation) throws Throwable {
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
@@ -136,20 +203,6 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
         ObservedInvocation mockInvocation = createObservedInvocation(proxyInvocation, result, behaviorDefiningInvocation, mockBehavior);
         scenario.addObservedMockInvocation(mockInvocation);
         return result;
-    }
-
-
-    protected T createInstance() {
-        return createMockObjectProxy(new MockObjectInvocationHandler());
-    }
-
-    protected ObjectFormatter createObjectFormatter() {
-        return new ObjectFormatter(10);
-    }
-
-
-    protected T createMockObjectProxy(ProxyInvocationHandler invocationHandler) {
-        return createProxy(mockedClass, invocationHandler);
     }
 
 
@@ -201,6 +254,24 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
         return new DefaultValueReturningMockBehavior();
     }
 
+    //
+    // Factory methods
+    //
+
+    protected T createInstance() {
+        return createMockObjectProxy(new MockObjectInvocationHandler());
+    }
+
+    protected ObjectFormatter createObjectFormatter() {
+        return new ObjectFormatter(10);
+    }
+
+
+    protected T createMockObjectProxy(ProxyInvocationHandler invocationHandler) {
+        return createProxy(mockedClass, invocationHandler);
+    }
+
+
     protected BehaviorDefiningInvocation createBehaviorDefiningInvocation(ProxyInvocation proxyInvocation, MockBehavior mockBehavior) {
         List<ArgumentMatcher> argumentMatchers = createArgumentMatchers(proxyInvocation);
         return new BehaviorDefiningInvocation(name, proxyInvocation, argumentMatchers, mockBehavior);
@@ -237,11 +308,13 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
         return result;
     }
 
+    //
+    // Proxy invocation handlers
+    //
 
     protected class AlwaysMatchingMockBehaviorInvocationHandler implements ProxyInvocationHandler {
 
         private MockBehavior mockBehavior;
-
 
         public AlwaysMatchingMockBehaviorInvocationHandler(MockBehavior mockBehavior) {
             this.mockBehavior = mockBehavior;

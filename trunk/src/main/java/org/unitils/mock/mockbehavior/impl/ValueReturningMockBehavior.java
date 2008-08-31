@@ -19,20 +19,34 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
+ * Mock behavior that returns a given value.
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
 public class ValueReturningMockBehavior implements MockBehavior {
 
+    /* The value to return */
     private Object valueToReturn;
 
 
+    /**
+     * Creates the returning behavior for the given value.
+     *
+     * @param valueToReturn The value
+     */
     public ValueReturningMockBehavior(Object valueToReturn) {
         this.valueToReturn = valueToReturn;
     }
 
 
+    /**
+     * Executes the mock behavior.
+     *
+     * @param proxyInvocation The proxy method invocation, not null
+     * @return The value
+     */
     public Object execute(ProxyInvocation proxyInvocation) {
         return valueToReturn;
     }

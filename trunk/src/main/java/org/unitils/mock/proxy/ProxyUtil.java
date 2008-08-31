@@ -111,20 +111,20 @@ public class ProxyUtil {
 
         public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
             StackTraceElement invokedAt = getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace());
-            ProxyInvocation invocation = new ProxyMethodInvocation(method, asList(arguments), invokedAt, proxy, methodProxy);
+            ProxyInvocation invocation = new CglibProxyInvocation(method, asList(arguments), invokedAt, proxy, methodProxy);
             return invocationHandler.handleInvocation(invocation);
         }
     }
 
 
-    public static class ProxyMethodInvocation extends ProxyInvocation {
+    public static class CglibProxyInvocation extends ProxyInvocation {
 
         private Object proxy;
 
         private MethodProxy methodProxy;
 
 
-        public ProxyMethodInvocation(Method method, List<?> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
+        public CglibProxyInvocation(Method method, List<?> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
             super(method, arguments, invokedAt);
             this.proxy = proxy;
             this.methodProxy = methodProxy;

@@ -19,6 +19,11 @@ import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
+ * Mock behavior that, instead of mocking the method invocation, performs the actual behavior of the mocked class.
+ * This is used to implement the partial mock behavior.
+ * <p/>
+ * todo test: what if there is no original behavior (e.g. interface)
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
@@ -26,6 +31,12 @@ import org.unitils.mock.proxy.ProxyInvocation;
 public class OriginalBehaviorInvokingMockBehavior implements MockBehavior {
 
 
+    /**
+     * Executes the mock behavior.
+     *
+     * @param proxyInvocation The proxy method invocation, not null
+     * @return The result value
+     */
     public Object execute(ProxyInvocation proxyInvocation) throws Throwable {
         return proxyInvocation.invokeOriginalBehavior();
     }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.mock.invocation;
+package org.unitils.mock.core;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.mockbehavior.MockBehavior;
