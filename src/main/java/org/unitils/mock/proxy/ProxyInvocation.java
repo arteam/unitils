@@ -19,20 +19,31 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
+ * An invocation of a proxy method.
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
 public abstract class ProxyInvocation {
 
-
+    /* The method that was called */
     private Method method;
 
+    /* The arguments that were used */
     private List<?> arguments;
 
+    /* The location of the invocation */
     private StackTraceElement invokedAt;
 
 
+    /**
+     * Creates an invocation.
+     *
+     * @param method    The method that was called, not null
+     * @param arguments The arguments that were used, not null
+     * @param invokedAt The location of the invocation, not null
+     */
     public ProxyInvocation(Method method, List<?> arguments, StackTraceElement invokedAt) {
         this.method = method;
         this.arguments = arguments;
@@ -40,19 +51,35 @@ public abstract class ProxyInvocation {
     }
 
 
-    public abstract Object invokeOriginalBehavior() throws Throwable;
+    /**
+     * Calls the actual method that was proxied using the same arguments.
+     *
+     * @return The result value
+     */
+    public Object invokeOriginalBehavior() throws Throwable {
+        throw new UnsupportedOperationException("Invoking of original behavior not implemented.");
+    }
 
 
+    /**
+     * @return The method that was called, not null
+     */
     public Method getMethod() {
         return method;
     }
 
 
+    /**
+     * @return The arguments that were used, not null
+     */
     public List<?> getArguments() {
         return arguments;
     }
 
 
+    /**
+     * @return The location of the invocation, not null
+     */
     public StackTraceElement getInvokedAt() {
         return invokedAt;
     }

@@ -18,31 +18,36 @@ package org.unitils.mock.argumentmatcher.impl;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 /**
- * An {@link ArgumentMatcher} implementation that will match if the given argument is (object) identical to the <code>Object</code> passed on construction.
- * 
+ * A matcher that will check whether an argument is the same instance (object identical) as the given value.
+ *
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
- *
  */
 public class SameArgumentMatcher implements ArgumentMatcher {
 
-	private final Object o;
+    /* The expected value */
+    private final Object value;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param o the object to check for object identity. Not null.
-	 */
-	public SameArgumentMatcher(Object o) {
-		this.o = o;
-	}
-	
-	/*
-	 * @see ArgumentMatcher#matches(Object)
-	 */
-	public boolean matches(Object o) {
-		return this.o == o;
-	}
+
+    /**
+     * Creates a matcher for the given value.
+     *
+     * @param value The expected value
+     */
+    public SameArgumentMatcher(Object value) {
+        this.value = value;
+    }
+
+
+    /**
+     * Returns true if the given object matches the expected argument, false otherwise.
+     *
+     * @param value The value to match
+     * @return True when passed object matches, false otherwise.
+     */
+    public boolean matches(Object value) {
+        return this.value == value;
+    }
 
 }

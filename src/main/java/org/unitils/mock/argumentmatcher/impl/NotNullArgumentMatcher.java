@@ -18,19 +18,23 @@ package org.unitils.mock.argumentmatcher.impl;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 
 /**
- * An {@link org.unitils.mock.argumentmatcher.ArgumentMatcher} implementation that will match if the given argument is not null.
- * 
+ * A matcher that will check whether an argument is not null.
+ *
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class NotNullArgumentMatcher implements ArgumentMatcher {
 
-	/*
-	 * @see ArgumentMatcher#matches(Object)
-	 */
-	public boolean matches(Object o) {
-		return o != null;
-	}
+
+    /**
+     * Returns true if the given object is not null, false otherwise.
+     *
+     * @param value The value to match
+     * @return True when passed object matches, false otherwise.
+     */
+    public boolean matches(Object value) {
+        return value != null;
+    }
 
 }

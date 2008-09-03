@@ -17,36 +17,41 @@ package org.unitils.mock.argumentmatcher.impl;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.ReflectionComparatorFactory;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 
 /**
- * An {@link ArgumentMatcher} implementation that will match if the given argument equals the <code>Object</code> passed on construction.
+ * A matcher for checking whether an argument equals a given value.
  * Reflection is used to compare all fields of these values.
- * 
+ *
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
- *
  */
 public class RefEqArgumentMatcher implements ArgumentMatcher {
 
-	private final Object o;
-	
-	/**
-	 * Constructor.
-	 * 
-	 * @param o the object to check for equality. Not null.
-	 */
-	public RefEqArgumentMatcher(Object o) {
-		this.o = o;
-	}
-	
-	/*
-	 * @see ArgumentMatcher#matches(Object)
-	 */
-	public boolean matches(Object o) {
-        ReflectionComparator reflectionComparator = ReflectionComparatorFactory.createRefectionComparator();
-        return reflectionComparator.getDifference(this.o, o) == null;
-	}
+    /* The expected value */
+    private final Object value;
+
+
+    /**
+     * Creates a matcher for the given value.
+     *
+     * @param value The expected value
+     */
+    public RefEqArgumentMatcher(Object value) {
+        this.value = value;
+    }
+
+
+    /**
+     * Returns true if the given object matches the expected argument, false otherwise.
+     *
+     * @param value The value to match
+     * @return True when passed object matches, false otherwise.
+     */
+    public boolean matches(Object value) {
+        ReflectionComparator reflectionComparator = createRefectionComparator();
+        return reflectionComparator.isEqual(this.value, value);
+    }
 
 }

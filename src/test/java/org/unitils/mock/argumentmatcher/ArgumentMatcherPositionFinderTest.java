@@ -15,11 +15,11 @@
  */
 package org.unitils.mock.argumentmatcher;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
 import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.mock.ArgumentMatchers.refEq;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
@@ -41,11 +41,11 @@ import java.util.List;
 public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
 
     /* The line nrs of the proxy method invocations in the TestClass.test method */
-    private int invocationLineNr = 153;
-    private int noMatcherInvocationLineNr = 155;
-    private int doubleInvocationLineNr = 157;
-    private int staticInvocationLineNr = 159;
-    private int noArgumentsInvocationLineNr = 161;
+    private int invocationLineNr = 151;
+    private int noMatcherInvocationLineNr = 153;
+    private int doubleInvocationLineNr = 155;
+    private int staticInvocationLineNr = 157;
+    private int noArgumentsInvocationLineNr = 159;
 
     /* A regular target method on the proxy */
     private Method proxyMethod;
@@ -124,20 +124,18 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
     /**
      * Test for trying to find matchers on a non-existing method.
      */
-    @Test
+    @Test(expected = UnitilsException.class)
     public void testGetArgumentMatcherIndexes_wrongMethodName() {
-        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "xxxx", proxyMethod, invocationLineNr, 1);
-        assertNull(result);
+        getArgumentMatcherIndexes(TestClass.class, "xxxx", proxyMethod, invocationLineNr, 1);
     }
 
 
     /**
      * Test for trying to find matchers on a wrong line.
      */
-    @Test
+    @Test(expected = UnitilsException.class)
     public void testGetArgumentMatcherIndexes_wrongLineNr() {
         List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, invocationLineNr, 9999);
-        assertNull(result);
     }
 
 
@@ -154,8 +152,7 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
             // invocation without argument matchers
             testProxy.someMethod("aValue", "aValue", "aValue");
             // 2 invocations on same line  DO NOT FORMAT
-            testProxy.someMethod(notNull(String.class), "aValue", "aValue");
-            testProxy.someMethod("aValue", "aValue", notNull(String.class));
+            testProxy.someMethod(notNull(String.class), "aValue", "aValue"); testProxy.someMethod("aValue", "aValue", notNull(String.class));
             // static invocation
             TestProxy.someStaticMethod(refEq(1), 33);
             // no arguments invocation

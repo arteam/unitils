@@ -19,8 +19,6 @@ import net.sf.cglib.proxy.*;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.proxy.ProxyInvocationHandler;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -38,8 +36,7 @@ public class ProxyUtil {
 
 
     /**
-     * Creates a proxy object for the given mock object.
-     * A invocation handler must be passed to hook into the proxy.
+     * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
      * @param mockedClass       The type to proxy, not null
      * @param invocationHandler The handler that will handle the method invocations of the proxy, not null.
@@ -57,23 +54,6 @@ public class ProxyUtil {
         Factory proxy = (Factory) objenesis.newInstance(enhancedTargetClass);
         proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(invocationHandler)});
         return (T) proxy;
-    }
-
-
-    /**
-     * Gets the method of the proxied class that was replaced by the given proxy method.
-     * An exception is thrown when the method is not found.
-     *
-     * @param proxyMethod  The proxy method for which to find the actual method, not null
-     * @param proxiedClass The class that was proxied, not null
-     * @return The method of the proxied class, not null
-     */
-    public static Method getOriginalMethod(Method proxyMethod, Class<?> proxiedClass) {
-        try {
-            return proxiedClass.getMethod(proxyMethod.getName(), proxyMethod.getParameterTypes());
-        } catch (NoSuchMethodException e) {
-            throw new UnitilsException("Unable to find the original method in class " + proxiedClass + " for following proxy method: " + proxyMethod, e);
-        }
     }
 
 
@@ -99,16 +79,35 @@ public class ProxyUtil {
     }
 
 
+    /**
+     * A cglib method intercepter that will delegate the invocations to the given invocation hanlder.
+     */
     public static class ProxyMethodInterceptor implements MethodInterceptor {
 
+        /* The invocation handler */
         private ProxyInvocationHandler invocationHandler;
 
 
+        /**
+         * Creates an interceptor.
+         *
+         * @param invocationHandler The handler to delegate the invocations to, not null
+         */
         public ProxyMethodInterceptor(ProxyInvocationHandler invocationHandler) {
             this.invocationHandler = invocationHandler;
         }
 
 
+        /**
+         * Intercepts the method call by wrapping the invocation in a {@link CglibProxyInvocation} and delegating the
+         * handling to the invocation handler.
+         *
+         * @param proxy       The proxy, not null
+         * @param method      The method that was called, not null
+         * @param arguments   The arguments that were used, not null
+         * @param methodProxy The cglib method proxy, not null
+         * @return The value to return for the method call, ignored for void methods
+         */
         public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
             StackTraceElement invokedAt = getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace());
             ProxyInvocation invocation = new CglibProxyInvocation(method, asList(arguments), invokedAt, proxy, methodProxy);
@@ -117,13 +116,27 @@ public class ProxyUtil {
     }
 
 
+    /**
+     * An invocation implementation that uses the cglib method proxy to be able to invoke the original behavior.
+     */
     public static class CglibProxyInvocation extends ProxyInvocation {
 
+        /* The proxy */
         private Object proxy;
 
+        /* The cglib method proxy */
         private MethodProxy methodProxy;
 
 
+        /**
+         * Creates an invocation.
+         *
+         * @param method      The method that was called, not null
+         * @param arguments   The arguments that were used, not null
+         * @param invokedAt   The location of the invocation, not null
+         * @param proxy       The proxy, not null
+         * @param methodProxy The cglib method proxy, not null
+         */
         public CglibProxyInvocation(Method method, List<?> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
             super(method, arguments, invokedAt);
             this.proxy = proxy;
@@ -131,6 +144,11 @@ public class ProxyUtil {
         }
 
 
+        /**
+         * Invokes the original behavior by calling the method proxy.
+         *
+         * @return The result value
+         */
         @Override
         public Object invokeOriginalBehavior() throws Throwable {
             return methodProxy.invokeSuper(proxy, getArguments().toArray());

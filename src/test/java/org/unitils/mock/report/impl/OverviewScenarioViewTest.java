@@ -41,9 +41,7 @@ public class OverviewScenarioViewTest {
     private Mock<TestInterface> testMock;
 
 
-    /**
-     * Initializes the test.
-     */
+    /** Initializes the test. */
     @Before
     public void setUp() {
         overviewScenarioView = new OverviewScenarioView();
@@ -52,28 +50,24 @@ public class OverviewScenarioViewTest {
     }
 
 
-    /**
-     * Test for creating a view containing 2 mock invocations.
-     */
+    /** Test for creating a view containing 2 mock invocations. */
     @Test
     public void testCreateView() {
         TestInterface testProxy = testMock.getInstance();
         testProxy.testMethod1("value1");
         testProxy.testMethod2();
 
-        String result = overviewScenarioView.createView(this, scenario);
+        String result = overviewScenarioView.createView(scenario);
 
         assertTrue(result.contains("testMethod1"));
         assertTrue(result.contains("testMethod2"));
     }
 
 
-    /**
-     * Test for creating a view when there were no mock invocations.
-     */
+    /** Test for creating a view when there were no mock invocations. */
     @Test
     public void testCreateView_noInvocations() {
-        String result = overviewScenarioView.createView(this, scenario);
+        String result = overviewScenarioView.createView(scenario);
         assertTrue(result.isEmpty());
     }
 
@@ -87,7 +81,7 @@ public class OverviewScenarioViewTest {
         TestInterface testProxy = testMock.getInstance();
         testProxy.testMethod1("012345678901234567891");
 
-        String result = overviewScenarioView.createView(this, scenario);
+        String result = overviewScenarioView.createView(scenario);
         assertTrue(result.contains("string1"));
         assertTrue(result.contains("012345678901234567891"));
     }
@@ -103,15 +97,13 @@ public class OverviewScenarioViewTest {
         TestInterface testProxy = testMock.getInstance();
         testProxy.testMethod1(null);
 
-        String result = overviewScenarioView.createView(this, scenario);
+        String result = overviewScenarioView.createView(scenario);
         assertTrue(result.contains("string1"));
         assertTrue(result.contains("012345678901234567891"));
     }
 
 
-    /**
-     * Test interface that is going to be mocked.
-     */
+    /** Test interface that is going to be mocked. */
     public static interface TestInterface {
 
         public String testMethod1(String arg1);

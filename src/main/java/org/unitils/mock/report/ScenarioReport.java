@@ -30,11 +30,10 @@ public interface ScenarioReport {
     /**
      * Creates a report.
      *
-     * @param message    An optional message
-     * @param testObject The test instance, null if there is no test object
-     * @param scenario   The scenario to output, not null
+     * @param message  An optional message
+     * @param scenario The scenario to output, not null
      * @return the report, not null
      */
-    String createReport(String message, Object testObject, Scenario scenario);
+    String createReport(String message, Scenario scenario);
 
 }

@@ -47,17 +47,13 @@ public class MockModule implements Module {
     private Scenario scenario;
 
 
-    /**
-     * No initialization needed for this module
-     */
+    /** No initialization needed for this module */
     public void init(Properties configuration) {
         scenario = createScenario();
     }
 
 
-    /**
-     * No after initialization needed for this module
-     */
+    /** No after initialization needed for this module */
     public void afterInit() {
     }
 
@@ -73,7 +69,7 @@ public class MockModule implements Module {
 
 
     public void logExecutionScenario() {
-        String report = scenario.createReport(null);
+        String report = scenario.createReport();
         logger.info(report);
     }
 
@@ -158,9 +154,7 @@ public class MockModule implements Module {
     }
 
 
-    /**
-     * Test listener that handles the mock creation and injection.
-     */
+    /** Test listener that handles the mock creation and injection. */
     protected class MockTestListener extends TestListener {
 
         /**

@@ -76,7 +76,7 @@ public class ArgumentMatcherPositionFinder {
 
         // find the correct test method
         List<MethodNode> testMethodNodes = restClassNode.methods;
-        for (final MethodNode testMethodNode : testMethodNodes) {
+        for (MethodNode testMethodNode : testMethodNodes) {
 
             // another method with the same name may exist
             // if no result was found it could be that the line nr was for the other method, so continue with the search

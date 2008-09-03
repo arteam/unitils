@@ -15,40 +15,46 @@
  */
 package org.unitils.mock.argumentmatcher.impl;
 
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import org.unitils.reflectionassert.ReflectionComparator;
+import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
-import org.unitils.reflectionassert.ReflectionComparator;
-import org.unitils.reflectionassert.ReflectionComparatorFactory;
-
 /**
- * An {@link ArgumentMatcher} implementation that will match if the given argument equals the <code>Object</code> passed on construction.
- * Reflection is used to compare all fields of these values, but order of collections is ignored and only fields that have a non default value will be compared. 
- * 
+ * A matcher for checking whether an argument equals a given value.
+ * Reflection is used to compare all fields of these values. The actual order of collections will be ignored and only
+ * fields that have a non default value will be compared.
+ *
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
- *
  */
 public class LenEqArgumentMatcher implements ArgumentMatcher {
-	private final Object o;
-	
-	/**
-	 * Constructor.
-	 * 
-	 * @param o the object to check for equality. Not null.
-	 */
-	public LenEqArgumentMatcher(Object o) {
-		this.o = o;
-	}
-	
-	/*
-	 * @see ArgumentMatcher#matches(Object)
-	 */
-	public boolean matches(Object o) {
-        ReflectionComparator reflectionComparator = ReflectionComparatorFactory.createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
-        return reflectionComparator.getDifference(this.o, o) == null;
-	}
+
+    /* The expected value */
+    private final Object value;
+
+
+    /**
+     * Creates a matcher for the given value.
+     *
+     * @param value The expected value
+     */
+    public LenEqArgumentMatcher(Object value) {
+        this.value = value;
+    }
+
+
+    /**
+     * Returns true if the given object matches the expected argument, false otherwise.
+     *
+     * @param value The value to match
+     * @return True when passed object matches, false otherwise.
+     */
+    public boolean matches(Object value) {
+        ReflectionComparator reflectionComparator = createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
+        return reflectionComparator.isEqual(this.value, value);
+    }
 
 }

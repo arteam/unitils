@@ -97,8 +97,14 @@ public class ObjectFormatter {
             result.append('"');
             return;
         }
-        if (object instanceof Number || object instanceof Character) {
+        if (object instanceof Number) {
             result.append(String.valueOf(object));
+            return;
+        }
+        if (object instanceof Character) {
+            result.append('\'');
+            result.append(String.valueOf(object));
+            result.append('\'');
             return;
         }
         Class type = object.getClass();

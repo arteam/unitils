@@ -15,9 +15,8 @@
  */
 package org.unitils.mock.report.impl;
 
-import org.unitils.mock.core.Scenario;
 import org.unitils.mock.core.ObservedInvocation;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioView;
 import static org.unitils.util.ReflectionUtils.getAllFields;
 import static org.unitils.util.ReflectionUtils.getFieldValue;
@@ -38,17 +37,16 @@ public class SuggestedAssertsScenarioView implements ScenarioView {
     /**
      * Creates a string representation of the given scenario.
      *
-     * @param testObject The test instance, null if there is no test object
-     * @param scenario   The sceneario, not null
+     * @param scenario The sceneario, not null
      * @return The string representation, not null
      */
-    public String createView(Object testObject, Scenario scenario) {
+    public String createView(Scenario scenario) {
         StringBuilder result = new StringBuilder();
 
         for (ObservedInvocation mockInvocation : scenario.getObservedInvocations()) {
             // do not output mocked methods (methods that return values)
-            if (Void.TYPE.equals(mockInvocation.getProxyInvocation().getMethod().getReturnType())) {
-                result.append(getSuggestedAssertStatement(testObject, mockInvocation));
+            if (Void.TYPE.equals(mockInvocation.getMethod().getReturnType())) {
+                result.append(getSuggestedAssertStatement(null, mockInvocation));
                 result.append("\n");
             }
         }
@@ -59,22 +57,20 @@ public class SuggestedAssertsScenarioView implements ScenarioView {
     /**
      * Creates an assert statement for the given method invocation and arguments.
      *
-     * @param testObject     The test instance, null if there is no test object
-     * @param mockInvocation The invocation, not null
+     * @param testObject         The test instance, null if there is no test object
+     * @param observedInvocation The invocation, not null
      * @return The string representation of the assert statement, not null
      */
-    protected String getSuggestedAssertStatement(Object testObject, ObservedInvocation mockInvocation) {
+    protected String getSuggestedAssertStatement(Object testObject, ObservedInvocation observedInvocation) {
         StringBuilder result = new StringBuilder();
 
-        ProxyInvocation proxyInvocation = mockInvocation.getProxyInvocation();
-
         result.append("assertInvoked(");
-        result.append(mockInvocation.getMockName());
+        result.append(observedInvocation.getMockName());
         result.append(").");
-        result.append(proxyInvocation.getMethod().getName());
+        result.append(observedInvocation.getMethod().getName());
         result.append("(");
         boolean firstArgument = true;
-        for (Object argument : proxyInvocation.getArguments()) {
+        for (Object argument : observedInvocation.getArguments()) {
             String testObjectFieldName = getFieldName(testObject, argument);
             if (!firstArgument) {
                 result.append(", ");
