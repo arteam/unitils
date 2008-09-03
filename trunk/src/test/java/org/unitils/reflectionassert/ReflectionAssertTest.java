@@ -198,7 +198,7 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
             assertLenEquals(new String[]{"test1", "test2"}, new Integer[]{1, 2});
         } catch (AssertionFailedError a) {
             // expected
-            assertTrue(a.getMessage().contains("[test1, test2]"));
+            assertTrue(a.getMessage().contains("[\"test1\", \"test2\"]"));
             assertTrue(a.getMessage().contains("[1, 2]"));
         }
     }

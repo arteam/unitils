@@ -27,36 +27,27 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class BehaviorDefiningInvocation {
+public class BehaviorDefiningInvocation extends ProxyInvocation {
 
     private String mockName;
-
-    private ProxyInvocation proxyInvocation;
 
     private List<ArgumentMatcher> argumentMatchers;
 
     private MockBehavior mockBehavior;
 
+    private boolean used;
 
-    public BehaviorDefiningInvocation(String mockName, ProxyInvocation proxyInvocation, List<ArgumentMatcher> argumentMatchers, MockBehavior mockBehavior) {
+
+    public BehaviorDefiningInvocation(String mockName, Method method, List<?> arguments, StackTraceElement invokedAt, List<ArgumentMatcher> argumentMatchers, MockBehavior mockBehavior) {
+        super(method, arguments, invokedAt);
         this.mockName = mockName;
-        this.proxyInvocation = proxyInvocation;
         this.argumentMatchers = argumentMatchers;
         this.mockBehavior = mockBehavior;
-
-        Method method = proxyInvocation.getMethod();
-        if (method.getParameterTypes().length != argumentMatchers.size()) {
-            throw new IllegalArgumentException("The number of argument matchers does not match the number of arguments of the given method. Number of argument matchers: " + argumentMatchers.size() + ". Number of arguments " + method.getParameterTypes().length);
-        }
+        this.used = false;
     }
 
     public String getMockName() {
         return mockName;
-    }
-
-
-    public ProxyInvocation getProxyInvocation() {
-        return proxyInvocation;
     }
 
 
@@ -69,6 +60,17 @@ public class BehaviorDefiningInvocation {
         return mockBehavior;
     }
 
+
+    public boolean isUsed() {
+        return used;
+    }
+
+
+    public void markAsUsed() {
+        this.used = true;
+    }
+
+
     /**
      * Returns whether or not the given {@link ProxyInvocation} matches this object's predefined <code>Method</code> and arguments.
      *
@@ -76,7 +78,7 @@ public class BehaviorDefiningInvocation {
      * @return true when given {@link org.unitils.mock.proxy.ProxyInvocation} matches, false otherwise.
      */
     public boolean matches(ProxyInvocation proxyInvocation) {
-        if (!this.proxyInvocation.getMethod().equals(proxyInvocation.getMethod())) {
+        if (!getMethod().equals(proxyInvocation.getMethod())) {
             return false;
         }
         List<?> arguments = proxyInvocation.getArguments();

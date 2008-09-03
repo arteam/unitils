@@ -16,26 +16,27 @@
 package org.unitils.mock.report.impl;
 
 import static org.apache.commons.lang.StringUtils.uncapitalize;
-import org.unitils.mock.core.Scenario;
+import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.core.ObservedInvocation;
-import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioView;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * A view that displays the observed invocations and they location where they were invoked.
+ * A view that displays the observed invocations and the location where they were invoked.
  * The arguments are shown inline when the lenght is small enough, else the argument is named using the
  * type (eg Person => person1) and the actual value is displayed below the invocations.
  * <p/>
- * <pre>
+ * Example: <pre><code>
  * 1.  mock.method1()) -> string1  ..... at MyTest.testMethod(MyTest.java:60)
  * 2.  mock.method1("bla", 4) -> null  ..... at MyTest.testMethod(MyTest.java:62)
  * 3.  mock.anotherMethod(myClass1)  ..... at MyTest.testMethod(MyTest.java:64)
- * <p/>
+ *
  * string1 -> "1234567891234567890"
  * myClass1 -> MyClass<aField="hello">
- * </pre>
+ * <code></pre>
  *
  * @author Kenny Claes
  * @author Filip Neven
@@ -43,15 +44,24 @@ import java.util.*;
  */
 public class OverviewScenarioView implements ScenarioView {
 
+    /**
+     * Formatter for arguments and return values
+     */
+    protected ObjectFormatter objectFormatter = new ObjectFormatter(10);
+
+    /**
+     * The maximum length of an inline value
+     */
+    protected int maximumValueLenght = 20;
+
 
     /**
      * Creates a string representation of the given scenario as described in the class javadoc.
      *
-     * @param testObject The test instance, null if there is no test object
-     * @param scenario   The sceneario, not null
+     * @param scenario The sceneario, not null
      * @return The string representation, not null
      */
-    public String createView(Object testObject, Scenario scenario) {
+    public String createView(Scenario scenario) {
         StringBuilder result = new StringBuilder();
 
         Map<Class<?>, Integer> largeValueIndexes = new HashMap<Class<?>, Integer>();
@@ -59,24 +69,19 @@ public class OverviewScenarioView implements ScenarioView {
 
         // append all invocations
         int invocationIndex = 1;
-        for (ObservedInvocation mockInvocation : scenario.getObservedInvocations()) {
+        for (ObservedInvocation observedInvocation : scenario.getObservedInvocations()) {
             result.append(invocationIndex++);
             result.append(".  ");
             if (invocationIndex > 10) {
                 result.setLength(result.length() - 1);
             }
-            result.append(formatObservedInvocation(mockInvocation, largeValueIndexes, formattedLargeValues));
+            result.append(formatObservedInvocation(observedInvocation, largeValueIndexes, formattedLargeValues));
+            result.append(formatInvocationDetails(observedInvocation));
             result.append("\n");
         }
 
         // append the values that were to long to be displayed inline
-        if (!formattedLargeValues.isEmpty()) {
-            result.append("\n");
-            for (String formattedLargeValue : formattedLargeValues) {
-                result.append(formattedLargeValue);
-                result.append("\n");
-            }
-        }
+        result.append(formatLargeValues(formattedLargeValues));
         return result.toString();
     }
 
@@ -96,18 +101,18 @@ public class OverviewScenarioView implements ScenarioView {
         StringBuilder result = new StringBuilder();
 
         // append the mock and method name
-        ProxyInvocation proxyInvocation = observedInvocation.getProxyInvocation();
+        Method method = observedInvocation.getMethod();
         result.append(observedInvocation.getMockName());
         result.append('.');
-        result.append(proxyInvocation.getMethod().getName());
+        result.append(method.getName());
 
         // append the arguments
         result.append('(');
-        Class<?>[] argumentTypes = proxyInvocation.getMethod().getParameterTypes();
+        Class<?>[] argumentTypes = method.getParameterTypes();
         if (argumentTypes.length > 0) {
-            Iterator<String> argumentsAsStrings = observedInvocation.getArgumentsAsStrings().iterator();
+            Iterator<?> arguments = observedInvocation.getArguments().iterator();
             for (Class<?> argumentType : argumentTypes) {
-                String argumentAsString = argumentsAsStrings.next();
+                String argumentAsString = objectFormatter.format(arguments.next());
                 result.append(formatValue(argumentAsString, argumentType, largeValueIndexes, formattedLargeValues));
                 result.append(", ");
             }
@@ -116,15 +121,47 @@ public class OverviewScenarioView implements ScenarioView {
         result.append(")");
 
         // append the result value, if there is one (void methods do not have mock behavior)
-        Class<?> resultType = proxyInvocation.getMethod().getReturnType();
+        Class<?> resultType = method.getReturnType();
         if (!Void.TYPE.equals(resultType)) {
             result.append(" -> ");
-            result.append(formatValue(observedInvocation.getResultAsString(), resultType, largeValueIndexes, formattedLargeValues));
+            String resultAsString = objectFormatter.format(observedInvocation.getResult());
+            result.append(formatValue(resultAsString, resultType, largeValueIndexes, formattedLargeValues));
         }
+        return result.toString();
+    }
 
-        // append the location
+
+    /**
+     * Creates a string representation of the details of the given invocation. This will give information about
+     * where the invocation occurred.
+     *
+     * @param observedInvocation The invocation to format, not null
+     * @return The string representation, not null
+     */
+    protected String formatInvocationDetails(ObservedInvocation observedInvocation) {
+        StringBuilder result = new StringBuilder();
         result.append("  ..... at ");
-        result.append(proxyInvocation.getInvokedAt());
+        result.append(observedInvocation.getInvokedAt());
+        return result.toString();
+    }
+
+
+    /**
+     * Format the values that were to long to be displayed inline
+     *
+     * @param formattedLargeValues The large values as strings, not null
+     * @return The string representation, not null
+     */
+    protected String formatLargeValues(List<String> formattedLargeValues) {
+        StringBuilder result = new StringBuilder();
+
+        if (!formattedLargeValues.isEmpty()) {
+            result.append("\n");
+            for (String formattedLargeValue : formattedLargeValues) {
+                result.append(formattedLargeValue);
+                result.append("\n");
+            }
+        }
         return result.toString();
     }
 
@@ -143,7 +180,7 @@ public class OverviewScenarioView implements ScenarioView {
      * @return The value or the replaced name, not null
      */
     protected String formatValue(String value, Class<?> type, Map<Class<?>, Integer> largeValueIndexes, List<String> formattedLargeValues) {
-        if (value.length() <= 20) {
+        if (value.length() <= maximumValueLenght) {
             return value;
         }
 

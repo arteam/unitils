@@ -17,8 +17,8 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.core.BehaviorDefiningInvocation;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -26,26 +26,21 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class ObservedInvocation {
+public class ObservedInvocation extends ProxyInvocation {
 
     private String mockName;
 
-    private ProxyInvocation proxyInvocation;
-
-    private List<String> argumentsAsStrings;
-
-    private String resultAsString;
+    private Object result;
 
     private BehaviorDefiningInvocation behaviorDefiningInvocation;
 
     private MockBehavior mockBehavior;
 
 
-    public ObservedInvocation(String mockName, ProxyInvocation proxyInvocation, List<String> argumentsAsStrings, String resultAsString, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
+    public ObservedInvocation(String mockName, Method method, List<?> arguments, Object result, StackTraceElement invokedAt, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
+        super(method, arguments, invokedAt);
         this.mockName = mockName;
-        this.proxyInvocation = proxyInvocation;
-        this.argumentsAsStrings = argumentsAsStrings;
-        this.resultAsString = resultAsString;
+        this.result = result;
         this.behaviorDefiningInvocation = behaviorDefiningInvocation;
         this.mockBehavior = mockBehavior;
     }
@@ -56,18 +51,8 @@ public class ObservedInvocation {
     }
 
 
-    public ProxyInvocation getProxyInvocation() {
-        return proxyInvocation;
-    }
-
-
-    public List<String> getArgumentsAsStrings() {
-        return argumentsAsStrings;
-    }
-
-
-    public String getResultAsString() {
-        return resultAsString;
+    public Object getResult() {
+        return result;
     }
 
 

@@ -15,125 +15,152 @@
  */
 package org.unitils.mock.report.impl;
 
-import org.unitils.mock.core.Scenario;
+import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.ObservedInvocation;
+import org.unitils.mock.core.Scenario;
 import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.report.ScenarioView;
+import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Default implementation of a {@link org.unitils.mock.report.ScenarioView} that just displays all the executed invocations.
+ * A view that displays the details of the observed invocations. The details include:
+ * <ul>
+ * <li>the location where the invocation was invoked</li>
+ * <li>the mock behavior that was executed</li>
+ * <li>the location where this mock behavior was defined</li>
+ * </ul>
+ * Example: <pre><code>
+ * 1. mock.method1() -> string1
+ *
+ * - string1 -> "1234567891234567890"
+ * - Observed at MyTest.testMethod(MyTest.java:75)
+ * - Behavior defined at MyTest.myTest(MyTest.java:37)
+ *
+ *
+ * 2. mock.method1("value", 4) -> null
+ *
+ * - Observed at MyTest.testMethod(MyTest.java:77)
+ * - No behavior defined, returned default value.
+ * <code></pre>
  *
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DetailedScenarioView implements ScenarioView {
+public class DetailedScenarioView extends OverviewScenarioView {
+
+    /**
+     * Formatter for arguments and return values
+     */
+    protected ObjectFormatter objectFormatter = new ObjectFormatter(10);
+
+    /**
+     * The maximum length of an inline value
+     */
+    protected int maximumValueLenght = 20;
 
 
     /**
-     * Creates a string representation of the given scenario.
+     * Creates a string representation of the given scenario as described in the class javadoc.
      *
-     * @param testObject The test instance, null if there is no test object
-     * @param scenario   The sceneario, not null
+     * @param scenario The sceneario, not null
      * @return The string representation, not null
      */
-    public String createView(Object testObject, Scenario scenario) {
+    @Override
+    public String createView(Scenario scenario) {
         StringBuilder result = new StringBuilder();
 
-        int invocationIndex = 1;
-        Map<String, Integer> argumentIndexes = new HashMap<String, Integer>();
+        Map<Class<?>, Integer> largeValueIndexes = new HashMap<Class<?>, Integer>();
 
-        for (ObservedInvocation mockInvocation : scenario.getObservedInvocations()) {
+        // append all invocations
+        int invocationIndex = 1;
+        for (ObservedInvocation observedInvocation : scenario.getObservedInvocations()) {
+            List<String> formattedLargeValues = new ArrayList<String>();
             result.append(invocationIndex++);
             result.append(". ");
-
-            result.append(createView(mockInvocation, argumentIndexes));
-            result.append("\n");
-            result.append("\n");
-            result.append("\n");
-        }
-
-        result.append("\n");
-
-        int argumentIndex = 1;
-        for (ObservedInvocation mockInvocation : scenario.getObservedInvocations()) {
-            if (!mockInvocation.getArgumentsAsStrings().isEmpty()) {
-                for (String argument : mockInvocation.getArgumentsAsStrings()) {
-                    if (argument.length() >= 10) {
-                        result.append(" testClass");
-                        result.append(argumentIndex++);
-                        result.append(" -> ");
-                        result.append(argument);
-                        result.append("\n");
-                    }
-                }
-            }
+            result.append(formatObservedInvocation(observedInvocation, largeValueIndexes, formattedLargeValues));
+            result.append("\n\n");
+            result.append(formatLargeValues(formattedLargeValues));
+            result.append(formatInvocationDetails(observedInvocation));
+            result.append(formatBehaviorDetails(observedInvocation));
+            result.append("\n\n");
         }
         return result.toString();
     }
 
 
-    protected String createView(ObservedInvocation observedInvocation, Map<String, Integer> argumentIndexes) {
+    /**
+     * Creates a string representation of the details of the given invocation. This will give information about
+     * where the invocation occurred.
+     *
+     * @param observedInvocation The invocation to format, not null
+     * @return The string representation, not null
+     */
+    protected String formatInvocationDetails(ObservedInvocation observedInvocation) {
+        StringBuilder result = new StringBuilder();
+        result.append("- Observed at ");
+        result.append(observedInvocation.getInvokedAt());
+        result.append("\n");
+        return result.toString();
+    }
+
+
+    /**
+     * Creates a string representation of the behavior details of the given invocation. This will give information about
+     * where the mock behavior was recorded.
+     *
+     * @param observedInvocation The invocation to format, not null
+     * @return The string representation, not null
+     */
+    protected String formatBehaviorDetails(ObservedInvocation observedInvocation) {
         StringBuilder result = new StringBuilder();
 
-        ProxyInvocation proxyInvocation = observedInvocation.getProxyInvocation();
         BehaviorDefiningInvocation behaviorDefiningInvocation = observedInvocation.getBehaviorDefiningInvocation();
-        MockBehavior mockBehavior = observedInvocation.getMockBehavior();
-
-        result.append(observedInvocation.getMockName());
-        result.append('.');
-        result.append(proxyInvocation.getMethod().getName());
-        result.append('(');
-
-        if (!observedInvocation.getArgumentsAsStrings().isEmpty()) {
-            for (String argument : observedInvocation.getArgumentsAsStrings()) {
-                if (argument.length() < 10) {
-                    result.append(argument);
-                } else {
-                    result.append("testClass");
-
-                    Integer index = argumentIndexes.get("testClass");
-                    if (index == null) {
-                        index = 0;
-                    }
-                    index++;
-                    argumentIndexes.put("testClass", index);
-
-                    result.append(index);
-                }
-                result.append(", ");
-            }
-            result.setLength(result.length() - 2);
-        }
-        result.append(")");
-        if (observedInvocation.hasMockBehavior()) {
-            result.append(" -> ");
-            result.append(observedInvocation.getResultAsString());
-        }
-        result.append("\n\n");
-        result.append("  Observed at ");
-        result.append(proxyInvocation.getInvokedAt());
-        result.append("\n");
         if (behaviorDefiningInvocation != null) {
-            result.append("  Behavior defined at ");
-            result.append(behaviorDefiningInvocation.getProxyInvocation().getInvokedAt());
-        } else if (mockBehavior != null) {
+            result.append("- Behavior defined at ");
+            result.append(behaviorDefiningInvocation.getInvokedAt());
+            result.append("\n");
+            return result.toString();
+        }
+
+        MockBehavior mockBehavior = observedInvocation.getMockBehavior();
+        if (mockBehavior != null) {
             if (mockBehavior instanceof OriginalBehaviorInvokingMockBehavior) {
-                result.append("  No behavior defined, executed original method behavior.");
+                result.append("- No behavior defined, executed original method behavior.");
             } else if (mockBehavior instanceof DefaultValueReturningMockBehavior) {
-                result.append("  No behavior defined, returned default value.");
+                result.append("- No behavior defined, returned default value.");
             } else {
-                result.append("  No behavior defined, executed default behavior.");
+                result.append("- No behavior defined, executed default behavior.");
             }
+            result.append("\n");
         }
         return result.toString();
     }
 
+
+    /**
+     * Format the values that were to long to be displayed inline
+     *
+     * @param formattedLargeValues The large values as strings, not null
+     * @return The string representation, not null
+     */
+    @Override
+    protected String formatLargeValues(List<String> formattedLargeValues) {
+        StringBuilder result = new StringBuilder();
+
+        if (!formattedLargeValues.isEmpty()) {
+            for (String formattedLargeValue : formattedLargeValues) {
+                result.append("- ");
+                result.append(formattedLargeValue);
+                result.append("\n");
+            }
+        }
+        return result.toString();
+    }
 }

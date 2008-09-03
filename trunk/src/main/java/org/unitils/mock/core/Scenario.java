@@ -15,12 +15,10 @@
  */
 package org.unitils.mock.core;
 
-import org.unitils.mock.core.BehaviorDefiningInvocation;
-import org.unitils.mock.core.ObservedInvocation;
-import org.unitils.mock.proxy.MethodFormatUtil;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
+import org.unitils.mock.report.impl.MethodFormatUtil;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,9 +31,7 @@ import java.util.List;
  */
 public class Scenario {
 
-    /**
-     * Insertion ordered map that keeps track of the registered invocations and whether or not they have already been checked for invocation with the various assertX() methods in this class.
-     */
+
     protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
 
     protected List<ObservedInvocation> unverifiedInvocations = new ArrayList<ObservedInvocation>();
@@ -59,7 +55,7 @@ public class Scenario {
     public void assertNoMoreInvocations() {
         if (!unverifiedInvocations.isEmpty()) {
             ObservedInvocation observedInvocation = unverifiedInvocations.get(0);
-            throw new AssertionError(getNoMoreInvocationsErrorMessage(observedInvocation.getProxyInvocation()));
+            throw new AssertionError(getNoMoreInvocationsErrorMessage(observedInvocation));
         }
     }
 
@@ -67,7 +63,7 @@ public class Scenario {
     public void assertInvoked(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         ObservedInvocation unverifiedInvocation = getMatchingUnverifiedInvocation(behaviorDefiningInvocation);
         if (unverifiedInvocation == null) {
-            throw new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation.getProxyInvocation()));
+            throw new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation));
         }
         unverifiedInvocations.remove(unverifiedInvocation);
     }
@@ -77,20 +73,20 @@ public class Scenario {
         ObservedInvocation unverifiedInvocation = getMatchingUnverifiedInvocation(behaviorDefiningInvocation);
         if (unverifiedInvocation != null) {
             unverifiedInvocations.remove(unverifiedInvocation);
-            throw new AssertionError(getAssertNotInvokedErrorMessage(behaviorDefiningInvocation.getProxyInvocation()));
+            throw new AssertionError(getAssertNotInvokedErrorMessage(behaviorDefiningInvocation));
         }
     }
 
 
-    public String createReport(Object testObject) {
+    public String createReport() {
         ScenarioReport scenarioReport = new DefaultScenarioReport();
-        return scenarioReport.createReport("Mock report:", testObject, this);
+        return scenarioReport.createReport("Mock report:", this);
     }
 
 
     protected ObservedInvocation getMatchingUnverifiedInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         for (ObservedInvocation observedInvocation : unverifiedInvocations) {
-            if (behaviorDefiningInvocation.matches(observedInvocation.getProxyInvocation())) {
+            if (behaviorDefiningInvocation.matches(observedInvocation)) {
                 return observedInvocation;
             }
         }
@@ -106,7 +102,7 @@ public class Scenario {
         message.append(" at ");
         message.append(proxyInvocation.getInvokedAt());
         message.append("\n");
-        message.append(createReport(null));
+        message.append(createReport());
         return message.toString();
     }
 
@@ -119,7 +115,7 @@ public class Scenario {
         message.append(MethodFormatUtil.getCompleteRepresentation(method));
         message.append(", but the invocation didn't occur.");
         message.append("\n");
-        message.append(createReport(null));
+        message.append(createReport());
         return message.toString();
     }
 
@@ -132,7 +128,7 @@ public class Scenario {
         message.append(" was called from ");
         message.append(proxyInvocation.getInvokedAt());
         message.append("\n");
-        message.append(createReport(null));
+        message.append(createReport());
         return message.toString();
     }
 

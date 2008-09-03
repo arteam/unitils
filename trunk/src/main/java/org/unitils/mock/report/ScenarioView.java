@@ -29,10 +29,9 @@ public interface ScenarioView {
     /**
      * Creates a string representation of the given scenario.
      *
-     * @param testObject The test instance, null if there is no test object
-     * @param scenario   The sceneario, not null
+     * @param scenario The sceneario, not null
      * @return The string representation, not null
      */
-    String createView(Object testObject, Scenario scenario);
+    String createView(Scenario scenario);
 
 }
