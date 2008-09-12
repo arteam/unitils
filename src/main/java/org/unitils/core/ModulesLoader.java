@@ -15,12 +15,23 @@
  */
 package org.unitils.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import static org.unitils.util.PropertyUtils.*;
+import static org.unitils.util.PropertyUtils.getBoolean;
+import static org.unitils.util.PropertyUtils.getString;
+import static org.unitils.util.PropertyUtils.getStringList;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A class for loading unitils modules.
@@ -47,31 +58,31 @@ import java.util.*;
 public class ModulesLoader {
 
     /**
-     * Property that contains the names of the modules that are to be loaded
+     * Property that contains the names of the modules that are to be loaded.
      */
     public static final String PROPKEY_MODULES = "unitils.modules";
 
     /**
-     * First part of all core specific properties
+     * First part of all core specific properties.
      */
     public static final String PROPKEY_MODULE_PREFIX = "unitils.module.";
 
     /**
-     * Last part of the core specific property that specifies whehter the core should be loaded
+     * Last part of the core specific property that specifies whether the core should be loaded.
      */
     public static final String PROPKEY_MODULE_SUFFIX_ENABLED = ".enabled";
 
     /**
-     * Last part of the core specific property that specifies the classname of the core
+     * Last part of the core specific property that specifies the classname of the core.
      */
     public static final String PROPKEY_MODULE_SUFFIX_CLASS_NAME = ".className";
 
     /**
-     * Last part of the core specific property that specifies the names of the modules that should be run before this core
+     * Last part of the core specific property that specifies the names of the modules that should be run before this core.
      */
     public static final String PROPKEY_MODULE_SUFFIX_RUN_AFTER = ".runAfter";
 
-    /* The logger instance for this class */
+    /** The logger instance for this class. */
     private static Log logger = LogFactory.getLog(ModulesLoader.class);
 
 
@@ -149,9 +160,9 @@ public class ModulesLoader {
                 if (e.getCause() instanceof ClassNotFoundException || e.getCause() instanceof NoClassDefFoundError) {
                     // Class not found, maybe this is caused by a library that is not in the classpath
                     // Log warning and ingore exception
-                    logger.warn("Unable to create module instance for module class: " + className + ". The module will " +
-                            "not be loaded. If this is caused by a library that is not used by your project and thus not " +
-                            "in the classpath, this warning can be avoided by explicitly disabling the module.");
+                    logger.warn("Unable to create module instance for module class: " + className + ". The module will "
+                            + "not be loaded. If this is caused by a library that is not used by your project and thus not "
+                            + "in the classpath, this warning can be avoided by explicitly disabling the module.");
                     logger.debug("Ignored exception during module initialisation.", e);
                     continue;
                 }
