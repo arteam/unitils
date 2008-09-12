@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.ScriptContentHandle.UrlScriptContentHandle;
 import org.unitils.dbmaintainer.version.Version;
 
@@ -130,6 +131,9 @@ public class Script implements Comparable<Script> {
      * verify if the contents of the script are equal to another one.
      */
     public ScriptContentHandle getScriptContentHandle() {
+        if (scriptContentHandle == null) {
+            throw new UnitilsException("Script content is not available");
+        }
 		return scriptContentHandle;
 	}
 
