@@ -64,9 +64,8 @@ public class SuggestedAssertsScenarioView implements ScenarioView {
     protected String getSuggestedAssertStatement(Object testObject, ObservedInvocation observedInvocation) {
         StringBuilder result = new StringBuilder();
 
-        result.append("assertInvoked(");
         result.append(observedInvocation.getMockName());
-        result.append(").");
+        result.append(".assertInvoked().");
         result.append(observedInvocation.getMethod().getName());
         result.append("(");
         boolean firstArgument = true;
