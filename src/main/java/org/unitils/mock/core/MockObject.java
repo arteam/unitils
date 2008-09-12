@@ -189,19 +189,19 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
     //
     // Core implementation
     //
-
-
     protected Object handleMockObjectInvocation(ProxyInvocation proxyInvocation) throws Throwable {
-        Object result = null;
-
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getMockBehavior(proxyInvocation, behaviorDefiningInvocation);
+        
+        ObservedInvocation mockInvocation = createObservedInvocation(proxyInvocation, behaviorDefiningInvocation, mockBehavior);
+        scenario.addObservedMockInvocation(mockInvocation);
+
+        Object result = null;
         if (mockBehavior != null) {
             result = mockBehavior.execute(proxyInvocation);
         }
-
-        ObservedInvocation mockInvocation = createObservedInvocation(proxyInvocation, result, behaviorDefiningInvocation, mockBehavior);
-        scenario.addObservedMockInvocation(mockInvocation);
+        
+        mockInvocation.setResult(createDeepClone(result));
         return result;
     }
 
@@ -241,15 +241,15 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
     }
 
     protected MockBehavior getMockBehavior(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation) {
-        if (proxyInvocation.getMethod().getReturnType() == Void.TYPE) {
-            return null;
-        }
         if (behaviorDefiningInvocation != null) {
             return behaviorDefiningInvocation.getMockBehavior();
         }
         // There's no matching behavior, execute the default one
         if (partialMock) {
             return new OriginalBehaviorInvokingMockBehavior();
+        }
+        if (proxyInvocation.getMethod().getReturnType() == Void.TYPE) {
+            return null;
         }
         return new DefaultValueReturningMockBehavior();
     }
@@ -276,13 +276,12 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
     }
 
 
-    protected ObservedInvocation createObservedInvocation(ProxyInvocation proxyInvocation, Object result, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
+    protected ObservedInvocation createObservedInvocation(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
         Method method = proxyInvocation.getMethod();
         List<?> clonedArguments = createDeepClone(proxyInvocation.getArguments());
-        Object clonedResult = createDeepClone(result);
         StackTraceElement invokedAt = proxyInvocation.getInvokedAt();
 
-        return new ObservedInvocation(name, method, clonedArguments, clonedResult, invokedAt, behaviorDefiningInvocation, mockBehavior);
+        return new ObservedInvocation(name, method, clonedArguments, invokedAt, behaviorDefiningInvocation, mockBehavior);
     }
 
 

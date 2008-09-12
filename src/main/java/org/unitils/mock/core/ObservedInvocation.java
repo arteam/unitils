@@ -37,12 +37,16 @@ public class ObservedInvocation extends ProxyInvocation {
     private MockBehavior mockBehavior;
 
 
-    public ObservedInvocation(String mockName, Method method, List<?> arguments, Object result, StackTraceElement invokedAt, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
+    public ObservedInvocation(String mockName, Method method, List<?> arguments, StackTraceElement invokedAt, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
         super(method, arguments, invokedAt);
         this.mockName = mockName;
-        this.result = result;
         this.behaviorDefiningInvocation = behaviorDefiningInvocation;
         this.mockBehavior = mockBehavior;
+    }
+
+
+    public void setResult(Object result) {
+        this.result = result;
     }
 
 
