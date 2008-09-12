@@ -164,7 +164,7 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
      * Utility method to create the test version table.
      */
     private void createExecutedScriptsTable() throws SQLException {
-        executeUpdate(dbVersionSource.getCreateVersionTableStatement(), dataSource);
+        executeUpdate(dbVersionSource.getCreateExecutedScriptsTableStatement(), dataSource);
     }
 
 
