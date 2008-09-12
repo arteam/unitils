@@ -74,7 +74,7 @@ public class ConfigurationLoader {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(ConfigurationLoader.class);
 
-    
+
     /**
      * Creates and loads all configuration settings.
      *
@@ -83,7 +83,7 @@ public class ConfigurationLoader {
     public Properties loadConfiguration() {
         return loadConfiguration(null);
     }
-    
+
 
     /**
      * Creates and loads all configuration settings.

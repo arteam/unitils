@@ -33,8 +33,11 @@ import java.lang.reflect.Method;
  */
 public abstract class UnitilsJUnit3 extends TestCase {
 
-	private static Class<?> currentTestClass;
-	
+    /**
+     * Keeps track of the test class for which tests are currently being executed.
+     */
+    private static Class<?> currentTestClass;
+
 
     /**
      * Creates a test without a name. Be sure to call {@link TestCase#setName} afterwards.
@@ -56,13 +59,15 @@ public abstract class UnitilsJUnit3 extends TestCase {
 
     /**
      * Overriden JUnit3 method to be able to call {@link TestListener#beforeTestSetUp} and {@link TestListener#afterTestTearDown}.
+     *
+     * @throws Throwable If an error occurs during the test
      */
     @Override
     public void runBare() throws Throwable {
-    	if (!getClass().equals(currentTestClass)) {
-    		currentTestClass = getClass();
-    		getTestListener().beforeTestClass(getClass());
-    	}
+        if (!getClass().equals(currentTestClass)) {
+            currentTestClass = getClass();
+            getTestListener().beforeTestClass(getClass());
+        }
         getTestListener().afterCreateTestObject(this);
 
         Throwable firstThrowable = null;
@@ -95,6 +100,8 @@ public abstract class UnitilsJUnit3 extends TestCase {
     /**
      * Overriden JUnit3 method to be able to call {@link TestListener#beforeTestMethod} and
      * {@link TestListener#afterTestMethod}.
+     *
+     * @throws Throwable If an error occurs during the test
      */
     @Override
     protected void runTest() throws Throwable {
