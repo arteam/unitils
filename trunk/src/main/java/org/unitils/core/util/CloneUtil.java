@@ -66,11 +66,13 @@ public class CloneUtil {
         }
 
         if (instanceToClone.getClass().isArray()) {
-            return cloneArray(instanceToClone, cloneCache);
+            clonedInstance = cloneArray(instanceToClone, cloneCache);
         }
 
         // if the instance is cloneable, try to clone it
-        clonedInstance = createInstanceUsingClone(instanceToClone);
+        if (clonedInstance == null) {
+            clonedInstance = createInstanceUsingClone(instanceToClone);
+        }
 
         // try to clone it ourselves
         if (clonedInstance == null) {
@@ -128,7 +130,7 @@ public class CloneUtil {
 
 
     protected static void cloneFields(Class clazz, Object instanceToClone, Object clonedInstance, Map<Object, Object> cloneCache) throws Throwable {
-        if (clazz == null) {
+        if (clazz == null || Object.class.equals(clazz)) {
             return;
         }
         Field[] fields = clazz.getDeclaredFields();
@@ -136,14 +138,14 @@ public class CloneUtil {
 
         for (Field field : fields) {
             // skip static fields
-            if (isStatic(field.getModifiers()) || field.isSynthetic()) {
+            if (isStatic(field.getModifiers())) {
                 continue;
             }
 
             Object fieldValue = field.get(instanceToClone);
             Object clonedFieldValue = cloneObject(fieldValue, cloneCache);
             field.set(clonedInstance, clonedFieldValue);
-        }
+        }       
         cloneFields(clazz.getSuperclass(), instanceToClone, clonedInstance, cloneCache);
     }
 

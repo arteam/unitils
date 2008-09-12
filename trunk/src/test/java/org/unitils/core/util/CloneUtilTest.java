@@ -21,11 +21,14 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import static java.util.Arrays.asList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * todo javadoc
@@ -99,6 +102,26 @@ public class CloneUtilTest {
         assertNotSame(collections.listValue, result.listValue);
         assertNotSame(collections.mapValue, result.mapValue);
     }
+    
+    
+    @Test
+    public void testCreateDeepClone_InnerClass() throws IllegalArgumentException, IllegalAccessException {
+        ClassWithInnerClass classWithInnerClass = new ClassWithInnerClass();
+        ClassWithInnerClass result = CloneUtil.createDeepClone(classWithInnerClass);
+        assertRefEquals(classWithInnerClass, result);
+        result.inner.setString();
+    }
+    
+    @Test
+    public void testCreateDeepClone_AnonymousClass() throws IllegalArgumentException, IllegalAccessException {
+        Comparable<String> anonymousClass = new Comparable<String>() {
+            public int compareTo(String o) {
+                return 0;
+            }
+        };
+        Comparable<String> result = CloneUtil.createDeepClone(anonymousClass);
+        assertRefEquals(anonymousClass, result);
+    }
 
 
     @Test
@@ -146,6 +169,19 @@ public class CloneUtilTest {
         public References(References references) {
             this.references = references;
         }
+    }
+    
+    protected static class ClassWithInnerClass {
+        
+        String str;
+        Inner inner = new Inner();
+        
+        class Inner {
+            void setString() {
+                str = "value";
+            }
+        }
+        
     }
 
 
