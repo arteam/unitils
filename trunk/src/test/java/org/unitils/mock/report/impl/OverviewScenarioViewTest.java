@@ -16,6 +16,8 @@
 package org.unitils.mock.report.impl;
 
 import static org.junit.Assert.assertTrue;
+
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.Mock;
@@ -68,7 +70,7 @@ public class OverviewScenarioViewTest {
     @Test
     public void testCreateView_noInvocations() {
         String result = overviewScenarioView.createView(scenario);
-        assertTrue(result.isEmpty());
+        assertTrue(StringUtils.isEmpty(result));
     }
 
 
