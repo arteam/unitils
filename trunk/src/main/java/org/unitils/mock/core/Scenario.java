@@ -31,20 +31,22 @@ import java.util.List;
  */
 public class Scenario {
 
+    protected static enum VerificationStatus {UNVERIFIED,  VERIFIED, VERIFIED_IN_ORDER};
+    
 
     protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
 
-    protected List<ObservedInvocation> unverifiedInvocations = new ArrayList<ObservedInvocation>();
+    protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
 
 
     public void reset() {
         observedInvocations.clear();
-        unverifiedInvocations.clear();
+        invocationVerificationStatuses.clear();
     }
 
     public void addObservedMockInvocation(ObservedInvocation mockInvocation) {
         observedInvocations.add(mockInvocation);
-        unverifiedInvocations.add(mockInvocation);
+        invocationVerificationStatuses.add(VerificationStatus.UNVERIFIED);
     }
 
     public List<ObservedInvocation> getObservedInvocations() {
@@ -53,27 +55,64 @@ public class Scenario {
 
 
     public void assertNoMoreInvocations() {
-        if (!unverifiedInvocations.isEmpty()) {
-            ObservedInvocation observedInvocation = unverifiedInvocations.get(0);
-            throw new AssertionError(getNoMoreInvocationsErrorMessage(observedInvocation));
+        for (int i = 0; i < observedInvocations.size(); i++) {
+            ObservedInvocation observedInvocation = observedInvocations.get(i);
+            VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
+            if (observedInvocation.getMockBehavior() == null && invocationVerificationStatus == VerificationStatus.UNVERIFIED) {
+                throw new AssertionError(getNoMoreInvocationsErrorMessage(observedInvocation));
+            }
         }
     }
 
 
     public void assertInvoked(BehaviorDefiningInvocation behaviorDefiningInvocation) {
-        ObservedInvocation unverifiedInvocation = getMatchingUnverifiedInvocation(behaviorDefiningInvocation);
-        if (unverifiedInvocation == null) {
-            throw new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation));
+        for (int i = 0; i < observedInvocations.size(); i++) {
+            ObservedInvocation observedInvocation = observedInvocations.get(i);
+            VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
+            if (invocationVerificationStatus == VerificationStatus.UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
+                // Found a match that's not verified yet. Mark as verified and proceed.
+                invocationVerificationStatuses.set(i, VerificationStatus.VERIFIED);
+                return;
+            }
         }
-        unverifiedInvocations.remove(unverifiedInvocation);
+        throw new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation));
+    }
+    
+    
+    public void assertInvokedInOrder(BehaviorDefiningInvocation behaviorDefiningInvocation) {
+        ObservedInvocation matchingInvocation = null;
+        for (int i = 0; i < observedInvocations.size(); i++) {
+            ObservedInvocation observedInvocation = observedInvocations.get(i);
+            VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
+            if (matchingInvocation == null && invocationVerificationStatus == VerificationStatus.UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
+                // Found a match that's not verified yet. Mark as verified in order, and check if there's no 
+                // subsequent observed invocation that's already verified using assertInvokedInOrder()
+                invocationVerificationStatuses.set(i, VerificationStatus.VERIFIED_IN_ORDER);
+                matchingInvocation = observedInvocation;
+                continue;
+            }
+            if (matchingInvocation != null) {
+                if (invocationVerificationStatus == VerificationStatus.VERIFIED_IN_ORDER) {
+                    throw new AssertionError(getInvokedOutOfOrderErrorMessage(behaviorDefiningInvocation, matchingInvocation, observedInvocation));
+                }
+            }
+        }
     }
 
 
+    protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation,
+            ObservedInvocation outOfOrderInvocation) {
+        // TODO
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
     public void assertNotInvoked(BehaviorDefiningInvocation behaviorDefiningInvocation) {
-        ObservedInvocation unverifiedInvocation = getMatchingUnverifiedInvocation(behaviorDefiningInvocation);
-        if (unverifiedInvocation != null) {
-            unverifiedInvocations.remove(unverifiedInvocation);
-            throw new AssertionError(getAssertNotInvokedErrorMessage(behaviorDefiningInvocation));
+        for (int i = 0; i < observedInvocations.size(); i++) {
+            ObservedInvocation observedInvocation = observedInvocations.get(i);
+            VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
+            if (invocationVerificationStatus != VerificationStatus.UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
+                throw new AssertionError(getAssertNotInvokedErrorMessage(behaviorDefiningInvocation));
+            }
         }
     }
 
@@ -85,8 +124,10 @@ public class Scenario {
 
 
     protected ObservedInvocation getMatchingUnverifiedInvocation(BehaviorDefiningInvocation behaviorDefiningInvocation) {
-        for (ObservedInvocation observedInvocation : unverifiedInvocations) {
-            if (behaviorDefiningInvocation.matches(observedInvocation)) {
+        for (int i = 0; i < observedInvocations.size(); i++) {
+            ObservedInvocation observedInvocation = observedInvocations.get(i);
+            VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
+            if (invocationVerificationStatus == VerificationStatus.UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
                 return observedInvocation;
             }
         }
