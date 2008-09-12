@@ -52,13 +52,12 @@ public class JpaUnitils {
     
     
     /**
-     * For the given target object, injects the <code>EntityManagerFactory</code> configured for the current test object into
-     * fields or methods annotated with <code>javax.persistence.PersistenceUnit</code> and the active, transactional 
-     * <code>EntityManager</code> into fields or methods annotated with <code>javax.persistence.PersistenceContext</code>
+     * For the given target object, injects the active, transactional <code>EntityManager</code> into 
+     * fields or methods annotated with <code>javax.persistence.PersistenceContext</code>
      * 
      * @param target
      */
-    public static void injectJpaResourcesInto(Object target) {
+    public static void injectEntityManagerInto(Object target) {
     	getJpaModule().injectJpaResourcesInto(getTestObject(), target);
     }
     

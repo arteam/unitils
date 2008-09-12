@@ -127,7 +127,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
     /**
      * True if the scripts table should be created automatically if it does not exist yet
      */
-    protected boolean autoCreateVersionTable;
+    protected boolean autoCreateExecutedScriptsTable;
     
     /**
      * Format of the contents of the executed_at column
@@ -155,7 +155,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
         this.executedAtColumnSize = PropertyUtils.getInt(PROPERTY_EXECUTED_AT_COLUMN_SIZE, configuration);
         this.succeededColumnName = defaultDbSupport.toCorrectCaseIdentifier(PropertyUtils.getString(PROPERTY_SUCCEEDED_COLUMN_NAME, configuration));
 
-        this.autoCreateVersionTable = PropertyUtils.getBoolean(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, configuration);
+        this.autoCreateExecutedScriptsTable = PropertyUtils.getBoolean(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, configuration);
         this.timestampFormat = new SimpleDateFormat(PropertyUtils.getString(PROPERTY_TIMESTAMP_FORMAT, configuration));
     }
 
@@ -168,7 +168,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 			return doGetExecutedScripts();
 
         } catch (UnitilsException e) {
-            if (checkVersionTable()) {
+            if (checkExecutedScriptsTable()) {
                 throw e;
             }
             // try again, executed scripts table was not ok
@@ -232,7 +232,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 			doRegisterExecutedScript(executedScript);
 
         } catch (UnitilsException e) {
-            if (checkVersionTable()) {
+            if (checkExecutedScriptsTable()) {
                 throw e;
             }
             // try again, version table was not ok
@@ -265,7 +265,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 			doUpdateExecutedScript(executedScript);
 
         } catch (UnitilsException e) {
-            if (checkVersionTable()) {
+            if (checkExecutedScriptsTable()) {
                 throw e;
             }
             // try again, version table was not ok
@@ -323,7 +323,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 			doClearAllExecutedScripts();
 
         } catch (UnitilsException e) {
-            if (checkVersionTable()) {
+            if (checkExecutedScriptsTable()) {
                 throw e;
             }
             // try again, version table was not ok
@@ -347,16 +347,16 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
      *
      * @return False if the version table was not ok and therefore auto-created
      */
-    protected boolean checkVersionTable() {
+    protected boolean checkExecutedScriptsTable() {
         // check valid
-        if (isVersionTableValid()) {
+        if (isExecutedScriptsTableValid()) {
             return true;
         }
 
         // does not exist yet, if auto-create create version table
-        if (autoCreateVersionTable) {
+        if (autoCreateExecutedScriptsTable) {
             logger.warn("Executed scripts table " + defaultDbSupport.qualified(executedScriptsTableName) + " doesn't exist yet or is invalid. A new one is created automatically.");
-            createVersionTable();
+            createExecutedScriptsTable();
             return false;
         }
 
@@ -364,7 +364,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
         String message = "Executed scripts table " + defaultDbSupport.qualified(executedScriptsTableName) + " doesn't exist yet or is invalid.\n";
         message += "Please create it manually or let Unitils create it automatically by setting the " + PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE + " property to true.\n";
         message += "The table can be created manually by executing following statement:\n";
-        message += getCreateVersionTableStatement();
+        message += getCreateExecutedScriptsTableStatement();
         throw new UnitilsException(message);
     }
 
@@ -375,7 +375,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
      *
      * @return False if the version table was not ok and therefore re-created
      */
-    protected boolean isVersionTableValid() {
+    protected boolean isExecutedScriptsTableValid() {
         // Check existence of version table
         Set<String> tableNames = defaultDbSupport.getTableNames();
         if (tableNames.contains(executedScriptsTableName)) {
@@ -395,7 +395,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
     /**
      * Creates the version table and inserts a version record.
      */
-    protected void createVersionTable() {
+    protected void createExecutedScriptsTable() {
         // If version table is invalid, drop and re-create
         try {
             defaultDbSupport.dropTable(executedScriptsTableName);
@@ -404,14 +404,14 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
         }
 
         // Create db version table
-        sqlHandler.executeUpdate(getCreateVersionTableStatement());
+        sqlHandler.executeUpdate(getCreateExecutedScriptsTableStatement());
     }
 
 
     /**
      * @return The statement to create the version table.
      */
-    protected String getCreateVersionTableStatement() {
+    protected String getCreateExecutedScriptsTableStatement() {
         String longDataType = defaultDbSupport.getLongDataType();
         return "create table " + defaultDbSupport.qualified(executedScriptsTableName) + " ( " + 
         	fileNameColumnName + " " + defaultDbSupport.getTextDataType(fileNameColumnSize) + ", " + 
