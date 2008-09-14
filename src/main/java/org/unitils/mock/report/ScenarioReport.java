@@ -29,11 +29,10 @@ public interface ScenarioReport {
 
     /**
      * Creates a report.
-     *
-     * @param message  An optional message
      * @param scenario The scenario to output, not null
+     *
      * @return the report, not null
      */
-    String createReport(String message, Scenario scenario);
+    String createReport(Scenario scenario);
 
 }
