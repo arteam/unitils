@@ -21,7 +21,21 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * todo javadoc
+ * An annotation for indicating that a method is an argument matcher method. The annotated method
+ * should register the argument matcher instance in the ArgumentMatcherRepository. Following example creates
+ * an argument matcher implemented by the SameArgumentMatcher class and registers it in the repository: <p />
+ * <code><pre>
+ * &#064;ArgumentMatcher
+ * public static &lt;T&gt; T same(T sameAs) {
+ *      ArgumentMatcherRepository.registerArgumentMatcher(new SameArgumentMatcher(sameAs));
+ *      return null;
+ * }
+ * </pre></code><p/>
+ * By annotating the method with this annotation, it can now be used inline in a mock invocation to register the
+ * argument matcher. For example:<p />
+ * <code>
+ * myMock.aMethod(1, "test", same(myObject));
+ * </code>
  */
 @Target(METHOD)
 @Retention(RUNTIME)

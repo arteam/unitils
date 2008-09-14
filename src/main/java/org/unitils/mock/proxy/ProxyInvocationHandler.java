@@ -16,8 +16,20 @@
 package org.unitils.mock.proxy;
 
 /**
+ * A class for handling method invocations of a proxy.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
+ * @author Kenny Claes
  */
 public interface ProxyInvocationHandler {
 
+
+    /**
+     * Handles the given method invocation of the proxy.
+     *
+     * @param invocation The method invocation, not null
+     * @return The result value for the method invocation
+     */
     Object handleInvocation(ProxyInvocation invocation) throws Throwable;
 }
