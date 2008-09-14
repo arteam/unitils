@@ -15,7 +15,6 @@
  */
 package org.unitils.mock.report.impl;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioReport;
 
@@ -32,18 +31,12 @@ public class DefaultScenarioReport implements ScenarioReport {
 
     /**
      * Creates a report.
-     *
-     * @param message  An optional message
      * @param scenario The scenario to output, not null
+     *
      * @return the report, not null
      */
-    public String createReport(String message, Scenario scenario) {
+    public String createReport(Scenario scenario) {
         StringBuilder result = new StringBuilder();
-        if (!isEmpty(message)) {
-            result.append(message);
-            result.append("\n\n");
-        }
-
         result.append("Observed scenario:\n\n");
         result.append(new OverviewScenarioView().createView(scenario));
         result.append("\n\nSuggested assert statements:\n\n");
