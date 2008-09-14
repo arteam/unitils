@@ -17,6 +17,7 @@ package org.unitils.dbmaintainer;
 
 import static org.junit.Assert.fail;
 import static org.unitils.easymock.EasyMockUnitils.replay;
+import static org.unitils.mock.MockUnitils.assertNoMoreInvocations;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -128,10 +129,9 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         expectNoScriptModifications();
         expectPostProcessingScripts(postProcessingScripts);
 
-        // No expected behavior
-        replay();
-
         dbMaintainer.updateDatabase();
+        
+        assertNoMoreInvocations();
     }
 
 
@@ -148,7 +148,6 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         dbMaintainer.updateDatabase();
         
         assertScriptsExecutedAndDbVersionSet();
-
     }
 
 
@@ -252,14 +251,14 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void assertScriptsExecutedAndDbVersionSet() {
-    	mockExecutedScriptInfoSource.assertInvoked().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
-        mockScriptRunner.assertInvoked().execute(scripts.get(0).getScriptContentHandle());
-        mockExecutedScriptInfoSource.assertInvoked().updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));
-        mockExecutedScriptInfoSource.assertInvoked().registerExecutedScript(new ExecutedScript(scripts.get(1), null, null));
-        mockScriptRunner.assertInvoked().execute(scripts.get(1).getScriptContentHandle());
-        mockExecutedScriptInfoSource.assertInvoked().updateExecutedScript(new ExecutedScript(scripts.get(1), null, null));
-        mockScriptRunner.assertInvoked().execute(postProcessingScripts.get(0).getScriptContentHandle());
-        mockScriptRunner.assertInvoked().execute(postProcessingScripts.get(1).getScriptContentHandle());
+    	mockExecutedScriptInfoSource.assertInvokedInOrder().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
+        mockScriptRunner.assertInvokedInOrder().execute(scripts.get(0).getScriptContentHandle());
+        mockExecutedScriptInfoSource.assertInvokedInOrder().updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));
+        mockExecutedScriptInfoSource.assertInvokedInOrder().registerExecutedScript(new ExecutedScript(scripts.get(1), null, null));
+        mockScriptRunner.assertInvokedInOrder().execute(scripts.get(1).getScriptContentHandle());
+        mockExecutedScriptInfoSource.assertInvokedInOrder().updateExecutedScript(new ExecutedScript(scripts.get(1), null, null));
+        mockScriptRunner.assertInvokedInOrder().execute(postProcessingScripts.get(0).getScriptContentHandle());
+        mockScriptRunner.assertInvokedInOrder().execute(postProcessingScripts.get(1).getScriptContentHandle());
     }
 
 
