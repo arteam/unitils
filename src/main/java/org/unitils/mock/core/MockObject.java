@@ -180,6 +180,11 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
     public T assertInvoked() {
         return createMockObjectProxy(new AssertInvokedInvocationHandler());
     }
+    
+    
+    public T assertInvokedInOrder() {
+        return createMockObjectProxy(new AssertInvokedInOrderInvocationHandler());
+    }
 
 
     public T assertNotInvoked() {
@@ -360,7 +365,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
 
     /**
      * Handles a method invocation of the proxy that is returned after an assertInvoked. The handling is delegated
-     * to the {@link Scenario#assertInvoked} method.
+     * to {@link Scenario#assertInvoked}.
      */
     protected class AssertInvokedInvocationHandler implements ProxyInvocationHandler {
 
@@ -370,11 +375,25 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
             return null;
         }
     }
+    
+    
+    /**
+     * Handles a method invocation of the proxy that is returned after an assertInvokedInOrder. The handling is delegated
+     * to {@link Scenario#assertInvokedInOrder}.
+     */
+    protected class AssertInvokedInOrderInvocationHandler implements ProxyInvocationHandler {
+
+        public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
+            BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, null);
+            scenario.assertInvokedInOrder(behaviorDefiningInvocation);
+            return null;
+        }
+    }
 
 
     /**
      * Handles a method invocation of the proxy that is returned after an assertNotInvoked. The handling is delegated
-     * to the {@link Scenario#assertNotInvoked} method.
+     * to {@link Scenario#assertNotInvoked}.
      */
     protected class AssertNotInvokedInvocationHandler implements ProxyInvocationHandler {
 

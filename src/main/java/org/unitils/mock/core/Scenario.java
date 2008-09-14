@@ -85,26 +85,21 @@ public class Scenario {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
             if (matchingInvocation == null && invocationVerificationStatus == VerificationStatus.UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
-                // Found a match that's not verified yet. Mark as verified in order, and check if there's no 
-                // subsequent observed invocation that's already verified using assertInvokedInOrder()
+                // Found a match that's not verified yet. Mark as verified in order.
                 invocationVerificationStatuses.set(i, VerificationStatus.VERIFIED_IN_ORDER);
                 matchingInvocation = observedInvocation;
                 continue;
             }
-            if (matchingInvocation != null) {
-                if (invocationVerificationStatus == VerificationStatus.VERIFIED_IN_ORDER) {
-                    throw new AssertionError(getInvokedOutOfOrderErrorMessage(behaviorDefiningInvocation, matchingInvocation, observedInvocation));
-                }
+            // If we found a match, then check if there's no subsequent observed invocation that's already verified using assertInvokedInOrder()
+            if (matchingInvocation != null && invocationVerificationStatus == VerificationStatus.VERIFIED_IN_ORDER) {
+                throw new AssertionError(getInvokedOutOfOrderErrorMessage(behaviorDefiningInvocation, matchingInvocation, observedInvocation));
             }
+        }
+        if (matchingInvocation == null) {
+            throw new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation));
         }
     }
 
-
-    protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation,
-            ObservedInvocation outOfOrderInvocation) {
-        // TODO
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 
     public void assertNotInvoked(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         for (int i = 0; i < observedInvocations.size(); i++) {
@@ -119,7 +114,7 @@ public class Scenario {
 
     public String createReport() {
         ScenarioReport scenarioReport = new DefaultScenarioReport();
-        return scenarioReport.createReport("Mock report:", this);
+        return scenarioReport.createReport(this);
     }
 
 
@@ -137,9 +132,8 @@ public class Scenario {
 
     protected String getAssertNotInvokedErrorMessage(ProxyInvocation proxyInvocation) {
         StringBuilder message = new StringBuilder();
-        Method method = proxyInvocation.getMethod();
         message.append("Prohibited invocation of ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(method));
+        message.append(MethodFormatUtil.getCompleteRepresentation(proxyInvocation.getMethod()));
         message.append(" at ");
         message.append(proxyInvocation.getInvokedAt());
         message.append("\n");
@@ -151,11 +145,22 @@ public class Scenario {
     // todo check message
     protected String getAssertInvokedErrorMessage(ProxyInvocation proxyInvocation) {
         StringBuilder message = new StringBuilder();
-        Method method = proxyInvocation.getMethod();
         message.append("Expected invocation of ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(method));
-        message.append(", but the invocation didn't occur.");
-        message.append("\n");
+        message.append(MethodFormatUtil.getCompleteRepresentation(proxyInvocation.getMethod()));
+        message.append(", but the invocation didn't occur.\n");
+        message.append(createReport());
+        return message.toString();
+    }
+    
+    
+    protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation,
+            ObservedInvocation outOfOrderInvocation) {
+        StringBuilder message = new StringBuilder();
+        message.append("Invocation of ");
+        message.append(MethodFormatUtil.getCompleteRepresentation(matchingInvocation.getMethod()));
+        message.append(" was expected to be performed after ");
+        message.append(MethodFormatUtil.getCompleteRepresentation(outOfOrderInvocation.getMethod()));
+        message.append(" but actually occurred before it.\n");
         message.append(createReport());
         return message.toString();
     }

@@ -90,6 +90,8 @@ public interface Mock<T> {
     T oncePerforms(MockBehavior mockBehavior);
 
     T assertInvoked();
+    
+    T assertInvokedInOrder();
 
     T assertNotInvoked();
 }
