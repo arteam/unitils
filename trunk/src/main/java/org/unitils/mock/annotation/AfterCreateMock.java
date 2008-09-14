@@ -21,7 +21,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that is called after a mock object has been created by the {@link org.unitils.easymock.EasyMockModule}
+ * Annotation for indicating that a method is to be called after a mock was created. This method can for example
+ * do some extra configuration or install the instance in a service locator.
+ * <p />
+ * The method should have following signature: <code>void myMethod(Object mock, String name, Class type)</code>
+ * <p/>
+ * The passed object is the created mock.
+ * The name is the name of the mock, typically the name of the field.
+ * The type is the class type of the mocked instance.
  *
  * @author Filip Neven
  * @author Tim Ducheyne

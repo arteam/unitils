@@ -18,15 +18,17 @@ package org.unitils.mock.mockbehavior.impl;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
+import java.lang.reflect.Array;
+import java.util.*;
+
 /**
  * Mock behavior that returns a default value.
  * <p/>
  * Following defaults are used:<ul>
- * <li>Primitive values: 0</li>
+ * <li>Number values: 0</li>
  * <li>Object values: null</li>
  * <li>Collectionn, arrays etc: empty values</li></ul>
  * <p/>
- * todo implment default values
  *
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -42,6 +44,22 @@ public class DefaultValueReturningMockBehavior implements MockBehavior {
      * @return The default value
      */
     public Object execute(ProxyInvocation proxyInvocation) {
+        Class<?> returnType = proxyInvocation.getMethod().getReturnType();
+        if (Number.class.isAssignableFrom(returnType)) {
+            return 0;
+        }
+        if (List.class.equals(returnType)) {
+            return new ArrayList();
+        }
+        if (Set.class.equals(returnType)) {
+            return new TreeSet();
+        }
+        if (Map.class.equals(returnType)) {
+            return new HashMap();
+        }
+        if (returnType.isArray()) {
+            Array.newInstance(returnType.getComponentType(), 0);
+        }
         return null;
     }
 
