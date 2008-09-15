@@ -75,23 +75,26 @@ public class DbScriptJarCreator {
     
     private String encoding;
     
+    private String targetDatabasePrefix;
+    
     private Properties defaultConfiguration = new ConfigurationLoader().getDefaultConfiguration();
 
     
     /**
      * Creates an instance
      * 
-     * @param configurationFileName Config file from which properties concerning script file organization are retrieved, if any
      * @param location Must not be null
      * @param extensions If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS
      * @param postProcessingDirName If not null, overrides the property DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME
      * @param encoding If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS
+     * @param targetDatabasePrefix If not null, overrides the property DefaultScriptSource.PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX
      */
-	public DbScriptJarCreator(String location, String extensions, String postProcessingDirName, String encoding) {
-        this.postProcessingDirName = postProcessingDirName;
+	public DbScriptJarCreator(String location, String extensions, String postProcessingDirName, String encoding, String targetDatabasePrefix) {
         this.location = location;
         this.extensions = extensions;
+        this.postProcessingDirName = postProcessingDirName;
         this.encoding = encoding;
+        this.targetDatabasePrefix = targetDatabasePrefix;
     }
 	
 	
@@ -174,14 +177,14 @@ public class DbScriptJarCreator {
 			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, extensions);
 		}
 		if (postProcessingDirName != null) {
-			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postProcessingDirName);
-		}
-		if (postProcessingDirName != null) {
             conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAME, postProcessingDirName);
         }
 		if (encoding != null) {
 		    conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_ENCODING, encoding);
 		}
+		if (targetDatabasePrefix != null) {
+            conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX, targetDatabasePrefix);
+        }
 		return conf;
 	}
     
@@ -210,6 +213,12 @@ public class DbScriptJarCreator {
 		    conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_ENCODING, 
                     defaultConfiguration.getProperty(DefaultScriptSource.PROPKEY_SCRIPTS_ENCODING));
 		}
+		if (targetDatabasePrefix != null) {
+            conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX, targetDatabasePrefix);
+        } else {
+            conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX, 
+                    defaultConfiguration.getProperty(DefaultScriptSource.PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX));
+        }
 		return conf;
 	}
 

@@ -40,11 +40,13 @@ public class DbScriptJarReader implements Iterable<Script> {
     private JarInputStream inputStream;
     private String jarFileName;
     private String encoding;
+    private String targetDatabasePrefix;
 
-    public DbScriptJarReader(String jarFileName, String encoding) throws IOException {
+    public DbScriptJarReader(String jarFileName, String encoding, String targetDatabasePrefix) throws IOException {
         this.jarFileName = jarFileName;
         this.inputStream = new JarInputStream(new FileInputStream(new File(jarFileName)));
         this.encoding = encoding;
+        this.targetDatabasePrefix = targetDatabasePrefix;
     }
     
     public void close() throws IOException {
@@ -72,7 +74,9 @@ public class DbScriptJarReader implements Iterable<Script> {
 
         public Script next() {
             String fileName = currentEntry.getName();
-            return new Script(fileName, currentEntry.getTime(), new UrlScriptContentHandle(getJarURL(fileName), encoding));
+            return new Script(fileName, currentEntry.getTime(), 
+                    new UrlScriptContentHandle(getJarURL(fileName), encoding), 
+                    targetDatabasePrefix);
         }
 
         public void remove() {

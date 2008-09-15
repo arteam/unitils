@@ -16,23 +16,11 @@
 package org.unitils.dbmaintainer.version.impl;
 
 import static java.util.Arrays.asList;
-import static junit.framework.Assert.assertEquals;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.lang.time.DateUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
@@ -40,6 +28,13 @@ import org.unitils.core.util.TestUtils;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.util.CollectionUtils;
+
+import javax.sql.DataSource;
+
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * Test class for {@link org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource}. The implementation is tested using a
@@ -86,9 +81,9 @@ public class DefaultExecutedScriptInfoSourceTest {
     
     @Before
     public void initTestData() throws ParseException {
-    	executedScript1 = new ExecutedScript(new Script("1_script1.sql", 10L, "xxx"), 
+    	executedScript1 = new ExecutedScript(new Script("1_script1.sql", 10L, "xxx", "@"), 
     			DateUtils.parseDate("20/05/2008 10:20:00", new String[] {"dd/MM/yyyy hh:mm:ss"}), true);
-    	executedScript2 = new ExecutedScript(new Script("script2.sql", 20L, "yyy"), 
+    	executedScript2 = new ExecutedScript(new Script("script2.sql", 20L, "yyy", "@"), 
     			DateUtils.parseDate("20/05/2008 10:25:00", new String[] {"dd/MM/yyyy hh:mm:ss"}), false);
     }
 
@@ -97,7 +92,7 @@ public class DefaultExecutedScriptInfoSourceTest {
      * Cleanup by dropping the test version table.
      */
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     	dropExecutedScriptsTable();
     }
 
@@ -106,7 +101,7 @@ public class DefaultExecutedScriptInfoSourceTest {
      * Test setting and getting version
      */
     @Test
-    public void testRegisterAndRetrieveExecutedScript() throws Exception {
+    public void testRegisterAndRetrieveExecutedScript() {
         dbVersionSource.registerExecutedScript(executedScript1);
         assertLenEquals(asList(executedScript1), dbVersionSource.getExecutedScripts());
         dbVersionSource.registerExecutedScript(executedScript2);
@@ -118,7 +113,7 @@ public class DefaultExecutedScriptInfoSourceTest {
      * Tests getting the version, but no executed scripts table yet (e.g. first use)
      */
     @Test(expected = UnitilsException.class)
-    public void testRegisterExecutedScript_NoExecutedScriptsTable() throws Exception {
+    public void testRegisterExecutedScript_NoExecutedScriptsTable() {
     	dropExecutedScriptsTable();
         dbVersionSource.registerExecutedScript(executedScript1);
     }
@@ -128,7 +123,7 @@ public class DefaultExecutedScriptInfoSourceTest {
      * Tests getting the version, but no executed scripts table yet and auto-create is true.
      */
     @Test
-    public void testGetDBVersion_noExecutedScriptsTableAutoCreate() throws Exception {
+    public void testGetDBVersion_noExecutedScriptsTableAutoCreate() {
     	dropExecutedScriptsTable();
 
         dbVersionSourceAutoCreate.registerExecutedScript(executedScript1);

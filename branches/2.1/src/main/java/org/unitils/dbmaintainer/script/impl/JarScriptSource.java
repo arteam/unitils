@@ -40,9 +40,10 @@ public class JarScriptSource extends DefaultScriptSource implements ScriptSource
 	protected List<Script> loadAllScripts() {
     	String sourceJar = PropertyUtils.getString(DB_MAINTAINER_SCRIPT_JAR, configuration);
     	String encoding = PropertyUtils.getString(PROPKEY_SCRIPTS_ENCODING, configuration);
+    	String targetDatabasePrefix = PropertyUtils.getString(PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX, configuration);
     	try {
         	List<Script> allScripts = new ArrayList<Script>();
-            DbScriptJarReader jarReader = new DbScriptJarReader(sourceJar, encoding);
+            DbScriptJarReader jarReader = new DbScriptJarReader(sourceJar, encoding, targetDatabasePrefix);
             for (Script script : jarReader) {
             	if (isScriptFile(new File(script.getFileName()))) {
             	    allScripts.add(script);

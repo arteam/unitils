@@ -75,7 +75,7 @@ public abstract class DbScriptJarHandler {
 		configuration.put(DBMaintainer.PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, Boolean.toString(false));
 		configuration.put(DBMaintainer.PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, Boolean.toString(false));
 		configuration.put(DefaultScriptSource.PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES, Boolean.toString(false));
-		configuration.put(DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, Boolean.toString(true));
+		configuration.put(DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, Boolean.toString(false));
 	
 		// Make sure the JarScriptSource is used, that reads scripts from the jar file instead of the file system
 		configuration.put(ScriptSource.class.getName() + ".implClassName", JarScriptSource.class.getName());

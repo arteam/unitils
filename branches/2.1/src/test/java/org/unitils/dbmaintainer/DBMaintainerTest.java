@@ -15,21 +15,8 @@
  */
 package org.unitils.dbmaintainer;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.junit.Assert.fail;
 import static org.unitils.easymock.EasyMockUnitils.replay;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.clean.DBClearer;
@@ -45,6 +32,11 @@ import org.unitils.easymock.annotation.Mock;
 import org.unitils.easymock.util.Calls;
 import org.unitils.inject.annotation.InjectIntoByType;
 import org.unitils.inject.annotation.TestedObject;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Tests the main algorithm of the DBMaintainer, using mocks for all implementation classes.
@@ -104,9 +96,9 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         dbMaintainer.disableConstraintsEnabled = true;
 
         scripts = new ArrayList<Script>();
-        Script script1 = new Script("01_script1.sql", 0L, "checksum1");
+        Script script1 = new Script("01_script1.sql", 0L, "checksum1", "@");
 		scripts.add(script1);
-        Script script2 = new Script("script2.sql", 0L, "checksum2");
+        Script script2 = new Script("script2.sql", 0L, "checksum2", "@");
 		scripts.add(script2);
 
         alreadyExecutedScripts = new ArrayList<ExecutedScript>();
@@ -114,8 +106,8 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         alreadyExecutedScripts.add(new ExecutedScript(script2, null, true));
         
         postProcessingScripts = new ArrayList<Script>();
-        postProcessingScripts.add(new Script("post-script1.sql", 0L, "post-checksum1"));
-        postProcessingScripts.add(new Script("post-script2.sql", 0L, "post-checksum2"));
+        postProcessingScripts.add(new Script("post-script1.sql", 0L, "post-checksum1", "@"));
+        postProcessingScripts.add(new Script("post-script2.sql", 0L, "post-checksum2", "@"));
         
         expect(mockVersionSource.getExecutedScripts()).andStubReturn(new HashSet<ExecutedScript>(alreadyExecutedScripts));
     }

@@ -77,6 +77,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
     
     /* The key of the property that specifies the column in which is stored whether the last update succeeded. */
     public static final String PROPERTY_SUCCEEDED_COLUMN_NAME = "dbMaintainer.succeededColumnName";
+    public static final String PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX = "dbMaintainer.scripts.targetDatabase.prefix";
 
     /* The key of the property that specifies whether the executec scripts table should be created automatically. */
     public static final String PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE = "dbMaintainer.autoCreateExecutedScriptsTable";
@@ -207,7 +208,9 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 								+ timestampFormat, e);
 					}
 					Boolean succeeded = rs.getInt(succeededColumnName) == 1 ? Boolean.TRUE : Boolean.FALSE;
-					ExecutedScript executedScript = new ExecutedScript(new Script(fileName, fileLastModifiedAt, checkSum), executedAt, succeeded);
+					ExecutedScript executedScript = new ExecutedScript(
+					        new Script(fileName, fileLastModifiedAt, checkSum, PropertyUtils.getString(PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX, configuration)), 
+					        executedAt, succeeded);
 					executedScripts.add(executedScript);
 				}
 

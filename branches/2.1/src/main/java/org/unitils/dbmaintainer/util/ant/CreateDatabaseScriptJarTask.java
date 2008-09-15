@@ -17,10 +17,7 @@
  */
 package org.unitils.dbmaintainer.util.ant;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
 import org.unitils.dbmaintainer.util.DbScriptJarCreator;
-
 
 /**
  * @author Alexander Snaps <alex.snaps@gmail.com>
@@ -34,12 +31,13 @@ public class CreateDatabaseScriptJarTask extends Task {
     private String extensions;
     private String postProcessingDirName;
     private String encoding;
+    private String targetDatabasePrefix;
 
     public void execute()
             throws BuildException {
 
         try {
-			DbScriptJarCreator creator = new DbScriptJarCreator(location, extensions, postProcessingDirName, encoding);
+			DbScriptJarCreator creator = new DbScriptJarCreator(location, extensions, postProcessingDirName, encoding, targetDatabasePrefix);
             creator.createJar(jarFileName);
         } catch(Exception e) {
         	e.printStackTrace();
@@ -65,5 +63,9 @@ public class CreateDatabaseScriptJarTask extends Task {
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+    
+    public void setTargetDatabasePrefix(String targetDatabasePrefix) {
+        this.targetDatabasePrefix = targetDatabasePrefix;
     }
 }

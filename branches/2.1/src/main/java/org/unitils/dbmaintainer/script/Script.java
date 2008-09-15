@@ -54,11 +54,12 @@ public class Script implements Comparable<Script> {
      * @param fileName The name of the script file, not null
      * @param fileLastModifiedAt 
      * @param scriptContentHandle Handle providing access to the contents of the script, not null
+     * @param targetDatabasePrefix 
      */
-    public Script(String fileName, Long fileLastModifiedAt, ScriptContentHandle scriptContentHandle) {
+    public Script(String fileName, Long fileLastModifiedAt, ScriptContentHandle scriptContentHandle, String targetDatabasePrefix) {
         this.fileName = fileName;
         this.version = getVersionFromPath(fileName);
-        this.targetDatabaseName = getTargetDatabaseNameFromPath(fileName);
+        this.targetDatabaseName = getTargetDatabaseNameFromPath(fileName, targetDatabasePrefix);
         this.fileLastModifiedAt = fileLastModifiedAt;
         this.scriptContentHandle = scriptContentHandle;
     }
@@ -74,11 +75,12 @@ public class Script implements Comparable<Script> {
      * @param fileName The name of the script file, not null
      * @param fileLastModifiedAt 
      * @param checkSum Checksum calculated for the content of the script
+	 * @param targetDatabasePrefix 
      */
-    public Script(String fileName, Long fileLastModifiedAt, String checkSum) {
+    public Script(String fileName, Long fileLastModifiedAt, String checkSum, String targetDatabasePrefix) {
     	this.fileName = fileName;
     	this.version = getVersionFromPath(fileName);
-    	this.targetDatabaseName = getTargetDatabaseNameFromPath(fileName);
+    	this.targetDatabaseName = getTargetDatabaseNameFromPath(fileName, targetDatabasePrefix);
     	this.fileLastModifiedAt = fileLastModifiedAt;
     	this.checkSum = checkSum;
     }
@@ -234,10 +236,10 @@ public class Script implements Comparable<Script> {
     }
     
     
-    protected String getTargetDatabaseNameFromPath(String relativePath) {
+    protected String getTargetDatabaseNameFromPath(String relativePath, String targetDatabasePrefix) {
     	String[] pathParts = StringUtils.split(relativePath, '/');
     	for (int i = pathParts.length - 1; i >= 0; i--) {
-    		String targetDatabase = extractTargetDatabase(pathParts[i]);
+    		String targetDatabase = extractTargetDatabase(pathParts[i], targetDatabasePrefix);
     		if (targetDatabase != null) {
     			return targetDatabase;
     		}
@@ -245,7 +247,7 @@ public class Script implements Comparable<Script> {
     	return null;
 	}
     
-    protected String extractTargetDatabase(String pathPart) {
+    protected String extractTargetDatabase(String pathPart, String targetDatabasePrefix) {
 		Long index = extractIndex(pathPart);
 		String pathPartAfterIndex;
 		if (index == null) {
@@ -253,7 +255,7 @@ public class Script implements Comparable<Script> {
 		} else {
 			pathPartAfterIndex = StringUtils.substringAfter(pathPart, "_");
 		}
-		if (pathPartAfterIndex.startsWith("@") && pathPartAfterIndex.contains("_")) {
+		if (pathPartAfterIndex.startsWith(targetDatabasePrefix) && pathPartAfterIndex.contains("_")) {
 			String databaseName = StringUtils.substringBefore(pathPartAfterIndex, "_").substring(1);
 			return databaseName;
 		}

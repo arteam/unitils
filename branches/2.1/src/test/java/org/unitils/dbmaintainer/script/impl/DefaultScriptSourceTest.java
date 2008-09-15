@@ -16,13 +16,18 @@
 package org.unitils.dbmaintainer.script.impl;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyDirectory;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyFile;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDeleteOnExit;
+
+import org.unitils.UnitilsJUnit4;
+import org.unitils.core.UnitilsException;
+import org.unitils.database.annotations.TestDataSource;
+import org.unitils.dbmaintainer.script.ExecutedScript;
+import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.version.Version;
+
+import javax.sql.DataSource;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,17 +35,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.core.UnitilsException;
-import org.unitils.database.annotations.TestDataSource;
-import org.unitils.dbmaintainer.script.ExecutedScript;
-import org.unitils.dbmaintainer.script.Script;
-import org.unitils.dbmaintainer.version.Version;
 
 /**
  * Tests the DefaultScriptSource
@@ -67,17 +61,17 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      * Cleans test directory and copies test files to it. Initializes test objects
      */
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     	executionDate = new Date();
 		alreadyExecutedScripts = new ArrayList<ExecutedScript>(asList(
-			new ExecutedScript(new Script("1_scripts/001_scriptA.sql", 0L, "9a6c61ba036ac10baa6d8229ddc61607"), executionDate, true),
-			new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "d28d9d6b03f7be2f6a51061360b00c9e"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/002_scriptE.sql", 0L, "2e02a907691a4f20a19ae363d5942e84"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/scriptF.sql", 0L, "77a703ac3381db7be6273a6e8899c772"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/subfolder/001_scriptG.sql", 0L, "1efbb7e68fb36681e047feb47fb57054"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "b653b6f1b6522083efe6012479898958"), executionDate, true),
-			new ExecutedScript(new Script("scripts/001_scriptI.sql", 0L, "1efbb7e68fb36681e047feb47fb57054"), executionDate, true),
-			new ExecutedScript(new Script("scripts/scriptJ.sql", 0L, "b653b6f1b6522083efe6012479898958"),  executionDate, true)
+			new ExecutedScript(new Script("1_scripts/001_scriptA.sql", 0L, "9a6c61ba036ac10baa6d8229ddc61607", "@"), executionDate, true),
+			new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "d28d9d6b03f7be2f6a51061360b00c9e", "@"), executionDate, true),
+			new ExecutedScript(new Script("2_scripts/002_scriptE.sql", 0L, "2e02a907691a4f20a19ae363d5942e84", "@"), executionDate, true),
+			new ExecutedScript(new Script("2_scripts/scriptF.sql", 0L, "77a703ac3381db7be6273a6e8899c772", "@"), executionDate, true),
+			new ExecutedScript(new Script("2_scripts/subfolder/001_scriptG.sql", 0L, "1efbb7e68fb36681e047feb47fb57054", "@"), executionDate, true),
+			new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "b653b6f1b6522083efe6012479898958", "@"), executionDate, true),
+			new ExecutedScript(new Script("scripts/001_scriptI.sql", 0L, "1efbb7e68fb36681e047feb47fb57054", "@"), executionDate, true),
+			new ExecutedScript(new Script("scripts/scriptJ.sql", 0L, "b653b6f1b6522083efe6012479898958", "@"),  executionDate, true)
     	));
     	
         // Create test directories
@@ -149,7 +143,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetNewScripts() {
-    	alreadyExecutedScripts.set(5, new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "xxx"), executionDate, true));
+    	alreadyExecutedScripts.set(5, new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "xxx", "@"), executionDate, true));
     	
 		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts));
 
@@ -167,7 +161,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     
     @Test
     public void testIsExistingScriptsModfied_modifiedScript() {
-    	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx"), executionDate, true));
+    	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx", "@"), executionDate, true));
     	
         assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
     }
@@ -183,7 +177,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     
     @Test
     public void testIsExistingScriptsModfied_scriptRemoved() {
-    	alreadyExecutedScripts.add(new ExecutedScript(new Script("1_scripts/003_scriptB.sql", 0L, "xxx"), executionDate, true));
+    	alreadyExecutedScripts.add(new ExecutedScript(new Script("1_scripts/003_scriptB.sql", 0L, "xxx", "@"), executionDate, true));
     	
         assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("x.x.x"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
     }
@@ -199,7 +193,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     
     @Test
     public void testIsExistingScriptsModfied_higherIndexScriptModified() {
-    	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx"), executionDate, true));
+    	alreadyExecutedScripts.set(1, new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "xxx", "@"), executionDate, true));
     	
         assertFalse(scriptSource.isExistingIndexedScriptModified(new Version("1.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));
         assertTrue(scriptSource.isExistingIndexedScriptModified(new Version("1.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts)));

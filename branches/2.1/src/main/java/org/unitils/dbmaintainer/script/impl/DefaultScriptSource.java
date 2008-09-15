@@ -73,6 +73,8 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     
     public static final String PROPKEY_SCRIPTS_ENCODING = "dbMaintainer.scripts.encoding";
     
+    public static final String PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX = "dbMaintainer.scripts.targetDatabase.prefix";
+    
     protected List<Script> allUpdateScripts, allPostProcessingScripts;
 
 
@@ -323,7 +325,8 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     protected Script createScript(File scriptFile, String relativePath) {
         return new Script(relativePath, scriptFile.lastModified(), 
                 new ScriptContentHandle.UrlScriptContentHandle(FileUtils.getUrl(scriptFile), 
-                PropertyUtils.getString(PROPKEY_SCRIPTS_ENCODING, configuration)));
+                PropertyUtils.getString(PROPKEY_SCRIPTS_ENCODING, configuration)),
+                PropertyUtils.getString(PROPKEY_SCRIPTS_TARGETDATABASE_PREFIX, configuration));
     }
 
 
