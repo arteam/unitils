@@ -28,7 +28,9 @@ Tutorial
     
     * {{{#Testing_with_Spring}Testing with Spring}}
     
-    * {{{#Testing_with_mock_objects}Testing with mock objects}}
+	* {{{#Testing_with_mock_objects}Testing with mock objects}}
+    
+    * {{{#EasyMock_support}EasyMock support}}
         
     []
 
@@ -1431,6 +1433,69 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 
 * {Testing with mock objects}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other parts or services that it depends on. Unitils provides extensive support for mock objects: offering a concise and intuitive syntax, enabling the developer to specify mock behavior before executing the test and verifying how the mock objects were used afterwards. Support is also offered for mock creation and injection.
+	
+	Before version 2.0, mock objects support was built upon EasyMock. This functionality will remain available. Refer to the chapter on {{{EasyMock support}EasyMock support}} for more info.
+
+	You may wonder why we've written a full-fledged mock module given the abundance of dynamic mock object libraries already available in the java landscape. The reason is that we actually experienced a lot of flaws when working with libraries such as EasyMock and JMock. The features that make the difference are:
+	
+    * Mock behavior definition is performed before invoking the method under test. No verification happens whether these statements were actually executed or how often. After the tested method invocation, assert statements are used to verify expected method invocations.
+	
+	* Concrete objects and argument matchers and null's (meaning I-don't-care) can be mixed in behavior definitions and assert statements, whereas with other mock libraries you must use either concrete objects or argument matchers, but you cannot mix them within the same method call.
+
+	* Optimal feedback is provided in the logs and in error messages: The observed scenario, completed with source file and line number info (transformed into direct links to the source by your favorite IDE), and suggested invocation assert statements that can be used as a start or simply be copy-pasted into the test.
+
+** Mock test example
+~~~~~~~~~~~~~~~~~~~~~~
+
+Following example is a test for an alert service: the sendScheduledAlerts() method requests all scheduled alerts from an AlertSchedulerService, and sends them using a MessageSenderService.
+
++-----+
+public class AlertServiceTest extends UnitilsJUnit4 {
+
+	AlertService alertService;
+	Message alert1, alert2;
+	Mock<SchedulerService> mockSchedulerService;
+	Mock<MessageService> mockMessageService;
+
+	@Before
+	public void init() {
+		alertService = new AlertService(mockSchedulerService.getInstance(),
+				mockMessageService.getInstance());
+		alert1 = new Alert(...); alert2 = new Alert(...);
+	}
+	
+	@Test 
+	public void testSendScheduledAlerts() {
+	    mockSchedulerService.returns(Arrays.asList(alert1, alert2)).getScheduledAlerts(null));
+	    
+	    alertService.sendScheduledAlerts();
+		
+		mockMessageService.assertInvoked().sendMessage(alert1);
+	    mockMessageService.assertInvoked().sendMessage(alert2);
+	}
+}
++-----+	
+
+    The example test makes use of a mock SchedulerService and MessageService. Each mock object is wrapped in a control object, that enables specifying mock behavior and invocation assert statements. The first statement in this test specifies that subsequent invocations of getScheduledAlerts on the mock SchedulerService with any parameter (null means as much as any in a behavior definition statement), will return a List containing alert1 and alert2.
+	The following statement invokes the method under test. After this, assert statements are invoked to verify that the sendAlert method was called on the mock MessageService, with first alert1 and second alert2 as method argument.
+
+** Creation of mock objects
+~~~~~~~~~~~~~~~~~~~~
+	Mock objects are wrapped inside a control object, which you can use to define behavior and invoke assert statements. To obtain a mock, simply declare it as a field of your test.
+
++-----+
+	Mock<MyService> mockService;
++-----+
+	
+	Unitils will create the mock control object for you and assign it to this field before each test. To obtain the mock object itself, simply call the getInstance() method on the control object.
+	
+** Define mock behavior
+~~~~~~~~~~~~~~~~~~~~
+	
+	
+* {EasyMock support}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other parts or services that it depends on. Unitils builds 
     further on {{{http://www.easymock.org}EasyMock}} for its mock object testing support. It provides convenience functionality that reduces the plumbing code that needs to 
     be written when working with mocks. This involves simplification of mock creation, argument matching and injection of mocks.
@@ -1444,7 +1509,7 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
     
     Following example shows a unit test for a method on a <UserService> that disables all user accounts that haven't been active for a certain time:
     
-+-----+
++-----+the 
 public class UserServiceTest extends UnitilsJUnit4 { 
 
     @Mock
