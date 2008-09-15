@@ -15,14 +15,23 @@
  */
 package org.unitils.mock.core;
 
-import org.unitils.mock.Mock;
-import org.unitils.mock.PartialMock;
-import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import static org.unitils.core.util.CloneUtil.createDeepClone;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.getArgumentMatchers;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.resetArgumentMatchers;
+import static org.unitils.mock.proxy.ProxyUtil.createProxy;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.unitils.inject.annotation.InjectInto;
+import org.unitils.inject.util.ObjectToInjectHolder;
+import org.unitils.mock.Mock;
+import org.unitils.mock.PartialMock;
+import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
-import static org.unitils.core.util.CloneUtil.createDeepClone;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
@@ -30,12 +39,6 @@ import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
-import static org.unitils.mock.proxy.ProxyUtil.createProxy;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Implementation of a Mock and PartialMock.
@@ -44,7 +47,7 @@ import java.util.List;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class MockObject<T> implements Mock<T>, PartialMock<T> {
+public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHolder {
 
 
     /* The name of the mock (e.g. the name of the field) */
@@ -90,7 +93,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
     //
 
     /**
-     * Gets the mock proxy instance. This is the instance that can be used to perform the test.
+     * Returns the mock proxy instance. This is the instance that can be used to perform the test.
      * You could for example inject it in the tested object. It will then perform the defined behavior and record
      * all observed method invocations so that assertions can be performed afterwards.
      *
@@ -100,6 +103,19 @@ public class MockObject<T> implements Mock<T>, PartialMock<T> {
         return instance;
     }
 
+
+    /**
+     * Returns the mock proxy instance. This is the object that must be injected if the field that it holds is 
+     * annotated with {@link InjectInto} or one of it's equivalents.
+     */
+    public Object getObjectToInject() {
+        return instance;
+    }
+
+    
+    public Class<?> getObjectToInjectType() {
+        return mockedClass;
+    }
 
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
