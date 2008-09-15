@@ -38,21 +38,27 @@ public class ProxyUtil {
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
-     * @param mockedClass       The type to proxy, not null
+     * @param proxiedClass       The type to proxy, not null
      * @param invocationHandler The handler that will handle the method invocations of the proxy, not null.
      * @return The proxy object, not null
      */
     @SuppressWarnings("unchecked")
-    public static <T> T createProxy(Class<T> mockedClass, ProxyInvocationHandler invocationHandler) {
+    public static <T> T createProxy(Class<T> proxiedClass, ProxyInvocationHandler invocationHandler) {
+        return createProxy(proxiedClass, new ProxyMethodInterceptor(invocationHandler));
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static <T> T createProxy(Class<T> proxiedClass, MethodInterceptor methodInterceptor) {
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(mockedClass);
+        enhancer.setSuperclass(proxiedClass);
         enhancer.setCallbackType(MethodInterceptor.class);
         enhancer.setUseFactory(true);
         Class<T> enhancedTargetClass = enhancer.createClass();
 
         Objenesis objenesis = new ObjenesisStd();
         Factory proxy = (Factory) objenesis.newInstance(enhancedTargetClass);
-        proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(invocationHandler)});
+        proxy.setCallbacks(new Callback[]{methodInterceptor});
         return (T) proxy;
     }
 

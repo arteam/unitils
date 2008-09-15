@@ -16,6 +16,7 @@
 package org.unitils.mock;
 
 import org.unitils.core.Unitils;
+import org.unitils.mock.dummy.DummyObjectUtil;
 
 /**
  * @author Filip Neven
@@ -31,6 +32,10 @@ public class MockUnitils {
 
     public static void logExecutionScenario() {
         getMockModule().logExecutionScenario();
+    }
+    
+    public static <T> T createDummy(Class<T> type) {
+        return DummyObjectUtil.createDummy(type);
     }
 
 

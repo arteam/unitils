@@ -15,6 +15,19 @@
  */
 package org.unitils.mock;
 
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ReflectionUtils.getFieldsOfType;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -22,14 +35,11 @@ import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
 import org.unitils.easymock.EasyMockModule;
 import org.unitils.mock.annotation.AfterCreateMock;
+import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.*;
-
-import java.lang.reflect.*;
-import java.util.Properties;
-import java.util.Set;
+import org.unitils.mock.dummy.DummyObjectUtil;
+import org.unitils.util.AnnotationUtils;
 
 /**
  * Module for testing with mock objects.
@@ -93,27 +103,41 @@ public class MockModule implements Module {
                 return (Class<?>) argumentTypes[0];
             }
         }
-        throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> and PartialMock<YourTypeToMock> types. Used type; " + type);
+        throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> " +
+        		"or PartialMock<YourTypeToMock> types. Used type; " + type);
     }
 
 
     protected void createAndInjectMocksIntoTest(Object testObject) {
         Set<Field> mockFields = getFieldsOfType(testObject.getClass(), Mock.class, false);
         for (Field field : mockFields) {
-            if (getFieldValue(testObject, field) == null) {
+            // TODO find solution for fields that are instantiated in declaration - a not-null check is not the 
+            // right solution, since TestNG reuses the same test instance in every test.
+            //if (getFieldValue(testObject, field) == null) {
                 Mock<?> mock = createMock(field, false);
                 setFieldValue(testObject, field, mock);
                 callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
-            }
+            //}
         }
 
         Set<Field> partialMockFields = getFieldsOfType(testObject.getClass(), PartialMock.class, false);
         for (Field field : partialMockFields) {
-            if (getFieldValue(testObject, field) == null) {
+            // TODO find solution for fields that are instantiated in declaration - a not-null check is not the 
+            // right solution, since TestNG reuses the same test instance in every test.
+            //if (getFieldValue(testObject, field) == null) {
                 Mock<?> mock = createMock(field, true);
                 setFieldValue(testObject, field, mock);
                 callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
-            }
+            //}
+        }
+    }
+    
+    
+    protected void createAndInjectDummiesIntoTest(Object testObject) {
+        Set<Field> dummyFields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Dummy.class);
+        for (Field dummyField : dummyFields) {
+            Object dummy = DummyObjectUtil.createDummy(dummyField.getType());
+            setFieldValue(testObject, dummyField, dummy);
         }
     }
 
@@ -165,6 +189,7 @@ public class MockModule implements Module {
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             scenario.reset();
             createAndInjectMocksIntoTest(testObject);
+            createAndInjectDummiesIntoTest(testObject);
         }
 
     }
