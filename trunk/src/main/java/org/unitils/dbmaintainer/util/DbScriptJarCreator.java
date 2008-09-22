@@ -183,9 +183,9 @@ public class DbScriptJarCreator {
 		if (scriptExtensions != null) {
 			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, scriptExtensions);
 		}
-		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH) : null);
+		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH) : null);
 		if (postPrDirNameStartsWith != null) {
-			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH, postPrDirNameStartsWith);
+			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH, postPrDirNameStartsWith);
 		}
 		return conf;
 	}
@@ -196,17 +196,17 @@ public class DbScriptJarCreator {
      */
     private Properties getScriptSourceConfiguration() {
 		Properties conf = new Properties();
-		String scriptsLocation = location != null ? location : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION) : null);
+		String scriptsLocation = location != null ? location : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS) : null);
 		if (scriptsLocation != null) {
-			conf.put(DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION, scriptsLocation);
+			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS, scriptsLocation);
 		}
 		String scriptExtensions = extensions != null ? extensions : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS) : null);
 		if (scriptExtensions != null) {
 			conf.put(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, scriptExtensions);
 		}
-		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH) : null);
+		String postPrDirNameStartsWith = postProcessingDirNameStartsWith != null ? postProcessingDirNameStartsWith : (configuration != null ? configuration.getProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH) : null);
 		if (postPrDirNameStartsWith != null) {
-			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH, postPrDirNameStartsWith);
+			conf.put(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH, postPrDirNameStartsWith);
 		}
 		return conf;
 	}
