@@ -25,6 +25,13 @@ import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.copyFile;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDeleteOnExit;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -33,6 +40,8 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -40,6 +49,7 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptContentHandle;
 import org.unitils.dbmaintainer.version.Version;
 
 /**
@@ -69,32 +79,54 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     @Before
     public void setUp() throws Exception {
     	executionDate = new Date();
-		alreadyExecutedScripts = new ArrayList<ExecutedScript>(asList(
-			new ExecutedScript(new Script("1_scripts/001_scriptA.sql", 0L, "da55bb1512fad44454934a181d339918a7289394"), executionDate, true),
-			new ExecutedScript(new Script("1_scripts/002_scriptB.sql", 0L, "a902917dbf9e35a5dda1a9bfd4a00c75fa247d8a"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/002_scriptE.sql", 0L, "5231869b0b758153646e1d4870ff7a65a3de7e2f"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/scriptF.sql", 0L, "f45dc8cf2589b8a4c4271d4e5ddc4d34ed8da67e"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/subfolder/001_scriptG.sql", 0L, "ca280bf042e7cf22685fb3001f0691d3103c15b1"), executionDate, true),
-			new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "9389cf7d1f2f6acb4d06b12c95213e50dd2ec8be"), executionDate, true),
-			new ExecutedScript(new Script("scripts/001_scriptI.sql", 0L, "ca280bf042e7cf22685fb3001f0691d3103c15b1"), executionDate, true),
-			new ExecutedScript(new Script("scripts/scriptJ.sql", 0L, "9389cf7d1f2f6acb4d06b12c95213e50dd2ec8be"),  executionDate, true)
-    	));
-    	
-        // Create test directories
+    	// Create test directories
         scriptsDirName = System.getProperty("java.io.tmpdir") + "DefaultScriptSourceTest";
         forceDeleteOnExit(new File(scriptsDirName));
 
         // Copy test files
         copyDirectory(new File(getClass().getResource("DefaultScriptSourceTest").toURI()), new File(scriptsDirName));
-        
+
+		alreadyExecutedScripts = new ArrayList<ExecutedScript>(asList(
+			getExecutedScript("1_scripts/001_scriptA.sql"),
+			getExecutedScript("1_scripts/002_scriptB.sql"),
+			getExecutedScript("2_scripts/002_scriptE.sql"),
+			getExecutedScript("2_scripts/scriptF.sql"),
+			getExecutedScript("2_scripts/subfolder/001_scriptG.sql"),
+			getExecutedScript("2_scripts/subfolder/scriptH.sql"),
+			getExecutedScript("scripts/001_scriptI.sql"),
+			getExecutedScript("scripts/scriptJ.sql")
+    	));
+    	
         // Initialize FileScriptSource object
         Properties configuration = new Properties();
-        String scriptsLocation = scriptsDirName + "/test_scripts";
-        configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPTS_LOCATION, scriptsLocation);
+        String scriptsLocations = scriptsDirName + "/test_scripts";
+        configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS, scriptsLocations);
         configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, "sql");
-        configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH, "postprocessing");
+        configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH, "postprocessing");
+        configuration.setProperty(DefaultScriptSource.PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES, "false");
         scriptSource = new DefaultScriptSource();
         scriptSource.init(configuration);
+    }
+
+
+    private ExecutedScript getExecutedScript(String scriptFileName) throws NoSuchAlgorithmException, IOException {
+        return new ExecutedScript(new Script(scriptFileName, 0L, getCheckSum(scriptFileName)), executionDate, true);
+    }
+
+
+    private String getCheckSum(String fileName) throws NoSuchAlgorithmException, IOException {
+        MessageDigest digest = MessageDigest.getInstance("MD5");
+        InputStream is = new DigestInputStream(new FileInputStream(scriptsDirName + "/test_scripts/" + fileName), digest);
+        IOUtils.copy(is, new NullOutputStream());
+        return getHexPresentation(digest.digest());
+    }
+    
+    private String getHexPresentation(byte[] byteArray) {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < byteArray.length; i++) {
+            result.append(Integer.toString((byteArray[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return result.toString();
     }
 
 
@@ -149,11 +181,11 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     public void testGetNewScripts() {
     	alreadyExecutedScripts.set(5, new ExecutedScript(new Script("2_scripts/subfolder/scriptH.sql", 0L, "xxx"), executionDate, true));
     	
-		List<Script> scripts = scriptSource.getNewScripts(new Version("2.2"), new HashSet<ExecutedScript>(alreadyExecutedScripts));
-
+		List<Script> scripts = scriptSource.getNewScripts(new Version("2.x.1"), new HashSet<ExecutedScript>(alreadyExecutedScripts));
+		
         assertEquals("1_scripts/scriptD.sql", scripts.get(0).getFileName());       			// x.1.x 		was added
-        assertEquals("2_scripts/subfolder/scriptH.sql", scripts.get(2).getFileName());      // x.2.x.x		was changed
-        assertEquals("scripts/001_scriptI.sql", scripts.get(3).getFileName());   			// x.x.1		higher version
+        assertEquals("2_scripts/subfolder/scriptH.sql", scripts.get(1).getFileName());      // x.2.x.x		was changed
+        assertEquals("scripts/001_scriptI.sql", scripts.get(2).getFileName());   			// x.x.1		higher version
     }
 
 

@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.UnitilsException;
@@ -57,17 +56,17 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     /**
      * Property key for the directory in which the script files are located
      */
-    public static final String PROPKEY_SCRIPTS_LOCATION = "dbMaintainer.scripts.location";
+    public static final String PROPKEY_SCRIPT_LOCATIONS = "dbMaintainer.script.locations";
 
     /**
      * Property key for the extension of the script files
      */
-    public static final String PROPKEY_SCRIPT_EXTENSIONS = "dbMaintainer.scripts.fileExtensions";
+    public static final String PROPKEY_SCRIPT_EXTENSIONS = "dbMaintainer.script.fileExtensions";
 
     /**
      * Property key for the directory in which the code script files are located
      */
-    public static final String PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH = "dbMaintainer.postProcessingScripts.directoryNameStartsWith";
+    public static final String PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH = "dbMaintainer.postProcessingScript.directoryNameStartsWith";
 
     public static final String PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES = "dbMaintainer.useScriptFileLastModificationDates.enabled";
     
@@ -246,12 +245,14 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @return A List containing all scripts in the given script locations, not null
      */
 	protected List<Script> loadAllScripts() {
-		String scriptsLocation = PropertyUtils.getString(PROPKEY_SCRIPTS_LOCATION, configuration);
-		if (!new File(scriptsLocation).exists()) {
-            throw new UnitilsException("File location " + scriptsLocation + " defined in property " + PROPKEY_SCRIPTS_LOCATION + " doesn't exist");
-        }
+		List<String> scriptLocations = PropertyUtils.getStringList(PROPKEY_SCRIPT_LOCATIONS, configuration);
 		List<Script> scripts = new ArrayList<Script>();
-		getScriptsAt(scripts, scriptsLocation, "");
+        for (String scriptLocation : scriptLocations) {
+    		if (!new File(scriptLocation).exists()) {
+                throw new UnitilsException("File location " + scriptLocation + " defined in property " + PROPKEY_SCRIPT_LOCATIONS + " doesn't exist");
+            }
+    		getScriptsAt(scripts, scriptLocation, "");
+		}
 		return scripts;
 	}
 
@@ -286,11 +287,13 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @return True if the given script is a post processing script according to the script source configuration
      */
     protected boolean isPostProcessingScript(Script script) {
-    	String postProcessingScriptDirNameStartsWith = PropertyUtils.getString(PROPKEY_POSTPROCESSINGSCRIPTS_DIRNAMESTARTSWITH, configuration);
-    	if (StringUtils.isEmpty(postProcessingScriptDirNameStartsWith)) {
-    		return false;
+    	List<String> startsWiths = PropertyUtils.getStringList(PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH, configuration);
+    	for (String startsWith : startsWiths) {
+    	    if (script.getFileName().startsWith(startsWith)) {
+    	        return true;
+    	    }
     	}
-		return script.getFileName().startsWith(postProcessingScriptDirNameStartsWith);
+		return false;
 	}
 
 
@@ -323,22 +326,6 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
 
 
     /**
-     * Gets the configured script locations and verfies that they on the file system. If one of them
-     * doesn't exist, an exception is thrown.
-     *
-     * @return The files, not null
-     */
-    protected File getScriptsLocation() {
-        String location = PropertyUtils.getString(PROPKEY_SCRIPTS_LOCATION, configuration);
-        File locationFile = new File(location);
-        if (!locationFile.exists()) {
-            throw new UnitilsException("File location " + location + " defined in property " + PROPKEY_SCRIPTS_LOCATION + " doesn't exist");
-        }
-		return locationFile;
-    }
-
-
-    /**
      * Gets the configured extensions for the script files.
      *
      * @return The extensions, not null
@@ -360,27 +347,6 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     }
 
 
-    /**
-     * Verifies that directories and files in the given list of fileLocations exist on the file
-     * system. If one of them doesn't exist, an exception is thrown
-     *
-     * @param locations    The directories and files that need to be checked
-     * @param propertyName The name of the property, for the error message if a location does not exist
-     * @return The list of files, not null
-     */
-    protected List<File> getFiles(List<String> locations, String propertyName) {
-        List<File> result = new ArrayList<File>();
-        for (String fileLocation : locations) {
-            File file = new File(fileLocation);
-            if (!file.exists()) {
-                throw new UnitilsException("File location " + fileLocation + " defined in property " + propertyName + " doesn't exist");
-            }
-            result.add(file);
-        }
-        return result;
-    }
-    
-    
     protected Map<String, Script> convertToScriptNameScriptMap(Set<ExecutedScript> executedScripts) {
 		Map<String, Script> scriptMap = new HashMap<String, Script>();
         for (ExecutedScript executedScript : executedScripts) {
