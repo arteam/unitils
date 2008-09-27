@@ -16,21 +16,14 @@
 package org.unitils.mock.core;
 
 import static org.unitils.core.util.CloneUtil.createDeepClone;
-import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
-import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.getArgumentMatchers;
-import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.resetArgumentMatchers;
-import static org.unitils.mock.proxy.ProxyUtil.createProxy;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.util.ObjectToInjectHolder;
 import org.unitils.mock.Mock;
 import org.unitils.mock.PartialMock;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.getArgumentMatchers;
+import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.resetArgumentMatchers;
 import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
@@ -39,6 +32,12 @@ import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
+import static org.unitils.mock.proxy.ProxyUtil.createProxy;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Implementation of a Mock and PartialMock.
@@ -105,17 +104,23 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
 
 
     /**
-     * Returns the mock proxy instance. This is the object that must be injected if the field that it holds is 
+     * Returns the mock proxy instance. This is the object that must be injected if the field that it holds is
      * annotated with {@link InjectInto} or one of it's equivalents.
+     *
+     * @return The mock proxy instance, not null
      */
     public Object getObjectToInject() {
         return instance;
     }
 
-    
+
+    /**
+     * @return The type of the object to inject (i.e. the mocked type), not null.
+     */
     public Class<?> getObjectToInjectType() {
         return mockedClass;
     }
+
 
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
@@ -176,18 +181,63 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     }
 
 
+    /**
+     * Defines behavior for this mock so that it will return the given value when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.returns("aValue").method1();
+     * <p/>
+     * will return "aValue" when method1 is called.
+     * <p/>
+     * When the behavior was executed it is removed, so it will only return a value once. Following
+     * invocations will trigger the next matching behavior. If no matching one time behavior is found, the
+     * always matching behaviors are tried.
+     *
+     * @param returnValue The value to return
+     * @return The proxy instance that will record the method call, not null
+     */
     public T onceReturns(Object returnValue) {
         MockBehavior mockBehavior = new ValueReturningMockBehavior(returnValue);
         return createMockObjectProxy(new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior));
     }
 
 
+    /**
+     * Defines behavior for this mock so that it raises the given exception when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.raises(new MyException()).method1();
+     * <p/>
+     * will throw the given exception when method1 is called.
+     * <p/>
+     * When the behavior was executed it is removed, so it will only raise the exception once. Following
+     * invocations will trigger the next matching behavior. If no matching one time behavior is found, the
+     * always matching behaviors are tried.
+     *
+     * @param exception The exception to raise, not null
+     * @return The proxy instance that will record the method call, not null
+     */
     public T onceRaises(Throwable exception) {
         MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
         return createMockObjectProxy(new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior));
     }
 
 
+    /**
+     * Defines behavior for this mock so that will be performed when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.performs(new MyMockBehavior()).method1();
+     * <p/>
+     * will execute the given mock behavior when method1 is called.
+     * <p/>
+     * When the behavior was executed it is removed, so it will only peform the given behavior once. Following
+     * invocations will trigger the next matching behavior. If no matching one time behavior is found, the
+     * always matching behaviors are tried.
+     *
+     * @param mockBehavior The behavior to perform, not null
+     * @return The proxy instance that will record the method call, not null
+     */
     public T oncePerforms(MockBehavior mockBehavior) {
         return createMockObjectProxy(new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior));
     }
@@ -196,8 +246,8 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     public T assertInvoked() {
         return createMockObjectProxy(new AssertInvokedInvocationHandler());
     }
-    
-    
+
+
     public T assertInvokedInOrder() {
         return createMockObjectProxy(new AssertInvokedInOrderInvocationHandler());
     }
@@ -210,10 +260,11 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     //
     // Core implementation
     //
+
     protected Object handleMockObjectInvocation(ProxyInvocation proxyInvocation) throws Throwable {
         BehaviorDefiningInvocation behaviorDefiningInvocation = getMatchingBehaviorDefiningInvocation(proxyInvocation);
         MockBehavior mockBehavior = getMockBehavior(proxyInvocation, behaviorDefiningInvocation);
-        
+
         ObservedInvocation mockInvocation = createObservedInvocation(proxyInvocation, behaviorDefiningInvocation, mockBehavior);
         scenario.addObservedMockInvocation(mockInvocation);
 
@@ -221,7 +272,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         if (mockBehavior != null) {
             result = mockBehavior.execute(proxyInvocation);
         }
-        
+
         mockInvocation.setResult(createDeepClone(result));
         return result;
     }
@@ -391,8 +442,8 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
             return null;
         }
     }
-    
-    
+
+
     /**
      * Handles a method invocation of the proxy that is returned after an assertInvokedInOrder. The handling is delegated
      * to {@link Scenario#assertInvokedInOrder}.

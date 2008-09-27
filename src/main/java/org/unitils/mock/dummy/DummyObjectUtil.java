@@ -15,14 +15,15 @@
  */
 package org.unitils.mock.dummy;
 
-import java.lang.reflect.Method;
-
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-
 import org.unitils.mock.proxy.ProxyUtil;
 
+import java.lang.reflect.Method;
+
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -31,7 +32,7 @@ public class DummyObjectUtil {
     public static <T> T createDummy(Class<T> type) {
         return ProxyUtil.createProxy(type, new DummyObjectMethodInterceptor());
     }
-    
+
     public static class DummyObjectMethodInterceptor implements MethodInterceptor {
 
         private Integer dummyObjectHashCode = new Object().hashCode();
@@ -57,14 +58,14 @@ public class DummyObjectUtil {
 
         protected boolean isEqualsMethod(Method method) {
             return "equals".equals(method.getName())
-                && 1 == method.getParameterTypes().length
-                && Object.class.equals(method.getParameterTypes()[0]);
+                    && 1 == method.getParameterTypes().length
+                    && Object.class.equals(method.getParameterTypes()[0]);
         }
 
         protected boolean isHashCodeMethod(Method method) {
-            return "hashCode".equals(method.getName()) 
-                && 0 == method.getParameterTypes().length;
+            return "hashCode".equals(method.getName())
+                    && 0 == method.getParameterTypes().length;
         }
-        
+
     }
 }
