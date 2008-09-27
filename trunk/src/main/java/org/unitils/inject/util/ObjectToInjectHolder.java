@@ -16,13 +16,14 @@
 package org.unitils.inject.util;
 
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
- *
  */
 public interface ObjectToInjectHolder {
 
     Object getObjectToInject();
-    
+
     Class<?> getObjectToInjectType();
 }

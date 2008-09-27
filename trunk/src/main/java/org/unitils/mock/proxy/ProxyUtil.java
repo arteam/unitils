@@ -48,6 +48,7 @@ public class ProxyUtil {
     }
 
 
+    // todo remove let dummy use the invocation handler
     @SuppressWarnings("unchecked")
     public static <T> T createProxy(Class<T> proxiedClass, MethodInterceptor methodInterceptor) {
         Enhancer enhancer = new Enhancer();
