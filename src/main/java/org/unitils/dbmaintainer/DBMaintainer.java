@@ -388,7 +388,18 @@ public class DBMaintainer {
      * @return True if a from scratch rebuild is needed, false otherwise
      */
     protected boolean shouldUpdateDatabaseFromScratch(Version currentVersion, Set<ExecutedScript> alreadyExecutedScripts) {
-    	// check whether the last run was successful
+        // check whether an existing script was updated
+        if (scriptSource.isExistingIndexedScriptModified(currentVersion, alreadyExecutedScripts)) {
+            if (!fromScratchEnabled) {
+                throw new UnitilsException("One or more existing incremental database update scripts have been modified, but updating from scratch is disabled. " +
+                        "You should either revert to the original version of the modified script and add an new incremental script that performs the desired " +
+                        "update, or perform the update manually on the database and then reset the database state by invoking resetDatabaseState()");
+            }
+            logger.info("One or more existing database update scripts have been modified. Database will be cleared and rebuilt from scratch.");
+            return true;
+        }
+        
+        // check whether the last run was successful
         if (errorInIndexedScriptDuringLastUpdate(alreadyExecutedScripts)) {
         	if (fromScratchEnabled) {
         		if (!keepRetryingAfterError) {
@@ -406,18 +417,6 @@ public class DBMaintainer {
         			"manually on the database, and then reset the database state by invoking resetDatabaseState()");
                 return false;
         	}
-        }
-
-    	
-        // check whether an existing script was updated
-        if (scriptSource.isExistingIndexedScriptModified(currentVersion, alreadyExecutedScripts)) {
-            if (!fromScratchEnabled) {
-                throw new UnitilsException("One or more existing incremental database update scripts have been modified, but updating from scratch is disabled. " +
-                		"You should either revert to the original version of the modified script and add an new incremental script that performs the desired " +
-                		"update, or perform the update manually on the database and then reset the database state by invoking resetDatabaseState()");
-            }
-            logger.info("One or more existing database update scripts have been modified. Database will be cleared and rebuilt from scratch.");
-            return true;
         }
 
         // from scratch is not needed
