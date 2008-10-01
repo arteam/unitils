@@ -66,7 +66,7 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
     /**
      * Property key for the directory in which the code script files are located
      */
-    public static final String PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH = "dbMaintainer.postProcessingScript.directoryNameStartsWith";
+    public static final String PROPKEY_POSTPROCESSINGSCRIPT_DIRNAME = "dbMaintainer.postProcessingScript.directoryName";
 
     public static final String PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES = "dbMaintainer.useScriptFileLastModificationDates.enabled";
     
@@ -287,7 +287,7 @@ public class DefaultScriptSource extends BaseConfigurable implements ScriptSourc
      * @return True if the given script is a post processing script according to the script source configuration
      */
     protected boolean isPostProcessingScript(Script script) {
-    	List<String> startsWiths = PropertyUtils.getStringList(PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH, configuration);
+    	List<String> startsWiths = PropertyUtils.getStringList(PROPKEY_POSTPROCESSINGSCRIPT_DIRNAME, configuration);
     	for (String startsWith : startsWiths) {
     	    if (script.getFileName().startsWith(startsWith)) {
     	        return true;

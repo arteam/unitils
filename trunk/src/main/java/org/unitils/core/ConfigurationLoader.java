@@ -99,7 +99,7 @@ public class ConfigurationLoader {
     	// Load the default properties file, that is distributed with unitils (unitils-default.properties)
     	Properties defaultProperties = loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
     	if (defaultProperties == null) {
-    		throw new UnitilsException("Configuration file: " + defaultProperties + " not found in classpath.");
+    		throw new UnitilsException("Configuration file: " + DEFAULT_PROPERTIES_FILE_NAME + " not found in classpath.");
     	}
     	properties.putAll(defaultProperties);
     	
