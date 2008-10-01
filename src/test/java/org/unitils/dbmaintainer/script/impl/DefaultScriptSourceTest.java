@@ -102,7 +102,7 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
         String scriptsLocations = scriptsDirName + "/test_scripts";
         configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS, scriptsLocations);
         configuration.setProperty(DefaultScriptSource.PROPKEY_SCRIPT_EXTENSIONS, "sql");
-        configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAMESTARTSWITH, "postprocessing");
+        configuration.setProperty(DefaultScriptSource.PROPKEY_POSTPROCESSINGSCRIPT_DIRNAME, "postprocessing");
         configuration.setProperty(DefaultScriptSource.PROPKEY_USESCRIPTFILELASTMODIFICATIONDATES, "false");
         scriptSource = new DefaultScriptSource();
         scriptSource.init(configuration);
