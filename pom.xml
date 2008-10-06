@@ -9,7 +9,7 @@
 
     <!-- Project information -->
     <name>Unitils</name>
-    <url>http://unitils.sourceforge.net/</url>
+    <url>http://www.unitils.org/</url>
     <description>
         Unitils provides utilities to further simplify unit-testing with JUnit, DBUnit, EasyMock
         Hibernate and Spring. The goal is to make unit-testing easy and maintainable by offering
@@ -26,8 +26,8 @@
 
     <!-- Environment Settings -->
     <issueManagement>
-        <system>Sourceforge Tracker</system>
-        <url>http://sourceforge.net/tracker/?group_id=167201</url>
+        <system>jira</system>
+        <url>http://jira.unitils.org/</url>
     </issueManagement>
     <scm>
         <connection>scm:svn:https://unitils.svn.sourceforge.net/svnroot/unitils/tags/releases/unitils-1.1-rc-1</connection>
