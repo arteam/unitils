@@ -35,9 +35,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.orm.common.OrmModule;
@@ -100,12 +98,16 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     			return isPersistenceUnitConfiguredFor(testObject);
 			}
     		
-			public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+            public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
 				SessionFactory sessionFactory = getPersistenceUnit(testObject);
 				HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(sessionFactory);
 				hibernateTransactionManager.setDataSource(getDataSource());
 				return hibernateTransactionManager;
 			}
+
+            public Integer getPreference() {
+                return 10;
+            }
     		
     	});
     }
@@ -206,11 +208,6 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
     }
 
 
-    protected DatabaseModule getDatabaseModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-	}
-    
-    
     protected DataSource getDataSource() {
     	return getDatabaseModule().getDataSource();
     }

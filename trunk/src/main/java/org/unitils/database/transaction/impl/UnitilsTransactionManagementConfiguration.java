@@ -34,7 +34,7 @@ public interface UnitilsTransactionManagementConfiguration {
 	 * given test object
 	 */
 	boolean isApplicableFor(Object testObject);
-
+	
 	
 	/**
 	 * Returns a <code>PlatformTransactionManager</code> that can provide transactional behavior for the given test object.
@@ -44,5 +44,8 @@ public interface UnitilsTransactionManagementConfiguration {
 	 * @return A <code>PlatformTransactionManager</code> that can provide transactional behavior for the given test object.
 	 */
 	PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject);
+
+
+    Integer getPreference();
 
 }

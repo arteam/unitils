@@ -20,6 +20,17 @@ import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
@@ -29,9 +40,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.unitils.core.TestListener;
-import org.unitils.core.Unitils;
 import org.unitils.core.util.ConfigUtils;
-import org.unitils.database.DatabaseModule;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.orm.common.OrmModule;
 import org.unitils.orm.common.util.OrmPersistenceUnitLoader;
@@ -40,17 +49,6 @@ import org.unitils.orm.jpa.util.JpaAnnotationConfigLoader;
 import org.unitils.orm.jpa.util.JpaConfig;
 import org.unitils.orm.jpa.util.JpaEntityManagerFactoryLoader;
 import org.unitils.orm.jpa.util.JpaProviderSupport;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
-import javax.sql.DataSource;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Module providing support for unit tests for code that uses JPA. It offers an easy way of loading a 
@@ -120,13 +118,17 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     			return isPersistenceUnitConfiguredFor(testObject);
 			}
     		
-			public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+            public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
 				EntityManagerFactory entityManagerFactory = getPersistenceUnit(testObject);
 				JpaTransactionManager jpaTransactionManager = new JpaTransactionManager(entityManagerFactory);
 				jpaTransactionManager.setDataSource(getDataSource());
 				jpaTransactionManager.setJpaDialect(jpaProviderSupport.getSpringJpaVendorAdaptor().getJpaDialect());
 				return jpaTransactionManager;
 			}
+            
+            public Integer getPreference() {
+                return 10;
+            }
     		
     	});
 	}
@@ -265,11 +267,6 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
     	return getDatabaseModule().getDataSource();
     }
     
-    
-    protected DatabaseModule getDatabaseModule() {
-		return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
-	}
-
     
     public JpaProviderSupport getJpaProviderSupport() {
     	return jpaProviderSupport;

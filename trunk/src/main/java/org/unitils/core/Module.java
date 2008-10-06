@@ -17,6 +17,8 @@ package org.unitils.core;
 
 import java.util.Properties;
 
+import org.unitils.database.DatabaseModule;
+
 /**
  * A type for modules that offer services to tests.
  * Before a module is used, {@link #init} will be called so that it can initialize itself. After initialization,
@@ -50,6 +52,5 @@ public interface Module {
      * @return The test listener, not null
      */
     TestListener getTestListener();
-
 
 }

@@ -29,7 +29,7 @@ public class ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ> {
 	/**
 	 * The persistence unit
 	 */
-	private ORMPU ormPersistenceContext;
+	private ORMPU ormPersistenceUnit;
 	
 	/**
 	 * The implementation specific configuration object
@@ -40,18 +40,18 @@ public class ConfiguredOrmPersistenceUnit<ORMPU, ORMCONFOBJ> {
 	/**
 	 * Creates a new instance
 	 * 
-	 * @param ormPersistenceContext
+	 * @param ormPersistenceUnit
 	 * @param ormConfigurationObject
 	 */
-	public ConfiguredOrmPersistenceUnit(ORMPU ormPersistenceContext, ORMCONFOBJ ormConfigurationObject) {
+	public ConfiguredOrmPersistenceUnit(ORMPU ormPersistenceUnit, ORMCONFOBJ ormConfigurationObject) {
 		super();
-		this.ormPersistenceContext = ormPersistenceContext;
+		this.ormPersistenceUnit = ormPersistenceUnit;
 		this.ormConfigurationObject = ormConfigurationObject;
 	}
 
 	
-	public ORMPU getOrmPersistenceContext() {
-		return ormPersistenceContext;
+	public ORMPU getOrmPersistenceUnit() {
+		return ormPersistenceUnit;
 	}
 
 	

@@ -15,11 +15,11 @@
  */
 package org.unitils.database.transaction;
 
-import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
-import org.unitils.database.util.spring.DatabaseSpringSupport;
+import java.util.Set;
 
 import javax.sql.DataSource;
-import java.util.Set;
+
+import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 
 
 /**
@@ -36,10 +36,8 @@ public interface UnitilsTransactionManager {
      *
      * @param transactionManagementConfigurations
      *                              Set of possible providers of a spring <code>PlatformTransactionManager</code>, not null
-     * @param databaseSpringSupport Provides access to <code>PlatformTransactionManager</code>s configured in a spring <code>ApplicationContext</code>,
-     *                              If the spring module is not enabled, this object is null
      */
-    void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations, DatabaseSpringSupport databaseSpringSupport);
+    void init(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations);
 
 
     /**
@@ -53,7 +51,7 @@ public interface UnitilsTransactionManager {
      */
     DataSource getTransactionalDataSource(DataSource dataSource);
 
-
+    
     /**
      * Starts a transaction.
      *
