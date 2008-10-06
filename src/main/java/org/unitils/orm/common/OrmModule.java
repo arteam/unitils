@@ -20,6 +20,7 @@ import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.util.ResourceConfigLoader;
+import org.unitils.database.DatabaseModule;
 import org.unitils.database.util.Flushable;
 import org.unitils.orm.common.spring.OrmSpringSupport;
 import org.unitils.orm.common.util.ConfiguredOrmPersistenceUnit;
@@ -133,7 +134,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
      */
     public ORM_PERSISTENCE_UNIT getPersistenceUnit(Object testObject) {
         ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> configuredPersistenceUnit = getConfiguredPersistenceUnit(testObject);
-        return configuredPersistenceUnit.getOrmPersistenceContext();
+        return configuredPersistenceUnit.getOrmPersistenceUnit();
     }
 
 
@@ -163,7 +164,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
     protected ConfiguredOrmPersistenceUnit<ORM_PERSISTENCE_UNIT, PROVIDER_CONFIGURATION_OBJECT> getConfiguredPersistenceUnit(Object testObject) {
         // If a persistence unit was configured in the spring ApplicationContext for this test object, we return
         // this one. Notice that in that case, no extra caching is done. This is not needed because the ApplicationContext
-        // is already cached, and the ApplicationContext makes sure that the same persitence unit instance is always returned.
+        // is already cached, and the ApplicationContext makes sure that the same persistence unit instance is always returned.
         if (ormSpringSupport != null && ormSpringSupport.isPersistenceUnitConfiguredInSpring(testObject)) {
             return ormSpringSupport.getConfiguredPersistenceUnit(testObject);
         }
@@ -181,6 +182,14 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
         }
         return configuredPersistenceUnit;
+    }
+    
+    
+    protected boolean isConfiguredPersistenceUnitActive(Object testObject) {
+        if (ormSpringSupport != null && ormSpringSupport.isPersistenceUnitConfiguredInSpring(testObject)) {
+            return true;
+        }
+        return configuredOrmPersistenceUnitCache.containsKey(testObject);
     }
 
 
@@ -339,6 +348,11 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
     protected boolean isSpringModuleEnabled() {
         // We specify the fully qualified classname of the spring module as string, to avoid classloading issues
         return Unitils.getInstance().getModulesRepository().isModuleEnabled("org.unitils.spring.SpringModule");
+    }
+
+
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 

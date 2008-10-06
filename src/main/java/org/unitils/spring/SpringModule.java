@@ -32,9 +32,13 @@ import java.util.Set;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
+import org.unitils.database.DatabaseModule;
+import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBean;
 import org.unitils.spring.annotation.SpringBeanByName;
@@ -87,6 +91,40 @@ public class SpringModule implements Module {
      * No after initialization needed for this module
      */
     public void afterInit() {
+        // Make sure that, if a custom transaction manager is configured in the spring ApplicationContext associated with
+        // the current test, it is used for managing transactions. 
+        if (isDatabaseModuleEnabled()) {
+            getDatabaseModule().registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
+                
+                public boolean isApplicableFor(Object testObject) {
+                    if (!isApplicationContextConfiguredFor(testObject)) {
+                        return false;
+                    }
+                    ApplicationContext context = getApplicationContext(testObject);
+                    return context.getBeansOfType(PlatformTransactionManager.class).size() != 0;
+                }
+                
+                @SuppressWarnings("unchecked")
+                public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
+                    ApplicationContext context = getApplicationContext(testObject);
+                    Map<String, PlatformTransactionManager> platformTransactionManagers = context.getBeansOfType(PlatformTransactionManager.class);
+                    if (platformTransactionManagers.size() == 0) {
+                        throw new UnitilsException("Could not find a bean of type " + PlatformTransactionManager.class.getSimpleName()
+                                + " in the spring ApplicationContext for this class");
+                    }
+                    if (platformTransactionManagers.size() > 1) {
+                        throw new UnitilsException("Found more than one bean of type " + PlatformTransactionManager.class.getSimpleName()
+                                + " in the spring ApplicationContext for this class");
+                    }
+                    return platformTransactionManagers.values().iterator().next();
+                }
+                
+                public Integer getPreference() {
+                    return 20;
+                }
+                
+            });
+        }
 	}
 
 
@@ -366,6 +404,16 @@ public class SpringModule implements Module {
     /*public void registerTestContext(TestContext testContext) {
     	this.testContext = testContext;
 	}*/
+    
+    
+    protected boolean isDatabaseModuleEnabled() {
+        return Unitils.getInstance().getModulesRepository().isModuleEnabled(DatabaseModule.class);
+    }
+    
+    
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
+    }
 
 
 	/**

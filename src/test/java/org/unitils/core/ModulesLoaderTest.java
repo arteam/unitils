@@ -231,6 +231,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 		public TestListener getTestListener() {
 			return null;
 		}
+
 	}
 
 	/**
@@ -247,6 +248,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 		public TestListener getTestListener() {
 			return null;
 		}
+
 	}
 
 	/**
@@ -263,6 +265,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 		public TestListener getTestListener() {
 			return null;
 		}
+
 	}
 
 	/**
@@ -279,6 +282,7 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 		public TestListener getTestListener() {
 			return null;
 		}
+
 	}
 
 
@@ -299,5 +303,6 @@ public class ModulesLoaderTest extends UnitilsJUnit4 {
 		public TestListener getTestListener() {
 			return null;
 		}
+
 	}
 }

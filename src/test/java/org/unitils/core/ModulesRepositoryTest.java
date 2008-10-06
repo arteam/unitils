@@ -158,7 +158,11 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 			return new TestListener1();
 		}
 
-		public static class TestListener1 extends TestListener {
+		public DatabaseModule getDatabaseModule() {
+            return null;
+        }
+
+        public static class TestListener1 extends TestListener {
 		}
 	}
 
@@ -173,7 +177,11 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 			return new TestListener2();
 		}
 
-		public static class TestListener2 extends TestListener {
+		public DatabaseModule getDatabaseModule() {
+            return null;
+        }
+
+        public static class TestListener2 extends TestListener {
 		}
 	}
 

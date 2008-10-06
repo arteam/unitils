@@ -209,5 +209,6 @@ public class ModuleUtilsTest extends TestCase {
 		public TestListener getTestListener() {
             return null;
         }
+
     }
 }
