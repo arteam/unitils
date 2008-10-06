@@ -288,8 +288,8 @@
         </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>
-            <artifactId>ejb</artifactId>
-            <version>3.0-public_review</version>
+             <artifactId>persistence-api</artifactId>
+            <version>1.0</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
