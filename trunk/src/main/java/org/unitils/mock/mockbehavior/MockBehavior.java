@@ -33,8 +33,8 @@ public interface MockBehavior {
     /**
      * Executes the mock behavior.
      *
-     * @param proxyInvocation The proxy method invocation, not null
+     * @param mockInvocation The mock method invocation, not null
      * @return The result value
      */
-    Object execute(ProxyInvocation proxyInvocation) throws Throwable;
+    Object execute(ProxyInvocation mockInvocation) throws Throwable;
 }

@@ -28,7 +28,6 @@ public class ArgumentMatchers {
 
 
     @ArgumentMatcher
-    @SuppressWarnings({"UnusedDeclaration"})
     public static <T> T notNull(Class<T> argumentClass) {
         registerArgumentMatcher(new NotNullArgumentMatcher());
         return null;
@@ -36,7 +35,6 @@ public class ArgumentMatchers {
 
 
     @ArgumentMatcher
-    @SuppressWarnings({"UnusedDeclaration"})
     public static <T> T isNull(Class<T> argumentClass) {
         registerArgumentMatcher(new NullArgumentMatcher());
         return null;
