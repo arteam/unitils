@@ -77,6 +77,8 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
      */
     @After
     public void tearDown() throws Exception {
+        closeQuietly(testSQLEndingWithCommentScriptReader);
+        closeQuietly(testSQLMissingSemiColonScriptReader);
         closeQuietly(testSQLScriptReader);
         closeQuietly(emptyScriptReader);
     }
