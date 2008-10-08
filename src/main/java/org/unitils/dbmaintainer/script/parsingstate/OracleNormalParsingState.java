@@ -16,6 +16,7 @@
 package org.unitils.dbmaintainer.script.parsingstate;
 
 import org.unitils.dbmaintainer.script.ParsingState;
+import org.unitils.dbmaintainer.script.StatementBuilder;
 
 /**
  * The initial state for Oracle. This parser adds PL/SQL statement recognition to the parser. In order for the
@@ -49,10 +50,10 @@ public class OracleNormalParsingState extends NormalParsingState {
      * @param previousChar The previous char, 0 if none
      * @param currentChar  The current char
      * @param nextChar     The next char, 0 if none
-     * @param statement    The statement that is built, not null
+     * @param statementBuilder The statement builder, not null
      * @return The next parsing state, null if the end of the statement is reached
      */
-    protected ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StringBuilder statement) {
+    protected ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StatementBuilder statementBuilder) {
         // track lines
         if (currentChar == '\n' || currentChar == '\r') {
             String trimmedLine = lineBuffer.toString().trim();
@@ -89,7 +90,7 @@ public class OracleNormalParsingState extends NormalParsingState {
         }
 
         // Let the normal state handle the character
-        ParsingState nextParsingState = super.getNextParsingState(previousChar, currentChar, nextChar, statement);
+        ParsingState nextParsingState = super.getNextParsingState(previousChar, currentChar, nextChar, statementBuilder);
 
         // normal state found an end of a statement, i.e. a semi-colon (;)
         if (nextParsingState == null) {

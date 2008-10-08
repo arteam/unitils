@@ -16,6 +16,7 @@
 package org.unitils.dbmaintainer.script.parsingstate;
 
 import org.unitils.dbmaintainer.script.ParsingState;
+import org.unitils.dbmaintainer.script.StatementBuilder;
 
 /**
  * A state for parsing single quotes ('text') part of a script.
@@ -60,10 +61,10 @@ public class InSingleQuotesParsingState extends BaseParsingState {
      * @param previousChar The previous char, 0 if none
      * @param currentChar  The current char
      * @param nextChar     The next char, 0 if none
-     * @param statement    The statement that is built, not null
+     * @param statementBuilder The statement builder, not null
      * @return The next parsing state, null if the end of the statement is reached
      */
-    protected ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StringBuilder statement) {
+    protected ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StatementBuilder statementBuilder) {
         // escape current character
         if (escaping) {
             escaping = false;

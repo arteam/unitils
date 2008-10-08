@@ -51,6 +51,9 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
     /* Reader for the test script with a missing semi colon */
     private Reader testSQLMissingSemiColonScriptReader;
 
+    /* Reader for the test script ending with a comment */
+    private Reader testSQLEndingWithCommentScriptReader;
+
     /* Reader for the empty script */
     private Reader emptyScriptReader;
 
@@ -64,6 +67,7 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
         configuration = new ConfigurationLoader().loadConfiguration();
         testSQLScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script.sql").toURI()));
         testSQLMissingSemiColonScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script-missing-semicolon.sql").toURI()));
+        testSQLEndingWithCommentScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script-ending-with-comment.sql").toURI()));
         emptyScriptReader = new StringReader("");
     }
 
@@ -104,6 +108,17 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
     }
 
 
+    /**
+     * Test parsing a statements out of a script ending with a comment.
+     */
+    @Test
+    public void testParseStatements_endingWithComment() throws Exception {
+        defaultScriptParser.init(configuration, testSQLEndingWithCommentScriptReader);
+        defaultScriptParser.getNextStatement();
+        defaultScriptParser.getNextStatement();
+    }
+
+    
     /**
      * Test parsing some statements out of an empty script.
      */

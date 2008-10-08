@@ -16,9 +16,10 @@
 package org.unitils.dbmaintainer.script.parsingstate;
 
 import org.unitils.dbmaintainer.script.ParsingState;
+import org.unitils.dbmaintainer.script.StatementBuilder;
 
 /**
- * Base class for a parsing state. This will handle a character by simply adding it to the statement.
+ * Base class for a parsing state. This will handle a character by simply adding it to the statement builder.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -27,29 +28,29 @@ public abstract class BaseParsingState implements ParsingState {
 
 
     /**
-     * Handles the next character by adding it to the statement.
+     * Handles the next character by adding it to the statement builder.
      *
      * @param previousChar The previous char, 0 if none
      * @param currentChar  The current char
      * @param nextChar     The next char, 0 if none
-     * @param statement    The statement that is built, not null
+     * @param statementBuilder The statement builder, not null
      * @return The next parsing state, null if the end of the statement is reached
      */
-    public ParsingState handleNextChar(char previousChar, char currentChar, char nextChar, StringBuilder statement) {
-        statement.append(currentChar);
-        return getNextParsingState(previousChar, currentChar, nextChar, statement);
+    public ParsingState handleNextChar(char previousChar, char currentChar, char nextChar, StatementBuilder statementBuilder) {
+        statementBuilder.append(currentChar);
+        return getNextParsingState(previousChar, currentChar, nextChar, statementBuilder);
     }
 
-
+    
     /**
      * Determines the next state.
      *
-     * @param previousChar The previous char, 0 if none
-     * @param currentChar  The current char
-     * @param nextChar     The next char, 0 if none
-     * @param statement    The statement that is built, not null
+     * @param previousChar     The previous char, 0 if none
+     * @param currentChar      The current char
+     * @param nextChar         The next char, 0 if none
+     * @param statementBuilder The statement builder, not null
      * @return The next parsing state, null if the end of the statement is reached
      */
-    protected abstract ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StringBuilder statement);
+    protected abstract ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StatementBuilder statementBuilder);
 
 }

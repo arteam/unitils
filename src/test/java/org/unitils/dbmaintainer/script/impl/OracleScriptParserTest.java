@@ -50,6 +50,9 @@ public class OracleScriptParserTest extends UnitilsJUnit4 {
     /* Reader for the Oracle PL-SQL test script */
     private Reader testPLSQLScriptReader;
 
+    /* Reader for the Oracle PL-SQL test script ending with a comment */
+    private Reader testPLSQLScriptEndingWithCommentReader;
+
     /* Reader for the empty script */
     private Reader emptyScriptReader;
 
@@ -63,6 +66,7 @@ public class OracleScriptParserTest extends UnitilsJUnit4 {
         configuration = new ConfigurationLoader().loadConfiguration();
         testSQLScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script.sql").toURI()));
         testPLSQLScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/plsql-script.sql").toURI()));
+        testPLSQLScriptEndingWithCommentReader = new FileReader(new File(getClass().getResource("ScriptParserTest/plsql-script-ending-with-comment.sql").toURI()));
         emptyScriptReader = new StringReader("");
     }
 
@@ -100,6 +104,21 @@ public class OracleScriptParserTest extends UnitilsJUnit4 {
     @Test
     public void testParseStatements_PLSQL() throws Exception {
         oracleScriptParser.init(configuration, testPLSQLScriptReader);
+
+        for (int i = 0; i < 5; i++) {
+            assertNotNull(oracleScriptParser.getNextStatement());
+        }
+        assertNull(oracleScriptParser.getNextStatement());
+    }
+
+
+   /**
+     * Test parsing some statements out of a PL-SQL script ending with a comment.
+     * 4 statements should have been found in the script.
+     */
+    @Test
+    public void testParseStatements_PLSQL_endingWithComment() throws Exception {
+        oracleScriptParser.init(configuration, testPLSQLScriptEndingWithCommentReader);
 
         for (int i = 0; i < 5; i++) {
             assertNotNull(oracleScriptParser.getNextStatement());

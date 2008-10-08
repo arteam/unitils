@@ -17,6 +17,7 @@ package org.unitils.dbmaintainer.script.impl;
 
 import org.unitils.dbmaintainer.script.parsingstate.NormalParsingState;
 import org.unitils.dbmaintainer.script.parsingstate.OracleNormalParsingState;
+import org.unitils.dbmaintainer.script.StatementBuilder;
 
 /**
  * A parser that can handle Oracle specific things like PL/SQL and a forward slash (/) as separator.
@@ -51,12 +52,12 @@ public class OracleScriptParser extends DefaultScriptParser {
      * Overridden to remove carriage returns from statements.
      * Oracle does not handle these characters correctly.
      *
-     * @param statementStringBuilder The build statement, not null
+     * @param statementBuilder The statement builder, not null
      * @return The statement, null if there is no statement (eg empty string)
      */
     @Override
-    protected String createStatement(StringBuilder statementStringBuilder) {
-        String statement = super.createStatement(statementStringBuilder);
+    protected String createStatement(StatementBuilder statementBuilder) {
+        String statement = super.createStatement(statementBuilder);
         if (statement != null) {
             statement = statement.replace("\r\n", "\n");
             statement = statement.replace("\r", "\n");
