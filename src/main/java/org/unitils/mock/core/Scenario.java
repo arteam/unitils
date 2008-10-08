@@ -33,16 +33,22 @@ import java.util.List;
 public class Scenario {
 
     protected static enum VerificationStatus {UNVERIFIED,  VERIFIED, VERIFIED_IN_ORDER};
-    
 
     protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
 
     protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
+    
+    protected SyntaxMonitor syntaxMonitor = new SyntaxMonitor();
 
+    public SyntaxMonitor getSyntaxMonitor() {
+        return syntaxMonitor;
+    }
 
+    
     public void reset() {
         observedInvocations.clear();
         invocationVerificationStatuses.clear();
+        syntaxMonitor.reset();
     }
 
     public void addObservedMockInvocation(ObservedInvocation mockInvocation) {
@@ -110,6 +116,11 @@ public class Scenario {
                 throw new AssertionError(getAssertNotInvokedErrorMessage(behaviorDefiningInvocation, observedInvocation));
             }
         }
+    }
+    
+    
+    public void assertSyntaxCorrectlyApplied() {
+        syntaxMonitor.verifyNotExpectingInvocation();
     }
 
 

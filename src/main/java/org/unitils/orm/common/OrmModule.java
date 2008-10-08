@@ -50,14 +50,14 @@ import java.util.*;
  * @param <PROVIDER_CONFIGURATION_OBJECT> Type of the implementation specific configuration object
  * @param <PERSISTENCE_UNIT_CONFIG_ANNOTATION> Type of the annotation used for configuring and injecting the persistence unit
  * @param <ORM_CONFIG> Type of the value object extending {@link OrmConfig} that contains all unitils specific persitence unit configuration
- * @param <ORM_PERSISTENCE_UNIT_CONFIGG_LOADER> Subtype of {@link OrmPersistenceUnitLoader} that loads the persistence unit based on the ORM_CONFIG.
+ * @param <ORM_PERSISTENCE_UNIT_CONFIG_LOADER> Subtype of {@link OrmPersistenceUnitLoader} that loads the persistence unit based on the ORM_CONFIG.
  */
-abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, PROVIDER_CONFIGURATION_OBJECT, PERSISTENCE_UNIT_CONFIG_ANNOTATION extends Annotation, ORM_CONFIG extends OrmConfig, ORM_PERSISTENCE_UNIT_CONFIGG_LOADER extends ResourceConfigLoader<ORM_CONFIG>> implements Module, Flushable {
+abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, PROVIDER_CONFIGURATION_OBJECT, PERSISTENCE_UNIT_CONFIG_ANNOTATION extends Annotation, ORM_CONFIG extends OrmConfig, ORM_PERSISTENCE_UNIT_CONFIG_LOADER extends ResourceConfigLoader<ORM_CONFIG>> implements Module, Flushable {
 
     /**
      * Class that loads the persistence unit configuration
      */
-    protected ORM_PERSISTENCE_UNIT_CONFIGG_LOADER persistenceUnitConfigLoader;
+    protected ORM_PERSISTENCE_UNIT_CONFIG_LOADER persistenceUnitConfigLoader;
 
     /**
      * Class that loads the persistence unit, given an object extending {@link OrmConfig}
@@ -93,7 +93,7 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
      * @return A new instance of the {@link ResourceConfigLoader} that scans a test object for a persistence
      *         unit configuration, and returns a specific subtype of {@link OrmConfig} that wraps this configuration
      */
-    abstract protected ORM_PERSISTENCE_UNIT_CONFIGG_LOADER createOrmConfigLoader();
+    abstract protected ORM_PERSISTENCE_UNIT_CONFIG_LOADER createOrmConfigLoader();
 
 
     /**
@@ -318,8 +318,8 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
             return;
         }
 
-        ORM_PERSISTENCE_UNIT entityManagerFactory = getPersistenceUnit(testObject);
-        setFieldAndSetterValue(testObject, fields, methods, entityManagerFactory);
+        ORM_PERSISTENCE_UNIT persistenceUnit = getPersistenceUnit(testObject);
+        setFieldAndSetterValue(testObject, fields, methods, persistenceUnit);
     }
 
 
