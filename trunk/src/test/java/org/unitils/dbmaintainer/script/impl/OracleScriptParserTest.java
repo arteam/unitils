@@ -77,6 +77,7 @@ public class OracleScriptParserTest extends UnitilsJUnit4 {
     @After
     public void tearDown() throws Exception {
         closeQuietly(testSQLScriptReader);
+        closeQuietly(testPLSQLScriptEndingWithCommentReader);
         closeQuietly(testPLSQLScriptReader);
         closeQuietly(emptyScriptReader);
     }
