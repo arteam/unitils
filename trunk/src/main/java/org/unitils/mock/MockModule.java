@@ -192,6 +192,12 @@ public class MockModule implements Module {
             createAndInjectDummiesIntoTest(testObject);
         }
 
+        @Override
+        public void afterTestTearDown(Object testObject, Method testMethod) {
+            scenario.assertSyntaxCorrectlyApplied();
+        }
+        
+
     }
 
 

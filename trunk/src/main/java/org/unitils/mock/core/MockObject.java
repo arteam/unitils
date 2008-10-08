@@ -66,6 +66,8 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
 
     /* The scenario that will record all observed invocations */
     protected Scenario scenario;
+    
+    protected SyntaxMonitor syntaxMonitor;
 
     /* The mock proxy instance */
     protected T instance;
@@ -84,6 +86,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         this.mockedClass = mockedClass;
         this.partialMock = partialMock;
         this.scenario = scenario;
+        this.syntaxMonitor = scenario.getSyntaxMonitor();
         this.instance = createInstance();
     }
 
@@ -138,7 +141,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      */
     public T returns(Object returnValue) {
         MockBehavior mockBehavior = new ValueReturningMockBehavior(returnValue);
-        return createMockObjectProxy(new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior));
+        AlwaysMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior);
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "returns(...)", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
@@ -158,7 +163,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      */
     public T raises(Throwable exception) {
         MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
-        return createMockObjectProxy(new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior));
+        AlwaysMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior);
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "raises(...)", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
@@ -177,7 +184,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      * @return The proxy instance that will record the method call, not null
      */
     public T performs(MockBehavior mockBehavior) {
-        return createMockObjectProxy(new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior));
+        AlwaysMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior);
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "performs(...)", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
@@ -198,7 +207,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      */
     public T onceReturns(Object returnValue) {
         MockBehavior mockBehavior = new ValueReturningMockBehavior(returnValue);
-        return createMockObjectProxy(new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior));
+        OneTimeMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior);
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "onceReturns(...)", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
@@ -219,7 +230,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      */
     public T onceRaises(Throwable exception) {
         MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
-        return createMockObjectProxy(new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior));
+        OneTimeMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior);
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "onceRaises(...)", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
@@ -239,22 +252,30 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      * @return The proxy instance that will record the method call, not null
      */
     public T oncePerforms(MockBehavior mockBehavior) {
-        return createMockObjectProxy(new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior));
+        OneTimeMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior);
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "oncePerforms(...)", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
     public T assertInvoked() {
-        return createMockObjectProxy(new AssertInvokedInvocationHandler());
+        AssertInvokedInvocationHandler proxyInvocationHandler = new AssertInvokedInvocationHandler();
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "assertInvoked()", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
     public T assertInvokedInOrder() {
-        return createMockObjectProxy(new AssertInvokedInOrderInvocationHandler());
+        AssertInvokedInOrderInvocationHandler proxyInvocationHandler = new AssertInvokedInOrderInvocationHandler();
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "assertInvokedInOrder()", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
     public T assertNotInvoked() {
-        return createMockObjectProxy(new AssertNotInvokedInvocationHandler());
+        AssertNotInvokedInvocationHandler proxyInvocationHandler = new AssertNotInvokedInvocationHandler();
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "assertNotInvoked()", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
     }
 
     //
@@ -324,6 +345,17 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
             return null;
         }
         return new DefaultValueReturningMockBehavior();
+    }
+    
+    //
+    // Utility methods
+    //
+    
+    protected StackTraceElement[] getInvokedAt() {
+        StackTraceElement[] currentStackTrace = Thread.currentThread().getStackTrace();
+        StackTraceElement[] result = new StackTraceElement[currentStackTrace.length - 4];
+        System.arraycopy(currentStackTrace, 4, result, 0, currentStackTrace.length - 4);
+        return result;
     }
 
     //
