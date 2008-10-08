@@ -16,6 +16,7 @@
 package org.unitils.dbmaintainer.script.parsingstate;
 
 import org.unitils.dbmaintainer.script.ParsingState;
+import org.unitils.dbmaintainer.script.StatementBuilder;
 
 /**
  * The default initial parsing state that is able to recognize the beginning of line comments, block comments,
@@ -82,11 +83,11 @@ public class NormalParsingState extends BaseParsingState {
      * @param previousChar The previous char, 0 if none
      * @param currentChar  The current char
      * @param nextChar     The next char, 0 if none
-     * @param statement    The statement that is built, not null
+     * @param statementBuilder The statement builder, not null
      * @return The next parsing state, null if the end of the statement is reached
      */
     @Override
-    protected ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StringBuilder statement) {
+    protected ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StatementBuilder statementBuilder) {
         // check ending of statement
         if (currentChar == ';') {
             return null;
@@ -94,11 +95,13 @@ public class NormalParsingState extends BaseParsingState {
         // escape current character
         if (escaping) {
             escaping = false;
+            statementBuilder.setExecutable(true);
             return this;
         }
         // check escaped characters
         if (currentChar == '\\' && backSlashEscapingEnabled) {
             escaping = true;
+            statementBuilder.setExecutable(true);
             return this;
         }
         // check line comment
@@ -116,6 +119,10 @@ public class NormalParsingState extends BaseParsingState {
         // check identifier with double quotes
         if (currentChar == '"') {
             return inDoubleQuotesParsingState;
+        }
+        // flag the statement executable from the second character
+        if (previousChar != 0) {
+            statementBuilder.setExecutable(true);
         }
         return this;
     }

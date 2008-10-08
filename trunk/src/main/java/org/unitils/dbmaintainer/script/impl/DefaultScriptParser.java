@@ -19,6 +19,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import org.unitils.core.UnitilsException;
 import org.unitils.dbmaintainer.script.ParsingState;
 import org.unitils.dbmaintainer.script.ScriptParser;
+import org.unitils.dbmaintainer.script.StatementBuilder;
 import org.unitils.dbmaintainer.script.parsingstate.*;
 import org.unitils.util.PropertyUtils;
 
@@ -122,12 +123,12 @@ public class DefaultScriptParser implements ScriptParser {
         // set initial state
         char previousChar = 0;
         currentParsingState = initialParsingState;
-        StringBuilder statementStringBuilder = new StringBuilder();
+        StatementBuilder statementBuilder = new StatementBuilder();
 
         // parse script
         while (currentChar != -1) {
             // skip leading whitespace (NOTE String.trim uses <= ' ' for whitespace)
-            if (statementStringBuilder.length() == 0 && currentChar <= ' ') {
+            if (statementBuilder.getLength() == 0 && currentChar <= ' ') {
                 currentChar = scriptReader.read();
                 continue;
             }
@@ -142,17 +143,18 @@ public class DefaultScriptParser implements ScriptParser {
             }
 
             // handle character
-            currentParsingState = currentParsingState.handleNextChar(previousChar, (char) currentChar, nextChar, statementStringBuilder);
+            currentParsingState = currentParsingState.handleNextChar(previousChar, (char) currentChar, nextChar, statementBuilder);
             previousChar = (char) currentChar;
             currentChar = nextCharInt;
 
             // if parsing state null, a statement end is found
             if (currentParsingState == null) {
-                String statement = createStatement(statementStringBuilder);
+                String statement = createStatement(statementBuilder);
 
                 // reset initial state
                 previousChar = 0;
-                statementStringBuilder.setLength(0);
+                statementBuilder.clear();
+                statementBuilder.setExecutable(false);
                 currentParsingState = initialParsingState;
 
                 if (statement != null) {
@@ -161,11 +163,13 @@ public class DefaultScriptParser implements ScriptParser {
             }
         }
 
-        // check whether there was still a statement in the script
+        // check whether there was still an executable statement in the script
         // or only whitespace was left
-        String finalStatement = createStatement(statementStringBuilder);
-        if (finalStatement != null) {
-            throw new UnitilsException("Last statement in script was not ended correctly. Each statement should end with one of " + Arrays.toString(getTrailingSeparatorCharsToRemove()));
+        if (statementBuilder.isExecutable()) {
+            String finalStatement = createStatement(statementBuilder);
+            if (finalStatement != null) {
+                throw new UnitilsException("Last statement in script was not ended correctly. Each statement should end with one of " + Arrays.toString(getTrailingSeparatorCharsToRemove()));
+            }
         }
         return null;
     }
@@ -175,12 +179,12 @@ public class DefaultScriptParser implements ScriptParser {
      * Creates the resulting statement out of the given characters.
      * This will trim the statement and remove any trailing separtors if needed.
      *
-     * @param statement The characters, not null
+     * @param statementBuilder The statement builder, not null
      * @return The resulting statement, null if no statement is left
      */
-    protected String createStatement(StringBuilder statement) {
+    protected String createStatement(StatementBuilder statementBuilder) {
         // get built statement to return
-        String trimmedStatement = statement.toString().trim();
+        String trimmedStatement = statementBuilder.getStatement().trim();
 
         // ignore empty statements
         if (isEmpty(trimmedStatement)) {
