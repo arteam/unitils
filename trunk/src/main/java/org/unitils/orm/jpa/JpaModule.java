@@ -126,6 +126,10 @@ public class JpaModule extends OrmModule<EntityManagerFactory, EntityManager, Ob
 				return jpaTransactionManager;
 			}
             
+            public boolean isTransactionalResourceAvailable(Object testObject) {
+                return getDatabaseModule().isDataSourceLoaded();
+            }
+
             public Integer getPreference() {
                 return 10;
             }

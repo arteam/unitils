@@ -45,6 +45,7 @@ import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 import org.unitils.spring.util.ApplicationContextFactory;
 import org.unitils.spring.util.ApplicationContextManager;
+import org.unitils.util.ReflectionUtils;
 
 /**
  * A module for Spring enabling a test class by offering an easy way to load application contexts and
@@ -101,26 +102,35 @@ public class SpringModule implements Module {
                         return false;
                     }
                     ApplicationContext context = getApplicationContext(testObject);
-                    return context.getBeansOfType(PlatformTransactionManager.class).size() != 0;
+                    return context.getBeansOfType(getPlatformTransactionManagerClass()).size() != 0;
                 }
                 
                 @SuppressWarnings("unchecked")
                 public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
                     ApplicationContext context = getApplicationContext(testObject);
-                    Map<String, PlatformTransactionManager> platformTransactionManagers = context.getBeansOfType(PlatformTransactionManager.class);
+                    Class<?> platformTransactionManagerClass = getPlatformTransactionManagerClass();
+                    Map<String, PlatformTransactionManager> platformTransactionManagers = context.getBeansOfType(platformTransactionManagerClass);
                     if (platformTransactionManagers.size() == 0) {
-                        throw new UnitilsException("Could not find a bean of type " + PlatformTransactionManager.class.getSimpleName()
+                        throw new UnitilsException("Could not find a bean of type " + platformTransactionManagerClass.getSimpleName()
                                 + " in the spring ApplicationContext for this class");
                     }
                     if (platformTransactionManagers.size() > 1) {
-                        throw new UnitilsException("Found more than one bean of type " + PlatformTransactionManager.class.getSimpleName()
+                        throw new UnitilsException("Found more than one bean of type " + platformTransactionManagerClass.getSimpleName()
                                 + " in the spring ApplicationContext for this class");
                     }
                     return platformTransactionManagers.values().iterator().next();
                 }
                 
+                public boolean isTransactionalResourceAvailable(Object testObject) {
+                    return true;
+                }
+
                 public Integer getPreference() {
                     return 20;
+                }
+                
+                protected Class<?> getPlatformTransactionManagerClass() {
+                    return ReflectionUtils.getClassWithName("org.springframework.transaction.PlatformTransactionManager");
                 }
                 
             });

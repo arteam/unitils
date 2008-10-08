@@ -78,5 +78,8 @@ public interface UnitilsTransactionManager {
     void rollback(Object testObject);
 
 
+    void activateTransactionIfNeeded(Object testObject);
+
+
 }
 
