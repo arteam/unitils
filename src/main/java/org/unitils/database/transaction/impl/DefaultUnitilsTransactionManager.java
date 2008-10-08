@@ -60,6 +60,8 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      */
     private static Log logger = LogFactory.getLog(DefaultUnitilsTransactionManager.class);
 
+    protected Map<Object, Boolean> testObjectTransactionActiveMap = new HashMap<Object, Boolean>();
+    
     /**
      * ThreadLocal for holding the TransactionStatus that keeps track of the
      * current test's transaction status
@@ -101,8 +103,27 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      *            The test object, not null
      */
     public void startTransaction(Object testObject) {
-        logger.debug("Starting transaction");
         UnitilsTransactionManagementConfiguration transactionManagementConfiguration = getTransactionManagementConfiguration(testObject);
+        if (transactionManagementConfiguration.isTransactionalResourceAvailable(testObject)) {
+            testObjectTransactionActiveMap.put(testObject, Boolean.TRUE);
+            doStartTransaction(testObject, transactionManagementConfiguration);
+        } else {
+            testObjectTransactionActiveMap.put(testObject, Boolean.FALSE);
+        }
+    }
+
+
+    public void activateTransactionIfNeeded(Object testObject) {
+        if (testObjectTransactionActiveMap.containsKey(testObject) && !testObjectTransactionActiveMap.get(testObject)) {
+            testObjectTransactionActiveMap.put(testObject, Boolean.TRUE);
+            UnitilsTransactionManagementConfiguration transactionManagementConfiguration = getTransactionManagementConfiguration(testObject);
+            doStartTransaction(testObject, transactionManagementConfiguration);
+        }
+    }
+
+
+    protected void doStartTransaction(Object testObject, UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
+        logger.debug("Starting transaction");
         PlatformTransactionManager platformTransactionManager = transactionManagementConfiguration.getSpringPlatformTransactionManager(testObject);
         testObjectPlatformTransactionManagerMap.put(testObject, platformTransactionManager);
         TransactionStatus transactionStatus = platformTransactionManager.getTransaction(createTransactionDefinition(testObject));
@@ -118,14 +139,15 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      *            The test object, not null
      */
     public void commit(Object testObject) {
-        if (!testObjectPlatformTransactionManagerMap.containsKey(testObject)) {
+        if (!testObjectTransactionActiveMap.containsKey(testObject)) {
             throw new UnitilsException("Trying to commit, while no transaction is currently active");
         }
         TransactionStatus transactionStatus = testObjectTransactionStatusMap.get(testObject);
-        if (transactionStatus != null) {
+        if (testObjectTransactionActiveMap.get(testObject)) {
             logger.debug("Commiting transaction");
             testObjectPlatformTransactionManagerMap.get(testObject).commit(transactionStatus);
         }
+        testObjectTransactionActiveMap.remove(testObject);
         testObjectTransactionStatusMap.remove(testObject);
         testObjectPlatformTransactionManagerMap.remove(testObject);
     }
@@ -138,14 +160,15 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      *            The test object, not null
      */
     public void rollback(Object testObject) {
-        if (!testObjectPlatformTransactionManagerMap.containsKey(testObject)) {
+        if (!testObjectTransactionActiveMap.containsKey(testObject)) {
             throw new UnitilsException("Trying to rollback, while no transaction is currently active");
         }
         TransactionStatus transactionStatus = testObjectTransactionStatusMap.get(testObject);
-        if (transactionStatus != null) {
+        if (testObjectTransactionActiveMap.get(testObject)) {
             logger.debug("Commiting transaction");
             testObjectPlatformTransactionManagerMap.get(testObject).rollback(transactionStatus);
         }
+        testObjectTransactionActiveMap.remove(testObject);
         testObjectTransactionStatusMap.remove(testObject);
         testObjectPlatformTransactionManagerMap.remove(testObject);
     }

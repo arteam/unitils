@@ -105,6 +105,10 @@ public class HibernateModule extends OrmModule<SessionFactory, Session, Configur
 				return hibernateTransactionManager;
 			}
 
+            public boolean isTransactionalResourceAvailable(Object testObject) {
+                return getDatabaseModule().isDataSourceLoaded();
+            }
+
             public Integer getPreference() {
                 return 10;
             }

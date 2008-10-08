@@ -174,6 +174,10 @@ public class DatabaseModule implements Module {
                 return new DataSourceTransactionManager(getDataSource());
             }
             
+            public boolean isTransactionalResourceAvailable(Object testObject) {
+                return isDataSourceLoaded();
+            }
+
             public Integer getPreference() {
                 return 1;
             }
@@ -191,8 +195,17 @@ public class DatabaseModule implements Module {
     public DataSource getDataSource() {
         if (dataSource == null) {
             dataSource = createDataSource();
+            if (transactionManager != null) {
+                Object testObject = getTestObject();
+                transactionManager.activateTransactionIfNeeded(testObject);
+            }
         }
         return dataSource;
+    }
+
+
+    public boolean isDataSourceLoaded() {
+        return dataSource != null;
     }
 
 
@@ -484,6 +497,12 @@ public class DatabaseModule implements Module {
     // todo javadoc
     public void registerTransactionManagementConfiguration(UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
         transactionManagementConfigurations.add(transactionManagementConfiguration);
+    }
+    
+    
+    protected Object getTestObject() {
+        Object testObject = Unitils.getInstance().getTestContext().getTestObject();
+        return testObject;
     }
 
 

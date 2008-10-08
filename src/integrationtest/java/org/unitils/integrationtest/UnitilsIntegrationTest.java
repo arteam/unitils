@@ -260,7 +260,7 @@ public class UnitilsIntegrationTest {
     @Test
     public void noDataSourceCreatedWhenNotUsedWithTransactionsEnabled() throws Exception {
         setWrongDatabasePassword();
-        setTransactionMode(TransactionMode.DISABLED);
+        setTransactionMode(TransactionMode.COMMIT);
         Unitils.initSingletonInstance();
         runTest(NoDatabaseTest.class, "testWhichDoesntNeedDatabase");
     }

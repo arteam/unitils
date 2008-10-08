@@ -45,6 +45,9 @@ public interface UnitilsTransactionManagementConfiguration {
 	 */
 	PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject);
 
+	
+	boolean isTransactionalResourceAvailable(Object testObject);
+	
 
     Integer getPreference();
 
