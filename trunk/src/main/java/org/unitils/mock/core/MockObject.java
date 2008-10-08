@@ -25,6 +25,7 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.get
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.getArgumentMatchers;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.resetArgumentMatchers;
 import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
+import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
@@ -167,6 +168,29 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "raises(...)", getInvokedAt());
         return createMockObjectProxy(proxyInvocationHandler);
     }
+    
+    
+    /**
+     * Defines behavior for this mock so that it raises the given exception when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.raises(MyException.class).method1();
+     * <p/>
+     * will throw an instance of the given exception classwhen method1 is called.
+     * <p/>
+     * Note that this behavior is executed each time a match is found. So the exception will be raised
+     * each time method1() is called. If you only want to raise the exception once, use the {@link #onceRaises} method.
+     *
+     * @param exception The exception to raise, not null
+     * @return The proxy instance that will record the method call, not null
+     */
+    public T raises(Class<? extends Throwable> exceptionClass) {
+        Throwable exception = DummyObjectUtil.createDummy(exceptionClass);
+        MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
+        AlwaysMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new AlwaysMatchingMockBehaviorInvocationHandler(mockBehavior);
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "raises(...)", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
+    }
 
 
     /**
@@ -229,6 +253,30 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      * @return The proxy instance that will record the method call, not null
      */
     public T onceRaises(Throwable exception) {
+        MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
+        OneTimeMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior);
+        syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "onceRaises(...)", getInvokedAt());
+        return createMockObjectProxy(proxyInvocationHandler);
+    }
+    
+    
+    /**
+     * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.raises(new MyException()).method1();
+     * <p/>
+     * will throw an instance of the given exception class when method1 is called.
+     * <p/>
+     * When the behavior was executed it is removed, so it will only raise the exception once. Following
+     * invocations will trigger the next matching behavior. If no matching one time behavior is found, the
+     * always matching behaviors are tried.
+     *
+     * @param exception The exception to raise, not null
+     * @return The proxy instance that will record the method call, not null
+     */
+    public T onceRaises(Class<? extends Throwable> exceptionClass) {
+        Throwable exception = DummyObjectUtil.createDummy(exceptionClass);
         MockBehavior mockBehavior = new ExceptionThrowingMockBehavior(exception);
         OneTimeMatchingMockBehaviorInvocationHandler proxyInvocationHandler = new OneTimeMatchingMockBehaviorInvocationHandler(mockBehavior);
         syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "onceRaises(...)", getInvokedAt());
@@ -502,4 +550,5 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
             return null;
         }
     }
+    
 }
