@@ -119,8 +119,8 @@ public class Scenario {
     }
     
     
-    public void assertSyntaxCorrectlyApplied() {
-        syntaxMonitor.verifyNotExpectingInvocation();
+    public void assertNotExpectingInvocation() {
+        syntaxMonitor.assertNotExpectingInvocation();
     }
 
 

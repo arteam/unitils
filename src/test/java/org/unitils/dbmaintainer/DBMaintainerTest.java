@@ -179,7 +179,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         // Set database version and available script expectations
         expectNewScriptsAdded();
         expectNoPostProcessingCodeScripts();
-        mockScriptRunner.raises(new UnitilsException("Test exception")).execute(scripts.get(0).getScriptContentHandle());
+        mockScriptRunner.raises(UnitilsException.class).execute(scripts.get(0).getScriptContentHandle());
 
         try {
             dbMaintainer.updateDatabase();
@@ -196,7 +196,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         // Set database version and available script expectations
         expectNewScriptsAdded();
         expectPostProcessingScripts(postProcessingScripts);
-        mockScriptRunner.raises(new UnitilsException("Test exception")).execute(ArgumentMatchers.same(postProcessingScripts.get(1).getScriptContentHandle()));
+        mockScriptRunner.raises(UnitilsException.class).execute(ArgumentMatchers.same(postProcessingScripts.get(1).getScriptContentHandle()));
 
         try {
             dbMaintainer.updateDatabase();
