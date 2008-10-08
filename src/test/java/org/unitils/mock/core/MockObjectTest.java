@@ -177,6 +177,32 @@ public class MockObjectTest {
         assertTrue(exception1);
         assertFalse(exception2);
     }
+    
+    
+    @Test
+    public void testRaises_exceptionClass() {
+        mockObject.raises(IllegalArgumentException.class).testMethodString();
+        
+        try {
+            mockObject.getInstance().testMethodString();
+            fail("Expected exception");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+    
+    
+    @Test
+    public void testOnceRaises_exceptionClass() {
+        mockObject.onceRaises(IllegalArgumentException.class).testMethodString();
+        
+        try {
+            mockObject.getInstance().testMethodString();
+            fail("Expected exception");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
 
 
     /**
