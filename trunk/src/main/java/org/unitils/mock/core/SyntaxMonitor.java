@@ -41,7 +41,7 @@ public class SyntaxMonitor {
 
     public void registerProxyReturningMethodCall(ProxyInvocationHandler proxyInvocationHandler, String mockObjectName, 
                 String behaviorDefiningMethodName, StackTraceElement[] invokedAt) {
-        verifyNotExpectingInvocation();
+        assertNotExpectingInvocation();
         this.expectingInvocationOn = proxyInvocationHandler;
         this.mockObjectName = mockObjectName;
         this.precedingMethodName = behaviorDefiningMethodName;
@@ -57,7 +57,7 @@ public class SyntaxMonitor {
     }
     
     
-    public void verifyNotExpectingInvocation() {
+    public void assertNotExpectingInvocation() {
         if (expectingInvocationOn != null) {
             raiseSyntaxException();
         }

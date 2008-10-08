@@ -57,10 +57,25 @@ public class ProxyUtil {
         enhancer.setUseFactory(true);
         Class<T> enhancedTargetClass = enhancer.createClass();
 
-        Objenesis objenesis = new ObjenesisStd();
-        Factory proxy = (Factory) objenesis.newInstance(enhancedTargetClass);
+        Factory proxy = (Factory) createInstanceOfType(enhancedTargetClass);
         proxy.setCallbacks(new Callback[]{methodInterceptor});
         return (T) proxy;
+    }
+
+
+    /**
+     * Creates an instance of the given type using objenesis. The class doesn't have to offer
+     * an empty constructor in order for this method to succeed. 
+     * 
+     * @param <T> The type of the instance
+     * @param clazz The class for which an instance is requested
+     * @return An instance of the given class
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T createInstanceOfType(Class<T> clazz) {
+        Objenesis objenesis = new ObjenesisStd();
+        T proxy = (T) objenesis.newInstance(clazz);
+        return proxy;
     }
 
 

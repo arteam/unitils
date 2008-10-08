@@ -65,6 +65,23 @@ public interface Mock<T> {
      * @return The proxy instance that will record the method call, not null
      */
     T raises(Throwable exception);
+    
+    
+    /**
+     * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.raises(new MyException()).method1();
+     * <p/>
+     * will throw an instance of the given exception class when method1 is called.
+     * <p/>
+     * Note that this behavior is executed each time a match is found. So the exception will be raised
+     * each time method1() is called. If you only want to raise the exception once, use the {@link #onceRaises} method.
+     *
+     * @param exception The exception to raise, not null
+     * @return The proxy instance that will record the method call, not null
+     */
+    T raises(Class<? extends Throwable> exceptionClass);
 
 
     /**

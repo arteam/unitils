@@ -194,7 +194,7 @@ public class MockModule implements Module {
 
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
-            scenario.assertSyntaxCorrectlyApplied();
+            scenario.assertNotExpectingInvocation();
         }
         
 
