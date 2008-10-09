@@ -15,16 +15,6 @@
  */
 package org.unitils.database.transaction.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
@@ -36,6 +26,9 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.spring.SpringModule;
+
+import javax.sql.DataSource;
+import java.util.*;
 
 /**
  * Implements transactions for unit tests, by delegating to a spring
@@ -49,7 +42,7 @@ import org.unitils.spring.SpringModule;
  * can offer transactional behavior for such a persistence unit is used. If no
  * such configuration is found, a <code>DataSourceTransactionManager</code> is
  * used.
- * 
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
@@ -61,7 +54,7 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
     private static Log logger = LogFactory.getLog(DefaultUnitilsTransactionManager.class);
 
     protected Map<Object, Boolean> testObjectTransactionActiveMap = new HashMap<Object, Boolean>();
-    
+
     /**
      * ThreadLocal for holding the TransactionStatus that keeps track of the
      * current test's transaction status
@@ -98,9 +91,8 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
     /**
      * Starts the transaction. Starts a transaction on the
      * PlatformTransactionManager that is configured for the given testObject.
-     * 
-     * @param testObject
-     *            The test object, not null
+     *
+     * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
         UnitilsTransactionManagementConfiguration transactionManagementConfiguration = getTransactionManagementConfiguration(testObject);
@@ -132,11 +124,10 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
 
 
     /**
-     * Commits the transaction. Uses the PlatformTransactionManager and transaction 
+     * Commits the transaction. Uses the PlatformTransactionManager and transaction
      * that is associated with the given test object.
-     * 
-     * @param testObject
-     *            The test object, not null
+     *
+     * @param testObject The test object, not null
      */
     public void commit(Object testObject) {
         if (!testObjectTransactionActiveMap.containsKey(testObject)) {
@@ -153,11 +144,10 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
     }
 
     /**
-     * Rolls back the transaction. Uses the PlatformTransactionManager and transaction 
+     * Rolls back the transaction. Uses the PlatformTransactionManager and transaction
      * that is associated with the given test object.
-     * 
-     * @param testObject
-     *            The test object, not null
+     *
+     * @param testObject The test object, not null
      */
     public void rollback(Object testObject) {
         if (!testObjectTransactionActiveMap.containsKey(testObject)) {
@@ -178,9 +168,8 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
      * necessary transaction parameters. Simply returns a default
      * <code>DefaultTransactionDefinition</code> object with the 'propagation
      * required' attribute
-     * 
-     * @param testObject
-     *            The test object, not null
+     *
+     * @param testObject The test object, not null
      * @return The default TransactionDefinition
      */
     protected TransactionDefinition createTransactionDefinition(Object testObject) {
@@ -196,8 +185,8 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
         }
         throw new UnitilsException("No applicable transaction management configuration found for test " + testObject.getClass());
     }
-    
-    
+
+
     protected void setTransactionManagementConfigurations(Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurationsSet) {
         List<UnitilsTransactionManagementConfiguration> configurations = new ArrayList<UnitilsTransactionManagementConfiguration>();
         configurations.addAll(transactionManagementConfigurationsSet);

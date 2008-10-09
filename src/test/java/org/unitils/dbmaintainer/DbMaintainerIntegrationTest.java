@@ -17,21 +17,9 @@ package org.unitils.dbmaintainer;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.Writer;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
 import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
@@ -39,18 +27,22 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.util.SQLTestUtils;
-import org.unitils.database.DatabaseModule;
 import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
+
+import javax.sql.DataSource;
+import java.io.*;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class DbMaintainerIntegrationTest {
-    
+
     private static final String INITIAL_INCREMENTAL_1 = "initial_incremental_1";
     private static final String INITIAL_INCREMENTAL_2 = "initial_incremental_2";
     private static final String INITIAL_REPEATABLE = "initial_repeatable";
@@ -61,17 +53,15 @@ public class DbMaintainerIntegrationTest {
     private static final String NEW_INCREMENTAL_LOWER_INDEX = "new_incremental_lower_index";
     private static final String SECOND_LOCATION_INCREMENTAL = "second_location_incremental";
     private static final String SECOND_LOCATION_REPEATABLE = "second_location_repeatable";
-    
+
     @TestDataSource
     private DataSource dataSource = null;
-    
+
     private File scriptsLocation1;
     private File scriptsLocation2;
     private DbSupport dbSupport;
-    private DBMaintainer dbMaintainer;
-    private DatabaseModule databaseModule;
     private Properties configuration;
-    
+
     @Before
     public void init() {
         scriptsLocation2 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts2");
@@ -80,20 +70,20 @@ public class DbMaintainerIntegrationTest {
         clearScriptsDirectory();
         clearTestDatabase();
     }
-    
+
     @After
     public void cleanup() {
         clearScriptsDirectory();
         clearTestDatabase();
     }
-    
+
     @Test
     public void initial() {
         addInitialScripts();
         updateDatabase();
         assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2);
     }
-    
+
     @Test
     public void addIncremental() {
         addInitialScripts();
@@ -103,7 +93,7 @@ public class DbMaintainerIntegrationTest {
         updateDatabase();
         assertTablesExist(NEW_INCREMENTAL);
     }
-    
+
     @Test
     public void addRepeatable() {
         addInitialScripts();
@@ -113,7 +103,7 @@ public class DbMaintainerIntegrationTest {
         updateDatabase();
         assertTablesExist(NEW_REPEATABLE);
     }
-    
+
     @Test
     public void updateRepeatable() {
         addInitialScripts();
@@ -122,7 +112,7 @@ public class DbMaintainerIntegrationTest {
         updateDatabase();
         assertTablesExist(UPDATED_REPEATABLE);
     }
-    
+
     @Test
     public void updateIncremental_fromScratchEnabled() {
         enableFromScratch();
@@ -133,7 +123,7 @@ public class DbMaintainerIntegrationTest {
         assertTablesDontExist(INITIAL_INCREMENTAL_1);
         assertTablesExist(UPDATED_INCREMENTAL_1);
     }
-    
+
     @Test
     public void updateIncremental_fromScratchDisabled() {
         addInitialScripts();
@@ -146,7 +136,7 @@ public class DbMaintainerIntegrationTest {
             //assertMessageContains(e.getMessage(), "existing", "modified", INITIAL_INCREMENTAL_1 + ".sql");
         }
     }
-    
+
     @Test
     public void addIncrementalWithLowerIndex_fromScratchEnabled() {
         enableFromScratch();
@@ -156,7 +146,7 @@ public class DbMaintainerIntegrationTest {
         updateDatabase();
         assertTablesExist(NEW_INCREMENTAL_LOWER_INDEX);
     }
-    
+
     @Test
     public void addIncrementalWithLowerIndex_fromScratchDisabled() {
         addInitialScripts();
@@ -169,7 +159,7 @@ public class DbMaintainerIntegrationTest {
             //assertMessageContains(e.getMessage(), "added", "lower index", NEW_INCREMENTAL_LOWER_INDEX + ".sql");
         }
     }
-    
+
     @Test
     public void removeExistingIncremental_fromScratchEnabled() {
         enableFromScratch();
@@ -179,7 +169,7 @@ public class DbMaintainerIntegrationTest {
         updateDatabase();
         assertTablesDontExist(INITIAL_INCREMENTAL_1);
     }
-    
+
     @Test
     public void removeExistingIncremental_fromScratchDisabled() {
         addInitialScripts();
@@ -192,7 +182,7 @@ public class DbMaintainerIntegrationTest {
             //assertMessageContains(e.getMessage(), "removed", INITIAL_INCREMENTAL_1 + ".sql");
         }
     }
-    
+
     @Test
     public void errorInIncrementalScript() {
         addInitialScripts();
@@ -218,7 +208,7 @@ public class DbMaintainerIntegrationTest {
         updateDatabase();
         assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2);
     }
-    
+
     @Test
     public void errorInRepeatableScript() {
         addInitialScripts();
@@ -238,7 +228,7 @@ public class DbMaintainerIntegrationTest {
         updateDatabase();
         assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2);
     }
-    
+
     @Test
     public void moreThanOneScriptLocation() {
         configureSecondScriptLocation();
@@ -247,7 +237,7 @@ public class DbMaintainerIntegrationTest {
         updateDatabase();
         assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2, SECOND_LOCATION_INCREMENTAL, SECOND_LOCATION_REPEATABLE);
     }
-    
+
     /*@Test
     public void notInfluencedByTransaction() {
         addInitialScripts();
@@ -257,14 +247,11 @@ public class DbMaintainerIntegrationTest {
         assertRecordExists();
     }*/
 
-    private void startTransaction() {
-        
-    }
 
     private void errorInInitialScript() {
         createScript("02_latest/01_" + INITIAL_INCREMENTAL_2 + ".sql", "this is an error;");
     }
-    
+
     private void fixErrorInInitialScript() {
         createScript("02_latest/01_" + INITIAL_INCREMENTAL_2 + ".sql", "create table " + INITIAL_INCREMENTAL_2 + " (test varchar(10));");
     }
@@ -293,7 +280,7 @@ public class DbMaintainerIntegrationTest {
     }
 
     private void updateRepeatableScript() {
-        createScript("01_base/" + INITIAL_REPEATABLE + ".sql", "drop table " + INITIAL_REPEATABLE + " if exists;\n" + 
+        createScript("01_base/" + INITIAL_REPEATABLE + ".sql", "drop table " + INITIAL_REPEATABLE + " if exists;\n" +
                 "drop table " + UPDATED_REPEATABLE + " if exists;\n" +
                 "create table " + UPDATED_REPEATABLE + "(test varchar(10));");
     }
@@ -301,7 +288,7 @@ public class DbMaintainerIntegrationTest {
     private void newIncrementalScript() {
         createScript("02_latest/02_" + NEW_INCREMENTAL + ".sql", "create table " + NEW_INCREMENTAL + " (test varchar(10));");
     }
-    
+
     private void newRepeatableScript() {
         createScript("02_latest/" + NEW_REPEATABLE + ".sql", "drop table " + NEW_REPEATABLE + " if exists;\n" +
                 "create table " + NEW_REPEATABLE + " (test varchar(10));");
@@ -309,42 +296,42 @@ public class DbMaintainerIntegrationTest {
 
     private void addInitialScripts() {
         createScript("01_base/01_" + INITIAL_INCREMENTAL_1 + ".sql", "create table " + INITIAL_INCREMENTAL_1 + "(test varchar(10));");
-        createScript("01_base/" + INITIAL_REPEATABLE + ".sql", "drop table " + INITIAL_REPEATABLE + " if exists;\n" + 
+        createScript("01_base/" + INITIAL_REPEATABLE + ".sql", "drop table " + INITIAL_REPEATABLE + " if exists;\n" +
                 "create table " + INITIAL_REPEATABLE + "(test varchar(10));");
         createScript("02_latest/01_" + INITIAL_INCREMENTAL_2 + ".sql", "create table " + INITIAL_INCREMENTAL_2 + "(test varchar(10));");
     }
-    
+
     private void addSecondLocationScripts() {
         createScript(scriptsLocation2, "01_base/02_" + SECOND_LOCATION_INCREMENTAL + ".sql", "create table " + SECOND_LOCATION_INCREMENTAL + "(test varchar(10));");
         createScript(scriptsLocation2, "01_base/" + SECOND_LOCATION_REPEATABLE + ".sql", "create table " + SECOND_LOCATION_REPEATABLE + "(test varchar(10));");
     }
 
-    
+
     private void assertTablesExist(String... tables) {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String table : tables) {
             assertTrue(table + " does not exist", tableNames.contains(dbSupport.toCorrectCaseIdentifier(table)));
         }
     }
-    
+
     private void assertTablesDontExist(String... tables) {
         Set<String> tableNames = dbSupport.getTableNames();
         for (String table : tables) {
             assertFalse(table + " exists, while it shouldn't", tableNames.contains(dbSupport.toCorrectCaseIdentifier(table)));
         }
     }
-    
+
     private void updateDatabase() {
-        dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource));
+        DBMaintainer dbMaintainer = new DBMaintainer(configuration, new DefaultSQLHandler(dataSource));
         dbMaintainer.updateDatabase();
     }
-    
+
     private void clearTestDatabase() {
-        SQLTestUtils.dropTestTables(dbSupport, "db_executed_scripts", INITIAL_INCREMENTAL_1, INITIAL_INCREMENTAL_2, 
+        SQLTestUtils.dropTestTables(dbSupport, "db_executed_scripts", INITIAL_INCREMENTAL_1, INITIAL_INCREMENTAL_2,
                 INITIAL_REPEATABLE, NEW_INCREMENTAL, NEW_REPEATABLE, UPDATED_INCREMENTAL_1, UPDATED_REPEATABLE,
                 NEW_INCREMENTAL_LOWER_INDEX, SECOND_LOCATION_INCREMENTAL, SECOND_LOCATION_REPEATABLE);
     }
-    
+
     private void createScript(String relativePath, String scriptContent) {
         createScript(scriptsLocation1, relativePath, scriptContent);
     }
@@ -362,7 +349,7 @@ public class DbMaintainerIntegrationTest {
             IOUtils.closeQuietly(fileWriter);
         }
     }
-    
+
     private void removeScript(String relativePath) {
         File scriptFile = new File(scriptsLocation1.getAbsolutePath() + "/" + relativePath);
         scriptFile.delete();
@@ -378,7 +365,7 @@ public class DbMaintainerIntegrationTest {
             // Ignored
         }
     }
-    
+
     private void configureSecondScriptLocation() {
         configuration.put("dbMaintainer.script.locations", scriptsLocation1.getAbsolutePath() + "," +
                 scriptsLocation2.getAbsolutePath());
@@ -395,11 +382,11 @@ public class DbMaintainerIntegrationTest {
         configuration.put("dbMaintainer.autoCreateExecutedScriptsTable", "true");
         configuration.put("dbMaintainer.script.locations", scriptsLocation1.getAbsolutePath());
         configuration.put("dbMaintainer.generateDataSetStructure.enabled", "false");
-        
+
         Unitils unitils = new Unitils();
         Unitils.setInstance(unitils);
         unitils.init(configuration);
-        
+
         dataSource = DatabaseUnitils.getDataSource();
         dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
         System.out.println("dbsupport: " + dbSupport);

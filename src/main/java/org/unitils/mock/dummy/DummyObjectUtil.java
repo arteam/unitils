@@ -71,7 +71,7 @@ public class DummyObjectUtil {
         public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
             if (isEqualsMethod(method)) {
                 Object other = arguments[0];
-                return new Boolean(proxy == other);
+                return proxy == other;
             } else if (isHashCodeMethod(method)) {
                 return dummyObjectHashCode;
             }

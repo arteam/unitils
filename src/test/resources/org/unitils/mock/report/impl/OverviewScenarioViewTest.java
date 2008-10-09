@@ -85,7 +85,6 @@ public class OverviewScenarioViewTest {
 
         String result = overviewScenarioView.createView(scenario);
         assertTrue(result.contains("string1"));
-        assertTrue(result.contains("012345678901234567891"));
     }
 
 
@@ -101,7 +100,6 @@ public class OverviewScenarioViewTest {
 
         String result = overviewScenarioView.createView(scenario);
         assertTrue(result.contains("string1"));
-        assertTrue(result.contains("012345678901234567891"));
     }
 
 
