@@ -85,11 +85,11 @@ public class DetailedScenarioView extends OverviewScenarioView {
             result.append(invocationIndex++);
             result.append(". ");
             result.append(formatObservedInvocation(observedInvocation, largeValueIndexes, formattedLargeValues));
-            result.append("\n\n");
+            result.append("\n");
             result.append(formatLargeValues(formattedLargeValues));
             result.append(formatInvocationDetails(observedInvocation));
             result.append(formatBehaviorDetails(observedInvocation));
-            result.append("\n\n");
+            result.append("\n");
         }
         return result.toString();
     }
