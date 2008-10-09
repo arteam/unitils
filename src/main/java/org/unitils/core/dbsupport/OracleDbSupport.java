@@ -179,7 +179,7 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void dropType(String typeName) {
-        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName) + " force");
+        getSQLHandler().executeUpdate("drop type " + qualified(typeName) + " force");
     }
 
 

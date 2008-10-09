@@ -290,7 +290,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 				executedAtColumnName + ", " + succeededColumnName + ") values ('" + executedScript.getScript().getFileName() +
 				"', '" + executedScript.getScript().getVersion().getIndexesString() + "', " + executedScript.getScript().getFileLastModifiedAt() + ", '" + 
 				executedScript.getScript().getCheckSum() + "', '" + executedAt + "', " + (executedScript.isSucceeded() ? "1" : "0") + ")";
-		sqlHandler.executeUpdate(insertSql);
+		sqlHandler.executeUpdateAndCommit(insertSql);
 	}
 	
 	
@@ -310,7 +310,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 			executedAtColumnName + " = '" + executedAt + "', " + 
 			succeededColumnName + " = " + (executedScript.isSucceeded() ? "1" : "0") + 
 			" where " + fileNameColumnName + " = '" + executedScript.getScript().getFileName() + "'";
-		sqlHandler.executeUpdate(updateSql);
+		sqlHandler.executeUpdateAndCommit(updateSql);
 	}
 
 
@@ -337,7 +337,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 		executedScripts = new HashSet<ExecutedScript>();
 		
 		String deleteSql = "delete from " + defaultDbSupport.qualified(executedScriptsTableName);
-		sqlHandler.executeUpdate(deleteSql);
+		sqlHandler.executeUpdateAndCommit(deleteSql);
 	}
 
 
@@ -404,7 +404,7 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
         }
 
         // Create db version table
-        sqlHandler.executeUpdate(getCreateExecutedScriptsTableStatement());
+        sqlHandler.executeUpdateAndCommit(getCreateExecutedScriptsTableStatement());
     }
 
 

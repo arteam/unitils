@@ -239,6 +239,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void assertScriptsExecutedAndDbVersionSet() {
+        assertNoMoreInvocations();
     	mockExecutedScriptInfoSource.assertInvokedInOrder().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
         mockScriptRunner.assertInvokedInOrder().execute(scripts.get(0).getScriptContentHandle());
         mockExecutedScriptInfoSource.assertInvokedInOrder().updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));

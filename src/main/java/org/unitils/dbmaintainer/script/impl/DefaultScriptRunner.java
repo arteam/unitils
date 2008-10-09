@@ -15,20 +15,17 @@
  */
 package org.unitils.dbmaintainer.script.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.dbmaintainer.script.Script;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
+
+import java.io.Reader;
+
 import org.unitils.dbmaintainer.script.ScriptContentHandle;
 import org.unitils.dbmaintainer.script.ScriptParser;
 import org.unitils.dbmaintainer.script.ScriptRunner;
 import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
-
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
-import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
-
-import java.io.Reader;
 
 /**
  * Default implementation of a script runner.
@@ -60,7 +57,7 @@ public class DefaultScriptRunner extends BaseDatabaseAccessor implements ScriptR
             // parse and execute the statements
             String statement;
             while ((statement = scriptParser.getNextStatement()) != null) {
-                sqlHandler.executeUpdate(statement);
+                sqlHandler.executeUpdateAndCommit(statement);
             }
         } finally {
             closeQuietly(scriptContentReader);
