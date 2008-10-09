@@ -43,6 +43,7 @@ public class DefaultValueReturningMockBehavior implements MockBehavior {
      * @param proxyInvocation The proxy method invocation, not null
      * @return The default value
      */
+    @SuppressWarnings("unchecked")
     public Object execute(ProxyInvocation proxyInvocation) {
         Class<?> returnType = proxyInvocation.getMethod().getReturnType();
         if (Number.class.isAssignableFrom(returnType)) {

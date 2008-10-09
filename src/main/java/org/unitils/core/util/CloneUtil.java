@@ -181,7 +181,7 @@ public class CloneUtil {
      * @param clonedInstance  The clone, not null
      * @param cloneCache      The cached clones, not null
      */
-    protected static void cloneFields(Class clazz, Object instanceToClone, Object clonedInstance, Map<Object, Object> cloneCache) throws Throwable {
+    protected static void cloneFields(Class<?> clazz, Object instanceToClone, Object clonedInstance, Map<Object, Object> cloneCache) throws Throwable {
         if (clazz == null || Object.class.equals(clazz)) {
             return;
         }

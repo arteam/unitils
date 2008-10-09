@@ -429,7 +429,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         List<ArgumentMatcher> argumentMatchers = createArgumentMatchers(proxyInvocation);
 
         List<?> clonedArguments = createDeepClone(proxyInvocation.getArguments());
-        return new BehaviorDefiningInvocation(name, proxyInvocation.getMethod(), clonedArguments, proxyInvocation.getInvokedAt(), argumentMatchers, mockBehavior);
+        return new BehaviorDefiningInvocation(proxyInvocation.getProxy(), name, proxyInvocation.getMethod(), clonedArguments, proxyInvocation.getInvokedAt(), argumentMatchers, mockBehavior);
     }
 
 
@@ -438,7 +438,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         List<?> clonedArguments = createDeepClone(proxyInvocation.getArguments());
         StackTraceElement invokedAt = proxyInvocation.getInvokedAt();
 
-        return new ObservedInvocation(name, method, clonedArguments, invokedAt, behaviorDefiningInvocation, mockBehavior);
+        return new ObservedInvocation(proxyInvocation.getProxy(), name, method, clonedArguments, invokedAt, behaviorDefiningInvocation, mockBehavior);
     }
 
 

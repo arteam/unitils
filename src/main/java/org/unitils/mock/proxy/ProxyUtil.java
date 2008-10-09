@@ -143,9 +143,6 @@ public class ProxyUtil {
      */
     public static class CglibProxyInvocation extends ProxyInvocation {
 
-        /* The proxy */
-        private Object proxy;
-
         /* The cglib method proxy */
         private MethodProxy methodProxy;
 
@@ -160,8 +157,7 @@ public class ProxyUtil {
          * @param methodProxy The cglib method proxy, not null
          */
         public CglibProxyInvocation(Method method, List<?> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
-            super(method, arguments, invokedAt);
-            this.proxy = proxy;
+            super(proxy, method, arguments, invokedAt);
             this.methodProxy = methodProxy;
         }
 
@@ -173,7 +169,7 @@ public class ProxyUtil {
          */
         @Override
         public Object invokeOriginalBehavior() throws Throwable {
-            return methodProxy.invokeSuper(proxy, getArguments().toArray());
+            return methodProxy.invokeSuper(getProxy(), getArguments().toArray());
         }
     }
 }

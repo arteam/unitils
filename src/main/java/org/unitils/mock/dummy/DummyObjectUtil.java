@@ -15,11 +15,15 @@
  */
 package org.unitils.mock.dummy;
 
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-import org.unitils.mock.proxy.ProxyUtil;
-
 import java.lang.reflect.Method;
+
+import net.sf.cglib.proxy.MethodProxy;
+
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
+import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.proxy.ProxyInvocationHandler;
+import org.unitils.mock.proxy.ProxyUtil;
 
 /**
  * todo javadoc
@@ -30,12 +34,30 @@ import java.lang.reflect.Method;
 public class DummyObjectUtil {
 
     public static <T> T createDummy(Class<T> type) {
-        return ProxyUtil.createProxy(type, new DummyObjectMethodInterceptor());
+        return ProxyUtil.createProxy(type, new DummyObjectInvocationHandler());
     }
 
-    public static class DummyObjectMethodInterceptor implements MethodInterceptor {
+    public static class DummyObjectInvocationHandler implements ProxyInvocationHandler {
 
         private Integer dummyObjectHashCode = new Object().hashCode();
+
+        private MockBehavior dummyObjectBehavior = new DefaultValueReturningMockBehavior(); 
+        
+        /**
+         * Handles the given method invocation of the dummy object.
+         *
+         * @param invocation The method invocation, not null
+         * @return The result value for the method invocation
+         */
+        public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
+            if (isEqualsMethod(invocation.getMethod())) {
+                Object other = invocation.getArguments().get(0);
+                return new Boolean(invocation.getProxy() == other);
+            } else if (isHashCodeMethod(invocation.getMethod())) {
+                return dummyObjectHashCode;
+            }
+            return dummyObjectBehavior.execute(invocation);
+        }
 
         /**
          * Intercepts the method call.
