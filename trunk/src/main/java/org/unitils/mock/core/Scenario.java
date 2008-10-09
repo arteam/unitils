@@ -180,7 +180,7 @@ public class Scenario {
         message.append(MethodFormatUtil.getCompleteRepresentation(method));
         message.append("\nwas called at ");
         message.append(unexpectedInvocation.getInvokedAt());
-        message.append("\n");
+        message.append("\n\n");
         message.append(createReport());
         return message.toString();
     }

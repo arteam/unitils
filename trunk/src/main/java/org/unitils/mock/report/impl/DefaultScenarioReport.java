@@ -39,9 +39,9 @@ public class DefaultScenarioReport implements ScenarioReport {
         StringBuilder result = new StringBuilder();
         result.append("Observed scenario:\n\n");
         result.append(new OverviewScenarioView().createView(scenario));
-        result.append("\n\nSuggested assert statements:\n\n");
+        result.append("\nSuggested assert statements:\n\n");
         result.append(new SuggestedAssertsScenarioView().createView(scenario));
-        result.append("\n\nDetailed scenario:\n\n");
+        result.append("\nDetailed scenario:\n\n");
         result.append(new DetailedScenarioView().createView(scenario));
 
         return result.toString();

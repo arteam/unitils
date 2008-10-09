@@ -80,8 +80,6 @@ public class OverviewScenarioView implements ScenarioView {
             result.append("\n");
         }
 
-        // append the values that were to long to be displayed inline
-        result.append(formatLargeValues(formattedLargeValues));
         return result.toString();
     }
 

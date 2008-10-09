@@ -82,7 +82,7 @@ public class SuggestedAssertsScenarioView implements ScenarioView {
                 result.append(getSuggestedArgument(argument));
             }
         }
-        result.append(")");
+        result.append(");");
         return result.toString();
     }
 
