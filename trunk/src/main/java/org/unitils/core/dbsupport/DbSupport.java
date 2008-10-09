@@ -285,7 +285,7 @@ abstract public class DbSupport {
      * @param triggerName The trigger to drop (case-sensitive), not null
      */
     public void dropTrigger(String triggerName) {
-        getSQLHandler().executeCodeUpdate("drop trigger " + qualified(triggerName));
+        getSQLHandler().executeUpdate("drop trigger " + qualified(triggerName));
     }
 
 
@@ -296,7 +296,7 @@ abstract public class DbSupport {
      * @param typeName The type to drop (case-sensitive), not null
      */
     public void dropType(String typeName) {
-        getSQLHandler().executeCodeUpdate("drop type " + qualified(typeName) + (supportsCascade() ? " cascade" : ""));
+        getSQLHandler().executeUpdate("drop type " + qualified(typeName) + (supportsCascade() ? " cascade" : ""));
     }
 
 

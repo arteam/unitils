@@ -15,14 +15,14 @@ public interface SQLHandler {
 	 * @return The nr of updates
 	 */
 	int executeUpdate(String sql);
-
+	
 	/**
-	 * Executes the given code update statement.
-	 *
-	 * @param sql The sql string for retrieving the items
-	 * @return The nr of updates
-	 */
-	int executeCodeUpdate(String sql);
+     * Executes the given statement and commits.
+     *
+     * @param sql The sql string for retrieving the items
+     * @return The nr of updates
+     */
+    int executeUpdateAndCommit(String sql);
 
 	/**
 	 * Returns the long extracted from the result of the given query. If no value is found, a {@link UnitilsException}

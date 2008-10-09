@@ -196,8 +196,7 @@ public class DatabaseModule implements Module {
         if (dataSource == null) {
             dataSource = createDataSource();
             if (transactionManager != null) {
-                Object testObject = getTestObject();
-                transactionManager.activateTransactionIfNeeded(testObject);
+                transactionManager.activateTransactionIfNeeded(getTestObject());
             }
         }
         return dataSource;

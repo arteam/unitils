@@ -15,17 +15,19 @@
  */
 package org.unitils.core.dbsupport;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.core.UnitilsException;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 
 /**
  * Class to which database updates and queries are passed. Is in fact a utility class, but is a concrete instance to
@@ -96,12 +98,12 @@ public class DefaultSQLHandler implements SQLHandler {
             closeQuietly(connection, statement, null);
         }
     }
-
-
+    
+    
     /* (non-Javadoc)
-	 * @see org.unitils.core.dbsupport.SQLHandler#executeCodeUpdate(java.lang.String)
-	 */
-    public int executeCodeUpdate(String sql) {
+     * @see org.dbmaintain.dbsupport.SQLHandler#executeUpdateAndCommit(java.lang.String)
+     */
+    public int executeUpdateAndCommit(String sql) {
         logger.debug(sql);
 
         if (!doExecuteUpdates) {
@@ -113,7 +115,9 @@ public class DefaultSQLHandler implements SQLHandler {
         try {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
-            return statement.executeUpdate(sql);
+            int nbChanges = statement.executeUpdate(sql);
+            connection.commit();
+            return nbChanges;
 
         } catch (Exception e) {
             throw new UnitilsException("Error while performing database update: " + sql, e);

@@ -39,6 +39,8 @@ import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.util.SQLTestUtils;
+import org.unitils.database.DatabaseModule;
+import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
@@ -47,7 +49,7 @@ import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
+public class DbMaintainerIntegrationTest {
     
     private static final String INITIAL_INCREMENTAL_1 = "initial_incremental_1";
     private static final String INITIAL_INCREMENTAL_2 = "initial_incremental_2";
@@ -67,12 +69,13 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
     private File scriptsLocation2;
     private DbSupport dbSupport;
     private DBMaintainer dbMaintainer;
+    private DatabaseModule databaseModule;
     private Properties configuration;
     
     @Before
     public void init() {
-        scriptsLocation1 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts1");
         scriptsLocation2 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts2");
+        scriptsLocation1 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts1");
         initConfiguration();
         clearScriptsDirectory();
         clearTestDatabase();
@@ -245,6 +248,18 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
         assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2, SECOND_LOCATION_INCREMENTAL, SECOND_LOCATION_REPEATABLE);
     }
     
+    /*@Test
+    public void notInfluencedByTransaction() {
+        addInitialScripts();
+        startTransaction();
+        addRecordInsertingScript();
+        rollbackTransaction();
+        assertRecordExists();
+    }*/
+
+    private void startTransaction() {
+        
+    }
 
     private void errorInInitialScript() {
         createScript("02_latest/01_" + INITIAL_INCREMENTAL_2 + ".sql", "this is an error;");
@@ -382,9 +397,11 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
         configuration.put("dbMaintainer.generateDataSetStructure.enabled", "false");
         
         Unitils unitils = new Unitils();
-        unitils.init(configuration);
         Unitils.setInstance(unitils);
+        unitils.init(configuration);
         
+        dataSource = DatabaseUnitils.getDataSource();
         dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
+        System.out.println("dbsupport: " + dbSupport);
     }
 }
