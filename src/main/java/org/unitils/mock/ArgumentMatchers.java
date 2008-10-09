@@ -27,7 +27,7 @@ import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.registe
 public class ArgumentMatchers {
 
 
-    
+    @ArgumentMatcher
     public static <T> T notNull(Class<T> argumentClass) {
         registerArgumentMatcher(new NotNullArgumentMatcher());
         return null;
