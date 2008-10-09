@@ -107,7 +107,7 @@ public class ObjectFormatter {
             result.append('\'');
             return;
         }
-        Class type = object.getClass();
+        Class<?> type = object.getClass();
         if (type.isPrimitive() || type.isEnum()) {
             result.append(String.valueOf(object));
             return;
@@ -121,11 +121,11 @@ public class ObjectFormatter {
             return;
         }
         if (object instanceof Collection) {
-            formatCollection((Collection) object, currentDepth, result);
+            formatCollection((Collection<?>) object, currentDepth, result);
             return;
         }
         if (object instanceof Map) {
-            formatMap((Map) object, currentDepth, result);
+            formatMap((Map<?, ?>) object, currentDepth, result);
             return;
         }
         if (currentDepth >= maxDepth) {

@@ -27,6 +27,9 @@ import java.util.List;
  */
 public abstract class ProxyInvocation {
 
+    /* The proxy on which the method was called */
+    private Object proxy;
+    
     /* The method that was called */
     private Method method;
 
@@ -44,7 +47,8 @@ public abstract class ProxyInvocation {
      * @param arguments The arguments that were used, not null
      * @param invokedAt The location of the invocation, not null
      */
-    public ProxyInvocation(Method method, List<?> arguments, StackTraceElement invokedAt) {
+    public ProxyInvocation(Object proxy, Method method, List<?> arguments, StackTraceElement invokedAt) {
+        this.proxy = proxy;
         this.method = method;
         this.arguments = arguments;
         this.invokedAt = invokedAt;
@@ -58,6 +62,14 @@ public abstract class ProxyInvocation {
      */
     public Object invokeOriginalBehavior() throws Throwable {
         throw new UnsupportedOperationException("Invoking of original behavior not implemented.");
+    }
+
+
+    /**
+     * @return The proxy on which the method was called
+     */
+    public Object getProxy() {
+        return proxy;
     }
 
 
