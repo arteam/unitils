@@ -40,8 +40,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.NullOutputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -117,7 +115,8 @@ public class DefaultScriptSourceTest extends UnitilsJUnit4 {
     private String getCheckSum(String fileName) throws NoSuchAlgorithmException, IOException {
         MessageDigest digest = MessageDigest.getInstance("MD5");
         InputStream is = new DigestInputStream(new FileInputStream(scriptsDirName + "/test_scripts/" + fileName), digest);
-        IOUtils.copy(is, new NullOutputStream());
+
+        while (is.read() != -1);
         return getHexPresentation(digest.digest());
     }
     

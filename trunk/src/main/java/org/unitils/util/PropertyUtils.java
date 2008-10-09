@@ -17,6 +17,7 @@ package org.unitils.util;
 
 import org.unitils.core.UnitilsException;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+import org.apache.commons.lang.text.StrSubstitutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -191,8 +192,8 @@ public class PropertyUtils {
             throw new UnitilsException("Value " + value + " for property " + propertyName + " is not a number.");
         }
     }
-    
-    
+
+
     /**
      * Gets the int value for the property with the given name. If no such property is found, the value is empty
      * or cannot be converted to a long, an exception will be raised.
@@ -297,7 +298,26 @@ public class PropertyUtils {
         if (value == null) {
             value = properties.getProperty(propertyName);
         }
-        return value;
+        return expandPropertyValue(value, properties);
+    }
+
+
+    /**
+     * Expands all property place holders to actual values. For example
+     * suppose you have a property defined as follows: root.dir=/usr/home
+     * Expanding following ${root.dir}/somesubdir
+     * will then give following result: /usr/home/somesubdir
+     *
+     * @param propertyValue The property value to expand
+     * @param properties    The properties, not null
+     * @return The expanded property value
+     */
+    private static String expandPropertyValue(String propertyValue, Properties properties) {
+        if (propertyValue == null) {
+            return null;
+        }
+        String result = StrSubstitutor.replace(propertyValue, properties);
+        return StrSubstitutor.replaceSystemProperties(result);
     }
 
 }

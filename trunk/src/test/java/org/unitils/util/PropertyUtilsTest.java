@@ -50,6 +50,8 @@ public class PropertyUtilsTest extends TestCase {
         testProperties.setProperty("booleanProperty", "true");
         testProperties.setProperty("longProperty", "5");
         testProperties.setProperty("instanceProperty", "java.lang.StringBuffer");
+        testProperties.setProperty("expandProperty", "A ${stringProperty} value");
+        testProperties.setProperty("expandSystemProperty", "${user.home}");
     }
 
 
@@ -293,6 +295,25 @@ public class PropertyUtilsTest extends TestCase {
         } catch (UnitilsException e) {
             //expected
         }
+    }
+
+
+    /**
+     * Test for getting a property that contains a place holder, e.g. ${something}
+     */
+    public void testGetString_expandProperty() {
+        String result = getString("expandProperty", testProperties);
+        assertEquals("A test value", result);
+    }
+
+
+    /**
+     * Test for getting a property that contains a place holder, e.g. ${something}
+     */
+    public void testGetString_expandSystemProperty() {
+        String result = getString("expandSystemProperty", testProperties);
+        assertFalse(result.contains("${user.home}"));
+        assertTrue(result.length() > 0);
     }
 
 }
