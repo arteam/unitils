@@ -538,4 +538,20 @@ public class ReflectionUtils {
     }
 
 
+    /**
+     * Gets the string representation of the method as follows:
+     *
+     * 'class name'.'method name'()
+     *
+     * @param method The method, not null
+     * @return The string representation, not null
+     */
+    public static String getSimpleMethodName(Method method) {
+        StringBuffer result = new StringBuffer();
+        result.append(method.getDeclaringClass().getSimpleName());
+        result.append('.');
+        result.append(method.getName());
+        result.append("()");
+        return result.toString();
+    }
 }

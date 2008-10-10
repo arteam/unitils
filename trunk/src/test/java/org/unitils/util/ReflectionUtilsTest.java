@@ -15,21 +15,14 @@
  */
 package org.unitils.util;
 
+import junit.framework.TestCase;
+import org.unitils.core.UnitilsException;
 import static org.unitils.util.CollectionUtils.asSet;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-import static org.unitils.util.ReflectionUtils.getPropertyName;
-import static org.unitils.util.ReflectionUtils.getFieldValue;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
+import static org.unitils.util.ReflectionUtils.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
-
-import junit.framework.TestCase;
-
-import org.unitils.core.UnitilsException;
 
 /**
  * Test for {@link ReflectionUtils}.
@@ -284,6 +277,15 @@ public class ReflectionUtilsTest extends TestCase {
         } catch (UnitilsException e) {
             //expected
         }
+    }
+
+
+    /**
+     * Tests creating a represenation of a method name.
+     */
+    public void testGetSimpleMethodName() {
+        String result = getSimpleMethodName(fieldSetterMethod);
+        assertEquals("TestObject.setField()", result);
     }
 
 

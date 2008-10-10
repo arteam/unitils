@@ -38,19 +38,12 @@ public class ProxyUtil {
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
-     * @param proxiedClass       The type to proxy, not null
+     * @param proxiedClass      The type to proxy, not null
      * @param invocationHandler The handler that will handle the method invocations of the proxy, not null.
      * @return The proxy object, not null
      */
     @SuppressWarnings("unchecked")
     public static <T> T createProxy(Class<T> proxiedClass, ProxyInvocationHandler invocationHandler) {
-        return createProxy(proxiedClass, new ProxyMethodInterceptor(invocationHandler));
-    }
-
-
-    // todo remove let dummy use the invocation handler
-    @SuppressWarnings("unchecked")
-    public static <T> T createProxy(Class<T> proxiedClass, MethodInterceptor methodInterceptor) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(proxiedClass);
         enhancer.setCallbackType(MethodInterceptor.class);
@@ -58,24 +51,23 @@ public class ProxyUtil {
         Class<T> enhancedTargetClass = enhancer.createClass();
 
         Factory proxy = (Factory) createInstanceOfType(enhancedTargetClass);
-        proxy.setCallbacks(new Callback[]{methodInterceptor});
+        proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(invocationHandler)});
         return (T) proxy;
     }
 
 
     /**
      * Creates an instance of the given type using objenesis. The class doesn't have to offer
-     * an empty constructor in order for this method to succeed. 
-     * 
-     * @param <T> The type of the instance
+     * an empty constructor in order for this method to succeed.
+     *
+     * @param <T>   The type of the instance
      * @param clazz The class for which an instance is requested
      * @return An instance of the given class
      */
     @SuppressWarnings("unchecked")
     public static <T> T createInstanceOfType(Class<T> clazz) {
         Objenesis objenesis = new ObjenesisStd();
-        T proxy = (T) objenesis.newInstance(clazz);
-        return proxy;
+        return (T) objenesis.newInstance(clazz);
     }
 
 
