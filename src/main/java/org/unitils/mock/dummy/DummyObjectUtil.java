@@ -15,34 +15,49 @@
  */
 package org.unitils.mock.dummy;
 
-import java.lang.reflect.Method;
-
 import net.sf.cglib.proxy.MethodProxy;
-
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
-import org.unitils.mock.proxy.ProxyUtil;
+import static org.unitils.mock.proxy.ProxyUtil.createProxy;
+
+import java.lang.reflect.Method;
 
 /**
- * todo javadoc
+ * Class for handling the dummy object behavior. A dummy object is a proxy that will return
+ * default values for every method. This can be used to quickly create test objects without
+ * having to worry about correctly filling in every field.
  *
  * @author Filip Neven
  * @author Tim Ducheyne
  */
 public class DummyObjectUtil {
 
+
+    /**
+     * Creates the dummy proxy object.
+     *
+     * @param type The type for the proxy, not null
+     * @return The proxy, not null
+     */
     public static <T> T createDummy(Class<T> type) {
-        return ProxyUtil.createProxy(type, new DummyObjectInvocationHandler());
+        return createProxy(type, new DummyObjectInvocationHandler());
     }
 
+
+    /**
+     * Invocation handler for the dummy proxy object that will return default values for every invocation.
+     */
     public static class DummyObjectInvocationHandler implements ProxyInvocationHandler {
 
+        /* The hash code that is returned when the hashCode method is called */
         private Integer dummyObjectHashCode = new Object().hashCode();
 
-        private MockBehavior dummyObjectBehavior = new DefaultValueReturningMockBehavior(); 
-        
+        /* The behavior that will return the default values */
+        private MockBehavior dummyObjectBehavior = new DefaultValueReturningMockBehavior();
+
+
         /**
          * Handles the given method invocation of the dummy object.
          *
@@ -52,12 +67,13 @@ public class DummyObjectUtil {
         public Object handleInvocation(ProxyInvocation invocation) throws Throwable {
             if (isEqualsMethod(invocation.getMethod())) {
                 Object other = invocation.getArguments().get(0);
-                return new Boolean(invocation.getProxy() == other);
+                return invocation.getProxy() == other;
             } else if (isHashCodeMethod(invocation.getMethod())) {
                 return dummyObjectHashCode;
             }
             return dummyObjectBehavior.execute(invocation);
         }
+
 
         /**
          * Intercepts the method call.
@@ -78,16 +94,25 @@ public class DummyObjectUtil {
             return null;
         }
 
+
+        /**
+         * @param method The method to check, not null
+         * @return True if the given method is the equals method
+         */
         protected boolean isEqualsMethod(Method method) {
             return "equals".equals(method.getName())
                     && 1 == method.getParameterTypes().length
                     && Object.class.equals(method.getParameterTypes()[0]);
         }
 
+
+        /**
+         * @param method The method to check, not null
+         * @return True if the given method is the equals method
+         */
         protected boolean isHashCodeMethod(Method method) {
             return "hashCode".equals(method.getName())
                     && 0 == method.getParameterTypes().length;
         }
-
     }
 }

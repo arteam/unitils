@@ -16,35 +16,40 @@
 package org.unitils.mock.core;
 
 import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.proxy.ProxyUtil;
+import static org.unitils.mock.proxy.ProxyUtil.getProxiedMethodStackTraceElement;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
-import org.unitils.mock.report.impl.MethodFormatUtil;
+import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
 public class Scenario {
 
-    protected static enum VerificationStatus {UNVERIFIED,  VERIFIED, VERIFIED_IN_ORDER};
+    protected static enum VerificationStatus {
+        UNVERIFIED, VERIFIED, VERIFIED_IN_ORDER
+    }
+
 
     protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
 
     protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
-    
+
     protected SyntaxMonitor syntaxMonitor = new SyntaxMonitor();
 
     public SyntaxMonitor getSyntaxMonitor() {
         return syntaxMonitor;
     }
 
-    
+
     public void reset() {
         observedInvocations.clear();
         invocationVerificationStatuses.clear();
@@ -84,8 +89,8 @@ public class Scenario {
         }
         new AssertionError(getAssertInvokedErrorMessage(behaviorDefiningInvocation));
     }
-    
-    
+
+
     public void assertInvokedInOrder(BehaviorDefiningInvocation behaviorDefiningInvocation) {
         ObservedInvocation matchingInvocation = null;
         for (int i = 0; i < observedInvocations.size(); i++) {
@@ -117,8 +122,8 @@ public class Scenario {
             }
         }
     }
-    
-    
+
+
     public void assertNotExpectingInvocation() {
         syntaxMonitor.assertNotExpectingInvocation();
     }
@@ -133,7 +138,7 @@ public class Scenario {
     protected String getAssertNotInvokedErrorMessage(ProxyInvocation proxyInvocation, ObservedInvocation unexpectedInvocation) {
         StringBuilder message = new StringBuilder();
         message.append("Unexpected invocation of ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(proxyInvocation.getMethod()));
+        message.append(getSimpleMethodName(proxyInvocation.getMethod()));
         message.append("\n");
         message.append("occurred at ");
         message.append(unexpectedInvocation.getInvokedAt());
@@ -149,22 +154,22 @@ public class Scenario {
     protected String getAssertInvokedErrorMessage(ProxyInvocation proxyInvocation) {
         StringBuilder message = new StringBuilder();
         message.append("Expected invocation of ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(proxyInvocation.getMethod()));
+        message.append(getSimpleMethodName(proxyInvocation.getMethod()));
         message.append(", but the invocation didn't occur.\n");
         message.append(getAssertLocationIndication());
         message.append("\n\n");
         message.append(createReport());
         return message.toString();
     }
-    
-    
+
+
     protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation,
-            ObservedInvocation outOfOrderInvocation) {
+                                                      ObservedInvocation outOfOrderInvocation) {
         StringBuilder message = new StringBuilder();
         message.append("Invocation of ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(matchingInvocation.getMethod()));
+        message.append(getSimpleMethodName(matchingInvocation.getMethod()));
         message.append(" was expected to be performed after ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(outOfOrderInvocation.getMethod()));
+        message.append(getSimpleMethodName(outOfOrderInvocation.getMethod()));
         message.append(" but actually occurred before it.\n");
         message.append(getAssertLocationIndication());
         message.append("\n\n");
@@ -177,18 +182,17 @@ public class Scenario {
         StringBuilder message = new StringBuilder();
         Method method = unexpectedInvocation.getMethod();
         message.append("No more invocations expected, but ");
-        message.append(MethodFormatUtil.getCompleteRepresentation(method));
+        message.append(getSimpleMethodName(method));
         message.append("\nwas called at ");
         message.append(unexpectedInvocation.getInvokedAt());
         message.append("\n\n");
         message.append(createReport());
         return message.toString();
     }
-    
-    protected String getAssertLocationIndication() {
-        return "at " + ProxyUtil.getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace());
-    }
 
+    protected String getAssertLocationIndication() {
+        return "at " + getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace());
+    }
 
 
 }
