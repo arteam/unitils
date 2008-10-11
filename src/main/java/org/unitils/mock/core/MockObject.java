@@ -312,21 +312,21 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
 
 
     public T assertInvoked() {
-        AssertInvokedInvocationHandler proxyInvocationHandler = new AssertInvokedInvocationHandler();
+        AssertInvokedInvocationHandler proxyInvocationHandler = new AssertInvokedInvocationHandler(getAssertedAt());
         syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "assertInvoked()", getInvokedAt());
         return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
     public T assertInvokedInOrder() {
-        AssertInvokedInOrderInvocationHandler proxyInvocationHandler = new AssertInvokedInOrderInvocationHandler();
+        AssertInvokedInOrderInvocationHandler proxyInvocationHandler = new AssertInvokedInOrderInvocationHandler(getAssertedAt());
         syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "assertInvokedInOrder()", getInvokedAt());
         return createMockObjectProxy(proxyInvocationHandler);
     }
 
 
     public T assertNotInvoked() {
-        AssertNotInvokedInvocationHandler proxyInvocationHandler = new AssertNotInvokedInvocationHandler();
+        AssertNotInvokedInvocationHandler proxyInvocationHandler = new AssertNotInvokedInvocationHandler(getAssertedAt());
         syntaxMonitor.registerProxyReturningMethodCall(proxyInvocationHandler, name, "assertNotInvoked()", getInvokedAt());
         return createMockObjectProxy(proxyInvocationHandler);
     }
@@ -404,6 +404,11 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     // Utility methods
     //
     
+    protected StackTraceElement getAssertedAt() {
+        StackTraceElement[] currentStackTrace = Thread.currentThread().getStackTrace();
+        return currentStackTrace[4];
+    }
+    
     protected StackTraceElement[] getInvokedAt() {
         StackTraceElement[] currentStackTrace = Thread.currentThread().getStackTrace();
         StackTraceElement[] result = new StackTraceElement[currentStackTrace.length - 4];
@@ -428,14 +433,14 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     protected BehaviorDefiningInvocation createBehaviorDefiningInvocation(ProxyInvocation proxyInvocation, MockBehavior mockBehavior) {
         List<ArgumentMatcher> argumentMatchers = createArgumentMatchers(proxyInvocation);
 
-        List<?> clonedArguments = createDeepClone(proxyInvocation.getArguments());
+        List<Object> clonedArguments = createDeepClone(proxyInvocation.getArguments());
         return new BehaviorDefiningInvocation(proxyInvocation.getProxy(), name, proxyInvocation.getMethod(), clonedArguments, proxyInvocation.getInvokedAt(), argumentMatchers, mockBehavior);
     }
 
 
     protected ObservedInvocation createObservedInvocation(ProxyInvocation proxyInvocation, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
         Method method = proxyInvocation.getMethod();
-        List<?> clonedArguments = createDeepClone(proxyInvocation.getArguments());
+        List<Object> clonedArguments = createDeepClone(proxyInvocation.getArguments());
         StackTraceElement invokedAt = proxyInvocation.getInvokedAt();
 
         return new ObservedInvocation(proxyInvocation.getProxy(), name, method, clonedArguments, invokedAt, behaviorDefiningInvocation, mockBehavior);
@@ -523,10 +528,16 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      */
     protected class AssertInvokedInvocationHandler implements ProxyInvocationHandler {
 
+        private StackTraceElement assertedAt;
+        
+        public AssertInvokedInvocationHandler(StackTraceElement assertedAt) {
+            this.assertedAt = assertedAt;
+        }
+        
         public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
             syntaxMonitor.registerProxyMethodCall(this);
             BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, null);
-            scenario.assertInvoked(behaviorDefiningInvocation);
+            scenario.assertInvoked(behaviorDefiningInvocation, assertedAt);
             return null;
         }
     }
@@ -538,10 +549,17 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      */
     protected class AssertInvokedInOrderInvocationHandler implements ProxyInvocationHandler {
 
+        private StackTraceElement assertedAt;
+        
+        public AssertInvokedInOrderInvocationHandler(StackTraceElement assertedAt) {
+            this.assertedAt = assertedAt;
+        }
+
+
         public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
             syntaxMonitor.registerProxyMethodCall(this);
             BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, null);
-            scenario.assertInvokedInOrder(behaviorDefiningInvocation);
+            scenario.assertInvokedInOrder(behaviorDefiningInvocation, assertedAt);
             return null;
         }
     }
@@ -553,10 +571,16 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      */
     protected class AssertNotInvokedInvocationHandler implements ProxyInvocationHandler {
 
+        private StackTraceElement assertedAt;
+        
+        public AssertNotInvokedInvocationHandler(StackTraceElement assertedAt) {
+            this.assertedAt = assertedAt;
+        }
+        
         public Object handleInvocation(ProxyInvocation proxyInvocation) throws Throwable {
             syntaxMonitor.registerProxyMethodCall(this);
             BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, null);
-            scenario.assertNotInvoked(behaviorDefiningInvocation);
+            scenario.assertNotInvoked(behaviorDefiningInvocation, assertedAt);
             return null;
         }
     }

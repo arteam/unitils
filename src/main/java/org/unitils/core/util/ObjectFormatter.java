@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+
 /**
  * A class for generating a string representation of any object, array or primitive value.
  * <p/>
@@ -105,6 +106,10 @@ public class ObjectFormatter {
             result.append('\'');
             result.append(String.valueOf(object));
             result.append('\'');
+            return;
+        }
+        if (object instanceof FormatAdvise) {
+            result.append(((FormatAdvise)object).$_format());
             return;
         }
         Class<?> type = object.getClass();

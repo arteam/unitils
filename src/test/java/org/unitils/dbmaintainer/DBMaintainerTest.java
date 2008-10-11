@@ -107,7 +107,8 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         postProcessingScripts.add(new Script("post-script1.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class)));
         postProcessingScripts.add(new Script("post-script2.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class)));
         
-        mockExecutedScriptInfoSource.returns(new HashSet<ExecutedScript>(alreadyExecutedScripts)).getExecutedScripts();
+        HashSet<ExecutedScript> hashSet = new HashSet<ExecutedScript>(alreadyExecutedScripts);
+        mockExecutedScriptInfoSource.returns(hashSet).getExecutedScripts();
     }
 
 
@@ -239,7 +240,6 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void assertScriptsExecutedAndDbVersionSet() {
-        //assertNoMoreInvocations();
     	mockExecutedScriptInfoSource.assertInvokedInOrder().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
         mockScriptRunner.assertInvokedInOrder().execute(scripts.get(0).getScriptContentHandle());
         mockExecutedScriptInfoSource.assertInvokedInOrder().updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));

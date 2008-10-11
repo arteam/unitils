@@ -38,7 +38,7 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
     private boolean used;
 
 
-    public BehaviorDefiningInvocation(Object proxy, String mockName, Method method, List<?> arguments, StackTraceElement invokedAt, List<ArgumentMatcher> argumentMatchers, MockBehavior mockBehavior) {
+    public BehaviorDefiningInvocation(Object proxy, String mockName, Method method, List<Object> arguments, StackTraceElement invokedAt, List<ArgumentMatcher> argumentMatchers, MockBehavior mockBehavior) {
         super(proxy, method, arguments, invokedAt);
         this.mockName = mockName;
         this.argumentMatchers = argumentMatchers;

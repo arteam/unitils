@@ -73,8 +73,8 @@ public class MockModule implements Module {
     }
 
 
-    public void assertNoMoreInvocations() {
-        scenario.assertNoMoreInvocations();
+    public void assertNoMoreInvocations(StackTraceElement assertedAt) {
+        scenario.assertNoMoreInvocations(assertedAt);
     }
 
 
@@ -187,14 +187,14 @@ public class MockModule implements Module {
          */
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
-            scenario.reset();
+            scenario = new Scenario();
             createAndInjectMocksIntoTest(testObject);
             createAndInjectDummiesIntoTest(testObject);
         }
 
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
-            scenario.assertNotExpectingInvocation();
+            scenario.getSyntaxMonitor().assertNotExpectingInvocation();
         }
         
 

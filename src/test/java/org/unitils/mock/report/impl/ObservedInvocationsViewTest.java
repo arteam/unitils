@@ -31,10 +31,10 @@ import org.unitils.mock.core.Scenario;
  * @author Filip Neven
  * @author Kenny Claes
  */
-public class OverviewScenarioViewTest {
+public class ObservedInvocationsViewTest {
 
     /* class under test */
-    private OverviewScenarioView overviewScenarioView;
+    private ObservedInvocationsView observedInvocationsView;
 
     /* Test scenario */
     private Scenario scenario;
@@ -46,7 +46,7 @@ public class OverviewScenarioViewTest {
     /** Initializes the test. */
     @Before
     public void setUp() {
-        overviewScenarioView = new OverviewScenarioView();
+        observedInvocationsView = new ObservedInvocationsView();
         scenario = new Scenario();
         testMock = new MockObject<TestInterface>("testMock", TestInterface.class, false, scenario);
     }
@@ -59,7 +59,7 @@ public class OverviewScenarioViewTest {
         testProxy.testMethod1("value1");
         testProxy.testMethod2();
 
-        String result = overviewScenarioView.createView(scenario);
+        String result = observedInvocationsView.createView(scenario.getObservedInvocations());
 
         assertTrue(result.contains("testMethod1"));
         assertTrue(result.contains("testMethod2"));
@@ -69,7 +69,7 @@ public class OverviewScenarioViewTest {
     /** Test for creating a view when there were no mock invocations. */
     @Test
     public void testCreateView_noInvocations() {
-        String result = overviewScenarioView.createView(scenario);
+        String result = observedInvocationsView.createView(scenario.getObservedInvocations());
         assertTrue(StringUtils.isEmpty(result));
     }
 
@@ -83,7 +83,7 @@ public class OverviewScenarioViewTest {
         TestInterface testProxy = testMock.getInstance();
         testProxy.testMethod1("012345678901234567891");
 
-        String result = overviewScenarioView.createView(scenario);
+        String result = observedInvocationsView.createView(scenario.getObservedInvocations());
         assertTrue(result.contains("string1"));
     }
 
@@ -98,7 +98,7 @@ public class OverviewScenarioViewTest {
         TestInterface testProxy = testMock.getInstance();
         testProxy.testMethod1(null);
 
-        String result = overviewScenarioView.createView(scenario);
+        String result = observedInvocationsView.createView(scenario.getObservedInvocations());
         assertTrue(result.contains("string1"));
     }
 

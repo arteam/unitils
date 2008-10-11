@@ -37,13 +37,21 @@ public class DefaultScenarioReport implements ScenarioReport {
      */
     public String createReport(Scenario scenario) {
         StringBuilder result = new StringBuilder();
-        result.append("Observed scenario:\n\n");
-        result.append(new OverviewScenarioView().createView(scenario));
-        result.append("\nSuggested assert statements:\n\n");
-        result.append(new SuggestedAssertsScenarioView().createView(scenario));
-        result.append("\nDetailed scenario:\n\n");
-        result.append(new DetailedScenarioView().createView(scenario));
-
+        String observedInvocations = new ObservedInvocationsView().createView(scenario.getObservedInvocations());
+        if (!"".equals(observedInvocations)) {
+            result.append("Observed scenario:\n\n");
+            result.append(observedInvocations);
+        }
+        String suggestedAssertStatements = new SuggestedAssertsScenarioView().createView(scenario);
+        if (!"".equals(suggestedAssertStatements)) {
+            result.append("\nSuggested assert statements:\n\n");
+            result.append(suggestedAssertStatements);
+        }
+        String detailedObservedInvocations = new DetailedObservedInvocationsView().createView(scenario.getObservedInvocations());
+        if (!"".equals(detailedObservedInvocations)) {
+            result.append("\nDetailed scenario:\n\n");
+            result.append(detailedObservedInvocations);
+        }
         return result.toString();
     }
 
