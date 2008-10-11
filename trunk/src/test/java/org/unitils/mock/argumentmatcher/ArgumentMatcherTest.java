@@ -17,14 +17,22 @@ package org.unitils.mock.argumentmatcher;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
-import static org.unitils.mock.ArgumentMatchers.*;
-import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
+import static org.unitils.mock.ArgumentMatchers.eq;
+import static org.unitils.mock.ArgumentMatchers.isNull;
+import static org.unitils.mock.ArgumentMatchers.lenEq;
+import static org.unitils.mock.ArgumentMatchers.notNull;
+import static org.unitils.mock.ArgumentMatchers.refEq;
+import static org.unitils.mock.ArgumentMatchers.same;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.mock.ArgumentMatchers;
+import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.Scenario;
 
 /**
  * Tests the usage of argment matchers.
@@ -279,6 +287,14 @@ public class ArgumentMatcherTest {
 
         boolean result = mockObject.getInstance().testMethodObject(null);
         assertFalse(result);
+    }
+    
+    @Test
+    public void testSameArgumentMatcher_assertInvoked() {
+        List<String> list = new ArrayList<String>();
+        mockObject.getInstance().testMethodObject(list);
+        
+        mockObject.assertInvoked().testMethodObject(same(list));
     }
 
 

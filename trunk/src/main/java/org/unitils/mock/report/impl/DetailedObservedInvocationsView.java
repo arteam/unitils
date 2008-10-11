@@ -15,18 +15,16 @@
  */
 package org.unitils.mock.report.impl;
 
-import org.unitils.core.util.ObjectFormatter;
-import org.unitils.mock.core.BehaviorDefiningInvocation;
-import org.unitils.mock.core.ObservedInvocation;
-import org.unitils.mock.core.Scenario;
-import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
-import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.unitils.core.util.ObjectFormatter;
+import org.unitils.mock.core.BehaviorDefiningInvocation;
+import org.unitils.mock.core.ObservedInvocation;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
+import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
 
 /**
  * A view that displays the details of the observed invocations. The details include:
@@ -53,7 +51,7 @@ import java.util.Map;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DetailedScenarioView extends OverviewScenarioView {
+public class DetailedObservedInvocationsView extends ObservedInvocationsView {
 
     /**
      * Formatter for arguments and return values
@@ -69,25 +67,24 @@ public class DetailedScenarioView extends OverviewScenarioView {
     /**
      * Creates a string representation of the given scenario as described in the class javadoc.
      *
-     * @param scenario The sceneario, not null
      * @return The string representation, not null
      */
     @Override
-    public String createView(Scenario scenario) {
+    public String createView(List<ObservedInvocation> observedInvocations) {
         StringBuilder result = new StringBuilder();
 
         Map<Class<?>, Integer> largeValueIndexes = new HashMap<Class<?>, Integer>();
-
+        
         // append all invocations
         int invocationIndex = 1;
-        for (ObservedInvocation observedInvocation : scenario.getObservedInvocations()) {
-            List<String> formattedLargeValues = new ArrayList<String>();
+        for (ObservedInvocation observedInvocation : observedInvocations) {
+            Map<String, String> formattedLargeValues = new HashMap<String, String>();
             result.append(invocationIndex++);
             result.append(". ");
             result.append(formatObservedInvocation(observedInvocation, largeValueIndexes, formattedLargeValues));
             result.append("\n");
             result.append(formatLargeValues(formattedLargeValues));
-            result.append(formatInvocationDetails(observedInvocation));
+            result.append(formatInvokedAt(observedInvocation));
             result.append(formatBehaviorDetails(observedInvocation));
             result.append("\n");
         }
@@ -102,7 +99,7 @@ public class DetailedScenarioView extends OverviewScenarioView {
      * @param observedInvocation The invocation to format, not null
      * @return The string representation, not null
      */
-    protected String formatInvocationDetails(ObservedInvocation observedInvocation) {
+    protected String formatInvokedAt(ObservedInvocation observedInvocation) {
         StringBuilder result = new StringBuilder();
         result.append("- Observed at ");
         result.append(observedInvocation.getInvokedAt());
@@ -143,21 +140,22 @@ public class DetailedScenarioView extends OverviewScenarioView {
         return result.toString();
     }
 
-
     /**
      * Format the values that were to long to be displayed inline
      *
      * @param formattedLargeValues The large values as strings, not null
      * @return The string representation, not null
      */
-    @Override
-    protected String formatLargeValues(List<String> formattedLargeValues) {
+    protected String formatLargeValues(Map<String, String> formattedLargeValues) {
         StringBuilder result = new StringBuilder();
 
         if (!formattedLargeValues.isEmpty()) {
-            for (String formattedLargeValue : formattedLargeValues) {
+            result.append("\n");
+            for (String largeValueName : formattedLargeValues.keySet()) {
                 result.append("- ");
-                result.append(formattedLargeValue);
+                result.append(largeValueName);
+                result.append(" -> ");
+                result.append(formattedLargeValues.get(largeValueName));
                 result.append("\n");
             }
         }

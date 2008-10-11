@@ -20,12 +20,19 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.unitils.core.util.CloneUtil;
+import org.unitils.core.util.FormatAdvise;
+import org.unitils.dbmaintainer.script.ExecutedScript;
+import org.unitils.dbmaintainer.script.Script;
+import org.unitils.dbmaintainer.script.ScriptContentHandle;
+import org.unitils.mock.MockUnitils;
 
 /**
  * @author Filip Neven
@@ -78,11 +85,42 @@ public class DummyObjectUtilTest {
         assertEquals(0, dummy.getInt());
     }
     
+    @Test
+    public void instanceOfFormatAdvise() {
+        TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
+        assertTrue(dummy instanceof FormatAdvise);
+        List<?> dummyList = DummyObjectUtil.createDummy(List.class);
+        assertTrue(dummyList instanceof FormatAdvise);
+    }
+    
+    @Test
+    public void refEquals() {
+        Script script = new Script("01_script1.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class));
+        ExecutedScript executedScript1 = new ExecutedScript(script, null, false);
+        ExecutedScript executedScript2 = new ExecutedScript(script, null, false);
+        assertLenEquals(executedScript1, executedScript2);
+    }
+    
+    @Test
+    public void toStringMethod() {
+        TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
+        assertEquals("DUMMY TestClass@" + Integer.toHexString(dummy.hashCode()), dummy.toString());
+    }
+    
+    @Test
+    public void cloneEqualToOriginal() {
+        TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
+        TestClass clone = CloneUtil.createDeepClone(dummy);
+        assertEquals(dummy, clone);
+    }
+    
+    
+    
     private class TestClass {
         
         public TestClass(String someValue) {}
 
-        public List getList() {return null;}
+        public List<?> getList() {return null;}
         
         public String getString() {return "someString";}
         

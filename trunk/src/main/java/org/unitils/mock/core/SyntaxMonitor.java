@@ -32,13 +32,6 @@ public class SyntaxMonitor {
     
     protected StackTraceElement[] invokedAt;
 
-    public void reset() {
-        expectingInvocationOn = null;
-        mockObjectName = null;
-        precedingMethodName = null;
-    }
-    
-
     public void registerProxyReturningMethodCall(ProxyInvocationHandler proxyInvocationHandler, String mockObjectName, 
                 String behaviorDefiningMethodName, StackTraceElement[] invokedAt) {
         assertNotExpectingInvocation();
@@ -53,7 +46,9 @@ public class SyntaxMonitor {
         if (expectingInvocationOn != proxyInvocationHandler) {
             raiseSyntaxException();
         }
-        reset();
+        expectingInvocationOn = null;
+        mockObjectName = null;
+        precedingMethodName = null;
     }
     
     

@@ -27,19 +27,27 @@ public class MockUnitils {
 
 
     public static void assertNoMoreInvocations() {
-        getMockModule().assertNoMoreInvocations();
+        getMockModule().assertNoMoreInvocations(getAssertedAt());
     }
 
+    
     public static void logExecutionScenario() {
         getMockModule().logExecutionScenario();
     }
     
+    
     public static <T> T createDummy(Class<T> type) {
         return DummyObjectUtil.createDummy(type);
     }
+    
+    
+    private static StackTraceElement getAssertedAt() {
+        StackTraceElement[] currentStackTrace = Thread.currentThread().getStackTrace();
+        return currentStackTrace[4];
+    }
 
 
-    protected static MockModule getMockModule() {
+    private static MockModule getMockModule() {
         return Unitils.getInstance().getModulesRepository().getModuleOfType(MockModule.class);
     }
 }

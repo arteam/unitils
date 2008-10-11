@@ -18,10 +18,13 @@ package org.unitils.mock.core;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -233,8 +236,8 @@ public class MockObjectTest {
         mockObject.getInstance().testMethodString();
         assertLenEquals(1, testMockBehavior.invocationCount);
     }
-
-
+    
+    
     /**
      * Interface that is mocked during the tests
      */
@@ -251,6 +254,8 @@ public class MockObjectTest {
         public Map<String, String> testMethodMap();
 
         public int[] testMethodArray();
+        
+        public void testMethodParam(List<String> param);
 
     }
 

@@ -16,13 +16,16 @@
 package org.unitils.mock.report.impl;
 
 import static org.apache.commons.lang.StringUtils.uncapitalize;
-import org.unitils.core.util.ObjectFormatter;
-import org.unitils.mock.core.ObservedInvocation;
-import org.unitils.mock.core.Scenario;
-import org.unitils.mock.report.ScenarioView;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.unitils.core.util.ObjectFormatter;
+import org.unitils.mock.core.ObservedInvocation;
 
 /**
  * A view that displays the observed invocations and the location where they were invoked.
@@ -42,45 +45,57 @@ import java.util.*;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class OverviewScenarioView implements ScenarioView {
+public class ObservedInvocationsView {
+
+    public static final int OBJECT_FORMATTER_MAX_RECURSION_DEPT = 10;
+    
+    /**
+     * The maximum length of an inline value
+     */
+    public static int MAX_INLINE_PARAMETER_LENGTH = 20;
+
 
     /**
      * Formatter for arguments and return values
      */
-    protected ObjectFormatter objectFormatter = new ObjectFormatter(10);
-
-    /**
-     * The maximum length of an inline value
-     */
-    protected int maximumValueLenght = 20;
-
+    protected ObjectFormatter objectFormatter = new ObjectFormatter(OBJECT_FORMATTER_MAX_RECURSION_DEPT);
 
     /**
      * Creates a string representation of the given scenario as described in the class javadoc.
+     * @param observedInvocations 
      *
-     * @param scenario The sceneario, not null
      * @return The string representation, not null
      */
-    public String createView(Scenario scenario) {
+    public String createView(List<ObservedInvocation> observedInvocations) {
         StringBuilder result = new StringBuilder();
 
-        Map<Class<?>, Integer> largeValueIndexes = new HashMap<Class<?>, Integer>();
-        List<String> formattedLargeValues = new ArrayList<String>();
+        Map<Class<?>, Integer> largeValueNameIndexes = new HashMap<Class<?>, Integer>();
+        Map<String, String> formattedLargeValues = new HashMap<String, String>();
 
         // append all invocations
-        int invocationIndex = 1;
-        for (ObservedInvocation observedInvocation : scenario.getObservedInvocations()) {
-            result.append(invocationIndex++);
-            result.append(".  ");
-            if (invocationIndex > 10) {
-                result.setLength(result.length() - 1);
-            }
-            result.append(formatObservedInvocation(observedInvocation, largeValueIndexes, formattedLargeValues));
-            result.append(formatInvocationDetails(observedInvocation));
+        int invocationIndex = 0;
+        for (ObservedInvocation observedInvocation : observedInvocations) {
+            result.append(formatInvocationIndex(++invocationIndex, observedInvocations.size()));
+            result.append(formatObservedInvocation(observedInvocation, largeValueNameIndexes, formattedLargeValues));
+            result.append(formatInvokedAt(observedInvocation));
             result.append("\n");
         }
 
         return result.toString();
+    }
+
+
+    /**
+     * Formats the invocation number, and adds spaces to make sure everything is formatted
+     * nicely on the same line width.
+     *   
+     * @param invocationIndex The index of the invcation
+     * @param totalInvocationNumber The total number of invocations.
+     * @return The formatted invocation number
+     */
+    protected String formatInvocationIndex(int invocationIndex, int totalInvocationNumber) {
+        int padSize = String.valueOf(totalInvocationNumber).length() + 2;
+        return StringUtils.rightPad(invocationIndex + ".", padSize);
     }
 
 
@@ -95,11 +110,11 @@ public class OverviewScenarioView implements ScenarioView {
      * @param formattedLargeValues The large values as strings, not null
      * @return The string representation, not null
      */
-    protected String formatObservedInvocation(ObservedInvocation observedInvocation, Map<Class<?>, Integer> largeValueIndexes, List<String> formattedLargeValues) {
+    protected String formatObservedInvocation(ObservedInvocation observedInvocation, Map<Class<?>, Integer> largeValueIndexes, Map<String, String> formattedLargeValues) {
         StringBuilder result = new StringBuilder();
-
-        // append the mock and method name
         Method method = observedInvocation.getMethod();
+        
+        // append the mock and method name
         result.append(observedInvocation.getMockName());
         result.append('.');
         result.append(method.getName());
@@ -108,12 +123,12 @@ public class OverviewScenarioView implements ScenarioView {
         result.append('(');
         Class<?>[] argumentTypes = method.getParameterTypes();
         if (argumentTypes.length > 0) {
-            Iterator<?> arguments = observedInvocation.getArguments().iterator();
+            Iterator<Object> arguments = observedInvocation.getArguments().iterator();
             for (Class<?> argumentType : argumentTypes) {
-                String argumentAsString = objectFormatter.format(arguments.next());
-                result.append(formatValue(argumentAsString, argumentType, largeValueIndexes, formattedLargeValues));
+                result.append(formatValue(arguments.next(), argumentType, largeValueIndexes, formattedLargeValues));
                 result.append(", ");
             }
+            // remove the last comma
             result.setLength(result.length() - 2);
         }
         result.append(")");
@@ -136,31 +151,8 @@ public class OverviewScenarioView implements ScenarioView {
      * @param observedInvocation The invocation to format, not null
      * @return The string representation, not null
      */
-    protected String formatInvocationDetails(ObservedInvocation observedInvocation) {
-        StringBuilder result = new StringBuilder();
-        result.append("  ..... at ");
-        result.append(observedInvocation.getInvokedAt());
-        return result.toString();
-    }
-
-
-    /**
-     * Format the values that were to long to be displayed inline
-     *
-     * @param formattedLargeValues The large values as strings, not null
-     * @return The string representation, not null
-     */
-    protected String formatLargeValues(List<String> formattedLargeValues) {
-        StringBuilder result = new StringBuilder();
-
-        if (!formattedLargeValues.isEmpty()) {
-            result.append("\n");
-            for (String formattedLargeValue : formattedLargeValues) {
-                result.append(formattedLargeValue);
-                result.append("\n");
-            }
-        }
-        return result.toString();
+    protected String formatInvokedAt(ObservedInvocation observedInvocation) {
+        return "  ..... at " + observedInvocation.getInvokedAt();
     }
 
 
@@ -173,43 +165,20 @@ public class OverviewScenarioView implements ScenarioView {
      *
      * @param value                The value to format, not null
      * @param type                 The type of the large value, not null
-     * @param largeValueIndexes    The current indexes to use for the large value names (per value type), not null
+     * @param largeValueNameIndexes    The current indexes to use for the large value names (per value type), not null
      * @param formattedLargeValues The large values as strings, not null
      * @return The value or the replaced name, not null
      */
-    protected String formatValue(String value, Class<?> type, Map<Class<?>, Integer> largeValueIndexes, List<String> formattedLargeValues) {
-        if (value.length() <= maximumValueLenght) {
-            return value;
+    protected String formatValue(Object object, Class<?> type, Map<Class<?>, Integer> largeValueNameIndexes, Map<String, String> objectsWithLargeRepresentation) {
+        String objectRepresentation = objectFormatter.format(object);
+        if (objectRepresentation.length() <= MAX_INLINE_PARAMETER_LENGTH) {
+            // The object representation is small enough to be shown inline
+            return objectRepresentation;
         }
-
-        Integer index = largeValueIndexes.get(type);
-        if (index == null) {
-            index = 0;
-        }
-        largeValueIndexes.put(type, ++index);
-
-        String largeValueName = formatLargeValueName(type, index);
-        formattedLargeValues.add(formatLargeValue(largeValueName, value));
+        // The object representation is to large to be shown inline. Generate a name for it, which can be shown as a replacement.
+        String largeValueName = createLargeValueName(type, largeValueNameIndexes);
+        objectsWithLargeRepresentation.put(largeValueName, objectRepresentation);
         return largeValueName;
-    }
-
-
-    /**
-     * Creates a string representation for a large value.
-     * This will return the name of the large value + the actual value.
-     * <p/>
-     * E.g. string1 -> "1234567891234567890"
-     *
-     * @param name  The name of the large value, not null
-     * @param value The value, not null
-     * @return The string representation, not null
-     */
-    protected String formatLargeValue(String name, String value) {
-        StringBuilder result = new StringBuilder();
-        result.append(name);
-        result.append(" -> ");
-        result.append(value);
-        return result.toString();
     }
 
 
@@ -221,7 +190,13 @@ public class OverviewScenarioView implements ScenarioView {
      * @param index The current index
      * @return The name, not null
      */
-    protected String formatLargeValueName(Class<?> type, int index) {
+    protected String createLargeValueName(Class<?> type, Map<Class<?>, Integer> largeValueNameIndexes) {
+        Integer index = largeValueNameIndexes.get(type);
+        if (index == null) {
+            index = 0;
+        }
+        largeValueNameIndexes.put(type, ++index);
+        
         String result = uncapitalize(type.getSimpleName());
         return result + index;
     }

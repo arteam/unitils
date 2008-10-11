@@ -16,6 +16,7 @@
 package org.unitils.mock.proxy;
 
 import net.sf.cglib.proxy.*;
+
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
@@ -33,8 +34,8 @@ import java.util.List;
  * @author Tim Ducheyne
  */
 public class ProxyUtil {
-
-
+    
+    
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
@@ -42,14 +43,28 @@ public class ProxyUtil {
      * @param invocationHandler The handler that will handle the method invocations of the proxy, not null.
      * @return The proxy object, not null
      */
-    @SuppressWarnings("unchecked")
     public static <T> T createProxy(Class<T> proxiedClass, ProxyInvocationHandler invocationHandler) {
+        return createProxy(proxiedClass, new Class<?>[0], invocationHandler);
+    }
+    /**
+     * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
+     *
+     * @param proxiedClass       The type to proxy, not null
+     * @param implementedInterfaces Additional interfaces that the proxy must implement, not null
+     * @param invocationHandler The handler that will handle the method invocations of the proxy, not null.
+     * @return The proxy object, not null
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T createProxy(Class<T> proxiedClass, Class<?>[] implementedInterfaces, ProxyInvocationHandler invocationHandler) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(proxiedClass);
+        if (implementedInterfaces.length != 0) {
+            enhancer.setInterfaces(implementedInterfaces);
+        }
         enhancer.setCallbackType(MethodInterceptor.class);
         enhancer.setUseFactory(true);
         Class<T> enhancedTargetClass = enhancer.createClass();
-
+        
         Factory proxy = (Factory) createInstanceOfType(enhancedTargetClass);
         proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(invocationHandler)});
         return (T) proxy;
@@ -76,9 +91,10 @@ public class ProxyUtil {
      * element. This element is the method call that was proxied by the proxy method.
      *
      * @param stackTraceElements The stack trace, not null
+     * @param failWhenNoProxyFound 
      * @return The proxied method trace element, not null
      */
-    public static StackTraceElement getProxiedMethodStackTraceElement(StackTraceElement[] stackTraceElements) {
+    public static StackTraceElement getProxiedMethodStackTraceElement(StackTraceElement[] stackTraceElements, boolean failWhenNoProxyFound) {
         boolean foundProxyMethod = false;
         for (StackTraceElement stackTraceElement : stackTraceElements) {
             if (foundProxyMethod) {
@@ -123,7 +139,7 @@ public class ProxyUtil {
          * @return The value to return for the method call, ignored for void methods
          */
         public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
-            StackTraceElement invokedAt = getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace());
+            StackTraceElement invokedAt = getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace(), true);
             ProxyInvocation invocation = new CglibProxyInvocation(method, asList(arguments), invokedAt, proxy, methodProxy);
             return invocationHandler.handleInvocation(invocation);
         }
@@ -148,7 +164,7 @@ public class ProxyUtil {
          * @param proxy       The proxy, not null
          * @param methodProxy The cglib method proxy, not null
          */
-        public CglibProxyInvocation(Method method, List<?> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
+        public CglibProxyInvocation(Method method, List<Object> arguments, StackTraceElement invokedAt, Object proxy, MethodProxy methodProxy) {
             super(proxy, method, arguments, invokedAt);
             this.methodProxy = methodProxy;
         }

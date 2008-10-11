@@ -15,11 +15,13 @@
  */
 package org.unitils.mock.dummy;
 
-import net.sf.cglib.proxy.MethodProxy;
+import org.unitils.core.util.FormatAdvise;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
+import org.unitils.mock.proxy.ProxyUtil;
+
 import static org.unitils.mock.proxy.ProxyUtil.createProxy;
 
 import java.lang.reflect.Method;
@@ -34,15 +36,24 @@ import java.lang.reflect.Method;
  */
 public class DummyObjectUtil {
 
-
     /**
      * Creates the dummy proxy object.
      *
      * @param type The type for the proxy, not null
      * @return The proxy, not null
      */
+    @SuppressWarnings("unchecked")
     public static <T> T createDummy(Class<T> type) {
-        return createProxy(type, new DummyObjectInvocationHandler());
+        Class<?> superClass;
+        Class<?>[] interfaces;
+        if (type.isInterface()) {
+            superClass = Object.class;
+            interfaces = new Class<?>[] {type, FormatAdvise.class, Cloneable.class};
+        } else {
+            superClass = type;
+            interfaces = new Class<?>[] {FormatAdvise.class, Cloneable.class};
+        }
+        return (T) ProxyUtil.createProxy(superClass, interfaces, new DummyObjectInvocationHandler(type));
     }
 
 
@@ -51,12 +62,20 @@ public class DummyObjectUtil {
      */
     public static class DummyObjectInvocationHandler implements ProxyInvocationHandler {
 
+        private Class<?> dummyObjectClass;
+        
         /* The hash code that is returned when the hashCode method is called */
         private Integer dummyObjectHashCode = new Object().hashCode();
 
         /* The behavior that will return the default values */
         private MockBehavior dummyObjectBehavior = new DefaultValueReturningMockBehavior();
 
+        /**
+         * @param dummyObjectClass
+         */
+        public DummyObjectInvocationHandler(Class<?> dummyObjectClass) {
+            this.dummyObjectClass = dummyObjectClass;
+        }
 
         /**
          * Handles the given method invocation of the dummy object.
@@ -70,29 +89,14 @@ public class DummyObjectUtil {
                 return invocation.getProxy() == other;
             } else if (isHashCodeMethod(invocation.getMethod())) {
                 return dummyObjectHashCode;
+            } else if (isCloneMethod(invocation.getMethod())) {
+                return invocation.getProxy();
+            } else if (isToStringMethod(invocation.getMethod()) || isFormatAdviseFormatMethod(invocation.getMethod())) {
+                return "DUMMY " + dummyObjectClass.getSimpleName() + "@" + Integer.toHexString(dummyObjectHashCode);
             }
             return dummyObjectBehavior.execute(invocation);
         }
 
-
-        /**
-         * Intercepts the method call.
-         *
-         * @param proxy       The proxy, not null
-         * @param method      The method that was called, not null
-         * @param arguments   The arguments that were used, not null
-         * @param methodProxy The cglib method proxy, not null
-         * @return The value to return for the method call, ignored for void methods
-         */
-        public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
-            if (isEqualsMethod(method)) {
-                Object other = arguments[0];
-                return proxy == other;
-            } else if (isHashCodeMethod(method)) {
-                return dummyObjectHashCode;
-            }
-            return null;
-        }
 
 
         /**
@@ -113,6 +117,20 @@ public class DummyObjectUtil {
         protected boolean isHashCodeMethod(Method method) {
             return "hashCode".equals(method.getName())
                     && 0 == method.getParameterTypes().length;
+        }
+        protected boolean isToStringMethod(Method method) {
+            return "toString".equals(method.getName())
+                    && 0 == method.getParameterTypes().length;
+        }
+        
+        protected boolean isCloneMethod(Method method) {
+            return "clone".equals(method.getName()) 
+                    && 0 == method.getParameterTypes().length;
+        }
+        
+        protected boolean isFormatAdviseFormatMethod(Method method) {
+            return "$_format".equals(method.getName())
+            && 0 == method.getParameterTypes().length;
         }
     }
 }

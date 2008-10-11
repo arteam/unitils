@@ -34,7 +34,7 @@ public abstract class ProxyInvocation {
     private Method method;
 
     /* The arguments that were used */
-    private List<?> arguments;
+    private List<Object> arguments;
 
     /* The location of the invocation */
     private StackTraceElement invokedAt;
@@ -47,7 +47,7 @@ public abstract class ProxyInvocation {
      * @param arguments The arguments that were used, not null
      * @param invokedAt The location of the invocation, not null
      */
-    public ProxyInvocation(Object proxy, Method method, List<?> arguments, StackTraceElement invokedAt) {
+    public ProxyInvocation(Object proxy, Method method, List<Object> arguments, StackTraceElement invokedAt) {
         this.proxy = proxy;
         this.method = method;
         this.arguments = arguments;
@@ -84,7 +84,7 @@ public abstract class ProxyInvocation {
     /**
      * @return The arguments that were used, not null
      */
-    public List<?> getArguments() {
+    public List<Object> getArguments() {
         return arguments;
     }
 
