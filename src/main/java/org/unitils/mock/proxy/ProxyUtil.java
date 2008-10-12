@@ -16,12 +16,12 @@
 package org.unitils.mock.proxy;
 
 import net.sf.cglib.proxy.*;
-
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Method;
+import static java.lang.reflect.Modifier.isAbstract;
 import java.util.Arrays;
 import static java.util.Arrays.asList;
 import java.util.List;
@@ -34,8 +34,8 @@ import java.util.List;
  * @author Tim Ducheyne
  */
 public class ProxyUtil {
-    
-    
+
+
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
@@ -46,12 +46,13 @@ public class ProxyUtil {
     public static <T> T createProxy(Class<T> proxiedClass, ProxyInvocationHandler invocationHandler) {
         return createProxy(proxiedClass, new Class<?>[0], invocationHandler);
     }
+
     /**
      * Creates a proxy object for the given type. All method invocations will be passed to the given invocation handler.
      *
-     * @param proxiedClass       The type to proxy, not null
+     * @param proxiedClass          The type to proxy, not null
      * @param implementedInterfaces Additional interfaces that the proxy must implement, not null
-     * @param invocationHandler The handler that will handle the method invocations of the proxy, not null.
+     * @param invocationHandler     The handler that will handle the method invocations of the proxy, not null.
      * @return The proxy object, not null
      */
     @SuppressWarnings("unchecked")
@@ -64,7 +65,7 @@ public class ProxyUtil {
         enhancer.setCallbackType(MethodInterceptor.class);
         enhancer.setUseFactory(true);
         Class<T> enhancedTargetClass = enhancer.createClass();
-        
+
         Factory proxy = (Factory) createInstanceOfType(enhancedTargetClass);
         proxy.setCallbacks(new Callback[]{new ProxyMethodInterceptor(invocationHandler)});
         return (T) proxy;
@@ -90,8 +91,8 @@ public class ProxyUtil {
      * First finds a trace element in which a cglib proxy method was invoked. Then it returns the following stack trace
      * element. This element is the method call that was proxied by the proxy method.
      *
-     * @param stackTraceElements The stack trace, not null
-     * @param failWhenNoProxyFound 
+     * @param stackTraceElements   The stack trace, not null
+     * @param failWhenNoProxyFound
      * @return The proxied method trace element, not null
      */
     public static StackTraceElement getProxiedMethodStackTraceElement(StackTraceElement[] stackTraceElements, boolean failWhenNoProxyFound) {
@@ -177,6 +178,9 @@ public class ProxyUtil {
          */
         @Override
         public Object invokeOriginalBehavior() throws Throwable {
+            if (isAbstract(getMethod().getModifiers())) {
+                throw new UnitilsException("Unable to invoke original behavior. The method is abstract, it does not have any behavior defined: " + getMethod());
+            }
             return methodProxy.invokeSuper(getProxy(), getArguments().toArray());
         }
     }

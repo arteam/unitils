@@ -17,22 +17,14 @@ package org.unitils.mock.argumentmatcher;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.mock.ArgumentMatchers.eq;
-import static org.unitils.mock.ArgumentMatchers.isNull;
-import static org.unitils.mock.ArgumentMatchers.lenEq;
-import static org.unitils.mock.ArgumentMatchers.notNull;
-import static org.unitils.mock.ArgumentMatchers.refEq;
-import static org.unitils.mock.ArgumentMatchers.same;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.mock.ArgumentMatchers;
+import static org.unitils.mock.ArgumentMatchers.*;
 import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests the usage of argment matchers.
@@ -242,7 +234,7 @@ public class ArgumentMatcherTest {
 
 
     /**
-     * Tests the reflection equals argument matcher, for an matching argument.
+     * Tests the same argument matcher, for an matching argument.
      */
     @Test
     public void testSameArgumentMatcher() {
@@ -255,7 +247,7 @@ public class ArgumentMatcherTest {
 
 
     /**
-     * Tests the reflection equals argument matcher, for a non-matching argument.
+     * Tests the same argument matcher, for a non-matching argument.
      */
     @Test
     public void testSameArgumentMatcher_noMatch() {
@@ -267,7 +259,7 @@ public class ArgumentMatcherTest {
 
 
     /**
-     * Tests the reflection equals argument matcher, for a matching null argument.
+     * Tests the same argument matcher, for a matching null argument.
      */
     @Test
     public void testSameArgumentMatcher_bothNull() {
@@ -279,7 +271,7 @@ public class ArgumentMatcherTest {
 
 
     /**
-     * Tests the reflection equals argument matcher, for a non-matching null argument.
+     * Tests the same argument matcher, for a non-matching null argument.
      */
     @Test
     public void testSameArgumentMatcher_null() {
@@ -288,12 +280,16 @@ public class ArgumentMatcherTest {
         boolean result = mockObject.getInstance().testMethodObject(null);
         assertFalse(result);
     }
-    
+
+
+    /**
+     * Tests the same argument matcher using assert invoked.
+     */
     @Test
     public void testSameArgumentMatcher_assertInvoked() {
         List<String> list = new ArrayList<String>();
         mockObject.getInstance().testMethodObject(list);
-        
+
         mockObject.assertInvoked().testMethodObject(same(list));
     }
 

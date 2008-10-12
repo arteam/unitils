@@ -15,12 +15,13 @@
  */
 package org.unitils.mock.report.impl;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioReport;
 
 /**
  * Creates a report of the given scenario. This will first output an overview of the executed scenario, followed by
- * a list of suggested assertions.
+ * a list of suggested assertions and finally a detailed listing of the executed scenario.
  *
  * @author Kenny Claes
  * @author Filip Neven
@@ -31,24 +32,24 @@ public class DefaultScenarioReport implements ScenarioReport {
 
     /**
      * Creates a report.
-     * @param scenario The scenario to output, not null
      *
+     * @param scenario The scenario to output, not null
      * @return the report, not null
      */
     public String createReport(Scenario scenario) {
         StringBuilder result = new StringBuilder();
         String observedInvocations = new ObservedInvocationsView().createView(scenario.getObservedInvocations());
-        if (!"".equals(observedInvocations)) {
+        if (!isEmpty(observedInvocations)) {
             result.append("Observed scenario:\n\n");
             result.append(observedInvocations);
         }
         String suggestedAssertStatements = new SuggestedAssertsScenarioView().createView(scenario);
-        if (!"".equals(suggestedAssertStatements)) {
+        if (!isEmpty(suggestedAssertStatements)) {
             result.append("\nSuggested assert statements:\n\n");
             result.append(suggestedAssertStatements);
         }
         String detailedObservedInvocations = new DetailedObservedInvocationsView().createView(scenario.getObservedInvocations());
-        if (!"".equals(detailedObservedInvocations)) {
+        if (!isEmpty(detailedObservedInvocations)) {
             result.append("\nDetailed scenario:\n\n");
             result.append(detailedObservedInvocations);
         }

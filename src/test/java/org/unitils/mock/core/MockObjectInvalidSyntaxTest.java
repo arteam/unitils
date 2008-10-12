@@ -17,7 +17,6 @@ package org.unitils.mock.core;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
@@ -40,8 +39,8 @@ public class MockObjectInvalidSyntaxTest {
         mockObject1 = new MockObject<TestClass>("testMock1", TestClass.class, false, scenario);
         mockObject2 = new MockObject<TestClass>("testMock2", TestClass.class, false, scenario);
     }
-    
-    
+
+
     @Test
     public void incompleteBehaviorDefinition_returns() {
         mockObject1.returns("aValue");
@@ -49,11 +48,10 @@ public class MockObjectInvalidSyntaxTest {
             mockObject2.returns("aValue");
             fail("Expected exception");
         } catch (UnitilsException e) {
-            e.printStackTrace();
             assertMessageContains(e.getMessage(), "testMock1.returns(...) must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     @Test
     public void incompleteBehaviorDefinition_raises() {
         mockObject1.raises(new RuntimeException());
@@ -63,7 +61,7 @@ public class MockObjectInvalidSyntaxTest {
             assertMessageContains(e.getMessage(), "testMock1.raises(...) must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     @Test
     public void incompleteBehaviorDefinition_performs() {
         mockObject1.performs(new MockBehavior() {
@@ -77,7 +75,7 @@ public class MockObjectInvalidSyntaxTest {
             assertMessageContains(e.getMessage(), "testMock1.performs(...) must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     @Test
     public void incompleteBehaviorDefinition_onceReturns() {
         mockObject1.onceReturns("aValue");
@@ -89,7 +87,7 @@ public class MockObjectInvalidSyntaxTest {
             assertMessageContains(e.getMessage(), "testMock1.onceReturns(...) must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     @Test
     public void incompleteBehaviorDefinition_onceRaises() {
         mockObject1.onceRaises(new RuntimeException());
@@ -99,7 +97,7 @@ public class MockObjectInvalidSyntaxTest {
             assertMessageContains(e.getMessage(), "testMock1.onceRaises(...) must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     @Test
     public void incompleteBehaviorDefinition_oncePerforms() {
         mockObject1.oncePerforms(new MockBehavior() {
@@ -113,7 +111,7 @@ public class MockObjectInvalidSyntaxTest {
             assertMessageContains(e.getMessage(), "testMock1.oncePerforms(...) must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     @Test
     public void incompleteAssertStatement_assertInvoked() {
         mockObject1.assertInvoked();
@@ -123,7 +121,7 @@ public class MockObjectInvalidSyntaxTest {
             assertMessageContains(e.getMessage(), "testMock1.assertInvoked() must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     @Test
     public void incompleteAssertStatement_assertInvokedInOrder() {
         mockObject1.assertInvokedInOrder();
@@ -133,7 +131,7 @@ public class MockObjectInvalidSyntaxTest {
             assertMessageContains(e.getMessage(), "testMock1.assertInvokedInOrder() must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     @Test
     public void incompleteAssertStatement_assertNotInvoked() {
         mockObject1.assertNotInvoked();
@@ -143,21 +141,21 @@ public class MockObjectInvalidSyntaxTest {
             assertMessageContains(e.getMessage(), "testMock1.assertNotInvoked() must be followed by a method invocation on the returned proxy");
         }
     }
-    
+
     private void assertMessageContains(String message, String... subStrings) {
         for (String subString : subStrings) {
             assertTrue("Expected message to contain substring " + subString + ", but it doesn't.\nMessage was: " + message,
                     message.contains(subString));
         }
     }
-    
+
     /**
      * Interface that is mocked during the tests
      */
     private static interface TestClass {
 
         public String testMethodReturningString();
-        
+
         public void testMethod();
 
     }
