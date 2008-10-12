@@ -18,14 +18,13 @@ package org.unitils.mock.core;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.core.UnitilsException;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 /**
  * Tests the mock object functionality for partial mocks.
- *
- * todo test for abstract/interface methods
  */
 public class MockObjectPartialMockTest {
 
@@ -101,9 +100,30 @@ public class MockObjectPartialMockTest {
 
 
     /**
+     * Tests invoking a method for with no behavior was defined. The behavior of the test class should have been invoked.
+     */
+    @Test
+    public void testOriginalBehavior() {
+        String result = mockObject.getInstance().testMethod();
+        assertLenEquals("original", result);
+        assertLenEquals(1, TestClass.invocationCount);
+    }
+
+
+    /**
+     * Tests invoking a method for with no behavior was defined, but the method is an abstract method.
+     * An exception should have been raised
+     */
+    @Test(expected = UnitilsException.class)
+    public void testOriginalBehavior_abstractMethod() {
+        mockObject.getInstance().abstractMethod();
+    }
+
+
+    /**
      * Class that is mocked during the tests. The test method counts how many times it was invoked.
      */
-    public static class TestClass {
+    public static abstract class TestClass {
 
         public static int invocationCount = 0;
 
@@ -111,6 +131,8 @@ public class MockObjectPartialMockTest {
             invocationCount++;
             return "original";
         }
+
+        public abstract void abstractMethod();
     }
 
 

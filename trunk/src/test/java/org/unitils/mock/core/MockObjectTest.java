@@ -18,22 +18,16 @@ package org.unitils.mock.core;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Tests the mock object functionality.
- *
- * todo tests for when no test method is called after fe returns()
- * e.g. mockObject.returns("aValue");
  */
 public class MockObjectTest {
 
@@ -180,12 +174,12 @@ public class MockObjectTest {
         assertTrue(exception1);
         assertFalse(exception2);
     }
-    
-    
+
+
     @Test
     public void testRaises_exceptionClass() {
         mockObject.raises(IllegalArgumentException.class).testMethodString();
-        
+
         try {
             mockObject.getInstance().testMethodString();
             fail("Expected exception");
@@ -193,12 +187,12 @@ public class MockObjectTest {
             // expected
         }
     }
-    
-    
+
+
     @Test
     public void testOnceRaises_exceptionClass() {
         mockObject.onceRaises(IllegalArgumentException.class).testMethodString();
-        
+
         try {
             mockObject.getInstance().testMethodString();
             fail("Expected exception");
@@ -236,8 +230,8 @@ public class MockObjectTest {
         mockObject.getInstance().testMethodString();
         assertLenEquals(1, testMockBehavior.invocationCount);
     }
-    
-    
+
+
     /**
      * Interface that is mocked during the tests
      */
@@ -254,7 +248,7 @@ public class MockObjectTest {
         public Map<String, String> testMethodMap();
 
         public int[] testMethodArray();
-        
+
         public void testMethodParam(List<String> param);
 
     }
