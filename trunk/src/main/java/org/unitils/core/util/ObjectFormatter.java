@@ -108,8 +108,9 @@ public class ObjectFormatter {
             result.append('\'');
             return;
         }
-        if (object instanceof FormatAdvise) {
-            result.append(((FormatAdvise)object).$_format());
+        Class<?> dummyObjectClass = getDummyObjectClass();
+        if (dummyObjectClass != null && dummyObjectClass.isAssignableFrom(object.getClass())) {
+            result.append(object.toString());
             return;
         }
         Class<?> type = object.getClass();
@@ -298,6 +299,19 @@ public class ObjectFormatter {
         while (superclazz != null && !superclazz.getName().startsWith("java.lang")) {
             formatFields(object, superclazz, currentDepth, result);
             superclazz = superclazz.getSuperclass();
+        }
+    }
+    
+    
+    /**
+     * @return The interface that represents a dummy object. If the DummyObject interface is not in the
+     * classpath, null is returned.
+     */
+    protected Class<?> getDummyObjectClass() {
+        try {
+            return Class.forName("org.unitils.mock.dummy.DummyObject");
+        } catch (ClassNotFoundException e) {
+            return null;
         }
     }
 

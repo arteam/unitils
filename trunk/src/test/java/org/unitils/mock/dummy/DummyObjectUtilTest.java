@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.unitils.core.util.CloneUtil;
-import org.unitils.core.util.FormatAdvise;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptContentHandle;
@@ -88,9 +87,9 @@ public class DummyObjectUtilTest {
     @Test
     public void instanceOfFormatAdvise() {
         TestClass dummy = DummyObjectUtil.createDummy(TestClass.class);
-        assertTrue(dummy instanceof FormatAdvise);
+        assertTrue(dummy instanceof DummyObject);
         List<?> dummyList = DummyObjectUtil.createDummy(List.class);
-        assertTrue(dummyList instanceof FormatAdvise);
+        assertTrue(dummyList instanceof DummyObject);
     }
     
     @Test
