@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.script;
+package org.unitils.dbmaintainer.script.parsingstate;
+
+import org.unitils.dbmaintainer.script.StatementBuilder;
 
 /**
  * A state of a parser that can handle a character and knows when the state ends and is transfered to another state.

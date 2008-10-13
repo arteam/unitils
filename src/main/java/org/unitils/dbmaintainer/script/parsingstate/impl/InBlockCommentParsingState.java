@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.script.parsingstate;
+package org.unitils.dbmaintainer.script.parsingstate.impl;
 
-import org.unitils.dbmaintainer.script.ParsingState;
+import org.unitils.dbmaintainer.script.parsingstate.ParsingState;
 import org.unitils.dbmaintainer.script.StatementBuilder;
 
-
 /**
- * A state for parsing an in-line comment (-- comment) part of a script.
+ * A state for parsing an in-block comment (/ * comment * /) part of a script.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class InLineCommentParsingState extends BaseParsingState {
+public class InBlockCommentParsingState extends BaseParsingState {
 
     /**
      * The normal parsing state, that should be returned when the comment end is reached.
@@ -44,7 +43,7 @@ public class InLineCommentParsingState extends BaseParsingState {
 
 
     /**
-     * Determines whether the end of the line comment is reached.
+     * Determines whether the end of the block comment is reached.
      * If that is the case, the normal parsing state is returned.
      *
      * @param previousChar The previous char, 0 if none
@@ -55,7 +54,7 @@ public class InLineCommentParsingState extends BaseParsingState {
      */
     protected ParsingState getNextParsingState(char previousChar, char currentChar, char nextChar, StatementBuilder statementBuilder) {
         // check for ending chars
-        if (currentChar == '\n' || currentChar == '\r') {
+        if (previousChar == '*' && currentChar == '/') {
             return normalParsingState;
         }
         return this;
