@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.script.parsingstate;
+package org.unitils.dbmaintainer.script.parsingstate.impl;
 
-import org.unitils.dbmaintainer.script.ParsingState;
+import org.unitils.dbmaintainer.script.parsingstate.ParsingState;
 import org.unitils.dbmaintainer.script.StatementBuilder;
 
 /**
