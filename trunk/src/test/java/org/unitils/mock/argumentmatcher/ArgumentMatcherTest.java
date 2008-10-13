@@ -28,6 +28,9 @@ import java.util.List;
 
 /**
  * Tests the usage of argment matchers.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class ArgumentMatcherTest {
 

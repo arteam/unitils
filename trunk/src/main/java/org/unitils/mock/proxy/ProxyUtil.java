@@ -91,11 +91,10 @@ public class ProxyUtil {
      * First finds a trace element in which a cglib proxy method was invoked. Then it returns the following stack trace
      * element. This element is the method call that was proxied by the proxy method.
      *
-     * @param stackTraceElements   The stack trace, not null
-     * @param failWhenNoProxyFound
+     * @param stackTraceElements The stack trace, not null
      * @return The proxied method trace element, not null
      */
-    public static StackTraceElement getProxiedMethodStackTraceElement(StackTraceElement[] stackTraceElements, boolean failWhenNoProxyFound) {
+    public static StackTraceElement getProxiedMethodStackTraceElement(StackTraceElement[] stackTraceElements) {
         boolean foundProxyMethod = false;
         for (StackTraceElement stackTraceElement : stackTraceElements) {
             if (foundProxyMethod) {
@@ -140,7 +139,7 @@ public class ProxyUtil {
          * @return The value to return for the method call, ignored for void methods
          */
         public Object intercept(Object proxy, Method method, Object[] arguments, MethodProxy methodProxy) throws Throwable {
-            StackTraceElement invokedAt = getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace(), true);
+            StackTraceElement invokedAt = getProxiedMethodStackTraceElement(Thread.currentThread().getStackTrace());
             ProxyInvocation invocation = new CglibProxyInvocation(method, asList(arguments), invokedAt, proxy, methodProxy);
             return invocationHandler.handleInvocation(invocation);
         }
@@ -173,6 +172,7 @@ public class ProxyUtil {
 
         /**
          * Invokes the original behavior by calling the method proxy.
+         * If there is no original behavior, e.g. an interface or abstract method, an exception is raised.
          *
          * @return The result value
          */

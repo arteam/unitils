@@ -25,6 +25,9 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
 
 /**
  * Tests the mock object functionality for partial mocks.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class MockObjectPartialMockTest {
 

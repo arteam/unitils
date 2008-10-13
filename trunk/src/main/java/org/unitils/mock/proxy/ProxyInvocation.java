@@ -29,12 +29,15 @@ public abstract class ProxyInvocation {
 
     /* The proxy on which the method was called */
     private Object proxy;
-    
+
     /* The method that was called */
     private Method method;
 
     /* The arguments that were used */
     private List<Object> arguments;
+
+    /* The arguments at the time that they were used */
+    private List<Object> argumentsAtInvocationTime;
 
     /* The location of the invocation */
     private StackTraceElement invokedAt;
@@ -43,14 +46,35 @@ public abstract class ProxyInvocation {
     /**
      * Creates an invocation.
      *
+     * @param proxy     The proxy on which the method was called, not null
      * @param method    The method that was called, not null
      * @param arguments The arguments that were used, not null
      * @param invokedAt The location of the invocation, not null
      */
     public ProxyInvocation(Object proxy, Method method, List<Object> arguments, StackTraceElement invokedAt) {
+        this(proxy, method, arguments, arguments, invokedAt);
+    }
+
+
+    /**
+     * Creates an invocation.
+     *
+     * The argumentsAtInvocationTime can be set as copies (deep clones) of the arguments at the time of
+     * the invocation. This way the original values can still be used later-on even when changes
+     * occur to the original values (pass-by-value vs pass-by-reference). If not explicitly set, this will return the
+     * same values as the arguments.
+     *
+     * @param proxy                     The proxy on which the method was called, not null
+     * @param method                    The method that was called, not null
+     * @param arguments                 The arguments that were used by reference, not null
+     * @param argumentsAtInvocationTime The arguments at the time that they were used, not null
+     * @param invokedAt                 The location of the invocation, not null
+     */
+    public ProxyInvocation(Object proxy, Method method, List<Object> arguments, List<Object> argumentsAtInvocationTime, StackTraceElement invokedAt) {
         this.proxy = proxy;
         this.method = method;
         this.arguments = arguments;
+        this.argumentsAtInvocationTime = argumentsAtInvocationTime;
         this.invokedAt = invokedAt;
     }
 
@@ -86,6 +110,21 @@ public abstract class ProxyInvocation {
      */
     public List<Object> getArguments() {
         return arguments;
+    }
+
+
+    /**
+     * The arguments at the time that they were used.
+     *
+     * The argumentsAtInvocationTime can be set as copies (deep clones) of the arguments at the time of
+     * the invocation. This way the original values can still be used later-on even when changes
+     * occur to the original values (pass-by-value vs pass-by-reference). If not explicitly set, this will return the
+     * same values as the arguments.
+     *
+     * @return The arguments, not null
+     */
+    public List<Object> getArgumentsAtInvocationTime() {
+        return argumentsAtInvocationTime;
     }
 
 
