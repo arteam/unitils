@@ -209,7 +209,7 @@ public class CloneUtil {
      * @param cloneCache   The cached clones, not null
      * @return The cloned array, not null
      */
-    public static Object cloneArray(Object arrayToClone, Map<Object, Object> cloneCache) throws Throwable {
+    protected static Object cloneArray(Object arrayToClone, Map<Object, Object> cloneCache) throws Throwable {
         // todo add to cache to avoid infinite loops
         int lenght = Array.getLength(arrayToClone);
         Object clonedArray = Array.newInstance(arrayToClone.getClass().getComponentType(), lenght);

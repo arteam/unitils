@@ -15,16 +15,13 @@
  */
 package org.unitils.mock.dummy;
 
-import org.unitils.core.util.FormatAdvise;
+import java.lang.reflect.Method;
+
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.proxy.ProxyInvocationHandler;
 import org.unitils.mock.proxy.ProxyUtil;
-
-import static org.unitils.mock.proxy.ProxyUtil.createProxy;
-
-import java.lang.reflect.Method;
 
 /**
  * Class for handling the dummy object behavior. A dummy object is a proxy that will return
@@ -48,10 +45,10 @@ public class DummyObjectUtil {
         Class<?>[] interfaces;
         if (type.isInterface()) {
             superClass = Object.class;
-            interfaces = new Class<?>[] {type, FormatAdvise.class, Cloneable.class};
+            interfaces = new Class<?>[] {type, DummyObject.class, Cloneable.class};
         } else {
             superClass = type;
-            interfaces = new Class<?>[] {FormatAdvise.class, Cloneable.class};
+            interfaces = new Class<?>[] {DummyObject.class, Cloneable.class};
         }
         return (T) ProxyUtil.createProxy(superClass, interfaces, new DummyObjectInvocationHandler(type));
     }
