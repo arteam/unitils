@@ -15,15 +15,15 @@
  */
 package org.unitils.mock.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import static org.unitils.mock.core.Scenario.VerificationStatus.*;
 import org.unitils.mock.proxy.ProxyInvocation;
-import static org.unitils.mock.proxy.ProxyUtil.getProxiedMethodStackTraceElement;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
-import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
 import org.unitils.mock.report.impl.ObservedInvocationsView;
+import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * todo javadoc
@@ -51,7 +51,7 @@ public class Scenario {
 
     public void addObservedMockInvocation(ObservedInvocation mockInvocation) {
         observedInvocations.add(mockInvocation);
-        invocationVerificationStatuses.add(VerificationStatus.UNVERIFIED);
+        invocationVerificationStatuses.add(UNVERIFIED);
     }
 
     public List<ObservedInvocation> getObservedInvocations() {
@@ -64,7 +64,7 @@ public class Scenario {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (observedInvocation.getMockBehavior() == null && invocationVerificationStatus == VerificationStatus.UNVERIFIED) {
+            if (observedInvocation.getMockBehavior() == null && invocationVerificationStatus == UNVERIFIED) {
                 unexpectedInvocations.add(observedInvocation);
             }
         }
@@ -78,9 +78,9 @@ public class Scenario {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (invocationVerificationStatus == VerificationStatus.UNVERIFIED && assertInvocation.matches(observedInvocation)) {
+            if (invocationVerificationStatus == UNVERIFIED && assertInvocation.matches(observedInvocation)) {
                 // Found a match that's not verified yet. Mark as verified and proceed.
-                invocationVerificationStatuses.set(i, VerificationStatus.VERIFIED);
+                invocationVerificationStatuses.set(i, VERIFIED);
                 return;
             }
         }
@@ -93,14 +93,14 @@ public class Scenario {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (matchingInvocation == null && invocationVerificationStatus == VerificationStatus.UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
+            if (matchingInvocation == null && invocationVerificationStatus == UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
                 // Found a match that's not verified yet. Mark as verified in order.
-                invocationVerificationStatuses.set(i, VerificationStatus.VERIFIED_IN_ORDER);
+                invocationVerificationStatuses.set(i, VERIFIED_IN_ORDER);
                 matchingInvocation = observedInvocation;
                 continue;
             }
             // If we found a match, then check if there's no subsequent observed invocation that's already verified using assertInvokedInOrder()
-            if (matchingInvocation != null && invocationVerificationStatus == VerificationStatus.VERIFIED_IN_ORDER) {
+            if (matchingInvocation != null && invocationVerificationStatus == VERIFIED_IN_ORDER) {
                 throw new AssertionError(getInvokedOutOfOrderErrorMessage(behaviorDefiningInvocation, matchingInvocation, observedInvocation, assertedAt));
             }
         }
@@ -114,7 +114,7 @@ public class Scenario {
         for (int i = 0; i < observedInvocations.size(); i++) {
             ObservedInvocation observedInvocation = observedInvocations.get(i);
             VerificationStatus invocationVerificationStatus = invocationVerificationStatuses.get(i);
-            if (invocationVerificationStatus == VerificationStatus.UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
+            if (invocationVerificationStatus == UNVERIFIED && behaviorDefiningInvocation.matches(observedInvocation)) {
                 throw new AssertionError(getAssertNotInvokedErrorMessage(behaviorDefiningInvocation, observedInvocation, assertedAt));
             }
         }
@@ -155,7 +155,7 @@ public class Scenario {
 
 
     protected String getInvokedOutOfOrderErrorMessage(BehaviorDefiningInvocation behaviorDefiningInvocation, ObservedInvocation matchingInvocation,
-            ObservedInvocation outOfOrderInvocation, StackTraceElement assertedAt) {
+                                                      ObservedInvocation outOfOrderInvocation, StackTraceElement assertedAt) {
         StringBuilder message = new StringBuilder();
         message.append("Invocation of ");
         message.append(getSimpleMethodName(matchingInvocation.getMethod()));

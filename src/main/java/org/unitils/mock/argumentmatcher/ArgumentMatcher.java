@@ -27,8 +27,14 @@ public interface ArgumentMatcher {
     /**
      * Returns true if the given object matches this object's expected argument, false otherwise.
      *
-     * @param value The value to match
+     * The argumentAtInvocationTime is a copy (deep clone) of the arguments at the time of
+     * the invocation. This way the original values can still be used later-on even when changes
+     * occur to the original values (pass-by-value vs pass-by-reference).
+     *
+     * @param argument                 The argument that were used by reference, not null
+     * @param argumentAtInvocationTime The argument at the time that they were used, not null
      * @return True when passed object matches, false otherwise.
      */
-    boolean matches(Object value);
+    boolean matches(Object argument, Object argumentAtInvocationTime);
+
 }

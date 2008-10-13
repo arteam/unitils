@@ -37,8 +37,25 @@ public class ObservedInvocation extends ProxyInvocation {
     private MockBehavior mockBehavior;
 
 
-    public ObservedInvocation(Object proxy, String mockName, Method method, List<Object> arguments, StackTraceElement invokedAt, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
-        super(proxy, method, arguments, invokedAt);
+    /**
+     * Creates an invocation.
+     *
+     * The argumentsAtInvocationTime should be copies (deep clones) of the arguments at the time of
+     * the invocation. This way the original values can still be used later-on even when changes
+     * occur to the original values (pass-by-value vs pass-by-reference).
+     *
+     * @param proxy                      The proxy on which the method was called, not null
+     * @param mockName                   The name of the mock, e.g. the field name, not null
+     * @param method                     The method that was called, not null
+     * @param arguments                  The arguments that were used by reference, not null
+     * @param argumentsAtInvocationTime  The copies of the arguments at the time that they were used, not null
+     * @param invokedAt                  The location of the invocation, not null
+     * @param behaviorDefiningInvocation The invocation that defined the behavior, null if there is no behavior
+     * @param mockBehavior               The executed behavior, not null
+     */
+    public ObservedInvocation(Object proxy, String mockName, Method method, List<Object> arguments, List<Object> argumentsAtInvocationTime,
+                              StackTraceElement invokedAt, BehaviorDefiningInvocation behaviorDefiningInvocation, MockBehavior mockBehavior) {
+        super(proxy, method, arguments, argumentsAtInvocationTime, invokedAt);
         this.mockName = mockName;
         this.behaviorDefiningInvocation = behaviorDefiningInvocation;
         this.mockBehavior = mockBehavior;

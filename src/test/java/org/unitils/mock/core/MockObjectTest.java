@@ -28,6 +28,9 @@ import java.util.Set;
 
 /**
  * Tests the mock object functionality.
+ *
+ * @author Tim Ducheyne
+ * @author Filip Neven
  */
 public class MockObjectTest {
 
