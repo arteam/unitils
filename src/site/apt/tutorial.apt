@@ -1433,28 +1433,30 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 
 * {Testing with mock objects}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other parts or services that it depends on. Unitils provides extensive support for mock objects: offering a concise and intuitive syntax, enabling the developer to specify mock behavior before executing the test and verifying how the mock objects were used afterwards. Support is also offered for mock creation and injection.
+    Unit tests should test code in isolation. Mock objects enable you to test a piece of code without having to care about other parts or services that it depends on. Since version 2.0, unitils provides a complete mock object solution to dynamically create mock objects. Support is also offered for mock creation and injection.
 	
 	Before version 2.0, mock objects support was built upon EasyMock. This functionality will remain available. Refer to the chapter on {{{EasyMock support}EasyMock support}} for more info.
 
-	You may wonder why we've written a full-fledged mock module given the abundance of dynamic mock object libraries already available in the java landscape. The reason is that we actually experienced a lot of flaws when working with libraries such as EasyMock and JMock. The features that make the difference are:
+	You may wonder why we've written a complete mock module given the abundance of dynamic mock object libraries already available. The reason is that we actually experienced a lot of flaws when working with libraries such as EasyMock and JMock. The features that make the difference are:
 	
-    * Mock behavior definition is performed before invoking the method under test. No verification happens whether these statements were actually executed or how often. After the tested method invocation, assert statements are used to verify expected method invocations.
+    * Mock behavior definition is performed before invoking the method under test. After the tested method invocation, assert statements are used to verify expected method invocations.
 	
-	* Concrete objects and argument matchers and null's (meaning I-don't-care) can be mixed in behavior definitions and assert statements, whereas with other mock libraries you must use either concrete objects or argument matchers, but you cannot mix them within the same method call.
+	* Concrete objects, argument matchers and the null reference (meaning I-don't-care) can be mixed in behavior definitions and assert statements, whereas in other mock libraries you must use either concrete objects or argument matchers, but you cannot mix them within the same method call.
 
-	* Optimal feedback is provided in the logs and in error messages: The observed scenario, completed with source file and line number info (transformed into direct links to the source by your favorite IDE), and suggested invocation assert statements that can be used as a start or simply be copy-pasted into the test.
+	* The best possible feedback is provided in logs and in error messages: The observed scenario, which lists all method calls performed on the mocks in order, with links to the source code, and suggested assert statements that can be used as a basis for your own asserts.
 
 ** Mock test example
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Following example is a test for an alert service: the sendScheduledAlerts() method requests all scheduled alerts from an AlertSchedulerService, and sends them using a MessageSenderService.
+Following example is a test for an alert service: the <sendScheduledAlerts()> method requests all scheduled alerts from an <AlertSchedulerService>, and sends them using a <MessageSenderService>.
 
 +-----+
 public class AlertServiceTest extends UnitilsJUnit4 {
 
 	AlertService alertService;
 	Message alert1, alert2;
+	List<Message> alerts;
+	
 	Mock<SchedulerService> mockSchedulerService;
 	Mock<MessageService> mockMessageService;
 
@@ -1463,11 +1465,12 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 		alertService = new AlertService(mockSchedulerService.getInstance(),
 				mockMessageService.getInstance());
 		alert1 = new Alert(...); alert2 = new Alert(...);
+		alerts = Arrays.asList(alert1, alert2);
 	}
 	
 	@Test 
 	public void testSendScheduledAlerts() {
-	    mockSchedulerService.returns(Arrays.asList(alert1, alert2)).getScheduledAlerts(null));
+	    mockSchedulerService.returns(alerts).getScheduledAlerts(null));
 	    
 	    alertService.sendScheduledAlerts();
 		
@@ -1477,23 +1480,161 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 }
 +-----+	
 
-    The example test makes use of a mock SchedulerService and MessageService. Each mock object is wrapped in a control object, that enables specifying mock behavior and invocation assert statements. The first statement in this test specifies that subsequent invocations of getScheduledAlerts on the mock SchedulerService with any parameter (null means as much as any in a behavior definition statement), will return a List containing alert1 and alert2.
-	The following statement invokes the method under test. After this, assert statements are invoked to verify that the sendAlert method was called on the mock MessageService, with first alert1 and second alert2 as method argument.
+    The example test makes use of a mock SchedulerService and MessageService. The first statement in this test specifies that subsequent invocations of getScheduledAlerts on the mock SchedulerService with any parameter (<null> means <any argument> in a behavior definition statement), will return a List containing alert1 and alert2.
+	The subsequent statement invokes the method under test. After this, assert statements are used to verify that <sendAlert> was called on the <mockMessageService>, with <alert1> and then <alert2> as arguments.
 
-** Creation of mock objects
+** Instantiation of mock objects
 ~~~~~~~~~~~~~~~~~~~~
-	Mock objects are wrapped inside a control object, which you can use to define behavior and invoke assert statements. To obtain a mock, simply declare it as a field of your test.
+	Mock objects are wrapped inside a control object, which you can use to define behavior and invoke assert statements. To have a mock control being instantiated, simply declare it as a field of your test.
 
 +-----+
 	Mock<MyService> mockService;
 +-----+
 	
-	Unitils will create the mock control object for you and assign it to this field before each test. To obtain the mock object itself, simply call the getInstance() method on the control object.
+	Unitils will create the mock control object for you and assign it to this field before each test. To obtain the mock object itself, simply call the getInstance() method on the control object:
+	
++----+
+    MyService myService = mockService.getInstance();
++----+
 	
 ** Define mock behavior
 ~~~~~~~~~~~~~~~~~~~~
+    Unitils offers a simple and concise syntax for defining mock behavior. To make the <getScheduledAlerts> method return <alerts> if called with <myUser> as argument, simply write:
+
++----+
+	mockSchedulerService.returns(alerts).getScheduledAlerts(myUser);
++----+
+
+    Or to make it throw an exception:
 	
++----+
+    mockSchedulerService.raises(new BackEndNotAvailableException()).getScheduledAlerts(myUser);
++----+
+    or
++----+
+    mockSchedulerService.raises(BackEndNotAvailableException.class).getScheduledAlerts(myUser);
++----+
 	
+
+	Or you may want to specify custom behavior as follows:
+	
++----+
+    mockSchedulerService.performs(new MockBehavior() {
+	    public Object execute(ProxyInvocation mockInvocation) {
+			// ... (retrieve alerts logic)
+			return alerts;
+		}
+	});
++----+
+
+    If you want the same method to behave differently during subsequent calls, you can make sure each behavior definition gets only matched once, by using the methods <onceReturns>, <onceRaises> or <oncePerforms>. E.g.
+	
++----+
+	mockSchedulerService.onceReturns(alerts).getScheduledAlerts(myUser);
+	mockSchedulerService.onceRaises(new BackEndNotAvailableException()).getScheduledAlerts(myUser);
++----+
+
+    If you would use <returns> and <raises> instead of <onceReturns> and <onceRaises>, the second behavior definition could never be matched: in this case, the first matching behavior definition always wins. 
+	
+	For sake of maintainability, we advise to avoid the usage of the <once> syntax, since making assumptions about the order of method calls makes your tests brittle. If possible, try to exploit the fact that subsequent calls to the same method use different parameter values.
+
+** Verify expected invocations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    After the execution of the tested method, you usually want to check that some expected method calls were performed on the mock objects. For example:
+    
++-----+
+    mockMessageService.assertInvoked().sendMessage(alert1);
++-----+
+
+    This verifies that <sendMessage> was called on the mock <MessageService> with <alert1> as argument. Note that each invocation can only be verified once: if you repeat the same assert statement twice, unitils checks that the method call in question was called two times.
+	
+	Note that unitils doesn't react on 'unexpected' invocations by default. You can explicitly prohibit method calls using <assertNotInvoked>. E.g. we can explicitly verify that alert number 3 wasn't sent like this:
+	
++-----+
+    mockMessagService.assertNotInvoked().sendMessage(alert3);
++-----+
+
+    To make sure that your mocks didn't receive any other method calls, except from the ones you've stubbed or verified, you can use following static method call:
+	
++-----+
+    MockUnitils.assertNoMoreInvocations();
++-----+
+
+    If you want to generally prohibit unexpected method calls, you can call <assertNoMoreInvocations> in an <@After> method, or in the <@After> method of you base test class.
+	
+    By default, the order of the actual calls is not verified. If you do want to verify the order, you can use <assertInvokedInOrder>. Suppose we want to make sure alert1 was sent before alert2:
+	
++-----+
+    mockMessageService.assertInvokedInOrder().sendMessage(alert1);
+	mockMessageService.assertInvokedInOrder().sendMessage(alert2);
++-----+
+
+** Argument matching
+~~~~~~~~~~~~~~~~~~
+    To improve maintainability and to simplify tests, it's better not to impose strong expectations on the values of arguments. Unitils offers a very simple way to ignore the value of an argument: simply pass the <null> reference. E.g. to ignore the <user> argument value in the <getScheduledAlerts> method call, we write:
+	
++-----+
+    mockSchedulerService.returns(alerts).getScheduledAlerts(null));
++-----+
+
+    Note that, if you do pass an object reference, the expected and actual object are compared using <lenient reflection comparison>: the fields are compared using reflection, fields which are <null>, 0 or false in the expected object are ignored and the order of collections is ignored (refer to {{{#Assertion_utilities}Assertion utilities}} for more information about reflection comparison).
+	
+	If you need yet another way to match arguments, you can use an argument matcher instead. A set of argument matchers is provided in <org.unitils.mock.ArgumentMatchers>, which contains a bunch of static methods that you'd typically import by means of a static import:
+
++-----+	
+	import static org.unitils.mock.ArgumentMatchers.*;
++-----+	
+	
+	Typical use cases for argument matchers are the following:
+	
++-----+
+	mockSchedulerService.returns(alerts).getScheduledAlerts(notNull(User.class))); // Matches with any not-null object of type User
+	mockSchedulerService.returns(alerts).getScheduledAlerts(isNull(User.class))); // The argument must be null
+	mockMessageService.assertInvoked().sendMessage(same(alert1)); // The argument must refer to alert1 instance
++-----+
+
+	Other argument matchers are <eq>, <refEq> and <lenEq>. When using <eq>, the equals method is called to see if the actual argument matches the expected one. With <refEq>, strict reflection comparison is used. <lenEq> is the default argument matcher which is also implicitly used when directly passing an argument: reflection argument matching wile ignoring java defaults (null, 0, false) and the order of collections.
+	
+*** Custom argument matchers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Unitils currenlty only offers 6 argument matchers, which is a lot less than competing libraries. This is intentional: We've experienced that most of them are rarely or never used. If you do have specific needs, it's easy to implement a custom argument matcher. E.g. a lessThan(...) argument matcher that checks if the given value is less than a given threshold can be implemented like this:
+	
++-----+
+public class CustomArgumentMatchers {
+
+	@ArgumentMatcher
+	public static int lessThan(int lessThan) {
+		ArgumentMatcherRepository.registerArgumentMatcher(new LessThanArgumentMatcher(lessThan));
+	}
+	
+}	
+
+public class LessThanArgumentMatcher implements ArgumentMatcher {
+
+    private Integer lessThan;
+
+    public LessThanArgumentMatcher(int lessThan) {
+        this.lessThan = lessThan;
+    }
+
+    public boolean matches(Object actualValue) {
+		Integer actualValueAsInt = (Integer) actualValue;
+        return lessThan.compareTo(actualValueAsInt) < 0;
+    }
+}
++-----+
+	
+** Dummy objects
+~~~~~~~~~~~~~~~~
+    In tests you often need an instance of a domain entity or value object, where it's actually not important to have it populated with test data. For example in the <AlertServiceTest> listed above, we need 2 <alert> instances. In the method under test, the alerts are retrieved from the SchedulerService and passed on the MessageService. Since no methods are called on the alert instances, the contents of the object are not important. However, the constructor typically forces you to pass in all required parameters, and the constructor may check that these parameters are not-null.
+	
+	Although you could create a mock object and only store the proxy instance, you actually simply need a dummy instance. For this you can use dummy objects. You can create a dummy object by calling <MockUnitils.createDummy>, or by annotating a field with the <@Dummy> annotation:
+	
++-----+
+    @Dummy
+	Message alert1, alert2;
++-----+
+
 * {EasyMock support}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other parts or services that it depends on. Unitils builds 
