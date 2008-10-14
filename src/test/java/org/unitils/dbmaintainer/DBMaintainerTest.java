@@ -77,8 +77,8 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
     /* Test database update scripts */
     List<Script> scripts, postProcessingScripts;
-    
     List<ExecutedScript> alreadyExecutedScripts;
+    ScriptContentHandle sciptContentHandle1, sciptContentHandle2, postProcessingSciptContentHandle1, postProcessingSciptContentHandle2;
 
 
     /**
@@ -94,9 +94,11 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         dbMaintainer.disableConstraintsEnabled = true;
 
         scripts = new ArrayList<Script>();
-        Script script1 = new Script("01_script1.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class));
+        sciptContentHandle1 = MockUnitils.createDummy(ScriptContentHandle.class);
+        Script script1 = new Script("01_script1.sql", 0L, sciptContentHandle1);
 		scripts.add(script1);
-        Script script2 = new Script("02_script2.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class));
+		sciptContentHandle2 = MockUnitils.createDummy(ScriptContentHandle.class);
+        Script script2 = new Script("02_script2.sql", 0L, sciptContentHandle2);
 		scripts.add(script2);
 
         alreadyExecutedScripts = new ArrayList<ExecutedScript>();
@@ -104,8 +106,10 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         alreadyExecutedScripts.add(new ExecutedScript(script2, null, true));
         
         postProcessingScripts = new ArrayList<Script>();
-        postProcessingScripts.add(new Script("post-script1.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class)));
-        postProcessingScripts.add(new Script("post-script2.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class)));
+        postProcessingSciptContentHandle1 = MockUnitils.createDummy(ScriptContentHandle.class);
+        postProcessingScripts.add(new Script("post-script1.sql", 0L, postProcessingSciptContentHandle1));
+        postProcessingSciptContentHandle2 = MockUnitils.createDummy(ScriptContentHandle.class);
+        postProcessingScripts.add(new Script("post-script2.sql", 0L, postProcessingSciptContentHandle2));
         
         HashSet<ExecutedScript> hashSet = new HashSet<ExecutedScript>(alreadyExecutedScripts);
         mockExecutedScriptInfoSource.returns(hashSet).getExecutedScripts();
@@ -240,6 +244,7 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void assertScriptsExecutedAndDbVersionSet() {
+        assertNoMoreInvocations();
     	mockExecutedScriptInfoSource.assertInvokedInOrder().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
         mockScriptRunner.assertInvokedInOrder().execute(scripts.get(0).getScriptContentHandle());
         mockExecutedScriptInfoSource.assertInvokedInOrder().updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));

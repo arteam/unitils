@@ -37,7 +37,7 @@ public class MockObjectInvalidSyntaxTest {
 
     @Before
     public void setUp() {
-        Scenario scenario = new Scenario();
+        Scenario scenario = new Scenario(null);
         mockObject1 = new MockObject<TestClass>("testMock1", TestClass.class, false, scenario);
         mockObject2 = new MockObject<TestClass>("testMock2", TestClass.class, false, scenario);
     }

@@ -59,7 +59,6 @@ public class MockModule implements Module {
 
     /** No initialization needed for this module */
     public void init(Properties configuration) {
-        scenario = createScenario();
     }
 
 
@@ -81,11 +80,6 @@ public class MockModule implements Module {
     public void logExecutionScenario() {
         String report = scenario.createReport();
         logger.info(report);
-    }
-
-
-    protected Scenario createScenario() {
-        return new Scenario();
     }
 
 
@@ -187,7 +181,7 @@ public class MockModule implements Module {
          */
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
-            scenario = new Scenario();
+            scenario = new Scenario(testObject);
             createAndInjectMocksIntoTest(testObject);
             createAndInjectDummiesIntoTest(testObject);
         }
