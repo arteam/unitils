@@ -40,7 +40,7 @@ public class ArgumentMatcherTest {
 
     @Before
     public void setUp() {
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, new Scenario());
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, new Scenario(null));
     }
 
 
@@ -53,6 +53,7 @@ public class ArgumentMatcherTest {
 
         boolean result = mockObject.getInstance().testMethodString("test");
         assertTrue(result);
+        mockObject.assertInvoked().testMethodString(eq("test"));
     }
 
 
@@ -65,6 +66,7 @@ public class ArgumentMatcherTest {
 
         boolean result = mockObject.getInstance().testMethodString("xxxx");
         assertFalse(result);
+        mockObject.assertNotInvoked().testMethodString(eq("test"));
     }
 
 
@@ -77,6 +79,7 @@ public class ArgumentMatcherTest {
 
         boolean result = mockObject.getInstance().testMethodString(null);
         assertTrue(result);
+        mockObject.assertInvoked().testMethodString(eq((String) null));
     }
 
 
@@ -89,6 +92,33 @@ public class ArgumentMatcherTest {
 
         boolean result = mockObject.getInstance().testMethodString(null);
         assertFalse(result);
+        mockObject.assertNotInvoked().testMethodString(eq("test"));
+    }
+    
+    
+    /**
+     * Tests the equals argument matcher in case the object changes between the behavior definition,
+     * the actual method call and the assert statement. Since the eq() argument matcher uses the original
+     * object reference and not a copy of the object, the values should keep on matching. 
+     */
+    @Test
+    public void testEqualsArgumentMatcher_objectChangesBetweenCalls() {
+        List<String> list = new ArrayList<String>();
+        
+        mockObject.returns(true).testMethodObject(eq(list));
+        
+        list.add("test");
+        assertTrue(mockObject.getInstance().testMethodObject(list));
+        
+        List<String> nonEqualList = new ArrayList<String>();
+        assertFalse(mockObject.getInstance().testMethodObject(nonEqualList));
+        
+        List<String> equalList = new ArrayList<String>();
+        equalList.add("test");
+        assertTrue(mockObject.getInstance().testMethodObject(equalList));
+        
+        list.add("test");
+        mockObject.assertInvoked().testMethodObject(eq(list));
     }
 
 
@@ -186,8 +216,35 @@ public class ArgumentMatcherTest {
         boolean result = mockObject.getInstance().testMethodString(null);
         assertFalse(result);
     }
-
-
+    
+    
+    /**
+     * Tests the lenient equals argument matcher in case the object changes between the behavior definition,
+     * the actual method call and the assert statement. Since the lenEq() argument matcher uses the a copy of 
+     * the object, the values should not match anymore. 
+     */
+    @Test
+    public void testLenEqArgumentMatcher_objectChangesBetweenCalls() {
+        List<String> list = new ArrayList<String>();
+        
+        mockObject.returns(true).testMethodObject(lenEq(list));
+        
+        list.add("test");
+        assertFalse(mockObject.getInstance().testMethodObject(list));
+        
+        List<String> emptyList = new ArrayList<String>();
+        assertTrue(mockObject.getInstance().testMethodObject(emptyList));
+        
+        List<String> oneElementList = new ArrayList<String>();
+        oneElementList.add("test");
+        assertFalse(mockObject.getInstance().testMethodObject(oneElementList));
+        
+        list.add("test");
+        mockObject.assertNotInvoked().testMethodObject(lenEq(list));
+        mockObject.assertInvoked().testMethodObject(lenEq(emptyList));
+    }
+    
+    
     /**
      * Tests the reflection equals argument matcher, for an matching argument.
      */
@@ -234,10 +291,36 @@ public class ArgumentMatcherTest {
         boolean result = mockObject.getInstance().testMethodString(null);
         assertFalse(result);
     }
+    
+    
+    /**
+     * Tests the lenient equals argument matcher in case the object changes between the behavior definition,
+     * the actual method call and the assert statement. Since the lenEq() argument matcher uses the a copy of 
+     * the object, the values should not match anymore. 
+     */
+    @Test
+    public void testRefEqArgumentMatcher_objectChangesBetweenCalls() {
+        List<String> list = new ArrayList<String>();
+        
+        mockObject.returns(true).testMethodObject(refEq(list));
+        
+        list.add("test");
+        assertFalse(mockObject.getInstance().testMethodObject(list));
+        
+        List<String> emptyList = new ArrayList<String>();
+        assertTrue(mockObject.getInstance().testMethodObject(emptyList));
+        
+        List<String> oneElementList = new ArrayList<String>();
+        oneElementList.add("test");
+        assertFalse(mockObject.getInstance().testMethodObject(oneElementList));
+        
+        list.add("test");
+        mockObject.assertNotInvoked().testMethodObject(refEq(list));
+        mockObject.assertInvoked().testMethodObject(refEq(emptyList));
+    }
 
 
     /**
-     * Tests the same argument matcher, for an matching argument.
      */
     @Test
     public void testSameArgumentMatcher() {
@@ -286,13 +369,28 @@ public class ArgumentMatcherTest {
 
 
     /**
-     * Tests the same argument matcher using assert invoked.
+     * Tests the same argument matcher in case the object changes between the behavior definition,
+     * the actual method call and the assert statement. Since the same() argument matcher uses the original
+     * object reference and not a copy of the object, the values should keep on matching. 
      */
     @Test
-    public void testSameArgumentMatcher_assertInvoked() {
+    public void testSameArgumentMatcher_objectChangesBetweenCalls() {
         List<String> list = new ArrayList<String>();
-        mockObject.getInstance().testMethodObject(list);
 
+        mockObject.returns(true).testMethodObject(same(list));
+        
+        list.add("test");
+        assertTrue(mockObject.getInstance().testMethodObject(list));
+        
+        List<String> equalList = new ArrayList<String>();
+        equalList.add("test");
+        assertFalse(mockObject.getInstance().testMethodObject(equalList));
+        
+        List<String> otherEqualList = new ArrayList<String>();
+        otherEqualList.add("test");
+        mockObject.assertNotInvoked().testMethodObject(same(otherEqualList));
+        
+        list.add("test");
         mockObject.assertInvoked().testMethodObject(same(list));
     }
 
