@@ -45,7 +45,7 @@ import org.unitils.mock.core.ObservedInvocation;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class ObservedInvocationsView {
+public class ObservedInvocationsReport {
 
     public static final int OBJECT_FORMATTER_MAX_RECURSION_DEPT = 10;
     
@@ -66,7 +66,7 @@ public class ObservedInvocationsView {
      *
      * @return The string representation, not null
      */
-    public String createView(List<ObservedInvocation> observedInvocations) {
+    public String createReport(List<ObservedInvocation> observedInvocations) {
         StringBuilder result = new StringBuilder();
 
         Map<Class<?>, Integer> largeValueNameIndexes = new HashMap<Class<?>, Integer>();

@@ -15,14 +15,14 @@
  */
 package org.unitils.mock.report.impl;
 
-import org.unitils.mock.core.ObservedInvocation;
-import org.unitils.mock.core.Scenario;
-import org.unitils.mock.report.ScenarioView;
 import static org.unitils.util.ReflectionUtils.getAllFields;
 import static org.unitils.util.ReflectionUtils.getFieldValue;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Set;
+
+import org.unitils.mock.core.ObservedInvocation;
 
 /**
  * A view that will return a list of suggested assert statements that one can use in a test for the given scenario.
@@ -31,22 +31,24 @@ import java.util.Set;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class SuggestedAssertsScenarioView implements ScenarioView {
+public class SuggestedAssertsReport {
 
 
     /**
      * Creates a string representation of the given scenario.
-     *
+     * @param testObject 
      * @param scenario The sceneario, not null
+     *
      * @return The string representation, not null
      */
-    public String createView(Scenario scenario) {
+    public String createReport(Object testObject, List<ObservedInvocation> observedInvocations) {
         StringBuilder result = new StringBuilder();
 
-        for (ObservedInvocation mockInvocation : scenario.getObservedInvocations()) {
+        for (ObservedInvocation mockInvocation : observedInvocations) {
             // do not output mocked methods (methods that return values)
-            if (Void.TYPE.equals(mockInvocation.getMethod().getReturnType())) {
-                result.append(getSuggestedAssertStatement(null, mockInvocation));
+            if (Void.TYPE.equals(mockInvocation.getMethod().getReturnType()) &&
+                    !mockInvocation.hasMockBehavior()) {
+                result.append(getSuggestedAssertStatement(testObject, mockInvocation));
                 result.append("\n");
             }
         }

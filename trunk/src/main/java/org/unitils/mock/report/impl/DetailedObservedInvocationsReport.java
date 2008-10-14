@@ -51,7 +51,7 @@ import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DetailedObservedInvocationsView extends ObservedInvocationsView {
+public class DetailedObservedInvocationsReport extends ObservedInvocationsReport {
 
     /**
      * Formatter for arguments and return values
@@ -70,7 +70,7 @@ public class DetailedObservedInvocationsView extends ObservedInvocationsView {
      * @return The string representation, not null
      */
     @Override
-    public String createView(List<ObservedInvocation> observedInvocations) {
+    public String createReport(List<ObservedInvocation> observedInvocations) {
         StringBuilder result = new StringBuilder();
 
         Map<Class<?>, Integer> largeValueIndexes = new HashMap<Class<?>, Integer>();

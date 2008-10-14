@@ -15,15 +15,18 @@
  */
 package org.unitils.mock.core;
 
-import static org.unitils.mock.core.Scenario.VerificationStatus.*;
-import org.unitils.mock.proxy.ProxyInvocation;
-import org.unitils.mock.report.ScenarioReport;
-import org.unitils.mock.report.impl.DefaultScenarioReport;
-import org.unitils.mock.report.impl.ObservedInvocationsView;
+import static org.unitils.mock.core.Scenario.VerificationStatus.UNVERIFIED;
+import static org.unitils.mock.core.Scenario.VerificationStatus.VERIFIED;
+import static org.unitils.mock.core.Scenario.VerificationStatus.VERIFIED_IN_ORDER;
 import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.report.ScenarioReport;
+import org.unitils.mock.report.impl.DefaultScenarioReport;
+import org.unitils.mock.report.impl.ObservedInvocationsReport;
 
 /**
  * todo javadoc
@@ -38,12 +41,24 @@ public class Scenario {
         UNVERIFIED, VERIFIED, VERIFIED_IN_ORDER
     }
 
-
     protected List<ObservedInvocation> observedInvocations = new ArrayList<ObservedInvocation>();
 
     protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
 
+    protected Object testObject;
+    
     protected SyntaxMonitor syntaxMonitor = new SyntaxMonitor();
+
+    /**
+     * @param testObject
+     */
+    public Scenario(Object testObject) {
+        this.testObject = testObject;
+    }
+
+    public Object getTestObject() {
+        return testObject;
+    }
 
     public SyntaxMonitor getSyntaxMonitor() {
         return syntaxMonitor;
@@ -172,7 +187,7 @@ public class Scenario {
     protected String getNoMoreInvocationsErrorMessage(List<ObservedInvocation> unexpectedInvocations, StackTraceElement assertedAt) {
         StringBuilder message = new StringBuilder();
         message.append("No more invocations expected, yet observed following calls:\n");
-        message.append(new ObservedInvocationsView().createView(unexpectedInvocations));
+        message.append(new ObservedInvocationsReport().createReport(unexpectedInvocations));
         message.append("\n");
         message.append(getAssertLocationIndication(assertedAt));
         message.append("\n");

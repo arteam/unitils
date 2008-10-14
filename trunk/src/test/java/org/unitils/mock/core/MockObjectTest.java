@@ -40,7 +40,7 @@ public class MockObjectTest {
 
     @Before
     public void setUp() {
-        mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, new Scenario());
+        mockObject = new MockObject<TestClass>("testMock", TestClass.class, false, new Scenario(null));
     }
 
 
