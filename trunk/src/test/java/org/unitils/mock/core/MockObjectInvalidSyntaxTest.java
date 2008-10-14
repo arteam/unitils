@@ -17,9 +17,14 @@ package org.unitils.mock.core;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+import static org.unitils.mock.ArgumentMatchers.notNull;
+
+import java.util.ArrayList;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
+import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
@@ -59,6 +64,7 @@ public class MockObjectInvalidSyntaxTest {
         mockObject1.raises(new RuntimeException());
         try {
             mockObject2.returns("aValue");
+            fail("Expected exception");
         } catch (UnitilsException e) {
             assertMessageContains(e.getMessage(), "testMock1.raises(...) must be followed by a method invocation on the returned proxy");
         }
@@ -73,6 +79,7 @@ public class MockObjectInvalidSyntaxTest {
         });
         try {
             mockObject2.assertInvoked();
+            fail("Expected exception");
         } catch (UnitilsException e) {
             assertMessageContains(e.getMessage(), "testMock1.performs(...) must be followed by a method invocation on the returned proxy");
         }
@@ -95,6 +102,7 @@ public class MockObjectInvalidSyntaxTest {
         mockObject1.onceRaises(new RuntimeException());
         try {
             mockObject2.returns("aValue");
+            fail("Expected exception");
         } catch (UnitilsException e) {
             assertMessageContains(e.getMessage(), "testMock1.onceRaises(...) must be followed by a method invocation on the returned proxy");
         }
@@ -109,6 +117,7 @@ public class MockObjectInvalidSyntaxTest {
         });
         try {
             mockObject2.assertInvoked();
+            fail("Expected exception");
         } catch (UnitilsException e) {
             assertMessageContains(e.getMessage(), "testMock1.oncePerforms(...) must be followed by a method invocation on the returned proxy");
         }
@@ -119,6 +128,7 @@ public class MockObjectInvalidSyntaxTest {
         mockObject1.assertInvoked();
         try {
             mockObject2.assertInvoked();
+            fail("Expected exception");
         } catch (UnitilsException e) {
             assertMessageContains(e.getMessage(), "testMock1.assertInvoked() must be followed by a method invocation on the returned proxy");
         }
@@ -129,6 +139,7 @@ public class MockObjectInvalidSyntaxTest {
         mockObject1.assertInvokedInOrder();
         try {
             mockObject2.assertInvoked();
+            fail("Expected exception");
         } catch (UnitilsException e) {
             assertMessageContains(e.getMessage(), "testMock1.assertInvokedInOrder() must be followed by a method invocation on the returned proxy");
         }
@@ -139,10 +150,44 @@ public class MockObjectInvalidSyntaxTest {
         mockObject1.assertNotInvoked();
         try {
             mockObject2.assertNotInvoked();
+            fail("Expected exception");
         } catch (UnitilsException e) {
             assertMessageContains(e.getMessage(), "testMock1.assertNotInvoked() must be followed by a method invocation on the returned proxy");
         }
     }
+    
+    @Test
+    public void tryToLetVoidMethodReturnValue() {
+        try {
+            mockObject1.returns("value").testMethod();
+            fail("Expected exception");
+        } catch (UnitilsException e) {
+            assertMessageContains(e.getMessage(), "testMock1.testMethod() is a void method, so it cannot return anything");
+        }
+    }
+    
+    @Test
+    public void tryToLetMethodReturnIncompatibleReturnValue() {
+        try {
+            mockObject1.returns(new ArrayList<String>()).testMethod();
+            fail("Expected exception");
+        } catch (UnitilsException e) {
+            assertMessageContains(e.getMessage(), "Trying to make testMock1.testMethod() return an ArrayList, which is incompatible with the return type String");
+        }
+    }
+    
+    @Test
+    public void argumentMatcherUsedOutsideBehaviorDefinition() {
+        try {
+            String notNull = notNull(String.class);
+            mockObject1.raises(IllegalArgumentException.class).testMethodArgument(notNull);
+            fail("Expected exception");
+        } catch (UnitilsException e) {
+            assertMessageContains(e.getMessage(), "Argument matchers cannot be used outside the context of a behavior definition or assert statement");
+        }
+    }
+    
+    
 
     private void assertMessageContains(String message, String... subStrings) {
         for (String subString : subStrings) {
@@ -159,6 +204,8 @@ public class MockObjectInvalidSyntaxTest {
         public String testMethodReturningString();
 
         public void testMethod();
+        
+        public void testMethodArgument(String str);
 
     }
 }
