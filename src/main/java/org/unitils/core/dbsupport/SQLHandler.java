@@ -11,15 +11,23 @@ public interface SQLHandler {
 	/**
 	 * Executes the given statement.
 	 *
-	 * @param sql The sql string for retrieving the items
+	 * @param sql The sql statement
 	 * @return The nr of updates
 	 */
 	int executeUpdate(String sql);
 	
 	/**
+	 * Executes the given query. Note that no result is returned: this method is only useful in case you want
+	 * to execute a query that has some desired side-effect (in fact, this method perfoms an update which is 
+	 * disguised as a query ;-) )
+	 * @param sql The sql query
+	 */
+	void executeQuery(String sql);
+	
+	/**
      * Executes the given statement and commits.
      *
-     * @param sql The sql string for retrieving the items
+     * @param sql The sql statement
      * @return The nr of updates
      */
     int executeUpdateAndCommit(String sql);

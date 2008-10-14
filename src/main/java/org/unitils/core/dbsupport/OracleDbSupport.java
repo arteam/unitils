@@ -250,7 +250,7 @@ public class OracleDbSupport extends DbSupport {
                 // change the increment
                 getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " increment by " + (newSequenceValue - lastNumber));
                 // select the increment
-                getSQLHandler().executeUpdate("select " + qualified(sequenceName) + ".NEXTVAL from DUAL");
+                getSQLHandler().executeQuery("select " + qualified(sequenceName) + ".NEXTVAL from DUAL");
                 // set back old increment
                 getSQLHandler().executeUpdate("alter sequence " + qualified(sequenceName) + " increment by " + incrementBy);
             }

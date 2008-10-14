@@ -280,6 +280,22 @@ public class DbSupportTest extends UnitilsJUnit4 {
         Set<String> result = dbSupport.getIdentityColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
         assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1")), result);
     }
+    
+    
+    /**
+     * Tests incrementing the current value of the primary key.
+     */
+    @Test
+    public void testIncrementSequenceToValue() throws Exception {
+        if (!dbSupport.supportsSequences()) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+
+        dbSupport.incrementSequenceToValue(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), 30);
+        long result = dbSupport.getSequenceValue("TEST_SEQUENCE");
+        assertEquals(30, result);
+    }
 
 
     /**
