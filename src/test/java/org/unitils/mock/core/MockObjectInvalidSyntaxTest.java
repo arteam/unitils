@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;
-import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 

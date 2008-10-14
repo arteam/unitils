@@ -101,6 +101,32 @@ public class DefaultSQLHandler implements SQLHandler {
     
     
     /* (non-Javadoc)
+     * @see org.unitils.core.dbsupport.SQLHandler#executeQuery(java.lang.String)
+     */
+    public void executeQuery(String sql) {
+        logger.debug(sql);
+
+        if (!doExecuteUpdates) {
+            // skip query
+            return;
+        }
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+        } catch (Exception e) {
+            throw new UnitilsException("Error while performing database update: " + sql, e);
+        } finally {
+            closeQuietly(connection, statement, resultSet);
+        }
+    }
+    
+    
+    /* (non-Javadoc)
      * @see org.dbmaintain.dbsupport.SQLHandler#executeUpdateAndCommit(java.lang.String)
      */
     public int executeUpdateAndCommit(String sql) {

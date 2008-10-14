@@ -15,9 +15,17 @@
  */
 package org.unitils.mock;
 
+import static org.unitils.mock.core.MockObject.isInDefiningBehaviorState;
+import static org.unitils.mock.core.MockObject.registerArgumentMatcher;
+
+import org.unitils.core.util.CloneUtil;
 import org.unitils.mock.annotation.ArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.*;
-import static org.unitils.mock.argumentmatcher.ArgumentMatcherRepository.registerArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.EqualsArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.NullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.RefEqArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.SameArgumentMatcher;
 
 /**
  * @author Filip Neven
@@ -57,6 +65,9 @@ public class ArgumentMatchers {
 
     @ArgumentMatcher
     public static <T> T refEq(T equalTo) {
+        if (isInDefiningBehaviorState()) {
+            equalTo = CloneUtil.createDeepClone(equalTo);
+        }
         registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
         return null;
     }
@@ -64,8 +75,12 @@ public class ArgumentMatchers {
 
     @ArgumentMatcher
     public static <T> T lenEq(T equalTo) {
+        if (isInDefiningBehaviorState()) {
+            equalTo = CloneUtil.createDeepClone(equalTo);
+        }
         registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
         return null;
     }
+
 
 }
