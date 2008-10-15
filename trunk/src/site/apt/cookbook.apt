@@ -23,25 +23,25 @@ Cookbook
 import static org.unitils.reflectionassert.ReflectionAssert.*;
 
 // Exact field-by-field comparison
-assertRefEquals(new Person("John", "Doe", new Address("New street", 5, "Brussels")), 
+assertReflectionEquals(new Person("John", "Doe", new Address("New street", 5, "Brussels")), 
 				 new Person("John", "Doe", new Address("New street", 5, "Brussels"));
   
 // Ignore Null / 0 values in the expected object
-assertRefEquals(new Person("John", null, new Address("New street", 0, null)), 
+assertReflectionEquals(new Person("John", null, new Address("New street", 0, null)),
 				 new Person("John", "Doe", new Address("New street", 5, "Brussels"), 
 				 ReflectionComparatorMode.IGNORE_DEFAULTS); 
   
 // Ignore collection order
-assertRefEquals(Arrays.asList(new Person("John"), new Person("Jane")), 
+assertReflectionEquals(Arrays.asList(new Person("John"), new Person("Jane")),
 				 new Person[] {new Person("Jane"), new Person("John")}, 
 				 ReflectionComparatorMode.LENIENT_ORDER);
   
 // Ignore null/0 values + collection order
-assertLenEquals(Arrays.asList(new Person("John"), null), 
+assertLenientEquals(Arrays.asList(new Person("John"), null),
 				 new Person[] {new Person("Jane", "Doe"), new Person("John", "Doe")});
 
 // Check only the firstName property 
-assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), 
+assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"),
 				 new Person[] {new Person("Jane", "Doe"), new Person("John", "Doe")});
 +-----+
 
@@ -156,7 +156,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Test
     public void testFindUserByLastName() {
         List<User> users = userDao.findByLastName("Doe");
-        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        ReflectionAssert.assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
 }
 +-----+
@@ -285,7 +285,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Test
     public void testFindUserByLastName() {
         List<User> users = userDao.findByLastName("Doe");
-        assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
 }
 +-----+
@@ -354,7 +354,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Test
     public void testFindUserByLastName() {
         List<User> users = userDao.findByLastName("Doe");
-        assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
 }
 +-----+
@@ -396,7 +396,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Test
     public void testFindUserByLastName() {
         List<User> users = userDao.findByLastName("Doe");
-        assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
   
     @Test
@@ -476,7 +476,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Test
     public void testFindUserByLastName() {
         List<User> users = userDao.findByLastName("Doe");
-        assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), users);
+        assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"), users);
     }
   
     @Test

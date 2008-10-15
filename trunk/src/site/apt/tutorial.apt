@@ -103,13 +103,13 @@ assertEquals(user1.getFirst(), user2.getFirst());
 assertEquals(user1.getLast(), user2.getLast());
 +-----+
     
-    Unitils offers utilities that help you perform these checks more easily, through reflection. Using <ReflectionAssert.assertRefEquals>,
+    Unitils offers utilities that help you perform these checks more easily, through reflection. Using <ReflectionAssert.assertReflectionEquals>,
     the above example could be re-written as follows:
     
 +-----+
 User user1 = new User(1, "John", "Doe");
 User user2 = new User(1, "John", "Doe");
-assertRefEquals(user1, user2);    
+assertReflectionEquals(user1, user2);
 +-----+
 
     This assertion loops over all fields in both objects and compares their values using reflection. For the above example, it will
@@ -121,12 +121,12 @@ assertRefEquals(user1, user2);
     As a result, following assertions will be successful:
 
 +-----+
-assertRefEquals(1, 1L); 
+assertReflectionEquals(1, 1L);
 
 List<Double> myList = new ArrayList<Double>();
 myList.add(1.0);
 myList.add(2.0);
-assertRefEquals(Arrays.asList(1, 2), myList); 
+assertReflectionEquals(Arrays.asList(1, 2), myList);
 +-----+
 
 
@@ -150,12 +150,12 @@ assertRefEquals(Arrays.asList(1, 2), myList);
     the actual order of the elements. For example, code for retrieving all bank-accounts with a negative balance will typically 
     return them in an order that is unimportant for the actual processing.
     
-    To implement this behavior, the <ReflectionAssert.assertRefEquals> method can be configured to ignore ordering by supplying it the <ReflectionComparatorMode.LENIENT_ORDER> 
+    To implement this behavior, the <ReflectionAssert.assertReflectionEquals> method can be configured to ignore ordering by supplying it the <ReflectionComparatorMode.LENIENT_ORDER>
     comparator mode:
 
 +-----+
 List<Integer> myList = Arrays.asList(3, 2, 1);
-assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER); 
+assertReflectionEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER);
 +-----+
     
 
@@ -170,15 +170,15 @@ assertRefEquals(Arrays.asList(1, 2, 3), myList, LENIENT_ORDER);
 +-----+
 User actualUser   = new User("John", "Doe", new Address("First street", "12", "Brussels"));
 User expectedUser = new User("John",  null, new Address("First street", null,       null));
-assertRefEquals(expectedUser, actualUser, IGNORE_DEFAULTS);
+assertReflectionEquals(expectedUser, actualUser, IGNORE_DEFAULTS);
 +-----+
 
     You specify that you want to ignore a field by setting this value to null in the left (=expected) instance. Right-instance fields that have default 
     values will still be compared.
     
 +-----+
-assertRefEquals(null, anyObject, IGNORE_DEFAULTS);  // Succeeds
-assertRefEquals(anyObject, null, IGNORE_DEFAULTS);  // Fails
+assertReflectionEquals(null, anyObject, IGNORE_DEFAULTS);  // Succeeds
+assertReflectionEquals(anyObject, null, IGNORE_DEFAULTS);  // Fails
 +-----+    
 
 
@@ -192,51 +192,51 @@ assertRefEquals(anyObject, null, IGNORE_DEFAULTS);  // Fails
 +-----+
 Date actualDate =   new Date(44444);
 Date expectedDate = new Date();
-assertRefEquals(expectedDate, actualDate, LENIENT_DATES); 
+assertReflectionEquals(expectedDate, actualDate, LENIENT_DATES);
 +-----+
 
 
-*** assertLenEquals
+*** assertLenientEquals
 ~~~~~~~~~~~~~~~~~~~
     The <ReflectionAssert> class also offers an assertion for which two of the leniency levels, lenient order and ignore defaults are pre-set: 
-    <ReflectionAssert.assertLenEquals>. The above examples can therefore be simplified as follows:
+    <ReflectionAssert.assertLenientEquals>. The above examples can therefore be simplified as follows:
     
 +-----+
 List<Integer> myList = Arrays.asList(3, 2, 1);
-assertLenEquals(Arrays.asList(1, 2, 3), myList); 
+assertLenientEquals(Arrays.asList(1, 2, 3), myList);
 
-assertLenEquals(null, "any");  // Succeeds
-assertLenEquals("any", null);  // Fails
+assertLenientEquals(null, "any");  // Succeeds
+assertLenientEquals("any", null);  // Fails
 +-----+
     
-    This len/ref thing is a general naming convention: assert<<Ref>>... is the version that is strict by default and for which you can 
-    manually set the leniency levels, assert<<Len>>... is the version for which the lenient order and ignore defaults are pre-set. 
+    This len/ref thing is a general naming convention: assert<<Reflection>>... is the version that is strict by default and for which you can
+    manually set the leniency levels, assert<<Lenient>>... is the version for which the lenient order and ignore defaults are pre-set.
     
         
 
 ** Property assertions
 ~~~~~~~~~~~~~~~~~~~~~~
-    The <assertLenEquals> and <assertRefEquals> methods compare objects as a whole. ReflectionAssert also contains methods to compare 
-    a specific property of two objects: <assertPropertyLenEquals> and <assertPropertyRefEquals>. The actual field that needs to be compared 
+    The <assertLenientEquals> and <assertReflectionEquals> methods compare objects as a whole. ReflectionAssert also contains methods to compare
+    a specific property of two objects: <assertPropertyLenientEquals> and <assertPropertyReflectionEquals>. The actual field that needs to be compared
     is specified using the {{{http://www.ognl.org/}OGNL}} notation. This language supports typical bean property expressions, like
     field1.innerField and a number of more powerful constructions.
     
     Some examples of property comparisons are:
 
 +-----+
-assertPropertyLenEquals("id", 1, user);
-assertPropertyLenEquals("address.street", "First street", user);
+assertPropertyLenientEquals("id", 1, user);
+assertPropertyLenientEquals("address.street", "First street", user);
 +-----+
 
     You can also supply collections as arguments for this method. In that case the specified field will be compared on each element in the collection. This
     provides an easy way to for example check whether all users in a retrieved list have certain id: 
 
 +-----+
-assertPropertyLenEquals("id", Arrays.asList(1, 2, 3), users);
-assertPropertyLenEquals("address.street", Arrays.asList("First street", "Second street", "Third street"), users);
+assertPropertyLenientEquals("id", Arrays.asList(1, 2, 3), users);
+assertPropertyLenientEquals("address.street", Arrays.asList("First street", "Second street", "Third street"), users);
 +-----+
 
-    Again there are two versions of each method: assertProperty<<Ref>>Equals and assertProperty<<Len>>Equals . 
+    Again there are two versions of each method: assertProperty<<Reflection>>Equals and assertProperty<<Lenient>>Equals .
     The ref version doesn't have leniency specified by default but provides the option to specify leniency modes, the len version
     has lenient order and ignore defaults set as fixed leniency modes.
 
@@ -404,13 +404,13 @@ public class UserDAOTest extends UnitilsJUnit4 {
     @Test
     public void testFindByName() {
         User result = userDao.findByName("doe", "john");
-        assertPropertyLenEquals("userName", "jdoe", result);
+        assertPropertyLenientEquals("userName", "jdoe", result);
     }
 
     @Test
     public void testFindByMinimalAge() {
         List<User> result = userDao.findByMinimalAge(18);        
-        assertPropertyLenEquals("firstName", Arrays.asList("jack"), result);
+        assertPropertyLenientEquals("firstName", Arrays.asList("jack"), result);
     }
 }
 +-----+
@@ -462,7 +462,7 @@ public class UserDAOTest extends UnitilsJUnit4 {
     @DataSet("UserDAOTest.testFindByMinimalAge.xml")
     public void testFindByMinimalAge() {
         List<User> result = userDao.findByMinimalAge(18);        
-        assertPropertyLenEquals("firstName", Arrays.asList("jack"), result);
+        assertPropertyLenientEquals("firstName", Arrays.asList("jack"), result);
     }
 }
 +-----+
@@ -485,14 +485,14 @@ public class UserDAOTest extends UnitilsJUnit4 {
     @Test
     public void testFindByName() {
         User result = userDao.findByName("doe", "john");
-        assertPropertyLenEquals("userName", "jdoe", result);
+        assertPropertyLenientEquals("userName", "jdoe", result);
     }
 
     @Test 
     @DataSet("UserDAOTest_ages.xml")
     public void testFindByMinimalAge() {
         List<User> result = userDao.findByMinimalAge(18);
-        assertPropertyLenEquals("firstName", Arrays.asList("jack"), result);
+        assertPropertyLenientEquals("firstName", Arrays.asList("jack"), result);
     }
 }
 +-----+
