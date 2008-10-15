@@ -15,16 +15,14 @@
  */
 package org.unitils.mock.report.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.unitils.core.util.ObjectFormatter;
 import org.unitils.mock.core.BehaviorDefiningInvocation;
 import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
+import org.unitils.mock.proxy.ProxyInvocation;
+
+import java.util.*;
 
 /**
  * A view that displays the details of the observed invocations. The details include:
@@ -53,16 +51,6 @@ import org.unitils.mock.mockbehavior.impl.OriginalBehaviorInvokingMockBehavior;
  */
 public class DetailedObservedInvocationsReport extends ObservedInvocationsReport {
 
-    /**
-     * Formatter for arguments and return values
-     */
-    protected ObjectFormatter objectFormatter = new ObjectFormatter(10);
-
-    /**
-     * The maximum length of an inline value
-     */
-    protected int maximumValueLenght = 20;
-
 
     /**
      * Creates a string representation of the given scenario as described in the class javadoc.
@@ -73,17 +61,19 @@ public class DetailedObservedInvocationsReport extends ObservedInvocationsReport
     public String createReport(List<ObservedInvocation> observedInvocations) {
         StringBuilder result = new StringBuilder();
 
-        Map<Class<?>, Integer> largeValueIndexes = new HashMap<Class<?>, Integer>();
-        
+        Map<Object, FormattedObject> allLargeObjects = new IdentityHashMap<Object, FormattedObject>();
+        Map<Class<?>, Integer> largeObjectNameIndexes = new HashMap<Class<?>, Integer>();
+
         // append all invocations
         int invocationIndex = 1;
         for (ObservedInvocation observedInvocation : observedInvocations) {
-            Map<String, String> formattedLargeValues = new HashMap<String, String>();
+            List<FormattedObject> currentLargeObjects = new ArrayList<FormattedObject>();
+
             result.append(invocationIndex++);
             result.append(". ");
-            result.append(formatObservedInvocation(observedInvocation, largeValueIndexes, formattedLargeValues));
+            result.append(formatObservedInvocation(observedInvocation, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
             result.append("\n");
-            result.append(formatLargeValues(formattedLargeValues));
+            result.append(formatLargeObjects(currentLargeObjects));
             result.append(formatInvokedAt(observedInvocation));
             result.append(formatBehaviorDetails(observedInvocation));
             result.append("\n");
@@ -96,13 +86,13 @@ public class DetailedObservedInvocationsReport extends ObservedInvocationsReport
      * Creates a string representation of the details of the given invocation. This will give information about
      * where the invocation occurred.
      *
-     * @param observedInvocation The invocation to format, not null
+     * @param proxyInvocation The invocation to format, not null
      * @return The string representation, not null
      */
-    protected String formatInvokedAt(ObservedInvocation observedInvocation) {
+    protected String formatInvokedAt(ProxyInvocation proxyInvocation) {
         StringBuilder result = new StringBuilder();
         result.append("- Observed at ");
-        result.append(observedInvocation.getInvokedAt());
+        result.append(proxyInvocation.getInvokedAt());
         result.append("\n");
         return result.toString();
     }
@@ -140,22 +130,22 @@ public class DetailedObservedInvocationsReport extends ObservedInvocationsReport
         return result.toString();
     }
 
+
     /**
      * Format the values that were to long to be displayed inline
      *
-     * @param formattedLargeValues The large values as strings, not null
+     * @param largeObjects The large value representations, not null
      * @return The string representation, not null
      */
-    protected String formatLargeValues(Map<String, String> formattedLargeValues) {
+    protected String formatLargeObjects(List<FormattedObject> largeObjects) {
         StringBuilder result = new StringBuilder();
 
-        if (!formattedLargeValues.isEmpty()) {
-            result.append("\n");
-            for (String largeValueName : formattedLargeValues.keySet()) {
+        if (!largeObjects.isEmpty()) {
+            for (FormattedObject largeObject : largeObjects) {
                 result.append("- ");
-                result.append(largeValueName);
+                result.append(largeObject.getName());
                 result.append(" -> ");
-                result.append(formattedLargeValues.get(largeValueName));
+                result.append(largeObject.getRepresentation());
                 result.append("\n");
             }
         }

@@ -15,8 +15,10 @@
  */
 package org.unitils.mock.mockbehavior.impl;
 
-import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.core.UnitilsException;
+import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
+import static org.unitils.util.ReflectionUtils.isAssignable;
 
 /**
  * Mock behavior that returns a given value.
@@ -25,7 +27,7 @@ import org.unitils.mock.proxy.ProxyInvocation;
  * @author Tim Ducheyne
  * @author Kenny Claes
  */
-public class ValueReturningMockBehavior implements MockBehavior {
+public class ValueReturningMockBehavior implements ValidatableMockBehavior {
 
     /* The value to return */
     private Object valueToReturn;
@@ -38,6 +40,23 @@ public class ValueReturningMockBehavior implements MockBehavior {
      */
     public ValueReturningMockBehavior(Object valueToReturn) {
         this.valueToReturn = valueToReturn;
+    }
+
+
+    /**
+     * Checks whether the mock behavior can be executed for the given invocation.
+     * An exception is raised if the method is a void method or has a non-assignable return type.
+     *
+     * @param proxyInvocation The proxy method invocation, not null
+     */
+    public void assertCanExecute(ProxyInvocation proxyInvocation) throws UnitilsException {
+        Class<?> returnType = proxyInvocation.getMethod().getReturnType();
+        if (returnType == Void.TYPE) {
+            throw new UnitilsException("Trying to define mock behavior that returns a value for a void method.");
+        }
+        if (valueToReturn != null && !isAssignable(valueToReturn.getClass(), returnType)) {
+            throw new UnitilsException("Trying to define mock behavior that returns a value for a method that does not have a suitable return type. Value type: " + valueToReturn.getClass() + ", return type: " + returnType);
+        }
     }
 
 

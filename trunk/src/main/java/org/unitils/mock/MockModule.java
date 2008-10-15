@@ -15,19 +15,6 @@
  */
 package org.unitils.mock;
 
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.getFieldsOfType;
-import static org.unitils.util.ReflectionUtils.invokeMethod;
-import static org.unitils.util.ReflectionUtils.setFieldValue;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
@@ -40,6 +27,12 @@ import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.util.AnnotationUtils;
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ReflectionUtils.*;
+
+import java.lang.reflect.*;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Module for testing with mock objects.
@@ -57,12 +50,16 @@ public class MockModule implements Module {
     private Scenario scenario;
 
 
-    /** No initialization needed for this module */
+    /**
+     * No initialization needed for this module
+     */
     public void init(Properties configuration) {
     }
 
 
-    /** No after initialization needed for this module */
+    /**
+     * No after initialization needed for this module
+     */
     public void afterInit() {
     }
 
@@ -98,7 +95,7 @@ public class MockModule implements Module {
             }
         }
         throw new UnitilsException("Unable to determine type of mock. A mock should be declared using the generic Mock<YourTypeToMock> " +
-        		"or PartialMock<YourTypeToMock> types. Used type; " + type);
+                "or PartialMock<YourTypeToMock> types. Used type; " + type);
     }
 
 
@@ -108,9 +105,9 @@ public class MockModule implements Module {
             // TODO find solution for fields that are instantiated in declaration - a not-null check is not the 
             // right solution, since TestNG reuses the same test instance in every test.
             //if (getFieldValue(testObject, field) == null) {
-                Mock<?> mock = createMock(field, false);
-                setFieldValue(testObject, field, mock);
-                callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
+            Mock<?> mock = createMock(field, false);
+            setFieldValue(testObject, field, mock);
+            callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
             //}
         }
 
@@ -119,14 +116,14 @@ public class MockModule implements Module {
             // TODO find solution for fields that are instantiated in declaration - a not-null check is not the 
             // right solution, since TestNG reuses the same test instance in every test.
             //if (getFieldValue(testObject, field) == null) {
-                Mock<?> mock = createMock(field, true);
-                setFieldValue(testObject, field, mock);
-                callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
+            Mock<?> mock = createMock(field, true);
+            setFieldValue(testObject, field, mock);
+            callAfterCreateMockMethods(testObject, mock, field.getName(), field.getType());
             //}
         }
     }
-    
-    
+
+
     protected void createAndInjectDummiesIntoTest(Object testObject) {
         Set<Field> dummyFields = AnnotationUtils.getFieldsAnnotatedWith(testObject.getClass(), Dummy.class);
         for (Field dummyField : dummyFields) {
@@ -172,7 +169,9 @@ public class MockModule implements Module {
     }
 
 
-    /** Test listener that handles the mock creation and injection. */
+    /**
+     * Test listener that handles the mock creation and injection.
+     */
     protected class MockTestListener extends TestListener {
 
         /**
@@ -188,9 +187,11 @@ public class MockModule implements Module {
 
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
-            scenario.getSyntaxMonitor().assertNotExpectingInvocation();
+            if (scenario != null) {
+                scenario.getSyntaxMonitor().assertNotExpectingInvocation();
+            }
         }
-        
+
 
     }
 

@@ -23,7 +23,7 @@ import org.unitils.mock.report.ScenarioReport;
  * Creates a report of the given scenario. This will first output an overview of
  * the executed scenario, followed by a list of suggested assertions and finally
  * a detailed listing of the executed scenario.
- * 
+ *
  * @author Kenny Claes
  * @author Filip Neven
  * @author Tim Ducheyne
@@ -32,9 +32,8 @@ public class DefaultScenarioReport implements ScenarioReport {
 
     /**
      * Creates a report.
-     * 
-     * @param scenario
-     *            The scenario to output, not null
+     *
+     * @param scenario The scenario to output, not null
      * @return the report, not null
      */
     public String createReport(Scenario scenario) {
