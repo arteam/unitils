@@ -57,7 +57,7 @@ public class UnitilsHibernatePhonebookTest extends UnitilsJUnit3 {
     @DataSet
     public void testSearchByLastName() {
         List&lt;Person&gt; result = phonebook.searchByLastName("Doe"));        
-        ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), result);    
+        ReflectionAssert.assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"), result);
     }
 }
 </pre></div>
@@ -197,7 +197,7 @@ certain property of every object in a collection matches a collection of expecte
 
 <div class="source"><pre>
 ReflectionAssert.assertReflectionEquals(new Person("John", "Doe"), result.get(0));
-ReflectionAssert.assertPropertyRefEquals("firstName", Arrays.asList("John", "Jane"), result);    
+ReflectionAssert.assertPropertyReflectionEquals("firstName", Arrays.asList("John", "Jane"), result);
 </pre></div>
 
 <p>The first assertion checks whether all field values of the Person object, in this case the first and last name, match those of the expected object. 
@@ -209,7 +209,7 @@ the order of elements in a collection. These leniency levels are offered by defa
 
 <div class="source"><pre>
 ReflectionAssert.assertLenientEquals(new Person("John", null), result.get(0));
-ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), result);    
+ReflectionAssert.assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"), result);    
 </pre></div>
 
 <p>The first statement verifies that the <i>firstName</i> field in the result object equals to "John", it ignores the other fields. The second one 
