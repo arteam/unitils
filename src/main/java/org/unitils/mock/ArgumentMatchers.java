@@ -15,19 +15,13 @@
  */
 package org.unitils.mock;
 
-import static org.unitils.mock.core.MockObject.isInDefiningBehaviorState;
-import static org.unitils.mock.core.MockObject.registerArgumentMatcher;
-
-import org.unitils.core.util.CloneUtil;
 import org.unitils.mock.annotation.ArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.EqualsArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.NullArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.RefEqArgumentMatcher;
-import org.unitils.mock.argumentmatcher.impl.SameArgumentMatcher;
+import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
+import org.unitils.mock.argumentmatcher.impl.*;
 
 /**
+ * todo javadoc
+ *
  * @author Filip Neven
  * @author Tim Ducheyne
  * @author Kenny Claes
@@ -37,48 +31,42 @@ public class ArgumentMatchers {
 
     @ArgumentMatcher
     public static <T> T notNull(Class<T> argumentClass) {
-        registerArgumentMatcher(new NotNullArgumentMatcher());
+        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new NotNullArgumentMatcher());
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T isNull(Class<T> argumentClass) {
-        registerArgumentMatcher(new NullArgumentMatcher());
+        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new NullArgumentMatcher());
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T same(T sameAs) {
-        registerArgumentMatcher(new SameArgumentMatcher(sameAs));
+        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new SameArgumentMatcher(sameAs));
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T eq(T equalTo) {
-        registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
+        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T refEq(T equalTo) {
-        if (isInDefiningBehaviorState()) {
-            equalTo = CloneUtil.createDeepClone(equalTo);
-        }
-        registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
+        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T lenEq(T equalTo) {
-        if (isInDefiningBehaviorState()) {
-            equalTo = CloneUtil.createDeepClone(equalTo);
-        }
-        registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
+        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
         return null;
     }
 

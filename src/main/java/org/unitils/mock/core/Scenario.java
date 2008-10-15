@@ -15,18 +15,15 @@
  */
 package org.unitils.mock.core;
 
-import static org.unitils.mock.core.Scenario.VerificationStatus.UNVERIFIED;
-import static org.unitils.mock.core.Scenario.VerificationStatus.VERIFIED;
-import static org.unitils.mock.core.Scenario.VerificationStatus.VERIFIED_IN_ORDER;
-import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import static org.unitils.mock.core.Scenario.VerificationStatus.*;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
 import org.unitils.mock.report.impl.ObservedInvocationsReport;
+import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * todo javadoc
@@ -46,12 +43,14 @@ public class Scenario {
     protected List<VerificationStatus> invocationVerificationStatuses = new ArrayList<VerificationStatus>();
 
     protected Object testObject;
-    
+
+    // todo move to mock object as static thread local
     protected SyntaxMonitor syntaxMonitor = new SyntaxMonitor();
 
-    /**
-     * @param testObject
-     */
+    public Scenario() {
+        this(null);
+    }
+
     public Scenario(Object testObject) {
         this.testObject = testObject;
     }

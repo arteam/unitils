@@ -496,7 +496,7 @@ public class ReflectionUtils {
      * @param clazz The class
      * @return The methods, not null
      */
-    private static Set<Method> getAllMethods(Class<?> clazz) {
+    public static Set<Method> getAllMethods(Class<?> clazz) {
         Set<Method> result = new HashSet<Method>();
         if (clazz == null || clazz.equals(Object.class)) {
             return result;
@@ -553,5 +553,36 @@ public class ReflectionUtils {
         result.append(method.getName());
         result.append("()");
         return result.toString();
+    }
+
+
+    /**
+     * Checks whether the given fromType is assignable to the given toType, also taking into account possible auto-boxing.
+     *
+     * @param fromType The from type, not null
+     * @param toType   The to type, not null
+     * @return True if assignable
+     */
+    public static boolean isAssignable(Class<?> fromType, Class<?> toType) {
+        // handle auto boxing types
+        if (boolean.class.equals(fromType) && Boolean.class.isAssignableFrom(toType) || boolean.class.equals(toType) && Boolean.class.isAssignableFrom(fromType)) {
+            return true;
+        }
+        if (char.class.equals(fromType) && Character.class.isAssignableFrom(toType) || char.class.equals(toType) && Character.class.isAssignableFrom(fromType)) {
+            return true;
+        }
+        if (int.class.equals(fromType) && Integer.class.isAssignableFrom(toType) || int.class.equals(toType) && Integer.class.isAssignableFrom(fromType)) {
+            return true;
+        }
+        if (long.class.equals(fromType) && Long.class.isAssignableFrom(toType) || long.class.equals(toType) && Long.class.isAssignableFrom(fromType)) {
+            return true;
+        }
+        if (float.class.equals(fromType) && Float.class.isAssignableFrom(toType) || float.class.equals(toType) && Float.class.isAssignableFrom(fromType)) {
+            return true;
+        }
+        if (double.class.equals(fromType) && Double.class.isAssignableFrom(toType) || double.class.equals(toType) && Double.class.isAssignableFrom(fromType)) {
+            return true;
+        }
+        return toType.isAssignableFrom(fromType);
     }
 }

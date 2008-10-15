@@ -17,6 +17,7 @@ package org.unitils.mock.core;
 
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.mockbehavior.ValidatableMockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
 import java.lang.reflect.Method;
@@ -67,6 +68,11 @@ public class BehaviorDefiningInvocation extends ProxyInvocation {
         this.argumentMatchers = argumentMatchers;
         this.mockBehavior = mockBehavior;
         this.used = false;
+
+        // check whether the mock behavior can applied for this invocation
+        if (mockBehavior instanceof ValidatableMockBehavior) {
+            ((ValidatableMockBehavior) mockBehavior).assertCanExecute(this);
+        }
     }
 
 

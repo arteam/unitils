@@ -15,6 +15,7 @@
  */
 package org.unitils.mock.argumentmatcher.impl;
 
+import static org.unitils.core.util.CloneUtil.createDeepClone;
 import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import org.unitils.reflectionassert.ReflectionComparator;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
@@ -34,12 +35,13 @@ public class RefEqArgumentMatcher implements ArgumentMatcher {
 
 
     /**
-     * Creates a matcher for the given value.
+     * Creates a matcher for the given value. A copy of the value is taken so that it can be compared
+     * even when the value itself was modified later-on.
      *
      * @param value The expected value
      */
     public RefEqArgumentMatcher(Object value) {
-        this.value = value;
+        this.value = createDeepClone(value);
     }
 
 
