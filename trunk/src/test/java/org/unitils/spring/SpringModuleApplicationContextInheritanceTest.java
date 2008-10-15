@@ -20,7 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import java.util.List;
 import java.util.Properties;
@@ -138,7 +138,7 @@ public class SpringModuleApplicationContextInheritanceTest {
         @SpringApplicationContext
         protected ApplicationContext createMethod2(List<String> locations) {
             createMethod2Called = true;
-            assertLenEquals(asList("classpath:org/unitils/spring/services-config.xml"), locations);
+            assertLenientEquals(asList("classpath:org/unitils/spring/services-config.xml"), locations);
             createMethod2Called = true;
             return new ClassPathXmlApplicationContext("classpath:org/unitils/spring/services-config.xml");
         }

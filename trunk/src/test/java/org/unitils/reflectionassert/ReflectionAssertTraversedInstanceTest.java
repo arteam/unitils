@@ -67,7 +67,7 @@ public class ReflectionAssertTraversedInstanceTest {
         root2.getChildren2().add(child2);
         root2.getChildren2().add(child1);
 
-        ReflectionAssert.assertLenEquals(root1, root2);
+        ReflectionAssert.assertLenientEquals(root1, root2);
     }
 
 
@@ -100,7 +100,7 @@ public class ReflectionAssertTraversedInstanceTest {
         root2.getChildren2().add(child2);
 
         // Should fail
-        ReflectionAssert.assertLenEquals(root1, root2);
+        ReflectionAssert.assertLenientEquals(root1, root2);
     }
 
 

@@ -196,7 +196,7 @@ compare all fields of the expected and actual object and all objects that are re
 certain property of every object in a collection matches a collection of expected values. E.g. you can specify the following:</p>
 
 <div class="source"><pre>
-ReflectionAssert.assertRefEquals(new Person("John", "Doe"), result.get(0));
+ReflectionAssert.assertReflectionEquals(new Person("John", "Doe"), result.get(0));
 ReflectionAssert.assertPropertyRefEquals("firstName", Arrays.asList("John", "Jane"), result);    
 </pre></div>
 
@@ -208,7 +208,7 @@ the order of elements in a collection. These leniency levels are offered by defa
 (instead of <i>assert<b>Ref</b>Equals</i>) methods. For example:</p>
 
 <div class="source"><pre>
-ReflectionAssert.assertLenEquals(new Person("John", null), result.get(0));
+ReflectionAssert.assertLenientEquals(new Person("John", null), result.get(0));
 ReflectionAssert.assertPropertyLenEquals("firstName", Arrays.asList("John", "Jane"), result);    
 </pre></div>
 

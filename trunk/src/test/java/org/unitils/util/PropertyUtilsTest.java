@@ -17,7 +17,7 @@ package org.unitils.util;
 
 import junit.framework.TestCase;
 import org.unitils.core.UnitilsException;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.util.PropertyUtils.*;
 
 import java.util.ArrayList;
@@ -100,7 +100,7 @@ public class PropertyUtilsTest extends TestCase {
      */
     public void testGetStringList() {
         List<String> result = getStringList("stringListProperty", testProperties);
-        assertLenEquals(asList("test1", "test2", "test3", ""), result);
+        assertLenientEquals(asList("test1", "test2", "test3", ""), result);
     }
 
 

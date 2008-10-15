@@ -20,8 +20,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
-import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.IGNORE_DEFAULTS;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 import static org.unitils.util.CollectionUtils.asSet;
@@ -70,8 +70,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for two equal objects.
      */
     @Test
-    public void testAssertRefEquals_equals() {
-        assertRefEquals(testObjectAString, testObjectBString);
+    public void testAssertReflectionEquals_equals() {
+        assertReflectionEquals(testObjectAString, testObjectBString);
     }
 
 
@@ -79,8 +79,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for two equal objects (message version).
      */
     @Test
-    public void testAssertRefEquals_equalsMessage() {
-        assertRefEquals("a message", testObjectAString, testObjectBString);
+    public void testAssertReflectionEquals_equalsMessage() {
+        assertReflectionEquals("a message", testObjectAString, testObjectBString);
     }
 
 
@@ -88,8 +88,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for two equal objects.
      */
     @Test
-    public void testAssertLenEquals_equals() {
-        assertLenEquals(testObjectAString, testObjectBString);
+    public void testAssertLenientEquals_equals() {
+        assertLenientEquals(testObjectAString, testObjectBString);
     }
 
 
@@ -97,8 +97,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for two equal objects (message version).
      */
     @Test
-    public void testAssertLenEquals_equalsMessage() {
-        assertLenEquals("a message", testObjectAString, testObjectBString);
+    public void testAssertLenientEquals_equalsMessage() {
+        assertLenientEquals("a message", testObjectAString, testObjectBString);
     }
 
 
@@ -106,8 +106,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for two objects that contain different values.
      */
     @Test(expected = AssertionFailedError.class)
-    public void testAssertRefEquals_notEqualsDifferentValues() {
-        assertRefEquals(testObjectAString, testObjectDifferentValueString);
+    public void testAssertReflectionEquals_notEqualsDifferentValues() {
+        assertReflectionEquals(testObjectAString, testObjectDifferentValueString);
     }
 
 
@@ -115,8 +115,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test case for a null left-argument.
      */
     @Test(expected = AssertionFailedError.class)
-    public void testAssertRefEquals_leftNull() {
-        assertRefEquals(null, testObjectAString);
+    public void testAssertReflectionEquals_leftNull() {
+        assertReflectionEquals(null, testObjectAString);
     }
 
 
@@ -124,8 +124,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test case for a null right-argument.
      */
     @Test(expected = AssertionFailedError.class)
-    public void testAssertRefEquals_rightNull() {
-        assertRefEquals(testObjectAString, null);
+    public void testAssertReflectionEquals_rightNull() {
+        assertReflectionEquals(testObjectAString, null);
     }
 
 
@@ -133,8 +133,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test case for both null arguments.
      */
     @Test
-    public void testAssertRefEquals_null() {
-        assertRefEquals(null, null);
+    public void testAssertReflectionEquals_null() {
+        assertReflectionEquals(null, null);
     }
 
 
@@ -142,8 +142,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for two equal collections but with different order.
      */
     @Test
-    public void testAssertRefEquals_equalsLenientOrder() {
-        assertRefEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"), LENIENT_ORDER);
+    public void testAssertReflectionEquals_equalsLenientOrder() {
+        assertReflectionEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"), LENIENT_ORDER);
     }
 
 
@@ -151,8 +151,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for two equal sets but with different order.
      */
     @Test
-    public void testAssertRefEquals_equalsLenientOrderSet() {
-        assertRefEquals(asSet(testObjectAString, testObjectAIntString), asSet(testObjectBIntString, testObjectBString), LENIENT_ORDER, IGNORE_DEFAULTS);
+    public void testAssertReflectionEquals_equalsLenientOrderSet() {
+        assertReflectionEquals(asSet(testObjectAString, testObjectAIntString), asSet(testObjectBIntString, testObjectBString), LENIENT_ORDER, IGNORE_DEFAULTS);
     }
 
 
@@ -160,8 +160,8 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for two equal collections but with different order.
      */
     @Test
-    public void testAssertLenEquals_equalsLenientOrder() {
-        assertLenEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"));
+    public void testAssertLenientEquals_equalsLenientOrder() {
+        assertLenientEquals(asList("element1", "element2", "element3"), asList("element3", "element1", "element2"));
     }
 
 
@@ -169,11 +169,11 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for ignored default left value.
      */
     @Test
-    public void testAssertRefEquals_equalsIgnoredDefault() {
+    public void testAssertReflectionEquals_equalsIgnoredDefault() {
         testObjectAString.setString1(null);
         testObjectBString.setString1("xxxxxx");
 
-        assertRefEquals(testObjectAString, testObjectBString, IGNORE_DEFAULTS);
+        assertReflectionEquals(testObjectAString, testObjectBString, IGNORE_DEFAULTS);
     }
 
 
@@ -181,11 +181,11 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for ignored default left value.
      */
     @Test
-    public void testAssertLenEquals_equalsIgnoredDefault() {
+    public void testAssertLenientEquals_equalsIgnoredDefault() {
         testObjectAString.setString1(null);
         testObjectBString.setString1("xxxxxx");
 
-        assertLenEquals(testObjectAString, testObjectBString);
+        assertLenientEquals(testObjectAString, testObjectBString);
     }
 
 
@@ -193,9 +193,9 @@ public class ReflectionAssertTest extends UnitilsJUnit4 {
      * Test for message of 2 not equal arrays. Should return return actual content instead of something like String[234
      */
     @Test
-    public void testAssertLenEquals_formatArraysMessage() {
+    public void testAssertLenientEquals_formatArraysMessage() {
         try {
-            assertLenEquals(new String[]{"test1", "test2"}, new Integer[]{1, 2});
+            assertLenientEquals(new String[]{"test1", "test2"}, new Integer[]{1, 2});
         } catch (AssertionFailedError a) {
             // expected
             assertTrue(a.getMessage().contains("[\"test1\", \"test2\"]"));

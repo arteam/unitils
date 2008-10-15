@@ -23,7 +23,7 @@ import org.unitils.core.UnitilsException;
 import static org.unitils.mock.ArgumentMatchers.notNull;
 import static org.unitils.mock.ArgumentMatchers.refEq;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
-import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.util.ReflectionUtils.getMethod;
 
 import java.lang.reflect.Method;
@@ -74,7 +74,7 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
     @Test
     public void testGetArgumentMatcherIndexes() {
         List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, invocationLineNr, 1);
-        assertRefEquals(asList(0, 2), result);
+        assertReflectionEquals(asList(0, 2), result);
     }
 
 
@@ -106,8 +106,8 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
         List<Integer> firstInvocationResult = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, doubleInvocationLineNr, 1);
         List<Integer> secondInvocationResult = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, doubleInvocationLineNr, 2);
 
-        assertRefEquals(asList(0), firstInvocationResult);
-        assertRefEquals(asList(2), secondInvocationResult);
+        assertReflectionEquals(asList(0), firstInvocationResult);
+        assertReflectionEquals(asList(2), secondInvocationResult);
     }
 
 
@@ -117,7 +117,7 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
     @Test
     public void testGetArgumentMatcherIndexes_staticInvocation() {
         List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", staticProxyMethod, staticInvocationLineNr, 1);
-        assertRefEquals(asList(0), result);
+        assertReflectionEquals(asList(0), result);
     }
 
 

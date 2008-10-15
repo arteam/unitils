@@ -48,7 +48,7 @@ public class HibernateJpaSpringTest extends UnitilsJUnit4 {
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
     	Person userFromDb = (Person) entityManager.find(Person.class, 1L);
-    	ReflectionAssert.assertLenEquals(person, userFromDb);
+    	ReflectionAssert.assertLenientEquals(person, userFromDb);
     }
 
     @Test

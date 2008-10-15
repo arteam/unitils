@@ -46,11 +46,11 @@ import java.util.Collection;
  * <li>lenient order: order is not important when comparing collections or arrays</li>
  * </ul>
  * <p/>
- * There are 2 versions of each method: a len and a ref verion.
+ * There are 2 versions of each method: a lenient and a reflection version.
  * With the ref versions you can set the comparator modes explicitly (note: no modes means strict comparisson). The len
  * versions are the same as the ref versions but have lenient order and ignore defaults set by default.
  * <p/>
- * The name assert..RefEquals is chosen instead of assert..Equals so it can be added as a static import
+ * The name assert..ReflectionEquals is chosen instead of assert..Equals so it can be added as a static import
  * without naming collisions.
  *
  * @author Tim Ducheyne
@@ -60,20 +60,55 @@ import java.util.Collection;
  */
 public class ReflectionAssert {
 
-
     /**
      * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
      * If they are not equal an AssertionFailedError is thrown.
      * <p/>
-     * This is identical to {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} with
+     * This is identical to {@link #assertReflectionEquals(Object,Object, ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param expected the expected object
      * @param actual   the given object
      * @throws AssertionFailedError when both objects are not equals
+     * @deprecated As of version 2.0, replaced by <code>assertLenientEquals(Object, Object)</code>.
+     * @see #assertLenientEquals(Object, Object)
      */
     public static void assertLenEquals(Object expected, Object actual) throws AssertionFailedError {
-        assertLenEquals(null, expected, actual);
+        assertLenientEquals(expected, actual);
+    }
+
+
+    /**
+     * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
+     * If they are not equal an AssertionFailedError is thrown.
+     * <p/>
+     * This is identical to {@link #assertReflectionEquals(Object,Object, ReflectionComparatorMode...)} with
+     * lenient order and ignore defaults set as comparator modes.
+     *
+     * @param expected the expected object
+     * @param actual   the given object
+     * @throws AssertionFailedError when both objects are not equals
+     */
+    public static void assertLenientEquals(Object expected, Object actual) throws AssertionFailedError {
+        assertLenientEquals(null, expected, actual);
+    }
+
+
+    /**
+     * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
+     * If they are not equal an AssertionFailedError is thrown.
+     * <p/>
+     * The comparator modes determine how strict to compare the values.
+     *
+     * @param expected the expected object
+     * @param actual   the given object
+     * @param modes    the comparator modes
+     * @throws AssertionFailedError when both objects are not equals
+     * @deprecated As of version 2.0, replaced by <code>assertReflectionEquals(Object, Object, ReflectionComparatorMode...)</code>.
+     * @see #assertReflectionEquals(Object, Object, ReflectionComparatorMode...)
+     */
+    public static void assertRefEquals(Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
+        assertReflectionEquals(expected, actual, modes);
     }
 
 
@@ -88,8 +123,8 @@ public class ReflectionAssert {
      * @param modes    the comparator modes
      * @throws AssertionFailedError when both objects are not equals
      */
-    public static void assertRefEquals(Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
-        assertRefEquals(null, expected, actual, modes);
+    public static void assertReflectionEquals(Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
+        assertReflectionEquals(null, expected, actual, modes);
     }
 
 
@@ -97,7 +132,26 @@ public class ReflectionAssert {
      * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
      * If they are not equal an AssertionFailedError is thrown.
      * <p/>
-     * This is identical to {@link #assertRefEquals(String,Object,Object,ReflectionComparatorMode...)} with
+     * This is identical to {@link #assertReflectionEquals(String,Object,Object,ReflectionComparatorMode...)} with
+     * lenient order and ignore defaults set as comparator modes.
+     *
+     * @param message  a message for when the assertion fails
+     * @param expected the expected object
+     * @param actual   the given object
+     * @throws AssertionFailedError when both objects are not equals
+     * @deprecated As of version 2.0, replaced by <code>assertLenientEquals(String, Object, Object)</code>.
+     * @see #assertLenientEquals(String, Object, Object)
+     */
+    public static void assertLenEquals(String message, Object expected, Object actual) throws AssertionFailedError {
+        assertLenientEquals(message, expected, actual);
+    }
+
+
+    /**
+     * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
+     * If they are not equal an AssertionFailedError is thrown.
+     * <p/>
+     * This is identical to {@link #assertReflectionEquals(String,Object,Object,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
      *
      * @param message  a message for when the assertion fails
@@ -105,8 +159,27 @@ public class ReflectionAssert {
      * @param actual   the given object
      * @throws AssertionFailedError when both objects are not equals
      */
-    public static void assertLenEquals(String message, Object expected, Object actual) throws AssertionFailedError {
-        assertRefEquals(message, expected, actual, LENIENT_ORDER, IGNORE_DEFAULTS);
+    public static void assertLenientEquals(String message, Object expected, Object actual) throws AssertionFailedError {
+        assertReflectionEquals(message, expected, actual, LENIENT_ORDER, IGNORE_DEFAULTS);
+    }
+
+
+    /**
+     * Asserts that two objects are equal. Reflection is used to compare all fields of these values.
+     * If they are not equal an AssertionFailedError is thrown.
+     * <p/>
+     * The comparator modes determine how strict to compare the values.
+     *
+     * @param message  a message for when the assertion fails
+     * @param expected the expected object
+     * @param actual   the given object
+     * @param modes    the comparator modes
+     * @throws AssertionFailedError when both objects are not equals
+     * @deprecated As of version 2.0, replaced by <code>assertReflectionEquals(String, Object, Object, ReflectionComparatorMode...)</code>.
+     * @see #assertReflectionEquals(String, Object, Object, ReflectionComparatorMode...)
+     */
+    public static void assertRefEquals(String message, Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
+        assertReflectionEquals(message, expected, actual, modes);
     }
 
 
@@ -122,7 +195,7 @@ public class ReflectionAssert {
      * @param modes    the comparator modes
      * @throws AssertionFailedError when both objects are not equals
      */
-    public static void assertRefEquals(String message, Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
+    public static void assertReflectionEquals(String message, Object expected, Object actual, ReflectionComparatorMode... modes) throws AssertionFailedError {
         ReflectionComparator reflectionComparator = createRefectionComparator(modes);
         Difference difference = reflectionComparator.getDifference(expected, actual);
         if (difference != null) {
@@ -136,7 +209,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertReflectionEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * This is identical to {@link #assertPropertyRefEquals(String,Object,Object,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
@@ -155,7 +228,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertReflectionEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -174,7 +247,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertReflectionEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * This is identical to {@link #assertPropertyRefEquals(String,String,Object,Object,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
@@ -194,7 +267,7 @@ public class ReflectionAssert {
      * Asserts that the value of a property of an object is equal to the given value.
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertReflectionEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -209,7 +282,7 @@ public class ReflectionAssert {
         assertNotNull("Actual object is null.", actualObject);
         Object propertyValue = getProperty(actualObject, propertyName);
         String formattedMessage = formatMessage(message, "Incorrect value for property: " + propertyName);
-        assertRefEquals(formattedMessage, expectedPropertyValue, propertyValue, modes);
+        assertReflectionEquals(formattedMessage, expectedPropertyValue, propertyValue, modes);
     }
 
 
@@ -220,7 +293,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertReflectionEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * This is identical to {@link #assertPropertyRefEquals(String,Collection,Collection,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
@@ -242,7 +315,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertReflectionEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -264,7 +337,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertReflectionEquals(Object,Object,ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * This is identical to {@link #assertPropertyRefEquals(String,String,Collection,Collection,ReflectionComparatorMode...)} with
      * lenient order and ignore defaults set as comparator modes.
@@ -287,7 +360,7 @@ public class ReflectionAssert {
      * id field of the myObjectCollection elements matches the values in the myIdCollection
      * <p/>
      * Bean notation can be used to specify inner properties. Eg myArray[2].innerValue.
-     * {@link #assertRefEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
+     * {@link #assertReflectionEquals(Object,Object, ReflectionComparatorMode...)} is used to check whether both values are equal.
      * <p/>
      * The comparator modes determine how strict to compare the values.
      *
@@ -301,7 +374,7 @@ public class ReflectionAssert {
     public static void assertPropertyRefEquals(String message, String propertyName, Collection<?> expectedPropertyValues, Collection<?> actualObjects, ReflectionComparatorMode... modes) throws AssertionFailedError {
         assertNotNull("Actual object list is null.", actualObjects);
         Collection<?> actualPropertyValues = CollectionUtils.collect(actualObjects, new OgnlTransformer(propertyName));
-        assertRefEquals(message, expectedPropertyValues, actualPropertyValues, modes);
+        assertReflectionEquals(message, expectedPropertyValues, actualPropertyValues, modes);
     }
 
 
