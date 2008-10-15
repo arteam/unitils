@@ -20,7 +20,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Arrays.asList;
-import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
 
@@ -45,7 +45,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetFieldsAnnotatedWith() {
     	Set<Field> annotatedFields = AnnotationUtils.getFieldsAnnotatedWith(TestClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", asList("field"), annotatedFields);
+        assertPropertyLenientEquals("name", asList("field"), annotatedFields);
     }
 
 
@@ -63,7 +63,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetFieldsAnnotatedWith_fieldFromSuperClass() {
     	Set<Field> annotatedFields = AnnotationUtils.getFieldsAnnotatedWith(TestSubClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", asList("field", "subField"), annotatedFields);
+        assertPropertyLenientEquals("name", asList("field", "subField"), annotatedFields);
     }
 
 
@@ -72,7 +72,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith() {
     	Set<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", asList("annotatedMethod"), annotatedMethods);
+        assertPropertyLenientEquals("name", asList("annotatedMethod"), annotatedMethods);
     }
 
 
@@ -90,7 +90,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith_methodFromSuperClass() {
     	Set<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class);
-        assertPropertyLenEquals("name", asList("annotatedMethod", "annotatedSubMethod"), annotatedMethods);
+        assertPropertyLenientEquals("name", asList("annotatedMethod", "annotatedSubMethod"), annotatedMethods);
     }
 
 
@@ -99,7 +99,7 @@ public class AnnotationUtilsTest extends TestCase {
      */
     public void testGetMethodsAnnotatedWith_noMethodsFromSuperClass() {
     	Set<Method> annotatedMethods = AnnotationUtils.getMethodsAnnotatedWith(TestSubClass.class, TestAnnotation.class, false);
-        assertPropertyLenEquals("name", asList("annotatedSubMethod"), annotatedMethods);
+        assertPropertyLenientEquals("name", asList("annotatedSubMethod"), annotatedMethods);
     }
 
     /**

@@ -1535,7 +1535,7 @@ public List&lt;User&gt; findPartnershipUsers(Company comp) {
 <div class="source"><pre>
 public void testFindPartnershipUsers() {
     List&lt;User&gt; foundUsers = userDao.findPartnershipUsers(&quot;MyCompany&quot;);
-    ReflectionAssert.assertPropertyLenEquals(&quot;id&quot;, Arrays.asList(2), foundUsers);
+    ReflectionAssert.assertPropertyLenientEquals(&quot;id&quot;, Arrays.asList(2), foundUsers);
 }
 </pre></div>
 

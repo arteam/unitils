@@ -17,7 +17,7 @@ package org.unitils.util;
 
 import static junit.framework.Assert.*;
 import org.junit.Test;
-import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenientEquals;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -41,7 +41,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFieldsAssignableFrom() {
         Set<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestSubClass.class, String.class, false);
-        assertPropertyLenEquals("name", asList("objectField", "stringField", "subClassObjectField", "subClassStringField"), fields);
+        assertPropertyLenientEquals("name", asList("objectField", "stringField", "subClassObjectField", "subClassStringField"), fields);
     }
 
 
@@ -51,7 +51,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFieldsAssignableFrom_static() {
         Set<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestSubClass.class, String.class, true);
-        assertPropertyLenEquals("name", asList("staticObjectField", "staticStringField", "subClassStaticObjectField", "subClassStaticStringField"), fields);
+        assertPropertyLenientEquals("name", asList("staticObjectField", "staticStringField", "subClassStaticObjectField", "subClassStaticStringField"), fields);
     }
 
 
@@ -73,7 +73,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFieldsAssignableFrom_primitive() {
         Set<Field> fields = ReflectionUtils.getFieldsAssignableFrom(TestSubClass.class, Integer.TYPE, false);
-        assertPropertyLenEquals("name", asList("intField", "subClassIntField"), fields);
+        assertPropertyLenientEquals("name", asList("intField", "subClassIntField"), fields);
     }
 
 
@@ -83,7 +83,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFieldsOfType() {
         Set<Field> fields = ReflectionUtils.getFieldsOfType(TestSubClass.class, String.class, false);
-        assertPropertyLenEquals("name", asList("stringField", "subClassStringField"), fields);
+        assertPropertyLenientEquals("name", asList("stringField", "subClassStringField"), fields);
     }
 
 
@@ -93,7 +93,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFieldsOfType_static() {
         Set<Field> field = ReflectionUtils.getFieldsOfType(TestSubClass.class, String.class, true);
-        assertPropertyLenEquals("name", asList("staticStringField", "subClassStaticStringField"), field);
+        assertPropertyLenientEquals("name", asList("staticStringField", "subClassStaticStringField"), field);
     }
 
 
@@ -114,7 +114,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFieldsOfType_primitive() {
         Set<Field> fields = ReflectionUtils.getFieldsOfType(TestSubClass.class, Integer.TYPE, false);
-        assertPropertyLenEquals("name", asList("intField", "subClassIntField"), fields);
+        assertPropertyLenientEquals("name", asList("intField", "subClassIntField"), fields);
     }
 
 
@@ -124,7 +124,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetSettersAssignableFrom() {
         Set<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestSubClass.class, String.class, false);
-        assertPropertyLenEquals("name", asList("setObjectField", "setStringField", "setSubClassObjectField", "setSubClassStringField"), methods);
+        assertPropertyLenientEquals("name", asList("setObjectField", "setStringField", "setSubClassObjectField", "setSubClassStringField"), methods);
     }
 
 
@@ -134,7 +134,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetSettersAssignableFrom_static() {
         Set<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestSubClass.class, String.class, true);
-        assertPropertyLenEquals("name", asList("setStaticObjectField", "setStaticStringField", "setSubClassStaticObjectField", "setSubClassStaticStringField"), methods);
+        assertPropertyLenientEquals("name", asList("setStaticObjectField", "setStaticStringField", "setSubClassStaticObjectField", "setSubClassStaticStringField"), methods);
     }
 
 
@@ -156,7 +156,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetSettersAssignableFrom_primitive() {
         Set<Method> methods = ReflectionUtils.getSettersAssignableFrom(TestSubClass.class, Integer.TYPE, false);
-        assertPropertyLenEquals("name", asList("setIntField", "setSubClassIntField"), methods);
+        assertPropertyLenientEquals("name", asList("setIntField", "setSubClassIntField"), methods);
     }
 
 
@@ -166,7 +166,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFirstSetterOfType() {
         Set<Method> methods = ReflectionUtils.getSettersOfType(TestSubClass.class, String.class, false);
-        assertPropertyLenEquals("name", asList("setStringField", "setSubClassStringField"), methods);
+        assertPropertyLenientEquals("name", asList("setStringField", "setSubClassStringField"), methods);
     }
 
 
@@ -176,7 +176,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFirstSetterOfType_static() {
         Set<Method> methods = ReflectionUtils.getSettersOfType(TestSubClass.class, String.class, true);
-        assertPropertyLenEquals("name", asList("setStaticStringField", "setSubClassStaticStringField"), methods);
+        assertPropertyLenientEquals("name", asList("setStaticStringField", "setSubClassStaticStringField"), methods);
     }
 
 
@@ -196,7 +196,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetSettersOfType_primitive() {
         Set<Method> methods = ReflectionUtils.getSettersOfType(TestSubClass.class, Integer.TYPE, false);
-        assertPropertyLenEquals("name", asList("setIntField", "setSubClassIntField"), methods);
+        assertPropertyLenientEquals("name", asList("setIntField", "setSubClassIntField"), methods);
     }
 
 
@@ -206,7 +206,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetSetter() {
         Method method = ReflectionUtils.getSetter(TestSubClass.class, "stringField", false);
-        assertPropertyLenEquals("name", "setStringField", method);
+        assertPropertyLenientEquals("name", "setStringField", method);
     }
 
 
@@ -216,7 +216,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetSetter_static() {
         Method method = ReflectionUtils.getSetter(TestSubClass.class, "staticStringField", true);
-        assertPropertyLenEquals("name", "setStaticStringField", method);
+        assertPropertyLenientEquals("name", "setStaticStringField", method);
     }
 
 
@@ -236,7 +236,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetGetter() {
         Method method = ReflectionUtils.getGetter(TestSubClass.class, "stringField", false);
-        assertPropertyLenEquals("name", "getStringField", method);
+        assertPropertyLenientEquals("name", "getStringField", method);
     }
 
 
@@ -246,7 +246,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetGetter_static() {
         Method method = ReflectionUtils.getGetter(TestSubClass.class, "staticStringField", true);
-        assertPropertyLenEquals("name", "getStaticStringField", method);
+        assertPropertyLenientEquals("name", "getStaticStringField", method);
     }
 
 
@@ -266,7 +266,7 @@ public class ReflectionUtilsTypesTest {
     public void testGetGetterForSetter() {
         Method setter = ReflectionUtils.getSetter(TestSubClass.class, "stringField", false);
         Method method = ReflectionUtils.getGetter(setter, false);
-        assertPropertyLenEquals("name", "getStringField", method);
+        assertPropertyLenientEquals("name", "getStringField", method);
     }
 
 
@@ -277,7 +277,7 @@ public class ReflectionUtilsTypesTest {
     public void testGetGetterForSetter_static() {
         Method setter = ReflectionUtils.getSetter(TestSubClass.class, "staticStringField", true);
         Method method = ReflectionUtils.getGetter(setter, true);
-        assertPropertyLenEquals("name", "getStaticStringField", method);
+        assertPropertyLenientEquals("name", "getStaticStringField", method);
     }
 
 
@@ -298,7 +298,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFieldWithName() {
         Field field = ReflectionUtils.getFieldWithName(TestSubClass.class, "stringField", false);
-        assertPropertyLenEquals("name", "stringField", field);
+        assertPropertyLenientEquals("name", "stringField", field);
     }
 
 
@@ -308,7 +308,7 @@ public class ReflectionUtilsTypesTest {
     @Test
     public void testGetFieldWithName_static() {
         Field field = ReflectionUtils.getFieldWithName(TestSubClass.class, "staticStringField", true);
-        assertPropertyLenEquals("name", "staticStringField", field);
+        assertPropertyLenientEquals("name", "staticStringField", field);
     }
 
 
