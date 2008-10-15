@@ -60,7 +60,12 @@ public class LenEqArgumentMatcher implements ArgumentMatcher {
      * @return True when passed object matches, false otherwise.
      */
     public boolean matches(Object argument, Object argumentAtInvocationTime) {
-        ReflectionComparator reflectionComparator = createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
+        ReflectionComparator reflectionComparator;
+        if (value instanceof Character || value instanceof Number || value instanceof Boolean) {
+            reflectionComparator = createRefectionComparator();
+        } else {
+            reflectionComparator = createRefectionComparator(LENIENT_ORDER, IGNORE_DEFAULTS);
+        }
         return reflectionComparator.isEqual(this.value, argumentAtInvocationTime);
     }
 

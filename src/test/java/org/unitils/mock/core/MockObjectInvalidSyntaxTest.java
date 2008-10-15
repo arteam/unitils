@@ -15,6 +15,7 @@
  */
 package org.unitils.mock.core;
 
+import static junit.framework.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.core.UnitilsException;

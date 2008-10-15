@@ -17,14 +17,20 @@ package org.unitils.mock.argumentmatcher;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
-import static org.unitils.mock.ArgumentMatchers.*;
-import org.unitils.mock.core.MockObject;
-import org.unitils.mock.core.Scenario;
+import static org.unitils.mock.ArgumentMatchers.eq;
+import static org.unitils.mock.ArgumentMatchers.isNull;
+import static org.unitils.mock.ArgumentMatchers.lenEq;
+import static org.unitils.mock.ArgumentMatchers.notNull;
+import static org.unitils.mock.ArgumentMatchers.refEq;
+import static org.unitils.mock.ArgumentMatchers.same;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.Scenario;
 
 /**
  * Tests the usage of argment matchers.
@@ -219,6 +225,36 @@ public class ArgumentMatcherTest {
     
     
     /**
+     * The lenient argument matcher should not do lenient argument matching if
+     * 0 is directly passed instead of being somewhere in the hierarchy
+     */
+    @Test
+    public void testLenEqArgumentMatcher_zero() {
+        mockObject.returns(true).testMethodInteger(0);
+        
+        boolean result = mockObject.getInstance().testMethodInteger(1);
+        assertFalse(result);
+        
+        mockObject.assertNotInvoked().testMethodInteger(0);
+    }
+    
+    
+    /**
+     * The lenient argument matcher should not do lenient argument matching if
+     * false is directly passed instead of being somewhere in the hierarchy
+     */
+    @Test
+    public void testLenEqArgumentMatcher_false() {
+        mockObject.returns(true).testMethodBoolean(false);
+        
+        boolean result = mockObject.getInstance().testMethodBoolean(true);
+        assertFalse(result);
+        
+        mockObject.assertNotInvoked().testMethodBoolean(false);
+    }
+    
+    
+    /**
      * Tests the lenient equals argument matcher in case the object changes between the behavior definition,
      * the actual method call and the assert statement. Since the lenEq() argument matcher uses the a copy of 
      * the object, the values should not match anymore. 
@@ -403,6 +439,10 @@ public class ArgumentMatcherTest {
         boolean testMethodString(String arg1);
 
         boolean testMethodObject(Object arg1);
+        
+        boolean testMethodInteger(int arg1);
+        
+        boolean testMethodBoolean(boolean arg1);
 
     }
 
