@@ -16,7 +16,7 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorFactory.createRefectionComparator;
 import org.unitils.reflectionassert.difference.CollectionDifference;
 import org.unitils.reflectionassert.difference.Difference;
@@ -138,7 +138,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
         assertEquals("test 2", difference2.getLeftValue());
         assertEquals("test 3", difference2.getRightValue());
 
-        assertRefEquals(2, ((CollectionDifference) result).getLeftMissingIndexes().get(0));
+        assertReflectionEquals(2, ((CollectionDifference) result).getLeftMissingIndexes().get(0));
     }
 
 
@@ -160,7 +160,7 @@ public class ReflectionComparatorCollectionTest extends TestCase {
         assertEquals("test 3", difference2.getLeftValue());
         assertEquals("test 2", difference2.getRightValue());
 
-        assertRefEquals(2, ((CollectionDifference) result).getRightMissingIndexes().get(0));
+        assertReflectionEquals(2, ((CollectionDifference) result).getRightMissingIndexes().get(0));
     }
 
 

@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 import static org.unitils.reflectionassert.ReflectionAssert.assertPropertyLenEquals;
 import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.toFile;
 
@@ -59,11 +59,11 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("LessColumnsLastDataSet.xml")));
 
         // there should be 1 dataset for the default schema A
-        assertLenEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
+        assertLenientEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
 
         // the dataset should contain 2 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
         ITableIterator tableIterator = dataSet.iterator();
 
         // first table TABLE_A row should contain 3 columns
@@ -94,11 +94,11 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("LessColumnsFirstDataSet.xml")));
 
         // there should be 1 dataset for the default schema A
-        assertLenEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
+        assertLenientEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
 
         // the dataset should contain 2 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSet.getTableNames());
         ITableIterator tableIterator = dataSet.iterator();
 
         // first table TABLE_A row should contain 1 column
@@ -129,19 +129,19 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("MultiSchemaDataSet.xml")));
 
         // there should be 3 schemas
-        assertLenEquals(new String[]{"SCHEMA_D", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
+        assertLenientEquals(new String[]{"SCHEMA_D", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
 
         // schema D should contain 3 tables
         IDataSet dataSetA = result.getDataSetForSchema("SCHEMA_D");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A"}, dataSetA.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A"}, dataSetA.getTableNames());
 
         // schema B should contain 2 tables
         IDataSet dataSetB = result.getDataSetForSchema("SCHEMA_B");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
 
         // schema C should contain 2 tables
         IDataSet dataSetC = result.getDataSetForSchema("SCHEMA_C");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetC.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetC.getTableNames());
     }
 
 
@@ -154,19 +154,19 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(toFile(getClass().getResource("MultiSchemaNoDefaultDataSet.xml")));
 
         // there should be 3 schemas
-        assertLenEquals(new String[]{"SCHEMA_A", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
+        assertLenientEquals(new String[]{"SCHEMA_A", "SCHEMA_B", "SCHEMA_C"}, result.getSchemaNames());
 
         // default schema A should contain 3 tables
         IDataSet dataSetA = result.getDataSetForSchema("SCHEMA_A");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A"}, dataSetA.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A"}, dataSetA.getTableNames());
 
         // schema B should contain 2 tables
         IDataSet dataSetB = result.getDataSetForSchema("SCHEMA_B");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetB.getTableNames());
 
         // schema C should contain 2 tables
         IDataSet dataSetC = result.getDataSetForSchema("SCHEMA_C");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetC.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A"}, dataSetC.getTableNames());
     }
 
 
@@ -181,10 +181,10 @@ public class MultiSchemaXmlDataSetReaderTest extends UnitilsJUnit4 {
         MultiSchemaDataSet result = multiSchemaXmlDataSetReader.readDataSetXml(file1, file2);
 
         // there should be 1 dataset for the default schema A
-        assertLenEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
+        assertLenientEquals(new String[]{"SCHEMA_A"}, result.getSchemaNames());
 
         // the dataset should contain 4 tables with the same name
         IDataSet dataSet = result.getDataSetForSchema("SCHEMA_A");
-        assertLenEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A", "TABLE_A"}, dataSet.getTableNames());
+        assertLenientEquals(new String[]{"TABLE_A", "TABLE_A", "TABLE_A", "TABLE_A"}, dataSet.getTableNames());
     }
 }

@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
-import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -65,7 +65,7 @@ public class CloneUtilTest {
     @Test
     public void testCreateDeepClone() {
         SimpleValues result = CloneUtil.createDeepClone(simpleValues1);
-        assertRefEquals(simpleValues1, result);
+        assertReflectionEquals(simpleValues1, result);
         assertNotSame(simpleValues1, result);
         assertSame(simpleValues1.stringValue, result.stringValue);
         assertSame(simpleValues1.longValue, result.longValue);
@@ -77,7 +77,7 @@ public class CloneUtilTest {
     @Test
     public void testCreateDeepClone_clonedTwice() {
         SimpleValues result = CloneUtil.createDeepClone(CloneUtil.createDeepClone(simpleValues1));
-        assertRefEquals(simpleValues1, result);
+        assertReflectionEquals(simpleValues1, result);
         assertNotSame(simpleValues1, result);
     }
 
@@ -87,7 +87,7 @@ public class CloneUtilTest {
         List<?> aList = Arrays.asList(1, new int[]{1, 2});
         List<?> result = CloneUtil.createDeepClone(aList);
 
-        assertRefEquals(aList, result);
+        assertReflectionEquals(aList, result);
         assertNotSame(aList, result);
         assertSame(aList.get(0), result.get(0));
         assertNotSame(aList.get(1), result.get(1));
@@ -97,7 +97,7 @@ public class CloneUtilTest {
     @Test
     public void testCreateDeepClone_collections() {
         Collections result = CloneUtil.createDeepClone(collections);
-        assertRefEquals(collections, result);
+        assertReflectionEquals(collections, result);
         assertNotSame(collections, result);
         assertNotSame(collections.listValue, result.listValue);
         assertNotSame(collections.mapValue, result.mapValue);
@@ -108,7 +108,7 @@ public class CloneUtilTest {
     public void testCreateDeepClone_InnerClass() throws IllegalArgumentException, IllegalAccessException {
         ClassWithInnerClass classWithInnerClass = new ClassWithInnerClass();
         ClassWithInnerClass result = CloneUtil.createDeepClone(classWithInnerClass);
-        assertRefEquals(classWithInnerClass, result);
+        assertReflectionEquals(classWithInnerClass, result);
         result.inner.setString();
     }
     
@@ -120,14 +120,14 @@ public class CloneUtilTest {
             }
         };
         Comparable<String> result = CloneUtil.createDeepClone(anonymousClass);
-        assertRefEquals(anonymousClass, result);
+        assertReflectionEquals(anonymousClass, result);
     }
 
 
     @Test
     public void testCreateDeepClone_loop() {
         References result = CloneUtil.createDeepClone(references);
-        assertRefEquals(references, result);
+        assertReflectionEquals(references, result);
         assertNotSame(references, result);
         assertNotSame(references.references, result.references);
         assertSame(references.references, references);

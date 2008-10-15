@@ -22,7 +22,7 @@ import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
 import org.unitils.dbmaintainer.script.ScriptContentHandle;
 import org.unitils.mock.MockUnitils;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -93,7 +93,7 @@ public class DummyObjectUtilTest {
         Script script = new Script("01_script1.sql", 0L, MockUnitils.createDummy(ScriptContentHandle.class));
         ExecutedScript executedScript1 = new ExecutedScript(script, null, false);
         ExecutedScript executedScript2 = new ExecutedScript(script, null, false);
-        assertLenEquals(executedScript1, executedScript2);
+        assertLenientEquals(executedScript1, executedScript2);
     }
 
     @Test

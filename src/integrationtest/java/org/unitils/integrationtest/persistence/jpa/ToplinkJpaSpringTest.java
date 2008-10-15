@@ -53,7 +53,7 @@ public class ToplinkJpaSpringTest {
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
     	Person userFromDb = (Person) entityManager.find(Person.class, 1L);
-    	ReflectionAssert.assertLenEquals(person, userFromDb);
+    	ReflectionAssert.assertLenientEquals(person, userFromDb);
     }
 
     @Test

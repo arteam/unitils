@@ -132,7 +132,7 @@ public class ReflectionComparatorHibernateProxyTest extends UnitilsJUnit4 {
         Child childWithParentProxy = (Child) sessionFactory.getCurrentSession().get(Child.class, 1L);
         Difference result = reflectionComparator.getDifference(childWithParentProxy, testChild);
 
-        ReflectionAssert.assertLenEquals(childWithParentProxy, testChild);
+        ReflectionAssert.assertLenientEquals(childWithParentProxy, testChild);
         assertNull(result);
     }
 

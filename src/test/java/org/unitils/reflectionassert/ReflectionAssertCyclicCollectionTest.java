@@ -16,8 +16,8 @@
 package org.unitils.reflectionassert;
 
 import junit.framework.TestCase;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
-import static org.unitils.reflectionassert.ReflectionAssert.assertRefEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,8 +54,8 @@ public class ReflectionAssertCyclicCollectionTest extends TestCase {
      * Tests the comparison of objects containing the cyclic dependency.
      * This should pass and should not cause a StackOverflow.
      */
-    public void testAssertRefEquals_infiniteLoop() {
-        assertRefEquals(testObjectA, testObjectB);
+    public void testAssertReflectionEquals_infiniteLoop() {
+        assertReflectionEquals(testObjectA, testObjectB);
     }
 
 
@@ -63,8 +63,8 @@ public class ReflectionAssertCyclicCollectionTest extends TestCase {
      * Tests the comparison of objects containing the cyclic dependency.
      * This should pass and should not cause a StackOverflow.
      */
-    public void testAssertLenEquals_infiniteLoop() {
-        assertLenEquals(testObjectA, testObjectB);
+    public void testAssertLenientEquals_infiniteLoop() {
+        assertLenientEquals(testObjectA, testObjectB);
     }
 
 

@@ -29,7 +29,7 @@ import static org.unitils.core.util.SQLTestUtils.*;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.getItemAsLong;
 import org.unitils.database.annotations.TestDataSource;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import javax.sql.DataSource;
 import static java.util.Arrays.asList;
@@ -88,9 +88,9 @@ public class DbSupportTest extends UnitilsJUnit4 {
         Set<String> result = dbSupport.getTableNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL quoting behavior: quoted identifiers are not treated as case sensitive.
-            assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_table"), dbSupport.toCorrectCaseIdentifier("Test_CASE_Table")), result);
+            assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("test_table"), dbSupport.toCorrectCaseIdentifier("Test_CASE_Table")), result);
         } else {
-            assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_table"), "Test_CASE_Table"), result);
+            assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("test_table"), "Test_CASE_Table"), result);
         }
     }
 
@@ -101,7 +101,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
     @Test
     public void testGetColumnNames() throws Exception {
         Set<String> result = dbSupport.getColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
-        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1"), dbSupport.toCorrectCaseIdentifier("col2")), result);
+        assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("col1"), dbSupport.toCorrectCaseIdentifier("col2")), result);
     }
 
 
@@ -125,9 +125,9 @@ public class DbSupportTest extends UnitilsJUnit4 {
         Set<String> result = dbSupport.getViewNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL quoting behavior: quoted identifiers are not treated as case sensitive.
-            assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_view"), dbSupport.toCorrectCaseIdentifier("Test_CASE_View")), result);
+            assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("test_view"), dbSupport.toCorrectCaseIdentifier("Test_CASE_View")), result);
         } else {
-            assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_view"), "Test_CASE_View"), result);
+            assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("test_view"), "Test_CASE_View"), result);
         }
     }
 
@@ -153,7 +153,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
             return;
         }
         Set<String> result = dbSupport.getSynonymNames();
-        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_synonym"), "Test_CASE_Synonym"), result);
+        assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("test_synonym"), "Test_CASE_Synonym"), result);
     }
 
 
@@ -182,7 +182,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
             return;
         }
         Set<String> result = dbSupport.getSequenceNames();
-        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), "Test_CASE_Sequence"), result);
+        assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), "Test_CASE_Sequence"), result);
     }
 
 
@@ -213,13 +213,13 @@ public class DbSupportTest extends UnitilsJUnit4 {
         Set<String> result = dbSupport.getTriggerNames();
         if ("mysql".equals(dbSupport.getDatabaseDialect())) {
             // MySQL trigger behavior: trigger names are case-sensitive
-            assertLenEquals(asList("test_trigger", "Test_CASE_Trigger"), result);
+            assertLenientEquals(asList("test_trigger", "Test_CASE_Trigger"), result);
         } else if ("postgresql".equals(dbSupport.getDatabaseDialect())) {
             // Postgresql trigger behavior: non-standard drop statement (see PostgreSqlDbSupport.dropTrigger for more info
             // Triggers are returned as  'trigger-name' ON 'table name'
-            assertLenEquals(asList(dbSupport.quoted("test_trigger") + " ON " + dbSupport.qualified("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Trigger") + " ON " + dbSupport.qualified("Test_CASE_Table")), result);
+            assertLenientEquals(asList(dbSupport.quoted("test_trigger") + " ON " + dbSupport.qualified("Test_CASE_Table"), dbSupport.quoted("Test_CASE_Trigger") + " ON " + dbSupport.qualified("Test_CASE_Table")), result);
         } else {
-            assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_trigger"), "Test_CASE_Trigger"), result);
+            assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("test_trigger"), "Test_CASE_Trigger"), result);
         }
     }
 
@@ -249,7 +249,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
             return;
         }
         Set<String> result = dbSupport.getTypeNames();
-        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("test_type"), "Test_CASE_Type"), result);
+        assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("test_type"), "Test_CASE_Type"), result);
     }
 
 
@@ -278,7 +278,7 @@ public class DbSupportTest extends UnitilsJUnit4 {
             return;
         }
         Set<String> result = dbSupport.getIdentityColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
-        assertLenEquals(asList(dbSupport.toCorrectCaseIdentifier("col1")), result);
+        assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("col1")), result);
     }
     
     

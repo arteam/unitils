@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import java.util.List;
 import java.util.Map;
@@ -54,8 +54,8 @@ public class MockObjectTest {
 
         String result1 = mockObject.getInstance().testMethodString();
         String result2 = mockObject.getInstance().testMethodString();
-        assertLenEquals("aValue", result1);
-        assertLenEquals("aValue", result2);
+        assertLenientEquals("aValue", result1);
+        assertLenientEquals("aValue", result2);
     }
 
 
@@ -69,7 +69,7 @@ public class MockObjectTest {
 
         String result1 = mockObject.getInstance().testMethodString();
         String result2 = mockObject.getInstance().testMethodString();
-        assertLenEquals("aValue", result1);
+        assertLenientEquals("aValue", result1);
         assertNull(result2);
     }
 
@@ -81,7 +81,7 @@ public class MockObjectTest {
     @Test
     public void testReturns_defaultBehaviorObject() {
         String result = mockObject.getInstance().testMethodString();
-        assertLenEquals(null, result);
+        assertLenientEquals(null, result);
     }
 
 
@@ -92,7 +92,7 @@ public class MockObjectTest {
     @Test
     public void testReturns_defaultBehaviorNumber() {
         int result = mockObject.getInstance().testMethodNumber();
-        assertLenEquals(0, result);
+        assertLenientEquals(0, result);
     }
 
 
@@ -103,7 +103,7 @@ public class MockObjectTest {
     @Test
     public void testReturns_defaultBehaviorList() {
         List<String> result = mockObject.getInstance().testMethodList();
-        assertLenEquals(0, result.size());
+        assertLenientEquals(0, result.size());
     }
 
 
@@ -114,7 +114,7 @@ public class MockObjectTest {
     @Test
     public void testReturns_defaultBehaviorSet() {
         Set<String> result = mockObject.getInstance().testMethodSet();
-        assertLenEquals(0, result.size());
+        assertLenientEquals(0, result.size());
     }
 
 
@@ -125,7 +125,7 @@ public class MockObjectTest {
     @Test
     public void testReturns_defaultBehaviorMap() {
         Map<String, String> result = mockObject.getInstance().testMethodMap();
-        assertLenEquals(0, result.size());
+        assertLenientEquals(0, result.size());
     }
 
 
@@ -216,7 +216,7 @@ public class MockObjectTest {
 
         mockObject.getInstance().testMethodString();
         mockObject.getInstance().testMethodString();
-        assertLenEquals(2, testMockBehavior.invocationCount);
+        assertLenientEquals(2, testMockBehavior.invocationCount);
     }
 
 
@@ -231,7 +231,7 @@ public class MockObjectTest {
 
         mockObject.getInstance().testMethodString();
         mockObject.getInstance().testMethodString();
-        assertLenEquals(1, testMockBehavior.invocationCount);
+        assertLenientEquals(1, testMockBehavior.invocationCount);
     }
 
 

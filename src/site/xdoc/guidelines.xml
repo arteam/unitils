@@ -761,7 +761,7 @@ public class UserAdminTest extends TestCase {
         //validate result
         Map authenticatedUserMap = userAdmin.getAuthenticatedUserMap();               
         User result = authenticatedUserMap.get(user.getSsn());                <span class="code-comment">// Implementation detail</span>
-        ReflectionAssert.assertLenEquals(user, result);
+        ReflectionAssert.assertLenientEquals(user, result);
     }
 }
 </pre></div>
@@ -1444,7 +1444,7 @@ public class UserDaoTest extends BaseDAOTest {
         userDao.update(user);
         User toVerify = userDao.findById(user.getId());
     
-        ReflectionAssert.assertRefEquals(user, toVerify);
+        ReflectionAssert.assertReflectionEquals(user, toVerify);
     }
     
     

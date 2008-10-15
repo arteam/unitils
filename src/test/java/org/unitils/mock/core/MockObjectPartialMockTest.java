@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 /**
  * Tests the mock object functionality for partial mocks.
@@ -53,8 +53,8 @@ public class MockObjectPartialMockTest {
         mockObject.returns("aValue").testMethod();
 
         String result = mockObject.getInstance().testMethod();
-        assertLenEquals("aValue", result);
-        assertLenEquals(0, TestClass.invocationCount);
+        assertLenientEquals("aValue", result);
+        assertLenientEquals(0, TestClass.invocationCount);
     }
 
 
@@ -65,8 +65,8 @@ public class MockObjectPartialMockTest {
     @Test
     public void testReturns_originalBehavior() {
         String result = mockObject.getInstance().testMethod();
-        assertLenEquals("original", result);
-        assertLenEquals(1, TestClass.invocationCount);
+        assertLenientEquals("original", result);
+        assertLenientEquals(1, TestClass.invocationCount);
     }
 
 
@@ -84,7 +84,7 @@ public class MockObjectPartialMockTest {
             exception = true;
         }
         assertTrue(exception);
-        assertLenEquals(0, TestClass.invocationCount);
+        assertLenientEquals(0, TestClass.invocationCount);
     }
 
 
@@ -97,8 +97,8 @@ public class MockObjectPartialMockTest {
         mockObject.performs(testMockBehavior).testMethod();
 
         mockObject.getInstance().testMethod();
-        assertLenEquals(1, testMockBehavior.invocationCount);
-        assertLenEquals(0, TestClass.invocationCount);
+        assertLenientEquals(1, testMockBehavior.invocationCount);
+        assertLenientEquals(0, TestClass.invocationCount);
     }
 
 
@@ -108,8 +108,8 @@ public class MockObjectPartialMockTest {
     @Test
     public void testOriginalBehavior() {
         String result = mockObject.getInstance().testMethod();
-        assertLenEquals("original", result);
-        assertLenEquals(1, TestClass.invocationCount);
+        assertLenientEquals("original", result);
+        assertLenientEquals(1, TestClass.invocationCount);
     }
 
 

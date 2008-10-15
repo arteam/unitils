@@ -21,7 +21,7 @@ import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
 import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -115,9 +115,9 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
     @Test
     public void testRegisterAndRetrieveExecutedScript() throws Exception {
         dbVersionSource.registerExecutedScript(executedScript1);
-        assertLenEquals(asList(executedScript1), dbVersionSource.getExecutedScripts());
+        assertLenientEquals(asList(executedScript1), dbVersionSource.getExecutedScripts());
         dbVersionSource.registerExecutedScript(executedScript2);
-        assertLenEquals(asList(executedScript1, executedScript2), dbVersionSource.getExecutedScripts());
+        assertLenientEquals(asList(executedScript1, executedScript2), dbVersionSource.getExecutedScripts());
     }
 
 
@@ -139,7 +139,7 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
     	dropExecutedScriptsTable();
 
         dbVersionSourceAutoCreate.registerExecutedScript(executedScript1);
-        assertLenEquals(asList(executedScript1), dbVersionSource.getExecutedScripts());
+        assertLenientEquals(asList(executedScript1), dbVersionSource.getExecutedScripts());
     }
     
     @Test
@@ -147,8 +147,8 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
     	dbVersionSource.registerExecutedScript(executedScript1);
     	executedScript1 = new ExecutedScript(executedScript1.getScript(), new Date(), false);
     	dbVersionSource.updateExecutedScript(executedScript1);
-    	assertLenEquals(CollectionUtils.asSet(executedScript1), dbVersionSource.getExecutedScripts());
-    	assertLenEquals(CollectionUtils.asSet(executedScript1), dbVersionSource.getExecutedScripts());
+    	assertLenientEquals(CollectionUtils.asSet(executedScript1), dbVersionSource.getExecutedScripts());
+    	assertLenientEquals(CollectionUtils.asSet(executedScript1), dbVersionSource.getExecutedScripts());
     }
     
     @Test

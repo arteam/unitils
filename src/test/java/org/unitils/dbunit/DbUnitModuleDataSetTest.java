@@ -27,7 +27,7 @@ import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.datasetfactory.impl.MultiSchemaXmlDataSetFactory;
 import org.unitils.dbunit.datasetloadstrategy.impl.CleanInsertLoadStrategy;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -180,7 +180,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
     public void testInsertDataSet_elementsWithDifferentColumns() throws Exception {
         File dataSetFile = new File(this.getClass().getResource("DifferentColumnsDataSet.xml").getPath());
         dbUnitModule.insertDataSet(dataSetFile, MultiSchemaXmlDataSetFactory.class, CleanInsertLoadStrategy.class);
-        assertLenEquals(3, getItemAsLong("select count(1) from test", dataSource));
+        assertLenientEquals(3, getItemAsLong("select count(1) from test", dataSource));
     }
 
     // Tests for behavior when data is loaded for a superclass method, but the test instance is of a
@@ -228,7 +228,7 @@ public class DbUnitModuleDataSetTest extends UnitilsJUnit4 {
     public void testInsertDataSet_multipleDataSets() throws Exception {
         dbUnitModule.insertDataSet(DataSetTest.class.getMethod("testMethodMultipleDataSets"), new DataSetTest());
         assertLoadedDataSet("dataSet1.xml");
-        assertLenEquals("dataSet2.xml", getItemAsString("select dataset from test1", dataSource));
+        assertLenientEquals("dataSet2.xml", getItemAsString("select dataset from test1", dataSource));
     }
 
 

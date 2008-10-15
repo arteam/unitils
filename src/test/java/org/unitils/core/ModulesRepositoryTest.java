@@ -18,7 +18,7 @@ package org.unitils.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.unitils.reflectionassert.ReflectionAssert.assertLenEquals;
+import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,7 +80,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 	@Test
 	public void testGetModuleOfType_subType() {
 		TestModule1 result = modulesRepository.getModuleOfType(TestModule2.class);
-		assertLenEquals(testModule2, result);
+		assertLenientEquals(testModule2, result);
 	}
 
 
@@ -118,7 +118,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 	@Test
 	public void testGetModulesOfType() {
 		List<TestModule1> result = modulesRepository.getModulesOfType(TestModule1.class);
-		assertLenEquals(Arrays.asList(testModule1a, testModule1b, testModule2), result);
+		assertLenientEquals(Arrays.asList(testModule1a, testModule1b, testModule2), result);
 	}
 
 
@@ -129,7 +129,7 @@ public class ModulesRepositoryTest extends UnitilsJUnit4 {
 	@Test
 	public void testGetModulesOfType_subType() {
 		List<TestModule2> result = modulesRepository.getModulesOfType(TestModule2.class);
-		assertLenEquals(Arrays.asList(testModule2), result);
+		assertLenientEquals(Arrays.asList(testModule2), result);
 	}
 
 
