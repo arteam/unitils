@@ -60,7 +60,9 @@ public class ExceptionThrowingMockBehavior implements ValidatableMockBehavior {
                 return;
             }
         }
-        throw new UnitilsException("Trying to define a behavior that throws a checked exception for a method that does not have a suitable throws clause. Exception type: " + exceptionToThrow.getClass() + ", throws clause: " + Arrays.toString(exceptionTypes));
+        throw new UnitilsException("Trying to make a method throw an exception that it doesn't declare. Exception type: " + exceptionToThrow.getClass() + 
+                (exceptionTypes.length > 0 ? ", declared exceptions: " + Arrays.toString(exceptionTypes) :
+                                             ", no declared exceptions"));
     }
 
 
