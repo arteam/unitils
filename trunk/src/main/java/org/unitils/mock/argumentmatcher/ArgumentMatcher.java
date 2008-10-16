@@ -16,7 +16,7 @@
 package org.unitils.mock.argumentmatcher;
 
 /**
- * A matcher that can check whether a given argument matches a predefined value.
+ * A matcher that can check whether a given argument matches certain criteria.
  *
  * @author Kenny Claes
  * @author Filip Neven

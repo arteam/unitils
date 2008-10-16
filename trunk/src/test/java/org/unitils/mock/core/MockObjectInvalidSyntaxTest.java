@@ -23,6 +23,7 @@ import static org.unitils.mock.ArgumentMatchers.notNull;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -124,6 +125,11 @@ public class MockObjectInvalidSyntaxTest {
     @Test(expected = UnitilsException.class)
     public void tryToLetMethodReturnIncompatibleReturnValue() {
         mockObject1.returns(new ArrayList<String>()).testMethod();
+    }
+    
+    @Test(expected = UnitilsException.class)
+    public void tryToLetMethodThrowUndeclaredCheckedException() {
+        mockObject1.raises(IOException.class).testMethod();
     }
 
 
