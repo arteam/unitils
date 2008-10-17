@@ -67,8 +67,6 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     /* The scenario that will record all observed invocations */
     protected Scenario scenario;
 
-    protected SyntaxMonitor syntaxMonitor;
-
     /* The mock proxy instance */
     protected T instance;
 
@@ -86,25 +84,14 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         this.mockedClass = mockedClass;
         this.partialMock = partialMock;
         this.scenario = scenario;
-        this.syntaxMonitor = scenario.getSyntaxMonitor();
         this.instance = createInstance();
     }
-
+    
+    
     //
-    // Implementation of the Mock and PartialMock interfaces
+    // Implementation of the ObjectToInjectHolder interface. Implementing this interface makes sure that the 
+    // proxy instance is injected instead of this object (which doesn't directly implement the mocked interface)
     //
-
-    /**
-     * Returns the mock proxy instance. This is the instance that can be used to perform the test.
-     * You could for example inject it in the tested object. It will then perform the defined behavior and record
-     * all observed method invocations so that assertions can be performed afterwards.
-     *
-     * @return The proxy instance, not null
-     */
-    public T getInstance() {
-        return instance;
-    }
-
 
     /**
      * Returns the mock proxy instance. This is the object that must be injected if the field that it holds is
@@ -124,7 +111,22 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         return mockedClass;
     }
 
+    //
+    // Implementation of the Mock and PartialMock interfaces
+    //
 
+    /**
+     * Returns the mock proxy instance. This is the instance that can be used to perform the test.
+     * You could for example inject it in the tested object. It will then perform the defined behavior and record
+     * all observed method invocations so that assertions can be performed afterwards.
+     *
+     * @return The proxy instance, not null
+     */
+    public T getInstance() {
+        return instance;
+    }
+
+    
     /**
      * Defines behavior for this mock so that it will return the given value when the invocation following
      * this call matches the observed behavior. E.g.
@@ -313,13 +315,13 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
 
     protected T startBehaviorDefinition(ProxyInvocationHandler proxyInvocationHandler, String behaviorDefinitionMethodName) {
         ArgumentMatcherRepository.getInstance().acceptArgumentMatchers();
-        syntaxMonitor.startDefinition(name, behaviorDefinitionMethodName, proxyInvocationHandler, getInvokedAt());
+        getSyntaxMonitor().startDefinition(name, behaviorDefinitionMethodName, proxyInvocationHandler, getInvokedAt());
         return createMockObjectProxy(proxyInvocationHandler);
     }
 
     protected T startAssertion(ProxyInvocationHandler proxyInvocationHandler, String assertMethodName) {
         ArgumentMatcherRepository.getInstance().acceptArgumentMatchers();
-        syntaxMonitor.startDefinition(name, assertMethodName, proxyInvocationHandler, getInvokedAt());
+        getSyntaxMonitor().startDefinition(name, assertMethodName, proxyInvocationHandler, getInvokedAt());
         return createMockObjectProxy(proxyInvocationHandler);
     }
 
@@ -345,35 +347,35 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
 
 
     protected void handleOneTimeMatchingMockBehaviorInvocation(ProxyInvocation proxyInvocation, MockBehavior mockBehavior) {
-        syntaxMonitor.endDefinition();
+        getSyntaxMonitor().endDefinition();
         BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, mockBehavior);
         oneTimeMatchingMockBehaviors.add(behaviorDefiningInvocation);
     }
 
 
     protected void handleAlwaysMatchingMockBehaviorInvocation(ProxyInvocation proxyInvocation, MockBehavior mockBehavior) {
-        syntaxMonitor.endDefinition();
+        getSyntaxMonitor().endDefinition();
         BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, mockBehavior);
         alwaysMatchingMockBehaviors.add(behaviorDefiningInvocation);
     }
 
 
     protected void handleAssertInvokedInvocation(ProxyInvocation proxyInvocation, StackTraceElement assertedAt) {
-        syntaxMonitor.endDefinition();
+        getSyntaxMonitor().endDefinition();
         BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, null);
         scenario.assertInvoked(behaviorDefiningInvocation, assertedAt);
     }
 
 
     protected void handleAssertInvokedInOrderInvocation(ProxyInvocation proxyInvocation, StackTraceElement assertedAt) {
-        syntaxMonitor.endDefinition();
+        getSyntaxMonitor().endDefinition();
         BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, null);
         scenario.assertInvokedInOrder(behaviorDefiningInvocation, assertedAt);
     }
 
 
     protected void handleAssertNotInvokedInvocation(ProxyInvocation proxyInvocation, StackTraceElement assertedAt) {
-        syntaxMonitor.endDefinition();
+        getSyntaxMonitor().endDefinition();
         BehaviorDefiningInvocation behaviorDefiningInvocation = createBehaviorDefiningInvocation(proxyInvocation, null);
         scenario.assertNotInvoked(behaviorDefiningInvocation, assertedAt);
     }
@@ -484,6 +486,11 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
         }
         argumentMatcherRepository.resetArgumentMatchers();
         return result;
+    }
+    
+   
+    protected SyntaxMonitor getSyntaxMonitor() {
+        return scenario.getSyntaxMonitor();
     }
 
     //

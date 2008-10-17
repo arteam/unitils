@@ -19,7 +19,10 @@ import static org.unitils.mock.core.Scenario.VerificationStatus.*;
 import org.unitils.mock.proxy.ProxyInvocation;
 import org.unitils.mock.report.ScenarioReport;
 import org.unitils.mock.report.impl.DefaultScenarioReport;
+import org.unitils.mock.report.impl.DetailedObservedInvocationsReport;
 import org.unitils.mock.report.impl.ObservedInvocationsReport;
+import org.unitils.mock.report.impl.SuggestedAssertsReport;
+
 import static org.unitils.util.ReflectionUtils.getSimpleMethodName;
 
 import java.util.ArrayList;
@@ -44,7 +47,6 @@ public class Scenario {
 
     protected Object testObject;
 
-    // todo move to mock object as static thread local
     protected SyntaxMonitor syntaxMonitor = new SyntaxMonitor();
 
     public Scenario() {
@@ -135,9 +137,27 @@ public class Scenario {
     }
 
 
-    public String createReport() {
-        ScenarioReport scenarioReport = new DefaultScenarioReport();
-        return scenarioReport.createReport(this);
+    public String createFullReport() {
+        ScenarioReport fullScenarioReport = new DefaultScenarioReport();
+        return fullScenarioReport.createReport(this);
+    }
+    
+    
+    public String createObservedInvocationsReport() {
+        ObservedInvocationsReport observedInvocationsReport = new ObservedInvocationsReport();
+        return observedInvocationsReport.createReport(this.getObservedInvocations());
+    }
+    
+    
+    public String createDetailedObservedInvocationsReport() {
+        DetailedObservedInvocationsReport observedInvocationsReport = new DetailedObservedInvocationsReport();
+        return observedInvocationsReport.createReport(this.getObservedInvocations());
+    }
+    
+    
+    public String createSuggestedAssertsReport() {
+        SuggestedAssertsReport suggestedAssertsReport = new SuggestedAssertsReport();
+        return suggestedAssertsReport.createReport(testObject, getObservedInvocations());
     }
 
 
@@ -150,7 +170,7 @@ public class Scenario {
         message.append("\n");
         message.append(getAssertLocationIndication(assertedAt));
         message.append("\n\n");
-        message.append(createReport());
+        message.append(createFullReport());
         return message.toString();
     }
 
@@ -163,7 +183,7 @@ public class Scenario {
         message.append(", but it didn't occur.\n");
         message.append(getAssertLocationIndication(invokedAt));
         message.append("\n\n");
-        message.append(createReport());
+        message.append(createFullReport());
         return message.toString();
     }
 
@@ -178,7 +198,7 @@ public class Scenario {
         message.append(" but actually occurred before it.\n");
         message.append(getAssertLocationIndication(assertedAt));
         message.append("\n\n");
-        message.append(createReport());
+        message.append(createFullReport());
         return message.toString();
     }
 
@@ -190,7 +210,7 @@ public class Scenario {
         message.append("\n");
         message.append(getAssertLocationIndication(assertedAt));
         message.append("\n");
-        message.append(createReport());
+        message.append(createFullReport());
         return message.toString();
     }
 

@@ -27,6 +27,8 @@ import org.unitils.mock.core.MockObject;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.util.AnnotationUtils;
+import org.unitils.util.PropertyUtils;
+
 import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
 import static org.unitils.util.ReflectionUtils.*;
 
@@ -46,14 +48,33 @@ public class MockModule implements Module {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(MockModule.class);
 
+    public static final String PROPERTY_LOG_FULL_SCENARIO_REPORT = "mockModule.logFullScenarioReport";
+    
+    public static final String PROPERTY_LOG_OBSERVED_SCENARIO = "mockModule.logObservedScenario";
+    
+    public static final String PROPERTY_LOG_DETAILED_OBSERVED_SCENARIO = "mockModule.logDetailedObservedScenario";
+    
+    public static final String PROPERTY_LOG_SUGGESTED_ASSERTS = "mockModule.logSuggestedAsserts";
 
-    private Scenario scenario;
+    protected Scenario scenario;
+    
+    protected boolean logFullScenarioReport;
+    
+    protected boolean logObservedScenario;
+    
+    protected boolean logDetailedObservedScenario;
+    
+    protected boolean logSuggestedAsserts;
 
 
     /**
      * No initialization needed for this module
      */
     public void init(Properties configuration) {
+        logFullScenarioReport = PropertyUtils.getBoolean(PROPERTY_LOG_FULL_SCENARIO_REPORT, configuration);
+        logObservedScenario = PropertyUtils.getBoolean(PROPERTY_LOG_OBSERVED_SCENARIO, configuration);
+        logDetailedObservedScenario = PropertyUtils.getBoolean(PROPERTY_LOG_DETAILED_OBSERVED_SCENARIO, configuration);
+        logSuggestedAsserts = PropertyUtils.getBoolean(PROPERTY_LOG_SUGGESTED_ASSERTS, configuration);
     }
 
 
@@ -74,11 +95,28 @@ public class MockModule implements Module {
     }
 
 
-    public void logExecutionScenario() {
-        String report = scenario.createReport();
+    public void logFullScenarioReport() {
+        String report = "\n\n" + scenario.createFullReport();
+        logger.info(report);
+    }
+    
+    
+    public void logObservedScenario() {
+        String report = "\n\nObserved scenario:\n\n" + scenario.createObservedInvocationsReport();
+        logger.info(report);
+    }
+    
+    
+    public void logDetailedObservedScenario() {
+        String report = "\n\nDetailed observed scenario:\n\n" + scenario.createDetailedObservedInvocationsReport();
         logger.info(report);
     }
 
+    
+    public void logSuggestedAsserts() {
+        String report = "\n\nSuggested assert statements:\n\n" + scenario.createSuggestedAssertsReport();
+        logger.info(report);
+    }
 
     @SuppressWarnings({"unchecked"})
     protected Mock<?> createMock(Field field, boolean partial) {
@@ -189,6 +227,19 @@ public class MockModule implements Module {
         public void afterTestTearDown(Object testObject, Method testMethod) {
             if (scenario != null) {
                 scenario.getSyntaxMonitor().assertNotExpectingInvocation();
+            }
+            if (logFullScenarioReport) {
+                logFullScenarioReport();
+                return;
+            }
+            if (logObservedScenario) {
+                logObservedScenario();
+            }
+            if (logDetailedObservedScenario) {
+                logDetailedObservedScenario();
+            }
+            if (logSuggestedAsserts) {
+                logSuggestedAsserts();
             }
         }
 

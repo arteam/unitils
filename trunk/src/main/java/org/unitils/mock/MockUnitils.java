@@ -31,8 +31,23 @@ public class MockUnitils {
     }
 
     
-    public static void logExecutionScenario() {
-        getMockModule().logExecutionScenario();
+    public static void logFullScenarioReport() {
+        getMockModule().logFullScenarioReport();
+    }
+    
+    
+    public void logObservedScenario() {
+        getMockModule().logObservedScenario();
+    }
+    
+    
+    public void logDetailedObservedScenario() {
+        getMockModule().logDetailedObservedScenario();
+    }
+
+    
+    public void logSuggestedAsserts() {
+        getMockModule().logSuggestedAsserts();
     }
     
     
