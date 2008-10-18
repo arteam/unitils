@@ -15,12 +15,24 @@
  */
 package org.unitils.mock;
 
+import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
+import static org.unitils.util.ReflectionUtils.getFieldsOfType;
+import static org.unitils.util.ReflectionUtils.invokeMethod;
+import static org.unitils.util.ReflectionUtils.setFieldValue;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.UnitilsException;
-import org.unitils.easymock.EasyMockModule;
 import org.unitils.mock.annotation.AfterCreateMock;
 import org.unitils.mock.annotation.Dummy;
 import org.unitils.mock.core.MockObject;
@@ -28,13 +40,6 @@ import org.unitils.mock.core.Scenario;
 import org.unitils.mock.dummy.DummyObjectUtil;
 import org.unitils.util.AnnotationUtils;
 import org.unitils.util.PropertyUtils;
-
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ReflectionUtils.*;
-
-import java.lang.reflect.*;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Module for testing with mock objects.
