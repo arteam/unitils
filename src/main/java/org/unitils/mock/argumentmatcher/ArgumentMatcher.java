@@ -32,7 +32,7 @@ public interface ArgumentMatcher {
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
      * @param argument                 The argument that was used by reference, not null
-     * @param argumentAtInvocationTime A copy containing the exact same contents as when the argument was used, not null
+     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
      * @return True when passed object matches, false otherwise.
      */
     boolean matches(Object argument, Object argumentAtInvocationTime);

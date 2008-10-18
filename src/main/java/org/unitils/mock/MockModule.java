@@ -208,14 +208,11 @@ public class MockModule implements Module {
 
 
     /**
-     * Test listener that handles the mock creation and injection.
+     * Test listener that handles the scenario and mock creation, and makes sure a final syntax check
+     * is performed after each test and that scenario reports are logged if required. 
      */
     protected class MockTestListener extends TestListener {
 
-        /**
-         * Before the test is executed this calls {@link EasyMockModule#createAndInjectRegularMocksIntoTest(Object)} to
-         * create and inject all mocks on the class.
-         */
         @Override
         public void beforeTestSetUp(Object testObject, Method testMethod) {
             scenario = new Scenario(testObject);
@@ -225,9 +222,10 @@ public class MockModule implements Module {
 
         @Override
         public void afterTestTearDown(Object testObject, Method testMethod) {
-            if (scenario != null) {
-                scenario.getSyntaxMonitor().assertNotExpectingInvocation();
+            if (scenario == null) {
+                return;
             }
+            scenario.getSyntaxMonitor().assertNotExpectingInvocation();
             if (logFullScenarioReport) {
                 logFullScenarioReport();
                 return;

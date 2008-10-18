@@ -48,7 +48,7 @@ public class EqualsArgumentMatcher implements ArgumentMatcher {
      * occur to the original values (pass-by-value vs pass-by-reference).
      *
      * @param argument                 The argument that were used by reference, not null
-     * @param argumentAtInvocationTime The argument at the time that they were used, not null
+     * @param argumentAtInvocationTime Copy of the argument, taken at the time that the invocation was performed, not null
      * @return True when passed object matches, false otherwise.
      */
     public boolean matches(Object argument, Object argumentAtInvocationTime) {
