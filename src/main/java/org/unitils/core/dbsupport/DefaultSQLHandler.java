@@ -15,19 +15,17 @@
  */
 package org.unitils.core.dbsupport;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.core.UnitilsException;
 import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.unitils.core.UnitilsException;
 
 /**
  * Class to which database updates and queries are passed. Is in fact a utility class, but is a concrete instance to
@@ -98,11 +96,11 @@ public class DefaultSQLHandler implements SQLHandler {
             closeQuietly(connection, statement, null);
         }
     }
-    
-    
+
+
     /* (non-Javadoc)
-     * @see org.unitils.core.dbsupport.SQLHandler#executeQuery(java.lang.String)
-     */
+    * @see org.unitils.core.dbsupport.SQLHandler#executeQuery(java.lang.String)
+    */
     public void executeQuery(String sql) {
         logger.debug(sql);
 
@@ -124,11 +122,11 @@ public class DefaultSQLHandler implements SQLHandler {
             closeQuietly(connection, statement, resultSet);
         }
     }
-    
-    
+
+
     /* (non-Javadoc)
-     * @see org.dbmaintain.dbsupport.SQLHandler#executeUpdateAndCommit(java.lang.String)
-     */
+    * @see org.dbmaintain.dbsupport.SQLHandler#executeUpdateAndCommit(java.lang.String)
+    */
     public int executeUpdateAndCommit(String sql) {
         logger.debug(sql);
 
@@ -142,7 +140,9 @@ public class DefaultSQLHandler implements SQLHandler {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
             int nbChanges = statement.executeUpdate(sql);
-            connection.commit();
+            if (!connection.getAutoCommit()) {
+                connection.commit();
+            }
             return nbChanges;
 
         } catch (Exception e) {
