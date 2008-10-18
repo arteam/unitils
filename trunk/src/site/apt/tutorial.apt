@@ -28,7 +28,7 @@ Tutorial
     
     * {{{#Testing_with_Spring}Testing with Spring}}
     
-	* {{{#Testing_with_mock_objects}Testing with mock objects}}
+    * {{{#Testing_with_mock_objects}Testing with mock objects}}
     
     * {{{#EasyMock_support}EasyMock support}}
         
@@ -529,7 +529,7 @@ DbUnitModule.DataSet.loadStrategy.default=org.unitils.dbunit.datasetloadstrategy
     * RefreshLoadStrategy: 'Refresh' the contents of the database with the contents of the dataset. This means that data of existing rows is updated and 
     non-existing rows are inserted. Any rows that are in the database but not in the dataset stay unaffected
     
-    * UpdateLoadStrategy: Update the contents of the database with the contents of the dataset. This means that data of existing rows is updated. Fails if 
+    * UpdateLoadStrategy: Update the contents of the database with the contents of the dataset. This means that data of existing rows is updated. 	Fails if 
     the dataset contains records that are not in the database (i.e. a records having the same value for the primary key column).
 
     []
@@ -1433,68 +1433,72 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 
 * {Testing with mock objects}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unit tests should test code in isolation. Mock objects enable you to test a piece of code without having to care about other parts or services that it depends on. Since version 2.0, unitils provides a complete mock object solution to dynamically create mock objects. Support is also offered for mock creation and injection.
+    Unit tests should test code in isolation. Mock objects enable you to test a piece of code without having to care about other objects or services that it depends on. Since version 2.0, unitils provides a complete mock object solution to dynamically create mock objects. Support is also offered for mock creation and injection.
 	
 	Before version 2.0, mock objects support was built upon EasyMock. This functionality will remain available. Refer to the chapter on {{{EasyMock support}EasyMock support}} for more info.
 
-	You may wonder why we've written a complete mock module given the abundance of dynamic mock object libraries already available. The reason is that we actually experienced a lot of flaws when working with libraries such as EasyMock and JMock. The features that make the difference are:
+	You may wonder why we've written a complete mock module given the abundance of dynamic mock object libraries already available. The reason is that in our opinion, a lot of things can be improved in the user friendlyness of existing libraries. The features that make the difference are:
 	
     * Mock behavior definition is performed before invoking the method under test. After the tested method invocation, assert statements are used to verify expected method invocations.
 	
-	* Concrete objects, argument matchers and the null reference (meaning I-don't-care) can be mixed in behavior definitions and assert statements, whereas in other mock libraries you must use either concrete objects or argument matchers, but you cannot mix them within the same method call.
+    * A concise, easy to use and consistent syntax.
+	
+    * Concrete objects, argument matchers and the null reference (meaning I-don't-care) can be mixed in behavior definitions and assert statements, whereas in other mock libraries you must use either concrete objects or argument matchers, but you cannot mix them within the same method call.
 
-	* The best possible feedback is provided in logs and in error messages: The observed scenario, which lists all method calls performed on the mocks in order, with links to the source code, and suggested assert statements that can be used as a basis for your own asserts.
+    * By default, value semantics is used by default to compare expected and actual arguments: You don't need to worry about the contents of objects being changed in between the method call and the call in which you perform an invocation assert statement: a copy of the original object is used for comparison.
+	
+    * The best possible feedback is provided in logs and in error messages: The observed scenario, which lists all method calls performed on the mocks in order, with links to the source code, the contents of all objects involved, and suggested assert statements that can be used as a basis for your own asserts.
 
 ** Mock test example
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Following example is a test for an alert service: the <sendScheduledAlerts()> method requests all scheduled alerts from an <AlertSchedulerService>, and sends them using a <MessageSenderService>.
+    Following example is a test for an alert service: the <sendScheduledAlerts()> method requests all scheduled alerts from an <AlertSchedulerService>, and sends them using a <MessageSenderService>.
 
 +-----+
 public class AlertServiceTest extends UnitilsJUnit4 {
 
-	AlertService alertService;
-	Message alert1, alert2;
-	List<Message> alerts;
+    AlertService alertService;
+    Message alert1, alert2;
+    List<Message> alerts;
 	
-	Mock<SchedulerService> mockSchedulerService;
-	Mock<MessageService> mockMessageService;
+    Mock<SchedulerService> mockSchedulerService;
+    Mock<MessageService> mockMessageService;
 
-	@Before
-	public void init() {
-		alertService = new AlertService(mockSchedulerService.getInstance(),
-				mockMessageService.getInstance());
-		alert1 = new Alert(...); alert2 = new Alert(...);
-		alerts = Arrays.asList(alert1, alert2);
-	}
+    @Before
+    public void init() {
+        alertService = new AlertService(mockSchedulerService.getInstance(),
+                mockMessageService.getInstance());
+        alert1 = new Alert(...); alert2 = new Alert(...);
+        alerts = Arrays.asList(alert1, alert2);
+    }
 	
-	@Test 
-	public void testSendScheduledAlerts() {
-	    mockSchedulerService.returns(alerts).getScheduledAlerts(null));
+    @Test 
+    public void testSendScheduledAlerts() {
+        mockSchedulerService.returns(alerts).getScheduledAlerts(null));
 	    
-	    alertService.sendScheduledAlerts();
+        alertService.sendScheduledAlerts();
 		
-		mockMessageService.assertInvoked().sendMessage(alert1);
-	    mockMessageService.assertInvoked().sendMessage(alert2);
-	}
+        mockMessageService.assertInvoked().sendMessage(alert1);
+        mockMessageService.assertInvoked().sendMessage(alert2);
+    }
 }
 +-----+	
 
     The example test makes use of a mock SchedulerService and MessageService. The first statement in this test specifies that subsequent invocations of getScheduledAlerts on the mock SchedulerService with any parameter (<null> means <any argument> in a behavior definition statement), will return a List containing alert1 and alert2.
-	The subsequent statement invokes the method under test. After this, assert statements are used to verify that <sendAlert> was called on the <mockMessageService>, with <alert1> and then <alert2> as arguments.
+    The subsequent statement invokes the method under test. After this, assert statements are used to verify that <sendAlert> was called on the <mockMessageService>, with <alert1> and then <alert2> as argument.
 
 ** Instantiation of mock objects
 ~~~~~~~~~~~~~~~~~~~~
-	Mock objects are wrapped inside a control object, which you can use to define behavior and invoke assert statements. To have a mock control being instantiated, simply declare it as a field of your test.
+    Mock objects are wrapped inside a control object, which you can use to define behavior and invoke assert statements. Simply declare the mock as a field of your test, you don't have to instantiate it yourself.
 
 +-----+
-	Mock<MyService> mockService;
+Mock<MyService> mockService;
 +-----+
 	
-	Unitils will create the mock control object for you and assign it to this field before each test. To obtain the mock object itself, simply call the getInstance() method on the control object:
+    Unitils creates the mock control object and assigns it to this field before each test. To obtain the mock object itself, simply call the getInstance() method on the control object:
 	
 +----+
-    MyService myService = mockService.getInstance();
+MyService myService = mockService.getInstance();
 +----+
 	
 ** Define mock behavior
@@ -1502,71 +1506,72 @@ public class AlertServiceTest extends UnitilsJUnit4 {
     Unitils offers a simple and concise syntax for defining mock behavior. To make the <getScheduledAlerts> method return <alerts> if called with <myUser> as argument, simply write:
 
 +----+
-	mockSchedulerService.returns(alerts).getScheduledAlerts(myUser);
+mockSchedulerService.returns(alerts).getScheduledAlerts(myUser);
 +----+
 
     Or to make it throw an exception:
 	
 +----+
-    mockSchedulerService.raises(new BackEndNotAvailableException()).getScheduledAlerts(myUser);
+mockSchedulerService.raises(new BackEndNotAvailableException()).getScheduledAlerts(myUser);
 +----+
-    or
-+----+
-    mockSchedulerService.raises(BackEndNotAvailableException.class).getScheduledAlerts(myUser);
-+----+
+    
+    You may also simply specify the exception class, an instance is created for you. Note that the exception class doesn't need to offer an empty constructor since under the hoods, Obgenesis is used to create the instance.
 	
++----+
+mockSchedulerService.raises(BackEndNotAvailableException.class).getScheduledAlerts(myUser);
++----+
 
-	Or you may want to specify custom behavior as follows:
+    Or you can specify custom behavior like in this example:
 	
 +----+
     mockSchedulerService.performs(new MockBehavior() {
-	    public Object execute(ProxyInvocation mockInvocation) {
-			// ... (retrieve alerts logic)
-			return alerts;
-		}
-	});
+        public Object execute(ProxyInvocation mockInvocation) {
+            // ... (retrieve alerts logic)
+            return alerts;
+        }
+    });
 +----+
 
-    If you want the same method to behave differently during subsequent calls, you can make sure each behavior definition gets only matched once, by using the methods <onceReturns>, <onceRaises> or <oncePerforms>. E.g.
+    If the same method must behave differently during subsequent calls, you can make sure each behavior definition gets only matched once, by using the methods <onceReturns>, <onceRaises> or <oncePerforms>. E.g.
 	
 +----+
-	mockSchedulerService.onceReturns(alerts).getScheduledAlerts(myUser);
-	mockSchedulerService.onceRaises(new BackEndNotAvailableException()).getScheduledAlerts(myUser);
+mockSchedulerService.onceReturns(alerts).getScheduledAlerts(myUser);
+mockSchedulerService.onceRaises(new BackEndNotAvailableException()).getScheduledAlerts(myUser);
 +----+
 
     If you would use <returns> and <raises> instead of <onceReturns> and <onceRaises>, the second behavior definition could never be matched: in this case, the first matching behavior definition always wins. 
 	
-	For sake of maintainability, we advise to avoid the usage of the <once> syntax, since making assumptions about the order of method calls makes your tests brittle. If possible, try to exploit the fact that subsequent calls to the same method use different parameter values.
+    For sake of maintainability, we advise to avoid the usage of the <once> syntax, since making assumptions about the order of method calls makes your tests brittle. If possible, try to exploit the fact that subsequent calls to the same method use different parameter values.
 
 ** Verify expected invocations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     After the execution of the tested method, you usually want to check that some expected method calls were performed on the mock objects. For example:
     
 +-----+
-    mockMessageService.assertInvoked().sendMessage(alert1);
+mockMessageService.assertInvoked().sendMessage(alert1);
 +-----+
 
     This verifies that <sendMessage> was called on the mock <MessageService> with <alert1> as argument. Note that each invocation can only be verified once: if you repeat the same assert statement twice, unitils checks that the method call in question was called two times.
 	
-	Note that unitils doesn't react on 'unexpected' invocations by default. You can explicitly prohibit method calls using <assertNotInvoked>. E.g. we can explicitly verify that alert number 3 wasn't sent like this:
+    Note that unitils doesn't react on 'unexpected' invocations by default. You can explicitly prohibit method calls using <assertNotInvoked>. E.g. we can explicitly verify that alert number 3 wasn't sent like this:
 	
 +-----+
-    mockMessagService.assertNotInvoked().sendMessage(alert3);
+mockMessagService.assertNotInvoked().sendMessage(alert3);
 +-----+
 
     To make sure that your mocks didn't receive any other method calls, except from the ones you've stubbed or verified, you can use following static method call:
 	
 +-----+
-    MockUnitils.assertNoMoreInvocations();
+MockUnitils.assertNoMoreInvocations();
 +-----+
 
-    If you want to generally prohibit unexpected method calls, you can call <assertNoMoreInvocations> in an <@After> method, or in the <@After> method of you base test class.
+    If you want to prohibit unexpected method calls in general, you can call <assertNoMoreInvocations> in an <@After> method, or in the <@After> method of you base test class.
 	
-    By default, the order of the actual calls is not verified. If you do want to verify the order, you can use <assertInvokedInOrder>. Suppose we want to make sure alert1 was sent before alert2:
+    By default, the order of the calls is not verified. If you do want to verify the order, you can use <assertInvokedInOrder>. For example we can make sure alert1 was sent before alert2 as follows:
 	
 +-----+
-    mockMessageService.assertInvokedInOrder().sendMessage(alert1);
-	mockMessageService.assertInvokedInOrder().sendMessage(alert2);
+mockMessageService.assertInvokedInOrder().sendMessage(alert1);
+mockMessageService.assertInvokedInOrder().sendMessage(alert2);
 +-----+
 
 ** Argument matching
@@ -1574,73 +1579,212 @@ public class AlertServiceTest extends UnitilsJUnit4 {
     To improve maintainability and to simplify tests, it's better not to impose strong expectations on the values of arguments. Unitils offers a very simple way to ignore the value of an argument: simply pass the <null> reference. E.g. to ignore the <user> argument value in the <getScheduledAlerts> method call, we write:
 	
 +-----+
-    mockSchedulerService.returns(alerts).getScheduledAlerts(null));
+mockSchedulerService.returns(alerts).getScheduledAlerts(null));
 +-----+
 
     Note that, if you do pass an object reference, the expected and actual object are compared using <lenient reflection comparison>: the fields are compared using reflection, fields which are <null>, 0 or false in the expected object are ignored and the order of collections is ignored (refer to {{{#Assertion_utilities}Assertion utilities}} for more information about reflection comparison).
 	
-	If you need yet another way to match arguments, you can use an argument matcher instead. A set of argument matchers is provided in <org.unitils.mock.ArgumentMatchers>, which contains a bunch of static methods that you'd typically import by means of a static import:
+    If you need yet another way to match arguments, you can use an argument matcher instead. A set of argument matchers is provided in <org.unitils.mock.ArgumentMatchers>, which contains a bunch of static methods that you'd typically import by means of a static import:
 
 +-----+	
-	import static org.unitils.mock.ArgumentMatchers.*;
+import static org.unitils.mock.ArgumentMatchers.*;
 +-----+	
 	
-	Typical use cases for argument matchers are the following:
+    Typical use cases for argument matchers are the following:
 	
 +-----+
-	mockSchedulerService.returns(alerts).getScheduledAlerts(notNull(User.class))); // Matches with any not-null object of type User
-	mockSchedulerService.returns(alerts).getScheduledAlerts(isNull(User.class))); // The argument must be null
-	mockMessageService.assertInvoked().sendMessage(same(alert1)); // The argument must refer to alert1 instance
+mockSchedulerService.returns(alerts).getScheduledAlerts(notNull(User.class))); // Matches with any not-null object of type User
+mockSchedulerService.returns(alerts).getScheduledAlerts(isNull(User.class))); // The argument must be null
+mockMessageService.assertInvoked().sendMessage(same(alert1)); // The argument must refer to alert1 instance
 +-----+
 
-	Other argument matchers are <eq>, <refEq> and <lenEq>. When using <eq>, the equals method is called to see if the actual argument matches the expected one. With <refEq>, strict reflection comparison is used. <lenEq> is the default argument matcher which is also implicitly used when directly passing an argument: reflection argument matching wile ignoring java defaults (null, 0, false) and the order of collections.
+    Other argument matchers are <eq>, <refEq> and <lenEq>. When using <eq>, the equals method is called to see if the actual argument matches the expected one. With <refEq>, strict reflection comparison is used. <lenEq> is the default argument matcher which is also implicitly used when directly passing an argument: reflection argument matching wile ignoring java defaults (null, 0, false) and the order of collections.
+	
+*** Value / reference semantics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    When passing arguments directly or using the lenEq / refEq argument matchers, a copy of the original objects is used for comparison. This way your checks are not affected by changes to values inside the objects. For example: suppose that after the alert has been sent, the <successfullySent> property is set to true and the alert is archived. We can verify that this property was correctlty set as follows:
+	
++-----+
+alert1.setSuccessfullySent(true);
+mockAlertRepository.assertInvoked().archiveAlert(alert1);
++-----+
+
+    If no copy would be taken, the assert statement would not fail if the <successfullySent> property wasn't set, because the <alert1> object would be compared with itself. 
+	
+    When using the same() or eq() argument matcher, the original objects are used for comparison. Following piece of code is therefore not correct:
+
++-----+
+alert1.setSuccessfullySent(true);                             // Useless assignment
+mockAlertRepository.assertInvoked().archiveAlert(eq(alert1)); // 
++-----+
+
+    Even if the <equals()> method of <Alert> would take into account the successfullySent property, this piece of code doesn't make any sense since the property is set in both the expected and actual object.
+
+    Note that when defining behavior, the same principle is used: changes to the arguments after the behavior definition will not change the semantics.
 	
 *** Custom argument matchers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unitils currenlty only offers 6 argument matchers, which is a lot less than competing libraries. This is intentional: We've experienced that most of them are rarely or never used. If you do have specific needs, it's easy to implement a custom argument matcher. E.g. a lessThan(...) argument matcher that checks if the given value is less than a given threshold can be implemented like this:
+    Unitils currenlty only offers 6 argument matchers, which is a lot less than competing libraries. This is intentional: We've experienced that most of them are rarely or never used. If you do have specific needs, it's easy to implement a custom argument matcher. The implementation of a lessThan(...) argument matcher could be as follows:
 	
 +-----+
 public class CustomArgumentMatchers {
 
-	@ArgumentMatcher
-	public static int lessThan(int lessThan) {
-		ArgumentMatcherRepository.registerArgumentMatcher(new LessThanArgumentMatcher(lessThan));
-	}
-	
+    @ArgumentMatcher
+    public static int lessThan(Integer lessThan) {
+        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new LessThanArgumentMatcher(lessThan));
+        return 0;
+    }
 }	
 
 public class LessThanArgumentMatcher implements ArgumentMatcher {
 
     private Integer lessThan;
 
-    public LessThanArgumentMatcher(int lessThan) {
+    public LessThanArgumentMatcher(Integer lessThan) {
         this.lessThan = lessThan;
     }
 
-    public boolean matches(Object actualValue) {
-		Integer actualValueAsInt = (Integer) actualValue;
-        return lessThan.compareTo(actualValueAsInt) < 0;
+    public boolean matches(Object argument, Object argumentAtInvocationTime) {
+        Integer argumentAsInt = (Integer) argument;
+        return lessThan.compareTo(argumentAsInt) < 0;
     }
 }
 +-----+
+	
+    The <matches> method of <ArgumentMatcher> is passed both the original object and a copy of the object taken at invocation time. Which one you use depends on whether you want to implement reference or value semantics.
 	
 ** Dummy objects
 ~~~~~~~~~~~~~~~~
     In tests you often need an instance of a domain entity or value object, where it's actually not important to have it populated with test data. For example in the <AlertServiceTest> listed above, we need 2 <alert> instances. In the method under test, the alerts are retrieved from the SchedulerService and passed on the MessageService. Since no methods are called on the alert instances, the contents of the object are not important. However, the constructor typically forces you to pass in all required parameters, and the constructor may check that these parameters are not-null.
 	
-	Although you could create a mock object and only store the proxy instance, you actually simply need a dummy instance. For this you can use dummy objects. You can create a dummy object by calling <MockUnitils.createDummy>, or by annotating a field with the <@Dummy> annotation:
+    Although you could create a mock object and only store the proxy instance, you actually simply need a dummy instance. For this you can use dummy objects. You can create a dummy object by calling <MockUnitils.createDummy>, or by annotating a field with the <@Dummy> annotation:
 	
 +-----+
-    @Dummy
-	Message alert1, alert2;
+@Dummy
+Message alert1, alert2;
 +-----+
 
+** Scenario and suggested assert statements reports
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    When an invocation assert statement fails, a detailed report is added to the error message containing the following sections:
+	
+    * Scenario overview: An overview of all the invocations performed on the mock objects, with links to where the invocations occurred in the source code.
+
+    * Suggested asserts: A set of invocation assert statements, which you can use as a basis for the assert statements of your test.
+
+    * Detailed scenario: All the invocations performed on the mock objects, the contents of the arguments and return values at invocation time, with a link to where the invocation occurred and where the behavior of the call was defined.
+	
+ You can also have these reports logged after each test, even if the test passes. Simply set one or more of the following properties to true in unitils.properties or unitils-local.properties:
+	
+    * mockModule.logObservedScenario
+
+    * mockModule.logDetailedObservedScenario
+
+    * mockModule.logSuggestedAsserts
+
+    * mockModule.logFullScenarioReport
+
+
+** Mock injection
+~~~~~~~~~~~~~~~~~
+    Unitils provides services that simplify mock injection in various ways. Following example shows how a <UserDao> mock is created and injected in the <userService>:
+
++-----+
+@InjectInto(property="userDao")
+private Mock<UserDao> mockUserDao;
+
+@TestedObject
+private UserService userService;
++-----+
+
+    Before executing a test method in the above example, but after the test setup, the <@Inject> annotation will cause the <mockUserDao> to be injected into the <userDao> property 
+    of the <userService>. The value for the attribute property of <@Inject> can be an arbitrary {{{http://www.ognl.org/}OGNL}} expression. Getter, setter and field access may 
+    be mixed and private access is also supported.
+  
+    The target object for injection is by default the field that is annotated with <@TestedObject>. If multiple fields are annotated with <@TestedObject> the object will be 
+    injected in each of them. A new instance will automatically be created if the tested object does not exist yet. If injection is not possible, for example when a property 
+    in the OGNL expression does not exist or the tested object could not be created, a <UnitilsException> will be raised and the test will fail. 
+  
+    If needed, the target object can also be specified explicitly, using the target attribute on the Inject annotation:
+  
++-----+
+@InjectInto(target="userService", property="userDao")
+private Mock<UserDao> mockUserDao;
+
+private UserService userService;
++-----+
+  
+    The previous example showed how you can explicitly inject mocks by specifying the name of the target property. Unitils also supports injecting objects into the target 
+    automatically by type. E.g.
+  
++-----+
+@InjectIntoByType
+private Mock<UserDao> mockUserDao;
+
+@TestedObject
+private UserService userService;
++-----+
+
+    The <mockUserDao> will be injected into a property of <userService> with the type <UserDao> or a superclass or interface of <UserDao>. If more than one candidate target 
+    property exists, the most specific one is chosen. If no single most specific target property can be found, a <UnitilsException> is thrown and the test fails.
+
+
+
+*** Static injection
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    There are variants of the <@InjectInto> and <@InjectIntoByType> annotations that can be used for injection into static fields or setter methods. These are called 
+    <@InjectIntoStatic> and <@InjectIntoStaticByType>, respectively. A common use of these annotations is to inject a mock into a singleton class. For example:    
+    
++-----+
+@InjectIntoStatic(target=UserService.class property="singleton")
+private Mock<UserDao> mockUserDao;
++-----+
+
+    This will inject the created mock into the static <singleton> field of the <UserService> class. 
+    
+    If this would be the only action performed, this test would leave the <UserService> in an invalid state. Other tests that access the same <singleton> field will now also 
+    get the mock instead of the real user service. To resolve this, Unitils will restore the old value of the field after the test was performed. In the above example, 
+    the <UserService> instance or null value contained in the <singleton> field will be put back after the test execution.
+    
+    The actual restore action can be configured by specifying it in the annotation. You can choose to restore the old value (=default), set the field to a null or 0 value or 
+    to leave the value as it is.
+    
++-----+
+@InjectIntoStaticByType(target=UserService.class restore=Restore.NULL_OR_0_VALUE)
+private Mock<UserDao> mockUserDao;
++-----+    
+    
+    The restore action can also be set project-wide, for all mocks at once, by changing the defaults in the configuration settings:
+
++-----+
+InjectModule.InjectIntoStatic.Restore.default=old_value
++-----+
+
+
+*** Mock injection when using a Service Locator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The above way of injecting mocks is very powerful and easy, but sometimes applications are not coded in such a way that this is possible. It could be for example, that 
+    an application uses a service locator instead of dependency injection. 
+    
+    To help with this, an <@AfterCreateMock> annotation is provided that allows intercepting a mock immediately after its creation. The annotated method takes as parameters an 
+    <Object> (the mock), a <String> (the name of the field to which the mock is assigned) and a <Class> (the type of the mock object). The mock instance can then be used to 
+    register the mock in the service locator or perform some other task of configuration. Such a method could for example be implemented as follows:
+  
++-----+
+@AfterCreateMock
+void injectMock(Object mock, String name, Class type) {
+    ServiceLocator.injectService(type, mock);
+}
++----+
+
+    The <injectService> method installs the instance, so that the mock instance is returned when the <ServiceLocator> is asked for an instance of that type. This allows for a very 
+    simple way of using mock objects in combination with such a service locator.
+
+	
 * {EasyMock support}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unit tests should test code in isolation. Mock objects allow testing a piece of code without having to care about other parts or services that it depends on. Unitils builds 
-    further on {{{http://www.easymock.org}EasyMock}} for its mock object testing support. It provides convenience functionality that reduces the plumbing code that needs to 
-    be written when working with mocks. This involves simplification of mock creation, argument matching and injection of mocks.
-    
+    Unitils also offers support for tests that use {{{http://www.easymock.org}EasyMock}}. It provides convenience functionality that reduces the plumbing: This involves simplification of mock creation, argument matching and injection of mocks.
+
     
 ** Mock creation
 ~~~~~~~~~~~~~~~~
@@ -1695,8 +1839,6 @@ private UserDao mockUserDao;
 EasyMockModule.Mock.Calls.default=lenient
 EasyMockModule.Mock.InvocationOrder.default=strict
 +-----+
-   
-   
    
 ** Reflection lenient argument matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1753,108 +1895,3 @@ EasyMockModule.Mock.Defaults.default=strict
 @RegularMock
 private UserDao mockUserDao;
 +-----+
-
-
-
-
-** Mock injection
-~~~~~~~~~~~~~~~~~
-    Unitils provides services that simplify mock injection in various ways. Following example shows how a <UserDao> mock is created and injected in the <userService>:
-
-+-----+
-@Mock 
-@InjectInto(property="userDao")
-private UserDao mockUserDao;
-
-@TestedObject
-private UserService userService;
-+-----+
-
-    Before executing a test method in the above example, but after the test setup, the <@Inject> annotation will cause the <mockUserDao> to be injected into the <userDao> property 
-    of the <userService>. The value for the attribute property of <@Inject> can be an arbitrary {{{http://www.ognl.org/}OGNL}} expression. Getter, setter and field access may 
-    be mixed and private access is also supported.
-  
-    The target object for injection is by default the field that is annotated with <@TestedObject>. If multiple fields are annotated with <@TestedObject> the object will be 
-    injected in each of them. A new instance will automatically be created if the tested object does not exist yet. If injection is not possible, for example when a property 
-    in the OGNL expression does not exist or the tested object could not be created, a <UnitilsException> will be raised and the test will fail. 
-  
-    If needed, the target object can also be specified explicitly, using the target attribute on the Inject annotation:
-  
-+-----+
-@Mock 
-@InjectInto(target="userService", property="userDao")
-private UserDao mockUserDao;
-
-private UserService userService;
-+-----+
-  
-    The previous example showed how you can explicitly inject mocks by specifying the name of the target property. Unitils also supports injecting objects into the target 
-    automatically by type. E.g.
-  
-+-----+
-@Mock 
-@InjectIntoByType
-private UserDao mockUserDao;
-
-@TestedObject
-private UserService userService;
-+-----+
-
-    The <mockUserDao> will be injected into a property of <userService> with the type <UserDao> or a superclass or interface of <UserDao>. If more than one candidate target 
-    property exists, the most specific one is chosen. If no single most specific target property can be found, a <UnitilsException> is thrown and the test fails.
-
-
-
-*** Static mock injection
-~~~~~~~~~~~~~~~~~~~~~~~~~
-    There are variants of the <@InjectInto> and <@InjectIntoByType> annotations that can be used for injection into static fields or setter methods. These are called 
-    <@InjectIntoStatic> and <@InjectIntoStaticByType>, respectively. A common use of these annotations is to inject a mock into a singleton class. For example:    
-    
-+-----+
-@Mock 
-@InjectIntoStatic(target=UserService.class property="singleton")
-private UserDao mockUserDao;
-+-----+
-
-    This will inject the created mock into the static <singleton> field of the <UserService> class. 
-    
-    If this would be the only action performed, this test would leave the <UserService> in an invalid state. Other tests that access the same <singleton> field will now also 
-    get the mock instead of the real user service. To resolve this, Unitils will restore the old value of the field after the test was performed. In the above example, 
-    the <UserService> instance or null value contained in the <singleton> field will be put back after the test execution.
-    
-    The actual restore action can be configured by specifying it in the annotation. You can choose to restore the old value (=default), set the field to a null or 0 value or 
-    to leave the value as it is.
-    
-+-----+
-@Mock 
-@InjectIntoStaticByType(target=UserService.class restore=Restore.NULL_OR_0_VALUE)
-private UserDao mockUserDao;
-+-----+    
-    
-    The restore action can also be set project-wide, for all mocks at once, by changing the defaults in the configuration settings:
-
-+-----+
-InjectModule.InjectIntoStatic.Restore.default=old_value
-+-----+
-
-
-
-*** Mock injection when using a Service Locator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    The above way of injecting mocks is very powerful and easy, but sometimes applications are not coded in such a way that this is possible. It could be for example, that 
-    an application uses a service locator instead of the typical {{{http://www.springframework.org}Spring}} way of providing a setter and a field for your services, and so 
-    there nothing to inject the mock into. 
-    
-    To resolve this, an <@AfterCreateMock> annotation is provided that allows intercepting a mock immediately after its creation. The annotated method takes as parameters an 
-    <Object> (the mock), a <String> (the name of the field to which the mock is assigned) and a <Class> (the type of the mock object). The mock instance can then be used to 
-    register the mock in the service locator or perform some other task of configuration. Such a method could for example be implemented as follows:
-  
-+-----+
-@AfterCreateMock
-void injectMock(Object mock, String name, Class type) {
-    ServiceLocator.injectService(type, mock);
-}
-+----+
-
-    The <injectService> method installs the instance, so that the mock instance is returned when the <ServiceLocator> is asked for an instance of that type. This allows for a very 
-    simple way of using mock objects in combination with such a service locator.

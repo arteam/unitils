@@ -15,16 +15,16 @@
  */
 package org.unitils.mock.core;
 
-import static junit.framework.Assert.assertNull;
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.core.UnitilsException;
 import static org.unitils.mock.ArgumentMatchers.notNull;
-import org.unitils.mock.mockbehavior.MockBehavior;
-import org.unitils.mock.proxy.ProxyInvocation;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.core.UnitilsException;
+import org.unitils.mock.mockbehavior.MockBehavior;
+import org.unitils.mock.proxy.ProxyInvocation;
 
 /**
  * todo javadoc
