@@ -24,7 +24,7 @@ import java.sql.Statement;
 
 /**
  * A collection of JDBC helper methods.  This class is thread safe.
- * 
+ *
  * TODO Make sure we use DataSourceUtils.getConnection and releaseConnection for getting / releasing Connections
  */
 public final class DbUtils {
@@ -132,15 +132,17 @@ public final class DbUtils {
     /**
      * Commits a <code>Connection</code> then closes it, avoid closing if null.
      *
-     * @param conn Connection to close.
+     * @param connection Connection to close.
      * @throws SQLException if a database access error occurs
      */
-    public static void commitAndClose(Connection conn) throws SQLException {
-        if (conn != null) {
+    public static void commitAndClose(Connection connection) throws SQLException {
+        if (connection != null) {
             try {
-                conn.commit();
+                if (!connection.getAutoCommit()) {
+                    connection.commit();
+                }
             } finally {
-                conn.close();
+                connection.close();
             }
         }
     }
