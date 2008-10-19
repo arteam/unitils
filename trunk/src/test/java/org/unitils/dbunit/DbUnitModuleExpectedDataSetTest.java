@@ -298,7 +298,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit4 {
      * Utility method to create the test table.
      */
     private void createTestTable() throws SQLException {
-        executeUpdate("create table test (dataset varchar(100))", dataSource);
+        executeUpdate("create table TEST(dataset varchar(100))", dataSource);
     }
 
 
@@ -307,7 +307,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit4 {
      */
     private void dropTestTable() throws SQLException {
         try {
-            executeUpdate("drop table test", dataSource);
+            executeUpdate("drop table TEST", dataSource);
         } catch (UnitilsException e) {
             // Ignored
         }

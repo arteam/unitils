@@ -280,8 +280,8 @@ public class DbSupportTest extends UnitilsJUnit4 {
         Set<String> result = dbSupport.getIdentityColumnNames(dbSupport.toCorrectCaseIdentifier("test_table"));
         assertLenientEquals(asList(dbSupport.toCorrectCaseIdentifier("col1")), result);
     }
-    
-    
+
+
     /**
      * Tests incrementing the current value of the primary key.
      */
@@ -292,8 +292,9 @@ public class DbSupportTest extends UnitilsJUnit4 {
             return;
         }
 
-        dbSupport.incrementSequenceToValue(dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE"), 30);
-        long result = dbSupport.getSequenceValue("TEST_SEQUENCE");
+        String sequenceName = dbSupport.toCorrectCaseIdentifier("TEST_SEQUENCE");
+        dbSupport.incrementSequenceToValue(sequenceName, 30);
+        long result = dbSupport.getSequenceValue(sequenceName);
         assertEquals(30, result);
     }
 

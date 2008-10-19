@@ -89,12 +89,12 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
         assertEquals(expectedDataSetName, dataSet);
     }
 
+
     /**
      * Creates the test tables.
      */
     private void createTestTables() {
-        // PUBLIC SCHEMA
-        executeUpdate("create table TEST(dataset varchar(100))", dataSource);
+        executeUpdate("create table test(dataset varchar(100))", dataSource);
     }
 
 
@@ -102,8 +102,9 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
      * Removes the test database tables
      */
     private void dropTestTables() {
-        executeUpdateQuietly("drop table TEST", dataSource);
+        executeUpdateQuietly("drop table test", dataSource);
     }
+
 
     /**
      * Test class with a class level dataset
@@ -118,6 +119,7 @@ public class DbUnitModuleDataSetOperationTest extends UnitilsJUnit4 {
         public void testMethodCustomDataSetOperation() {
         }
     }
+
 
     public static class MockDataSetLoadStrategy implements DataSetLoadStrategy {
 
