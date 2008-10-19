@@ -327,7 +327,7 @@ public class DbMaintainerIntegrationTest {
     }
 
     private void clearTestDatabase() {
-        SQLTestUtils.dropTestTables(dbSupport, "db_executed_scripts", INITIAL_INCREMENTAL_1, INITIAL_INCREMENTAL_2,
+        SQLTestUtils.dropTestTables(dbSupport, "dbmaintain_scripts", INITIAL_INCREMENTAL_1, INITIAL_INCREMENTAL_2,
                 INITIAL_REPEATABLE, NEW_INCREMENTAL, NEW_REPEATABLE, UPDATED_INCREMENTAL_1, UPDATED_REPEATABLE,
                 NEW_INCREMENTAL_LOWER_INDEX, SECOND_LOCATION_INCREMENTAL, SECOND_LOCATION_REPEATABLE);
     }
