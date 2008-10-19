@@ -797,16 +797,16 @@ dbscripts/ 01_production/ 001_initial.sql
 	Scripts located in a folders without a version number are executed after the scripts located in a folder with a version number. Folders may contain 
 	subfolders that in turn have a version number. The same ordering system is recursively applied to those subfolders.
 		
-    The database maintainer stores the current version of a database schema in a table called <DB_VERSION>. This way, it can determine whether the database is 
+    The database maintainer stores the current version of a database schema in a table called <DBMAINTAIN_SCRIPTS>. This way, it can determine whether the database is 
     up to date or not.
 	
     This version table is not created automatically by default. This is to make sure unitils does not clear the wrong database by accident. Suppose for example
     you have configured unitils to connect to your system test database. If you would enable the database maintainer it would see that the database is not in synch with 
-    the scripts (because there is no <DB_VERSION> table) and as a result drop the whole database and recreate it from scratch. This is probably not the desired result.
-    Therefore a database can only be updated automatically if it is 'unitils-enabled', i.e. when it contains a <DB_VERSION> table.  
+    the scripts (because there is no <DBMAINTAIN_SCRIPTS> table) and as a result drop the whole database and recreate it from scratch. This is probably not the desired result.
+    Therefore a database can only be updated automatically if it is 'unitils-enabled', i.e. when it contains a <DBMAINTAIN_SCRIPTS> table.  
 
     The database maintainer will throw an exception when it does not find a version table. The correct DDL statements for creating the version table will be 
-    displayed in the exception message. If desired, you can make unitils create the <DB_VERSION> table automatically by setting following property to true. 
+    displayed in the exception message. If desired, you can make unitils create the <DBMAINTAIN_SCRIPTS> table automatically by setting following property to true. 
 
 +-----+
 dbMaintainer.dbVersionSource.autoCreateVersionTable=true

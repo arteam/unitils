@@ -172,7 +172,7 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
      * Utility method to drop the test executed scripts table.
      */
     private void dropExecutedScriptsTable() throws SQLException {
-        executeUpdateQuietly("drop table db_executed_scripts", dataSource);
+        executeUpdateQuietly("drop table dbmaintain_scripts", dataSource);
     }
 
 }
