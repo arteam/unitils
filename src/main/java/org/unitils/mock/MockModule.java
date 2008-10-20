@@ -123,9 +123,14 @@ public class MockModule implements Module {
         logger.info(report);
     }
 
-    @SuppressWarnings({"unchecked"})
+
     protected Mock<?> createMock(Field field, boolean partial) {
-        return new MockObject(field.getName(), getMockedClass(field), partial, getScenario());
+        return createMock(field.getName(), getMockedClass(field), partial);
+    }
+    
+    
+    public <T> Mock<T> createMock(String name, Class<T> type, boolean partial) {
+        return new MockObject<T>(name, type, partial, getScenario());
     }
 
 
