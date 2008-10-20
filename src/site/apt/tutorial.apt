@@ -28,7 +28,7 @@ Tutorial
     
     * {{{#Testing_with_Spring}Testing with Spring}}
     
-    * {{{#Testing_with_mock_objects}Testing with mock objects}}
+    * {{{#Mock_objects}Mock objects}}
     
     * {{{#EasyMock_support}EasyMock support}}
         
@@ -1431,7 +1431,7 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 }
 +-----+
 
-* {Testing with mock objects}
+* {Mock objects}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unit tests should test code in isolation. Mock objects enable you to test a piece of code without having to care about other objects or services that it depends on. Since version 2.0, unitils provides a complete mock object solution to dynamically create mock objects. Support is also offered for mock creation and injection.
 	
@@ -1495,7 +1495,9 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 Mock<MyService> mockService;
 +-----+
 	
-    Unitils creates the mock control object and assigns it to this field before each test. To obtain the mock object itself, simply call the getInstance() method on the control object:
+    Unitils creates the mock control object and assigns it to this field before each test. You can also obtain a mock control by calling MockUnitils.createMock(mockName, type) or MockUnitils.createMock(type). The name is optional: it is only used in reports and error messages and if omitted, a default name is generated.
+	
+	To obtain the mock object itself, simply call the getInstance() method on the control object:
 	
 +----+
 MyService myService = mockService.getInstance();
@@ -1684,10 +1686,17 @@ Message alert1, alert2;
 
     * mockModule.logFullScenarioReport
 
+** Partial mocks
+~~~~~~~~~~~~~~~~
+    It may sometimes be desirable to obtain a mock object while keeping the original implementation, in order to mock only some method calls or simply to monitor the behavior of the object without actually mocking it. You can use partial mocks for this purpose. A partial mock can be obtained either by calling <MockUnitils.createPartialMock()>, or by declaring it as a field using the <PartialMock> interface:
+	
++-----+
+PartialMock<MyService> mockService;
++-----+
 
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
-    Unitils provides services that simplify mock injection in various ways. Following example shows how a <UserDao> mock is created and injected in the <userService>:
+    Unitils provides services that injection of mocks into the tested object. Following example shows how a <UserDao> mock is created and injected in the <userService>:
 
 +-----+
 @InjectInto(property="userDao")
@@ -1697,13 +1706,13 @@ private Mock<UserDao> mockUserDao;
 private UserService userService;
 +-----+
 
-    Before executing a test method in the above example, but after the test setup, the <@Inject> annotation will cause the <mockUserDao> to be injected into the <userDao> property 
+    Before executing a test method in the above example, but after the test setup, the <mockUserDao> will be injected into the <userDao> property 
     of the <userService>. The value for the attribute property of <@Inject> can be an arbitrary {{{http://www.ognl.org/}OGNL}} expression. Getter, setter and field access may 
     be mixed and private access is also supported.
   
-    The target object for injection is by default the field that is annotated with <@TestedObject>. If multiple fields are annotated with <@TestedObject> the object will be 
+    The target object for injection is by default the one referenced by the field annotated with <@TestedObject>. If multiple fields are annotated with <@TestedObject> the object is
     injected in each of them. A new instance will automatically be created if the tested object does not exist yet. If injection is not possible, for example when a property 
-    in the OGNL expression does not exist or the tested object could not be created, a <UnitilsException> will be raised and the test will fail. 
+    in the OGNL expression does not exist or the tested object could not be created, an exception is thrown. 
   
     If needed, the target object can also be specified explicitly, using the target attribute on the Inject annotation:
   
@@ -1714,7 +1723,7 @@ private Mock<UserDao> mockUserDao;
 private UserService userService;
 +-----+
   
-    The previous example showed how you can explicitly inject mocks by specifying the name of the target property. Unitils also supports injecting objects into the target 
+    The previous example shows how you can explicitly inject mocks by specifying the name of the target property. Unitils also supports injecting objects into the target 
     automatically by type. E.g.
   
 +-----+
@@ -1726,8 +1735,7 @@ private UserService userService;
 +-----+
 
     The <mockUserDao> will be injected into a property of <userService> with the type <UserDao> or a superclass or interface of <UserDao>. If more than one candidate target 
-    property exists, the most specific one is chosen. If no single most specific target property can be found, a <UnitilsException> is thrown and the test fails.
-
+    property exists, the most specific one is chosen. If no single most specific target property can be found, a <UnitilsException> is thrown.
 
 
 *** Static injection
