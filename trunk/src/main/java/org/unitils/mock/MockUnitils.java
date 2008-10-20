@@ -29,7 +29,31 @@ public class MockUnitils {
     public static void assertNoMoreInvocations() {
         getMockModule().assertNoMoreInvocations(getAssertedAt());
     }
+    
+    
+    public static <T> T createDummy(Class<T> type) {
+        return DummyObjectUtil.createDummy(type);
+    }
+    
+    
+    public static <T> Mock<T> createMock(Class<T> type) {
+        return getMockModule().createMock("mock" + type.getSimpleName(), type, false);
+    }
+    
+    
+    public static <T> Mock<T> createMock(String name, Class<T> type) {
+        return getMockModule().createMock(name, type, false);
+    }
 
+    
+    public static <T> PartialMock<T> createPartialMock(Class<T> type) {
+        return (PartialMock<T>) getMockModule().createMock("mock" + type.getSimpleName(), type, true);
+    }
+    
+    
+    public static <T> PartialMock<T> createPartialMock(String name, Class<T> type) {
+        return (PartialMock<T>) getMockModule().createMock(name, type, true);
+    }
     
     public static void logFullScenarioReport() {
         getMockModule().logFullScenarioReport();
@@ -48,11 +72,6 @@ public class MockUnitils {
     
     public void logSuggestedAsserts() {
         getMockModule().logSuggestedAsserts();
-    }
-    
-    
-    public static <T> T createDummy(Class<T> type) {
-        return DummyObjectUtil.createDummy(type);
     }
     
     
