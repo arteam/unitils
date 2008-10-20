@@ -45,13 +45,59 @@ assertPropertyLenientEquals("firstName", Arrays.asList("John", "Jane"),
 				 new Person[] {new Person("Jane", "Doe"), new Person("John", "Doe")});
 +-----+
 
+* Mock objects
+~~~~~~~~~~~~~~
+    Following example demonstrates the mock objects support. It's a test for an alert service: the <sendScheduledAlerts()> method requests all scheduled alerts from an <AlertSchedulerService>, and sends them using a <MessageSenderService>.
 
++-----+
+import static org.unitils.mock.ArgumentMatchers.*;
 
+public class AlertServiceTest extends UnitilsJUnit4 {
 
-* Mock creation and mock injection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-    This example demonstrates the EasyMock and injection modules. The test must extend one of unitils base classes: UnitilsJUnit3, UnitilsJUnit4 or UnitilsTestNG.
-    No additional configuration is needed.
+    AlertService alertService;
+	List<Message> alerts;
+	@Dummy Message alert1, alert2;                 // Dummy objects
+    
+    Mock<SchedulerService> mockSchedulerService;   // Mock objects
+    Mock<MessageService> mockMessageService;
+
+    @Before
+    public void init() {
+        alertService = new AlertService(mockSchedulerService.getInstance(),
+                mockMessageService.getInstance());
+        alert1 = new Alert(...); alert2 = new Alert(...);
+        alerts = Arrays.asList(alert1, alert2);
+    }
+	
+    @Test 
+    public void testSendScheduledAlerts() {
+        mockSchedulerService.returns(alerts).getScheduledAlerts(null)); // Definition of behavior
+	    
+        alertService.sendScheduledAlerts();
+		
+        mockMessageService.assertInvoked().sendMessage(alert1);         // Invocation asserts
+        mockMessageService.assertInvoked().sendMessage(same(alert2));
+    }
+}
++-----+	
+	
+    The example demonstrates following features:
+	
+    * Behavior of mock objects can be defined using the notation mockObject.returns(...).methodCall(...). Passing <null> as an argument in a behavior definition causes the value of this argument to be ignored. You can also use raises(...) to make the method throw an exception, or performs(...) to specify custom behavior. By default, methods return default values such as <null>, <0>, <false> or an empty collection.
+	
+    * You can assert that certain calls were made on a mock object by using the notation mockObject.assertInvoked().methodCall(...). You can use mockObject.assertInvokedInOrder().methodCall(...) if you want to ensure the calls were made in a certain order. With assertNotInvoked() you can explicitly verify a certain invocation didn't occur or you can use MockUnitils.assertNoMoreInvocations() to make sure no other invocations occurred, except for the ones you verified.
+	
+    * By default, expected arguments are compared with actual arguments using <lenient reflection comparison>: The fields are compared using reflection, the order of collections is ignored and fields that are null, 0 or false in the expected object are ignored. If you want an argument to be ignored altogether, you can simply use <null>. Argument matchers can be used if other behavior is desired: available argument matchers are <notNull>, <isNull>, <same>, <eq>, <refEq> and <lenEq>. Argument matchers, concrete objects and the null reference can be combined within the same call.
+	
+    * In tests, you often need an instance of some domain or value object without the contents of the object being important. For this you can use dummy objects. You can obtain a dummy object by annotating a field with @Dummy or by calling MockUnitils.createDummy(dummyObjectClass). The class doesn't need to offer an empty constructor. 
+	
+	* To obtain a mock object, simply declare Mock&lt;MyClass&gt; as a field of your test, it will be automatically instantiated behind the scenes. Another way to obtain a mock object is by calling MockUnitils.createMock(mockObjectClass). You can also use 'partial' mocks by declaring the field as PartialMock&lt;MyClass&gt; or by calling MockUnitils.createPartialMock(mockObjectClass): With a partial mock, methods keep their original behavior unless you specify a different one.
+    
+	* When a test fails, a detailed report is shown listing the observed mock invocations with links to the source code and the contents of all objects involved, and suggested assert statements that can be used as a basis for your own asserts.
+	
+* EasyMock support
+~~~~~~~~~~~~~~~~~~
+    This example demonstrates the EasyMock and injection modules.
     
 +-----+
 public class UserServiceTest extends UnitilsJUnit4 {
@@ -96,7 +142,7 @@ public class UserServiceTest extends UnitilsJUnit4 {
     
     
     
-* Database testing
+* Testing the persistence layer
 ~~~~~~~~~~~~~~~~~~
 
     Since Unitils 1.1, you need spring 2.0 or above in your classpath, if you want to make use of unitils database, JPA or hibernate support. This is because under the hoods, 
