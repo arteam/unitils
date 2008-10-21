@@ -1466,8 +1466,8 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 
     @Before
     public void init() {
-        alertService = new AlertService(mockSchedulerService.getInstance(),
-                mockMessageService.getInstance());
+        alertService = new AlertService(mockSchedulerService.getMock(),
+                mockMessageService.getMock());
         alert1 = new Alert(...); alert2 = new Alert(...);
         alerts = Arrays.asList(alert1, alert2);
     }
@@ -1497,10 +1497,10 @@ Mock<MyService> mockService;
 	
     Unitils creates the mock control object and assigns it to this field before each test. You can also obtain a mock control by calling MockUnitils.createMock(mockName, type) or MockUnitils.createMock(type). The name is optional: it is only used in reports and error messages and if omitted, a default name is generated.
 	
-	To obtain the mock object itself, simply call the getInstance() method on the control object:
+	To obtain the mock object itself, simply call the getMock() method on the control object:
 	
 +----+
-MyService myService = mockService.getInstance();
+MyService myService = mockService.getMock();
 +----+
 	
 ** Define mock behavior

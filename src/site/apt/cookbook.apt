@@ -63,8 +63,8 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 
     @Before
     public void init() {
-        alertService = new AlertService(mockSchedulerService.getInstance(),
-                mockMessageService.getInstance());
+        alertService = new AlertService(mockSchedulerService.getMock(),
+                mockMessageService.getMock());
         alerts = Arrays.asList(alert1, alert2);
     }
 	
