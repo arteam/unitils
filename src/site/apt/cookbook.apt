@@ -65,39 +65,65 @@ public class AlertServiceTest extends UnitilsJUnit4 {
     public void init() {
         alertService = new AlertService(mockSchedulerService.getInstance(),
                 mockMessageService.getInstance());
-        alert1 = new Alert(...); alert2 = new Alert(...);
         alerts = Arrays.asList(alert1, alert2);
     }
 	
     @Test 
     public void testSendScheduledAlerts() {
-        mockSchedulerService.returns(alerts).getScheduledAlerts(null)); // Definition of behavior
+        mockSchedulerService.returns(alerts).getScheduledAlerts(null)); // Definition of behavior, null means 'any argument'
 	    
         alertService.sendScheduledAlerts();
 		
-        mockMessageService.assertInvoked().sendMessage(alert1);         // Invocation asserts
-        mockMessageService.assertInvoked().sendMessage(same(alert2));
+        mockMessageService.assertInvoked().sendMessage(alert1);         // Invocation assert
+        mockMessageService.assertInvoked().sendMessage(same(alert2));   // Argument matcher
     }
 }
 +-----+	
 	
     The example demonstrates following features:
 	
-    * Behavior of mock objects can be defined using the notation mockObject.returns(...).methodCall(...). Passing <null> as an argument in a behavior definition causes the value of this argument to be ignored. You can also use raises(...) to make the method throw an exception, or performs(...) to specify custom behavior. By default, methods return default values such as <null>, <0>, <false> or an empty collection.
+    * Behavior of mock objects can be defined using the notation mockObject.returns(...).methodCall(...). Passing <null> as an argument in a behavior definition causes the value of this argument to be ignored. You can also use raises(...) to make a method throw an exception, or performs(...) to specify custom behavior. If no behavior is specified, methods return default values such as <null>, <0>, <false> or an empty collection.
 	
-    * You can assert that certain calls were made on a mock object by using the notation mockObject.assertInvoked().methodCall(...). You can use mockObject.assertInvokedInOrder().methodCall(...) if you want to ensure the calls were made in a certain order. With assertNotInvoked() you can explicitly verify a certain invocation didn't occur or you can use MockUnitils.assertNoMoreInvocations() to make sure no other invocations occurred, except for the ones you verified.
+    * You can verify that certain calls were made on a mock object by using the notation mockObject.assertInvoked().methodCall(...). You can use mockObject.assertInvokedInOrder().methodCall(...) to ensure the calls were made in a certain sequence. With mockObject.assertNotInvoked().methodCall(...) you can explicitly verify that a certain invocation didn't occur or you can use MockUnitils.assertNoMoreInvocations() to make sure no other invocation occurred, except for the ones you verified.
 	
-    * By default, expected arguments are compared with actual arguments using <lenient reflection comparison>: The fields are compared using reflection, the order of collections is ignored and fields that are null, 0 or false in the expected object are ignored. If you want an argument to be ignored altogether, you can simply use <null>. Argument matchers can be used if other behavior is desired: available argument matchers are <notNull>, <isNull>, <same>, <eq>, <refEq> and <lenEq>. Argument matchers, concrete objects and the null reference can be combined within the same call.
+    * By default, expected arguments are compared with actual arguments using <lenient reflection comparison>: The fields are compared using reflection, the order of collections is ignored and fields that are null, 0 or false in the expected object are ignored. If you want an argument to be ignored altogether, you can simply use <null>. Argument matchers can be used if other behavior is desired: available argument matchers are <notNull>, <isNull>, <same>, <eq>, <refEq> and <lenEq>. Argument matchers, concrete objects and <null> can be combined in the same call.
 	
-    * In tests, you often need an instance of some domain or value object without the contents of the object being important. For this you can use dummy objects. You can obtain a dummy object by annotating a field with @Dummy or by calling MockUnitils.createDummy(dummyObjectClass). The class doesn't need to offer an empty constructor. 
+    * Often you need an instance of some domain or value object without the contents of the object being important. For this you can use dummy objects. You can obtain a dummy object by annotating a field with @Dummy or by calling MockUnitils.createDummy(dummyObjectClass). The class doesn't need to offer an empty constructor.
 	
-	* To obtain a mock object, simply declare Mock&lt;MyClass&gt; as a field of your test, it will be automatically instantiated behind the scenes. Another way to obtain a mock object is by calling MockUnitils.createMock(mockObjectClass). You can also use 'partial' mocks by declaring the field as PartialMock&lt;MyClass&gt; or by calling MockUnitils.createPartialMock(mockObjectClass): With a partial mock, methods keep their original behavior unless you specify a different one.
+	* To obtain a mock object, simply declare Mock&lt;MyClass&gt; as a field of your test, you don't have to instantiate it. You can also obtain a mock using MockUnitils.createMock(mockObjectClass). You can also use 'partial' mocks by declaring the field as PartialMock&lt;MyClass&gt; or by calling MockUnitils.createPartialMock(mockObjectClass): In a partial mock, methods keep their original behavior unless you specify a different one.
     
 	* When a test fails, a detailed report is shown listing the observed mock invocations with links to the source code and the contents of all objects involved, and suggested assert statements that can be used as a basis for your own asserts.
 	
+* Injection of mocks
+~~~~~~~~~~~~~~~~~~~~
+    The fixture of the last test can be rewritten as follows, making use of unitils' injection support:
+	
++----+
+    List<Message> alerts;
+    @Dummy Message alert1, alert2;
+    
+    @InjectIntoByType                        // Is injected into a property of type SchedulerService of the tested object
+    Mock<SchedulerService> mockSchedulerService;
+    @InjectInto(property = "messageService") // Is injected into the messageService property of the tested object
+    Mock<MessageService> mockMessageService;
+
+    @TestedObject
+    AlertService alertService;    // The tested object is automatically instantiated
+	
+    @Before
+    public void init() {
+        alerts = Arrays.asList(alert1, alert2);
+    }
++-----+
+
+    * The object referenced by the field annotated with <@InjectInto> is injected to the the object referenced by the field annotated with <@TestedObject>, in the specified property. The target property is automatically determined by type when using <@InjectIntoByType>, or by name when using <@InjectIntoByName>. The target can also be specified explicitly using the <target> attribute.
+    
+    * The field annotated with <@TestedObject> is automatically instantiated with an instance of the declared type, if necessary (i.e. if not instantiated during test setup) and possible (i.e. if the declared type is a non-abstract class and offers an empty constructor).
+    
+	
 * EasyMock support
 ~~~~~~~~~~~~~~~~~~
-    This example demonstrates the EasyMock and injection modules.
+    This example demonstrates the EasyMock module.
     
 +-----+
 public class UserServiceTest extends UnitilsJUnit4 {
@@ -129,7 +155,7 @@ public class UserServiceTest extends UnitilsJUnit4 {
     
     * The contents of the field <mockUserDao> is injected into a property of <userService> of type <UserDAO>.
     
-    * During the test, we first record the expected behavior. Arguments are matched using lenient reflection equals: ignoring null/0 defaults and the order of collections
+    * During the test, we first record the expected behavior. Arguments are matched using lenient reflection equals: ignoring null, 0 and false and the order of collections
     
     * <EasyMockUnitils.replay()> is called to call replay on all mocks that were created during the test
     
@@ -146,7 +172,7 @@ public class UserServiceTest extends UnitilsJUnit4 {
 ~~~~~~~~~~~~~~~~~~
 
     Since Unitils 1.1, you need spring 2.0 or above in your classpath, if you want to make use of unitils database, JPA or hibernate support. This is because under the hoods, 
-	spring is used for transactions and integration with JPA or hibernate. This does not mean you need to use spring in	your application code! You can keep spring as a test-
+	spring is used for transactions and for integration with JPA or hibernate. This does not mean you need to use spring in	your application code, you can keep spring as a test-
 	dependency only.
 
     To enable testing your persistence layer, you should start with setting up a test database for every developer in the team. In the configuration shown below, we assume 
@@ -184,7 +210,6 @@ database.schemaNames=<developers database schema name>
 	Following is an example of a typical database test:
     
 +-----+
-@Transactional(TransactionMode.COMMIT)
 public class UserDaoTest extends UnitilsJUnit4 {
     
     @TestDataSource
@@ -238,23 +263,20 @@ public class UserDaoTest extends UnitilsJUnit4 {
     
     []
 
+** Rollback after each test
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    By default, each test is executed in a transaction, which is committed in the end. If you want your transactions to rollback after every test, annotate 
+	the class or method with @Transactional(TransactionMode.ROLLBACK).
 
-* Automatic maintenance of unit test databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    To enable automatic maintenance of the developers' unit test databases, start with creating a database scripts folder. Add this folder 
+* Automatic maintenance of test databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    To enable automatic maintenance of the developers' test databases, start with creating a database scripts folder. Add this folder 
     to your source control system. Next, add following properties to <unitils.properties>:
   
 +------+
 # If set to true, the DBMaintainer will be used to update the unit test database schema. This is done once for each
 # test run, when creating the DataSource that provides access to the unit test database.
 updateDataBaseSchema.enabled=true
-
-# Set to true if the db version table should be created automatically if it does not exist yet.
-# If false, an exception is thrown the it does not exist yet, showing how to create the version table manually. 
-# This is set to false by default to be sure that no non-unit test schema is dropped by accident. If a 
-# version table is available, we assume it to be a unit-test schema, if not, you should manually add a version table 
-# to indicate that it is a unit-test schema.
-dbMaintainer.dbVersionSource.autoCreateVersionTable=true
 
 # Comma separated list of directories and files in which the database update scripts are located. Directories in this
 # list are recursively searched for files.
@@ -263,44 +285,33 @@ dbMaintainer.script.locations=<Paths to your database update script files>
 # DbUnit database XSD directory
 dataSetStructureGenerator.xsd.dirName=<Path to your database XSD directory>
 
-# Comma separated list of database items that may not be dropped or cleared by the db maintainer when
-# updating the database from scratch (dbMaintainer.fromScratch.enabled=true).
-# Schemas can also be preserved as a whole. If identifiers are quoted (eg "" for oracle) they are considered
-# case sensitive. Items that do not have a schema prefix are considered to be in the default schema
-dbMaintainer.preserve.schemas=
-dbMaintainer.preserve.tables=
-dbMaintainer.preserve.views=
-dbMaintainer.preserve.synonyms=
-dbMaintainer.preserve.sequences=
-
-# Comma separated list of table names. The tables listed here will not be emptied when the db maintainer performs a database
-# update. This can be used for Tables that contain rather static, read only or type data. The database version table
-# is preserved automatically.
-# Tables listed here will still be dropped when the db maintainer performs a from scratch update. If this is not desirable
-# you should add the tablename to the dbMaintainer.preserve.tables property instead
-# Schemas can also be preserved as a whole. If identifiers are quoted (eg "" for oracle) they are considered 
-# case sensitive. Items that do not have a schema prefix are considered to be in the default schema
-dbMaintainer.preserveDataOnly.schemas=
-dbMaintainer.preserveDataOnly.tables=
+# Set this property to true if the dbmaintain_scripts table should be created automatically if not found.
+# If false, an exception is thrown when the table is not found, indicating how to create it manually. 
+# This property is false by default to be sure that a database is cleared by accident. If an executed 
+# scripts table is available, we assume it to be a database managed by dbmaintain.
+dbMaintainer.autoCreateExecutedScriptsTable=false
 +------+
 
-    For every time update to the database structure, create a DDL script and add it to the database scripts folder. The name of this script must
-    comply with following naming convention: <\<version\>_\<some name\>.sql>. For example:
+    For every update to the database structure, create a DDL script and add it to the database scripts folder. The name of this script must
+    comply with following naming convention: <\<index\>_\<some name\>.sql>. For example:
     
 +-----+
 dbscripts / 001_user_table.sql
             002_company_table.sql
 +-----+
 
-    Unitils detects that a script was added and will invoke it on the database. If one of the existing scripts is altered, the
+    Unitils detects that a script was added and will execute it on the database. If one of the existing scripts is altered, the
     database is dropped and created from scratch, re-executing all scripts. When the database is updated, XSD files are generated 
     that can be used for validation and auto-completion when writing DBUnit data sets. 
+	
+	A lot more features are offered by the DB maintainer, such as hierarchical organization of scripts, repeatable and post-processing scripts.
+	Read the tutorial for more information.
 
-* Setup a JPA test
-~~~~~~~~~~~~~~~~~~
+* Test a JPA DAO 
+~~~~~~~~~~~~~~~~
     Since unitils 1.1, support for JPA is offered, with hibernate, openjpa and toplink as supported persistence providers.
 
-    To make use of unitils' JPA support, make sure the database support is configured correctly as described above and that you have you JPA provider's 
+    To make use of unitils' JPA support, make sure the datasource is configured correctly as described above and that you have your JPA provider's 
 	libraries and spring (2.0 or +) in your classpath. Note: if you use spring as IOC container in your application code, the JPA configuration can also be 
 	performed from within an application context (See below).
     
@@ -314,7 +325,6 @@ jpa.persistenceProvider=hibernate
 
 +-----+
 @JpaEntityManagerFactory(persistenceUnit = "test", configFile = "META-INF/persistence-test.xml")
-@Transactional(TransactionMode.COMMIT)
 public class UserDaoTest extends UnitilsJUnit4 {
 
     @PersistenceContext
@@ -325,7 +335,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
     @Before
     public void setUp() {
         userDao = new UserDao();
-        userDao.setEntityManager(entityManager);
+        JpaUnitils.injectEntityManagerInto(userDao);
     }
   
     @Test
@@ -340,7 +350,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
 	indicated using the persistenceUnit attribute. The config file attribute is optional. If omitted, the JPA default META-INF/persistence.xml is loaded.
 
 	Unitils injects the EntityManagerFactory and EntityManager into fields / setters annotated with the standard JPA @PersistenceUnit and @PersistenceContext 
-	annotations, respectively.
+	annotations.
 
 	Important note: You should not obtain your EntityManager by invoking entityManagerFactory.createEntityManager()! An EntityManger obtained this way won't participate
 	in the test's transaction! If you need to obtain an EntityManager programatically, use JpaUnitils.getEntityManager().
@@ -354,7 +364,6 @@ public class UserDaoTest extends UnitilsJUnit4 {
 
 +-----+
 @JpaEntityManagerFactory(persistenceUnit = "test", configFile = "META-INF/persistence-test.xml")
-@Transactional(TransactionMode.COMMIT)
 public class HibernateMappingTest extends UnitilsJUnit4 {
     
     @Test
@@ -365,8 +374,8 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 +-----+
 
 
-* Setup a Hibernate test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Test a hibernate DAO
+~~~~~~~~~~~~~~~~~~~~~~
     To make use of Unitils' Hibernate support, first make sure the database support is configured correctly as described above and that you have hibernate
     and spring (2.0+) in your classpath. Note: if you use spring as IOC container in your application code, the Hibernate configuration can also be performed 
 	from an application context (See below).
@@ -383,7 +392,6 @@ HibernateModule.configuration.implClassName=org.hibernate.cfg.Configuration
 
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
-@Transactional(TransactionMode.COMMIT)
 public class UserDaoTest extends UnitilsJUnit4 {
 
     @HibernateSessionFactory
@@ -409,8 +417,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
 	available in the classpath. Unitils injects this <SessionFactory> in all fields or setters annotated with <@HibernateSessionFactory>, before
 	starting a transaction and starting with the execution of the setUp() method.
 
-	Note: Since unitils 1.1, tests must always be executed in a transaction.
-
+	
 ** Database mapping test for hibernate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Unitils is shipped with a ready-to-use test that verifies if the mapping of all your mapped classes is consistent with the database structure. 
@@ -418,7 +425,6 @@ public class UserDaoTest extends UnitilsJUnit4 {
 
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
-@Transactional(TransactionMode.COMMIT)
 public class HibernateMappingTest extends UnitilsJUnit4 {
     
     @Test
@@ -479,8 +485,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
 </beans>
 +-----+
 
-	The test-specific configuration file test-config.xml specifies the DataSource. The makes sure the spring-configured SessionFactory 
-	connects with the database configured in Unitils.
+	The test-specific configuration file test-config.xml makes sure the spring-configured SessionFactory connects with the database configured in Unitils.
 
 +-----+
 <?xml version="1.0" encoding="UTF-8"?>
