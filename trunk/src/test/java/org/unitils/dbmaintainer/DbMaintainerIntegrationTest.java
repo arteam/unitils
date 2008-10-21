@@ -28,6 +28,7 @@ import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.util.SQLTestUtils;
 import org.unitils.database.DatabaseUnitils;
+import org.unitils.database.SQLUnitils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
@@ -53,6 +54,7 @@ public class DbMaintainerIntegrationTest {
     private static final String NEW_INCREMENTAL_LOWER_INDEX = "new_incremental_lower_index";
     private static final String SECOND_LOCATION_INCREMENTAL = "second_location_incremental";
     private static final String SECOND_LOCATION_REPEATABLE = "second_location_repeatable";
+    private static final String BEFORE_INITIAL_TABLE = "before_initial";
 
     @TestDataSource
     private DataSource dataSource = null;
@@ -238,16 +240,37 @@ public class DbMaintainerIntegrationTest {
         assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2, SECOND_LOCATION_INCREMENTAL, SECOND_LOCATION_REPEATABLE);
     }
 
-    /*@Test
-    public void notInfluencedByTransaction() {
+
+    /**
+     * Verifies that, if the dbmaintain_scripts table doesn't exist yet, and the autoCreateExecutedScriptsInfoTable property is set to true,
+     * we start with a from scratch update
+     */
+    @Test
+    public void initialFromScratchUpdate() {
+        createTable(BEFORE_INITIAL_TABLE);
         addInitialScripts();
-        startTransaction();
-        addRecordInsertingScript();
-        rollbackTransaction();
-        assertRecordExists();
-    }*/
+        updateDatabase();
+        assertTablesDontExist(BEFORE_INITIAL_TABLE);
+    }
+    
+    /**
+     * Verifies that, if the dbmaintain_scripts table doesn't exist yet, and the autoCreateExecutedScriptsInfoTable property is set to true,
+     * we start with a from scratch update
+     */
+    @Test
+    public void noInitialFromScratchUpdateIfFromScratchDisabled() {
+        disableFromScratch();
+        createTable(BEFORE_INITIAL_TABLE);
+        addInitialScripts();
+        updateDatabase();
+        assertTablesExist(BEFORE_INITIAL_TABLE);
+    }
 
 
+    private void createTable(String tableName) {
+        SQLUnitils.executeUpdate("create table " + tableName + " (test varchar(10))", dbSupport.getSQLHandler().getDataSource());
+    }
+    
     private void errorInInitialScript() {
         createScript("02_latest/01_" + INITIAL_INCREMENTAL_2 + ".sql", "this is an error;");
     }
@@ -273,6 +296,10 @@ public class DbMaintainerIntegrationTest {
 
     private void enableFromScratch() {
         configuration.put(DBMaintainer.PROPKEY_FROM_SCRATCH_ENABLED, "true");
+    }
+    
+    private void disableFromScratch() {
+        configuration.put(DBMaintainer.PROPKEY_FROM_SCRATCH_ENABLED, "false");
     }
 
     private void updateIncrementalScript() {

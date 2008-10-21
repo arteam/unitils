@@ -29,6 +29,19 @@ import org.unitils.dbmaintainer.util.DatabaseAccessing;
  */
 public interface ExecutedScriptInfoSource extends DatabaseAccessing {
 
+    
+    /**
+     * This method returns whether a from scratch update is recommended: It will return true
+     * if the database is in it's initial state (i.e. no scripts were executed yet) and the 
+     * autoCreateExecutedScriptsTable property is set to true.
+     * <p/>
+     * The reasoning behind this is that before executing the first script, it's a good idea to 
+     * clear the database in order to start with a clean situation.
+     * 
+     * @return True if a from-scratch update is recommended
+     */
+    boolean isFromScratchUpdateRecommended();
+    
 
     /**
      * Registers the fact that the given script has been executed on the database
@@ -45,11 +58,13 @@ public interface ExecutedScriptInfoSource extends DatabaseAccessing {
      */
     void updateExecutedScript(ExecutedScript executedScript);
     
+    
     /**
      * Clears all script executions that have been registered. After having invoked this method, 
      * {@link #getExecutedScripts()} will return an empty set.
      */
     void clearAllExecutedScripts();
+    
     
     /**
      * @return All scripts that were registered as being executed on the database

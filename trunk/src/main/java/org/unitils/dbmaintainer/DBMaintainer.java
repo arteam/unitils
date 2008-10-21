@@ -227,12 +227,15 @@ public class DBMaintainer {
      * with one of the scripts, a {@link UnitilsException} is thrown.
      */
     public void updateDatabase() {
+        // Check if the executed scripts info source recommends a from-scratch update
+        boolean fromScratchUpdateRecommended = versionSource.isFromScratchUpdateRecommended();
+        
         Set<ExecutedScript> alreadyExecutedScripts = versionSource.getExecutedScripts();
         Version highestExecutedScriptVersion = getHighestExecutedScriptVersion(alreadyExecutedScripts);
 
         // check whether an incremental update can be performed
-        if (!shouldUpdateDatabaseFromScratch(highestExecutedScriptVersion, alreadyExecutedScripts)) {
-            // update database with new scripts
+        if (!(fromScratchUpdateRecommended && fromScratchEnabled) && !shouldUpdateDatabaseFromScratch(highestExecutedScriptVersion, alreadyExecutedScripts)) {
+            // perform an incremental update
             updateDatabase(scriptSource.getNewScripts(highestExecutedScriptVersion, alreadyExecutedScripts));
             return;
         }

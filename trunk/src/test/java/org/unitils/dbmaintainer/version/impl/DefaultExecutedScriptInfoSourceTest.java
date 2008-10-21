@@ -17,6 +17,8 @@ package org.unitils.dbmaintainer.version.impl;
 
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.unitils.core.dbsupport.DbSupportFactory.getDefaultDbSupport;
 import static org.unitils.database.SQLUnitils.executeUpdate;
 import static org.unitils.database.SQLUnitils.executeUpdateQuietly;
@@ -127,6 +129,7 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
     @Test(expected = UnitilsException.class)
     public void testRegisterExecutedScript_NoExecutedScriptsTable() throws Exception {
     	dropExecutedScriptsTable();
+    	
         dbVersionSource.registerExecutedScript(executedScript1);
     }
 
@@ -138,7 +141,7 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
     public void testGetDBVersion_noExecutedScriptsTableAutoCreate() throws Exception {
     	dropExecutedScriptsTable();
 
-        dbVersionSourceAutoCreate.registerExecutedScript(executedScript1);
+    	dbVersionSourceAutoCreate.registerExecutedScript(executedScript1);
         assertLenientEquals(asList(executedScript1), dbVersionSource.getExecutedScripts());
     }
     
@@ -157,6 +160,17 @@ public class DefaultExecutedScriptInfoSourceTest extends UnitilsJUnit4 {
     	dbVersionSource.registerExecutedScript(executedScript2);
     	dbVersionSource.clearAllExecutedScripts();
     	assertEquals(0, dbVersionSource.getExecutedScripts().size());
+    }
+    
+    @Test
+    public void testIsFromScratchUpdateRecommended() throws SQLException {
+        assertFalse(dbVersionSource.isFromScratchUpdateRecommended());
+        assertFalse(dbVersionSourceAutoCreate.isFromScratchUpdateRecommended());
+        
+        dropExecutedScriptsTable();
+        
+        assertFalse(dbVersionSource.isFromScratchUpdateRecommended());
+        assertTrue(dbVersionSourceAutoCreate.isFromScratchUpdateRecommended());
     }
 
 
