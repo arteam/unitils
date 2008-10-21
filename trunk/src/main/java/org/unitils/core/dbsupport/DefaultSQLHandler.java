@@ -140,7 +140,7 @@ public class DefaultSQLHandler implements SQLHandler {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
             int nbChanges = statement.executeUpdate(sql);
-            if (!connection.getAutoCommit()) {
+                if (!connection.getAutoCommit()) {
                 connection.commit();
             }
             return nbChanges;
