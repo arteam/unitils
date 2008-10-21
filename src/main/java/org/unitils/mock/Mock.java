@@ -30,7 +30,7 @@ public interface Mock<T> {
      *
      * @return The proxy instance, not null
      */
-    T getInstance();
+    T getMock();
 
 
     /**

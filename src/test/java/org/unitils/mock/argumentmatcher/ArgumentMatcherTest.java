@@ -57,7 +57,7 @@ public class ArgumentMatcherTest {
     public void testEqualsArgumentMatcher() {
         mockObject.returns(true).testMethodString(eq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString("test");
+        boolean result = mockObject.getMock().testMethodString("test");
         assertTrue(result);
         mockObject.assertInvoked().testMethodString(eq("test"));
     }
@@ -70,7 +70,7 @@ public class ArgumentMatcherTest {
     public void testEqualsArgumentMatcher_noMatch() {
         mockObject.returns(true).testMethodString(eq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString("xxxx");
+        boolean result = mockObject.getMock().testMethodString("xxxx");
         assertFalse(result);
         mockObject.assertNotInvoked().testMethodString(eq("test"));
     }
@@ -83,7 +83,7 @@ public class ArgumentMatcherTest {
     public void testEqualsArgumentMatcher_bothNull() {
         mockObject.returns(true).testMethodString(eq((String) null));
 
-        boolean result = mockObject.getInstance().testMethodString(null);
+        boolean result = mockObject.getMock().testMethodString(null);
         assertTrue(result);
         mockObject.assertInvoked().testMethodString(eq((String) null));
     }
@@ -96,7 +96,7 @@ public class ArgumentMatcherTest {
     public void testEqualsArgumentMatcher_null() {
         mockObject.returns(true).testMethodString(eq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString(null);
+        boolean result = mockObject.getMock().testMethodString(null);
         assertFalse(result);
         mockObject.assertNotInvoked().testMethodString(eq("test"));
     }
@@ -114,14 +114,14 @@ public class ArgumentMatcherTest {
         mockObject.returns(true).testMethodObject(eq(list));
         
         list.add("test");
-        assertTrue(mockObject.getInstance().testMethodObject(list));
+        assertTrue(mockObject.getMock().testMethodObject(list));
         
         List<String> nonEqualList = new ArrayList<String>();
-        assertFalse(mockObject.getInstance().testMethodObject(nonEqualList));
+        assertFalse(mockObject.getMock().testMethodObject(nonEqualList));
         
         List<String> equalList = new ArrayList<String>();
         equalList.add("test");
-        assertTrue(mockObject.getInstance().testMethodObject(equalList));
+        assertTrue(mockObject.getMock().testMethodObject(equalList));
         
         list.add("test");
         mockObject.assertInvoked().testMethodObject(eq(list));
@@ -135,7 +135,7 @@ public class ArgumentMatcherTest {
     public void testNotNullArgumentMatcher() {
         mockObject.returns(true).testMethodString(notNull(String.class));
 
-        boolean result = mockObject.getInstance().testMethodString("test");
+        boolean result = mockObject.getMock().testMethodString("test");
         assertTrue(result);
     }
 
@@ -147,7 +147,7 @@ public class ArgumentMatcherTest {
     public void testNotNullArgumentMatcher_noMatch() {
         mockObject.returns(true).testMethodString(notNull(String.class));
 
-        boolean result = mockObject.getInstance().testMethodString(null);
+        boolean result = mockObject.getMock().testMethodString(null);
         assertFalse(result);
     }
 
@@ -159,7 +159,7 @@ public class ArgumentMatcherTest {
     public void testNullArgumentMatcher() {
         mockObject.returns(true).testMethodString(isNull(String.class));
 
-        boolean result = mockObject.getInstance().testMethodString(null);
+        boolean result = mockObject.getMock().testMethodString(null);
         assertTrue(result);
     }
 
@@ -171,7 +171,7 @@ public class ArgumentMatcherTest {
     public void testNullArgumentMatcher_noMatch() {
         mockObject.returns(true).testMethodString(isNull(String.class));
 
-        boolean result = mockObject.getInstance().testMethodString("test");
+        boolean result = mockObject.getMock().testMethodString("test");
         assertFalse(result);
     }
 
@@ -183,7 +183,7 @@ public class ArgumentMatcherTest {
     public void testLenEqArgumentMatcher() {
         mockObject.returns(true).testMethodString(lenEq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString("test");
+        boolean result = mockObject.getMock().testMethodString("test");
         assertTrue(result);
     }
 
@@ -195,7 +195,7 @@ public class ArgumentMatcherTest {
     public void testLenEqArgumentMatcher_noMatch() {
         mockObject.returns(true).testMethodString(lenEq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString("xxxx");
+        boolean result = mockObject.getMock().testMethodString("xxxx");
         assertFalse(result);
     }
 
@@ -207,7 +207,7 @@ public class ArgumentMatcherTest {
     public void testLenEqArgumentMatcher_bothNull() {
         mockObject.returns(true).testMethodString(lenEq((String) null));
 
-        boolean result = mockObject.getInstance().testMethodString(null);
+        boolean result = mockObject.getMock().testMethodString(null);
         assertTrue(result);
     }
 
@@ -219,7 +219,7 @@ public class ArgumentMatcherTest {
     public void testLenEqArgumentMatcher_null() {
         mockObject.returns(true).testMethodString(lenEq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString(null);
+        boolean result = mockObject.getMock().testMethodString(null);
         assertFalse(result);
     }
     
@@ -232,7 +232,7 @@ public class ArgumentMatcherTest {
     public void testLenEqArgumentMatcher_zero() {
         mockObject.returns(true).testMethodInteger(0);
         
-        boolean result = mockObject.getInstance().testMethodInteger(1);
+        boolean result = mockObject.getMock().testMethodInteger(1);
         assertFalse(result);
         
         mockObject.assertNotInvoked().testMethodInteger(0);
@@ -247,7 +247,7 @@ public class ArgumentMatcherTest {
     public void testLenEqArgumentMatcher_false() {
         mockObject.returns(true).testMethodBoolean(false);
         
-        boolean result = mockObject.getInstance().testMethodBoolean(true);
+        boolean result = mockObject.getMock().testMethodBoolean(true);
         assertFalse(result);
         
         mockObject.assertNotInvoked().testMethodBoolean(false);
@@ -266,14 +266,14 @@ public class ArgumentMatcherTest {
         mockObject.returns(true).testMethodObject(lenEq(list));
         
         list.add("test");
-        assertFalse(mockObject.getInstance().testMethodObject(list));
+        assertFalse(mockObject.getMock().testMethodObject(list));
         
         List<String> emptyList = new ArrayList<String>();
-        assertTrue(mockObject.getInstance().testMethodObject(emptyList));
+        assertTrue(mockObject.getMock().testMethodObject(emptyList));
         
         List<String> oneElementList = new ArrayList<String>();
         oneElementList.add("test");
-        assertFalse(mockObject.getInstance().testMethodObject(oneElementList));
+        assertFalse(mockObject.getMock().testMethodObject(oneElementList));
         
         list.add("test");
         mockObject.assertNotInvoked().testMethodObject(lenEq(list));
@@ -288,7 +288,7 @@ public class ArgumentMatcherTest {
     public void testRefEqArgumentMatcher() {
         mockObject.returns(true).testMethodString(refEq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString("test");
+        boolean result = mockObject.getMock().testMethodString("test");
         assertTrue(result);
     }
 
@@ -300,7 +300,7 @@ public class ArgumentMatcherTest {
     public void testRefEqArgumentMatcher_noMatch() {
         mockObject.returns(true).testMethodString(refEq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString("xxxx");
+        boolean result = mockObject.getMock().testMethodString("xxxx");
         assertFalse(result);
     }
 
@@ -312,7 +312,7 @@ public class ArgumentMatcherTest {
     public void testRefEqArgumentMatcher_bothNull() {
         mockObject.returns(true).testMethodString(refEq((String) null));
 
-        boolean result = mockObject.getInstance().testMethodString(null);
+        boolean result = mockObject.getMock().testMethodString(null);
         assertTrue(result);
     }
 
@@ -324,7 +324,7 @@ public class ArgumentMatcherTest {
     public void testRefEqArgumentMatcher_null() {
         mockObject.returns(true).testMethodString(refEq("test"));
 
-        boolean result = mockObject.getInstance().testMethodString(null);
+        boolean result = mockObject.getMock().testMethodString(null);
         assertFalse(result);
     }
     
@@ -341,14 +341,14 @@ public class ArgumentMatcherTest {
         mockObject.returns(true).testMethodObject(refEq(list));
         
         list.add("test");
-        assertFalse(mockObject.getInstance().testMethodObject(list));
+        assertFalse(mockObject.getMock().testMethodObject(list));
         
         List<String> emptyList = new ArrayList<String>();
-        assertTrue(mockObject.getInstance().testMethodObject(emptyList));
+        assertTrue(mockObject.getMock().testMethodObject(emptyList));
         
         List<String> oneElementList = new ArrayList<String>();
         oneElementList.add("test");
-        assertFalse(mockObject.getInstance().testMethodObject(oneElementList));
+        assertFalse(mockObject.getMock().testMethodObject(oneElementList));
         
         list.add("test");
         mockObject.assertNotInvoked().testMethodObject(refEq(list));
@@ -363,7 +363,7 @@ public class ArgumentMatcherTest {
         List object = new ArrayList();
         mockObject.returns(true).testMethodObject(same(object));
 
-        boolean result = mockObject.getInstance().testMethodObject(object);
+        boolean result = mockObject.getMock().testMethodObject(object);
         assertTrue(result);
     }
 
@@ -375,7 +375,7 @@ public class ArgumentMatcherTest {
     public void testSameArgumentMatcher_noMatch() {
         mockObject.returns(true).testMethodObject(same(new ArrayList()));
 
-        boolean result = mockObject.getInstance().testMethodObject(new ArrayList());
+        boolean result = mockObject.getMock().testMethodObject(new ArrayList());
         assertFalse(result);
     }
 
@@ -387,7 +387,7 @@ public class ArgumentMatcherTest {
     public void testSameArgumentMatcher_bothNull() {
         mockObject.returns(true).testMethodObject(same(null));
 
-        boolean result = mockObject.getInstance().testMethodObject(null);
+        boolean result = mockObject.getMock().testMethodObject(null);
         assertTrue(result);
     }
 
@@ -399,7 +399,7 @@ public class ArgumentMatcherTest {
     public void testSameArgumentMatcher_null() {
         mockObject.returns(true).testMethodObject(same(new ArrayList()));
 
-        boolean result = mockObject.getInstance().testMethodObject(null);
+        boolean result = mockObject.getMock().testMethodObject(null);
         assertFalse(result);
     }
 
@@ -416,11 +416,11 @@ public class ArgumentMatcherTest {
         mockObject.returns(true).testMethodObject(same(list));
         
         list.add("test");
-        assertTrue(mockObject.getInstance().testMethodObject(list));
+        assertTrue(mockObject.getMock().testMethodObject(list));
         
         List<String> equalList = new ArrayList<String>();
         equalList.add("test");
-        assertFalse(mockObject.getInstance().testMethodObject(equalList));
+        assertFalse(mockObject.getMock().testMethodObject(equalList));
         
         List<String> otherEqualList = new ArrayList<String>();
         otherEqualList.add("test");

@@ -122,7 +122,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      *
      * @return The proxy instance, not null
      */
-    public T getInstance() {
+    public T getMock() {
         return instance;
     }
 

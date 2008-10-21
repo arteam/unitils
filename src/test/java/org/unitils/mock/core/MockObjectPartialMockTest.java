@@ -52,7 +52,7 @@ public class MockObjectPartialMockTest {
     public void testReturns() {
         mockObject.returns("aValue").testMethod();
 
-        String result = mockObject.getInstance().testMethod();
+        String result = mockObject.getMock().testMethod();
         assertLenientEquals("aValue", result);
         assertLenientEquals(0, TestClass.invocationCount);
     }
@@ -64,7 +64,7 @@ public class MockObjectPartialMockTest {
      */
     @Test
     public void testReturns_originalBehavior() {
-        String result = mockObject.getInstance().testMethod();
+        String result = mockObject.getMock().testMethod();
         assertLenientEquals("original", result);
         assertLenientEquals(1, TestClass.invocationCount);
     }
@@ -79,7 +79,7 @@ public class MockObjectPartialMockTest {
 
         boolean exception = false;
         try {
-            mockObject.getInstance().testMethod();
+            mockObject.getMock().testMethod();
         } catch (ThreadDeath e) {
             exception = true;
         }
@@ -96,7 +96,7 @@ public class MockObjectPartialMockTest {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
         mockObject.performs(testMockBehavior).testMethod();
 
-        mockObject.getInstance().testMethod();
+        mockObject.getMock().testMethod();
         assertLenientEquals(1, testMockBehavior.invocationCount);
         assertLenientEquals(0, TestClass.invocationCount);
     }
@@ -107,7 +107,7 @@ public class MockObjectPartialMockTest {
      */
     @Test
     public void testOriginalBehavior() {
-        String result = mockObject.getInstance().testMethod();
+        String result = mockObject.getMock().testMethod();
         assertLenientEquals("original", result);
         assertLenientEquals(1, TestClass.invocationCount);
     }
@@ -119,7 +119,7 @@ public class MockObjectPartialMockTest {
      */
     @Test(expected = UnitilsException.class)
     public void testOriginalBehavior_abstractMethod() {
-        mockObject.getInstance().abstractMethod();
+        mockObject.getMock().abstractMethod();
     }
 
 
