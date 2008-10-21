@@ -55,7 +55,7 @@ public class ObservedInvocationsReportTest {
     /** Test for creating a view containing 2 mock invocations. */
     @Test
     public void testCreateView() {
-        TestInterface testProxy = testMock.getInstance();
+        TestInterface testProxy = testMock.getMock();
         testProxy.testMethod1("value1");
         testProxy.testMethod2();
 
@@ -80,7 +80,7 @@ public class ObservedInvocationsReportTest {
      */
     @Test
     public void testCreateView_largeArgumentValue() {
-        TestInterface testProxy = testMock.getInstance();
+        TestInterface testProxy = testMock.getMock();
         testProxy.testMethod1("012345678901234567891");
 
         String result = observedInvocationsView.createReport(scenario.getObservedInvocations());
@@ -95,7 +95,7 @@ public class ObservedInvocationsReportTest {
     @Test
     public void testCreateView_largeResultValue() {
         testMock.returns("012345678901234567891").testMethod1(null);
-        TestInterface testProxy = testMock.getInstance();
+        TestInterface testProxy = testMock.getMock();
         testProxy.testMethod1(null);
 
         String result = observedInvocationsView.createReport(scenario.getObservedInvocations());

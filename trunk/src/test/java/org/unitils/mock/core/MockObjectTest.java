@@ -52,8 +52,8 @@ public class MockObjectTest {
     public void testReturns() {
         mockObject.returns("aValue").testMethodString();
 
-        String result1 = mockObject.getInstance().testMethodString();
-        String result2 = mockObject.getInstance().testMethodString();
+        String result1 = mockObject.getMock().testMethodString();
+        String result2 = mockObject.getMock().testMethodString();
         assertLenientEquals("aValue", result1);
         assertLenientEquals("aValue", result2);
     }
@@ -67,8 +67,8 @@ public class MockObjectTest {
     public void testOnceReturns() {
         mockObject.onceReturns("aValue").testMethodString();
 
-        String result1 = mockObject.getInstance().testMethodString();
-        String result2 = mockObject.getInstance().testMethodString();
+        String result1 = mockObject.getMock().testMethodString();
+        String result2 = mockObject.getMock().testMethodString();
         assertLenientEquals("aValue", result1);
         assertNull(result2);
     }
@@ -80,7 +80,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorObject() {
-        String result = mockObject.getInstance().testMethodString();
+        String result = mockObject.getMock().testMethodString();
         assertLenientEquals(null, result);
     }
 
@@ -91,7 +91,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorNumber() {
-        int result = mockObject.getInstance().testMethodNumber();
+        int result = mockObject.getMock().testMethodNumber();
         assertLenientEquals(0, result);
     }
 
@@ -102,7 +102,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorList() {
-        List<String> result = mockObject.getInstance().testMethodList();
+        List<String> result = mockObject.getMock().testMethodList();
         assertLenientEquals(0, result.size());
     }
 
@@ -113,7 +113,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorSet() {
-        Set<String> result = mockObject.getInstance().testMethodSet();
+        Set<String> result = mockObject.getMock().testMethodSet();
         assertLenientEquals(0, result.size());
     }
 
@@ -124,7 +124,7 @@ public class MockObjectTest {
      */
     @Test
     public void testReturns_defaultBehaviorMap() {
-        Map<String, String> result = mockObject.getInstance().testMethodMap();
+        Map<String, String> result = mockObject.getMock().testMethodMap();
         assertLenientEquals(0, result.size());
     }
 
@@ -139,13 +139,13 @@ public class MockObjectTest {
 
         boolean exception1 = false;
         try {
-            mockObject.getInstance().testMethodString();
+            mockObject.getMock().testMethodString();
         } catch (ThreadDeath e) {
             exception1 = true;
         }
         boolean exception2 = false;
         try {
-            mockObject.getInstance().testMethodString();
+            mockObject.getMock().testMethodString();
         } catch (ThreadDeath e) {
             exception2 = true;
         }
@@ -164,13 +164,13 @@ public class MockObjectTest {
 
         boolean exception1 = false;
         try {
-            mockObject.getInstance().testMethodString();
+            mockObject.getMock().testMethodString();
         } catch (ThreadDeath e) {
             exception1 = true;
         }
         boolean exception2 = false;
         try {
-            mockObject.getInstance().testMethodString();
+            mockObject.getMock().testMethodString();
         } catch (ThreadDeath e) {
             exception2 = true;
         }
@@ -184,7 +184,7 @@ public class MockObjectTest {
         mockObject.raises(IllegalArgumentException.class).testMethodString();
 
         try {
-            mockObject.getInstance().testMethodString();
+            mockObject.getMock().testMethodString();
             fail("Expected exception");
         } catch (IllegalArgumentException e) {
             // expected
@@ -197,7 +197,7 @@ public class MockObjectTest {
         mockObject.onceRaises(IllegalArgumentException.class).testMethodString();
 
         try {
-            mockObject.getInstance().testMethodString();
+            mockObject.getMock().testMethodString();
             fail("Expected exception");
         } catch (IllegalArgumentException e) {
             // expected
@@ -214,8 +214,8 @@ public class MockObjectTest {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
         mockObject.performs(testMockBehavior).testMethodString();
 
-        mockObject.getInstance().testMethodString();
-        mockObject.getInstance().testMethodString();
+        mockObject.getMock().testMethodString();
+        mockObject.getMock().testMethodString();
         assertLenientEquals(2, testMockBehavior.invocationCount);
     }
 
@@ -229,8 +229,8 @@ public class MockObjectTest {
         TestMockBehavior testMockBehavior = new TestMockBehavior();
         mockObject.oncePerforms(testMockBehavior).testMethodString();
 
-        mockObject.getInstance().testMethodString();
-        mockObject.getInstance().testMethodString();
+        mockObject.getMock().testMethodString();
+        mockObject.getMock().testMethodString();
         assertLenientEquals(1, testMockBehavior.invocationCount);
     }
 
