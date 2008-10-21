@@ -212,6 +212,25 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
         
         assertScriptsExecutedAndDbVersionSet();
     }
+    
+    @Test
+    public void testUpdateDatabase_isInitialFromScratchUpdate() {
+        expectFromScratchUpdateRecommended();
+        expectPostProcessingScripts(postProcessingScripts);
+        
+        dbMaintainer.updateDatabase();
+        
+        mockDbClearer.assertInvoked().clearSchemas();
+        mockExecutedScriptInfoSource.assertInvoked().clearAllExecutedScripts();
+        assertScriptsExecutedAndDbVersionSet();
+    }
+
+
+    private void expectFromScratchUpdateRecommended() {
+        mockExecutedScriptInfoSource.returns(true).isFromScratchUpdateRecommended();
+        expectModifiedScripts(false);
+        expectAllScripts(scripts);
+    }
 
 
     @SuppressWarnings({"unchecked"})

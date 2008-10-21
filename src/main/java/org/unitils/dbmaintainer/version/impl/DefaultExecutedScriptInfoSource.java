@@ -160,6 +160,21 @@ public class DefaultExecutedScriptInfoSource extends BaseDatabaseAccessor implem
 
 
     /**
+     * This method returns whether a from scratch update is recommended: It will return true
+     * if the database is in it's initial state (i.e. the dbmaintain_scripts table doesn't exist yet 
+     * or is invalid) and the autoCreateExecutedScriptsTable property is set to true.
+     * <p/>
+     * The reasoning behind this is that before executing the first script, it's a good idea to 
+     * clear the database in order to start with a clean situation.
+     * 
+     * @return True if a from-scratch update is recommended
+     */
+    public boolean isFromScratchUpdateRecommended() {
+        return !isExecutedScriptsTableValid() && autoCreateExecutedScriptsTable;
+    }
+
+
+    /**
      * @return All scripts that were registered as executed on the database
      */
     public Set<ExecutedScript> getExecutedScripts() {
