@@ -1569,11 +1569,11 @@ MockUnitils.assertNoMoreInvocations();
 
     If you want to prohibit unexpected method calls in general, you can call <assertNoMoreInvocations> in an <@After> method, or in the <@After> method of you base test class.
 	
-    By default, the order of the calls is not verified. If you do want to verify the order, you can use <assertInvokedInOrder>. For example we can make sure alert1 was sent before alert2 as follows:
+    By default, the order of the calls is not verified. If you do want to verify the order, you can use <assertInvokedInSequence>. For example we can make sure alert1 was sent before alert2 as follows:
 	
 +-----+
-mockMessageService.assertInvokedInOrder().sendMessage(alert1);
-mockMessageService.assertInvokedInOrder().sendMessage(alert2);
+mockMessageService.assertInvokedInSequence().sendMessage(alert1);
+mockMessageService.assertInvokedInSequence().sendMessage(alert2);
 +-----+
 
 ** Argument matching

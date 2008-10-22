@@ -63,14 +63,13 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 
     @Before
     public void init() {
-        alertService = new AlertService(mockSchedulerService.getMock(),
-                mockMessageService.getMock());
+        alertService = new AlertService(mockSchedulerService.getMock(), mockMessageService.getMock());
         alerts = Arrays.asList(alert1, alert2);
     }
 	
     @Test 
     public void testSendScheduledAlerts() {
-        mockSchedulerService.returns(alerts).getScheduledAlerts(null)); // Definition of behavior, null means 'any argument'
+        mockSchedulerService.returns(alerts).getScheduledAlerts(null); // Definition of behavior, null means 'any argument'
 	    
         alertService.sendScheduledAlerts();
 		
@@ -84,7 +83,7 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 	
     * Behavior of mock objects can be defined using the notation mockObject.returns(...).methodCall(...). Passing <null> as an argument in a behavior definition causes the value of this argument to be ignored. You can also use raises(...) to make a method throw an exception, or performs(...) to specify custom behavior. If no behavior is specified, methods return default values such as <null>, <0>, <false> or an empty collection.
 	
-    * You can verify that certain calls were made on a mock object by using the notation mockObject.assertInvoked().methodCall(...). You can use mockObject.assertInvokedInOrder().methodCall(...) to ensure the calls were made in a certain sequence. With mockObject.assertNotInvoked().methodCall(...) you can explicitly verify that a certain invocation didn't occur or you can use MockUnitils.assertNoMoreInvocations() to make sure no other invocation occurred, except for the ones you verified.
+    * You can verify that certain calls were made on a mock object by using the notation mockObject.assertInvoked().methodCall(...). You can use mockObject.assertInvokedInSequence().methodCall(...) to ensure the calls were made in a certain sequence. With mockObject.assertNotInvoked().methodCall(...) you can explicitly verify that a certain invocation didn't occur or you can use MockUnitils.assertNoMoreInvocations() to make sure no other invocation occurred, except for the ones you verified.
 	
     * By default, expected arguments are compared with actual arguments using <lenient reflection comparison>: The fields are compared using reflection, the order of collections is ignored and fields that are null, 0 or false in the expected object are ignored. If you want an argument to be ignored altogether, you can simply use <null>. Argument matchers can be used if other behavior is desired: available argument matchers are <notNull>, <isNull>, <same>, <eq>, <refEq> and <lenEq>. Argument matchers, concrete objects and <null> can be combined in the same call.
 	
