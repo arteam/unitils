@@ -29,7 +29,7 @@
             <item name="Cookbook" href="cookbook.html"/>
             <item name="Guidelines" href="guidelines.html"/>     
             <item name="API Javadoc" href="apidocs/index.html"/>
-            <item name="Forum;" href="http://sourceforge.net/forum/?group_id=167201"/>
+            <item name="Forum" href="http://sourceforge.net/forum/?group_id=167201"/>
         </menu>
         
         <menu name="Project info">
@@ -39,7 +39,6 @@
             <item name="Issue Tracking" href="http://jira.unitils.org"/>
             <item name="Source Repository" href="source-repository.html"/>
             <item name="Acknowledgements" href="acknowledgements.html"/>
-			<item name="Filip's weblog" href="http://filipneven.blogspot.com"/>
         </menu>
         
     </body>
