@@ -28,7 +28,7 @@ Tutorial
     
     * {{{#Testing_with_Spring}Testing with Spring}}
     
-    * {{{#Mock_objects}Mock objects}}
+    * {{{#Testing_with_mock_objects}Testing with mock objects}}
     
     * {{{#EasyMock_support}EasyMock support}}
         
@@ -369,8 +369,10 @@ public class MyTest {
    * <DbUnitModule>: test data management using DbUnit
 
    * <HibernateModule>: Hibernate configuration support and automatic database mapping checking
-
-   * <EasyMockModule>: support for creating mocks and lenient reflection argument matching
+   
+   * <MockModule>: support for creating mocks using the Unitils mock framework
+   
+   * <EasyMockModule>: support for creating mocks using EasyMock
 
    * <InjectModule>: support for injecting (mock) objects into other objects
    
@@ -604,7 +606,7 @@ public class UserDAOTest extends UnitilsJUnit4 {
 
     In this case we defined 2 schemas, <SCHEMA_A> and <SCHEMA_B>. The first schema, <SCHEMA_A>, is linked to the default xml namespace, the second schema, <SCHEMA_B>, is 
     linked to xml namespace b. If a table xml element is prefixed with namespace b, the table is expected to be in schema <SCHEMA_B>, if it doesn't have a namespace
-    prefix it is considered to be in SCHEMA_A. In the example, test data is defines for tables <SCHEMA_A.user> and <SCHEMA_B.role>. 
+    prefix it is considered to be in SCHEMA_A. In the example, test data is defined for tables <SCHEMA_A.user> and <SCHEMA_B.role>. 
     
     If no default namespace is specified, it is by default set to the first of the list of schema names defined by the property <database.schemaNames>. So suppose you 
     have defined following schema names:
@@ -680,31 +682,35 @@ public abstract class BaseDAOTest extends UnitilsJUnit4 {
       modified. To make sure the database is in the same known state before every test, a transaction is started before and rolled back after 
       each test.
 
-    * When using hibernate or JPA, you need to run each test in a transaction to make the system work properly. 
+    * When using hibernate or JPA, since these require you to run each test in a transaction to make the system work properly. 
     
-    By default, transaction management is disabled. This default behavior can be changed by setting following property:
+    []
+    
+    By default every test is executed in a transaction, which is committed at the end of the test. 
+    
+    This default behavior can be changed by by setting a property. Transaction management can for example be disabled (= auto-commit behavior) as follows:
     
 +-----+
-DatabaseModule.Transactional.value.default=commit
+DatabaseModule.Transactional.value.default=disabled
 +-----+
 
-    With this setting, every test is executed in a transaction, which is committed. Other supported values for this property are <rollback> and <disabled>.
+    Other supported values for this property are <commit>, <rollback> and <disabled>.
     
-    The default transactional behavior can be modified at the level of a test class, by annotating the test class with <@Transactional>. For example:
+    The transactional behavior can also be modified at the level of a test class, by annotating the test class with <@Transactional>. For example:
     
 +-----+
 @Transactional(TransactionMode.ROLLBACK)
 public class UserDaoTest extends UnitilsJUnit4 {
 +-----+
 
-    This way, transaction management is enabled for the annotated class, making sure the transaction is rolled back after each test. The <@Transactional> 
-    annotation is inheritable, so it can be moved to a shared superclass instead of specifying it for each test separately.
+    This will roll back the transaction after each test in the test class. The <@Transactional> annotation is inheritable, so it can be moved to a 
+    shared superclass instead of specifying it for each test separately.
 
-	Under the hoods, unitils depends on spring to implement transaction management. This doesn't mean you that need to use spring in your
-	application code for transaction management. The fact that spring is used, is completely transparent.
+    Under the hoods, unitils depends on spring to implement transaction management. This doesn't mean you that need to use spring in your
+    application code for transaction management. The fact that spring is used, is completely transparent.
 	
-	If you are using unitils' spring support (see {{{Testing with Spring}Testing with spring}}), and you've configured a bean of type <PlatformTransactionManager>
-	in your spring configuration, unitils will make use of this transaction manager.
+    If you are using unitils' spring support (see {{{Testing with Spring}Testing with spring}}), and you've configured a bean of type <PlatformTransactionManager>
+    in your spring configuration, unitils will make use of this transaction manager.
 
 
 
@@ -737,10 +743,10 @@ public class UserDaoTest extends UnitilsJUnit4 {
 ** {Maintaining the database structure}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    A powerful <DBMaintainer> is can automatically maintain each developer's individual database schema. It will check whether database structure updates are available 
-	and apply them if necessary. 
+    A powerful tool, the <DBMaintainer>, can automatically maintain each developer's individual database schema. It will check whether database structure updates are available 
+    and apply them if necessary. 
 	
-	The database maintainer is disabled by default. If you want to use it you have to enable it by setting following property:
+    The database maintainer is disabled by default. If you want to use it you have to enable it by setting following property:
     
 +-----+
 updateDataBaseSchema.enabled=true
@@ -817,13 +823,6 @@ dbMaintainer.dbVersionSource.autoCreateVersionTable=true
 	Database updates and associated java code changes are checked in together, and the rest of the team always receives these updates all at once, so that they aren't
 	bothered with failing tests.
 
-** Database script support
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Database scripts can contain following items:
-	- SQL or DDL statements, terminated by a ;
-	- Line comments, starting with --
-	- Block comments, starting with /* and terminated by */
 	
 ** Oracle PL/SQL support
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -901,6 +900,7 @@ dbMaintainer.preserveDataOnly.tables=CONFIGURATION_SETTINGS
     the correct dialect (oracle, mysql...) is configured. If you are for example using an Oracle database, you should set the dialect propety to <oracle>:
     
 +-----+
+# Supported values are 'oracle', 'db2', 'mysql', 'hsqldb', 'postgresql', 'derby' and 'mssql'
 database.dialect=oracle
 +-----+
         
@@ -916,7 +916,9 @@ database.dialect=oracle
     
     * <<DB2>> - Tested with version 9
 	
-	* <<Derby>>
+    * <<Derby>> - Tested with version 10.2.2.0
+    
+    * <<MS-SQL Server>> - Tested with version 2005
 
     []
  
@@ -928,16 +930,8 @@ database.dialect=oracle
     can help you to write datasets more quickly. Modern IDEs offer you code-completion and give errors when e.g. a column name is incorrectly spelled in one of your dataset files.
     
     The database maintainer generates an XSD for each configured database schema. These XSDs have the same name as the corresponding database schema, e.g. <SCHEMA_A.xsd>. 
-	Next to these schema XSDs, a general <dataset.xsd> is generated. This XSD bundles all schema XSDs. This is the one you have to include in your XML declaration.
+     Next to these schema XSDs, a general <dataset.xsd> is generated. This XSD bundles all schema XSDs. This is the one you have to include in your XML declaration.
     
-    The target location for the XSDs is configured by setting following property:
-    
-+-----+
-dataSetStructureGenerator.xsd.dirName=target/xsd
-+-----+
-    
-    Unitils creates a file dataset.xsd and stores it in this directory. If the directory didn't exist yet, it's created automatically.
-	
 +-----+
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="target/xsd/dataset.xsd">
@@ -948,8 +942,16 @@ dataSetStructureGenerator.xsd.dirName=target/xsd
     
 </dataset>
 +-----+  
-	
-	The generated XSD also supports multiple database shemas. Suppose you are using 2 schemas: 
+
+    The target location for the XSDs is configured by setting following property:
+    
++-----+
+dataSetStructureGenerator.xsd.dirName=target/xsd
++-----+
+    
+    Unitils creates a file dataset.xsd and stores it in this directory. If the directory didn't exist yet, it's created automatically.
+		
+    The generated XSD also supports multiple database shemas. Suppose you are using 2 schemas: 
     
 +-----+
 database.schemaNames=SCHEMA_A, SCHEMA_B
@@ -984,9 +986,7 @@ target/xsd/ SCHEMA_B.xsd
     element that is explicitly prefixed with the <SCHEMA_A> namespace (prefix a). The role table element is prefixed with the <SCHEMA_B> namespace and will thus be validated
     against the <SCHEMA_B> database structure.
     
-    If you only use 1 database schema, there is no need to use namespaces, you can simply use the default namespace. For example if in the above example only a single database is used, 
-	you get following data set:
-      
+    If you only use 1 database schema, there is no need to use namespaces, you can simply use the default namespace.       
     
     For backward compatibility reasons, a DTD can also be generated instead of an XSD. This DTD however does not support multiple database schemas. Only the structure 
     of the default database schema, i.e. the first one in the <database.schemaNames> list will be described. 
@@ -1024,8 +1024,10 @@ dataSetStructureGenerator.dtd.filename=target/dtd/MyDatabase.dtd
     Testing a HQL method is done in the same way as described above in {{{#Managing test data with DbUnit} Managing test data with DbUnit}}. The <@DataSet> annotation
     can be used for loading test data from a data set and the <ReflectionAssert> class or <@ExpectedDataSet> annotation can be used for checking the result. 
 
-	Unitils hibernate support is based on spring's ORM abstraction layer. Spring is used under the hoods to configure a SessionFactory that connects to the unitils-configured
-	database, and associate a hibernate Session with the current transaction.
+    Unitils hibernate support is based on spring's ORM abstraction layer. Spring is used under the hoods to configure a SessionFactory that connects to the unitils-configured
+    database, and associate a hibernate Session with the current transaction. This doesn't mean you that need to use spring in your application code. 
+    The fact that spring is used, is completely transparent.
+
 
 ** {Loading Hibernate configurations}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
@@ -1033,34 +1035,30 @@ dataSetStructureGenerator.dtd.filename=target/dtd/MyDatabase.dtd
     a class, field or method with the <@HibernateSessionFactory> annotation. The Hibernate configuration files that you want to have loaded can be passed as a parameter. If 
     you annotate a field or method with this annotation, the session factory is also injected into this field or method.
 	
-	Since unitils 1.1, all hibernate tests must be run in a transaction! Read the chapter on {{{#Transactions} Transactions}} for more information on transaction support.
-	
-	Under the hoods, hibernate uses an instance of <org.hibernate.cfg.Configuration> or <org.hibernate.cfg.AnnotationConfiguration> for loading configuration files and 
-	registering mapped classes, depending on whether you're using hibernate the classic way or whether you use hibernate with annotation. By default, Unitils uses 
-	<org.hibernate.cfg.AnnotationConfiguration>. If you're using mapping files only and you don't have the hibernate annotations extension in your classpath, you can change 
-	this by setting following property:
+    Note that in order to function correctly, Hibernate tests must be run in a transaction. Unitils is configured by default to run in a transaction. Read the chapter on {{{#Transactions} Transactions}} 
+    for more information on transaction support.
+    
+    Under the hoods, hibernate uses an instance of <org.hibernate.cfg.Configuration> or <org.hibernate.cfg.AnnotationConfiguration> for loading configuration files and 
+    registering mapped classes, depending on whether you're using hibernate the classic way or whether you use hibernate with annotation. By default, Unitils uses 
+    <org.hibernate.cfg.AnnotationConfiguration>. If you're using mapping files only and you don't have the hibernate annotations extension in your classpath, you can change 
+    this by setting following property:
 	
 +----+
 HibernateModule.configuration.implClassName=org.hibernate.cfg.Configuration
 +----+
   
 +-----+
-@Transactional(TransactionMode.COMMIT)
-@HibernateSessionFactory({"hibernate.cfg.xml", "mapped-classes.cfg.xml"})
 public class UserDaoTest extends UnitilsJUnit4 {
     
-    @HibernateSessionFactory
+    @HibernateSessionFactory({"hibernate.cfg.xml", "mapped-classes.cfg.xml"})
     private SessionFactory sessionFactory;
     
-    @HibernateSessionFactory
-    void setSessionFactory(SessionFactory sessionFactory) {
-		// ...
-    }
 }
 +-----+
 
     This will create a Hibernate <Configuration> and load the configuration files <hibernate.cfg.xml> and <mapped-class.cfg.xml>. The
-    <Configuration> instance is used to create a <SessionFactory> which is injected into the annotated field and setter method of the test.
+    <Configuration> instance is used to create a <SessionFactory> which is injected into the annotated field method of the test. 
+    Setter injection is also supported by annotating the setter method instead of the field.
     
     Unitils also scans superclasses for <@HibernateSessionFactory> annotations. We advise to specify all configuration on a common superclass
 	for all hibernate tests. E.g.:
@@ -1103,7 +1101,7 @@ public class UserDaoTest extends BaseDaoTest {
     Performing programmatic configuration is also supported. You can use it by annotating a custom initialization method with 
     <@HibernateSessionFactory>. A custom configuration method has 1 parameter of a <Configuration> (sub-)type and a void return 
     type. It can be used to further configure the <Configuration> instance that was created by Unitils. A typical usage is to programmatically 
-	register mapped classes:    
+    register mapped classes:    
     
 +-----+
 @HibernateSessionFactory
@@ -1134,11 +1132,11 @@ public abstract class BaseDAOTest extends UnitilsJUnit4 {
 }
 +-----+
 
-    Unitils manages all sessions created by these session factories. It will for flush the session before checking the state of a database and 
+    Unitils manages all sessions created by these session factories. It will flush the session before checking the state of a database and 
     close the session after a unit test was finished.
-	
-	Unitils also provides what we call a 'test-bound session context'. This means that, for the duration of a test, every call to <SessionFactory.getCurrentSession()>
-	will return the same hibernate session.
+    
+    Unitils also provides what we call a 'test-bound session context'. This means that, for the duration of a test, every call to <SessionFactory.getCurrentSession()>
+    will return the same hibernate session.
 	
     
 ** Hibernate mapping test
@@ -1146,7 +1144,7 @@ public abstract class BaseDAOTest extends UnitilsJUnit4 {
     Unitils is shipped with a unit test that verifies if the mapping of all your mapped classes is consistent with the database 
     structure. <HibernateUnitils.assertMappingWithDatabaseConsistent()> checks if any updates are required to the database to make it 
     consistent with the Hibernate mapping. If yes, the test fails showing all DDL statements that should be issued to the database. 
-	This test is not automatically executed, you have to write a unit test yourself like follows:
+    This test is not automatically executed, you have to write a unit test yourself like follows:
     
 +-----+
 @HibernateSessionFactory("hibernate.cfg.xml")
@@ -1171,14 +1169,14 @@ alter table PRODUCT add column barCode varchar(255);
 * {Testing with JPA}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Since release 1.1, Unitils provides support for JPA. Unitils' JPA support has been built on top of spring's JPA abstraction layer on top. Therefore, 
-	Unitils supports all JPA vendors that spring supports. Currently the supported vendors are hibernate, oracle toplink and openjpa.
-	
-	Unitils has to know which JPA vendor you are using. Therefore, specify the property jpa.persistenceProvider in unitils.properties with one of
-	the supported values: hibernate, toplink or openjpa, e.g.
+    Unitils' JPA support has been built on top of spring's JPA abstraction layer on top. Therefore, it supports all JPA vendors that spring supports. 
+    The fact that spring is used under the hood, is completely transparent. It doesn't mean you that need to use spring in your application code. 
+    
+    To indicate which JPA vendor you are using, you need to set the property jpa.persistenceProvider in unitils.properties to one of
+    the supported values: hibernate (default), toplink or openjpa.  
 	
 +-----+
-jpa.persistenceProvider=hibernate
+jpa.persistenceProvider=toplink
 +-----+
 	
 	If your application uses spring IOC, you'll probably want to make unitils work with the <EntityManagerFactory> configured in spring. To
@@ -1193,10 +1191,10 @@ public class UserDaoTest extends UnitilsJUnit4 {
 +-----+
 
     Unitils will initialize an <EntityManagerFactory>, load the persistence unit named 'pu', and inject it into the field annotated with 
-	<@JpaEntityManagerFactory>. The default config file <META-INF/persistence.xml>. The jar file or class folder that contains the file
-	<META-INF/persistence.xml> is automatically scanned for objects that are annotated as JPA entities.
-	
-	It's also possible to use a different configuration file than <META-INF/persistence.xml> for testing, using the configFile attribute, e.g.:
+    <@JpaEntityManagerFactory>. By default it will look in jar files and class folders for a config file named <META-INF/persistence.xml>. 
+    This jar file or class folder is then automatically scanned for objects that are annotated as JPA entities.
+    
+    It's also possible to use a different configuration file than <META-INF/persistence.xml>, by using the configFile attribute, e.g.:
 	
 +-----+
 public class UserDaoTest extends UnitilsJUnit4 {
@@ -1206,16 +1204,15 @@ public class UserDaoTest extends UnitilsJUnit4 {
 +-----+
 
     Fields or setter methods of the test object can be annotated with <@javax.persistence.PersistenceUnit> and <@javax.persistence.PersistenceContext>.
-	Unitils will inject an <EntityManagerFactory> or <EntityManager> on these anntotated fields / setters, respectively.
-	
-	Tests that use JPA must be run in a transaction. This is done preferably by annotating the test class or test method with 
-	<@org.unitils.database.annotations.Transactional>. See read the section {{{#Transactions}Transactions}} for more information.
+    Unitils will inject an <EntityManagerFactory> or <EntityManager> on these anntotated fields / setters, respectively.
+    
+    Note that in order to function correctly, JPA tests must be run in a transaction. Unitils is configured by default to run in a transaction. Read the chapter on {{{#Transactions} Transactions}} 
+    for more information on transaction support.
 
-    Unitils also supports using a custom configuration method, just like when configuring a hibernate <SessionFactory>. A 
-	<org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean> must be taken as parameter for such a method. This method will be called 
-	after loading the persistence.xml file.
-	
-	Just as when using hibernate, you can create a test that verifies the mapping of the entities with the database. An implementation looks as follows:
+    Unitils also supports using a custom configuration method. The method should be annotated with <@JpaEntityManagerFactory> and should have a single argument of type
+    <org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean>. It will be called after loading the persistence.xml file.
+
+    Just as when using Hibernate, you can create a test that verifies the mapping of the entities with the database. An implementation looks as follows:
 	
 +-----+
 @JpaEntityManagerFactory(persistenceUnit = "pu", configFile = "persistence-test.xml")
@@ -1227,6 +1224,7 @@ public class JpaMappingTest extends UnitilsJUnit4 {
     }
 }
 +-----+ 
+	
 	
 * {Testing with Spring}
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1242,32 +1240,28 @@ public class JpaMappingTest extends UnitilsJUnit4 {
     
     * Make use of a Hibernate <SessionFactory> configured in Spring
 	
-	* Reference the Unitils DataSource in Spring configuration
+    * Reference the Unitils DataSource in Spring configuration
 
+    []
 
 
 
 ** ApplicationContext configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Loading an application context can easily be achieved by annotating a class, method or field with a <@SpringApplicationContext> annotation, 
-	and specifying the spring config files as attribute. 
-	The resulting application context is injected into fields or methods annotated with <@SpringApplicationContext>. For example:
+    and specifying the spring config files as attribute. The resulting application context is injected into fields or methods annotated with <@SpringApplicationContext>. For example:
     
 +-----+
-@SpringApplicationContext({"spring-config.xml", "spring-test-config.xml"})
 public class UserServiceTest extends UnitilsJUnit4 {
 
-    @SpringApplicationContext
+    @SpringApplicationContext({"spring-config.xml", "spring-test-config.xml"})
     private ApplicationContext applicationContext;
     
-    @SpringApplicationContext
-    private void setApplicationContext(ApplicationContext applicationContext) {
-    }
 }
 +-----+
 
-    This will create a new <ApplicationContext> loading the config files <spring-config.xml> and <spring-test-config.xml> and will inject it into the annotated field 
-    and setter method. 
+    This will create a new <ApplicationContext> loading the config files <spring-config.xml> and <spring-test-config.xml> and will inject it into the annotated field. 
+    Setter injection is also supported by annotating the setter method instead of the field.
     
     Superclasses are also scanned for the presence of <@SpringApplicationContext> annotations. If found, these configuration files are loaded before the 
     configuration files specified in subclasses. This makes it possible to override configuration settings or to add extra configuration specific for the test. 
@@ -1278,10 +1272,9 @@ public class UserServiceTest extends UnitilsJUnit4 {
 public class BaseServiceTest extends UnitilsJUnit4 {
 }
 
-@SpringApplicationContext("extra-spring-beans.xml")
 public class UserServiceTest extends BaseServiceTest {
 
-    @SpringApplicationContext
+    @SpringApplicationContext("extra-spring-beans.xml")
     private ApplicationContext applicationContext;     
 }
 +-----+
@@ -1357,7 +1350,8 @@ private UserService userService;
 private UserService userService;
 +-----+
 
-    With <@SpringBean>, you can get a Spring bean from the application context by explicitly specifying the name of the bean. <@SpringBeanByName>, has the same effect, but now the name of the field is used to identify the bean.
+    With <@SpringBean>, you can get a Spring bean from the application context by explicitly specifying the name of the bean. <@SpringBeanByName>, has the same effect, 
+    but now the name of the field is used to identify the bean.
     
     When using <@SpringBeanByType>, the application context is queried for a bean having a type assignable to the field. In this case, this is
     a bean of type <UserService> or one of its sub-types. If no such bean exists or if there is more than one possible candidate, an exception is thrown.
@@ -1431,13 +1425,15 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 }
 +-----+
 
-* {Mock objects}
+* {Testing with mock objects}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Unit tests should test code in isolation. Mock objects enable you to test a piece of code without having to care about other objects or services that it depends on. Since version 2.0, unitils provides a complete mock object solution to dynamically create mock objects. Support is also offered for mock creation and injection.
-	
-	Before version 2.0, mock objects support was built upon EasyMock. This functionality will remain available. Refer to the chapter on {{{EasyMock support}EasyMock support}} for more info.
-
-	You may wonder why we've written a complete mock module given the abundance of dynamic mock object libraries already available. The reason is that in our opinion, a lot of things can be improved in the user friendlyness of existing libraries. The features that make the difference are:
+    Unit tests should test code in isolation. Mock objects enable you to test a piece of code without having to care about other objects or services that it depends on. Since version 2.0, unitils provides 
+    a complete mock object solution to dynamically create mock objects. Support is also offered for mock creation and injection.
+    
+    Before version 2.0, mock objects support was built upon EasyMock. This functionality will remain available. Refer to the chapter on {{{EasyMock support}EasyMock support}} for more info.
+    
+    You may wonder why we've written a complete mock module given the abundance of dynamic mock object libraries already available. The reason is that in our opinion, a lot of things can be 
+    improved in the user friendlyness of existing libraries. The features that make the difference are:
 	
     * Mock behavior definition is performed before invoking the method under test. After the tested method invocation, assert statements are used to verify expected method invocations.
 	
@@ -1448,6 +1444,9 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
     * By default, value semantics is used by default to compare expected and actual arguments: You don't need to worry about the contents of objects being changed in between the method call and the call in which you perform an invocation assert statement: a copy of the original object is used for comparison.
 	
     * The best possible feedback is provided in logs and in error messages: The observed scenario, which lists all method calls performed on the mocks in order, with links to the source code, the contents of all objects involved, and suggested assert statements that can be used as a basis for your own asserts.
+    
+    []
+
 
 ** Mock test example
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -1466,8 +1465,7 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 
     @Before
     public void init() {
-        alertService = new AlertService(mockSchedulerService.getMock(),
-                mockMessageService.getMock());
+        alertService = new AlertService(mockSchedulerService.getInstance(), mockMessageService.getInstance());
         alert1 = new Alert(...); alert2 = new Alert(...);
         alerts = Arrays.asList(alert1, alert2);
     }
@@ -1484,8 +1482,10 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 }
 +-----+	
 
-    The example test makes use of a mock SchedulerService and MessageService. The first statement in this test specifies that subsequent invocations of getScheduledAlerts on the mock SchedulerService with any parameter (<null> means <any argument> in a behavior definition statement), will return a List containing alert1 and alert2.
-    The subsequent statement invokes the method under test. After this, assert statements are used to verify that <sendAlert> was called on the <mockMessageService>, with <alert1> and then <alert2> as argument.
+    The example test makes use of a mock SchedulerService and MessageService. The first statement in this test specifies that subsequent invocations of getScheduledAlerts on the mock SchedulerService 
+    with any parameter (<null> means <any argument> in a behavior definition statement), will return a List containing alert1 and alert2. The subsequent statement invokes the method 
+    under test. After this, assert statements are used to verify that <sendAlert> was called on the <mockMessageService>, with <alert1> and then <alert2> as argument.
+
 
 ** Instantiation of mock objects
 ~~~~~~~~~~~~~~~~~~~~
@@ -1495,12 +1495,10 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 Mock<MyService> mockService;
 +-----+
 	
-    Unitils creates the mock control object and assigns it to this field before each test. You can also obtain a mock control by calling MockUnitils.createMock(mockName, type) or MockUnitils.createMock(type). The name is optional: it is only used in reports and error messages and if omitted, a default name is generated.
-	
-	To obtain the mock object itself, simply call the getMock() method on the control object:
+    Unitils creates the mock control object and assigns it to this field before each test. To obtain the mock object itself, simply call the getInstance() method on the control object:
 	
 +----+
-MyService myService = mockService.getMock();
+MyService myService = mockService.getInstance();
 +----+
 	
 ** Define mock behavior
@@ -1686,17 +1684,10 @@ Message alert1, alert2;
 
     * mockModule.logFullScenarioReport
 
-** Partial mocks
-~~~~~~~~~~~~~~~~
-    It may sometimes be desirable to obtain a mock object while keeping the original implementation, in order to mock only some method calls or simply to monitor the behavior of the object without actually mocking it. You can use partial mocks for this purpose. A partial mock can be obtained either by calling <MockUnitils.createPartialMock()>, or by declaring it as a field using the <PartialMock> interface:
-	
-+-----+
-PartialMock<MyService> mockService;
-+-----+
 
 ** Mock injection
 ~~~~~~~~~~~~~~~~~
-    Unitils provides services that injection of mocks into the tested object. Following example shows how a <UserDao> mock is created and injected in the <userService>:
+    Unitils provides services that simplify mock injection in various ways. Following example shows how a <UserDao> mock is created and injected in the <userService>:
 
 +-----+
 @InjectInto(property="userDao")
@@ -1706,13 +1697,13 @@ private Mock<UserDao> mockUserDao;
 private UserService userService;
 +-----+
 
-    Before executing a test method in the above example, but after the test setup, the <mockUserDao> will be injected into the <userDao> property 
+    Before executing a test method in the above example, but after the test setup, the <@Inject> annotation will cause the <mockUserDao> to be injected into the <userDao> property 
     of the <userService>. The value for the attribute property of <@Inject> can be an arbitrary {{{http://www.ognl.org/}OGNL}} expression. Getter, setter and field access may 
     be mixed and private access is also supported.
   
-    The target object for injection is by default the one referenced by the field annotated with <@TestedObject>. If multiple fields are annotated with <@TestedObject> the object is
+    The target object for injection is by default the field that is annotated with <@TestedObject>. If multiple fields are annotated with <@TestedObject> the object will be 
     injected in each of them. A new instance will automatically be created if the tested object does not exist yet. If injection is not possible, for example when a property 
-    in the OGNL expression does not exist or the tested object could not be created, an exception is thrown. 
+    in the OGNL expression does not exist or the tested object could not be created, a <UnitilsException> will be raised and the test will fail. 
   
     If needed, the target object can also be specified explicitly, using the target attribute on the Inject annotation:
   
@@ -1723,7 +1714,7 @@ private Mock<UserDao> mockUserDao;
 private UserService userService;
 +-----+
   
-    The previous example shows how you can explicitly inject mocks by specifying the name of the target property. Unitils also supports injecting objects into the target 
+    The previous example showed how you can explicitly inject mocks by specifying the name of the target property. Unitils also supports injecting objects into the target 
     automatically by type. E.g.
   
 +-----+
@@ -1735,7 +1726,8 @@ private UserService userService;
 +-----+
 
     The <mockUserDao> will be injected into a property of <userService> with the type <UserDao> or a superclass or interface of <UserDao>. If more than one candidate target 
-    property exists, the most specific one is chosen. If no single most specific target property can be found, a <UnitilsException> is thrown.
+    property exists, the most specific one is chosen. If no single most specific target property can be found, a <UnitilsException> is thrown and the test fails.
+
 
 
 *** Static injection
@@ -1798,7 +1790,7 @@ void injectMock(Object mock, String name, Class type) {
 ~~~~~~~~~~~~~~~~
     Mocks can automatically be created by annotating a field with the <@Mock> annotation, Unitils will create a mock of the same type as the field and inject the instance 
     into that field. This mock creation and assignment is performed before the setup of your test. During the setup you can then do extra configuration and, for example, 
-    install the mock so that it is used by your code during the test. Later-on we will show you how Unitils can help you perform this mock injection more easily.
+    install the mock so that it is used by your code during the test. The previous section already showed you how Unitils can help you perform this mock injection more easily.
     
     Following example shows a unit test for a method on a <UserService> that disables all user accounts that haven't been active for a certain time:
     
