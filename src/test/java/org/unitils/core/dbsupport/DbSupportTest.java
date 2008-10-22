@@ -409,11 +409,11 @@ public class DbSupportTest extends UnitilsJUnit4 {
 
 
     /**
-     * Tests disabling a foreign key constraint on the test table.
+     * Tests disabling a foreign key constraint on the test tables.
      */
     @Test
     public void testRemoveReferentialConstraints() throws Exception {
-        dbSupport.removeReferentialConstraints("Test_CASE_Table");
+        dbSupport.disableReferentialConstraints();
 
         // should succeed now
         // drop triggers to avoid side-effects during insert
@@ -426,21 +426,22 @@ public class DbSupportTest extends UnitilsJUnit4 {
 
 
     /**
-     * Tests disabling foreign key constraints on the test table but with an unexisting table name.
+     * Tests disabling foreign key constraints but there are no tables.
      * Nothing should happen
      */
     @Test
-    public void testRemoveReferentialConstraints_tableNotFound() throws Exception {
-        dbSupport.removeReferentialConstraints("xxxx");
+    public void testRemoveReferentialConstraints_noTablesFound() throws Exception {
+        cleanupTestDatabase();
+        dbSupport.disableReferentialConstraints();
     }
 
 
     /**
-     * Tests disabling not null constraints on the test table.
+     * Tests disabling not null constraints on the test tables.
      */
     @Test
     public void testRemoveValueConstraints() throws Exception {
-        dbSupport.removeValueConstraints(dbSupport.toCorrectCaseIdentifier("TEST_TABLE"));
+        dbSupport.disableValueConstraints();
 
         // should succeed now
         if ("mssql".equals(dbSupport.getDatabaseDialect())) {
@@ -453,12 +454,13 @@ public class DbSupportTest extends UnitilsJUnit4 {
 
 
     /**
-     * Tests disabling not null constraints on the test table but with an unexisting table name.
+     * Tests disabling not null constraints but there are no tables.
      * Nothing should happen
      */
     @Test
-    public void testRemoveValueConstraints_tableNotFound() throws Exception {
-        dbSupport.removeValueConstraints("xxxx");
+    public void testRemoveValueConstraints_noTablesFound() throws Exception {
+        cleanupTestDatabase();
+        dbSupport.disableValueConstraints();
     }
 
 

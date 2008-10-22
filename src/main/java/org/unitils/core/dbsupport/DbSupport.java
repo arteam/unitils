@@ -301,19 +301,15 @@ abstract public class DbSupport {
 
 
     /**
-     * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all referential constraints (e.g. foreign keys) on all table in the schema
      */
-    public abstract void removeReferentialConstraints(String tableName);
+    public abstract void disableReferentialConstraints();
 
 
     /**
-     * Disables all value constraints (e.g. not null) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all value constraints (e.g. not null) on all tables in the schema
      */
-    public abstract void removeValueConstraints(String tableName);
+    public abstract void disableValueConstraints();
 
 
     /**

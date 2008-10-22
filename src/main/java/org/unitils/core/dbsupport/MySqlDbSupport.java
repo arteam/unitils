@@ -92,12 +92,13 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
-     * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all referential constraints (e.g. foreign keys) on all table in the schema
      */
     @Override
-    public void removeReferentialConstraints(String tableName) {
+    public void disableReferentialConstraints() {
+        // todo implement
+        String tableName = null;
+
         SQLHandler sqlHandler = getSQLHandler();
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' AND table_name = '" + tableName + "' and constraint_schema = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
@@ -107,12 +108,13 @@ public class MySqlDbSupport extends DbSupport {
 
 
     /**
-     * Disables all value constraints (e.g. not null) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all value constraints (e.g. not null) on all tables in the schema
      */
     @Override
-    public void removeValueConstraints(String tableName) {
+    public void disableValueConstraints() {
+        // todo implement
+        String tableName = null;
+
         SQLHandler sqlHandler = getSQLHandler();
 
         // disable all unique constraints (check constraints are not implemented)

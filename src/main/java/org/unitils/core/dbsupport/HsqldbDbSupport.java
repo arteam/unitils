@@ -90,41 +90,39 @@ public class HsqldbDbSupport extends DbSupport {
 
 
     /**
-     * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all referential constraints (e.g. foreign keys) on all table in the schema
      */
     @Override
-    public void removeReferentialConstraints(String tableName) {
+    public void disableReferentialConstraints() {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = getSQLHandler().getItemsAsStringSet("select CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE = 'FOREIGN KEY' AND TABLE_NAME = '" + tableName + "' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
-        for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE = 'FOREIGN KEY' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
+        for (String[] tableAndConstraintName : tableAndConstraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " drop constraint " + quoted(tableAndConstraintName[1]));
         }
     }
 
 
     /**
-     * Disables all value constraints (e.g. not null) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all value constraints (e.g. not null) on all tables in the schema
      */
     @Override
-    public void removeValueConstraints(String tableName) {
+    public void disableValueConstraints() {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String> constraintNames = getSQLHandler().getItemsAsStringSet("select CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE IN ('CHECK', 'UNIQUE') AND TABLE_NAME = '" + tableName + "' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
-        for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE IN ('CHECK', 'UNIQUE') AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
+        for (String[] tableAndConstraintName : tableAndConstraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " drop constraint " + quoted(tableAndConstraintName[1]));
         }
 
-        Set<String> notNullColumnNames = sqlHandler.getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where IS_NULLABLE = 'NO' AND TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'");
-        Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'");
-        for (String notNullColumnName : notNullColumnNames) {
-            if (primaryKeyColumnNames.contains(notNullColumnName)) {
+        Set<String[]> tableAndNotNullColumnNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where IS_NULLABLE = 'NO' AND TABLE_SCHEM = '" + getSchemaName() + "'");
+        for (String[] tableAndNotNullColumnName : tableAndNotNullColumnNames) {
+            String tableName = tableAndNotNullColumnName[0];
+            String columnName = tableAndNotNullColumnName[1];
+            Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'");
+            if (primaryKeyColumnNames.contains(columnName)) {
                 // Do not remove PK constraints
                 continue;
             }
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(notNullColumnName) + " set null");
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " set null");
         }
     }
 
