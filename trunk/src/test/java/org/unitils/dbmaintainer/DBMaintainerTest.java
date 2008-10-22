@@ -263,14 +263,14 @@ public class DBMaintainerTest extends UnitilsJUnit4 {
 
 
     private void assertScriptsExecutedAndDbVersionSet() {
-    	mockExecutedScriptInfoSource.assertInvokedInOrder().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
-        mockScriptRunner.assertInvokedInOrder().execute(scripts.get(0).getScriptContentHandle());
-        mockExecutedScriptInfoSource.assertInvokedInOrder().updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));
-        mockExecutedScriptInfoSource.assertInvokedInOrder().registerExecutedScript(new ExecutedScript(scripts.get(1), null, null));
-        mockScriptRunner.assertInvokedInOrder().execute(scripts.get(1).getScriptContentHandle());
-        mockExecutedScriptInfoSource.assertInvokedInOrder().updateExecutedScript(new ExecutedScript(scripts.get(1), null, null));
-        mockScriptRunner.assertInvokedInOrder().execute(postProcessingScripts.get(0).getScriptContentHandle());
-        mockScriptRunner.assertInvokedInOrder().execute(postProcessingScripts.get(1).getScriptContentHandle());
+    	mockExecutedScriptInfoSource.assertInvokedInSequence().registerExecutedScript(new ExecutedScript(scripts.get(0), null, null));
+        mockScriptRunner.assertInvokedInSequence().execute(scripts.get(0).getScriptContentHandle());
+        mockExecutedScriptInfoSource.assertInvokedInSequence().updateExecutedScript(new ExecutedScript(scripts.get(0), null, null));
+        mockExecutedScriptInfoSource.assertInvokedInSequence().registerExecutedScript(new ExecutedScript(scripts.get(1), null, null));
+        mockScriptRunner.assertInvokedInSequence().execute(scripts.get(1).getScriptContentHandle());
+        mockExecutedScriptInfoSource.assertInvokedInSequence().updateExecutedScript(new ExecutedScript(scripts.get(1), null, null));
+        mockScriptRunner.assertInvokedInSequence().execute(postProcessingScripts.get(0).getScriptContentHandle());
+        mockScriptRunner.assertInvokedInSequence().execute(postProcessingScripts.get(1).getScriptContentHandle());
     }
 
 
