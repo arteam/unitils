@@ -301,7 +301,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     }
 
 
-    public T assertInvokedInOrder() {
+    public T assertInvokedInSequence() {
         AssertInvokedInOrderInvocationHandler proxyInvocationHandler = new AssertInvokedInOrderInvocationHandler(getAssertedAt());
         return startAssertion(proxyInvocationHandler, "assertInvokedInOrder");
     }

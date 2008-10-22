@@ -108,7 +108,7 @@ public interface Mock<T> {
 
     T assertInvoked();
     
-    T assertInvokedInOrder();
+    T assertInvokedInSequence();
 
     T assertNotInvoked();
 }

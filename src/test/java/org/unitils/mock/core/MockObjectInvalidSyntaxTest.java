@@ -105,7 +105,7 @@ public class MockObjectInvalidSyntaxTest {
 
     @Test(expected = UnitilsException.class)
     public void incompleteAssertStatement_assertInvokedInOrder() {
-        mockObject1.assertInvokedInOrder();
+        mockObject1.assertInvokedInSequence();
         mockObject2.assertInvoked();
     }
 
