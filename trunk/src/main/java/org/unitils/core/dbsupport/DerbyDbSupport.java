@@ -129,12 +129,13 @@ public class DerbyDbSupport extends DbSupport {
 
 
     /**
-     * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all referential constraints (e.g. foreign keys) on all table in the schema
      */
     @Override
-    public void removeReferentialConstraints(String tableName) {
+    public void disableReferentialConstraints() {
+        // todo implement
+        String tableName = null;
+
         SQLHandler sqlHandler = getSQLHandler();
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select c.CONSTRAINTNAME from SYS.SYSCONSTRAINTS c, SYS.SYSTABLES t, SYS.SYSSCHEMAS s where c.TYPE = 'F' AND c.TABLEID = t.TABLEID  AND t.TABLENAME = '" + tableName + "' AND t.SCHEMAID = s.SCHEMAID AND s.SCHEMANAME = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
@@ -144,12 +145,13 @@ public class DerbyDbSupport extends DbSupport {
 
 
     /**
-     * Disables all value constraints (e.g. not null) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all value constraints (e.g. not null) on all tables in the schema
      */
     @Override
-    public void removeValueConstraints(String tableName) {
+    public void disableValueConstraints() {
+        // todo implement
+        String tableName = null;
+
         SQLHandler sqlHandler = getSQLHandler();
 
         // disable all check and unique constraints

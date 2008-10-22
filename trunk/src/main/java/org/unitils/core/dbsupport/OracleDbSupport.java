@@ -184,33 +184,29 @@ public class OracleDbSupport extends DbSupport {
 
 
     /**
-     * Removes all referential constraints (e.g. foreign keys) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all referential constraints (e.g. foreign keys) on all table in the schema
      */
     @Override
-    public void removeReferentialConstraints(String tableName) {
+    public void disableReferentialConstraints() {
         SQLHandler sqlHandler = getSQLHandler();
         // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%'");
-        for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%' and STATUS <> 'DISABLED'");
+        for (String[] tableAndConstraintName : tableAndConstraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " disable constraint " + quoted(tableAndConstraintName[1]));
         }
     }
 
 
     /**
-     * Disables all value constraints (e.g. not null) on the specified table
-     *
-     * @param tableName The table, not null
+     * Disables all value constraints (e.g. not null) on all tables in the schema
      */
     @Override
-    public void removeValueConstraints(String tableName) {
+    public void disableValueConstraints() {
         SQLHandler sqlHandler = getSQLHandler();
         // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and TABLE_NAME = '" + tableName + "' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%'");
-        for (String constraintName : constraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%' and STATUS <> 'DISABLED'");
+        for (String[] tableAndConstraintName : tableAndConstraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " disable constraint " + quoted(tableAndConstraintName[1]));
         }
     }
 
