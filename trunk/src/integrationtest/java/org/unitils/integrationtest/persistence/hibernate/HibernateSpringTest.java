@@ -27,7 +27,6 @@ import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 import org.unitils.spring.annotation.SpringApplicationContext;
 
-//@Transactional(TransactionMode.ROLLBACK)
 public class HibernateSpringTest extends UnitilsJUnit4 {
 
 	@SpringApplicationContext({"org/unitils/integrationtest/persistence/hibernate/hibernateSpringTest-spring.xml"})

@@ -392,7 +392,6 @@ public class DatabaseModule implements Module {
      * @param testObject The test object, not null
      */
     public void startTransaction(Object testObject) {
-        logger.info("Starting transaction.");
         getTransactionManager().startTransaction(testObject);
     }
     
@@ -405,7 +404,6 @@ public class DatabaseModule implements Module {
     public void commitTransaction(Object testObject) {
         flushDatabaseUpdates(testObject);
         getTransactionManager().commit(testObject);
-        logger.info("Committed transaction.");
     }
 
 
@@ -417,7 +415,6 @@ public class DatabaseModule implements Module {
     public void rollbackTransaction(Object testObject) {
         flushDatabaseUpdates(testObject);
         getTransactionManager().rollback(testObject);
-        logger.info("Rolled back transaction.");
     }
 
 
