@@ -33,7 +33,6 @@ import org.unitils.spring.annotation.SpringApplicationContext;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-@Transactional(TransactionMode.COMMIT)
 public class ToplinkJpaSpringTest {
 
 	@SpringApplicationContext({"org/unitils/integrationtest/persistence/jpa/toplinkJpaSpringTest-spring.xml"})

@@ -21,8 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.database.annotations.TestDataSource;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.integrationtest.sampleproject.dao.PersonDao;
@@ -30,7 +28,6 @@ import org.unitils.integrationtest.sampleproject.dao.impl.JdbcPersonDao;
 import org.unitils.integrationtest.sampleproject.model.Person;
 import org.unitils.reflectionassert.ReflectionAssert;
 
-//@Transactional(TransactionMode.COMMIT)
 public class JdbcTest extends UnitilsJUnit4 {
 
 	@TestDataSource

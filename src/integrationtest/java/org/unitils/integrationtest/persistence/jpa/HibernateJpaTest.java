@@ -22,8 +22,6 @@ import javax.persistence.PersistenceContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
-import org.unitils.database.annotations.Transactional;
-import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.integrationtest.sampleproject.model.Person;
@@ -31,7 +29,6 @@ import org.unitils.orm.jpa.JpaUnitils;
 import org.unitils.orm.jpa.annotation.JpaEntityManagerFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
-//@Transactional(TransactionMode.COMMIT)
 public class HibernateJpaTest extends UnitilsJUnit4 {
 
 	@JpaEntityManagerFactory(persistenceUnit = "test", configFile = "org/unitils/integrationtest/persistence/jpa/hibernate-persistence-test.xml")

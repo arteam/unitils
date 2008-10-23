@@ -16,6 +16,7 @@
 package org.unitils.integrationtest.persistence.hibernate;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
@@ -27,7 +28,6 @@ import org.unitils.integrationtest.sampleproject.model.Person;
 import org.unitils.orm.hibernate.annotation.HibernateSessionFactory;
 import org.unitils.reflectionassert.ReflectionAssert;
 
-//@Transactional(TransactionMode.COMMIT)
 public class HibernateTest extends UnitilsJUnit4 {
 
 	@HibernateSessionFactory({"org/unitils/integrationtest/persistence/hibernate/hibernate-test.cfg.xml"})
@@ -43,7 +43,8 @@ public class HibernateTest extends UnitilsJUnit4 {
     @Test
     @DataSet("../datasets/SinglePerson.xml")
     public void testFindById() {
-    	Person userFromDb = (Person) sessionFactory.getCurrentSession().get(Person.class, 1L);
+    	Session currentSession = sessionFactory.getCurrentSession();
+        Person userFromDb = (Person) currentSession.get(Person.class, 1L);
     	ReflectionAssert.assertLenientEquals(person, userFromDb);
     }
 
@@ -51,7 +52,8 @@ public class HibernateTest extends UnitilsJUnit4 {
     @DataSet("../datasets/NoPersons.xml")
     @ExpectedDataSet("../datasets/SinglePerson-result.xml")
     public void testPersist() {
-    	sessionFactory.getCurrentSession().persist(person);
+    	Session currentSession = sessionFactory.getCurrentSession();
+        currentSession.persist(person);
     }
 	
 }
