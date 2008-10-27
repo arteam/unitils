@@ -144,7 +144,7 @@ public class DefaultDifferenceView implements DifferenceView {
 
 
     /**
-     * Creates a string representation of an unorder collection difference.
+     * Creates a string representation of an unordered collection difference.
      *
      * @param unorderedCollectionDifference The difference, not null
      * @param fieldName                     The current fieldName, null for root

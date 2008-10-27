@@ -24,6 +24,7 @@ import static org.unitils.util.CollectionUtils.convertToCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Comparator for collections and arrays.
@@ -65,8 +66,8 @@ public class CollectionComparator implements Comparator {
      */
     public Difference compare(Object left, Object right, boolean onlyFirstDifference, ReflectionComparator reflectionComparator) {
         // Convert to list and compare as collection
-        ArrayList<Object> leftList = new ArrayList<Object>(convertToCollection(left));
-        ArrayList<Object> rightList = new ArrayList<Object>(convertToCollection(right));
+        List<Object> leftList = new ArrayList<Object>(convertToCollection(left));
+        List<Object> rightList = new ArrayList<Object>(convertToCollection(right));
 
         int elementIndex = -1;
         CollectionDifference difference = new CollectionDifference("Different elements", left, right, leftList, rightList);

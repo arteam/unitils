@@ -99,7 +99,7 @@ public class ReflectionComparator {
      * @return the root difference, null if there is no difference
      */
     public Difference getDifference(Object left, Object right, boolean onlyFirstDifference) {
-        // check whether difference is avaible in cache
+        // check whether difference is available in cache
         Map<Object, Difference> cachedResult = cachedResults.get(left);
         if (cachedResult != null) {
             if (cachedResult.containsKey(right)) {
