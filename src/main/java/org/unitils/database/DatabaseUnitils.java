@@ -36,7 +36,7 @@ public class DatabaseUnitils {
      * @return The DataSource that connects to the test database
      */
     public static DataSource getDataSource() {
-    	return getDatabaseModule().getTransactionalDataSource(getTestObject());
+    	return getDatabaseModule().getTransactionalDataSourceAndActivateTransactionIfNeeded(getTestObject());
     }
     
     

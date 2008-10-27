@@ -171,7 +171,7 @@ public class DatabaseModule implements Module {
             }
             
             public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
-                return new DataSourceTransactionManager(getDataSource());
+                return new DataSourceTransactionManager(getDataSourceAndActivateTransactionIfNeeded());
             }
             
             public boolean isTransactionalResourceAvailable(Object testObject) {
@@ -184,30 +184,8 @@ public class DatabaseModule implements Module {
             
         });
     }
-
-
-    /**
-     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
-     * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
-     *
-     * @return The <code>DataSource</code>
-     */
-    public DataSource getDataSource() {
-        if (dataSource == null) {
-            dataSource = createDataSource();
-            if (transactionManager != null) {
-                transactionManager.activateTransactionIfNeeded(getTestObject());
-            }
-        }
-        return dataSource;
-    }
-
-
-    public boolean isDataSourceLoaded() {
-        return dataSource != null;
-    }
-
-
+    
+    
     /**
      * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
@@ -218,11 +196,46 @@ public class DatabaseModule implements Module {
      * @param testObject The test instance, not null
      * @return The <code>DataSource</code>
      */
-    public DataSource getTransactionalDataSource(Object testObject) {
+    public DataSource getTransactionalDataSourceAndActivateTransactionIfNeeded(Object testObject) {
         if (wrapDataSourceInTransactionalProxy) {
-            return getTransactionManager().getTransactionalDataSource(getDataSource());
+            return getTransactionManager().getTransactionalDataSource(getDataSourceAndActivateTransactionIfNeeded());
         }
-        return getDataSource();
+        return getDataSourceAndActivateTransactionIfNeeded();
+    }
+
+
+    /**
+     * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
+     * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
+     *
+     * @return The <code>DataSource</code>
+     */
+    public DataSource getDataSourceAndActivateTransactionIfNeeded() {
+        if (dataSource == null) {
+            dataSource = createDataSource();
+            activateTransactionIfNeeded();
+        }
+        return dataSource;
+    }
+    
+    
+    public DataSource getDataSource() {
+        if (dataSource == null) {
+            dataSource = createDataSource();
+        }
+        return dataSource;
+    }
+
+
+    public void activateTransactionIfNeeded() {
+        if (transactionManager != null) {
+            transactionManager.activateTransactionIfNeeded(getTestObject());
+        }
+    }
+
+
+    public boolean isDataSourceLoaded() {
+        return dataSource != null;
     }
 
 
@@ -318,7 +331,7 @@ public class DatabaseModule implements Module {
             // Nothing to do. Jump out to make sure that we don't try to instantiate the DataSource
             return;
         }
-        setFieldAndSetterValue(testObject, fields, methods, getTransactionalDataSource(testObject));
+        setFieldAndSetterValue(testObject, fields, methods, getTransactionalDataSourceAndActivateTransactionIfNeeded(testObject));
     }
 
 
@@ -486,7 +499,7 @@ public class DatabaseModule implements Module {
      *         test database
      */
     protected SQLHandler getDefaultSqlHandler() {
-        return new DefaultSQLHandler(getDataSource());
+        return new DefaultSQLHandler(getDataSourceAndActivateTransactionIfNeeded());
     }
 
 

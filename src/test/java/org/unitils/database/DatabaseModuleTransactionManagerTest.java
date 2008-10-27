@@ -82,9 +82,9 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
 
         Method testMethod = TransactionsDisabledTest.class.getMethod("test", new Class[]{});
         databaseModule.startTransactionForTestMethod(transactionsDisabledTest, testMethod);
-        Connection conn1 = databaseModule.getDataSource().getConnection();
+        Connection conn1 = databaseModule.getDataSourceAndActivateTransactionIfNeeded().getConnection();
         conn1.close();
-        Connection conn2 = databaseModule.getDataSource().getConnection();
+        Connection conn2 = databaseModule.getDataSourceAndActivateTransactionIfNeeded().getConnection();
         conn2.close();
         assertNotSame(conn1, conn2);
         databaseModule.endTransactionForTestMethod(transactionsDisabledTest, testMethod);
@@ -105,7 +105,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = RollbackTest.class.getMethod("test", new Class[]{});
-        DataSource dataSource = databaseModule.getTransactionalDataSource(rollbackTest);
+        DataSource dataSource = databaseModule.getTransactionalDataSourceAndActivateTransactionIfNeeded(rollbackTest);
         databaseModule.startTransactionForTestMethod(rollbackTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         Connection targetConnection1 = ((ConnectionProxy) connection1).getTargetConnection();
@@ -132,7 +132,7 @@ public class DatabaseModuleTransactionManagerTest extends DatabaseModuleTransact
         replay(mockConnection1, mockConnection2);
 
         Method testMethod = CommitTest.class.getMethod("test", new Class[]{});
-        DataSource dataSource = databaseModule.getTransactionalDataSource(commitTest);
+        DataSource dataSource = databaseModule.getTransactionalDataSourceAndActivateTransactionIfNeeded(commitTest);
         databaseModule.startTransactionForTestMethod(commitTest, testMethod);
         Connection connection1 = dataSource.getConnection();
         Connection targetConnection1 = ((ConnectionProxy) connection1).getTargetConnection();
