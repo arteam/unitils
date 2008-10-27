@@ -39,7 +39,7 @@ public class DefaultDifferenceReport implements DifferenceReport {
      */
     public String createReport(String message, Difference difference) {
         if (difference == null) {
-            return "Found no differences.";
+            return "No differences found.";
         }
 
         StringBuilder result = new StringBuilder();
