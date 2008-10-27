@@ -96,7 +96,9 @@ public class MockModule implements Module {
 
 
     public void assertNoMoreInvocations(StackTraceElement assertedAt) {
-        scenario.assertNoMoreInvocations(assertedAt);
+        if (scenario != null) {
+            scenario.assertNoMoreInvocations(assertedAt);
+        }
     }
 
 
