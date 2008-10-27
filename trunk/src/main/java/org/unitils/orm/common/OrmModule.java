@@ -180,17 +180,18 @@ abstract public class OrmModule<ORM_PERSISTENCE_UNIT, ORM_PERSISTENCE_CONTEXT, P
         if (configuredPersistenceUnit == null) {
             configuredPersistenceUnit = ormPersistenceUnitLoader.getConfiguredOrmPersistenceUnit(testObject, persistenceUnitConfig);
             configuredOrmPersistenceUnitCache.put(persistenceUnitConfig, configuredPersistenceUnit);
+            getDatabaseModule().activateTransactionIfNeeded();
         }
         return configuredPersistenceUnit;
     }
     
     
-    protected boolean isConfiguredPersistenceUnitActive(Object testObject) {
+    /*protected boolean isConfiguredPersistenceUnitActive(Object testObject) {
         if (ormSpringSupport != null && ormSpringSupport.isPersistenceUnitConfiguredInSpring(testObject)) {
             return true;
         }
         return configuredOrmPersistenceUnitCache.containsKey(testObject);
-    }
+    }*/
 
 
     /**

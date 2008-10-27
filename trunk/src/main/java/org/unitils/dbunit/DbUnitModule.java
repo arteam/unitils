@@ -381,7 +381,7 @@ public class DbUnitModule implements Module {
      */
     protected DbUnitDatabaseConnection createDbUnitConnection(String schemaName) {
         // A DbSupport instance is fetched in order to get the schema name in correct case
-        DataSource dataSource = getDatabaseModule().getDataSource();
+        DataSource dataSource = getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         DbSupport dbSupport = getDbSupport(configuration, sqlHandler, schemaName);
 
@@ -508,7 +508,7 @@ public class DbUnitModule implements Module {
      * @return The default DbSupport (the one that connects to the default database schema)
      */
     protected DbSupport getDefaultDbSupport() {
-        DataSource dataSource = getDatabaseModule().getDataSource();
+        DataSource dataSource = getDatabaseModule().getDataSourceAndActivateTransactionIfNeeded();
         SQLHandler sqlHandler = new DefaultSQLHandler(dataSource);
         return DbSupportFactory.getDefaultDbSupport(configuration, sqlHandler);
     }

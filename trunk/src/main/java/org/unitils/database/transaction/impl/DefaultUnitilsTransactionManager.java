@@ -135,7 +135,7 @@ public class DefaultUnitilsTransactionManager implements UnitilsTransactionManag
         }
         TransactionStatus transactionStatus = testObjectTransactionStatusMap.get(testObject);
         if (testObjectTransactionActiveMap.get(testObject)) {
-            logger.debug("Commiting transaction");
+            logger.debug("Committing transaction");
             testObjectPlatformTransactionManagerMap.get(testObject).commit(transactionStatus);
         }
         testObjectTransactionActiveMap.remove(testObject);
