@@ -78,7 +78,7 @@ public interface Mock<T> {
      * Note that this behavior is executed each time a match is found. So the exception will be raised
      * each time method1() is called. If you only want to raise the exception once, use the {@link #onceRaises} method.
      *
-     * @param exception The exception to raise, not null
+     * @param exceptionClass The class of the exception to raise, not null
      * @return The proxy instance that will record the method call, not null
      */
     T raises(Class<? extends Throwable> exceptionClass);
@@ -100,15 +100,105 @@ public interface Mock<T> {
      */
     T performs(MockBehavior mockBehavior);
 
+    
+    /**
+     * Defines behavior for this mock so that it will return the given value when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.onceReturns("aValue").method1();
+     * <p/>
+     * will return "aValue" when method1 is called.
+     * <p/>
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #returns} instead.
+     *
+     * @param returnValue The value to return
+     * @return The proxy instance that will record the method call, not null
+     */
     T onceReturns(Object returnValue);
 
+    
+    /**
+     * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.raises(new MyException()).method1();
+     * <p/>
+     * will throw an instance of the given exception class when method1 is called.
+     * <p/>
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #raises} instead.
+     *
+     * @param exception The exception to raise, not null
+     * @return The proxy instance that will record the method call, not null
+     */
     T onceRaises(Throwable exception);
+    
+    
+    /**
+     * Defines behavior for this mock so that it raises an instance of the given exception class when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.raises(new MyException()).method1();
+     * <p/>
+     * will throw an instance of the given exception class when method1 is called.
+     * <p/>
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #raises} instead.
+     *
+     * @param exceptionClass The class of the exception to raise, not null
+     * @return The proxy instance that will record the method call, not null
+     */
+    T onceRaises(Class<? extends Throwable> exceptionClass);
 
+    
+    /**
+     * Defines behavior for this mock so that will be performed when the invocation following
+     * this call matches the observed behavior. E.g.
+     * <p/>
+     * mock.performs(new MyMockBehavior()).method1();
+     * <p/>
+     * will execute the given mock behavior when method1 is called.
+     * <p/>
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #performs} instead.
+     *
+     * @param mockBehavior The behavior to perform, not null
+     * @return The proxy instance that will record the method call, not null
+     */
     T oncePerforms(MockBehavior mockBehavior);
 
+    
+    /**
+     * Asserts that an invocation that matches the invocation following this call has been observed
+     * on this mock object during this test.
+     * 
+     * @return The proxy instance that will record the method call, not null
+     */
     T assertInvoked();
     
+    
+    /**
+     * Asserts that an invocation that matches the invocation following this call has been observed
+     * on this mock object during this test. 
+     * <p/>
+     * If this method is used multiple times during the current test, the sequence of the observed method 
+     * calls has to be the same as the sequence of the calls to this method.
+     * 
+     * @return The proxy instance that will record the method call, not null
+     */
     T assertInvokedInSequence();
 
+    
+    /**
+     * Asserts that no invocation that matches the invocation following this call has been observed
+     * on this mock object during this test.
+     * 
+     * @return The proxy instance that will record the method call, not null
+     */
     T assertNotInvoked();
 }
