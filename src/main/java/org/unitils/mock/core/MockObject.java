@@ -217,9 +217,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      * <p/>
      * will return "aValue" when method1 is called.
      * <p/>
-     * When the behavior was executed it is removed, so it will only return a value once. Following
-     * invocations will trigger the next matching behavior. If no matching one time behavior is found, the
-     * always matching behaviors are tried.
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #returns} instead.
      *
      * @param returnValue The value to return
      * @return The proxy instance that will record the method call, not null
@@ -238,9 +238,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      * <p/>
      * will throw the given exception when method1 is called.
      * <p/>
-     * When the behavior was executed it is removed, so it will only raise the exception once. Following
-     * invocations will trigger the next matching behavior. If no matching one time behavior is found, the
-     * always matching behaviors are tried.
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #raises} instead.
      *
      * @param exception The exception to raise, not null
      * @return The proxy instance that will record the method call, not null
@@ -260,9 +260,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      * <p/>
      * will throw an instance of the given exception class when method1 is called.
      * <p/>
-     * When the behavior was executed it is removed, so it will only raise the exception once. Following
-     * invocations will trigger the next matching behavior. If no matching one time behavior is found, the
-     * always matching behaviors are tried.
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #raises} instead.
      *
      * @param exceptionClass The type of exception to raise, not null
      * @return The proxy instance that will record the method call, not null
@@ -282,9 +282,9 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
      * <p/>
      * will execute the given mock behavior when method1 is called.
      * <p/>
-     * When the behavior was executed it is removed, so it will only peform the given behavior once. Following
-     * invocations will trigger the next matching behavior. If no matching one time behavior is found, the
-     * always matching behaviors are tried.
+     * Note that this behavior is executed only once. If method1() is invoked a second time, a different
+     * behavior definition will be used (if defined) or a default value will be returned. If you want this
+     * definition to be able to be matched multiple times, use the method {@link #performs} instead.
      *
      * @param mockBehavior The behavior to perform, not null
      * @return The proxy instance that will record the method call, not null
@@ -295,18 +295,39 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     }
 
 
+    /**
+     * Asserts that an invocation that matches the invocation following this call has been observed
+     * on this mock object during this test.
+     * 
+     * @return The proxy instance that will record the method call, not null
+     */
     public T assertInvoked() {
         AssertInvokedInvocationHandler proxyInvocationHandler = new AssertInvokedInvocationHandler(getAssertedAt());
         return startAssertion(proxyInvocationHandler, "assertInvoked");
     }
 
 
+    /**
+     * Asserts that an invocation that matches the invocation following this call has been observed
+     * on this mock object during this test. 
+     * <p/>
+     * If this method is used multiple times during the current test, the sequence of the observed method 
+     * calls has to be the same as the sequence of the calls to this method.
+     * 
+     * @return The proxy instance that will record the method call, not null
+     */
     public T assertInvokedInSequence() {
         AssertInvokedInOrderInvocationHandler proxyInvocationHandler = new AssertInvokedInOrderInvocationHandler(getAssertedAt());
         return startAssertion(proxyInvocationHandler, "assertInvokedInOrder");
     }
 
 
+    /**
+     * Asserts that no invocation that matches the invocation following this call has been observed
+     * on this mock object during this test.
+     * 
+     * @return The proxy instance that will record the method call, not null
+     */
     public T assertNotInvoked() {
         AssertNotInvokedInvocationHandler proxyInvocationHandler = new AssertNotInvokedInvocationHandler(getAssertedAt());
         return startAssertion(proxyInvocationHandler, "assertNotInvoked");
