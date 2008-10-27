@@ -372,6 +372,12 @@ public class HibernateMappingTest extends UnitilsJUnit4 {
 }
 +-----+
 
+    Note that, if you use toplink as persistence provider, you need to run your tests with a JVM agent to enable load-time bytecode modification. We use the spring-agent.jar for this purpose. You enable the spring agent by adding following JVM option:
+	
++-----+
+-javaagent:/path/to/spring-agent.jar
++-----+
+
 
 * Test a hibernate DAO
 ~~~~~~~~~~~~~~~~~~~~~~

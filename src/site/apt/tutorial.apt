@@ -1178,6 +1178,12 @@ alter table PRODUCT add column barCode varchar(255);
 +-----+
 jpa.persistenceProvider=toplink
 +-----+
+
+    Note that, if you use toplink as persistence provider, you need to run your tests with a JVM agent to enable load-time bytecode modification. We use the spring-agent.jar for this purpose. You enable the spring agent by adding following JVM option:
+	
++-----+
+-javaagent:/path/to/spring-agent.jar
++-----+
 	
 	If your application uses spring IOC, you'll probably want to make unitils work with the <EntityManagerFactory> configured in spring. To
 	read more about this, refer to {{{#Testing with Spring} Testing with Spring}}. If you're not using spring, you can configure an <EntityManagerFactory> 
