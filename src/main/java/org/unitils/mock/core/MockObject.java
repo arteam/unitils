@@ -341,7 +341,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
             result = mockBehavior.execute(proxyInvocation);
         }
 
-        mockInvocation.setResult(createDeepClone(result));
+        mockInvocation.setResultAtInvocationTime(createDeepClone(result));
         return result;
     }
 

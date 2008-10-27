@@ -16,6 +16,10 @@
 package org.unitils.mock.report.impl;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+
+import java.util.List;
+
+import org.unitils.mock.core.ObservedInvocation;
 import org.unitils.mock.core.Scenario;
 import org.unitils.mock.report.ScenarioReport;
 
@@ -38,21 +42,25 @@ public class DefaultScenarioReport implements ScenarioReport {
      */
     public String createReport(Scenario scenario) {
         StringBuilder result = new StringBuilder();
-        String observedInvocations = new ObservedInvocationsReport().createReport(scenario.getObservedInvocations());
-        if (isNotEmpty(observedInvocations)) {
-            result.append("Observed scenario:\n\n");
-            result.append(observedInvocations);
+        List<ObservedInvocation> observedInvocations = scenario.getObservedInvocations();
+        if (observedInvocations.isEmpty()) {
+            // Make sure we don't return a report containing 3 titles and no content
+            return "No invocations observed.\n";
         }
-        String suggestedAssertStatements = new SuggestedAssertsReport().createReport(scenario.getTestObject(), scenario.getObservedInvocations());
-        if (isNotEmpty(suggestedAssertStatements)) {
-            result.append("\nSuggested assert statements:\n\n");
-            result.append(suggestedAssertStatements);
+        result.append("Observed scenario:\n\n");
+        result.append(new ObservedInvocationsReport().createReport(observedInvocations));
+        result.append("\n");
+        
+        result.append("Suggested assert statements:\n\n");
+        String suggestedAssertsReport = new SuggestedAssertsReport().createReport(scenario.getTestObject(), observedInvocations);
+        if (isNotEmpty(suggestedAssertsReport)) {
+            result.append(suggestedAssertsReport);
+            result.append("\n");
         }
-        String detailedObservedInvocations = new DetailedObservedInvocationsReport().createReport(scenario.getObservedInvocations());
-        if (isNotEmpty(detailedObservedInvocations)) {
-            result.append("\nDetailed scenario:\n\n");
-            result.append(detailedObservedInvocations);
-        }
+        
+        result.append("Detailed scenario:\n\n");
+        result.append(new DetailedObservedInvocationsReport().createReport(observedInvocations));
+        
         return result.toString();
     }
 
