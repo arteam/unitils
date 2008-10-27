@@ -87,7 +87,7 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         result.append('(');
         Class<?>[] argumentTypes = method.getParameterTypes();
         if (argumentTypes.length > 0) {
-            Iterator<Object> arguments = observedInvocation.getArguments().iterator();
+            Iterator<Object> arguments = observedInvocation.getArgumentsAtInvocationTime().iterator();
             for (Class<?> argumentType : argumentTypes) {
                 result.append(formatValue(arguments.next(), argumentType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
                 result.append(", ");
@@ -97,11 +97,11 @@ public class ObservedInvocationsReport extends ProxyInvocationsReport {
         }
         result.append(")");
 
-        // append the result value, if there is one (void methods do not have mock behavior)
+        // append the result value, if the method is non-void
         Class<?> resultType = method.getReturnType();
         if (!Void.TYPE.equals(resultType)) {
             result.append(" -> ");
-            String resultAsString = objectFormatter.format(observedInvocation.getResult());
+            String resultAsString = objectFormatter.format(observedInvocation.getResultAtInvocationTime());
             result.append(formatValue(resultAsString, resultType, currentLargeObjects, allLargeObjects, largeObjectNameIndexes));
         }
         return result.toString();

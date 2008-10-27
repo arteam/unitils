@@ -30,7 +30,7 @@ public class ObservedInvocation extends ProxyInvocation {
 
     private String mockName;
 
-    private Object result;
+    private Object resultAtInvocationTime;
 
     private BehaviorDefiningInvocation behaviorDefiningInvocation;
 
@@ -62,8 +62,8 @@ public class ObservedInvocation extends ProxyInvocation {
     }
 
 
-    public void setResult(Object result) {
-        this.result = result;
+    public void setResultAtInvocationTime(Object result) {
+        this.resultAtInvocationTime = result;
     }
 
 
@@ -72,8 +72,8 @@ public class ObservedInvocation extends ProxyInvocation {
     }
 
 
-    public Object getResult() {
-        return result;
+    public Object getResultAtInvocationTime() {
+        return resultAtInvocationTime;
     }
 
 
