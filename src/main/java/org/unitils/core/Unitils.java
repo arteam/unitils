@@ -75,6 +75,7 @@ public class Unitils {
     }
 
 
+    /* Listener that observes the execution of tests */
     private TestListener testListener;
     
     /* Repository for all modules that are currently active in Unitils */
@@ -129,6 +130,10 @@ public class Unitils {
     }
     
     
+    /**
+     * Gives all modules the opportunity to performs initialization that
+     * can only work after all other modules have been initialized
+     */
     protected void afterInitModules() {
     	for (Module module : modulesRepository.getModules()) {
     		module.afterInit();
@@ -136,6 +141,12 @@ public class Unitils {
     }
     
     
+    /**
+     * Verifies that we're not working with a distribution that includes the necessary classes from spring,
+     * while spring is in the classpath anyway.
+     * 
+     * @param configuration The configuration
+     */
     protected void verifyPackaging(Properties configuration) {
     	String springCoreClassName = configuration.getProperty("spring.core.someClass.name");
     	String unitilsPackagedWithSpring = "org.unitils.includeddeps." + springCoreClassName;
@@ -149,7 +160,13 @@ public class Unitils {
 	}
 
     
-	private boolean isClassAvailable(String className) {
+    /**
+     * Utility method that verifies whether the class with the given fully qualified classname is available
+     * in the classpath.
+     * @param className The name of the class
+     * @return True if the class with the given name is available
+     */
+	protected boolean isClassAvailable(String className) {
 		try {
 			Thread.currentThread().getContextClassLoader().loadClass(className);
 			return true;
