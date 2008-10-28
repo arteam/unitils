@@ -18,17 +18,21 @@ package org.unitils.core;
 import java.lang.reflect.Method;
 
 /**
- * todo javadoc
+ * Object that holds information about the current test execution. During a test run
+ * it always knows which test is running.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
 public class TestContext {
 
+    /* The class who's tests are currenlty executed */
     private Class<?> testClass;
 
+    /* The instance of the test class which is currenlty executed */
     private Object testObject;
 
+    /* The test method which is currently executed */
     private Method testMethod;
 
 

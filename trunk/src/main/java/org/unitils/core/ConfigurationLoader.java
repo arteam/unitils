@@ -15,15 +15,16 @@
  */
 package org.unitils.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import org.unitils.util.PropertyUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.unitils.util.PropertyUtils;
 
 
 /**
@@ -127,6 +128,13 @@ public class ConfigurationLoader {
     }
 
 
+	/**
+	 * Loads the properties file with the given name, which is available in the classpath. If no
+	 * file with the given name is found, null is returned.
+	 * 
+	 * @param propertiesFileName The name of the properties file
+	 * @return The Properties object, null if the properties file wasn't found.
+	 */
     protected Properties loadPropertiesFileFromClasspath(String propertiesFileName) {
         InputStream inputStream = null;
         try {
@@ -146,6 +154,13 @@ public class ConfigurationLoader {
     }
 
 
+    /**
+     * Loads the properties file with the given name, which is available in the user home folder. If no
+     * file with the given name is found, null is returned.
+     * 
+     * @param propertiesFileName The name of the properties file
+     * @return The Properties object, null if the properties file wasn't found.
+     */
     protected Properties loadPropertiesFileFromUserHome(String propertiesFileName) {
         InputStream inputStream = null;
         try {
