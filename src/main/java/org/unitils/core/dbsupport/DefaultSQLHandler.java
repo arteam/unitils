@@ -234,45 +234,9 @@ public class DefaultSQLHandler implements SQLHandler {
     }
 
 
-    /**
-     * Returns the all values of the items extracted from the result of the given query.
-     * Eg select a, b, c from my table will return a set for each record containing the values of a, b and c
-     *
-     * @param sql The sql string for retrieving the items
-     * @return The items, not null
-     */
-    public Set<String[]> getAllItemsAsStringSet(String sql) {
-        logger.debug(sql);
-
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            Set<String[]> result = new HashSet<String[]>();
-            while (resultSet.next()) {
-                int columnCount = resultSet.getMetaData().getColumnCount();
-                String[] record = new String[columnCount];
-                for (int i = 0; i < columnCount; i++) {
-                    record[i] = resultSet.getString(i+1);
-                }
-                result.add(record);
-            }
-            return result;
-
-        } catch (Exception e) {
-            throw new UnitilsException("Error while executing statement: " + sql, e);
-        } finally {
-            closeQuietly(connection, statement, resultSet);
-        }
-    }
-
-
     /* (non-Javadoc)
-	 * @see org.unitils.core.dbsupport.SQLHandler#exists(java.lang.String)
-	 */
+      * @see org.unitils.core.dbsupport.SQLHandler#exists(java.lang.String)
+      */
     public boolean exists(String sql) {
         logger.debug(sql);
 

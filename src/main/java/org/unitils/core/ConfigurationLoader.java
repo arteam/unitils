@@ -17,10 +17,8 @@ package org.unitils.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.unitils.util.PropertyUtils;
-
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
-import static org.unitils.util.PropertyUtils.getString;
+import org.unitils.util.PropertyUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,62 +85,50 @@ public class ConfigurationLoader {
 
     /**
      * Creates and loads all configuration settings.
-     * 
-     * @param customConfigurationFileName The name of the custom configuration file. 
-     *        May be null: if so, the fileName is retrieved from the default properties. 
      *
+     * @param customConfigurationFileName The name of the custom configuration file.
+     *                                    May be null: if so, the fileName is retrieved from the default properties.
      * @return the settings, not null
      */
     public Properties loadConfiguration(String customConfigurationFileName) {
-    	Properties properties = new Properties();
-    	
-    	// Load the default properties file, that is distributed with unitils (unitils-default.properties)
-    	Properties defaultProperties = loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
-    	if (defaultProperties == null) {
-    		throw new UnitilsException("Configuration file: " + DEFAULT_PROPERTIES_FILE_NAME + " not found in classpath.");
-    	}
-    	properties.putAll(defaultProperties);
-    	
-    	// Load the custom project level configuration file (unitils.properties)
-    	if (customConfigurationFileName == null) {
-    		customConfigurationFileName = PropertyUtils.getString(PROPKEY_CUSTOM_CONFIGURATION, properties);
-    	}
-    	Properties customProperties = loadPropertiesFileFromClasspath(customConfigurationFileName);
-    	if (customProperties == null) {
-    		logger.warn("No custom configuration file " + customConfigurationFileName + " found.");
-        } else {
-        	properties.putAll(customProperties);
+        Properties properties = new Properties();
+
+        // Load the default properties file, that is distributed with unitils (unitils-default.properties)
+        Properties defaultProperties = loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
+        if (defaultProperties == null) {
+            throw new UnitilsException("Configuration file: " + DEFAULT_PROPERTIES_FILE_NAME + " not found in classpath.");
         }
-    	
-    	// Load the local configuration file from the user home, or from the classpath
-    	String localConfigurationFileName = PropertyUtils.getString(PROPKEY_LOCAL_CONFIGURATION, properties);
-    	Properties localProperties = loadPropertiesFileFromUserHome(localConfigurationFileName);
-    	if (localProperties == null) {
-    		localProperties = loadPropertiesFileFromClasspath(localConfigurationFileName);
-    	}
-    	if (localProperties == null) {
-    		logger.info("No custom configuration file " + customConfigurationFileName + " found.");
-        } else {
-        	properties.putAll(localProperties);
+        properties.putAll(defaultProperties);
+
+        // Load the custom project level configuration file (unitils.properties)
+        if (customConfigurationFileName == null) {
+            customConfigurationFileName = PropertyUtils.getString(PROPKEY_CUSTOM_CONFIGURATION, properties);
         }
-        
+        Properties customProperties = loadPropertiesFileFromClasspath(customConfigurationFileName);
+        if (customProperties == null) {
+            logger.warn("No custom configuration file " + customConfigurationFileName + " found.");
+        } else {
+            properties.putAll(customProperties);
+        }
+
+        // Load the local configuration file from the user home, or from the classpath
+        String localConfigurationFileName = PropertyUtils.getString(PROPKEY_LOCAL_CONFIGURATION, properties);
+        Properties localProperties = loadPropertiesFileFromUserHome(localConfigurationFileName);
+        if (localProperties == null) {
+            localProperties = loadPropertiesFileFromClasspath(localConfigurationFileName);
+        }
+        if (localProperties == null) {
+            logger.info("No custom configuration file " + customConfigurationFileName + " found.");
+        } else {
+            properties.putAll(localProperties);
+        }
+
         return properties;
     }
 
 
-    /**
-     * Creates and loads the default configuration settings from the {@link #DEFAULT_PROPERTIES_FILE_NAME} file.
-     *
-     * @return the defaults, not null
-     * @throws RuntimeException if the file cannot be found or loaded
-     */
-    public Properties getDefaultConfiguration() {
-        return loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
-    }
-
-
-	protected Properties loadPropertiesFileFromClasspath(String propertiesFileName) {
-		InputStream inputStream = null;
+    protected Properties loadPropertiesFileFromClasspath(String propertiesFileName) {
+        InputStream inputStream = null;
         try {
             Properties properties = new Properties();
             inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFileName);
@@ -157,17 +143,17 @@ public class ConfigurationLoader {
         } finally {
             closeQuietly(inputStream);
         }
-	}
-	
-	
-	protected Properties loadPropertiesFileFromUserHome(String propertiesFileName) {
-		InputStream inputStream = null;
+    }
+
+
+    protected Properties loadPropertiesFileFromUserHome(String propertiesFileName) {
+        InputStream inputStream = null;
         try {
             Properties properties = new Properties();
             String userHomeDir = System.getProperty("user.home");
             File localPropertiesFile = new File(userHomeDir, propertiesFileName);
             if (!localPropertiesFile.exists()) {
-            	return null;
+                return null;
             }
             inputStream = new FileInputStream(localPropertiesFile);
             properties.load(inputStream);
@@ -179,6 +165,6 @@ public class ConfigurationLoader {
         } finally {
             closeQuietly(inputStream);
         }
-	}
+    }
 
 }

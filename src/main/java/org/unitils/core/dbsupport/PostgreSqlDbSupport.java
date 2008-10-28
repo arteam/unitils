@@ -150,9 +150,15 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public void disableReferentialConstraints() {
-        // todo implement
-        String tableName = null;
+        Set<String> tableNames = getTableNames();
+        for (String tableName : tableNames) {
+            disableReferentialConstraints(tableName);
+        }
+    }
 
+
+    // todo refactor (see oracle)
+    protected void disableReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select constraint_name from information_schema.table_constraints con where con.table_name = '" + tableName + "' and constraint_type = 'FOREIGN KEY' and constraint_schema = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
@@ -166,9 +172,15 @@ public class PostgreSqlDbSupport extends DbSupport {
      */
     @Override
     public void disableValueConstraints() {
-        // todo implement
-        String tableName = null;
+        Set<String> tableNames = getTableNames();
+        for (String tableName : tableNames) {
+            disableValueConstraints(tableName);
+        }
+    }
 
+
+    // todo refactor (see oracle)
+    protected void disableValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
         // disable all check and unique constraints

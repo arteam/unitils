@@ -15,7 +15,7 @@
 <p><table>
     <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
     <tr><td>commons-logging</td>        <td>commons-logging</td>            <td>1.1</td>                    <td></td>                           <td>jar</td>                 </tr>
-    <tr><td>commons-lang</td>           <td>commons-lang</td>               <td>2.2</td>                    <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>commons-lang</td>           <td>commons-lang</td>               <td>2.3</td>                    <td></td>                           <td>jar</td>                 </tr>
     <tr><td>commons-collections</td>    <td>commons-collections</td>        <td>3.2</td>                    <td></td>                           <td>jar</td>                 </tr>    
     <tr><td>ognl</td>                   <td>ognl</td>                       <td>2.6.9</td>                  <td></td>                           <td>jar</td>                 </tr>
 </table></p>
@@ -24,7 +24,7 @@
 <p><table>
     <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
     <tr><td>junit</td>                  <td>junit</td>                      <td>4.4</td>                    <td></td>                           <td>jar</td>                 </tr>
-    <tr><td>org.testng</td>             <td>testng</td>                     <td>5.1</td>                    <td>jdk15</td>                      <td>jar</td>                 </tr>    
+    <tr><td>org.testng</td>             <td>testng</td>                     <td>5.7</td>                    <td>jdk15</td>                      <td>jar</td>                 </tr>    
 </table></p>
 
 
@@ -41,7 +41,7 @@
 <p>If you want to use data sets for your test data, you will also need DbUnit:</p>
 <p><table>
     <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
-    <tr><td>dbunit</td>                 <td>dbunit</td>                     <td>2.2</td>                    <td></td>                           <td>jar</td>                 </tr>        
+    <tr><td>dbunit</td>                 <td>dbunit</td>                     <td>2.2.2</td>                    <td></td>                           <td>jar</td>                 </tr>        
 </table></p>
 
 <p>If you want to use test with Hibernate, you will ofcourse need Hibernate (hibernate-annotations is optional):</p>
@@ -63,8 +63,8 @@
 <p>Next to the core dependencies you will also need to add following dependencies to your classpath when you want to use Unitils to create mocks object:</p>
 <p><table>
     <tr><td><b><i>GroupId</i></b></td>  <td><b><i>ArtifactId</i></b></td>   <td><b><i>Version</i></b></td>  <td><b><i>Classifier</i></b></td>   <td><b><i>Type</i></b></td>  </tr>
-    <tr><td>org.easymock</td>           <td>easymock</td>                   <td>2.2</td>                    <td></td>                           <td>jar</td>                 </tr>
-    <tr><td>org.easymock</td>           <td>easymockclassextension</td>     <td>2.2</td>                    <td></td>                           <td>jar</td>                 </tr>    
+    <tr><td>org.easymock</td>           <td>easymock</td>                   <td>2.3</td>                    <td></td>                           <td>jar</td>                 </tr>
+    <tr><td>org.easymock</td>           <td>easymockclassextension</td>     <td>2.3</td>                    <td></td>                           <td>jar</td>                 </tr>    
     <tr><td><i>cglib</i></td>           <td><i>cglib</i></td>               <td><i>2.1_3</i></td>           <td></td>                           <td><i>jar</i></td>          </tr>    
 </table></p>
 

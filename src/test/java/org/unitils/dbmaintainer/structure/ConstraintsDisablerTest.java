@@ -91,7 +91,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected foreign key violation
         }
-        constraintsDisabler.removeConstraints();
+        constraintsDisabler.disableConstraints();
         // Should not throw exception anymore
         executeUpdate("insert into table2 (col1) values ('test')", dataSource);
     }
@@ -109,7 +109,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected foreign key violation
         }
-        constraintsDisabler.removeConstraints();
+        constraintsDisabler.disableConstraints();
         // Should not throw exception anymore
         executeUpdate("insert into table3 (col1) values ('test')", dataSource);
     }
@@ -126,7 +126,7 @@ public class ConstraintsDisablerTest extends UnitilsJUnit4 {
         } catch (UnitilsException e) {
             // Expected not null violation
         }
-        constraintsDisabler.removeConstraints();
+        constraintsDisabler.disableConstraints();
         // Should not throw exception anymore
         executeUpdate("insert into table1 (col1, col2) values ('test', null)", dataSource);
     }

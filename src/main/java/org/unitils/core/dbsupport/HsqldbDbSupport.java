@@ -15,6 +15,12 @@
  */
 package org.unitils.core.dbsupport;
 
+import org.unitils.core.UnitilsException;
+import static org.unitils.thirdparty.org.apache.commons.dbutils.DbUtils.closeQuietly;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Set;
 
 /**
@@ -94,10 +100,26 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public void disableReferentialConstraints() {
-        SQLHandler sqlHandler = getSQLHandler();
-        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE = 'FOREIGN KEY' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
-        for (String[] tableAndConstraintName : tableAndConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " drop constraint " + quoted(tableAndConstraintName[1]));
+        Connection connection = null;
+        Statement queryStatement = null;
+        Statement alterStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getSQLHandler().getDataSource().getConnection();
+            queryStatement = connection.createStatement();
+            alterStatement = connection.createStatement();
+
+            resultSet = queryStatement.executeQuery("select TABLE_NAME, CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE = 'FOREIGN KEY' AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
+            while (resultSet.next()) {
+                String tableName = resultSet.getString("TABLE_NAME");
+                String constraintName = resultSet.getString("CONSTRAINT_NAME");
+                alterStatement.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
+            }
+        } catch (Exception e) {
+            throw new UnitilsException("Error while disabling not referential constraints on schema " + getSchemaName(), e);
+        } finally {
+            closeQuietly(queryStatement);
+            closeQuietly(connection, alterStatement, resultSet);
         }
     }
 
@@ -107,22 +129,65 @@ public class HsqldbDbSupport extends DbSupport {
      */
     @Override
     public void disableValueConstraints() {
-        SQLHandler sqlHandler = getSQLHandler();
-        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE IN ('CHECK', 'UNIQUE') AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
-        for (String[] tableAndConstraintName : tableAndConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " drop constraint " + quoted(tableAndConstraintName[1]));
-        }
+        disableCheckAndUniqueConstraints();
+        disableNotNullConstraints();
+    }
 
-        Set<String[]> tableAndNotNullColumnNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS where IS_NULLABLE = 'NO' AND TABLE_SCHEM = '" + getSchemaName() + "'");
-        for (String[] tableAndNotNullColumnName : tableAndNotNullColumnNames) {
-            String tableName = tableAndNotNullColumnName[0];
-            String columnName = tableAndNotNullColumnName[1];
-            Set<String> primaryKeyColumnNames = sqlHandler.getItemsAsStringSet("select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS where TABLE_NAME = '" + tableName + "' AND TABLE_SCHEM = '" + getSchemaName() + "'");
-            if (primaryKeyColumnNames.contains(columnName)) {
-                // Do not remove PK constraints
-                continue;
+
+    /**
+     * Disables all check and unique constraints on all tables in the schema
+     */
+    protected void disableCheckAndUniqueConstraints() {
+        Connection connection = null;
+        Statement queryStatement = null;
+        Statement alterStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getSQLHandler().getDataSource().getConnection();
+            queryStatement = connection.createStatement();
+            alterStatement = connection.createStatement();
+
+            resultSet = queryStatement.executeQuery("select TABLE_NAME, CONSTRAINT_NAME from INFORMATION_SCHEMA.SYSTEM_TABLE_CONSTRAINTS where CONSTRAINT_TYPE IN ('CHECK', 'UNIQUE') AND CONSTRAINT_SCHEMA = '" + getSchemaName() + "'");
+            while (resultSet.next()) {
+                String tableName = resultSet.getString("TABLE_NAME");
+                String constraintName = resultSet.getString("CONSTRAINT_NAME");
+                alterStatement.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
             }
-            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " set null");
+        } catch (Exception e) {
+            throw new UnitilsException("Error while disabling check and unique constraints on schema " + getSchemaName(), e);
+        } finally {
+            closeQuietly(queryStatement);
+            closeQuietly(connection, alterStatement, resultSet);
+        }
+    }
+
+
+    /**
+     * Disables all not null constraints on all tables in the schema
+     */
+    protected void disableNotNullConstraints() {
+        Connection connection = null;
+        Statement queryStatement = null;
+        Statement alterStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getSQLHandler().getDataSource().getConnection();
+            queryStatement = connection.createStatement();
+            alterStatement = connection.createStatement();
+
+            // Do not remove PK constraints
+            resultSet = queryStatement.executeQuery("select col.TABLE_NAME, col.COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_COLUMNS col where col.IS_NULLABLE = 'NO' and col.TABLE_SCHEM = '" + getSchemaName() + "' " +
+                    "AND NOT EXISTS ( select COLUMN_NAME from INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS pk where pk.TABLE_NAME = col.TABLE_NAME and pk.COLUMN_NAME = col.COLUMN_NAME and pk.TABLE_SCHEM = '" + getSchemaName() + "' )");
+            while (resultSet.next()) {
+                String tableName = resultSet.getString("TABLE_NAME");
+                String columnName = resultSet.getString("COLUMN_NAME");
+                alterStatement.executeUpdate("alter table " + qualified(tableName) + " alter column " + quoted(columnName) + " set null");
+            }
+        } catch (Exception e) {
+            throw new UnitilsException("Error while disabling not null constraints on schema " + getSchemaName(), e);
+        } finally {
+            closeQuietly(queryStatement);
+            closeQuietly(connection, alterStatement, resultSet);
         }
     }
 

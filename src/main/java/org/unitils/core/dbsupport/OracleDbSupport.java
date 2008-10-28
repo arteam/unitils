@@ -188,11 +188,27 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void disableReferentialConstraints() {
-        SQLHandler sqlHandler = getSQLHandler();
-        // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%' and STATUS <> 'DISABLED'");
-        for (String[] tableAndConstraintName : tableAndConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " disable constraint " + quoted(tableAndConstraintName[1]));
+        Connection connection = null;
+        Statement queryStatement = null;
+        Statement alterStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getSQLHandler().getDataSource().getConnection();
+            queryStatement = connection.createStatement();
+            alterStatement = connection.createStatement();
+
+            // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
+            resultSet = queryStatement.executeQuery("select TABLE_NAME, CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE = 'R' and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%' and STATUS <> 'DISABLED'");
+            while (resultSet.next()) {
+                String tableName = resultSet.getString("TABLE_NAME");
+                String constraintName = resultSet.getString("CONSTRAINT_NAME");
+                alterStatement.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+            }
+        } catch (Exception e) {
+            throw new UnitilsException("Error while disabling referential constraints on schema " + getSchemaName(), e);
+        } finally {
+            closeQuietly(queryStatement);
+            closeQuietly(connection, alterStatement, resultSet);
         }
     }
 
@@ -202,11 +218,27 @@ public class OracleDbSupport extends DbSupport {
      */
     @Override
     public void disableValueConstraints() {
-        SQLHandler sqlHandler = getSQLHandler();
-        // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
-        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select TABLE_NAME, CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%' and STATUS <> 'DISABLED'");
-        for (String[] tableAndConstraintName : tableAndConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " disable constraint " + quoted(tableAndConstraintName[1]));
+        Connection connection = null;
+        Statement queryStatement = null;
+        Statement alterStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getSQLHandler().getDataSource().getConnection();
+            queryStatement = connection.createStatement();
+            alterStatement = connection.createStatement();
+
+            // to be sure no recycled items are handled, all items with a name that starts with BIN$ will be filtered out.
+            resultSet = queryStatement.executeQuery("select TABLE_NAME, CONSTRAINT_NAME from ALL_CONSTRAINTS where CONSTRAINT_TYPE in ('U', 'C', 'V', 'O') and OWNER = '" + getSchemaName() + "' and CONSTRAINT_NAME not like 'BIN$%' and STATUS <> 'DISABLED'");
+            while (resultSet.next()) {
+                String tableName = resultSet.getString("TABLE_NAME");
+                String constraintName = resultSet.getString("CONSTRAINT_NAME");
+                alterStatement.executeUpdate("alter table " + qualified(tableName) + " disable constraint " + quoted(constraintName));
+            }
+        } catch (Exception e) {
+            throw new UnitilsException("Error while disabling value constraints on schema " + getSchemaName(), e);
+        } finally {
+            closeQuietly(queryStatement);
+            closeQuietly(connection, alterStatement, resultSet);
         }
     }
 

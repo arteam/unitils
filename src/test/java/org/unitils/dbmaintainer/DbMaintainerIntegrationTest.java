@@ -17,21 +17,27 @@ package org.unitils.dbmaintainer;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.UnitilsJUnit4;
 import org.unitils.core.ConfigurationLoader;
-import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
-import org.unitils.core.util.SQLTestUtils;
-import org.unitils.database.DatabaseUnitils;
+import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import org.unitils.database.SQLUnitils;
 import org.unitils.database.annotations.TestDataSource;
+import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED;
+import static org.unitils.dbmaintainer.script.impl.DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS;
+import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
+import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
 import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
+import org.unitils.util.PropertyUtils;
 
 import javax.sql.DataSource;
 import java.io.*;
@@ -42,7 +48,7 @@ import java.util.Set;
  * @author Filip Neven
  * @author Tim Ducheyne
  */
-public class DbMaintainerIntegrationTest {
+public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
 
     private static final String INITIAL_INCREMENTAL_1 = "initial_incremental_1";
     private static final String INITIAL_INCREMENTAL_2 = "initial_incremental_2";
@@ -56,6 +62,10 @@ public class DbMaintainerIntegrationTest {
     private static final String SECOND_LOCATION_REPEATABLE = "second_location_repeatable";
     private static final String BEFORE_INITIAL_TABLE = "before_initial";
 
+    /* The logger instance for this class */
+    private static Log logger = LogFactory.getLog(DbMaintainerIntegrationTest.class);
+
+    /* DataSource for the test database, is injected */
     @TestDataSource
     private DataSource dataSource = null;
 
@@ -64,23 +74,43 @@ public class DbMaintainerIntegrationTest {
     private DbSupport dbSupport;
     private Properties configuration;
 
+    /* True if current test is not for the current dialect */
+    private boolean disabled;
+
     @Before
-    public void init() {
+    public void setUp() throws Exception {
+        configuration = new ConfigurationLoader().loadConfiguration();
+        this.disabled = !"hsqldb".equals(PropertyUtils.getString(PROPKEY_DATABASE_DIALECT, configuration));
+        if (disabled) {
+            return;
+        }
         scriptsLocation2 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts2");
         scriptsLocation1 = new File(System.getProperty("java.io.tmpdir") + "/dbmaintain-integrationtest/scripts1");
-        initConfiguration();
+
+        configuration.put(PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE, "true");
+        configuration.put(PROPKEY_SCRIPT_LOCATIONS, scriptsLocation1.getAbsolutePath());
+        configuration.put(PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED, "false");
+
+        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
         clearScriptsDirectory();
         clearTestDatabase();
     }
 
     @After
     public void cleanup() {
+        if (disabled) {
+            return;
+        }
         clearScriptsDirectory();
         clearTestDatabase();
     }
 
     @Test
     public void initial() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         updateDatabase();
         assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2);
@@ -88,6 +118,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void addIncremental() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         updateDatabase();
         assertTablesDontExist(NEW_INCREMENTAL);
@@ -98,6 +132,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void addRepeatable() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         updateDatabase();
         assertTablesDontExist(NEW_REPEATABLE);
@@ -108,6 +146,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void updateRepeatable() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         updateDatabase();
         updateRepeatableScript();
@@ -117,6 +159,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void updateIncremental_fromScratchEnabled() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         enableFromScratch();
         addInitialScripts();
         updateDatabase();
@@ -128,6 +174,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void updateIncremental_fromScratchDisabled() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         updateDatabase();
         updateIncrementalScript();
@@ -141,6 +191,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void addIncrementalWithLowerIndex_fromScratchEnabled() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         enableFromScratch();
         addInitialScripts();
         updateDatabase();
@@ -151,6 +205,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void addIncrementalWithLowerIndex_fromScratchDisabled() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         updateDatabase();
         addIncrementalScriptWithLowerIndex();
@@ -164,6 +222,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void removeExistingIncremental_fromScratchEnabled() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         enableFromScratch();
         addInitialScripts();
         updateDatabase();
@@ -174,6 +236,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void removeExistingIncremental_fromScratchDisabled() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         updateDatabase();
         removeIncrementalScript();
@@ -187,6 +253,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void errorInIncrementalScript() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         errorInInitialScript();
         try {
@@ -213,6 +283,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void errorInRepeatableScript() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         addInitialScripts();
         //createErrorInRepeatableScript();
         try {
@@ -233,6 +307,10 @@ public class DbMaintainerIntegrationTest {
 
     @Test
     public void moreThanOneScriptLocation() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         configureSecondScriptLocation();
         addInitialScripts();
         addSecondLocationScripts();
@@ -247,18 +325,26 @@ public class DbMaintainerIntegrationTest {
      */
     @Test
     public void initialFromScratchUpdate() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         createTable(BEFORE_INITIAL_TABLE);
         addInitialScripts();
         updateDatabase();
         assertTablesDontExist(BEFORE_INITIAL_TABLE);
     }
-    
+
     /**
      * Verifies that, if the dbmaintain_scripts table doesn't exist yet, and the autoCreateExecutedScriptsInfoTable property is set to true,
      * we start with a from scratch update
      */
     @Test
     public void noInitialFromScratchUpdateIfFromScratchDisabled() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
         disableFromScratch();
         createTable(BEFORE_INITIAL_TABLE);
         addInitialScripts();
@@ -270,7 +356,7 @@ public class DbMaintainerIntegrationTest {
     private void createTable(String tableName) {
         SQLUnitils.executeUpdate("create table " + tableName + " (test varchar(10))", dbSupport.getSQLHandler().getDataSource());
     }
-    
+
     private void errorInInitialScript() {
         createScript("02_latest/01_" + INITIAL_INCREMENTAL_2 + ".sql", "this is an error;");
     }
@@ -297,7 +383,7 @@ public class DbMaintainerIntegrationTest {
     private void enableFromScratch() {
         configuration.put(DBMaintainer.PROPKEY_FROM_SCRATCH_ENABLED, "true");
     }
-    
+
     private void disableFromScratch() {
         configuration.put(DBMaintainer.PROPKEY_FROM_SCRATCH_ENABLED, "false");
     }
@@ -354,7 +440,7 @@ public class DbMaintainerIntegrationTest {
     }
 
     private void clearTestDatabase() {
-        SQLTestUtils.dropTestTables(dbSupport, "dbmaintain_scripts", INITIAL_INCREMENTAL_1, INITIAL_INCREMENTAL_2,
+        dropTestTables(dbSupport, "dbmaintain_scripts", INITIAL_INCREMENTAL_1, INITIAL_INCREMENTAL_2,
                 INITIAL_REPEATABLE, NEW_INCREMENTAL, NEW_REPEATABLE, UPDATED_INCREMENTAL_1, UPDATED_REPEATABLE,
                 NEW_INCREMENTAL_LOWER_INDEX, SECOND_LOCATION_INCREMENTAL, SECOND_LOCATION_REPEATABLE, BEFORE_INITIAL_TABLE);
     }
@@ -394,28 +480,7 @@ public class DbMaintainerIntegrationTest {
     }
 
     private void configureSecondScriptLocation() {
-        configuration.put("dbMaintainer.script.locations", scriptsLocation1.getAbsolutePath() + "," +
-                scriptsLocation2.getAbsolutePath());
+        configuration.put("dbMaintainer.script.locations", scriptsLocation1.getAbsolutePath() + "," + scriptsLocation2.getAbsolutePath());
     }
 
-    private void initConfiguration() {
-        configuration = new ConfigurationLoader().getDefaultConfiguration();
-        configuration.put("database.dialect", "hsqldb");
-        configuration.put("database.driverClassName", "org.hsqldb.jdbcDriver");
-        configuration.put("database.url", "jdbc:hsqldb:mem:unitils");
-        configuration.put("database.userName", "sa");
-        configuration.put("database.password", "");
-        configuration.put("database.schemaNames", "PUBLIC");
-        configuration.put("dbMaintainer.autoCreateExecutedScriptsTable", "true");
-        configuration.put("dbMaintainer.script.locations", scriptsLocation1.getAbsolutePath());
-        configuration.put("dbMaintainer.generateDataSetStructure.enabled", "false");
-
-        Unitils unitils = new Unitils();
-        Unitils.setInstance(unitils);
-        unitils.init(configuration);
-
-        dataSource = DatabaseUnitils.getDataSource();
-        dbSupport = DbSupportFactory.getDefaultDbSupport(configuration, new DefaultSQLHandler(dataSource));
-        System.out.println("dbsupport: " + dbSupport);
-    }
 }

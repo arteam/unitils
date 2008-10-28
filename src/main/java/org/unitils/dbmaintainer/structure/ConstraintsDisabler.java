@@ -32,6 +32,6 @@ public interface ConstraintsDisabler extends DatabaseAccessing {
     /**
      * Disables all constraints of the database schemas.
      */
-    void removeConstraints();
+    void disableConstraints();
 
 }
