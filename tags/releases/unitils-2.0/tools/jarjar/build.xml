@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<project name="unitils" default="jar" basedir=".">
+	
+	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="jarjar-1.0rc6.jar"/>
+
+	<target name="jar">
+		<jarjar jarfile="unitils-nodeptospring-1.1-rc-1.jar">
+			<zipfileset src="../../target/unitils-1.1-rc-1.jar"/>
+			<zipfileset src="../../lib/spring-beans-2.5.2.jar"/>
+			<zipfileset src="../../lib/spring-context-2.5.2.jar"/>
+			<zipfileset src="../../lib/spring-core-2.5.2.jar"/>
+			<zipfileset src="../../lib/spring-jdbc-2.5.2.jar"/>
+			<zipfileset src="../../lib/spring-orm-2.5.2.jar"/>
+			<zipfileset src="../../lib/spring-test-2.5.2.jar"/>
+			<zipfileset src="../../lib/spring-tx-2.5.2.jar"/>
+			<rule pattern="org.springframework.**" result="org.unitils.includeddeps.org.springframework.@1"/>
+		</jarjar>
+	</target>
+
+</project>
