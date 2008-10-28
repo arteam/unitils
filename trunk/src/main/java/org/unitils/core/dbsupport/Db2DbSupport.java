@@ -111,9 +111,15 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void disableReferentialConstraints() {
-        // todo implement
-        String tableName = null;
+        Set<String> tableNames = getTableNames();
+        for (String tableName : tableNames) {
+            disableReferentialConstraints(tableName);
+        }
+    }
 
+
+    // todo refactor (see oracle)
+    protected void disableReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
         Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select CONSTNAME from SYSCAT.TABCONST where TYPE = 'F' and TABNAME = '" + tableName + "' and TABSCHEMA = '" + getSchemaName() + "'");
         for (String constraintName : constraintNames) {
@@ -127,9 +133,15 @@ public class Db2DbSupport extends DbSupport {
      */
     @Override
     public void disableValueConstraints() {
-        // todo implement
-        String tableName = null;
+        Set<String> tableNames = getTableNames();
+        for (String tableName : tableNames) {
+            disableValueConstraints(tableName);
+        }
+    }
 
+
+    // todo refactor (see oracle)
+    protected void disableValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
         // disable all check and unique constraints

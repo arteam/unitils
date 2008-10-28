@@ -122,14 +122,23 @@ public class MsSqlDbSupport extends DbSupport {
 
 
     /**
-     * Removes all referential constraints (e.g. foreign keys) on all table in the schema
+     * Disables all referential constraints (e.g. foreign keys) on all table in the schema
      */
     @Override
     public void disableReferentialConstraints() {
+        Set<String> tableNames = getTableNames();
+        for (String tableName : tableNames) {
+            disableReferentialConstraints(tableName);
+        }
+    }
+
+
+    // todo refactor (see oracle)
+    protected void disableReferentialConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
-        Set<String[]> tableAndConstraintNames = sqlHandler.getAllItemsAsStringSet("select t.name, f.name from sys.foreign_keys f, sys.tables t, sys.schemas s where f.parent_object_id = t.object_id and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
-        for (String[] tableAndConstraintName : tableAndConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableAndConstraintName[0]) + " drop constraint " + quoted(tableAndConstraintName[1]));
+        Set<String> constraintNames = sqlHandler.getItemsAsStringSet("select f.name from sys.foreign_keys f, sys.tables t, sys.schemas s where f.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+        for (String constraintName : constraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(constraintName));
         }
     }
 
@@ -139,23 +148,31 @@ public class MsSqlDbSupport extends DbSupport {
      */
     @Override
     public void disableValueConstraints() {
+        Set<String> tableNames = getTableNames();
+        for (String tableName : tableNames) {
+            disableValueConstraints(tableName);
+        }
+    }
+
+
+    // todo refactor (see oracle)
+    protected void disableValueConstraints(String tableName) {
         SQLHandler sqlHandler = getSQLHandler();
 
         // disable all unique constraints
-        Set<String[]> tableAndKeyConstraintNames = sqlHandler.getAllItemsAsStringSet("select t.name, k.name from sys.key_constraints k, sys.tables t, sys.schemas s where k.type = 'UQ' and k.parent_object_id = t.object_id and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
-        for (String[] tableAndKeyConstraintName : tableAndKeyConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableAndKeyConstraintName[0]) + " drop constraint " + quoted(tableAndKeyConstraintName[1]));
+        Set<String> keyConstraintNames = sqlHandler.getItemsAsStringSet("select k.name from sys.key_constraints k, sys.tables t, sys.schemas s where k.type = 'UQ' and k.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+        for (String keyConstraintName : keyConstraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(keyConstraintName));
         }
 
         // disable all check constraints
-        Set<String[]> tableAndCheckConstraintNames = sqlHandler.getAllItemsAsStringSet("select t.name, c.name from sys.check_constraints c, sys.tables t, sys.schemas s where c.parent_object_id = t.object_id and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
-        for (String[] tableAndCheckConstraintName : tableAndCheckConstraintNames) {
-            sqlHandler.executeUpdate("alter table " + qualified(tableAndCheckConstraintName[0]) + " drop constraint " + quoted(tableAndCheckConstraintName[1]));
+        Set<String> checkConstraintNames = sqlHandler.getItemsAsStringSet("select c.name from sys.check_constraints c, sys.tables t, sys.schemas s where c.parent_object_id = t.object_id and t.name = '" + tableName + "' and t.schema_id = s.schema_id and s.name = '" + getSchemaName() + "'");
+        for (String checkConstraintName : checkConstraintNames) {
+            sqlHandler.executeUpdate("alter table " + qualified(tableName) + " drop constraint " + quoted(checkConstraintName));
         }
 
         // disable all not null constraints
-        // todo implement
-        //disableNotNullConstraints();
+        disableNotNullConstraints(tableName);
     }
 
 

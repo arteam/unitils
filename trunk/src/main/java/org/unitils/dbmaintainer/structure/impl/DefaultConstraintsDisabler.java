@@ -37,26 +37,26 @@ public class DefaultConstraintsDisabler extends BaseDatabaseAccessor implements 
 
 
     /**
-     * Permanently disable every foreign key or not-null constraint
+     * Disable every foreign key or not-null constraint
      */
-    public void removeConstraints() {
+    public void disableConstraints() {
         for (DbSupport dbSupport : dbSupports) {
             logger.info("Disabling contraints in database schema " + dbSupport.getSchemaName());
 
-            // first remove referential constraints to avoid conflicts
-            removeReferentialConstraints(dbSupport);
-            // remove not-null and check constraints
-            removeValueConstraints(dbSupport);
+            // first disable referential constraints to avoid conflicts
+            disableReferentialConstraints(dbSupport);
+            // disable not-null and check constraints
+            disableValueConstraints(dbSupport);
         }
     }
 
 
     /**
-     * Removes all referential constraints (e.g. foreign keys) on all tables in the schema
+     * Disables all referential constraints (e.g. foreign keys) on all tables in the schema
      *
      * @param dbSupport The dbSupport for the database, not null
      */
-    protected void removeReferentialConstraints(DbSupport dbSupport) {
+    protected void disableReferentialConstraints(DbSupport dbSupport) {
         try {
             dbSupport.disableReferentialConstraints();
         } catch (Throwable t) {
@@ -70,7 +70,7 @@ public class DefaultConstraintsDisabler extends BaseDatabaseAccessor implements 
      *
      * @param dbSupport The dbSupport for the database, not null
      */
-    protected void removeValueConstraints(DbSupport dbSupport) {
+    protected void disableValueConstraints(DbSupport dbSupport) {
         try {
             dbSupport.disableValueConstraints();
         } catch (Throwable t) {

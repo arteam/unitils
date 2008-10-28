@@ -51,7 +51,7 @@ public interface SQLHandler {
      */
     String getItemAsString(String sql);
 
-    
+
     /**
      * Returns the items extracted from the result of the given query.
      *
@@ -59,16 +59,6 @@ public interface SQLHandler {
      * @return The items, not null
      */
     Set<String> getItemsAsStringSet(String sql);
-
-
-    /**
-     * Returns the all values of the items extracted from the result of the given query.
-     * Eg select a, b, c from my table will return a set for each record containing the values of a, b and c
-     *
-     * @param sql The sql string for retrieving the items
-     * @return The items, not null
-     */
-    Set<String[]> getAllItemsAsStringSet(String sql);
 
 
     /**
