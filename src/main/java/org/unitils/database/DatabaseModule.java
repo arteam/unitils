@@ -510,8 +510,7 @@ public class DatabaseModule implements Module {
     
     
     protected Object getTestObject() {
-        Object testObject = Unitils.getInstance().getTestContext().getTestObject();
-        return testObject;
+        return Unitils.getInstance().getTestContext().getTestObject();
     }
 
 

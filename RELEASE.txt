@@ -7,21 +7,23 @@ mvn release:clean
 
 Step 1: Actual run  	
 
-	check whether everything is ready to be release
-	update version 
-	create release tag
+Command:	mvn release:prepare
 
-	mvn release:prepare
+This will:	check whether everything is ready to be release
+		update version 
+		create release tag
+
+	
 	
 
 Step 2: Create release 
 
-	mvn release:perform	
+Command:	mvn release:perform	
 
-	download clean release
-	build unitils 	
-	create distribution
-	upload the unitils jar to the repository on SourceForge 
+This will:	download clean release
+		build unitils 	
+		create distribution
+		upload the unitils jar to the repository on SourceForge 
 
 
 
