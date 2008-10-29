@@ -3,6 +3,19 @@
         <title>Migration path</title>
     </properties>
     <body>
+        <section name="Migration to 2.0">
+            <p>For databases managed by unitils, a different table is used to store information about the current status of the database.
+               This table is called DBMAINTAIN_SCRIPTS and contains a record for every script that was executed. The next time you update your database,
+               the DbMaintainer will fail because this table doesn't exist yet. The error message also contains the DDL for creating this table.
+               You can make sure this table is created automatically by setting the property dbMaintainer.autoCreateExecutedScriptsTable to true.
+            </p>
+            <p>
+               The dbmaintainer no longer supports post-processing scripts configured using the property dbMaintainer.postProcessingScript.locations. Instead, 
+               you can define one or more directories relative to the scripts location that contain post-processing scripts using the property 
+               dbMaintainer.postProcessingScript.directoryName. By default, scripts inside the directory called 'postprocessing' are regarded as 
+               postprocessing scripts.
+            </p>
+        </section>
         <section name="Migration to 1.1-rc-2">
             <p>In 1.1-rc-2 we've made the migration of the DB_VERSION table more explicit. If a version table is found that uses the old structure,
                 an exception is raised. The new structure should contain a column <i>version_indexes</i> instead of <i>version_index</i>.

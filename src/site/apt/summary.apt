@@ -13,27 +13,40 @@ Summary
     {{{http://www.springframework.org}Spring}}, {{{http://www.hibernate.org}Hibernate}} and the Java Persistence API (JPA). It has been designed to 
 	offer these services to unit tests in a very configurable and loosely coupled way. As a result, services can be added and extended very easily.
     
-    Currently Unitils offers following features:
+    Unitils offers following features:
 
     * <General testing utilities>
 
         * Equality assertion through reflection, with different options like ignoring Java default/null values and ignoring order of collections
 
     []
-
-    * <Database testing utilities>
-
-        * Automatic maintenance and constraints disabling of unit test databases
+	
+    * <Mock objects support>
+	
+        * Dynamically define stub behavior of and verify invocations on mock object using a simple syntax.
         
-           * Support for Oracle, Hsqldb, MySql, DB2, Postgresql and Derby 
+        * Optimal feedback including a simple and extended execution scenario report and suggested assert statements.
+        
+        * Use argument matchers for relaxing method parameter constraints and mix them with concrete objects. Use null when the actual argument 
+        value is not important.
+        
+        * Use dummy objects when stub data objects without any required behavior are needed.
 
-        * Simplify unit test database connection setup
+    * <Persistence layer testing support>
+
+        * Automatic maintenance of databases, with support for incremental, repeatable and post processing scripts
+        
+        * Automatically disable constraints and set sequences to a minimum value
+        
+           * Support for Oracle, Hsqldb, MySql, DB2, Postgresql, MsSql and Derby
+
+        * Simplify test database connection setup
 
         * Simple insertion of test data with DBUnit
 		
-		* Run tests in a transaction
+		    * Run tests in a transaction
 		
-		* JPA entity manager creation and injection for hibernate, toplink and openjpa
+		    * JPA entity manager creation and injection for hibernate, toplink and openjpa
 
         * Hibernate SessionFactory creation and session management
 
@@ -41,7 +54,7 @@ Summary
 
     []
 
-    * <Mock object utilities>
+    * <EasyMock integration support>
 
         * Simplify EasyMock mock object creation
 
@@ -67,8 +80,8 @@ Summary
 ~~~~~~~~~~~~~~~
     * An overview of the features and how to configure and use them is available as a {{{tutorial.html} tutorial}}. 
     
-    * To get you started with Unitils even more quickly, there is also a {{{cookbook.html} cookbook}} available, containing step-by-step
-      instructions on how to configure your project.
+    * To get started with quickly, there is also a {{{cookbook.html} cookbook}} available, containing step-by-step
+      instructions on how to configure your tests.
 
     * Guidelines for unit testing can be found on the {{{guidelines.html} guidelines}} page. 
 
@@ -78,7 +91,17 @@ Summary
 * News
 ~~~~~~
 
-    <<2008-05-02 - Release of Unitils 1.1 rc 2>>
+  <<2008-10-28 - Release of Unitils 2.0>>
+
+    We're proud to announce the new major version! In this version adds a new module has been added for writing tests with mock objects. 
+    The DbMaintainer has been extended with a number of new features and several bugs were fixed. Take a look at the {{{migration.html} 
+    migration page}} to know what must be done to migrate to version 2.0.
+	
+  <<2008-06-25 - Release of Unitils 1.1>>
+  
+    This release includes support for MsSql, some bug fixes and a few small improvements.
+	
+	<<2008-05-02 - Release of Unitils 1.1 rc 2>>
 
     In this release, some small issues have been resolved: Postgresql support is improved, the database version is correctly updated during a from-scratch update
     and a test is added to check whether the version table is correctly migrated. See the {{{migration.html} migration page}} for more information on the migration
