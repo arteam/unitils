@@ -743,7 +743,7 @@ public class UserDaoTest extends UnitilsJUnit4 {
 ** {Maintaining the database structure}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    A powerful tool, the <DBMaintainer>, can automatically maintain each developer's individual database schema. It will check whether database structure updates are available 
+    The <DBMaintainer> can automatically maintain each developer's individual database schema. It will check whether database structure updates are available 
     and apply them if necessary. 
 	
     The database maintainer is disabled by default. If you want to use it you have to enable it by setting following property:
@@ -765,9 +765,9 @@ dbMaintainer.script.locations=myproject/dbscripts
 +-----+
 
     Multiple directories can be specified, separated by commas. Subdirectories are also scanned for script files. All scripts are required to follow a 
-    particular naming pattern: they start with a version number, followed by an underscore and end with '.sql' (the extension is configurable). The example below shows some 
-    typical scripts names. The leading zeroes in the example are not required, they are only added for convenience, to make sure they are shown in proper sequence in a file 
-    explorer window.
+    particular naming pattern: they start with a version number, followed by an underscore and end with '.sql' (the supported extensions are configurable). The example below 
+    shows some typical scripts names. The leading zeroes in the example are not required, they are only added for convenience, to make sure they are shown in proper sequence 
+    in a file explorer window.
 
 +-----+
 dbscripts/ 001_initial.sql
@@ -775,18 +775,20 @@ dbscripts/ 001_initial.sql
            003_auditing_updates.sql
 +-----+
 
-    Suppose you add a new script, this time with version number 4: <004_create_user_admin_tables.sql>. The next time you execute a database test, the database 
-    maintainer will notice that the database structure is no longer up to date. It will update the database schema incrementally by executing all of the new scripts, 
-    in this case only <004_create_user_admin_tables.sql>.
+  Suppose you add a new script, this time with version number 4: <004_create_user_admin_tables.sql>. The next time you execute a database test, the database 
+  maintainer will notice that the database structure is no longer up to date. It will update the database schema incrementally by executing all of the new scripts, 
+  in this case only <004_create_user_admin_tables.sql>.
         
-    The database maintainer will also notice if one of the existing database scripts was modified. For example suppose that <002_tracking_updates.sql> was changed. 
-    In that case, the database maintainer will first clear the database, thereby removing all tables and then recreate it from scratch, executing all scripts in sequence.
+  The database maintainer will also notice if one of the existing database scripts was modified. For example suppose that <002_tracking_updates.sql> was changed. 
+  In that case, the database maintainer will first clear the database, thereby removing all tables and then recreate it from scratch, executing all scripts in sequence.
 	
 	The database script folders may also contain scripts without a version number. Such scripts are executed last, after execution of all versioned scripts. If an 
-	existing version-less script is updated, this script will be applied to the database again, the database is not recreated from scratch.
+	existing version-less script is updated, this script will be applied to the database again, the database is not recreated from scratch. We call such scripts
+	'repeatable' scripts, since their execution can be repeated without having to update from scratch. You typically use this for stored procedure definitions, 
+	views or definition of reference data.
     
-    For performance reasons, it's a good practice to work incrementally, each time adding new update files for small database updates. This makes sure updates can be 
-    executed very quickly. If you database is small, you could of course just as well simply maintain one script and update it each time a database update is needed.
+  For performance reasons, it's a good practice to work incrementally, each time adding new update files for small database updates. This makes sure updates can be 
+  executed very quickly. If you database is small, you could of course just as well simply maintain one script and update it each time a database update is needed.
     
 	Database scripts are often organized in multiple directories, usually grouped per application version. To define the order in which the scripts in these folders
 	must be executed, the folder names can be prefixed by a version number, just like individual scripts. For example:
@@ -806,16 +808,16 @@ dbscripts/ 01_production/ 001_initial.sql
     The database maintainer stores the current version of a database schema in a table called <DBMAINTAIN_SCRIPTS>. This way, it can determine whether the database is 
     up to date or not.
 	
-    This version table is not created automatically by default. This is to make sure unitils does not clear the wrong database by accident. Suppose for example
+    This table is by default not created automatically. This is to make sure unitils does not clear the wrong database by accident. Suppose for example
     you have configured unitils to connect to your system test database. If you would enable the database maintainer it would see that the database is not in synch with 
     the scripts (because there is no <DBMAINTAIN_SCRIPTS> table) and as a result drop the whole database and recreate it from scratch. This is probably not the desired result.
     Therefore a database can only be updated automatically if it is 'unitils-enabled', i.e. when it contains a <DBMAINTAIN_SCRIPTS> table.  
-
+ß
     The database maintainer will throw an exception when it does not find a version table. The correct DDL statements for creating the version table will be 
     displayed in the exception message. If desired, you can make unitils create the <DBMAINTAIN_SCRIPTS> table automatically by setting following property to true. 
 
 +-----+
-dbMaintainer.dbVersionSource.autoCreateVersionTable=true
+dbMaintainer.autoCreateExecutedScriptsTable=true
 +-----+
 
     Tip: We strongly advise to manage your project's database scripts in a version control system (e.g. cvs, subversion). This way, database scripts are brought into
@@ -1218,7 +1220,8 @@ public class UserDaoTest extends UnitilsJUnit4 {
     Unitils also supports using a custom configuration method. The method should be annotated with <@JpaEntityManagerFactory> and should have a single argument of type
     <org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean>. It will be called after loading the persistence.xml file.
 
-    Just as when using Hibernate, you can create a test that verifies the mapping of the entities with the database. An implementation looks as follows:
+    You can create a test that verifies the mapping of the entities with the database. Note that this functionality only works when hibernate is
+    used under the hoods as persistence provider. An implementation looks as follows:
 	
 +-----+
 @JpaEntityManagerFactory(persistenceUnit = "pu", configFile = "persistence-test.xml")
@@ -1471,7 +1474,7 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 
     @Before
     public void init() {
-        alertService = new AlertService(mockSchedulerService.getInstance(), mockMessageService.getInstance());
+        alertService = new AlertService(mockSchedulerService.getMock(), mockMessageService.getMock());
         alert1 = new Alert(...); alert2 = new Alert(...);
         alerts = Arrays.asList(alert1, alert2);
     }
@@ -1501,10 +1504,10 @@ public class AlertServiceTest extends UnitilsJUnit4 {
 Mock<MyService> mockService;
 +-----+
 	
-    Unitils creates the mock control object and assigns it to this field before each test. To obtain the mock object itself, simply call the getInstance() method on the control object:
+    Unitils creates the mock control object and assigns it to this field before each test. To obtain the mock object itself, simply call the getMock() method on the control object:
 	
 +----+
-MyService myService = mockService.getInstance();
+MyService myService = mockService.getMock();
 +----+
 	
 ** Define mock behavior
@@ -1637,7 +1640,7 @@ public class CustomArgumentMatchers {
 
     @ArgumentMatcher
     public static int lessThan(Integer lessThan) {
-        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new LessThanArgumentMatcher(lessThan));
+        ArgumentMatcherRepository.getMock().registerArgumentMatcher(new LessThanArgumentMatcher(lessThan));
         return 0;
     }
 }	
@@ -1689,6 +1692,16 @@ Message alert1, alert2;
     * mockModule.logSuggestedAsserts
 
     * mockModule.logFullScenarioReport
+
+
+** Partial mocks
+~~~~~~~~~~~~~~~~
+     It may sometimes be desirable to obtain a mock object while keeping the original implementation, in order to mock only some method calls or simply to monitor the behavior of the object without actually mocking it. You can use partial mocks for this purpose. A partial mock can be obtained either by calling <MockUnitils.createPartialMock()>, or by declaring it as a field using the <PartialMock> interface:
+	
++-----+
+PartialMock<MyService> mockService;
++-----+
+
 
 
 ** Mock injection

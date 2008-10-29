@@ -8,7 +8,7 @@ Cookbook
     This page helps you to get started quickly with unitils. Code and configuration are explained using simple examples.  
     
     This cookbook contains only typical configuration. More elaborate information about unitils and its configuration can be found 
-    in the {{{documentation.html} tutorial}}. A complete documented reference of all possible configuration options can be found in 
+    in the {{{tutorial.html} tutorial}}. A complete documented reference of all possible configuration options can be found in 
     {{{unitils-default.properties} unitils-default.properties}}. 
    
     The third party libraries required by unitils can be found on the {{{dependencies.html}dependencies}} page.
