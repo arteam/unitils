@@ -41,11 +41,12 @@ import java.util.List;
 public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
 
     /* The line nrs of the proxy method invocations in the TestClass.test method */
-    private int invocationLineNr = 151;
-    private int noMatcherInvocationLineNr = 153;
-    private int doubleInvocationLineNr = 155;
-    private int staticInvocationLineNr = 157;
-    private int noArgumentsInvocationLineNr = 159;
+    private int invocationLineNr = 158;
+    private int noMatcherInvocationLineNr = invocationLineNr + 2;
+    private int doubleInvocationLineNr = invocationLineNr + 4;
+    private int multiLineInvocationLineNr = invocationLineNr + 6;
+    private int staticInvocationLineNr = invocationLineNr + 10;
+    private int noArgumentsInvocationLineNr = invocationLineNr + 12;
 
     /* A regular target method on the proxy */
     private Method proxyMethod;
@@ -110,6 +111,12 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
         assertReflectionEquals(asList(2), secondInvocationResult);
     }
 
+    @Test
+    public void testGetArgumentMatcherIndexes_invocationOnMultipleLines() {
+        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, multiLineInvocationLineNr, 1);
+        assertReflectionEquals(asList(0, 2), result);
+    }
+
 
     /**
      * Test finding matchers for a static proxy method invocation.
@@ -153,6 +160,10 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
             testProxy.someMethod("aValue", "aValue", "aValue");
             // 2 invocations on same line  DO NOT FORMAT
             testProxy.someMethod(notNull(String.class), "aValue", "aValue"); testProxy.someMethod("aValue", "aValue", notNull(String.class));
+            // Invocation spread over multiple lines
+            testProxy.someMethod(notNull(String.class),
+                    "aValue",
+                    notNull(String.class));
             // static invocation
             TestProxy.someStaticMethod(refEq(1), 33);
             // no arguments invocation
