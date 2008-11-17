@@ -138,6 +138,11 @@ public class MockObjectInvalidSyntaxTest {
         String notNull = notNull(String.class);
         mockObject1.raises(IllegalArgumentException.class).testMethodArgument(notNull);
     }
+    
+    @Test(expected = UnitilsException.class)
+    public void nestedBehaviorDefintionCall() {
+        mockObject1.raises(IllegalArgumentException.class).testMethodArgument(mockObject1.returns("aValue").testMethodReturningString());
+    }
 
 
     /**

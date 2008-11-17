@@ -15,20 +15,23 @@
  */
 package org.unitils.mock.argumentmatcher;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.core.UnitilsException;
 import static org.unitils.mock.ArgumentMatchers.notNull;
-import static org.unitils.mock.ArgumentMatchers.refEq;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.util.ReflectionUtils.getMethod;
 
 import java.lang.reflect.Method;
-import static java.util.Arrays.asList;
 import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.unitils.core.UnitilsException;
+import org.unitils.mock.core.MockObject;
+import org.unitils.mock.core.Scenario;
+import org.unitils.mock.dummy.DummyObjectUtil;
+import org.unitils.mock.mockbehavior.MockBehavior;
 
 /**
  * Tests the finding of the argument matchers in a proxy method invocation.
@@ -37,16 +40,17 @@ import java.util.List;
  * @author Filip Neven
  * @author Kenny Claes
  */
-@SuppressWarnings({"UnusedDeclaration"})
-public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
+public class ArgumentMatcherPositionFinderTest {
 
     /* The line nrs of the proxy method invocations in the TestClass.test method */
-    private int invocationLineNr = 158;
+    private int invocationLineNr = 153;
     private int noMatcherInvocationLineNr = invocationLineNr + 2;
     private int doubleInvocationLineNr = invocationLineNr + 4;
-    private int multiLineInvocationLineNr = invocationLineNr + 6;
-    private int staticInvocationLineNr = invocationLineNr + 10;
-    private int noArgumentsInvocationLineNr = invocationLineNr + 12;
+    private int multiLineInvocationLineNrFrom = invocationLineNr + 6;
+    private int multiLineInvocationLineNrTo = invocationLineNr + 8;
+    private int noArgumentsInvocationLineNr = invocationLineNr + 10;
+    private int nestedArgumentMatcherLineNr = invocationLineNr + 12;
+    private int nestedMethodInvocationLineNr = invocationLineNr + 14;
 
     /* A regular target method on the proxy */
     private Method proxyMethod;
@@ -56,16 +60,18 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
 
     /* A target method without args on the proxy */
     private Method noArgumentsProxyMethod;
-
+    
+    private Method valueReturningProxyMethod;
 
     /**
-     * Initializes the proxy methods
+     * Initializes the proxy methods and mock object
      */
     @Before
     public void setUp() {
-        proxyMethod = getMethod(TestProxy.class, "someMethod", false, String.class, String.class, String.class);
-        staticProxyMethod = getMethod(TestProxy.class, "someStaticMethod", true, Integer.TYPE, Integer.TYPE);
-        noArgumentsProxyMethod = getMethod(TestProxy.class, "someMethod", false);
+        proxyMethod = getMethod(MockedClass.class, "someMethod", false, String.class, String.class, String.class);
+        staticProxyMethod = getMethod(MockedClass.class, "someStaticMethod", true, Integer.TYPE, Integer.TYPE);
+        noArgumentsProxyMethod = getMethod(MockedClass.class, "someMethod", false);
+        valueReturningProxyMethod = getMethod(MockedClass.class, "valueReturningMethod", false, String.class, String.class, String.class);
     }
 
 
@@ -74,7 +80,7 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetArgumentMatcherIndexes() {
-        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, invocationLineNr, 1);
+        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, invocationLineNr, invocationLineNr);
         assertReflectionEquals(asList(0, 2), result);
     }
 
@@ -84,7 +90,7 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetArgumentMatcherIndexes_noArgumentMatchers() {
-        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, noMatcherInvocationLineNr, 1);
+        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, noMatcherInvocationLineNr, noMatcherInvocationLineNr);
         assertTrue(result.isEmpty());
     }
 
@@ -94,7 +100,7 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
      */
     @Test
     public void testGetArgumentMatcherIndexes_noArguments() {
-        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", noArgumentsProxyMethod, noArgumentsInvocationLineNr, 1);
+        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", noArgumentsProxyMethod, noArgumentsInvocationLineNr, noArgumentsInvocationLineNr);
         assertTrue(result.isEmpty());
     }
 
@@ -102,29 +108,25 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
     /**
      * Test finding matchers for two method invocations on the same line. The index determines which one.
      */
-    @Test
+    @Test(expected = UnitilsException.class)
     public void testGetArgumentMatcherIndexes_twoInvocationsOnSameLine() {
-        List<Integer> firstInvocationResult = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, doubleInvocationLineNr, 1);
-        List<Integer> secondInvocationResult = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, doubleInvocationLineNr, 2);
-
-        assertReflectionEquals(asList(0), firstInvocationResult);
-        assertReflectionEquals(asList(2), secondInvocationResult);
+        getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, doubleInvocationLineNr, doubleInvocationLineNr);
     }
 
     @Test
     public void testGetArgumentMatcherIndexes_invocationOnMultipleLines() {
-        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, multiLineInvocationLineNr, 1);
+        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, multiLineInvocationLineNrFrom, multiLineInvocationLineNrTo);
         assertReflectionEquals(asList(0, 2), result);
     }
-
-
-    /**
-     * Test finding matchers for a static proxy method invocation.
-     */
-    @Test
-    public void testGetArgumentMatcherIndexes_staticInvocation() {
-        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", staticProxyMethod, staticInvocationLineNr, 1);
-        assertReflectionEquals(asList(0), result);
+    
+    @Test(expected = UnitilsException.class)
+    public void testGetArgumentMatcherIndexes_nestedArgumentMatcher() {
+        getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, nestedArgumentMatcherLineNr, nestedArgumentMatcherLineNr);
+    }
+    
+    @Test(expected = UnitilsException.class)
+    public void testGetArgumentMatcherIndexes_nestedMethodInvocation() {
+        getArgumentMatcherIndexes(TestClass.class, "test", valueReturningProxyMethod, nestedMethodInvocationLineNr, nestedMethodInvocationLineNr);
     }
 
 
@@ -133,16 +135,7 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
      */
     @Test(expected = UnitilsException.class)
     public void testGetArgumentMatcherIndexes_wrongMethodName() {
-        getArgumentMatcherIndexes(TestClass.class, "xxxx", proxyMethod, invocationLineNr, 1);
-    }
-
-
-    /**
-     * Test for trying to find matchers on a wrong line.
-     */
-    @Test(expected = UnitilsException.class)
-    public void testGetArgumentMatcherIndexes_wrongLineNr() {
-        List<Integer> result = getArgumentMatcherIndexes(TestClass.class, "test", proxyMethod, invocationLineNr, 9999);
+        getArgumentMatcherIndexes(TestClass.class, "xxxx", proxyMethod, invocationLineNr, invocationLineNr);
     }
 
 
@@ -151,23 +144,27 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
      */
     public static class TestClass {
 
-        private TestProxy testProxy = new TestProxy();
-
+        MockObject<MockedClass> mockObject = new MockObject<MockedClass>("testMock", MockedClass.class, false, new Scenario(null));
+        
+        MockBehavior dummyBehavior = DummyObjectUtil.createDummy(MockBehavior.class);
+        
         public void test() {
             // regular invocation
-            testProxy.someMethod(notNull(String.class), "aValue", notNull(String.class));
+            mockObject.performs(dummyBehavior).someMethod(notNull(String.class), "aValue", notNull(String.class));
             // invocation without argument matchers
-            testProxy.someMethod("aValue", "aValue", "aValue");
+            mockObject.performs(dummyBehavior).someMethod("aValue", "aValue", "aValue");
             // 2 invocations on same line  DO NOT FORMAT
-            testProxy.someMethod(notNull(String.class), "aValue", "aValue"); testProxy.someMethod("aValue", "aValue", notNull(String.class));
+            mockObject.performs(dummyBehavior).someMethod(notNull(String.class), "aValue", "aValue"); mockObject.performs(dummyBehavior).someMethod("aValue", "aValue", notNull(String.class));
             // Invocation spread over multiple lines
-            testProxy.someMethod(notNull(String.class),
+            mockObject.performs(dummyBehavior).someMethod(notNull(String.class),
                     "aValue",
                     notNull(String.class));
-            // static invocation
-            TestProxy.someStaticMethod(refEq(1), 33);
             // no arguments invocation
-            testProxy.someMethod();
+            mockObject.performs(dummyBehavior).someMethod();
+            // nested argument matcher
+            mockObject.performs(dummyBehavior).someMethod("" + notNull(String.class), "aValue", "aValue");
+            // method also used inside argument expression
+            mockObject.performs(dummyBehavior).valueReturningMethod(notNull(String.class), new MockedClass().valueReturningMethod(null, null, null), "aValue");
         }
     }
 
@@ -175,15 +172,19 @@ public class ArgumentMatcherPositionFinderTest extends UnitilsJUnit4 {
     /**
      * Simulates a proxy
      */
-    public static class TestProxy {
+    public static class MockedClass {
 
-        public void someMethod(String value1, String value2, String value3) {
+        public void someMethod(String param1, String param2, String param3) {
         }
 
-        public static void someStaticMethod(int value1, int value2) {
+        public static void someStaticMethod(int param1, int param2) {
         }
 
         public void someMethod() {
+        }
+        
+        public String valueReturningMethod(String param1, String param2, String param3) {
+            return null;
         }
     }
 }

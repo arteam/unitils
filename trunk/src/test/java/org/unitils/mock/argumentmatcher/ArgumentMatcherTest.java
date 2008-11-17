@@ -15,7 +15,7 @@
  */
 package org.unitils.mock.argumentmatcher;
 
-import static org.junit.Assert.assertFalse;
+import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.unitils.mock.ArgumentMatchers.eq;
 import static org.unitils.mock.ArgumentMatchers.isNull;
@@ -429,7 +429,7 @@ public class ArgumentMatcherTest {
         list.add("test");
         mockObject.assertInvoked().testMethodObject(same(list));
     }
-
+    
 
     /**
      * Interface that is mocked during the tests
@@ -443,7 +443,7 @@ public class ArgumentMatcherTest {
         boolean testMethodInteger(int arg1);
         
         boolean testMethodBoolean(boolean arg1);
-
+        
     }
 
 }
