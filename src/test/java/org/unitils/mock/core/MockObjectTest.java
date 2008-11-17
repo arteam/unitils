@@ -16,12 +16,15 @@
 package org.unitils.mock.core;
 
 import static org.junit.Assert.*;
+import static org.unitils.mock.ArgumentMatchers.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -234,6 +237,18 @@ public class MockObjectTest {
         assertLenientEquals(1, testMockBehavior.invocationCount);
     }
 
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testInvocationSpreadOverMoreThanOneLine() {
+        TestMockBehavior testMockBehavior = new TestMockBehavior();
+        mockObject.performs(testMockBehavior).testMethodParam(
+              notNull(List.class));
+        mockObject.getMock().testMethodParam(null);
+        assertEquals(0, testMockBehavior.invocationCount);
+        mockObject.getMock().testMethodParam(new ArrayList<String>());
+        assertEquals(1, testMockBehavior.invocationCount);
+    }
 
     /**
      * Interface that is mocked during the tests

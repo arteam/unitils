@@ -17,7 +17,13 @@ package org.unitils.mock;
 
 import org.unitils.mock.annotation.ArgumentMatcher;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
-import org.unitils.mock.argumentmatcher.impl.*;
+import org.unitils.mock.argumentmatcher.impl.EqualsArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.NotNullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.NullArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.RefEqArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.SameArgumentMatcher;
+import org.unitils.util.CallStackUtils;
 
 /**
  * todo javadoc
@@ -31,44 +37,52 @@ public class ArgumentMatchers {
 
     @ArgumentMatcher
     public static <T> T notNull(Class<T> argumentClass) {
-        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new NotNullArgumentMatcher());
+        registerArgumentMatcher(new NotNullArgumentMatcher());
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T isNull(Class<T> argumentClass) {
-        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new NullArgumentMatcher());
+        registerArgumentMatcher(new NullArgumentMatcher());
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T same(T sameAs) {
-        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new SameArgumentMatcher(sameAs));
+        registerArgumentMatcher(new SameArgumentMatcher(sameAs));
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T eq(T equalTo) {
-        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
+        registerArgumentMatcher(new EqualsArgumentMatcher(equalTo));
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T refEq(T equalTo) {
-        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
+        registerArgumentMatcher(new RefEqArgumentMatcher(equalTo));
         return null;
     }
 
 
     @ArgumentMatcher
     public static <T> T lenEq(T equalTo) {
-        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
+        registerArgumentMatcher(new LenEqArgumentMatcher(equalTo));
         return null;
     }
 
 
+    protected static <T> void registerArgumentMatcher(org.unitils.mock.argumentmatcher.ArgumentMatcher argumentMatcher) {
+        ArgumentMatcherRepository.getInstance().registerArgumentMatcher(argumentMatcher, getInvokedAtLineNr());
+    }
+
+    static int getInvokedAtLineNr() {
+        return CallStackUtils.getInvocationStackTrace(ArgumentMatchers.class)[0].getLineNumber();
+    }
+    
 }

@@ -26,7 +26,6 @@ import static org.unitils.thirdparty.org.apache.commons.io.FileUtils.forceDelete
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
@@ -47,7 +46,6 @@ import org.unitils.core.UnitilsException;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.dbmaintainer.script.ExecutedScript;
 import org.unitils.dbmaintainer.script.Script;
-import org.unitils.dbmaintainer.script.ScriptContentHandle;
 import org.unitils.dbmaintainer.version.Version;
 
 /**
