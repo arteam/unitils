@@ -16,10 +16,16 @@
 package org.unitils.mock;
 
 import org.unitils.mock.annotation.MatchStatement;
+import org.unitils.mock.core.MockObject;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
 /**
- * todo javadoc
+ * Declares the contract for a controller object that enables defining the behavior of methods of a mock object, 
+ * or for performing assert statements that verify that certain calls were effectively made. A method is also defined 
+ * that provides access to the actual mock object.
+ * <p/>
+ * If Unitils encounters a field declared as {@link Mock}, a {@link MockObject} is automatically instantiated and
+ * assigned to the declared field. 
  */
 public interface Mock<T> {
 
