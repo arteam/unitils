@@ -427,15 +427,15 @@ public class ArgumentMatcherPositionFinder {
                     // we've found an argument matcher
                     return ARGUMENT_MATCHER;
                 }
-                // If the method is not an argument matcher, make sure none of the arguments of this method is an argument matcher,
-                // since this is not supported
-                for (Value value : (List<Value>)values) {
-                    if (value == ARGUMENT_MATCHER) {
-                        throwUnitilsException("An argument matcher's return value cannot be used inside an expression");
-                    }
-                }
             }
 
+            // If the method is not an argument matcher, make sure none of the arguments of this method is an argument matcher,
+            // since this is not supported
+            for (Value value : (List<Value>)values) {
+                if (value == ARGUMENT_MATCHER) {
+                    throwUnitilsException("An argument matcher's return value cannot be used inside an expression");
+                }
+            }
             // nothing special found
             return REGULAR_VALUE;
         }
@@ -479,7 +479,7 @@ public class ArgumentMatcherPositionFinder {
             String methodDescriptor = methodNode.desc;
 
             Class<?> clazz = getClassWithName(className);
-            Method[] methods = clazz.getDeclaredMethods();
+            Method[] methods = clazz.getMethods();
             for (Method method : methods) {
                 if (methodName.equals(method.getName()) && methodDescriptor.equals(getMethodDescriptor(method))) {
                     return method;

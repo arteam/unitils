@@ -15,6 +15,7 @@
  */
 package org.unitils.mock;
 
+import org.unitils.mock.annotation.MatchStatement;
 import org.unitils.mock.mockbehavior.MockBehavior;
 
 /**
@@ -47,6 +48,7 @@ public interface Mock<T> {
      * @param returnValue The value to return
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T returns(Object returnValue);
 
 
@@ -64,6 +66,7 @@ public interface Mock<T> {
      * @param exception The exception to raise, not null
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T raises(Throwable exception);
     
     
@@ -81,6 +84,7 @@ public interface Mock<T> {
      * @param exceptionClass The class of the exception to raise, not null
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T raises(Class<? extends Throwable> exceptionClass);
 
 
@@ -98,6 +102,7 @@ public interface Mock<T> {
      * @param mockBehavior The behavior to perform, not null
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T performs(MockBehavior mockBehavior);
 
     
@@ -116,6 +121,7 @@ public interface Mock<T> {
      * @param returnValue The value to return
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T onceReturns(Object returnValue);
 
     
@@ -134,6 +140,7 @@ public interface Mock<T> {
      * @param exception The exception to raise, not null
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T onceRaises(Throwable exception);
     
     
@@ -152,6 +159,7 @@ public interface Mock<T> {
      * @param exceptionClass The class of the exception to raise, not null
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T onceRaises(Class<? extends Throwable> exceptionClass);
 
     
@@ -170,6 +178,7 @@ public interface Mock<T> {
      * @param mockBehavior The behavior to perform, not null
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T oncePerforms(MockBehavior mockBehavior);
 
     
@@ -179,6 +188,7 @@ public interface Mock<T> {
      * 
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T assertInvoked();
     
     
@@ -191,6 +201,7 @@ public interface Mock<T> {
      * 
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T assertInvokedInSequence();
 
     
@@ -200,5 +211,6 @@ public interface Mock<T> {
      * 
      * @return The proxy instance that will record the method call, not null
      */
+    @MatchStatement
     T assertNotInvoked();
 }
