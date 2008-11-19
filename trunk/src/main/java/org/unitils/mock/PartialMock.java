@@ -15,8 +15,16 @@
  */
 package org.unitils.mock;
 
+import org.unitils.mock.core.MockObject;
+
 /**
- * todo javadoc
+ * Declares the contract for a controller object that enables defining the behavior of methods of a partial mock object, 
+ * or for performing assert statements that verify that certain calls were effectively made. A method is also defined 
+ * that provides access to the actual partial mock object.
+ * <p/>
+ * If Unitils encounters a field declared as {@link PartialMock}, a {@link MockObject} is automatically instantiated and
+ * assigned to the declared field. This mock object will use the original implementation of each method as default 
+ * behavior.
  */
 public interface PartialMock<T> extends Mock<T> {
 
