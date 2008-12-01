@@ -32,6 +32,7 @@ import static org.unitils.core.util.SQLTestUtils.dropTestTables;
 import org.unitils.database.SQLUnitils;
 import org.unitils.database.annotations.TestDataSource;
 import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_GENERATE_DATA_SET_STRUCTURE_ENABLED;
+import static org.unitils.dbmaintainer.DBMaintainer.PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED;
 import static org.unitils.dbmaintainer.script.impl.DefaultScriptSource.PROPKEY_SCRIPT_LOCATIONS;
 import static org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils.PROPKEY_DATABASE_DIALECT;
 import static org.unitils.dbmaintainer.version.impl.DefaultExecutedScriptInfoSource.PROPERTY_AUTO_CREATE_EXECUTED_SCRIPTS_TABLE;
@@ -252,33 +253,84 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
     }
 
     @Test
-    public void errorInIncrementalScript() {
+    public void errorInIncrementalScript_dontKeepRetrying() {
         if (disabled) {
             logger.warn("Test is not for current dialect. Skipping test.");
             return;
         }
+
+        enableFromScratch();
+        configuration.put(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, "false");
+
         addInitialScripts();
         errorInInitialScript();
+        newIncrementalScript();
+
+        // execute the scripts
+        // the second script will have an error
         try {
             updateDatabase();
         } catch (UnitilsException e) {
-            // TODO
-            //assertMessageContains(e.getMessage(), "error", INITIAL_INCREMENTAL_2 + ".sql");
+            assertMessageContains(e.getMessage(), "Error while performing database update");
         }
+        assertTablesDontExist(INITIAL_INCREMENTAL_2, NEW_INCREMENTAL);
+
+        // try again
+        // No script should have been executed, an exception should have been raised that the script that
+        // caused the error, was not changed.
         try {
             updateDatabase();
         } catch (UnitilsException e) {
-            assertMessageContains(e.getMessage(), "previous run", "error", INITIAL_INCREMENTAL_2 + ".sql");
+            assertMessageContains(e.getMessage(), "During a previous database update");
         }
+        assertTablesDontExist(INITIAL_INCREMENTAL_2, NEW_INCREMENTAL);
+
+        // change the script and try again
+        // the database should have been recreated from scratch and all the tables should have been re-created
         fixErrorInInitialScript();
+        updateDatabase();
+        assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2, NEW_INCREMENTAL);
+    }
+
+
+    @Test
+    public void errorInIncrementalScript_keepRetrying() {
+        if (disabled) {
+            logger.warn("Test is not for current dialect. Skipping test.");
+            return;
+        }
+
+        enableFromScratch();
+        configuration.put(PROPKEY_KEEP_RETRYING_AFTER_ERROR_ENABLED, "true");
+
+        addInitialScripts();
+        errorInInitialScript();
+        newIncrementalScript();
+
+        // execute the scripts
+        // the second script will have an error
         try {
             updateDatabase();
         } catch (UnitilsException e) {
-            assertMessageContains(e.getMessage(), "existing", "modified"/*, INITIAL_INCREMENTAL_2 + ".sql"*/);
+            assertMessageContains(e.getMessage(), "Error while performing database update");
         }
-        enableFromScratch();
+        assertTablesDontExist(INITIAL_INCREMENTAL_2, NEW_INCREMENTAL);
+
+        // try again
+        // The database should have been recreated from scratch and the second script should have caused the
+        // same error
+        try {
+            updateDatabase();
+        } catch (UnitilsException e) {
+            assertMessageContains(e.getMessage(), "Error while performing database update");
+        }
+        assertTablesDontExist(INITIAL_INCREMENTAL_2, NEW_INCREMENTAL);
+
+        // change the script and try again
+        // the database should have been recreated from scratch and all the tables should have been re-created
+        fixErrorInInitialScript();
         updateDatabase();
-        assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2);
+        assertTablesExist(INITIAL_INCREMENTAL_1, INITIAL_REPEATABLE, INITIAL_INCREMENTAL_2, NEW_INCREMENTAL);
     }
 
     @Test
@@ -375,8 +427,7 @@ public class DbMaintainerIntegrationTest extends UnitilsJUnit4 {
 
     private void assertMessageContains(String message, String... subStrings) {
         for (String subString : subStrings) {
-            assertTrue("Expected message to contain substring " + subString + ", but it doesn't.\nMessage was: " + message,
-                    message.contains(subString));
+            assertTrue("Expected message to contain substring " + subString + ", but it doesn't.\nMessage was: " + message, message.contains(subString));
         }
     }
 
