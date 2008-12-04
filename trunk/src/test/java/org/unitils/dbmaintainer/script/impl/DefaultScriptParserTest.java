@@ -54,6 +54,9 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
     /* Reader for the test script ending with a comment */
     private Reader testSQLEndingWithCommentScriptReader;
 
+    /* Reader for the test script not ending with a new line */
+    private Reader testSQLNotEndingWithNewLineScriptReader;
+
     /* Reader for the empty script */
     private Reader emptyScriptReader;
 
@@ -68,6 +71,7 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
         testSQLScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script.sql").toURI()));
         testSQLMissingSemiColonScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script-missing-semicolon.sql").toURI()));
         testSQLEndingWithCommentScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script-ending-with-comment.sql").toURI()));
+        testSQLNotEndingWithNewLineScriptReader = new FileReader(new File(getClass().getResource("ScriptParserTest/sql-script-not-ending-with-new-line.sql").toURI()));
         emptyScriptReader = new StringReader("");
     }
 
@@ -79,6 +83,7 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
     public void tearDown() throws Exception {
         closeQuietly(testSQLEndingWithCommentScriptReader);
         closeQuietly(testSQLMissingSemiColonScriptReader);
+        closeQuietly(testSQLNotEndingWithNewLineScriptReader);
         closeQuietly(testSQLScriptReader);
         closeQuietly(emptyScriptReader);
     }
@@ -120,7 +125,18 @@ public class DefaultScriptParserTest extends UnitilsJUnit4 {
         defaultScriptParser.getNextStatement();
     }
 
-    
+
+    /**
+     * Test parsing statements out of a script that does not end with a new line.
+     */
+    @Test
+    public void testParseStatements_notEndingWithNewLine() throws Exception {
+        defaultScriptParser.init(configuration, testSQLEndingWithCommentScriptReader);
+        defaultScriptParser.getNextStatement();
+        defaultScriptParser.getNextStatement();
+    }
+
+
     /**
      * Test parsing some statements out of an empty script.
      */

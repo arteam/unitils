@@ -15,23 +15,12 @@
  */
 package org.unitils.core;
 
-import static org.unitils.util.PropertyUtils.getBoolean;
-import static org.unitils.util.PropertyUtils.getString;
-import static org.unitils.util.PropertyUtils.getStringList;
-import static org.unitils.util.ReflectionUtils.createInstanceOfType;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import static org.unitils.util.PropertyUtils.*;
+import static org.unitils.util.ReflectionUtils.createInstanceOfType;
+
+import java.util.*;
 
 /**
  * A class for loading unitils modules.
@@ -82,7 +71,9 @@ public class ModulesLoader {
      */
     public static final String PROPKEY_MODULE_SUFFIX_RUN_AFTER = ".runAfter";
 
-    /** The logger instance for this class. */
+    /**
+     * The logger instance for this class.
+     */
     private static Log logger = LogFactory.getLog(ModulesLoader.class);
 
 
@@ -130,7 +121,34 @@ public class ModulesLoader {
             List<Module> modules = createAndInitializeModules(moduleNameList, configuration);
             result.addAll(modules);
         }
+
+        // after initialize
+        afterInitModules(result);
         return result;
+    }
+
+
+    /**
+     * Gives all modules the opportunity to performs initialization that
+     * can only work after all other modules have been initialized
+     *
+     * @param modules The modules to after init, not null
+     */
+    protected void afterInitModules(List<Module> modules) {
+        Iterator<Module> iterator = modules.iterator();
+        while (iterator.hasNext()) {
+            Module module = iterator.next();
+            try {
+                module.afterInit();
+                iterator.remove();
+
+            } catch (RuntimeException e) {
+                logInitializationWarning(module.getClass().getName(), e);
+
+            } catch (NoClassDefFoundError e) {
+                logInitializationWarning(module.getClass().getName(), e);
+            }
+        }
     }
 
 
@@ -156,22 +174,29 @@ public class ModulesLoader {
                 ((Module) module).init(configuration);
                 result.add((Module) module);
 
-            } catch (UnitilsException e) {
-                if (e.getCause() instanceof ClassNotFoundException || e.getCause() instanceof NoClassDefFoundError) {
-                    // Class not found, maybe this is caused by a library that is not in the classpath
-                    // Log warning and ingore exception
-                    logger.warn("Unable to create module instance for module class: " + className + ". The module will "
-                            + "not be loaded. If this is caused by a library that is not used by your project and thus not "
-                            + "in the classpath, this warning can be avoided by explicitly disabling the module.");
-                    logger.debug("Ignored exception during module initialisation.", e);
-                    continue;
-                }
-                throw e;
             } catch (RuntimeException e) {
-                throw e;
+                logInitializationWarning(className, e);
+
+            } catch (NoClassDefFoundError e) {
+                logInitializationWarning(className, e);
             }
         }
         return result;
+    }
+
+
+    /**
+     * Logs a warning that a module could not be loaded.
+     * For example a class not found caused by a library that is not in the classpath
+     *
+     * @param className The class name of the module, not null
+     * @param t         The exception, not null
+     */
+    private void logInitializationWarning(String className, Throwable t) {
+        logger.warn("Unable to create module instance for module class: " + className + ". The module will "
+                + "not be loaded. If this is caused by a library that is not used by your project and thus not "
+                + "in the classpath, this warning can be avoided by explicitly disabling the module.");
+        logger.debug("Ignored exception during module initialisation.", t);
     }
 
 

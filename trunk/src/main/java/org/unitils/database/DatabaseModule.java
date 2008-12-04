@@ -15,29 +15,6 @@
  */
 package org.unitils.database;
 
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.database.util.TransactionMode.COMMIT;
-import static org.unitils.database.util.TransactionMode.DEFAULT;
-import static org.unitils.database.util.TransactionMode.DISABLED;
-import static org.unitils.database.util.TransactionMode.ROLLBACK;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -48,6 +25,7 @@ import org.unitils.core.Unitils;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
@@ -55,6 +33,7 @@ import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
+import static org.unitils.database.util.TransactionMode.*;
 import org.unitils.dbmaintainer.DBMaintainer;
 import org.unitils.dbmaintainer.clean.DBCleaner;
 import org.unitils.dbmaintainer.clean.DBClearer;
@@ -63,7 +42,17 @@ import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
 import org.unitils.dbmaintainer.structure.SequenceUpdater;
 import org.unitils.dbmaintainer.util.DatabaseAccessing;
 import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.util.AnnotationUtils.*;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import javax.sql.DataSource;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * Module that provides support for database testing: Creation of a datasource that connects to the
@@ -99,7 +88,7 @@ public class DatabaseModule implements Module {
 
     /**
      * Property indicating whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
-     * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
+     * {@link #getTransactionalDataSourceAndActivateTransactionIfNeeded} must be wrapped in a transactional proxy
      */
     public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
 
@@ -128,7 +117,7 @@ public class DatabaseModule implements Module {
 
     /**
      * Indicates whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
-     * {@link #getTransactionalDataSource} must be wrapped in a transactional proxy
+     * {@link #getTransactionalDataSourceAndActivateTransactionIfNeeded} must be wrapped in a transactional proxy
      */
     protected boolean wrapDataSourceInTransactionalProxy;
 
@@ -165,15 +154,15 @@ public class DatabaseModule implements Module {
         // Make sure that a spring DataSourceTransactionManager is used for transaction management, if
         // no other transaction management configuration takes preference
         registerTransactionManagementConfiguration(new UnitilsTransactionManagementConfiguration() {
-            
+
             public boolean isApplicableFor(Object testObject) {
                 return true;
             }
-            
+
             public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
                 return new DataSourceTransactionManager(getDataSourceAndActivateTransactionIfNeeded());
             }
-            
+
             public boolean isTransactionalResourceAvailable(Object testObject) {
                 return isDataSourceLoaded();
             }
@@ -181,11 +170,11 @@ public class DatabaseModule implements Module {
             public Integer getPreference() {
                 return 1;
             }
-            
+
         });
     }
-    
-    
+
+
     /**
      * Returns the <code>DataSource</code> that provides connection to the unit test database. When invoked the first
      * time, the DBMaintainer is invoked to make sure the test database is up-to-date (if database updating is enabled)
@@ -217,8 +206,8 @@ public class DatabaseModule implements Module {
         }
         return dataSource;
     }
-    
-    
+
+
     public DataSource getDataSource() {
         if (dataSource == null) {
             dataSource = createDataSource();
@@ -407,8 +396,8 @@ public class DatabaseModule implements Module {
     public void startTransaction(Object testObject) {
         getTransactionManager().startTransaction(testObject);
     }
-    
-    
+
+
     /**
      * Commits the current transaction.
      *
@@ -485,9 +474,8 @@ public class DatabaseModule implements Module {
 
 
     /**
-     * @return A configured instance of {@link DatabaseAccessing} of the given type
-     *
      * @param databaseTaskType The type of database task, not null
+     * @return A configured instance of {@link DatabaseAccessing} of the given type
      */
     protected <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
         return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler());
@@ -507,8 +495,8 @@ public class DatabaseModule implements Module {
     public void registerTransactionManagementConfiguration(UnitilsTransactionManagementConfiguration transactionManagementConfiguration) {
         transactionManagementConfigurations.add(transactionManagementConfiguration);
     }
-    
-    
+
+
     protected Object getTestObject() {
         return Unitils.getInstance().getTestContext().getTestObject();
     }
