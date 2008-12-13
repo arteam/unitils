@@ -130,6 +130,11 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
     public T getMock() {
         return instance;
     }
+    
+    
+    public Class<?> getMockedClass() {
+        return mockedClass;
+    }
 
     
     /**
@@ -641,5 +646,6 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
             return null;
         }
     }
+
 
 }

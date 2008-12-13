@@ -851,29 +851,35 @@ dbMaintainer.postProcessingScript.locations=myproject/postprocessingscripts
 ** {Preserving items}
 ~~~~~~~~~~~~~~~~~~~~~
 
-    Before doing an update, all data in the database is deleted. This is to avoid errors executing update scripts that add not-null columns or foreign keys 
-    to existing tables. Sometimes, you can have tables of which the content cannot be deleted. E.g. a table that contains read-only data such as configuration 
-    settings. To enable this, it is possible to specify a number of tables for which the data should be preserved. If tables, sequences... may not be dropped when 
-    rebuilding the schema from scratch, the database maintainer can also be configured to preserve these items. For example:
-    
+    It's possible to exclude certain database objects from being dropped when a fromScratch update occurs, or when the clearDatabase operation is invoked: the data in these tables is also not removed when performing an update using the cleanDatabase option. If you want a table to be dropped in case of a fromScratch update, but you want it's data to preserved when performing the cleanDatabase operation, you can use one of the preserveDataOnly properties.
+	
 +-----+
+# Comma separated list of database items that may not be dropped or cleared by DbMaintain when
+# updating the database from scratch.
+# Schemas can also be preserved entirely. If identifiers are quoted (eg "" for oracle) they are considered
+# case sensitive. Items may be prefixed with the schema name. Items that do not have a schema prefix are 
+# considered to be in the default schema.
 dbMaintainer.preserve.schemas=
-dbMaintainer.preserve.tables=USER_TABLE
+dbMaintainer.preserve.tables=
 dbMaintainer.preserve.views=
+dbMaintainer.preserve.materializedViews=
 dbMaintainer.preserve.synonyms=
-dbMaintainer.preserve.sequences=PK_SEQUENCE
+dbMaintainer.preserve.sequences=
 
+# Comma separated list of table names. The tables listed here will not be emptied during a cleanDatabase operation.
+# Data of the dbmaintain_scripts table is preserved automatically.
+# Tables listed here will still be dropped before a fromScratch update. If this is not desirable
+# you should use the property dbMaintainer.preserve.tables instead.
+# Schemas can also be preserved entirely. If identifiers are quoted (eg "" for oracle) they are considered 
+# case sensitive. Items may be prefixed with the schema name. Items that do not have a schema prefix are considered 
+# to be in the default schema
 dbMaintainer.preserveDataOnly.schemas=
-dbMaintainer.preserveDataOnly.tables=CONFIGURATION_SETTINGS
+dbMaintainer.preserveDataOnly.tables=
 +-----+
     
-    The first group of properties define the tables, views etc. that should be left untouched by the database maintainer. These will neither be dropped nor cleared. The last
-    group of properties define tables that should not be emptied when updating the database. They will however be dropped when the database is rebuilt from scratch. 
-
-    If one of the items to preserve does not exist, an exception is raised and dropping the database is cancelled. This to make sure that unitils does not 
-    accidentally drop items that shouldn't be dropped. For example, suppose you have a typo in a name of a table to preserve. In that case, unitils will complain it
-    does not know the table and stop the database update.    
-        
+    Note that the items in the preserve properties must exist! If one of them doesn't exist, the operation is aborted and an error message is given.
+	
+	Note that in the ant tasks, no attributes are provided for configuring items to preserve.
 
 ** {Disabling constraints and updating sequences}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
