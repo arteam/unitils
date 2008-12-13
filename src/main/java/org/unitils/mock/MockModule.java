@@ -194,11 +194,11 @@ public class MockModule implements Module {
      * @param type       the field(=mock) type
      */
     // todo should we inject the mock or the proxy??
-    protected void callAfterCreateMockMethods(Object testObject, Object mockObject, String name, Class<?> type) {
+    protected void callAfterCreateMockMethods(Object testObject, Mock<?> mockObject, String name, Class<?> type) {
         Set<Method> methods = getMethodsAnnotatedWith(testObject.getClass(), AfterCreateMock.class);
         for (Method method : methods) {
             try {
-                invokeMethod(testObject, method, mockObject, name, type);
+                invokeMethod(testObject, method, mockObject.getMock(), name, ((MockObject<?>)mockObject).getMockedClass());
 
             } catch (InvocationTargetException e) {
                 throw new UnitilsException("An exception occurred while invoking an after create mock method.", e);
