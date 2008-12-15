@@ -169,15 +169,4 @@ public class ModulesRepository {
         return result;
     }
 
-
-	/**
-	 * Gives all modules the chance to initialize itself with the given configuration
-	 * @param configuration The configuration
-	 */
-    public void initModules(Properties configuration) {
-        for (Module module : modules) {
-            ((Module) module).init(configuration);
-        }
-	}
-
 }
