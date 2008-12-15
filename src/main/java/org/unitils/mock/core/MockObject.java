@@ -27,6 +27,7 @@ import org.unitils.mock.argumentmatcher.ArgumentMatcher;
 import static org.unitils.mock.argumentmatcher.ArgumentMatcherPositionFinder.getArgumentMatcherIndexes;
 import org.unitils.mock.argumentmatcher.ArgumentMatcherRepository;
 import org.unitils.mock.argumentmatcher.impl.LenEqArgumentMatcher;
+import org.unitils.mock.argumentmatcher.impl.DefaultArgumentMatcher;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.mockbehavior.impl.DefaultValueReturningMockBehavior;
 import org.unitils.mock.mockbehavior.impl.ExceptionThrowingMockBehavior;
@@ -524,7 +525,7 @@ public class MockObject<T> implements Mock<T>, PartialMock<T>, ObjectToInjectHol
             if (argumentMatcherIndexes.contains(argumentIndex++)) {
                 result.add(argumentMatcherIterator.next());
             } else {
-                result.add(new LenEqArgumentMatcher(argument));
+                result.add(new DefaultArgumentMatcher(argument));
             }
         }
         ArgumentMatcherRepository.getInstance().registerEndOfMatchingInvocation();
