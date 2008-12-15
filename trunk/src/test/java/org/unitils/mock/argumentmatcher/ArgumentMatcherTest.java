@@ -279,6 +279,16 @@ public class ArgumentMatcherTest {
         mockObject.assertNotInvoked().testMethodObject(lenEq(list));
         mockObject.assertInvoked().testMethodObject(lenEq(emptyList));
     }
+
+    @Test
+    public void testLenEqArgumentMatcher_objectChangesBetweenCalls_assertInvoked() {
+        List<String> list = new ArrayList<String>();
+        mockObject.getMock().testMethodObject(list);
+
+        list.add("test");
+        mockObject.assertNotInvoked().testMethodObject(lenEq(list));
+        mockObject.assertInvoked().testMethodObject(lenEq(new ArrayList<String>()));
+    }
     
     
     /**
@@ -349,10 +359,16 @@ public class ArgumentMatcherTest {
         List<String> oneElementList = new ArrayList<String>();
         oneElementList.add("test");
         assertFalse(mockObject.getMock().testMethodObject(oneElementList));
-        
+    }
+
+    @Test
+    public void testRefEqArgumentMatcher_objectChangesBetweenCalls_assertInvoked() {
+        List<String> list = new ArrayList<String>();
+        mockObject.getMock().testMethodObject(list);
+
         list.add("test");
         mockObject.assertNotInvoked().testMethodObject(refEq(list));
-        mockObject.assertInvoked().testMethodObject(refEq(emptyList));
+        mockObject.assertInvoked().testMethodObject(refEq(new ArrayList<String>()));
     }
 
 
@@ -421,14 +437,46 @@ public class ArgumentMatcherTest {
         List<String> equalList = new ArrayList<String>();
         equalList.add("test");
         assertFalse(mockObject.getMock().testMethodObject(equalList));
-        
-        List<String> otherEqualList = new ArrayList<String>();
-        otherEqualList.add("test");
-        mockObject.assertNotInvoked().testMethodObject(same(otherEqualList));
-        
+    }
+
+    @Test
+    public void testSameArgumentMatcher_objectChangesBetweenCalls_assertInvoked() {
+        List<String> list = new ArrayList<String>();
+        mockObject.getMock().testMethodObject(list);
+
         list.add("test");
+        mockObject.assertNotInvoked().testMethodObject(same(new ArrayList<String>()));
         mockObject.assertInvoked().testMethodObject(same(list));
     }
+
+    @Test
+    public void testDefaultArgumentMatcher_objectChangesBetweenCalls() {
+        List<String> list = new ArrayList<String>();
+
+        mockObject.returns(true).testMethodObject(list);
+
+        list.add("test");
+        assertTrue(mockObject.getMock().testMethodObject(list));
+
+        List<String> emptyList = new ArrayList<String>();
+        assertTrue(mockObject.getMock().testMethodObject(emptyList));
+
+        List<String> oneElementList = new ArrayList<String>();
+        oneElementList.add("test");
+        assertFalse(mockObject.getMock().testMethodObject(oneElementList));
+    }
+
+    @Test
+    public void testDefaultArgumentMatcher_objectChangesBetweenCalls_assertInvoked() {
+        List<String> list = new ArrayList<String>();
+        mockObject.getMock().testMethodObject(list);
+        mockObject.assertInvoked().testMethodObject(refEq(new ArrayList<String>()));
+
+        mockObject.getMock().testMethodObject(list);
+        list.add("test");
+        mockObject.assertInvoked().testMethodObject(list);
+    }
+
     
 
     /**
