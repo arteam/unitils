@@ -1,0 +1,186 @@
+ -----
+ Summary
+ -----
+ -----
+
+Summary
+~~~~~~~
+    Unitils is an open source library aimed at making unit testing easy and maintainable. 
+    Unitils builds further on existing libraries like {{{http://www.dbunit.org}DBUnit}} and {{{http://www.easymock.org}EasyMock}} and integrates 
+    with {{{http://www.junit.org}JUnit}} and {{{http://testng.org}TestNG}}.
+ 
+    Unitils provides general asserion utilities, support for database testing, support for testing with mock objects and offers integration with 
+    {{{http://www.springframework.org}Spring}}, {{{http://www.hibernate.org}Hibernate}} and the Java Persistence API (JPA). It has been designed to 
+	offer these services to unit tests in a very configurable and loosely coupled way. As a result, services can be added and extended very easily.
+    
+    Unitils offers following features:
+
+    * <General testing utilities>
+
+        * Equality assertion through reflection, with different options like ignoring Java default/null values and ignoring order of collections
+
+    []
+	
+    * <Mock objects support>
+	
+        * Dynamically define stub behavior of and verify invocations on mock object using a simple syntax.
+        
+        * Optimal feedback including a simple and extended execution scenario report and suggested assert statements.
+        
+        * Use argument matchers for relaxing method parameter constraints and mix them with concrete objects. Use null when the actual argument 
+        value is not important.
+        
+        * Use dummy objects when stub data objects without any required behavior are needed.
+
+    * <Persistence layer testing support>
+
+        * Automatic maintenance of databases, with support for incremental, repeatable and post processing scripts
+        
+        * Automatically disable constraints and set sequences to a minimum value
+        
+           * Support for Oracle, Hsqldb, MySql, DB2, Postgresql, MsSql and Derby
+
+        * Simplify test database connection setup
+
+        * Simple insertion of test data with DBUnit
+		
+		    * Run tests in a transaction
+		
+		    * JPA entity manager creation and injection for hibernate, toplink and openjpa
+
+        * Hibernate SessionFactory creation and session management
+
+        * Automatically test the mapping of JPA entities / hibernate mapped objects with the database
+
+    []
+
+    * <EasyMock integration support>
+
+        * Simplify EasyMock mock object creation
+
+        * Simplify mock object injection
+
+        * EasyMock argument matching using reflection equality
+
+    []
+    
+    * <Spring integration>
+    
+        * ApplicationContext configuration and easy injection of spring managed beans into a unit test
+        
+        * Support for using a Spring-configured Hibernate SessionFactory in unit tests.
+
+    []
+
+    The project started begin 2006 from an {{{http://www.j-technologies.be}Ordina J-Technologies}} discussion group on unit testing. The result was a list of guidelines 
+    and Unitils emerged in an attempt to write code to support these guidelines. 
+        
+
+* Documentation
+~~~~~~~~~~~~~~~
+    * An overview of the features and how to configure and use them is available as a {{{tutorial.html} tutorial}}. 
+    
+    * To get started with quickly, there is also a {{{cookbook.html} cookbook}} available, containing step-by-step
+      instructions on how to configure your tests.
+
+    * Guidelines for unit testing can be found on the {{{guidelines.html} guidelines}} page. 
+
+    []
+    
+
+* News
+~~~~~~
+
+  <<2008-10-28 - Release of Unitils 2.0>>
+
+    We're proud to announce the new major version! In this version adds a new module has been added for writing tests with mock objects. 
+    The DbMaintainer has been extended with a number of new features and several bugs were fixed. Take a look at the {{{migration.html} 
+    migration page}} to know what must be done to migrate to version 2.0.
+	
+  <<2008-06-25 - Release of Unitils 1.1>>
+  
+    This release includes support for MsSql, some bug fixes and a few small improvements.
+	
+	<<2008-05-02 - Release of Unitils 1.1 rc 2>>
+
+    In this release, some small issues have been resolved: Postgresql support is improved, the database version is correctly updated during a from-scratch update
+    and a test is added to check whether the version table is correctly migrated. See the {{{migration.html} migration page}} for more information on the migration
+    of the version table.
+
+	<<2008-03-28 - Release of Unitils 1.1 rc 1>>
+	
+	We've been working hard to implement following features: JPA integration, support for hierarchically organized database scripts, support for Oracle PL/SQL in database scripts. Also, Unitils' transaction management and 
+	hibernate integration have been re-implemented on top of spring's abstraction layer for ORM and transactions. Unitils' JPA integration is also built on top of spring's JPA abstraction layer. Therefore, spring 
+	(2.0 or later) has become a depencency of unitils for all persistence-layer testing features. This doesn't mean your application code necessarily has to use spring: spring is used by unitils under the hoods, transparantly. 
+	
+	Unitils 1.1-rc-1 bundles all these new features. Read the {{{tutorial.html} tutorial}} for more information on Unitils' new features. Take a look at the {{{migration.html} migration page}} 
+	to see what you must do to migrate to unitils 1.1-rc-1. 
+
+
+    <<2007-12-05 - Release of Unitils 1.0>>
+
+    The Unitils team is proud to announce the release of Unitils 1.0. Big thanks to everyone who has helped to make this possible!
+
+
+    <<2007-10-23 - Release of Unitils 1.0 rc 5>>
+  
+    Release candidate 5 for Unitils is available. This will be the last release candidate before the 1.0 release. It contains some fixes, 
+    JUnit 4.4 support, extra utility methods for database testing, extra configuration for data set locations etc. 
+
+
+    <<2007-10-23 - Unitils on Parleys>>
+
+    Video of the Unitils presentation given at Spring-One is available at {{{http://www.parleys.com/display/PARLEYS/Unitils+-+making+unit+testing+easy?showComments=true} Parleys}}.
+        
+    <<2007-09-25 - Switched to JIRA>>
+
+    We've migrated the issue and feature tracking to JIRA! Bugs and feature requests can now be reported 
+    at {{{http://jira.unitils.org}http://jira.unitils.org}}. 
+
+
+    <<2007-08-15 - Release of Unitils 1.0 rc 4>>
+  
+    Release candidate 4 for Unitils is available. It contains some important fixes, support for loading multiple data sets and easier access to 
+    the behavior of the dbmaintainer. Note that this version is not fully backwards compatible with rc 3, there is a small 
+    change in the default behavior of the @DataSet annotation. A migration path is available {{{migration.html} here}}.
+   
+    
+    <<2007-06-20 - Release of Unitils 1.0 rc 3>>
+  
+    Release candidate 3 for Unitils is available. It contains multi-schema support, transactional testing support and support for Db2.
+    Note that this version is not fully backwards compatible with rc 2, a small set of properties has been renamed or redefined. 
+    A migration path is available {{{migration.html} here}}.
+    
+    
+    <<2007-03-15 - Article on Spring site>>
+  
+    The {{{spring_article.html}Testing Spring - Hibernate applications with Unitils}} article was posted on the Spring site, demonstrating 
+    how one can use Unitils to easily test Spring-Hibernate applications.    
+    
+    
+    <<2007-04-22 - Release of Unitils 1.0 rc 2>>
+  
+    Release candidate 2 for Unitils is available. It contains fixes for reported issues and support for extra databases such as PostgreSql and 
+    Oracle 10. Thanks for the valuable feedback!
+    
+    
+    <<2007-03-08 - Release of Unitils 1.0 rc 1>>
+  
+    A release candidate for Unitils is available. This version adds Spring integration and simplifies some of the existing functionality, 
+    such as the loading of Hibernate configuration files. It also contains a major update of the tutorial, cookbook and guidelines. Congratulations 
+    and thanks to everyone who has helped to make this possible!
+    
+    
+    <<2006-12-13 - Quicky at JavaPolis>>
+  
+    Unitils has been introduced at {{{http://www.javapolis.com}JavaPolis}} in a short 15-minute session. Read the 
+    {{{http://www.javapolis.com/confluence/display/JP06/Unitils+by+Filip+Neven+and+Tim+Ducheyne}presentation summary}} for more information.
+    The slides of the presentation can be found {{{files/UnitilsJP06.pdf} here}}.
+    
+    
+    <<2006-12-09 - Release of Unitils 1.0 beta 1>>
+  
+    The Unitils development team released Unitils 1.0 beta 1. We also published the site content on SourceForge. 
+    Congratulations and thanks to everyone who has helped to make this possible!
+    
+    
