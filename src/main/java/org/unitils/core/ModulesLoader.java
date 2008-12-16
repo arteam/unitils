@@ -20,6 +20,9 @@ import static org.unitils.util.PropertyUtils.getString;
 import static org.unitils.util.PropertyUtils.getStringList;
 import static org.unitils.util.ReflectionUtils.createInstanceOfType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,9 +32,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * A class for loading unitils modules.
@@ -160,19 +160,35 @@ public class ModulesLoader {
                 if (e.getCause() instanceof ClassNotFoundException || e.getCause() instanceof NoClassDefFoundError) {
                     // Class not found, maybe this is caused by a library that is not in the classpath
                     // Log warning and ingore exception
-                    logger.warn("Unable to create module instance for module class: " + className + ". The module will "
-                            + "not be loaded. If this is caused by a library that is not used by your project and thus not "
-                            + "in the classpath, this warning can be avoided by explicitly disabling the module.");
-                    logger.debug("Ignored exception during module initialisation.", e);
+                    logInitializationWarning(moduleName, className, e);
                     continue;
                 }
                 throw e;
-            } catch (RuntimeException e) {
-                throw e;
+            } catch (NoClassDefFoundError e) {
+                // Class not found, maybe this is caused by a library that is not in the classpath
+                // Log warning and ingore exception
+                logInitializationWarning(moduleName, className, e);
             }
         }
         return result;
     }
+    
+    
+    /**
+     * Logs a warning that a module could not be loaded.
+     * For example a class not found caused by a library that is not in the classpath
+     * @param moduleName TODO
+     * @param className The class name of the module, not null
+     * @param t         The exception, not null
+     */
+    protected void logInitializationWarning(String moduleName, String className, Throwable t) {
+        logger.warn("Unable to create module " + moduleName + "(" + className + "). This causes the module to " +
+                "be implicitly disabled. This is probably caused by a missing library. If you don't need this " +
+                "module, this warning can be avoided by explicitly disabling the module by setting the property " + 
+                PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_ENABLED + "=false");
+        logger.debug("Ignored exception during module initialisation.", t);
+    }
+
 
 
     /**

@@ -15,15 +15,16 @@
  */
 package org.unitils.util;
 
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.capitalize;
+
 import org.unitils.core.UnitilsException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -60,6 +61,9 @@ public class ReflectionUtils {
         } catch (ClassNotFoundException e) {
             throw new UnitilsException("Class " + className + " not found", e);
 
+        } catch (UnitilsException e) {
+            throw e;
+        
         } catch (Exception e) {
             throw new UnitilsException("Error while instantiating class " + className, e);
         }
@@ -82,7 +86,10 @@ public class ReflectionUtils {
                 constructor.setAccessible(true);
             }
             return constructor.newInstance();
-
+        
+        } catch (InvocationTargetException e) {
+            throw new UnitilsException("Error while trying to create object of class " + type.getName(), e.getCause());
+        
         } catch (Exception e) {
             throw new UnitilsException("Error while trying to create object of class " + type.getName(), e);
         }
