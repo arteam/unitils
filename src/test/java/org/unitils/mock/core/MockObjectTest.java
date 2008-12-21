@@ -19,9 +19,9 @@ import static org.junit.Assert.*;
 import static org.unitils.mock.ArgumentMatchers.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.unitils.mock.ArgumentMatchers;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
+import org.unitils.mock.MockUnitils;
 import static org.unitils.reflectionassert.ReflectionAssert.assertLenientEquals;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class MockObjectTest {
 
     /* Class under test */
     private MockObject<TestClass> mockObject;
-
+    
 
     @Before
     public void setUp() {
@@ -248,6 +248,37 @@ public class MockObjectTest {
         assertEquals(0, testMockBehavior.invocationCount);
         mockObject.getMock().testMethodParam(new ArrayList<String>());
         assertEquals(1, testMockBehavior.invocationCount);
+    }
+
+    @Test
+    public void testCorrectAssertionFailedStackTrace() {
+        try {
+            mockObject.assertInvoked().testMethodString();
+            fail();
+        } catch (AssertionError e) {
+            assertTopOfStackTracePointsToCurrentTest(e, "testCorrectAssertionFailedStackTrace");
+        }
+
+        try {
+            mockObject.getMock().testMethodString();
+            mockObject.assertNotInvoked().testMethodString();
+            fail();
+        } catch (AssertionError e) {
+            assertTopOfStackTracePointsToCurrentTest(e, "testCorrectAssertionFailedStackTrace");
+        }
+
+        try {
+            mockObject.assertInvokedInSequence().testMethodArray();
+            fail();
+        } catch (AssertionError e) {
+            assertTopOfStackTracePointsToCurrentTest(e, "testCorrectAssertionFailedStackTrace");
+        }
+    }
+
+    private void assertTopOfStackTracePointsToCurrentTest(Throwable e, Object testMethodName) {
+        StackTraceElement topOfStackTrace = e.getStackTrace()[0];
+        assertEquals(MockObjectTest.class.getName(), topOfStackTrace.getClassName());
+        assertEquals(testMethodName, topOfStackTrace.getMethodName());
     }
 
     /**

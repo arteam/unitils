@@ -17,6 +17,7 @@ package org.unitils.mock;
 
 import org.unitils.core.Unitils;
 import org.unitils.mock.dummy.DummyObjectUtil;
+import org.unitils.util.CallStackUtils;
 
 /**
  * @author Filip Neven
@@ -75,9 +76,8 @@ public class MockUnitils {
     }
     
     
-    private static StackTraceElement getAssertedAt() {
-        StackTraceElement[] currentStackTrace = Thread.currentThread().getStackTrace();
-        return currentStackTrace[4];
+    private static StackTraceElement[] getAssertedAt() {
+        return CallStackUtils.getInvocationStackTrace(MockUnitils.class);
     }
 
 
