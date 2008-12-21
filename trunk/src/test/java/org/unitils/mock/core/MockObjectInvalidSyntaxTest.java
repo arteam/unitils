@@ -47,9 +47,15 @@ public class MockObjectInvalidSyntaxTest {
 
 
     @Test(expected = UnitilsException.class)
-    public void incompleteBehaviorDefinition_returns() {
+    public void incompleteBehaviorDefinition_returns_followedBySecondBehaviorDefinition() {
         mockObject1.returns("aValue");
         mockObject2.returns("aValue");
+    }
+
+    @Test(expected = UnitilsException.class)
+    public void incompleteBehaviorDefinition_returns_followedByActualInvocation() {
+        mockObject1.returns("aValue");
+        mockObject2.getMock().testMethod();
     }
 
 

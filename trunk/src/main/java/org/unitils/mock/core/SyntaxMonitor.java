@@ -24,7 +24,6 @@ import org.unitils.mock.proxy.ProxyInvocationHandler;
  */
 public class SyntaxMonitor {
 
-
     protected String mockObjectName;
 
     protected String definingMethodName;
@@ -53,7 +52,8 @@ public class SyntaxMonitor {
 
     public void assertNotExpectingInvocation() {
         if (activeProxyInvocationHandler != null) {
-            UnitilsException exception = new UnitilsException("Invalid syntax. " + mockObjectName + "." + definingMethodName + "() must be followed by a method invocation on the returned proxy. E.g. " + mockObjectName + "." + definingMethodName + "().myMethod();");
+            UnitilsException exception = new UnitilsException("Invalid syntax. " + mockObjectName + "." + definingMethodName +
+                    "() must be followed by a method invocation on the returned proxy. E.g. " + mockObjectName + "." + definingMethodName + "().myMethod();");
             exception.setStackTrace(invokedAt);
             throw exception;
         }
