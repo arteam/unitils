@@ -182,7 +182,7 @@ public class ModulesLoader {
      * @param t         The exception, not null
      */
     protected void logInitializationWarning(String moduleName, String className, Throwable t) {
-        logger.warn("Unable to create module " + moduleName + "(" + className + "). This causes the module to " +
+        logger.warn("Unable to create module " + moduleName + " (" + className + "). This causes the module to " +
                 "be implicitly disabled. This is probably caused by a missing library. If you don't need this " +
                 "module, this warning can be avoided by explicitly disabling the module by setting the property " + 
                 PROPKEY_MODULE_PREFIX + moduleName + PROPKEY_MODULE_SUFFIX_ENABLED + "=false");
