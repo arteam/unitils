@@ -13,5 +13,5 @@
         <priority value="DEBUG" />
         <appender-ref ref="STDOUT" />
     </root>
-    
+
 </log4j:configuration>
