@@ -93,7 +93,7 @@ Summary
 
   <<2008-12-19 - Release of Unitils 2.1 and 2.2>>
   
-  Unitils 2.1 and 2.2 only contain bugfixes. The release of Unitils 2.1 was immediately followed by a release of version 2.2, because we found an important bug in the 2.1 release. Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10011}release notes}} for more details.
+  Unitils 2.1 and 2.2 only contain bugfixes. The release of Unitils 2.1 was immediately followed by a release of version 2.2, because we found an important bug in the 2.1 release, and we had to bring out a new release since version 2.1 was already published in maven. Check the {{{http://jira.unitils.org/secure/ReleaseNote.jspa?projectId=10000&styleName=Html&version=10011}release notes}} for more details.
 
   <<2008-10-28 - Release of Unitils 2.0>>
 
