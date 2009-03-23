@@ -17,13 +17,12 @@ package org.unitils.core;
 
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.unitils.core.util.PropertiesReader;
 import org.unitils.util.PropertyUtils;
 
 
@@ -73,6 +72,9 @@ public class ConfigurationLoader {
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(ConfigurationLoader.class);
 
+    /** reads properties from configuration file */
+	private PropertiesReader propertiesReader = new PropertiesReader();
+
 
     /**
      * Creates and loads all configuration settings.
@@ -95,7 +97,7 @@ public class ConfigurationLoader {
         Properties properties = new Properties();
 
         // Load the default properties file, that is distributed with unitils (unitils-default.properties)
-        Properties defaultProperties = loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
+        Properties defaultProperties = propertiesReader.loadPropertiesFileFromClasspath(DEFAULT_PROPERTIES_FILE_NAME);
         if (defaultProperties == null) {
             throw new UnitilsException("Configuration file: " + DEFAULT_PROPERTIES_FILE_NAME + " not found in classpath.");
         }
@@ -105,7 +107,7 @@ public class ConfigurationLoader {
         if (customConfigurationFileName == null) {
             customConfigurationFileName = PropertyUtils.getString(PROPKEY_CUSTOM_CONFIGURATION, properties);
         }
-        Properties customProperties = loadPropertiesFileFromClasspath(customConfigurationFileName);
+        Properties customProperties = propertiesReader.loadPropertiesFileFromClasspath(customConfigurationFileName);
         if (customProperties == null) {
             logger.warn("No custom configuration file " + customConfigurationFileName + " found.");
         } else {
@@ -114,72 +116,16 @@ public class ConfigurationLoader {
 
         // Load the local configuration file from the user home, or from the classpath
         String localConfigurationFileName = PropertyUtils.getString(PROPKEY_LOCAL_CONFIGURATION, properties);
-        Properties localProperties = loadPropertiesFileFromUserHome(localConfigurationFileName);
+        Properties localProperties = propertiesReader.loadPropertiesFileFromUserHome(localConfigurationFileName);
         if (localProperties == null) {
-            localProperties = loadPropertiesFileFromClasspath(localConfigurationFileName);
+            localProperties = propertiesReader.loadPropertiesFileFromClasspath(localConfigurationFileName);
         }
         if (localProperties == null) {
-            logger.info("No custom configuration file " + customConfigurationFileName + " found.");
+            logger.info("No custom configuration file " + localConfigurationFileName + " found.");
         } else {
             properties.putAll(localProperties);
         }
 
         return properties;
     }
-
-
-	/**
-	 * Loads the properties file with the given name, which is available in the classpath. If no
-	 * file with the given name is found, null is returned.
-	 * 
-	 * @param propertiesFileName The name of the properties file
-	 * @return The Properties object, null if the properties file wasn't found.
-	 */
-    protected Properties loadPropertiesFileFromClasspath(String propertiesFileName) {
-        InputStream inputStream = null;
-        try {
-            Properties properties = new Properties();
-            inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFileName);
-            if (inputStream == null) {
-                return null;
-            }
-            properties.load(inputStream);
-            return properties;
-
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to load configuration file: " + propertiesFileName, e);
-        } finally {
-            closeQuietly(inputStream);
-        }
-    }
-
-
-    /**
-     * Loads the properties file with the given name, which is available in the user home folder. If no
-     * file with the given name is found, null is returned.
-     * 
-     * @param propertiesFileName The name of the properties file
-     * @return The Properties object, null if the properties file wasn't found.
-     */
-    protected Properties loadPropertiesFileFromUserHome(String propertiesFileName) {
-        InputStream inputStream = null;
-        try {
-            Properties properties = new Properties();
-            String userHomeDir = System.getProperty("user.home");
-            File localPropertiesFile = new File(userHomeDir, propertiesFileName);
-            if (!localPropertiesFile.exists()) {
-                return null;
-            }
-            inputStream = new FileInputStream(localPropertiesFile);
-            properties.load(inputStream);
-            logger.info("Loaded configuration file " + propertiesFileName + " from user home");
-            return properties;
-
-        } catch (Exception e) {
-            throw new UnitilsException("Unable to load configuration file: " + propertiesFileName + " from user home", e);
-        } finally {
-            closeQuietly(inputStream);
-        }
-    }
-
 }
