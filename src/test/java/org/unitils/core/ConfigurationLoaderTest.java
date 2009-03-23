@@ -61,20 +61,20 @@ public class ConfigurationLoaderTest {
 	/** Faked custom Properties */
 	private Properties customProperties;
 	
-	/** TODO: refactor */
-	String customProperty;
+	/** Overwritten configuration file name */
+	String customLocalConfigurationFileName;
 	
 	/** dummy filename */
-	private String FILE_NAME_CUSTOM_PROPERTIES;
+	private String CUSTOM_PROPERTIES_FILE_NAME;
 
 	/** dummy filename */
-	private String FILE_NAME_LOCAL_PROPERTIES;
+	private String LOCAL_PROPERTIES_FILE_NAME;
 
 	/** Expected log message if no custom file was found */
 	private String EXPECTED_MESSAGE_NO_CUSTOM_FILE;
 
 	/** Expected log message if no user file was found */
-	private String EXPECTED_MESSAGE_NO_USER_FILE;
+	private String EXPECTED_MESSAGE_NO_LOCAL_FILE;
 	
 	//-----------------------------------------------------------------------------------
 	// SetUp
@@ -83,19 +83,19 @@ public class ConfigurationLoaderTest {
 	public void setUp(){
 		sut = new ConfigurationLoader();
 		
-		FILE_NAME_CUSTOM_PROPERTIES = "customConfigurationFileName";
-		FILE_NAME_LOCAL_PROPERTIES = "localConfigurationFileName";
-		customProperty = "customProperty";
+		CUSTOM_PROPERTIES_FILE_NAME = "unitils-custom.properties";
+		LOCAL_PROPERTIES_FILE_NAME = "unitils-local.properties";
 		
+		customLocalConfigurationFileName = "my-unitils.properties";
 		customProperties = new Properties();
-		customProperties.put("customProperty", customProperty);
+		customProperties.put(ConfigurationLoader.PROPKEY_LOCAL_CONFIGURATION, customLocalConfigurationFileName);
 		
 		unitilsDefaultProperties = new Properties();
-		unitilsDefaultProperties.put(ConfigurationLoader.PROPKEY_CUSTOM_CONFIGURATION, FILE_NAME_CUSTOM_PROPERTIES);
-		unitilsDefaultProperties.put(ConfigurationLoader.PROPKEY_LOCAL_CONFIGURATION, FILE_NAME_LOCAL_PROPERTIES);
+		unitilsDefaultProperties.put(ConfigurationLoader.PROPKEY_CUSTOM_CONFIGURATION, CUSTOM_PROPERTIES_FILE_NAME);
+		unitilsDefaultProperties.put(ConfigurationLoader.PROPKEY_LOCAL_CONFIGURATION, LOCAL_PROPERTIES_FILE_NAME);
 		
-		EXPECTED_MESSAGE_NO_CUSTOM_FILE = "No custom configuration file " + FILE_NAME_CUSTOM_PROPERTIES + " found.";
-		EXPECTED_MESSAGE_NO_USER_FILE = "No custom configuration file " + FILE_NAME_LOCAL_PROPERTIES + " found.";
+		EXPECTED_MESSAGE_NO_CUSTOM_FILE = "No custom configuration file " + CUSTOM_PROPERTIES_FILE_NAME + " found.";
+		EXPECTED_MESSAGE_NO_LOCAL_FILE = "No custom configuration file " + LOCAL_PROPERTIES_FILE_NAME + " found.";
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -142,13 +142,13 @@ public class ConfigurationLoaderTest {
 		String fileName = null;
 		
 		propertiesReader.returns(unitilsDefaultProperties).loadPropertiesFileFromClasspath(ConfigurationLoader.DEFAULT_PROPERTIES_FILE_NAME);
-		propertiesReader.returns(null).loadPropertiesFileFromClasspath(same(FILE_NAME_CUSTOM_PROPERTIES));
-		propertiesReader.returns(null).loadPropertiesFileFromUserHome(same(FILE_NAME_LOCAL_PROPERTIES));
-		propertiesReader.returns(null).loadPropertiesFileFromClasspath(same(FILE_NAME_CUSTOM_PROPERTIES));
+		propertiesReader.returns(null).loadPropertiesFileFromClasspath(same(CUSTOM_PROPERTIES_FILE_NAME));
+		propertiesReader.returns(null).loadPropertiesFileFromUserHome(same(LOCAL_PROPERTIES_FILE_NAME));
+		propertiesReader.returns(null).loadPropertiesFileFromClasspath(same(CUSTOM_PROPERTIES_FILE_NAME));
 		
 		Properties returnedProperties = sut.loadConfiguration(fileName);
 		usedLogger.assertInvoked().warn(EXPECTED_MESSAGE_NO_CUSTOM_FILE);
-		usedLogger.assertInvoked().info(EXPECTED_MESSAGE_NO_USER_FILE);
+		usedLogger.assertInvoked().info(EXPECTED_MESSAGE_NO_LOCAL_FILE);
 
 		ReflectionAssert.assertReflectionEquals(unitilsDefaultProperties, returnedProperties);
 		
@@ -167,18 +167,22 @@ public class ConfigurationLoaderTest {
 	 */
 	@Test
 	public void testLoadConfiguration_defaultAndCustomConfigurationFound(){
-		unitilsDefaultProperties.put(customProperty, customProperty);
-		Properties expectedProperties = unitilsDefaultProperties;
+		customLocalConfigurationFileName = "my-unitils.properties";
+		Properties expectedProperties = new Properties();
+		expectedProperties = unitilsDefaultProperties;
+		expectedProperties.putAll(customProperties);
 	
+		EXPECTED_MESSAGE_NO_LOCAL_FILE = "No custom configuration file " + customLocalConfigurationFileName + " found.";
+		
 		String fileName = null;
 		
 		propertiesReader.returns(unitilsDefaultProperties).loadPropertiesFileFromClasspath(ConfigurationLoader.DEFAULT_PROPERTIES_FILE_NAME);
-		propertiesReader.returns(customProperties).loadPropertiesFileFromClasspath(FILE_NAME_CUSTOM_PROPERTIES);
-		propertiesReader.returns(null).loadPropertiesFileFromUserHome(same(FILE_NAME_LOCAL_PROPERTIES));
-		propertiesReader.returns(null).loadPropertiesFileFromClasspath(same(FILE_NAME_CUSTOM_PROPERTIES));
+		propertiesReader.returns(customProperties).loadPropertiesFileFromClasspath(CUSTOM_PROPERTIES_FILE_NAME);
+		propertiesReader.returns(null).loadPropertiesFileFromUserHome(same(LOCAL_PROPERTIES_FILE_NAME));
+		propertiesReader.returns(null).loadPropertiesFileFromClasspath(same(CUSTOM_PROPERTIES_FILE_NAME));
 		
 		Properties returnedProperties = sut.loadConfiguration(fileName);
-		usedLogger.assertInvoked().info(EXPECTED_MESSAGE_NO_USER_FILE);
+		usedLogger.assertInvoked().info(EXPECTED_MESSAGE_NO_LOCAL_FILE);
 
 		ReflectionAssert.assertReflectionEquals(expectedProperties, returnedProperties);
 		
@@ -193,7 +197,7 @@ public class ConfigurationLoaderTest {
 	 *  <li>local configuration file found in user home directory</li>
 	 *  <li>returns properties from unitils.properties first overwritten with custom properties then with user properties</li>
 	 *  </ul>
-	 * 
+	 *  TODO: finish Test
 	 */
 	@Test
 	public void testLoadConfiguration_allConfigurationssFoundWithUserConfigurationFromHomeDir(){
@@ -210,7 +214,7 @@ public class ConfigurationLoaderTest {
 	 *  <li>local configuration file found in classpath</li>
 	 *  <li>returns properties from unitils.properties first overwritten with custom properties then with user properties</li>
 	 *  </ul>
-	 * 
+	 *  TODO: finish Test
 	 */
 	@Test
 	public void testLoadConfiguration_allConfigurationsFoundWithUserConfigurationFromClasspath(){
