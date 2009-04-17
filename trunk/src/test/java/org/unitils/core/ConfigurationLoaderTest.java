@@ -60,6 +60,9 @@ public class ConfigurationLoaderTest {
 
 	/** Faked custom Properties */
 	private Properties customProperties;
+
+	/** Faked local Properties from user.home */
+	private Properties localProperties;
 	
 	/** Overwritten configuration file name */
 	String customLocalConfigurationFileName;
@@ -75,7 +78,7 @@ public class ConfigurationLoaderTest {
 
 	/** Expected log message if no user file was found */
 	private String EXPECTED_MESSAGE_NO_LOCAL_FILE;
-	
+
 	//-----------------------------------------------------------------------------------
 	// SetUp
 	//-----------------------------------------------------------------------------------
@@ -85,6 +88,9 @@ public class ConfigurationLoaderTest {
 		
 		CUSTOM_PROPERTIES_FILE_NAME = "unitils-custom.properties";
 		LOCAL_PROPERTIES_FILE_NAME = "unitils-local.properties";
+
+		localProperties = new Properties();
+		localProperties.put("key", "value");
 		
 		customLocalConfigurationFileName = "my-unitils.properties";
 		customProperties = new Properties();
@@ -93,6 +99,8 @@ public class ConfigurationLoaderTest {
 		unitilsDefaultProperties = new Properties();
 		unitilsDefaultProperties.put(ConfigurationLoader.PROPKEY_CUSTOM_CONFIGURATION, CUSTOM_PROPERTIES_FILE_NAME);
 		unitilsDefaultProperties.put(ConfigurationLoader.PROPKEY_LOCAL_CONFIGURATION, LOCAL_PROPERTIES_FILE_NAME);
+		
+		
 		
 		EXPECTED_MESSAGE_NO_CUSTOM_FILE = "No custom configuration file " + CUSTOM_PROPERTIES_FILE_NAME + " found.";
 		EXPECTED_MESSAGE_NO_LOCAL_FILE = "No custom configuration file " + LOCAL_PROPERTIES_FILE_NAME + " found.";
@@ -184,8 +192,7 @@ public class ConfigurationLoaderTest {
 		Properties returnedProperties = sut.loadConfiguration(fileName);
 		usedLogger.assertInvoked().info(EXPECTED_MESSAGE_NO_LOCAL_FILE);
 
-		ReflectionAssert.assertReflectionEquals(expectedProperties, returnedProperties);
-		
+		ReflectionAssert.assertReflectionEquals(expectedProperties, returnedProperties);		
 	}
 	
 	/**
@@ -197,11 +204,25 @@ public class ConfigurationLoaderTest {
 	 *  <li>local configuration file found in user home directory</li>
 	 *  <li>returns properties from unitils.properties first overwritten with custom properties then with user properties</li>
 	 *  </ul>
-	 *  TODO: finish Test
 	 */
 	@Test
 	public void testLoadConfiguration_allConfigurationssFoundWithUserConfigurationFromHomeDir(){
+		customLocalConfigurationFileName = "my-unitils.properties";
+		Properties expectedProperties = new Properties();
+		expectedProperties = unitilsDefaultProperties;
+		expectedProperties.putAll(customProperties);
+		expectedProperties.putAll(localProperties);
 		
+		String fileName = null;
+		
+		propertiesReader.returns(unitilsDefaultProperties).loadPropertiesFileFromClasspath(ConfigurationLoader.DEFAULT_PROPERTIES_FILE_NAME);
+		propertiesReader.returns(customProperties).loadPropertiesFileFromClasspath(CUSTOM_PROPERTIES_FILE_NAME);
+		propertiesReader.returns(localProperties).loadPropertiesFileFromUserHome(same(LOCAL_PROPERTIES_FILE_NAME));
+		propertiesReader.returns(null).loadPropertiesFileFromClasspath(same(CUSTOM_PROPERTIES_FILE_NAME));
+		
+		Properties returnedProperties = sut.loadConfiguration(fileName);
+
+		ReflectionAssert.assertReflectionEquals(expectedProperties, returnedProperties);	
 	}
 	
 	/**
@@ -214,10 +235,24 @@ public class ConfigurationLoaderTest {
 	 *  <li>local configuration file found in classpath</li>
 	 *  <li>returns properties from unitils.properties first overwritten with custom properties then with user properties</li>
 	 *  </ul>
-	 *  TODO: finish Test
 	 */
 	@Test
 	public void testLoadConfiguration_allConfigurationsFoundWithUserConfigurationFromClasspath(){
+		customLocalConfigurationFileName = "my-unitils.properties";
+		Properties expectedProperties = new Properties();
+		expectedProperties = unitilsDefaultProperties;
+		expectedProperties.putAll(customProperties);
+		expectedProperties.putAll(localProperties);
 		
+		String fileName = null;
+		
+		propertiesReader.returns(unitilsDefaultProperties).loadPropertiesFileFromClasspath(ConfigurationLoader.DEFAULT_PROPERTIES_FILE_NAME);
+		propertiesReader.returns(customProperties).loadPropertiesFileFromClasspath(CUSTOM_PROPERTIES_FILE_NAME);
+		propertiesReader.returns(null).loadPropertiesFileFromUserHome(same(LOCAL_PROPERTIES_FILE_NAME));
+		propertiesReader.returns(localProperties).loadPropertiesFileFromClasspath(same(CUSTOM_PROPERTIES_FILE_NAME));
+		
+		Properties returnedProperties = sut.loadConfiguration(fileName);
+
+		ReflectionAssert.assertReflectionEquals(expectedProperties, returnedProperties);	
 	}
 }
