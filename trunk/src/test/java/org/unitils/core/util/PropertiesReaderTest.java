@@ -15,37 +15,31 @@
  */
 package org.unitils.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.core.UnitilsException;
 import org.unitils.inject.annotation.TestedObject;
-import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
-
+import org.unitils.thirdparty.org.apache.commons.io.FileUtils;
 /**
  * @author Fabian Krueger
  * 
  * Test for {@link PropertiesReader}
  * 
  */
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class PropertiesReaderTest {
+public class PropertiesReaderTest extends UnitilsTestNG {
 	
 	/** System under Test */
 	@TestedObject
@@ -53,6 +47,11 @@ public class PropertiesReaderTest {
 
 	private static final String TEST_FILE = "propertiesReaderTest.properties";
 	
+	
+	@BeforeMethod
+	public void setUp(){
+		sut = new PropertiesReader();
+	}
 	//-----------------------------------------------------------------------------------
 	// Test
 	//-----------------------------------------------------------------------------------
@@ -68,8 +67,6 @@ public class PropertiesReaderTest {
 			fail("UnitilsExcepton expected");
 		} catch(UnitilsException ue){
 			assertEquals(expectedMessage, ue.getMessage());
-		} catch (Exception e){
-			fail("UnitilsExcepton expected");
 		}
 	}
 	
@@ -82,16 +79,13 @@ public class PropertiesReaderTest {
 			fail("UnitilsExcepton expected");
 		} catch(UnitilsException ue){
 			assertEquals(expectedMessage, ue.getMessage());
-		} catch (Exception e){
-			fail("UnitilsExcepton expected");
 		}
 	}
 	
 	@Test
 	public void loadPropertiesFileFromUserHome_withMissingFile_shouldReturnNull(){
 		String configurationFile = "nofilefound.foo";
-		Properties returnedProperties;
-		returnedProperties = sut.loadPropertiesFileFromUserHome(configurationFile);
+		Properties returnedProperties = sut.loadPropertiesFileFromUserHome(configurationFile);
 		assertNull(returnedProperties);
 	}
 	
@@ -99,8 +93,7 @@ public class PropertiesReaderTest {
 	public void loadPropertiesFileFromUserHome_withExistingFile_shouldReturnProperties()
 			throws IOException {
 		copyDummyPropertiesFileToUserHome();
-		Properties returnedProperties;
-		returnedProperties = sut.loadPropertiesFileFromUserHome(TEST_FILE);
+		Properties returnedProperties = sut.loadPropertiesFileFromUserHome(TEST_FILE);
 		assertNotNull(returnedProperties);
 		assertEquals("some value", returnedProperties.getProperty("testprop"));
 		deleteDummyPropertiesFileFromUserHome();
@@ -117,8 +110,6 @@ public class PropertiesReaderTest {
 			fail("UnitilsExcepton expected");
 		} catch(UnitilsException ue){
 			assertEquals(expectedMessage, ue.getMessage());
-		} catch (Exception e){
-			fail("UnitilsExcepton expected");
 		}
 	}
 	
@@ -147,8 +138,7 @@ public class PropertiesReaderTest {
 	@Test
 	public void loadPropertiesFileFromClasspath_withExistingFile_shouldReturnProperties()
 			throws IOException {
-		Properties returnedProperties;
-		returnedProperties = sut.loadPropertiesFileFromClasspath(TEST_FILE);
+		Properties returnedProperties = sut.loadPropertiesFileFromClasspath(TEST_FILE);
 		assertNotNull(returnedProperties);
 		assertEquals("some value", returnedProperties.getProperty("testprop"));
 	}
@@ -158,13 +148,12 @@ public class PropertiesReaderTest {
 	//-----------------------------------------------------------------------------------
 	private void copyDummyPropertiesFileToUserHome()
 			throws FileNotFoundException, IOException {
-		String userHome = System.getProperty("user.home");
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(TEST_FILE);
-		assertNotNull("File "+TEST_FILE+" must reside in same package as TestClass.", inputStream);
-		File targetFile = new File(userHome + "/" + TEST_FILE);
-		FileOutputStream fop = new FileOutputStream(targetFile);
-		IOUtils.copy(inputStream, fop);
-		assertTrue("File "+TEST_FILE+" should reside in user home.",targetFile.exists());
+	    String userHome = System.getProperty("user.home");
+	    String classPath = this.getClass().getClassLoader().getResource(".").getPath();
+		File fileToCopy = new File(classPath + "/" + TEST_FILE);
+		FileUtils.copyFileToDirectory(fileToCopy, new File(userHome));
+		File copiedFile = new File(userHome + "/" + TEST_FILE);
+		assertTrue("File "+TEST_FILE+" should be in user home.",copiedFile.exists());
 	}
 	
 	private void deleteDummyPropertiesFileFromUserHome() {
