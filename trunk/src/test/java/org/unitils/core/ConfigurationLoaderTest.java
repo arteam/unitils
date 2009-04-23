@@ -15,18 +15,15 @@
  */
 package org.unitils.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.unitils.mock.ArgumentMatchers.same;
 
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.unitils.UnitilsJUnit4;
-import org.unitils.UnitilsJUnit4TestClassRunner;
+import static org.testng.AssertJUnit.*;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.unitils.UnitilsTestNG;
 import org.unitils.core.util.PropertiesReader;
 import org.unitils.inject.annotation.InjectInto;
 import org.unitils.inject.annotation.InjectIntoStatic;
@@ -40,8 +37,8 @@ import org.unitils.reflectionassert.ReflectionAssert;
  * Test for {@link ConfigurationLoader}.
  * 
  */
-@RunWith(UnitilsJUnit4TestClassRunner.class)
-public class ConfigurationLoaderTest {
+//@RunWith(UnitilsJUnit4TestClassRunner.class)
+public class ConfigurationLoaderTest extends UnitilsTestNG{
 	
 	/** System under Test */
 	@TestedObject
@@ -82,7 +79,7 @@ public class ConfigurationLoaderTest {
 	//-----------------------------------------------------------------------------------
 	// SetUp
 	//-----------------------------------------------------------------------------------
-	@Before
+	@BeforeMethod
 	public void setUp(){
 		sut = new ConfigurationLoader();
 		
