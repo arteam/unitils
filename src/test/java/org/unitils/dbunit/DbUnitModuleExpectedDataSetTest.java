@@ -120,7 +120,7 @@ public class DbUnitModuleExpectedDataSetTest extends UnitilsJUnit4 {
             dbUnitModule.insertDataSet(testMethod, testObject);
             dbUnitModule.assertDbContentAsExpected(testMethod, testObject);
             fail("Expected AssertionFailedError");
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             //expected
         }
 

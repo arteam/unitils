@@ -56,6 +56,8 @@ public class ArgumentMatcherPositionFinder {
      * Locates the argument matchers for the given proxy method invocation.
      *
      * @param proxyInvocation The method invocation, not null
+     * @param fromLineNr      The begin line-nr of the invocation
+     * @param toLineNr        The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
      * @return The argument indexes, empty if there are no matchers
      */
     public static List<Integer> getArgumentMatcherIndexes(ProxyInvocation proxyInvocation, int fromLineNr, int toLineNr) {
@@ -71,10 +73,11 @@ public class ArgumentMatcherPositionFinder {
      * Locates the argument matchers for the method invocation on the given line.
      * An exception is raised when the given method cannot be found.
      *
-     * @param clazz           The class containing the method invocation, not null
-     * @param methodName      The method containing the method invocation, not null
-     * @param invokedMethod   The invocation to look for, not null
-     * @param lineNr          The line nr of the invocation
+     * @param clazz         The class containing the method invocation, not null
+     * @param methodName    The method containing the method invocation, not null
+     * @param invokedMethod The invocation to look for, not null
+     * @param fromLineNr    The begin line-nr of the invocation
+     * @param toLineNr      The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
      * @return The argument indexes, empty if there are no matchers
      */
     @SuppressWarnings({"unchecked"})
@@ -127,14 +130,15 @@ public class ArgumentMatcherPositionFinder {
     /**
      * Locates the argument matchers for the method invocation on the given line.
      *
-     * @param classNode       The class containing the method invocation, not null
-     * @param methodNode      The method containing the method invocation, not null
-     * @param invokedMethod   The invocation to look for, not null
-     * @param lineNr          The line nr of the invocation
+     * @param classNode     The class containing the method invocation, not null
+     * @param methodNode    The method containing the method invocation, not null
+     * @param invokedMethod The invocation to look for, not null
+     * @param fromLineNr    The begin line-nr of the invocation
+     * @param toLineNr      The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
      * @return The argument indexes, null if method was not found, empty if method found but there are no matchers
      */
-    protected static List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName, 
-            Method invokedMethod, int fromLineNr, int toLineNr) {
+    protected static List<Integer> findArgumentMatcherIndexes(ClassNode classNode, MethodNode methodNode, Class<?> interpretedClass, String interpretedMethodName,
+                                                              Method invokedMethod, int fromLineNr, int toLineNr) {
         String invokedMethodName = invokedMethod.getName();
         String invokedMethodDescriptor = getMethodDescriptor(invokedMethod);
         try {
@@ -238,9 +242,9 @@ public class ArgumentMatcherPositionFinder {
         protected static final Value ARGUMENT_MATCHER = BasicValue.REFERENCE_VALUE;
 
         protected Class<?> interpretedMethodClass;
-        
+
         protected String interpretedMethodName;
-        
+
         /* The name of the method to look for */
         protected String invokedMethodName;
 
@@ -249,12 +253,12 @@ public class ArgumentMatcherPositionFinder {
 
         /* The line nrs between which the invocation can be found */
         protected int fromLineNr, toLineNr;
-        
+
         /* The line that is currently being analyzed */
         protected int currentLineNr = 0;
 
         protected boolean currentlyInMatchStatement = false;
-        
+
         protected boolean matchStatementFound = false;
 
         /* The resulting indexes or null if method was not found */
@@ -263,12 +267,14 @@ public class ArgumentMatcherPositionFinder {
 
         /**
          * Creates an interpreter.
+         *
          * @param invokedMethodName       The method to look for, not null
          * @param invokedMethodDescriptor The signature of the method to look for, not null
-         * @param lineNr                  The line nr of the invocation
+         * @param fromLineNr              The begin line-nr of the invocation
+         * @param toLineNr                The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
          */
-        public MethodInterpreter(Class<?> interpretedMethodClass, String interpretedMethodName, String invokedMethodName, 
-                String invokedMethodDescriptor, int fromLineNr, int toLineNr) {
+        public MethodInterpreter(Class<?> interpretedMethodClass, String interpretedMethodName, String invokedMethodName,
+                                 String invokedMethodDescriptor, int fromLineNr, int toLineNr) {
             this.interpretedMethodClass = interpretedMethodClass;
             this.interpretedMethodName = interpretedMethodName;
             this.invokedMethodName = invokedMethodName;
@@ -431,7 +437,7 @@ public class ArgumentMatcherPositionFinder {
 
             // If the method is not an argument matcher, make sure none of the arguments of this method is an argument matcher,
             // since this is not supported
-            for (Value value : (List<Value>)values) {
+            for (Value value : (List<Value>) values) {
                 if (value == ARGUMENT_MATCHER) {
                     throwUnitilsException("An argument matcher's return value cannot be used inside an expression");
                 }
@@ -444,12 +450,12 @@ public class ArgumentMatcherPositionFinder {
         /**
          * Throws a {@link UnitilsException} with the given error message. The stacktrace is modified, to make
          * it point to the line of code that was analyzed by this class.
-         * 
+         *
          * @param errorMessage The error message
          */
         protected void throwUnitilsException(String errorMessage) {
             UnitilsException exception = new UnitilsException(errorMessage);
-            exception.setStackTrace(new StackTraceElement[] {new StackTraceElement(interpretedMethodClass.getName(), interpretedMethodName, interpretedMethodClass.getName(), currentLineNr)});
+            exception.setStackTrace(new StackTraceElement[]{new StackTraceElement(interpretedMethodClass.getName(), interpretedMethodName, interpretedMethodClass.getName(), currentLineNr)});
             throw exception;
         }
 
