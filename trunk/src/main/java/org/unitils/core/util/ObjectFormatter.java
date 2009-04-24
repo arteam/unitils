@@ -24,6 +24,7 @@ import static java.lang.reflect.Modifier.isStatic;
 import static java.lang.reflect.Modifier.isTransient;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -98,7 +99,7 @@ public class ObjectFormatter {
             result.append('"');
             return;
         }
-        if (object instanceof Number) {
+        if (object instanceof Number || object instanceof Date) {
             result.append(String.valueOf(object));
             return;
         }
@@ -301,11 +302,11 @@ public class ObjectFormatter {
             superclazz = superclazz.getSuperclass();
         }
     }
-    
-    
+
+
     /**
      * @return The interface that represents a dummy object. If the DummyObject interface is not in the
-     * classpath, null is returned.
+     *         classpath, null is returned.
      */
     protected Class<?> getDummyObjectClass() {
         try {

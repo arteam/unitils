@@ -18,6 +18,7 @@ package org.unitils.dbunit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbunit.database.DatabaseConfig;
+import static org.dbunit.database.DatabaseConfig.*;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.unitils.core.Module;
@@ -26,20 +27,18 @@ import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
 import org.unitils.core.dbsupport.DbSupport;
 import org.unitils.core.dbsupport.DbSupportFactory;
-import org.unitils.core.dbsupport.SQLHandler;
-
 import static org.unitils.core.dbsupport.DbSupportFactory.getDbSupport;
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-
 import org.unitils.core.dbsupport.DefaultSQLHandler;
+import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import org.unitils.database.DatabaseModule;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.dbunit.datasetfactory.DataSetFactory;
 import org.unitils.dbunit.datasetfactory.DataSetResolver;
 import org.unitils.dbunit.datasetloadstrategy.DataSetLoadStrategy;
-import org.unitils.dbunit.util.DbUnitAssert;
+import org.unitils.dbunit.util.DataSetAssert;
 import org.unitils.dbunit.util.DbUnitDatabaseConnection;
 import org.unitils.dbunit.util.MultiSchemaDataSet;
 import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotation;
@@ -254,12 +253,31 @@ public class DbUnitModule implements Module {
             // first make sure every database update is flushed to the database
             getDatabaseModule().flushDatabaseUpdates(testObject);
 
+            DataSetAssert dataSetAssert = new DataSetAssert();
             for (String schemaName : multiSchemaExpectedDataSet.getSchemaNames()) {
-                IDataSet compositeDataSet = multiSchemaExpectedDataSet.getDataSetForSchema(schemaName);
-                DbUnitAssert.assertDbContentAsExpected(compositeDataSet, getDbUnitDatabaseConnection(schemaName));
+                IDataSet expectedDataSet = multiSchemaExpectedDataSet.getDataSetForSchema(schemaName);
+                IDataSet actualDataSet = getActualDataSet(schemaName);
+
+                dataSetAssert.assertEqualDbUnitDataSets(schemaName, expectedDataSet, actualDataSet);
             }
         } finally {
             closeJdbcConnection();
+        }
+    }
+
+
+    /**
+     * Gets the actual data set for the given schema.
+     *
+     * @param schemaName The schema to get the data set for, not null
+     * @return The actual data set, not null
+     */
+    protected IDataSet getActualDataSet(String schemaName) {
+        try {
+            return getDbUnitDatabaseConnection(schemaName).createDataSet();
+
+        } catch (Exception e) {
+            throw new UnitilsException("Unable to get actual data set for schema " + schemaName, e);
         }
     }
 
@@ -299,7 +317,6 @@ public class DbUnitModule implements Module {
             // empty means, use default file name, which is the name of the class + extension
             dataSetFileNames = new String[]{getDefaultDataSetFileName(testClass, dataSetFactory.getDataSetFileExtension())};
         }
-
         return getDataSet(testClass, dataSetFileNames, dataSetFactory);
     }
 
@@ -390,12 +407,12 @@ public class DbUnitModule implements Module {
         DatabaseConfig config = connection.getConfig();
 
         // Make sure that dbunit's correct IDataTypeFactory, that handles dbms specific data type issues, is used
-        IDataTypeFactory dataTypeFactory = (IDataTypeFactory) getInstanceOf(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
-        config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
+        IDataTypeFactory dataTypeFactory = getInstanceOf(IDataTypeFactory.class, configuration, dbSupport.getDatabaseDialect());
+        config.setProperty(PROPERTY_DATATYPE_FACTORY, dataTypeFactory);
         // Make sure that table and column names are escaped using the dbms-specific identifier quote string
-        config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
+        config.setProperty(PROPERTY_ESCAPE_PATTERN, dbSupport.getIdentifierQuoteString() + '?' + dbSupport.getIdentifierQuoteString());
         // Make sure that batched statements are used to insert the data into the database
-        config.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, "true");
+        config.setProperty(FEATURE_BATCHED_STATEMENTS, "true");
         // Make sure that Oracle's recycled tables (BIN$) are ignored (value is used to ensure dbunit-2.2 compliancy)
         config.setProperty("http://www.dbunit.org/features/skipOracleRecycleBinTables", "true");
 
@@ -440,7 +457,7 @@ public class DbUnitModule implements Module {
      * @param extension The configured extension of dataset files, not null
      * @return The expected dataset filename, not null
      */
-    protected static String getDefaultExpectedDataSetFileName(Method method, Class<?> testClass, String extension) {
+    protected String getDefaultExpectedDataSetFileName(Method method, Class<?> testClass, String extension) {
         String className = testClass.getName();
         return className.substring(className.lastIndexOf(".") + 1) + "." + method.getName() + "-result." + extension;
     }
@@ -499,8 +516,7 @@ public class DbUnitModule implements Module {
      * @return The data set resolver, as configured in the Unitils configuration
      */
     protected DataSetResolver getDataSetResolver() {
-        DataSetResolver dataSetResolver = ConfigUtils.getConfiguredInstanceOf(DataSetResolver.class, configuration);
-        return dataSetResolver;
+        return ConfigUtils.getConfiguredInstanceOf(DataSetResolver.class, configuration);
     }
 
 

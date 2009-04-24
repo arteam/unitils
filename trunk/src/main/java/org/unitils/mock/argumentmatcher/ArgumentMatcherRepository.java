@@ -56,9 +56,11 @@ public class ArgumentMatcherRepository {
 
     /* Determines whether the repository can accept argument matchers */
     private boolean acceptingArgumentMatchers = false;
-    
+
+    /* The begin line-nr of the invocation */
     private int matchInvocationStartLineNr;
-    
+
+    /* The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line) */
     private int matchInvocationEndLineNr;
 
 
@@ -66,7 +68,7 @@ public class ArgumentMatcherRepository {
      * Registers an argument matcher at the given line nr.
      *
      * @param argumentMatcher The matcher, not null
-     * @param lineNr The line number on which the argument matcher was registered.
+     * @param lineNr          The line number on which the argument matcher was registered.
      */
     public void registerArgumentMatcher(ArgumentMatcher argumentMatcher, int lineNr) {
         if (!acceptingArgumentMatchers) {
@@ -87,11 +89,17 @@ public class ArgumentMatcherRepository {
     }
 
 
+    /**
+     * @return The begin line-nr of the invocation
+     */
     public int getMatchInvocationStartLineNr() {
         return matchInvocationStartLineNr;
     }
 
 
+    /**
+     * @return The end line-nr of the invocation (could be different from the begin line-nr if the invocation is written on more than 1 line)
+     */
     public int getMatchInvocationEndLineNr() {
         return matchInvocationEndLineNr;
     }
@@ -100,22 +108,20 @@ public class ArgumentMatcherRepository {
     /**
      * From the moment that this method is called until {@link #registerEndOfMatchingInvocation} has been called,
      * argument matchers can be registered.
-     * 
+     *
      * @param lineNr The line number at which the matching invocation starts, i.e. the line number at which the performs, assertInvoked, etc.
-     * statement occurs.
+     *               statement occurs.
      */
     public void registerStartOfMatchingInvocation(int lineNr) {
         acceptingArgumentMatchers = true;
         matchInvocationStartLineNr = lineNr;
         matchInvocationEndLineNr = lineNr;
     }
-    
+
 
     /**
-     * Clears the current argument matchers. After this method is called, {@link #registerStartOfMatchingInvocation()} must
+     * Clears the current argument matchers. After this method is called, {@link #registerStartOfMatchingInvocation} must
      * be called again to be able to register argument matchers.
-     * 
-     * @param lineNr The line number
      */
     public void registerEndOfMatchingInvocation() {
         argumentMatchers = new ArrayList<ArgumentMatcher>();
