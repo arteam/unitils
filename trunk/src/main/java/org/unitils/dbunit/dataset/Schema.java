@@ -81,11 +81,11 @@ public class Schema {
      * @throws UnitilsException When a table with the same name was already added
      */
     public void addTable(Table table) {
-        Table existingTable = getTable(table.getTableName().toUpperCase());
+        Table existingTable = getTable(table.getName().toUpperCase());
         if (existingTable != null) {
-            throw new UnitilsException("Unable to add table to data set. A table with name " + table.getTableName() + " already exists.");
+            throw new UnitilsException("Unable to add table to data set. A table with name " + table.getName() + " already exists.");
         }
-        tables.put(table.getTableName(), table);
+        tables.put(table.getName(), table);
     }
 
 
@@ -99,7 +99,7 @@ public class Schema {
         SchemaDifference schemaDifference = new SchemaDifference(this, actualSchema);
 
         for (Table table : getTables()) {
-            Table actualTable = actualSchema.getTable(table.getTableName());
+            Table actualTable = actualSchema.getTable(table.getName());
             if (actualTable == null) {
                 schemaDifference.addMissingTable(table);
             } else {

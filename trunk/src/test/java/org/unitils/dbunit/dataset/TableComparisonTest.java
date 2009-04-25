@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.dbunit.dataset.comparison.RowDifference;
 import org.unitils.dbunit.dataset.comparison.TableDifference;
-import org.unitils.dbunit.dataset.comparison.ValueDifference;
+import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -123,9 +123,9 @@ public class TableComparisonTest extends UnitilsJUnit4 {
 
     private void assertValueDifference(TableDifference tableDifference, String expectedValue, Object actualValue) {
         RowDifference rowDifference = tableDifference.getBestRowDifferences().get(0);
-        ValueDifference valueDifference = rowDifference.getValueDifferences().get(0);
-        assertEquals(expectedValue, valueDifference.getValue().getValue());
-        assertEquals(actualValue, valueDifference.getActualValue().getValue());
+        ColumnDifference valueDifference = rowDifference.getColumnDifferences().get(0);
+        assertEquals(expectedValue, valueDifference.getColumn().getValue());
+        assertEquals(actualValue, valueDifference.getActualColumn().getValue());
     }
 
     private void assertMissingRow(TableDifference tableDifference) {
@@ -136,27 +136,27 @@ public class TableComparisonTest extends UnitilsJUnit4 {
 
     private void addActualRow(String value) {
         Row dataSetRow = new Row();
-        dataSetRow.addValue(new Value("column", VARCHAR, value));
+        dataSetRow.addColumn(new Column("column", VARCHAR, value));
         actualTable.addRow(dataSetRow);
     }
 
 
     private void addActualRow(Date date) {
         Row dataSetRow = new Row();
-        dataSetRow.addValue(new Value("column", DATE, date));
+        dataSetRow.addColumn(new Column("column", DATE, date));
         actualTable.addRow(dataSetRow);
     }
 
     private void addActualRow(Double number) {
         Row dataSetRow = new Row();
-        dataSetRow.addValue(new Value("column", DOUBLE, number));
+        dataSetRow.addColumn(new Column("column", DOUBLE, number));
         actualTable.addRow(dataSetRow);
     }
 
 
     private void addExpectedRow(String value) {
         Row dataSetRow = new Row();
-        dataSetRow.addValue(new Value("column", VARCHAR, value));
+        dataSetRow.addColumn(new Column("column", VARCHAR, value));
         expectedTable.addRow(dataSetRow);
     }
 }

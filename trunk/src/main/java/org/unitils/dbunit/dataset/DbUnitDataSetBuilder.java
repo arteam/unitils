@@ -58,25 +58,25 @@ public class DbUnitDataSetBuilder {
 
     private List<String> getPrimaryKeyColumnNames(ITable dbUnitTable) throws DataSetException {
         List<String> result = new ArrayList<String>();
-        for (Column column : dbUnitTable.getTableMetaData().getPrimaryKeys()) {
+        for (org.dbunit.dataset.Column column : dbUnitTable.getTableMetaData().getPrimaryKeys()) {
             result.add(column.getColumnName());
         }
         return result;
     }
 
     protected void addRows(ITable dbUnitTable, Table dataSetTable, List<String> primaryKeyColumnNames) throws DataSetException {
-        Column[] columns = dbUnitTable.getTableMetaData().getColumns();
+        org.dbunit.dataset.Column[] columns = dbUnitTable.getTableMetaData().getColumns();
         int rowCount = dbUnitTable.getRowCount();
         for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
             Row row = new Row(primaryKeyColumnNames);
             dataSetTable.addRow(row);
 
-            for (Column column : columns) {
+            for (org.dbunit.dataset.Column column : columns) {
                 String columnName = column.getColumnName();
                 DataType columnType = column.getDataType();
                 Object value = dbUnitTable.getValue(rowIndex, columnName);
 
-                row.addValue(new Value(columnName, columnType, value));
+                row.addColumn(new Column(columnName, columnType, value));
             }
         }
     }

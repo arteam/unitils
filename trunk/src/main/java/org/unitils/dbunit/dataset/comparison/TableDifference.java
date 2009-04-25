@@ -88,7 +88,7 @@ public class TableDifference {
 
 
     /**
-     * @return The best results in the comparison between the rows
+     * @return The best results in the comparison between the rows, not null
      */
     public List<RowDifference> getBestRowDifferences() {
         return new ArrayList<RowDifference>(bestRowDifferences.values());
