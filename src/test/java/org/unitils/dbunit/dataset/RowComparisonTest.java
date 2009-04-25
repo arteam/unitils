@@ -16,13 +16,12 @@
 package org.unitils.dbunit.dataset;
 
 import static org.dbunit.dataset.datatype.DataType.VARCHAR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.core.UnitilsException;
+import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 import org.unitils.dbunit.dataset.comparison.RowDifference;
-import org.unitils.dbunit.dataset.comparison.ValueDifference;
 
 /**
  * Tests the comparison behavior of a data set row
@@ -38,10 +37,10 @@ public class RowComparisonTest extends UnitilsJUnit4 {
 
     @Test
     public void testEqualRows() throws Exception {
-        addValue(expectedRow, "column1", "value1");
-        addValue(expectedRow, "column2", "value2");
-        addValue(actualRow, "column1", "value1");
-        addValue(actualRow, "column2", "value2");
+        addColumn(expectedRow, "column1", "value1");
+        addColumn(expectedRow, "column2", "value2");
+        addColumn(actualRow, "column1", "value1");
+        addColumn(actualRow, "column2", "value2");
 
         RowDifference result = expectedRow.compare(actualRow);
 
@@ -51,25 +50,25 @@ public class RowComparisonTest extends UnitilsJUnit4 {
 
     @Test
     public void testDifferentValues() throws Exception {
-        addValue(expectedRow, "column1", "value1");
-        addValue(expectedRow, "column2", "value2");
-        addValue(actualRow, "column1", "xxxx");
-        addValue(actualRow, "column2", "yyyy");
+        addColumn(expectedRow, "column1", "value1");
+        addColumn(expectedRow, "column2", "value2");
+        addColumn(actualRow, "column1", "xxxx");
+        addColumn(actualRow, "column2", "yyyy");
 
         RowDifference result = expectedRow.compare(actualRow);
 
-        ValueDifference valueDifference1 = result.getValueDifference("column1");
-        ValueDifference valueDifference2 = result.getValueDifference("column2");
-        assertValueDifference(valueDifference1, "value1", "xxxx");
-        assertValueDifference(valueDifference2, "value2", "yyyy");
+        ColumnDifference columnDifference1 = result.getColumnDifference("column1");
+        ColumnDifference columnDifference2 = result.getColumnDifference("column2");
+        assertColumnDifference(columnDifference1, "value1", "xxxx");
+        assertColumnDifference(columnDifference2, "value2", "yyyy");
     }
 
 
     @Test
-    public void testEqualsWithMoreValuesInActualRow() throws Exception {
-        addValue(expectedRow, "column1", "value1");
-        addValue(actualRow, "column1", "value1");
-        addValue(actualRow, "column2", "yyyy");
+    public void testEqualsWithMoreColumnsInActualRow() throws Exception {
+        addColumn(expectedRow, "column1", "value1");
+        addColumn(actualRow, "column1", "value1");
+        addColumn(actualRow, "column2", "yyyy");
 
         RowDifference result = expectedRow.compare(actualRow);
 
@@ -78,34 +77,38 @@ public class RowComparisonTest extends UnitilsJUnit4 {
 
 
     @Test
-    public void testMissingValueInActualRow() throws Exception {
-        addValue(expectedRow, "column1", "value1");
-        addValue(expectedRow, "column2", "value2");
-        addValue(actualRow, "column1", "value1");
+    public void testMissingColumnInActualRow() throws Exception {
+        addColumn(expectedRow, "column1", "value1");
+        addColumn(expectedRow, "column2", "value2");
+        addColumn(actualRow, "column1", "value1");
 
         RowDifference result = expectedRow.compare(actualRow);
 
-        ValueDifference valueDifference = result.getValueDifference("column2");
-        assertEquals("value2", valueDifference.getValue().getValue());
-        assertNull("value2", valueDifference.getActualValue());
+        assertMissingColumn(result);
     }
 
 
     @Test(expected = UnitilsException.class)
-    public void testAddingTwoValuesForSameColumn() throws Exception {
-        addValue(expectedRow, "column", "value");
-        addValue(expectedRow, "column", "value");
+    public void testAddingTwoColumnsForSameName() throws Exception {
+        addColumn(expectedRow, "column", "value");
+        addColumn(expectedRow, "column", "value");
     }
 
 
-    private void assertValueDifference(ValueDifference valueDifference, String expectedValue, String actualValue) {
-        assertEquals(expectedValue, valueDifference.getValue().getValue());
-        assertEquals(actualValue, valueDifference.getActualValue().getValue());
+    private void assertColumnDifference(ColumnDifference columnDifference, String expectedValue, String actualValue) {
+        assertEquals(expectedValue, columnDifference.getColumn().getValue());
+        assertEquals(actualValue, columnDifference.getActualColumn().getValue());
     }
 
 
-    private void addValue(Row row, String columnName, String value) {
-        row.addValue(new Value(columnName, VARCHAR, value));
+    private void assertMissingColumn(RowDifference rowDifference) {
+        Column column = rowDifference.getMissingColumns().get(0);
+        assertNotNull(column);
+    }
+
+
+    private void addColumn(Row row, String columnName, String value) {
+        row.addColumn(new Column(columnName, VARCHAR, value));
     }
 
 }

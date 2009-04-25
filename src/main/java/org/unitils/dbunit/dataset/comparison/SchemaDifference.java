@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The result of comparing 2 data set schemas.
+ * The differences between 2 data set schemas.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -39,11 +39,11 @@ public class SchemaDifference {
     private List<Table> missingTables = new ArrayList<Table>();
 
     /* The differences between the tables of the schemas, empty if none found */
-    private List<TableDifference> tableDifference = new ArrayList<TableDifference>();
+    private List<TableDifference> tableDifferences = new ArrayList<TableDifference>();
 
 
     /**
-     * Create a comparison result.
+     * Create a schema difference.
      *
      * @param schema       The expected schema, not null
      * @param actualSchema The actual schema, not null
@@ -71,10 +71,18 @@ public class SchemaDifference {
 
 
     /**
-     * @return The differences between the tables of the schema, not null
+     * @return The differences between the tables of the schema, empty if none found
      */
-    public List<TableDifference> getTableDifference() {
-        return tableDifference;
+    public List<TableDifference> getTableDifferences() {
+        return tableDifferences;
+    }
+
+
+    /**
+     * @return The tables that were not found in the actual schema, empty if none found
+     */
+    public List<Table> getMissingTables() {
+        return missingTables;
     }
 
 
@@ -84,15 +92,7 @@ public class SchemaDifference {
      * @param tableDifference The table comparison, not null
      */
     public void addTableDifference(TableDifference tableDifference) {
-        this.tableDifference.add(tableDifference);
-    }
-
-
-    /**
-     * @return The tables that were not found in the actual schema, empty if none found
-     */
-    public List<Table> getMissingTables() {
-        return missingTables;
+        this.tableDifferences.add(tableDifference);
     }
 
 
@@ -110,7 +110,7 @@ public class SchemaDifference {
      * @return True if both schemas are a match
      */
     public boolean isMatch() {
-        return missingTables.isEmpty() && tableDifference.isEmpty();
+        return missingTables.isEmpty() && tableDifferences.isEmpty();
     }
 
 }

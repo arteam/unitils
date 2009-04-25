@@ -16,8 +16,8 @@
 package org.unitils.dbunit.dataset;
 
 import org.unitils.core.UnitilsException;
+import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 import org.unitils.dbunit.dataset.comparison.RowDifference;
-import org.unitils.dbunit.dataset.comparison.ValueDifference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,8 @@ import java.util.List;
  */
 public class Row {
 
-    /* The values of the row */
-    private List<Value> values = new ArrayList<Value>();
+    /* The columns of the row */
+    private List<Column> columns = new ArrayList<Column>();
 
     /* The names of the primary key columns, empty if none defined */
     private List<String> primaryKeyColumnNames;
@@ -64,21 +64,6 @@ public class Row {
 
 
     /**
-     * Adds a value to the row. Only one value per column can be added.
-     *
-     * @param value The value to add, not null
-     * @throws UnitilsException When a value for the same column was already added
-     */
-    public void addValue(Value value) {
-        Value existingValue = getValue(value.getColumnName());
-        if (existingValue != null) {
-            throw new UnitilsException("Unable to add value to data set row. A value for this column already exists. Column name: " + value.getColumnName() + ", existing value: " + existingValue.getValue() + ", new value: " + value.getValue());
-        }
-        values.add(value);
-    }
-
-
-    /**
      * Compares the row with the given actual row.
      *
      * @param actualRow The row to compare with, not null
@@ -86,13 +71,52 @@ public class Row {
      */
     public boolean canCompare(Row actualRow) {
         for (String primaryKeyColumnName : primaryKeyColumnNames) {
-            Value value = getValue(primaryKeyColumnName);
-            Value actualValue = actualRow.getValue(primaryKeyColumnName);
-            if (value != null && !value.equalValue(actualValue)) {
+            Column column = getColumn(primaryKeyColumnName);
+            Column actualColumn = actualRow.getColumn(primaryKeyColumnName);
+            if (column != null && column.compare(actualColumn) != null) {
                 return false;
             }
         }
         return true;
+    }
+
+
+    /**
+     * Gets the column for the given name.
+     *
+     * @param columnName The name of the column, not null
+     * @return The column, null if not found
+     */
+    public Column getColumn(String columnName) {
+        for (Column column : columns) {
+            if (columnName.equalsIgnoreCase(column.getName())) {
+                return column;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * @return The columns of the row, not null
+     */
+    public List<Column> getColumns() {
+        return columns;
+    }
+
+
+    /**
+     * Adds a column to the row. A column can only be added once.
+     *
+     * @param column The column to add, not null
+     * @throws UnitilsException When a value for the same column was already added
+     */
+    public void addColumn(Column column) {
+        Column existingColumn = getColumn(column.getName());
+        if (existingColumn != null) {
+            throw new UnitilsException("Unable to add column to data set row. A column for this name already exists. Column name: " + column.getName() + ", existing value: " + existingColumn.getValue() + ", new value: " + column.getValue());
+        }
+        columns.add(column);
     }
 
 
@@ -104,12 +128,17 @@ public class Row {
      */
     public RowDifference compare(Row actualRow) {
         RowDifference rowDifference = new RowDifference(this, actualRow);
-        for (Value value : values) {
-            String columnName = value.getColumnName();
+        for (Column column : columns) {
+            String columnName = column.getName();
 
-            Value actualValue = actualRow.getValue(columnName);
-            if (actualValue == null || !value.equalValue(actualValue)) {
-                rowDifference.addValueDifference(new ValueDifference(value, actualValue));
+            Column actualColumn = actualRow.getColumn(columnName);
+            if (actualColumn == null) {
+                rowDifference.addMissingColumn(column);
+            } else {
+                ColumnDifference columnDifference = column.compare(actualColumn);
+                if (columnDifference != null) {
+                    rowDifference.addColumnDifference(columnDifference);
+                }
             }
         }
         if (rowDifference.isMatch()) {
@@ -118,27 +147,4 @@ public class Row {
         return rowDifference;
     }
 
-
-    /**
-     * Gets the value for the given column.
-     *
-     * @param columnName The column, not null
-     * @return The value, null if the column is not found
-     */
-    public Value getValue(String columnName) {
-        for (Value value : values) {
-            if (columnName.equalsIgnoreCase(value.getColumnName())) {
-                return value;
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * @return The values of the row, not null
-     */
-    public List<Value> getValues() {
-        return values;
-    }
 }

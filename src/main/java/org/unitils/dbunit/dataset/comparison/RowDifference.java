@@ -15,6 +15,7 @@
  */
 package org.unitils.dbunit.dataset.comparison;
 
+import org.unitils.dbunit.dataset.Column;
 import org.unitils.dbunit.dataset.Row;
 
 import java.util.ArrayList;
@@ -34,12 +35,15 @@ public class RowDifference {
     /* The actual row, not null */
     private Row actualRow;
 
+    /* The columns that were not found in the actual row, empty if none found */
+    private List<Column> missingColumns = new ArrayList<Column>();
+
     /* The differences between the rows, empty if there is a match */
-    private List<ValueDifference> valueDifferences = new ArrayList<ValueDifference>();
+    private List<ColumnDifference> columnDifferences = new ArrayList<ColumnDifference>();
 
 
     /**
-     * Create a comparison result.
+     * Create a row difference.
      *
      * @param row       The expected row, not null
      * @param actualRow The actual row, null if the row was not found
@@ -69,8 +73,16 @@ public class RowDifference {
     /**
      * @return The differences between the rows, empty if there is a match
      */
-    public List<ValueDifference> getValueDifferences() {
-        return valueDifferences;
+    public List<ColumnDifference> getColumnDifferences() {
+        return columnDifferences;
+    }
+
+
+    /**
+     * @return The columns that were not found in the actual row, empty if none found
+     */
+    public List<Column> getMissingColumns() {
+        return missingColumns;
     }
 
 
@@ -78,22 +90,33 @@ public class RowDifference {
      * @param columnName The column to find the difference for, not null
      * @return The differences of that column, null if not found
      */
-    public ValueDifference getValueDifference(String columnName) {
-        for (ValueDifference valueDifference : valueDifferences) {
-            if (columnName.equals(valueDifference.getValue().getColumnName())) {
-                return valueDifference;
+    public ColumnDifference getColumnDifference(String columnName) {
+        for (ColumnDifference columnDifference : columnDifferences) {
+            if (columnName.equals(columnDifference.getColumn().getName())) {
+                return columnDifference;
             }
         }
         return null;
     }
 
+
     /**
      * Adds a difference for a column
      *
-     * @param valueDifference The difference, not null
+     * @param columnDifference The difference, not null
      */
-    public void addValueDifference(ValueDifference valueDifference) {
-        valueDifferences.add(valueDifference);
+    public void addColumnDifference(ColumnDifference columnDifference) {
+        columnDifferences.add(columnDifference);
+    }
+
+
+    /**
+     * Adds a column that was not found in the actual row
+     *
+     * @param column The missing column, not null
+     */
+    public void addMissingColumn(Column column) {
+        missingColumns.add(column);
     }
 
 
@@ -102,7 +125,7 @@ public class RowDifference {
      * @return True if the given result has less differences
      */
     public boolean isBetterMatch(RowDifference rowComparison) {
-        return valueDifferences.size() < rowComparison.getValueDifferences().size();
+        return columnDifferences.size() < rowComparison.getColumnDifferences().size();
     }
 
 
@@ -110,8 +133,6 @@ public class RowDifference {
      * @return True if both rows are a match
      */
     public boolean isMatch() {
-        return valueDifferences.isEmpty();
+        return columnDifferences.isEmpty() && missingColumns.isEmpty();
     }
-
-
 }

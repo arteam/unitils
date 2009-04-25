@@ -31,7 +31,7 @@ import java.util.List;
 public class Table {
 
     /* The name of the table */
-    private String tableName;
+    private String name;
 
     /* The data set rows */
     private List<Row> rows = new ArrayList<Row>();
@@ -40,18 +40,18 @@ public class Table {
     /**
      * Creates a data set table.
      *
-     * @param tableName The name of the table, not null
+     * @param name The name of the table, not null
      */
-    public Table(String tableName) {
-        this.tableName = tableName;
+    public Table(String name) {
+        this.name = name;
     }
 
 
     /**
      * @return The name of the table, not null
      */
-    public String getTableName() {
-        return tableName;
+    public String getName() {
+        return name;
     }
 
 

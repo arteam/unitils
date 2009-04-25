@@ -15,48 +15,48 @@
  */
 package org.unitils.dbunit.dataset.comparison;
 
-import org.unitils.dbunit.dataset.Value;
+import org.unitils.dbunit.dataset.Column;
 
 /**
- * A holder for 2 different values.
+ * The difference between 2 column values.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class ValueDifference {
+public class ColumnDifference {
 
-    /* The expected value, not null */
-    private Value value;
+    /* The expected column, not null */
+    private Column column;
 
-    /* The actual value, null if the value was not found */
-    private Value actualValue;
+    /* The actual column, not null */
+    private Column actualColumn;
 
 
     /**
-     * Creates a value difference.
+     * Creates a column difference.
      *
-     * @param value       The expected value, not null
-     * @param actualValue The actual value, null if the value was not found
+     * @param column       The expected column, not null
+     * @param actualColumn The actual column, not null
      */
-    public ValueDifference(Value value, Value actualValue) {
-        this.value = value;
-        this.actualValue = actualValue;
+    public ColumnDifference(Column column, Column actualColumn) {
+        this.column = column;
+        this.actualColumn = actualColumn;
     }
 
 
     /**
      * @return The expected value, not null
      */
-    public Value getValue() {
-        return value;
+    public Column getColumn() {
+        return column;
     }
 
 
     /**
      * @return The actual value, null if the value was not found
      */
-    public Value getActualValue() {
-        return actualValue;
+    public Column getActualColumn() {
+        return actualColumn;
     }
 
 }

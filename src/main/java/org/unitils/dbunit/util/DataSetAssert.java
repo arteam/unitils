@@ -18,10 +18,10 @@ package org.unitils.dbunit.util;
 import org.dbunit.dataset.IDataSet;
 import org.unitils.core.util.ObjectFormatter;
 import org.unitils.dbunit.dataset.*;
+import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 import org.unitils.dbunit.dataset.comparison.RowDifference;
 import org.unitils.dbunit.dataset.comparison.SchemaDifference;
 import org.unitils.dbunit.dataset.comparison.TableDifference;
-import org.unitils.dbunit.dataset.comparison.ValueDifference;
 
 /**
  * Assert class that offers assert methods for testing things that are specific to DbUnit.
@@ -74,13 +74,13 @@ public class DataSetAssert {
             result.append("Found missing table ");
             result.append(schemaComparison.getSchema().getName());
             result.append(".");
-            result.append(missingTable.getTableName());
+            result.append(missingTable.getName());
         }
     }
 
 
     protected void appendTableDifferences(SchemaDifference schemaComparison, StringBuilder result) {
-        for (TableDifference tableDifference : schemaComparison.getTableDifference()) {
+        for (TableDifference tableDifference : schemaComparison.getTableDifferences()) {
             result.append("Found differences for table ");
             appendTableName(schemaComparison.getSchema(), tableDifference.getTable(), result);
             result.append(":\n ");
@@ -109,14 +109,18 @@ public class DataSetAssert {
             appendRow(rowDifference.getRow(), result);
 
             result.append("\n\n  Best matching differences:  ");
-            for (ValueDifference valueDifference : rowDifference.getValueDifferences()) {
+            for (Column column : rowDifference.getMissingColumns()) {
+                result.append("\n  Missing column ");
+                result.append(column.getName());
+            }
+            for (ColumnDifference columnDifference : rowDifference.getColumnDifferences()) {
                 result.append("\n  ");
-                result.append(valueDifference.getValue().getColumnName());
+                result.append(columnDifference.getColumn().getName());
                 result.append(": ");
-                result.append(objectFormatter.format(valueDifference.getValue().getValue()));
+                result.append(objectFormatter.format(columnDifference.getColumn().getValue()));
                 result.append(" <-> ");
-                Value actualValue = valueDifference.getActualValue();
-                result.append(objectFormatter.format(actualValue == null ? null : actualValue.getValue()));
+                Column actualColumn = columnDifference.getActualColumn();
+                result.append(objectFormatter.format(actualColumn == null ? null : actualColumn.getValue()));
             }
             result.append("\n");
         }
@@ -124,8 +128,8 @@ public class DataSetAssert {
 
 
     protected void appendColumnNames(Row row, StringBuilder result) {
-        for (Value value : row.getValues()) {
-            result.append(value.getColumnName());
+        for (Column column : row.getColumns()) {
+            result.append(column.getName());
             result.append(", ");
         }
         result.setLength(result.length() - 2);
@@ -133,8 +137,8 @@ public class DataSetAssert {
 
 
     protected void appendRow(Row row, StringBuilder result) {
-        for (Value value : row.getValues()) {
-            result.append(objectFormatter.format(value.getValue()));
+        for (Column column : row.getColumns()) {
+            result.append(objectFormatter.format(column.getValue()));
             result.append(", ");
         }
         result.setLength(result.length() - 2);
@@ -166,7 +170,7 @@ public class DataSetAssert {
     protected void appendTableName(Schema schema, Table table, StringBuilder result) {
         result.append(schema.getName());
         result.append(".");
-        result.append(table.getTableName());
+        result.append(table.getName());
     }
 
 }
