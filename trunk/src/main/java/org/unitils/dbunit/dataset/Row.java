@@ -30,64 +30,25 @@ import java.util.List;
  */
 public class Row {
 
+    /* The primary key columns, empty if none defined */
+    private List<Column> primaryKeyColumns = new ArrayList<Column>();
+
     /* The columns of the row */
     private List<Column> columns = new ArrayList<Column>();
 
-    /* The names of the primary key columns, empty if none defined */
-    private List<String> primaryKeyColumnNames;
-
 
     /**
-     * Creates a row.
-     */
-    public Row() {
-        this(new ArrayList<String>());
-    }
-
-
-    /**
-     * Creates a row.
-     *
-     * @param primaryKeyColumnNames The names of the primary key columns, empty if none defined
-     */
-    public Row(List<String> primaryKeyColumnNames) {
-        this.primaryKeyColumnNames = primaryKeyColumnNames;
-    }
-
-
-    /**
-     * @return The names of the primary key columns, empty if none defined
-     */
-    public List<String> getPrimaryKeyColumnNames() {
-        return primaryKeyColumnNames;
-    }
-
-
-    /**
-     * Compares the row with the given actual row.
-     *
-     * @param actualRow The row to compare with, not null
-     * @return The difference, null the pk columns did not match
-     */
-    public boolean canCompare(Row actualRow) {
-        for (String primaryKeyColumnName : primaryKeyColumnNames) {
-            Column column = getColumn(primaryKeyColumnName);
-            Column actualColumn = actualRow.getColumn(primaryKeyColumnName);
-            if (column != null && column.compare(actualColumn) != null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Gets the column for the given name.
+     * Gets the column for the given name. The name is case insensitive.
      *
      * @param columnName The name of the column, not null
      * @return The column, null if not found
      */
     public Column getColumn(String columnName) {
+        for (Column primaryKeyColumn : primaryKeyColumns) {
+            if (columnName.equalsIgnoreCase(primaryKeyColumn.getName())) {
+                return primaryKeyColumn;
+            }
+        }
         for (Column column : columns) {
             if (columnName.equalsIgnoreCase(column.getName())) {
                 return column;
@@ -98,10 +59,33 @@ public class Row {
 
 
     /**
+     * @return The primary key columns, empty if none defined
+     */
+    public List<Column> getPrimaryKeyColumns() {
+        return primaryKeyColumns;
+    }
+
+
+    /**
      * @return The columns of the row, not null
      */
     public List<Column> getColumns() {
         return columns;
+    }
+
+
+    /**
+     * Adds a column to the row. A column can only be added once.
+     *
+     * @param primaryKeyColumn The column to add, not null
+     * @throws UnitilsException When a value for the same column was already added
+     */
+    public void addPrimaryKeyColumn(Column primaryKeyColumn) {
+        Column existingColumn = getColumn(primaryKeyColumn.getName());
+        if (existingColumn != null) {
+            throw new UnitilsException("Unable to add primary column to data set row. A column for this name already exists. Column name: " + primaryKeyColumn.getName() + ", existing value: " + existingColumn.getValue() + ", new value: " + primaryKeyColumn.getValue());
+        }
+        primaryKeyColumns.add(primaryKeyColumn);
     }
 
 
@@ -121,6 +105,21 @@ public class Row {
 
 
     /**
+     * @param actualRow The row to compare with, not null
+     * @return True if the pk columns did not match
+     */
+    public boolean hasDifferentPrimaryKeyColumns(Row actualRow) {
+        for (Column primaryKeyColumn : actualRow.getPrimaryKeyColumns()) {
+            Column column = getColumn(primaryKeyColumn.getName());
+            if (column != null && column.compare(primaryKeyColumn) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Compares the row with the given actual row.
      *
      * @param actualRow The row to compare with, not null
@@ -128,23 +127,35 @@ public class Row {
      */
     public RowDifference compare(Row actualRow) {
         RowDifference rowDifference = new RowDifference(this, actualRow);
-        for (Column column : columns) {
-            String columnName = column.getName();
+        compareColumns(primaryKeyColumns, actualRow, rowDifference);
+        compareColumns(columns, actualRow, rowDifference);
 
-            Column actualColumn = actualRow.getColumn(columnName);
-            if (actualColumn == null) {
-                rowDifference.addMissingColumn(column);
-            } else {
-                ColumnDifference columnDifference = column.compare(actualColumn);
-                if (columnDifference != null) {
-                    rowDifference.addColumnDifference(columnDifference);
-                }
-            }
-        }
         if (rowDifference.isMatch()) {
             return null;
         }
         return rowDifference;
+    }
+
+
+    /**
+     * Compares the given columns with the columns of the actual row.
+     *
+     * @param columns   The columns to compare, not null
+     * @param actualRow The columns to compare with, not null
+     * @param result    The result to add the differences to, not null
+     */
+    protected void compareColumns(List<Column> columns, Row actualRow, RowDifference result) {
+        for (Column column : columns) {
+            Column actualColumn = actualRow.getColumn(column.getName());
+            if (actualColumn == null) {
+                result.addMissingColumn(column);
+            } else {
+                ColumnDifference columnDifference = column.compare(actualColumn);
+                if (columnDifference != null) {
+                    result.addColumnDifference(columnDifference);
+                }
+            }
+        }
     }
 
 }

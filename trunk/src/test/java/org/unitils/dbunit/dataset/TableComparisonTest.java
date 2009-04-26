@@ -15,20 +15,17 @@
  */
 package org.unitils.dbunit.dataset;
 
-import static org.dbunit.dataset.datatype.DataType.*;
+import static org.dbunit.dataset.datatype.DataType.VARCHAR;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 import org.unitils.dbunit.dataset.comparison.RowDifference;
 import org.unitils.dbunit.dataset.comparison.TableDifference;
-import org.unitils.dbunit.dataset.comparison.ColumnDifference;
-
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
- * todo javadoc
+ * Tests the comparison behavior of a data set table.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -38,16 +35,18 @@ public class TableComparisonTest extends UnitilsJUnit4 {
     private Table expectedTable;
     private Table actualTable;
 
+
     @Before
     public void initialize() {
         expectedTable = new Table("test_table");
         actualTable = new Table("test_table");
     }
 
+
     @Test
-    public void testAssertEqualTables() throws Exception {
-        addExpectedRow("value");
-        addActualRow("value");
+    public void testEqualTables() throws Exception {
+        addRow(expectedTable, "value1", "value2");
+        addRow(actualTable, "value1", "value2");
 
         TableDifference result = expectedTable.compare(actualTable);
 
@@ -56,21 +55,9 @@ public class TableComparisonTest extends UnitilsJUnit4 {
 
 
     @Test
-    public void testDifferentStringValue() throws Exception {
-        addExpectedRow("value");
-        addActualRow("xxxx");
-
-        TableDifference result = expectedTable.compare(actualTable);
-
-        assertValueDifference(result, "value", "xxxx");
-    }
-
-
-    @Test
-    public void testEqualDateValue() throws Exception {
-        Date date = new GregorianCalendar(2009, 5, 10).getTime();
-        addExpectedRow("2009-06-10");
-        addActualRow(date);
+    public void testEqualTablesWithPrimaryKeys() throws Exception {
+        addRow(expectedTable, "pk1", "value1");
+        addRowWithPrimaryKey(actualTable, "pk1", "value1");
 
         TableDifference result = expectedTable.compare(actualTable);
 
@@ -79,84 +66,131 @@ public class TableComparisonTest extends UnitilsJUnit4 {
 
 
     @Test
-    public void testDifferentDateValue() throws Exception {
-        Date date = new GregorianCalendar(2009, 5, 10).getTime();
-        addExpectedRow("1980-01-05");
-        addActualRow(date);
+    public void testMissingRowForPrimaryKey() throws Exception {
+        addRow(expectedTable, "pk1", "value");
+        addRowWithPrimaryKey(actualTable, "xxxx", "value");
 
         TableDifference result = expectedTable.compare(actualTable);
 
-        assertValueDifference(result, "1980-01-05", date);
+        assertMissingRow(result, "pk1");
     }
+
 
     @Test
-    public void testEqualDoubleValue() throws Exception {
-        addExpectedRow("-1.00");
-        addActualRow(-1.0);
+    public void testMissingRowWithoutPrimaryKey() throws Exception {
+        addRow(expectedTable, "value1");
+        addRow(expectedTable, "value2");
+        addRow(actualTable, "value1");
 
         TableDifference result = expectedTable.compare(actualTable);
 
-        assertNull(result);
+        assertMissingRow(result, "value2");
     }
+
 
     @Test
-    public void testDifferentDoubleValue() throws Exception {
-        addExpectedRow("-1.00");
-        addActualRow(-5.0);
+    public void testDifferentValueUsingPrimaryKey() throws Exception {
+        addRow(expectedTable, "pk1", "value1");
+        addRow(expectedTable, "pk2", "value2");
+        addRowWithPrimaryKey(actualTable, "pk1", "value2");
 
         TableDifference result = expectedTable.compare(actualTable);
 
-        assertValueDifference(result, "-1.00", -5.0);
+        assertDifferentRows(result, "value1", "value2");
     }
+
 
     @Test
-    public void testMissingRow() throws Exception {
-        addExpectedRow("value1");
-        addExpectedRow("value2");
-        addActualRow("value1");
+    public void testDifferentValueWithoutPrimaryKey() throws Exception {
+        addRow(expectedTable, "value1", "value2");
+        addRow(actualTable, "value1", "xxxx");
 
         TableDifference result = expectedTable.compare(actualTable);
 
-        assertMissingRow(result);
+        assertDifferentRows(result, "value2", "xxxx");
     }
 
 
-    private void assertValueDifference(TableDifference tableDifference, String expectedValue, Object actualValue) {
-        RowDifference rowDifference = tableDifference.getBestRowDifferences().get(0);
-        ColumnDifference valueDifference = rowDifference.getColumnDifferences().get(0);
-        assertEquals(expectedValue, valueDifference.getColumn().getValue());
-        assertEquals(actualValue, valueDifference.getActualColumn().getValue());
+    @Test
+    public void testBestMatchingDifferences() throws Exception {
+        addRow(expectedTable, "xxxx", "value2a", "value3");
+        addRow(expectedTable, "yyyy", "value2b", "value3");
+        addRow(actualTable, "value1", "value2b", "value3");
+        addRow(actualTable, "value1", "value2a", "value3");
+
+        TableDifference result = expectedTable.compare(actualTable);
+
+        RowDifference rowDifference1 = getRowDifference(result, "xxxx", "value1");
+        assertEquals("value2a", rowDifference1.getActualRow().getColumn("column1").getValue());
+        RowDifference rowDifference2 = getRowDifference(result, "yyyy", "value1");
+        assertEquals("value2b", rowDifference2.getActualRow().getColumn("column1").getValue());
     }
 
-    private void assertMissingRow(TableDifference tableDifference) {
+
+    @Test
+    public void testBestMatchingDifferencesWithMatchingRow() throws Exception {
+        addRow(expectedTable, "xxxx", "yyyy", "value3");
+        addRow(expectedTable, "value1", "value2", "value3");
+        addRow(actualTable, "value1", "value2", "value3");
+        addRow(actualTable, "value1", "value2", "value3");
+
+        TableDifference result = expectedTable.compare(actualTable);
+
+        assertDifferentRows(result, "xxxx", "value1");
+    }
+
+
+    @Test
+    public void testMissingTableDoubleMatch() throws Exception {
+        addRow(expectedTable, "value1");
+        addRow(expectedTable, "value1");
+        addRow(actualTable, "value1");
+
+        TableDifference result = expectedTable.compare(actualTable);
+
+        assertMissingRow(result, "value1");
+        assertEquals(1, result.getMissingRows().size());
+    }
+
+
+    private void assertDifferentRows(TableDifference tableDifference, String expectedValue, Object actualValue) {
+        RowDifference rowDifference = getRowDifference(tableDifference, expectedValue, actualValue);
+        assertNotNull("Row difference not found for expected value: " + expectedValue + " and actual value: " + actualValue, rowDifference);
+    }
+
+
+    private RowDifference getRowDifference(TableDifference tableDifference, String expectedValue, Object actualValue) {
+        for (RowDifference rowDifference : tableDifference.getBestRowDifferences()) {
+            ColumnDifference valueDifference = rowDifference.getColumnDifferences().get(0);
+            if (expectedValue.equals(valueDifference.getColumn().getValue()) && actualValue.equals(valueDifference.getActualColumn().getValue())) {
+                return rowDifference;
+            }
+        }
+        return null;
+    }
+
+
+    private void assertMissingRow(TableDifference tableDifference, String value) {
         Row row = tableDifference.getMissingRows().get(0);
-        assertNotNull(row);
+        assertEquals(value, row.getColumn("column0").getValue());
     }
 
 
-    private void addActualRow(String value) {
-        Row dataSetRow = new Row();
-        dataSetRow.addColumn(new Column("column", VARCHAR, value));
-        actualTable.addRow(dataSetRow);
+    private void addRowWithPrimaryKey(Table table, String pkValue, String... values) {
+        Row row = new Row();
+        row.addPrimaryKeyColumn(new Column("column0", VARCHAR, pkValue));
+        for (int i = 0; i < values.length; i++) {
+            row.addColumn(new Column("column" + (i + 1), VARCHAR, values[i]));
+        }
+        table.addRow(row);
     }
 
 
-    private void addActualRow(Date date) {
-        Row dataSetRow = new Row();
-        dataSetRow.addColumn(new Column("column", DATE, date));
-        actualTable.addRow(dataSetRow);
-    }
-
-    private void addActualRow(Double number) {
-        Row dataSetRow = new Row();
-        dataSetRow.addColumn(new Column("column", DOUBLE, number));
-        actualTable.addRow(dataSetRow);
-    }
-
-
-    private void addExpectedRow(String value) {
-        Row dataSetRow = new Row();
-        dataSetRow.addColumn(new Column("column", VARCHAR, value));
-        expectedTable.addRow(dataSetRow);
+    private void addRow(Table table, String... values) {
+        Row row = new Row();
+        for (int i = 0; i < values.length; i++) {
+            row.addColumn(new Column("column" + i, VARCHAR, values[i]));
+        }
+        table.addRow(row);
     }
 }

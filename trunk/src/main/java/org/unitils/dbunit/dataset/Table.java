@@ -64,6 +64,13 @@ public class Table {
 
 
     /**
+     * @return True if the table does not contain any rows
+     */
+    public boolean isEmpty() {
+        return rows.isEmpty();
+    }
+
+    /**
      * Adds a data set row
      *
      * @param row The row to add, not null
@@ -80,37 +87,55 @@ public class Table {
      * @return The difference, null if none found
      */
     public TableDifference compare(Table actualTable) {
-        TableDifference tableDifference = new TableDifference(this, actualTable);
+        TableDifference result = new TableDifference(this, actualTable);
 
+        if (isEmpty()) {
+            if (actualTable.isEmpty()) {
+                return null;
+            }
+            return result;
+        }
+
+        compareRows(rows, actualTable, result);
+        if (result.isMatch()) {
+            return null;
+        }
+        return result;
+    }
+
+
+    /**
+     * Compares the given rows with the columns of the actual table.
+     *
+     * @param rows        The rows to compare, not null
+     * @param actualTable The rows to compare with, not null
+     * @param result      The result to add the differences to, not null
+     */
+    protected void compareRows(List<Row> rows, Table actualTable, TableDifference result) {
         List<Row> rowsWithoutMatch = new ArrayList<Row>(rows);
         for (Row actualRow : actualTable.getRows()) {
             Iterator<Row> rowIterator = rowsWithoutMatch.iterator();
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
 
-                if (!row.canCompare(actualRow)) {
+                if (row.hasDifferentPrimaryKeyColumns(actualRow)) {
                     continue;
                 }
                 RowDifference rowDifference = row.compare(actualRow);
                 if (rowDifference == null) {
-                    tableDifference.setMatchingRow(row, actualRow);
+                    result.setMatchingRow(row, actualRow);
                     rowIterator.remove();
                     break;
                 } else {
-                    tableDifference.setIfBestRowDifference(rowDifference);
+                    result.setIfBestRowDifference(rowDifference);
                 }
             }
         }
 
         for (Row row : rowsWithoutMatch) {
-            if (tableDifference.getBestRowDifference(row) == null) {
-                tableDifference.addMissingRow(row);
+            if (result.getBestRowDifference(row) == null) {
+                result.addMissingRow(row);
             }
         }
-
-        if (tableDifference.isMatch()) {
-            return null;
-        }
-        return tableDifference;
     }
 }

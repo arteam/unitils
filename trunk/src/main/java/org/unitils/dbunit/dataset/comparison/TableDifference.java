@@ -96,11 +96,11 @@ public class TableDifference {
 
 
     /**
-     * @param dataSetRow The row to get the difference for, not null
-     * @return The best difference, null if there was a match
+     * @param row The row to get the difference for, not null
+     * @return The best difference, null if not found or if there was a match
      */
-    public RowDifference getBestRowDifference(Row dataSetRow) {
-        return bestRowDifferences.get(dataSetRow);
+    public RowDifference getBestRowDifference(Row row) {
+        return bestRowDifferences.get(row);
     }
 
 
