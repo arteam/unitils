@@ -24,7 +24,7 @@ import org.unitils.dbunit.dataset.comparison.ColumnDifference;
 import org.unitils.dbunit.dataset.comparison.RowDifference;
 
 /**
- * Tests the comparison behavior of a data set row
+ * Tests the comparison behavior of a data set row.
  *
  * @author Tim Ducheyne
  * @author Filip Neven
@@ -39,6 +39,19 @@ public class RowComparisonTest extends UnitilsJUnit4 {
     public void testEqualRows() throws Exception {
         addColumn(expectedRow, "column1", "value1");
         addColumn(expectedRow, "column2", "value2");
+        addColumn(actualRow, "column1", "value1");
+        addColumn(actualRow, "column2", "value2");
+
+        RowDifference result = expectedRow.compare(actualRow);
+
+        assertNull(result);
+    }
+
+
+    @Test
+    public void testEqualRowsDifferentCase() throws Exception {
+        addColumn(expectedRow, "COLUMN1", "value1");
+        addColumn(expectedRow, "COLUMN2", "value2");
         addColumn(actualRow, "column1", "value1");
         addColumn(actualRow, "column2", "value2");
 
@@ -92,6 +105,16 @@ public class RowComparisonTest extends UnitilsJUnit4 {
     public void testAddingTwoColumnsForSameName() throws Exception {
         addColumn(expectedRow, "column", "value");
         addColumn(expectedRow, "column", "value");
+    }
+
+
+    @Test
+    public void testGetColumnDifferenceForUnknownColumn() throws Exception {
+        RowDifference rowDifference = new RowDifference(new Row(), new Row());
+
+        ColumnDifference result = rowDifference.getColumnDifference("xxxxx");
+
+        assertNull(result);
     }
 
 

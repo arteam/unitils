@@ -125,7 +125,7 @@ public class RowDifference {
      * @return True if the given result has less differences
      */
     public boolean isBetterMatch(RowDifference rowComparison) {
-        return columnDifferences.size() < rowComparison.getColumnDifferences().size();
+        return (columnDifferences.size() + missingColumns.size()) < (rowComparison.getMissingColumns().size() + rowComparison.getColumnDifferences().size());
     }
 
 

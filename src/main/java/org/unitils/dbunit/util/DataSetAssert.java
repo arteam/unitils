@@ -31,12 +31,20 @@ import org.unitils.dbunit.dataset.comparison.TableDifference;
  */
 public class DataSetAssert {
 
-
+    /* Utility for creating string representations */
     private ObjectFormatter objectFormatter = new ObjectFormatter();
 
 
-    // todo javadoc
-    public void assertEqualSchemas(Schema expectedSchema, Schema actualSchema) {
+    /**
+     * Asserts that the given expected schema is equal to the actual schema.
+     * Tables, rows or columns that are not specified in the expected schema will be ignored.
+     * If an empty table is specified in the expected schema, it will check that the actual table is also be empty.
+     *
+     * @param expectedSchema The expected schema, not null
+     * @param actualSchema   The actual schema, not null
+     * @throws AssertionError When the assertion fails.
+     */
+    public void assertEqualSchemas(Schema expectedSchema, Schema actualSchema) throws AssertionError {
         SchemaDifference schemaDifference = expectedSchema.compare(actualSchema);
         if (schemaDifference != null) {
             String message = generateErrorMessage(schemaDifference);
@@ -45,65 +53,109 @@ public class DataSetAssert {
     }
 
 
-    // todo javadoc
+    /**
+     * Asserts that the given expected DbUnit data set is equal to the actual DbUnit data set.
+     * Tables, rows or columns that are not specified in the expected data set will be ignored.
+     * If an empty table is specified in the expected data set, it will check that the actual table is also be empty.
+     *
+     * @param schemaName      The name of the schema that these data sets belong to, not null
+     * @param expectedDataSet The expected data set, not null
+     * @param actualDataSet   The actual data set, not null
+     * @throws AssertionError When the assertion fails.
+     */
     public void assertEqualDbUnitDataSets(String schemaName, IDataSet expectedDataSet, IDataSet actualDataSet) {
-        DbUnitDataSetBuilder dbUnitDataSetBuilder = new DbUnitDataSetBuilder();
-        Schema actualSchema = dbUnitDataSetBuilder.createDataSetSchema(schemaName, actualDataSet);
-        Schema expectedSchema = dbUnitDataSetBuilder.createDataSetSchema(schemaName, expectedDataSet);
+        SchemaFactory dbUnitDataSetBuilder = new SchemaFactory();
+        Schema actualSchema = dbUnitDataSetBuilder.createSchemaForDbUnitDataSet(schemaName, actualDataSet);
+        Schema expectedSchema = dbUnitDataSetBuilder.createSchemaForDbUnitDataSet(schemaName, expectedDataSet);
 
         assertEqualSchemas(expectedSchema, actualSchema);
     }
 
 
-    //todo javadoc
-    protected String generateErrorMessage(SchemaDifference schemaComparison) {
+    /**
+     * Formats the assertion failed message for the given difference.
+     *
+     * @param schemaDifference The difference, not null
+     * @return The message, not null
+     */
+    protected String generateErrorMessage(SchemaDifference schemaDifference) {
         StringBuilder result = new StringBuilder("Assertion failed. Differences found between the expected data set and actual database content.");
 
-        String schemaName = schemaComparison.getSchema().getName();
-        appendMissingTableDifferences(schemaComparison, result);
-        result.append("\n");
-        appendTableDifferences(schemaComparison, result);
+        String schemaName = schemaDifference.getSchema().getName();
+        appendMissingTableDifferences(schemaDifference, result);
+        appendTableDifferences(schemaDifference, result);
         result.append("\n\nActual database content:\n\n");
-        appendSchemaContent(schemaComparison.getActualSchema(), result);
+        appendSchemaContent(schemaDifference.getSchema(), schemaDifference.getActualSchema(), result);
         return result.toString();
     }
 
 
-    protected void appendMissingTableDifferences(SchemaDifference schemaComparison, StringBuilder result) {
-        for (Table missingTable : schemaComparison.getMissingTables()) {
-            result.append("Found missing table ");
-            result.append(schemaComparison.getSchema().getName());
+    /**
+     * Appends the missing tables of the given schema difference to the result
+     *
+     * @param schemaDifference The difference, not null
+     * @param result           The result to append to, not null
+     */
+    protected void appendMissingTableDifferences(SchemaDifference schemaDifference, StringBuilder result) {
+        for (Table missingTable : schemaDifference.getMissingTables()) {
+            result.append("\nFound missing table ");
+            result.append(schemaDifference.getSchema().getName());
             result.append(".");
             result.append(missingTable.getName());
         }
     }
 
 
-    protected void appendTableDifferences(SchemaDifference schemaComparison, StringBuilder result) {
-        for (TableDifference tableDifference : schemaComparison.getTableDifferences()) {
-            result.append("Found differences for table ");
-            appendTableName(schemaComparison.getSchema(), tableDifference.getTable(), result);
-            result.append(":\n ");
+    /**
+     * Appends the table differences of the given schema difference to the result
+     *
+     * @param schemaDifference The difference, not null
+     * @param result           The result to append to, not null
+     */
+    protected void appendTableDifferences(SchemaDifference schemaDifference, StringBuilder result) {
+        for (TableDifference tableDifference : schemaDifference.getTableDifferences()) {
+            Table table = tableDifference.getTable();
+            if (table.isEmpty()) {
+                result.append("\nExpected table to be empty but found rows for table ");
+                appendTableName(schemaDifference.getSchema(), table, result);
+                result.append("\n");
+                continue;
+            }
+            result.append("\nFound differences for table ");
+            appendTableName(schemaDifference.getSchema(), table, result);
+            result.append(":\n");
             appendMissingRowDifferences(tableDifference, result);
             appendBestRowDifferences(tableDifference, result);
+        }
+    }
+
+
+    /**
+     * Appends the missing rows of the given table difference to the result
+     *
+     * @param tableDifference The difference, not null
+     * @param result          The result to append to, not null
+     */
+    protected void appendMissingRowDifferences(TableDifference tableDifference, StringBuilder result) {
+        for (Row missingRow : tableDifference.getMissingRows()) {
+            result.append("\n  Missing row:\n  ");
+            appendColumnNames(missingRow, result);
+            result.append("\n  ");
+            appendRow(missingRow, result);
             result.append("\n");
         }
     }
 
 
-    protected void appendMissingRowDifferences(TableDifference tableDifference, StringBuilder result) {
-        for (Row missingRow : tableDifference.getMissingRows()) {
-            result.append("Missing row:\n\n  ");
-            appendColumnNames(missingRow, result);
-            result.append("\n  ");
-            appendRow(missingRow, result);
-        }
-    }
-
-
+    /**
+     * Appends the best matching row differences of the given table difference to the result
+     *
+     * @param tableDifference The difference, not null
+     * @param result          The result to append to, not null
+     */
     protected void appendBestRowDifferences(TableDifference tableDifference, StringBuilder result) {
         for (RowDifference rowDifference : tableDifference.getBestRowDifferences()) {
-            result.append("\nDifferent row: \n\n  ");
+            result.append("\n  Different row: \n  ");
             appendColumnNames(rowDifference.getRow(), result);
             result.append("\n  ");
             appendRow(rowDifference.getRow(), result);
@@ -127,6 +179,12 @@ public class DataSetAssert {
     }
 
 
+    /**
+     * Appends the column names of the given row to the result
+     *
+     * @param row    The row, not null
+     * @param result The result to append to, not null
+     */
     protected void appendColumnNames(Row row, StringBuilder result) {
         for (Column column : row.getColumns()) {
             result.append(column.getName());
@@ -136,6 +194,12 @@ public class DataSetAssert {
     }
 
 
+    /**
+     * Appends the values of the given row to the result
+     *
+     * @param row    The row, not null
+     * @param result The result to append to, not null
+     */
     protected void appendRow(Row row, StringBuilder result) {
         for (Column column : row.getColumns()) {
             result.append(objectFormatter.format(column.getValue()));
@@ -145,18 +209,30 @@ public class DataSetAssert {
     }
 
 
-    protected void appendSchemaContent(Schema schema, StringBuilder result) {
+    /**
+     * Appends all rows and tables of the actual schema to the result. Only tables that are in the
+     * expected schema will be appended.
+     *
+     * @param schema       The expected schema, not null
+     * @param actualSchema The actual schema, not null
+     * @param result       The result to append to, not null
+     */
+    protected void appendSchemaContent(Schema schema, Schema actualSchema, StringBuilder result) {
         for (Table table : schema.getTables()) {
-            appendTableName(schema, table, result);
+            Table actualTable = actualSchema.getTable(table.getName());
+            if (actualTable == null) {
+                continue;
+            }
+            appendTableName(schema, actualTable, result);
             result.append("\n");
 
-            if (table.getRows().isEmpty()) {
+            if (actualTable.getRows().isEmpty()) {
                 result.append("  <empty table>\n");
             } else {
                 result.append("  ");
-                appendColumnNames(table.getRows().get(0), result);
+                appendColumnNames(actualTable.getRows().get(0), result);
                 result.append("\n");
-                for (Row row : table.getRows()) {
+                for (Row row : actualTable.getRows()) {
                     result.append("  ");
                     appendRow(row, result);
                     result.append("\n");
@@ -167,6 +243,13 @@ public class DataSetAssert {
     }
 
 
+    /**
+     * Appends the schema and table name to the result
+     *
+     * @param schema The schema name, not null
+     * @param table  The table name, not null
+     * @param result The result to append to, not null
+     */
     protected void appendTableName(Schema schema, Table table, StringBuilder result) {
         result.append(schema.getName());
         result.append(".");

@@ -20,9 +20,7 @@ import org.unitils.dbunit.dataset.comparison.SchemaDifference;
 import org.unitils.dbunit.dataset.comparison.TableDifference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A data set schema
@@ -35,8 +33,8 @@ public class Schema {
     /* The name of the data set schema, not null */
     private String name;
 
-    /* The tables in the schema with the table name as key */
-    private Map<String, Table> tables = new HashMap<String, Table>();
+    /* The tables in the schema, not null */
+    private List<Table> tables = new ArrayList<Table>();
 
 
     /**
@@ -61,16 +59,23 @@ public class Schema {
      * @return The tables of the schema, not null
      */
     public List<Table> getTables() {
-        return new ArrayList<Table>(tables.values());
+        return tables;
     }
 
 
     /**
+     * Gets the table for the given name. The name is case insensitive.
+     *
      * @param tableName The table name to look for, not null
-     * @return The table with the given name, null if not found
+     * @return The table, null if not found
      */
     public Table getTable(String tableName) {
-        return tables.get(tableName.toUpperCase());
+        for (Table table : tables) {
+            if (tableName.equalsIgnoreCase(table.getName())) {
+                return table;
+            }
+        }
+        return null;
     }
 
 
@@ -81,11 +86,11 @@ public class Schema {
      * @throws UnitilsException When a table with the same name was already added
      */
     public void addTable(Table table) {
-        Table existingTable = getTable(table.getName().toUpperCase());
+        Table existingTable = getTable(table.getName());
         if (existingTable != null) {
             throw new UnitilsException("Unable to add table to data set. A table with name " + table.getName() + " already exists.");
         }
-        tables.put(table.getName(), table);
+        tables.add(table);
     }
 
 
