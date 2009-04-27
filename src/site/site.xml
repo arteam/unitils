@@ -2,7 +2,7 @@
 <project name="Unitils">
     <bannerLeft>
         <name>Unitils</name>
-        <src>./images/logos/unitils.gif</src>        
+        <src>./images/logos/unitils.png</src>        
     </bannerLeft>
     
     <poweredBy>    

@@ -357,6 +357,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+	      <reportSets>
+		<reportSet>
+		    <reports>
+		        <report>javadoc</report>
+		    </reports>
+		 </reportSet>
+	      </reportSets>
             </plugin>
 
             <!-- Disable generation of mailinglist, ci-->
@@ -372,6 +379,7 @@
                     </reportSet>
                 </reportSets>
             </plugin>
+	     
         </plugins>
     </reporting>
 
