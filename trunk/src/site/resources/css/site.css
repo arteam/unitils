@@ -11,7 +11,8 @@ a:visited {
 }
 
 #banner {
-    height: 75px;
+    height: 50px;
+	margin-left:10px;
     background: none;
 }
 
