@@ -72,9 +72,6 @@ Summary
 
     []
 
-    The project started begin 2006 from an {{{http://www.j-technologies.be}Ordina J-Technologies}} discussion group on unit testing. The result was a list of guidelines 
-    and Unitils emerged in an attempt to write code to support these guidelines. 
-        
 
 * Documentation
 ~~~~~~~~~~~~~~~
