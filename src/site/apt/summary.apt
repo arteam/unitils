@@ -5,9 +5,7 @@
 
 Summary
 ~~~~~~~
-    Unitils is an open source library aimed at making unit testing easy and maintainable. 
-    Unitils builds further on existing libraries like {{{http://www.dbunit.org}DBUnit}} and {{{http://www.easymock.org}EasyMock}} and integrates 
-    with {{{http://www.junit.org}JUnit}} and {{{http://testng.org}TestNG}}.
+    Unitils is an open source library aimed at making unit testing easy and maintainable. Unitils builds further on existing libraries like {{{http://www.dbunit.org}dbunit}} and integrates with {{{http://www.junit.org}JUnit}} and {{{http://testng.org}TestNG}}.
  
     Unitils provides general asserion utilities, support for database testing, support for testing with mock objects and offers integration with 
     {{{http://www.springframework.org}Spring}}, {{{http://www.hibernate.org}Hibernate}} and the Java Persistence API (JPA). It has been designed to 
@@ -31,6 +29,8 @@ Summary
         value is not important.
         
         * Use dummy objects when stub data objects without any required behavior are needed.
+
+    []
 
     * <Persistence layer testing support>
 
