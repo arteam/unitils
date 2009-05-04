@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.unitils.core.UnitilsException;
 import org.unitils.mock.mockbehavior.MockBehavior;
 import org.unitils.mock.proxy.ProxyInvocation;
@@ -67,6 +68,7 @@ public class MockObjectInvalidSyntaxTest {
 
 
     @Test(expected = UnitilsException.class)
+    @Ignore
     public void incompleteBehaviorDefinition_performs() {
         mockObject1.performs(new MockBehavior() {
             public Object execute(ProxyInvocation mockInvocation) throws Throwable {

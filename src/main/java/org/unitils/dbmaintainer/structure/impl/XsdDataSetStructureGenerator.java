@@ -15,10 +15,12 @@
  */
 package org.unitils.dbmaintainer.structure.impl;
 
+import org.dbmaintain.dbsupport.DbSupport;
+import org.unitils.core.Unitils;
 import org.unitils.core.UnitilsException;
-import org.unitils.core.dbsupport.DbSupport;
+import org.unitils.database.DatabaseModule;
+import org.unitils.database.DatabasePostProcessor;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
-import org.unitils.dbmaintainer.util.BaseDatabaseAccessor;
 import static org.unitils.thirdparty.org.apache.commons.io.IOUtils.closeQuietly;
 import org.unitils.util.PropertyUtils;
 
@@ -38,7 +40,7 @@ import java.util.Set;
  * @author Tim Ducheyne
  * @author Filip Neven
  */
-public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implements DataSetStructureGenerator {
+public class XsdDataSetStructureGenerator implements DataSetStructureGenerator, DatabasePostProcessor {
 
     /* Property key for the target directory for the generated xsd files */
     public static final String PROPKEY_XSD_DIR_NAME = "dataSetStructureGenerator.xsd.dirName";
@@ -52,18 +54,35 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
     /* The suffix to use when defining complex types for the table definitions */
     private String complexTypeSuffix;
 
+    private DbSupport defaultDbSupport;
+
+
+    public XsdDataSetStructureGenerator() {
+    }
+
+    
+    public XsdDataSetStructureGenerator(String xsdDirectoryName, String complexTypeSuffix, DbSupport defaultDbSupport) {
+        this.xsdDirectoryName = xsdDirectoryName;
+        this.complexTypeSuffix = complexTypeSuffix;
+        this.defaultDbSupport = defaultDbSupport;
+    }
 
     /**
      * Initializes the generator.
      *
      * @param configuration The config, not null
      */
-    @Override
-    protected void doInit(Properties configuration) {
+    public void init(Properties configuration) {
         xsdDirectoryName = PropertyUtils.getString(PROPKEY_XSD_DIR_NAME, configuration);
         complexTypeSuffix = PropertyUtils.getString(PROPKEY_XSD_COMPLEX_TYPE_SUFFIX, configuration);
+
+        defaultDbSupport = getDatabaseModule().getDbMaintainFacade().getDefaultDbSupport();
     }
 
+
+    public void postProcessDatabase() {
+        generateDataSetStructure();
+    }
 
     /**
      * Generates the XSDs, and writes them to the target directory specified by the property {@link #PROPKEY_XSD_DIR_NAME}.
@@ -73,8 +92,9 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
         xsdDirectory.mkdirs();
 
         generateDataSetXsd(xsdDirectory);
-        for (DbSupport dbSupport : dbSupports) {
-            generateDatabaseSchemaXsd(dbSupport, xsdDirectory);
+        Set<String> schemaNames = defaultDbSupport.getSchemaNames();
+        for (String schemaName : schemaNames) {
+            generateDatabaseSchemaXsd(schemaName, xsdDirectory);
         }
     }
 
@@ -89,12 +109,12 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
         try {
             writer = new BufferedWriter(new FileWriter(new File(xsdDirectory, "dataset.xsd")));
 
-            String defaultSchemaName = defaultDbSupport.getSchemaName();
+            String defaultSchemaName = defaultDbSupport.getDefaultSchemaName();
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
             writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns:dflt=\"" + defaultSchemaName + "\">\n");
 
-            for (DbSupport dbSupport : dbSupports) {
-                String schemaName = dbSupport.getSchemaName();
+            Set<String> schemaNames = defaultDbSupport.getSchemaNames();
+            for (String schemaName : schemaNames) {
                 writer.write("\t<xsd:import namespace=\"" + schemaName + "\" schemaLocation=\"" + schemaName + ".xsd\" />\n");
             }
 
@@ -102,7 +122,7 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
             writer.write("\t\t<xsd:complexType>\n");
             writer.write("\t\t\t<xsd:choice minOccurs=\"0\" maxOccurs=\"unbounded\">\n");
 
-            Set<String> defaultSchemaTableNames = defaultDbSupport.getTableNames();
+            Set<String> defaultSchemaTableNames = defaultDbSupport.getTableNames(defaultSchemaName);
             for (String tableName : defaultSchemaTableNames) {
                 writer.write("\t\t\t\t<xsd:element name=\"" + tableName + "\" type=\"dflt:" + tableName + complexTypeSuffix + "\" />\n");
             }
@@ -124,18 +144,18 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
     /**
      * Generates an XSD for the database schema of the given db support.
      *
-     * @param dbSupport    The db support, not null
+     * @param schemaName The schema name, not null
      * @param xsdDirectory The target directory, not null
      */
-    protected void generateDatabaseSchemaXsd(DbSupport dbSupport, File xsdDirectory) {
+    protected void generateDatabaseSchemaXsd(String schemaName, File xsdDirectory) {
         Writer writer = null;
         try {
-            writer = new BufferedWriter(new FileWriter(new File(xsdDirectory, dbSupport.getSchemaName() + ".xsd")));
+            writer = new BufferedWriter(new FileWriter(new File(xsdDirectory, schemaName + ".xsd")));
 
             writer.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"" + dbSupport.getSchemaName() + "\" targetNamespace=\"" + dbSupport.getSchemaName() + "\">\n");
+            writer.write("<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"qualified\" xmlns=\"" + schemaName + "\" targetNamespace=\"" + schemaName + "\">\n");
 
-            Set<String> tableNames = dbSupport.getTableNames();
+            Set<String> tableNames = defaultDbSupport.getTableNames(schemaName);
             for (String tableName : tableNames) {
                 writer.write("\t<xsd:element name=\"" + tableName + "\" type=\"" + tableName + complexTypeSuffix + "\" />\n");
             }
@@ -143,7 +163,7 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
             for (String tableName : tableNames) {
                 writer.write("\t<xsd:complexType name=\"" + tableName + complexTypeSuffix + "\">\n");
 
-                Set<String> columnNames = dbSupport.getColumnNames(tableName);
+                Set<String> columnNames = defaultDbSupport.getColumnNames(schemaName, tableName);
                 for (String columnName : columnNames) {
                     writer.write("\t\t<xsd:attribute name=\"" + columnName + "\" use=\"optional\" />\n");
                 }
@@ -156,6 +176,11 @@ public class XsdDataSetStructureGenerator extends BaseDatabaseAccessor implement
         } finally {
             closeQuietly(writer);
         }
+    }
+
+
+    protected DatabaseModule getDatabaseModule() {
+        return Unitils.getInstance().getModulesRepository().getModuleOfType(DatabaseModule.class);
     }
 
 }

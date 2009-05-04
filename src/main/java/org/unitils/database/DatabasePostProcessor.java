@@ -13,34 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.unitils.dbmaintainer.script;
-
-import java.io.Reader;
-import java.util.Properties;
+package org.unitils.database;
 
 /**
- * An interface for a parser that can parse statements out of a script.
+ * Defines the contract for classes that perform database post-processing on a test database after
+ * the database was updated, e.g. for making the database more test-friendly.
  *
- * @author Tim Ducheyne
  * @author Filip Neven
  */
-public interface ScriptParser {
+public interface DatabasePostProcessor {
 
 
     /**
-     * Initializes the parser with the given configuration settings.
-     *
-     * @param configuration The config, not null
-     * @param scriptReader  The script stream, not null
+     * Perform some post processing on the database, e.g. for making the database more test-friendly
      */
-    void init(Properties configuration, Reader scriptReader);
-
-
-    /**
-     * Gets the next statement out of the given script stream.
-     *
-     * @return the statements, null if no more statements
-     */
-    String getNextStatement();
-
+    void postProcessDatabase();
 }

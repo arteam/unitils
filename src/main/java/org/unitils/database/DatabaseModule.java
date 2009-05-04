@@ -15,55 +15,42 @@
  */
 package org.unitils.database;
 
-import static org.unitils.core.util.ConfigUtils.getInstanceOf;
-import static org.unitils.database.util.TransactionMode.COMMIT;
-import static org.unitils.database.util.TransactionMode.DEFAULT;
-import static org.unitils.database.util.TransactionMode.DISABLED;
-import static org.unitils.database.util.TransactionMode.ROLLBACK;
-import static org.unitils.util.AnnotationUtils.getFieldsAnnotatedWith;
-import static org.unitils.util.AnnotationUtils.getMethodOrClassLevelAnnotationProperty;
-import static org.unitils.util.AnnotationUtils.getMethodsAnnotatedWith;
-import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
-import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
-import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.unitils.core.UnitilsDataSourceFactory;
 import org.unitils.core.Module;
 import org.unitils.core.TestListener;
 import org.unitils.core.Unitils;
 import org.unitils.core.dbsupport.DefaultSQLHandler;
 import org.unitils.core.dbsupport.SQLHandler;
 import org.unitils.core.util.ConfigUtils;
+import static org.unitils.core.util.ConfigUtils.getInstanceOf;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.config.DataSourceFactory;
+import org.unitils.database.databaseupdater.DatabaseUpdater;
+import org.unitils.database.databaseupdater.dbmaintain.DbMaintainFacade;
 import org.unitils.database.transaction.UnitilsTransactionManager;
 import org.unitils.database.transaction.impl.UnitilsTransactionManagementConfiguration;
 import org.unitils.database.util.Flushable;
 import org.unitils.database.util.TransactionMode;
-import org.unitils.dbmaintainer.DBMaintainer;
-import org.unitils.dbmaintainer.clean.DBCleaner;
-import org.unitils.dbmaintainer.clean.DBClearer;
-import org.unitils.dbmaintainer.structure.ConstraintsDisabler;
+import static org.unitils.database.util.TransactionMode.*;
+import org.unitils.database.datasource.UnitilsDataSource;
 import org.unitils.dbmaintainer.structure.DataSetStructureGenerator;
-import org.unitils.dbmaintainer.structure.SequenceUpdater;
-import org.unitils.dbmaintainer.util.DatabaseAccessing;
-import org.unitils.dbmaintainer.util.DatabaseModuleConfigUtils;
+import static org.unitils.util.AnnotationUtils.*;
+import static org.unitils.util.ModuleUtils.getAnnotationPropertyDefaults;
+import static org.unitils.util.ModuleUtils.getEnumValueReplaceDefault;
 import org.unitils.util.PropertyUtils;
+import org.unitils.util.ReflectionUtils;
+import static org.unitils.util.ReflectionUtils.setFieldAndSetterValue;
+
+import javax.sql.DataSource;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * Module that provides support for database testing: Creation of a datasource that connects to the
@@ -87,7 +74,6 @@ import org.unitils.util.PropertyUtils;
  * @author Filip Neven
  * @author Tim Ducheyne
  * @see TestDataSource
- * @see DBMaintainer
  * @see Transactional
  */
 public class DatabaseModule implements Module {
@@ -98,10 +84,25 @@ public class DatabaseModule implements Module {
     public static final String PROPERTY_UPDATEDATABASESCHEMA_ENABLED = "updateDataBaseSchema.enabled";
 
     /**
+     * Property indicating if the database constraints should org disabled after updating the database
+     */
+    public static final String PROPERTY_DISABLE_CONSTRAINTS = "dbMaintainer.disableConstraints";
+
+    /**
+     * Property indicating if the database constraints should org disabled after updating the database
+     */
+    public static final String PROPERTY_UPDATE_SEQUENCES = "dbMaintainer.updateSequences";
+
+    /**
      * Property indicating whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
      * {@link #getTransactionalDataSourceAndActivateTransactionIfNeeded(Object)} must be wrapped in a transactional proxy
      */
     public static final String PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY = "dataSource.wrapInTransactionalProxy";
+
+    /**
+     * Property key of the SQL dialect of the underlying DBMS implementation
+     */
+    public static final String PROPKEY_DATABASE_DIALECT = "database.dialect";
 
     /* The logger instance for this class */
     private static Log logger = LogFactory.getLog(DatabaseModule.class);
@@ -112,9 +113,14 @@ public class DatabaseModule implements Module {
     protected Map<Class<? extends Annotation>, Map<String, String>> defaultAnnotationPropertyValues;
 
     /**
-     * The datasources with the name as key
+     * The unitils datasource that is used by default, i.e. when no database name is specified
      */
-    protected DataSource dataSource;
+    protected UnitilsDataSource defaultUnitilsDataSource;
+
+    /**
+     * Maps all database names with their respective unitils datasources
+     */
+    protected Map<String, UnitilsDataSource> nameUnitilsDataSourceMap;
 
     /**
      * The configuration of Unitils
@@ -124,7 +130,17 @@ public class DatabaseModule implements Module {
     /**
      * Indicates if the DBMaintainer should be invoked to update the database
      */
-    protected boolean updateDatabaseSchemaEnabled;
+    protected boolean updateDatabaseEnabled;
+
+    /**
+     * Indicates whether the database constraints must be disabled after updating the test database
+     */
+    protected boolean disableConstraints;
+
+    /**
+     * Indicates whether the database sequences must be updated after updating the test database
+     */
+    protected boolean updateSequences;
 
     /**
      * Indicates whether the datasource injected onto test fields annotated with @TestDataSource or retrieved using
@@ -142,6 +158,21 @@ public class DatabaseModule implements Module {
      */
     protected Set<UnitilsTransactionManagementConfiguration> transactionManagementConfigurations = new HashSet<UnitilsTransactionManagementConfiguration>();
 
+    /**
+     * Implementation that is responsible for bringing the database up-to-date
+     */
+    protected DatabaseUpdater databaseUpdater;
+
+    /**
+     * Provides access to the dbmaintain library
+     */
+    protected DbMaintainFacade dbMaintainFacade;
+
+    /**
+     * Set of implementations of DatabasePostProcessor which are all executed after having updated the database
+     */
+    protected Set<DatabasePostProcessor> databasePostProcessors = new LinkedHashSet<DatabasePostProcessor>();
+
 
     /**
      * Initializes this module using the given <code>Configuration</code>
@@ -150,13 +181,19 @@ public class DatabaseModule implements Module {
      */
     @SuppressWarnings("unchecked")
     public void init(Properties configuration) {
+        PlatformTransactionManager.class.getName();
+
         this.configuration = configuration;
 
         defaultAnnotationPropertyValues = getAnnotationPropertyDefaults(DatabaseModule.class, configuration, Transactional.class);
-        updateDatabaseSchemaEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
         wrapDataSourceInTransactionalProxy = PropertyUtils.getBoolean(PROPERTY_WRAP_DATASOURCE_IN_TRANSACTIONAL_PROXY, configuration);
 
-        PlatformTransactionManager.class.getName();
+        updateDatabaseEnabled = PropertyUtils.getBoolean(PROPERTY_UPDATEDATABASESCHEMA_ENABLED, configuration);
+        if (updateDatabaseEnabled) {
+            databaseUpdater = ConfigUtils.getConfiguredInstanceOf(DatabaseUpdater.class, configuration);
+        }
+        disableConstraints = PropertyUtils.getBoolean(PROPERTY_DISABLE_CONSTRAINTS, configuration);
+        updateSequences = PropertyUtils.getBoolean(PROPERTY_UPDATE_SEQUENCES, configuration);
     }
 
 
@@ -173,7 +210,7 @@ public class DatabaseModule implements Module {
             }
             
             public PlatformTransactionManager getSpringPlatformTransactionManager(Object testObject) {
-                return new DataSourceTransactionManager(getDataSourceAndActivateTransactionIfNeeded());
+                return new DataSourceTransactionManager(getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded().getDataSource());
             }
             
             public boolean isTransactionalResourceAvailable(Object testObject) {
@@ -185,6 +222,34 @@ public class DatabaseModule implements Module {
             }
             
         });
+
+        // Register the disable constraints and update sequences database postprocessors, if the
+        // respective options are enabled
+        if (disableConstraints) {
+            registerDatabasePostProcessor(new DatabasePostProcessor() {
+                public void postProcessDatabase() {
+                    getDbMaintainFacade().disableConstraints();
+                }
+            });
+        }
+        if (updateSequences) {
+            registerDatabasePostProcessor(new DatabasePostProcessor() {
+                public void postProcessDatabase() {
+                    getDbMaintainFacade().updateSequences();
+                }
+            });
+        }
+    }
+
+
+    /**
+     * Register the given database post processor. After the database has been updated, the given postprocessor
+     * will be executed
+     *
+     * @param postProcessor to be executed after each database update
+     */
+    public void registerDatabasePostProcessor(DatabasePostProcessor postProcessor) {
+        databasePostProcessors.add(postProcessor);
     }
     
     
@@ -200,9 +265,9 @@ public class DatabaseModule implements Module {
      */
     public DataSource getTransactionalDataSourceAndActivateTransactionIfNeeded(Object testObject) {
         if (wrapDataSourceInTransactionalProxy) {
-            return getTransactionManager().getTransactionalDataSource(getDataSourceAndActivateTransactionIfNeeded());
+            return getTransactionManager().getTransactionalDataSource(getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded().getDataSource());
         }
-        return getDataSourceAndActivateTransactionIfNeeded();
+        return getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded().getDataSource();
     }
 
 
@@ -212,20 +277,37 @@ public class DatabaseModule implements Module {
      *
      * @return The <code>DataSource</code>
      */
-    public DataSource getDataSourceAndActivateTransactionIfNeeded() {
-        if (dataSource == null) {
-            dataSource = createDataSource();
+    public UnitilsDataSource getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded() {
+        if (defaultUnitilsDataSource == null) {
+            initUnitilsDataSources();
             activateTransactionIfNeeded();
         }
-        return dataSource;
+        return defaultUnitilsDataSource;
     }
-    
-    
-    public DataSource getDataSource() {
-        if (dataSource == null) {
-            dataSource = createDataSource();
+
+
+    /**
+     * @return the default unitils datasource
+     */
+    public UnitilsDataSource getDefaultUnitilsDataSource() {
+        if (defaultUnitilsDataSource == null) {
+            initUnitilsDataSources();
         }
-        return dataSource;
+        return defaultUnitilsDataSource;
+    }
+
+
+    /**
+     * Initializes all unitils datasources
+     */
+    protected void initUnitilsDataSources() {
+        UnitilsDataSourceFactory unitilsDataSourceFactory = new UnitilsDataSourceFactory(configuration);
+        defaultUnitilsDataSource = unitilsDataSourceFactory.getDefaultUnitilsDataSource();
+        nameUnitilsDataSourceMap = unitilsDataSourceFactory.getNameUnitilsDataSourceMap();
+        // Call the database maintainer if enabled
+        if (updateDatabaseEnabled) {
+            updateDatabase();
+        }
     }
 
 
@@ -237,7 +319,7 @@ public class DatabaseModule implements Module {
 
 
     public boolean isDataSourceLoaded() {
-        return dataSource != null;
+        return defaultUnitilsDataSource != null;
     }
 
 
@@ -274,24 +356,21 @@ public class DatabaseModule implements Module {
 
     /**
      * Determines whether the test database is outdated and, if this is the case, updates the database with the
-     * latest changes. See {@link DBMaintainer} for more information.
+     * latest changes.
      */
     public void updateDatabase() {
-        updateDatabase(getDefaultSqlHandler());
+        logger.info("Checking if database has to be updated.");
+        boolean updated = databaseUpdater.updateDatabase();
+        if (updated) {
+            performDatabasePostProcessing();
+        }
     }
 
-
-    /**
-     * Determines whether the test database is outdated and, if that is the case, updates the database with the
-     * latest changes.
-     *
-     * @param sqlHandler SQLHandler that needs to be used for the database updates
-     * @see {@link DBMaintainer}
-     */
-    public void updateDatabase(SQLHandler sqlHandler) {
-        logger.info("Checking if database has to be updated.");
-        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
-        dbMaintainer.updateDatabase();
+    
+    protected void performDatabasePostProcessing() {
+        for (DatabasePostProcessor databasePostProcessor : databasePostProcessors) {
+            databasePostProcessor.postProcessDatabase();
+        }
     }
 
 
@@ -301,22 +380,8 @@ public class DatabaseModule implements Module {
      * the database version is not yet set to the current one. This method can also be useful for example for
      * reinitializing the database after having reorganized the scripts folder.
      */
-    public void resetDatabaseState() {
-        resetDatabaseState(getDefaultSqlHandler());
-    }
-
-
-    /**
-     * Updates the database version to the current version, without issuing any other updates to the database.
-     * This method can be used for example after you've manually brought the database to the latest version, but
-     * the database version is not yet set to the current one. This method can also be useful for example for
-     * reinitializing the database after having reorganized the scripts folder.
-     *
-     * @param sqlHandler The {@link DefaultSQLHandler} to which all commands are issued
-     */
-    public void resetDatabaseState(SQLHandler sqlHandler) {
-        DBMaintainer dbMaintainer = new DBMaintainer(configuration, sqlHandler);
-        dbMaintainer.resetDatabaseState();
+    public void markDatabaseAsUpToDate() {
+        getDbMaintainFacade().markDatabaseAsUpToDate();
     }
 
 
@@ -334,25 +399,6 @@ public class DatabaseModule implements Module {
             return;
         }
         setFieldAndSetterValue(testObject, fields, methods, getTransactionalDataSourceAndActivateTransactionIfNeeded(testObject));
-    }
-
-
-    /**
-     * Creates a datasource by using the factory that is defined by the dataSourceFactory.className property
-     *
-     * @return the datasource
-     */
-    protected DataSource createDataSource() {
-        // Get the factory for the data source and create it
-        DataSourceFactory dataSourceFactory = ConfigUtils.getConfiguredInstanceOf(DataSourceFactory.class, configuration);
-        dataSourceFactory.init(configuration);
-        DataSource dataSource = dataSourceFactory.createDataSource();
-
-        // Call the database maintainer if enabled
-        if (updateDatabaseSchemaEnabled) {
-            updateDatabase(new DefaultSQLHandler(dataSource));
-        }
-        return dataSource;
     }
 
 
@@ -447,16 +493,16 @@ public class DatabaseModule implements Module {
     /**
      * Clears all configured schema's. I.e. drops all tables, views and other database objects.
      */
-    public void clearSchemas() {
-        getConfiguredDatabaseTaskInstance(DBClearer.class).clearSchemas();
+    public void clearDatabase() {
+        getDbMaintainFacade().clearDatabase();
     }
 
 
     /**
      * Cleans all configured schema's. I.e. removes all data from its database tables.
      */
-    public void cleanSchemas() {
-        getConfiguredDatabaseTaskInstance(DBCleaner.class).cleanSchemas();
+    public void cleanDatabase() {
+        getDbMaintainFacade().cleanDatabase();
     }
 
 
@@ -464,7 +510,7 @@ public class DatabaseModule implements Module {
      * Disables all foreigh key and not-null constraints on the configured schema's.
      */
     public void disableConstraints() {
-        getConfiguredDatabaseTaskInstance(ConstraintsDisabler.class).disableConstraints();
+        getDbMaintainFacade().disableConstraints();
     }
 
 
@@ -473,7 +519,16 @@ public class DatabaseModule implements Module {
      * to this treshold
      */
     public void updateSequences() {
-        getConfiguredDatabaseTaskInstance(SequenceUpdater.class).updateSequences();
+        getDbMaintainFacade().updateSequences();
+    }
+
+
+    public DbMaintainFacade getDbMaintainFacade() {
+        if (dbMaintainFacade == null) {
+            dbMaintainFacade = ReflectionUtils.createInstanceOfType("org.unitils.database.databaseupdater.dbmaintain.DefaultDbMaintainFacade", false);
+            dbMaintainFacade.init(configuration);
+        }
+        return dbMaintainFacade;
     }
 
 
@@ -482,17 +537,7 @@ public class DatabaseModule implements Module {
      * describes the structure of the database.
      */
     public void generateDatasetDefinition() {
-        getConfiguredDatabaseTaskInstance(DataSetStructureGenerator.class).generateDataSetStructure();
-    }
-
-
-    /**
-     * @return A configured instance of {@link DatabaseAccessing} of the given type
-     *
-     * @param databaseTaskType The type of database task, not null
-     */
-    protected <T extends DatabaseAccessing> T getConfiguredDatabaseTaskInstance(Class<T> databaseTaskType) {
-        return DatabaseModuleConfigUtils.getConfiguredDatabaseTaskInstance(databaseTaskType, configuration, getDefaultSqlHandler());
+        ConfigUtils.getConfiguredInstanceOf(DataSetStructureGenerator.class, configuration).generateDataSetStructure();
     }
 
 
@@ -501,7 +546,7 @@ public class DatabaseModule implements Module {
      *         test database
      */
     protected SQLHandler getDefaultSqlHandler() {
-        return new DefaultSQLHandler(getDataSourceAndActivateTransactionIfNeeded());
+        return new DefaultSQLHandler(getDefaultUnitilsDataSourceAndActivateTransactionIfNeeded().getDataSource());
     }
 
 
